@@ -3,6 +3,10 @@
 
 \usepackage{epsfig}
 
+% The parser can't tell what mode this command is going to be used
+% in.
+\newcommand{\boldstuff}[1]{{\bf #1}}
+
 \begin{document}
 
 This is a test {\sf document} that uses {\bf deprecated} code.
