@@ -33,8 +33,8 @@
     <resources>
         <res id="LicencePanel.licence" src="doc/LICENSE"/>
         <res id="InfoPanel.info" src="doc/README"/>
-        <res id="shortcutSpec.xml" src="shortcutSpec.xml"/>
-        <res id="Unix_shortcutSpec.xml" src="unix_shortcutSpec.xml"/>
+        <res id="shortcutSpec.xml" src="installer/shortcutSpec.xml"/>
+        <res id="Unix_shortcutSpec.xml" src="installer/unix_shortcutSpec.xml"/>
     </resources>
 
     <panels>
