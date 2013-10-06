@@ -16,7 +16,6 @@ app     : lib lib/texparserlib.jar lib/texparserapp.jar \
 
 dist    : source ../dist/texparser-installer.jar
 	cp doc/texparser.pdf ../dist
-	cp texparser-src.zip ../dist
 
 ../dist/texparser-installer.jar        : app installer/install.xml
 	$(IZPACKDIR)/bin/compile installer/install.xml -b . \
@@ -84,8 +83,13 @@ lib/texparser-splash.png  :
 	cd lib; ln -s ../images/texparser-splash.png
 
 source	:
-	svn export --force file:///media/Repository//programming/java/texparser texparser-src
-	zip -r texparser-src.zip texparser-src
+	cd ..; git archive -o texparser-src.zip HEAD; \
+	mkdir -p texparser-src; \
+	unzip -d texparser-src texparser-src.zip; \
+	rm texparser-src.zip; \
+	find texparser-src -name .gitignore -exec rm {} \; ;\
+	zip -r texparser-src.zip texparser-src; \
+	rm -r texparser-src; mv texparser-src.zip dist
 
 
 clean   :
