@@ -1,0 +1,93 @@
+This code is highly experimental and still under construction. It
+comes with no guarantees, no warranties and is not future-proof.
+
+PURPOSE
+=======
+
+My Java application MakeJmlrBookGUI needs to parse LaTeX files so
+that it can fix common problems. This mainly involves replacing
+obsolete/problematic code and removing ".eps" from include graphics, 
+so that the book correctly compiles with pdflatex and my jmlrbook class.
+Since TeX4HT no longer works with my jmlrbook class, I started to
+extend the TeX parsing code so that it could convert the article
+abstracts to HTML without requiring TeX4HT.
+
+Since I have another Java application that also needs to parse LaTeX
+files (datatooltk), I decided to split away the TeX parsing code
+into a separate library, namely texparserlib.jar. At the moment,
+texparserapp.jar is just provided to test the texparserlib.jar code,
+but I may develop it into an application for replacing obsolete
+LaTeX code. texparserapp currently only works in batch mode.
+
+Syntax:
+
+texparserapp --in <tex file> --output <out dir>
+
+This parses <tex file> and saves the new file in <out dir> and
+copies over any included images. It will run epstopdf on any eps
+files and wmf2eps on any wps files. Both epstopdf and wmf2eps must
+be on your system path.
+
+The output directory <out dir> must not exist. This is a
+precautionary measure to ensure you don't accidentally overwrite the
+original files.
+
+
+TEST FILES
+==========
+
+
+Test files are in src/tests/
+
+EXAMPLES
+========
+
+Example 1:
+_________
+
+The test file src/tests/test-obsolete/test-obs.tex contains obsolete
+commands such as \bf, \centerline and \epsfig.
+
+cd src/tests
+texparserapp --in test-obsolete/test-obs.tex --output output/test-obsolete
+
+This will create the directory output/test-obsolete and create a
+file in it called test-obs.tex which is the original file with the
+obsolete commands replaced. The eps file is also copied over to the
+new directory and epstopdf is used to create a corresponding pdf
+file. The \epsfig command is converted to \includegraphics with the
+file extension removed.
+
+Font changing commands, such as \bf, are changed to the
+corresponding LaTeX2e font declarations (such as \bfseries) in text mode
+and the corresponding LaTeX2e math font commands (such as \mathbf)
+in math mode. The commands are unchanged if they occur in the
+argument of \verb. (I haven't implemented a check for
+\begin{verbatim} yet. I also need to check for instances of \bf etc
+in the argument of command definitions, such as \newcommand, and
+leave them unchanged, as there's often no way of knowing if the
+command is to be used in text or math mode.)
+
+Example 2:
+_________
+
+The test file src/tests/test-sw/test-sw.tex simulates output from
+Scientific Word. (I don't have SW so I can't test this. The code is
+based on the type of code I've had to work with as a production
+editor.) In general I don't want commands such as \bigskip in the
+articles, as the inter-paragraph spacing should be dependent on the 
+book style. Also, I don't have tcilatex.tex used by SW, so
+texparserapp removes \input{tcilatex} and substitutes \FRAME and
+\Qcb. I don't know what other commands tcilatex defines. Those two
+are the only ones I've encountered so far. texparserapp also
+replaces \special{language "Scientific Word";...;tempfilename
+'imgname.wmf'} with \includegraphics{imgname} and runs wmf2eps on
+the wmf image.
+
+cd src/tests
+texparserap --in test-sw/test-sw.tex --output output/test-sw
+
+This creates the directory output/test-sw and writes a copy of
+test-sw.tex with the relevant substitutions. The image file
+X0001.wmf is converted to eps and the eps file is then converted to
+pdf.

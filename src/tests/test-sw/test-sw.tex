@@ -1,0 +1,47 @@
+% This is a test document attempting to emulate the type of code
+% produced by Scientific Word
+\documentclass[twoside,11pt]{article}
+
+\input{tcilatex}
+
+\begin{document}
+
+\section{Sample Document}
+
+\bigskip
+
+This is a sample document that attempts to emulate the type of
+output produced by Scientific Word.
+
+\bigskip
+
+\textbf{Example 1.} \ Here's a reference to Figure 1.
+
+\FRAME{xxx}{2.5in}{1.5in}{0pt}{\Qcb{Fig. 1.
+A Sample Figure}}{%
+}{Figure}{\special{language "Scientific Word";type
+"GRAPHIC";maintain-aspect-ratio TRUE;display "USEDEF";valid_file
+"T";width
+2.5in;height 1.5in;depth 0pt;original-width
+4.5in;original-height
+2.6in;cropleft "0";croptop "1";cropright "1";cropbottom
+"0";tempfilename
+'X0001.wmf';tempfile-properties "XPR";}}
+
+Here's some maths $x_1,...,x_n$ with a citation Smith (2005). \ A
+spurious space was inserted before the start of this sentence.
+
+\bigskip
+
+\noindent \textbf{Theory 2.}
+
+\noindent Some more sample text. \ Another unwanted space.
+
+\nocite{Smith2005}
+
+\bigskip
+
+\bibliographystyle{plain}
+\bibliography{sample}
+
+\end{document}

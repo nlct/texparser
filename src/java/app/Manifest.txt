@@ -1,0 +1,2 @@
+Main-Class: com/dickimawbooks/texparserapp/TeXParserApp
+Class-Path: . javahelp2.jar jlfgr-1_0.jar texparserlib.jar

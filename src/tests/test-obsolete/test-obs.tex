@@ -1,0 +1,37 @@
+% This is a test file
+\documentclass[12pt,a4paper]{article}
+
+\usepackage{epsfig}
+
+\begin{document}
+
+This is a test {\sf document} that uses {\bf deprecated} code.
+Figure~\ref{fig:sample} shows a sample {\it image}.
+  Verbatim text like \verb|\bf| or \verb|\sf| shouldn't be
+modified. Some maths: $\bf x$, \begin{math}\cal X\end{math},
+\(\tt y\).
+\[
+  {\bf x}; {\cal Y}; {\tt z}
+\]
+
+   \centerline{X}
+
+\begin{figure}
+\centerline{\epsfig{file=sampleimg.eps}}
+\caption{A Sample Image}
+\label{fig:sample}
+\end{figure}
+
+$$y = \sum_{i=1}^n \xi_i$$
+
+$${\bf x}; {\cal Y} {\it z}$$
+
+\begin{displaymath}
+{\bf x}; {\cal Y} {\it z}
+\end{displaymath}
+
+\begin{equation}
+{\bf x}; {\cal Y} {\it z}
+\end{equation}
+
+\end{document}
