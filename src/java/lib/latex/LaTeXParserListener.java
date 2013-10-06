@@ -72,6 +72,9 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       putControlSequence("end", new End());
       putControlSequence("documentclass", new DocumentClass());
       putControlSequence("usepackage", new UsePackage());
+      putControlSequence("newcommand", new NewCommand());
+      putControlSequence("renewcommand", new NewCommand("renewcommand"));
+      putControlSequence("providecommand", new NewCommand("providecommand"));
 
       putControlSequence("input", new Input());
       putControlSequence("InputIfFileExists", new InputIfFileExists());
@@ -112,6 +115,14 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       super.addPredefined();
 
       putControlSequence("documentstyle", new DocumentStyle());
+   }
+
+   public void newcommand(TeXParser parser, String type, String csName, boolean isShort,
+     int numParams, TeXObject defValue, TeXObject definition)
+   throws IOException
+   {
+      putControlSequence(csName,
+        new LaTeXCommand(csName, isShort, numParams, defValue, definition));
    }
 
    private void addFontWeightDeclaration(String declName, String textblockName,

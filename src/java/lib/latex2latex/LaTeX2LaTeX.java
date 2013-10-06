@@ -688,6 +688,38 @@ public class LaTeX2LaTeX extends LaTeXParserListener
       write(delim);
    }
 
+   public void newcommand(TeXParser parser, String type,
+     String csName, boolean isShort,
+     int numParams, TeXObject defValue, TeXObject definition)
+    throws IOException
+   {
+      
+      char bg = parser.getBgChar();
+      char eg = parser.getEgChar();
+      char esc = parser.getEscChar();
+
+      write(""+esc+type);
+
+      if (isShort)
+      {
+         write("*");
+      }
+
+      write(""+bg+esc+csName+eg);
+
+      if (numParams > 0)
+      {
+         write("["+numParams+"]");
+
+         if (defValue != null)
+         {
+            write("["+defValue.toString(parser)+"]");
+         }
+      }
+
+      write(""+bg+definition.toString(parser)+eg);
+   }
+
    private File inFile;
 
    private Path outPath, basePath;
@@ -703,7 +735,8 @@ public class LaTeX2LaTeX extends LaTeXParserListener
       "rm", "tt", "sf", "bf", "it", "sl", "sc", "cal",
       "includegraphics", "usepackage", "graphicspath",
       "documentclass", "documentstyle", "begin", "end",
-      "FRAME", "Qcb", "verb", "[", "(", "input"
+      "FRAME", "Qcb", "verb", "[", "(", "input",
+      "newcommand", "renewcommand", "providecommand"
    };
 
    public static final String[] SKIP_CMDS = new String[]

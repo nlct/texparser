@@ -618,6 +618,12 @@ public class TeXParserApp implements TeXApp
          case TeXSyntaxException.ERROR_UNDEFINED:
            message = getLabelWithValue("error.undefined", e.getParam());
          break;
+         case TeXSyntaxException.ERROR_CS_EXPECTED:
+           message = getLabelWithValue("error.cs_expected", e.getParam());
+         break;
+         case TeXSyntaxException.ERROR_NUMBER_EXPECTED:
+           message = getLabelWithValue("error.number_expected", e.getParam());
+         break;
          default:
            message = e.getMessage();
       }
