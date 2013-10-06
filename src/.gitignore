@@ -1,5 +1,5 @@
 classes
-lib
+*.jar
 texparser-src
 texparser-src.zip
-.*.swp
+*.swp

@@ -336,11 +336,26 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
    {
       if (path.toString().endsWith("tcilatex.tex"))
       {
+         usepackage(parser, null, "amsmath");
          addSpecialListener(new SWSpecialListener());
-      }
 
-      putControlSequence("FRAME", new SWFrame());
-      putControlSequence("Qcb", new Qcb());
+         putControlSequence("FRAME", new SWFrame());
+         putControlSequence("Qcb", new Qcb());
+         putControlSequence("BF", new BF());
+         putControlSequence("NEG", new NEG());
+         putControlSequence("QATOP", new QATOP());
+         putControlSequence("QTATOP", new QTATOP());
+         putControlSequence("QDATOP", new QDATOP());
+         putControlSequence("QABOVE", new QABOVE());
+         putControlSequence("QTABOVE", new QTABOVE());
+         putControlSequence("QDABOVE", new QDABOVE());
+         putControlSequence("QOVERD", new QOVERD());
+         putControlSequence("QTOVERD", new QTOVERD());
+         putControlSequence("QDOVERD", new QDOVERD());
+         putControlSequence("QATOPD", new QATOPD());
+         putControlSequence("QTATOPD", new QTATOPD());
+         putControlSequence("QDATOPD", new QDATOPD());
+      }
    }
 
    private Hashtable<String,Environment> envTable;

@@ -379,6 +379,7 @@ public class LaTeX2LaTeX extends LaTeXParserListener
          // Hopefully this will be in the preamble!
 
          usepackage(parser, null, "graphicx");
+         usepackage(parser, null, "amsmath");
       }
    }
 
