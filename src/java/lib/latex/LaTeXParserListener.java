@@ -57,6 +57,11 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       return displayMathEnv.contains(name);
    }
 
+   public void addEnvironment(String name, Environment env)
+   {
+      envTable.put(name, env);
+   }
+
    protected void addPredefined()
    {
       loadedPackages = new Vector<String>();
@@ -67,6 +72,9 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       addInlineMathEnv("math");
       addDisplayMathEnv("displaymath");
       addDisplayMathEnv("equation");
+
+      addEnvironment("verbatim", new Verbatim());
+      addEnvironment("verbatim*", new Verbatim("verbatim*"));
 
       putControlSequence("begin", new Begin());
       putControlSequence("end", new End());
@@ -212,6 +220,12 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
    public FontFamilyDeclaration getFontFamilyDeclaration(String name, int family)
    {
       return new FontFamilyDeclaration(name, family);
+   }
+
+   public boolean isVerbatimEnv(String name)
+   {
+      return name.equals("verbatim") || name.equals("verbatim*")
+        || name.equals("lstlisting");
    }
 
    public Environment createEnvironment(String name)

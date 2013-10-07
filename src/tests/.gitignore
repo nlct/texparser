@@ -1,1 +1,7 @@
 output
+*.aux
+*.bbl
+*.log
+*.out
+*.blg
+test*.pdf

@@ -4,6 +4,8 @@
 \jmlryear{2013}
 \jmlrvolume{10}
 
+\newcommand*{\boldstuff}[1]{\textbf{#1}}
+
 \author{\Name{Ann
 Other}\Email{sample@nowhere.com}\\\addr{University of Nowhere}}
 
@@ -18,7 +20,8 @@ Other}\Email{sample@nowhere.com}\\\addr{University of Nowhere}}
 \begin{abstract}
 This is an example paper. The abstract has a formula
 $\boldsymbol{\xi} = \surd2 \sum_{i=1}^n \mathbf{x}$
-and a citation \citep{smith2005}.
+and a citation \citep{smith2005}. It also has a custom
+\boldstuff{command} defined by the author.
 \end{abstract}
 \begin{keywords}
 test;sample
@@ -26,7 +29,10 @@ test;sample
 
 \section{Introduction}
 
-Here's some dummy text.
+Here's some dummy text with a reference to section~\ref{sec:sample}.
+
+\section{Sample Section}
+\label{sec:sample}
 
 \bibliography{sample}
 \end{document}
