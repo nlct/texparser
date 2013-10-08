@@ -222,12 +222,6 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       return new FontFamilyDeclaration(name, family);
    }
 
-   public boolean isVerbatimEnv(String name)
-   {
-      return name.equals("verbatim") || name.equals("verbatim*")
-        || name.equals("lstlisting");
-   }
-
    public Environment createEnvironment(String name)
    {
       Environment env = envTable.get(name);

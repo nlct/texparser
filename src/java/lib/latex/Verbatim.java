@@ -89,9 +89,53 @@ public class Verbatim extends Environment
    public void popGroup(TeXParser parser)
      throws IOException
    {
-// This doesn't allow for spaces after \end
-      parser.readTo(""+parser.getEscChar()+"end"
-        +parser.getBgChar()+getName()+parser.getEgChar(), this);
+      while (true)
+      {
+         TeXObject object = parser.pop();
+
+         if ((object instanceof ControlSequence)
+          && ((ControlSequence)object).getName().equals("end"))
+         {
+            TeXObjectList list = new TeXObjectList();
+
+            TeXObject arg = parser.pop();
+
+            while (arg instanceof WhiteSpace)
+            {
+               list.add(arg);
+               arg = parser.pop();
+            }
+
+            String envName;
+
+            if (arg instanceof Group)
+            {
+               envName = ((Group)arg).toList().toString(parser);
+            }
+            else
+            {
+               envName = arg.toString(parser);
+            }
+
+            if (envName.equals(getName()))
+            {
+               // Found end of this environment
+
+               break;
+            }
+
+            // Found end of something else (still part of verbatim)
+
+            add(object);
+            addAll(list);
+            add(arg);
+         }
+         else
+         {
+            add(object);
+         }
+      }
+
    }
 
    public void process(TeXParser parser)

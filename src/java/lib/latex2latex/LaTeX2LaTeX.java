@@ -60,6 +60,12 @@ public class LaTeX2LaTeX extends LaTeXParserListener
       putControlSequence("[", new L2LDisplayMathCs());
    }
 
+   public boolean isVerbatim(String name)
+   {
+      return name.equals("verbatim") || name.equals("verbatim*")
+       || name.equals("lstlisting");
+   }
+
    public Environment createEnvironment(String name)
    {
       if (isInlineMathEnv(name))
@@ -70,6 +76,11 @@ public class LaTeX2LaTeX extends LaTeXParserListener
       if (isDisplayMathEnv(name))
       {
          return new L2LEnvironment(name, TeXSettings.MODE_DISPLAY_MATH);
+      }
+
+      if (isVerbatim(name))
+      {
+         return new L2LVerbatim(name);
       }
 
       return new L2LEnvironment(name);
