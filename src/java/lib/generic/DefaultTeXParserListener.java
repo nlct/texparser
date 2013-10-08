@@ -177,6 +177,11 @@ public abstract class DefaultTeXParserListener implements TeXParserListener
       return new SkippedEols();
    }
 
+   public BinarySymbol createBinarySymbol(String name, int code)
+   {
+      return new BinarySymbol(name, code);
+   }
+
    public BigOperator createBigOperator(String name, int code)
    {
       return new BigOperator(name, code);
