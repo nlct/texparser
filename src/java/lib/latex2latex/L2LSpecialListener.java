@@ -23,7 +23,7 @@ import java.io.IOException;
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.generic.*;
 
-public class L2HSpecialListener implements SpecialListener
+public class L2LSpecialListener implements SpecialListener
 {
    public boolean process(TeXParser parser, String param)
      throws IOException

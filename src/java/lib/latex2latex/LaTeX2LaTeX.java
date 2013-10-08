@@ -48,7 +48,7 @@ public class LaTeX2LaTeX extends LaTeXParserListener
 
       setWriteable(this);
 
-      specialListener = new L2HSpecialListener();
+      specialListener = new L2LSpecialListener();
 
    }
 
