@@ -256,6 +256,7 @@ public class TeXSettings
          case FAMILY_SF:
          case FAMILY_TT:
            currentFontFamily = setting;
+         break;
          default:
            throw new IllegalArgumentException("Invalid setting '"
             + setting+"' for TeXSettings.setFontFamily(int)");
@@ -273,6 +274,7 @@ public class TeXSettings
          case SHAPE_EM:
          case SHAPE_SC:
            currentFontShape = setting;
+         break;
          default:
            throw new IllegalArgumentException("Invalid setting '"
             + setting+"' for TeXSettings.setFontShape(int)");
@@ -287,6 +289,7 @@ public class TeXSettings
          case WEIGHT_MD:
          case WEIGHT_BF:
            currentFontWeight = setting;
+         break;
          default:
            throw new IllegalArgumentException("Invalid setting '"
             + setting+"' for TeXSettings.setFontWeight(int)");
@@ -310,6 +313,7 @@ public class TeXSettings
          case SIZE_SCRIPT:
          case SIZE_TINY:
            currentFontSize = setting;
+         break;
          default:
            throw new IllegalArgumentException("Invalid setting '"
             + setting+"' for TeXSettings.setFontSize(int)");
@@ -332,6 +336,7 @@ public class TeXSettings
          case MATH_STYLE_BOLDSYMBOL:
          case MATH_STYLE_PMB:
            currentMathFont = setting;
+         break;
          default:
            throw new IllegalArgumentException("Invalid setting '"
             + setting+"' for TeXSettings.setMathFont(int)");
@@ -348,6 +353,7 @@ public class TeXSettings
          case PAR_ALIGN_RIGHT:
          case PAR_ALIGN_CENTER:
            currentParAlign = setting;
+         break;
          default:
            throw new IllegalArgumentException("Invalid setting '"
             + setting+"' for TeXSettings.setParAlign(int)");
