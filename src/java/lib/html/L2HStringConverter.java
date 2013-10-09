@@ -46,41 +46,155 @@ public class L2HStringConverter extends LaTeXParserListener
     throws IOException
    {
       L2HStringConverter listener = new L2HStringConverter(app);
-      TeXParser parser = new TeXParser(listener);
+      listener.parser = new TeXParser(listener);
 
       if (atIsLetter)
       {
-         parser.setCatCode('@', TeXParser.TYPE_LETTER);
+         listener.parser.setCatCode('@', TeXParser.TYPE_LETTER);
       }
 
       StringReader reader = new StringReader(str);
-      parser.parse(reader);
+      listener.parser.parse(reader);
 
       return listener.writer.toString();
+   }
+
+   public String getStyle()
+   {
+      String style = "";
+
+      if (parser != null)
+      {
+         TeXSettings settings = parser.getSettings();
+
+         switch (settings.getCurrentFontFamily())
+         {
+            case TeXSettings.FAMILY_RM:
+               style = "font-family: serif; ";
+               break;
+            case TeXSettings.FAMILY_SF:
+               style = "font-family: sans-serif; ";
+               break;
+            case TeXSettings.FAMILY_TT:
+               style = "font-family: monospace; ";
+               break;
+         }
+
+         switch (settings.getCurrentFontShape())
+         {
+            case TeXSettings.SHAPE_UP:
+               style += "font-style: normal; font-variant: normal; ";
+               break;
+            case TeXSettings.SHAPE_IT:
+               style += "font-style: italic; font-variant: normal; ";
+               break;
+            case TeXSettings.SHAPE_SL:
+               style += "font-style: oblique; font-variant: normal; ";
+               break;
+            case TeXSettings.SHAPE_EM:
+               TeXSettings parent = settings.getParent();
+
+               if (parent != null)
+               {
+                  int parentStyle = parent.getFontShape();
+
+                  if (parentStyle == TeXSettings.SHAPE_UP
+                    ||parentStyle == TeXSettings.INHERIT)
+                  {
+                     if (settings.getFontFamily() == TeXSettings.FAMILY_SF)
+                     {
+                        style += "font-style: oblique; ";
+                     }
+                     else
+                     {
+                        style += "font-style: italic; ";
+                     }
+                  }
+                  else
+                  {
+                     style += "font-style: normal; ";
+                  }
+               }
+               else
+               {
+                  if (settings.getFontFamily() == TeXSettings.FAMILY_SF)
+                  {
+                     style += "font-style: oblique; ";
+                  }
+                  else
+                  {
+                     style += "font-style: italic; ";
+                  }
+               }
+
+               style += "font-variant: normal; ";
+
+               break;
+            case TeXSettings.SHAPE_SC:
+               style += "font-style: normal; font-variant: small-caps; ";
+               break;
+         }
+
+         switch (settings.getCurrentFontWeight())
+         {
+            case TeXSettings.WEIGHT_MD:
+               style += "font-weight: normal; ";
+               break;
+            case TeXSettings.WEIGHT_BF:
+               style += "font-weight: bold; ";
+               break;
+         }
+      }
+
+      return style;
    }
 
    public void writeCodePoint(int codePoint)
      throws IOException
    {
+      String style = getStyle();
+
+      if (!style.isEmpty())
+      {
+         writer.write("<span style=\""+style+"\">");
+      }
+
       writer.write(codePoint);
+
+      if (!style.isEmpty())
+      {
+         writer.write("</span>");
+      }
    }
 
    public void write(String str)
      throws IOException
    {
+      String style = getStyle();
+
+      if (!style.isEmpty())
+      {
+         writer.write("<span style=\""+style+"\">");
+      }
+
       writer.write(str);
+
+      if (!style.isEmpty())
+      {
+         writer.write("</span>");
+      }
    }
 
    public void write(char c)
      throws IOException
    {
-      writer.write(""+c);
+      write(""+c);
    }
 
    public void writeln(String str)
      throws IOException
    {
-      writer.write(str+"<br>");
+      write(str+"<br>");
    }
 
    public void href(TeXParser parser, String url, TeXObject text)
@@ -193,4 +307,6 @@ public class L2HStringConverter extends LaTeXParserListener
    private StringWriter writer;
 
    private TeXApp texApp;
+
+   private TeXParser parser;
 }
