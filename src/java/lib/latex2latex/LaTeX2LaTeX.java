@@ -680,6 +680,17 @@ public class LaTeX2LaTeX extends LaTeXParserListener
       }
    }
 
+   public void href(TeXParser parser, String url, TeXObject text)
+    throws IOException
+   {
+      String bg = ""+parser.getBgChar();
+      String eg = ""+parser.getEgChar();
+
+      write(parser.getEscChar()+"href");
+      write(bg+url+eg);
+      write(bg+text.toString(parser)+eg);
+   }
+
    public void verb(TeXParser parser, boolean isStar, 
      char delim, String text)
      throws IOException

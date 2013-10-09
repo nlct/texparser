@@ -114,6 +114,9 @@ public interface TeXParserListener
 
    public void addFileReference(TeXPath texPath);
 
+   public void href(TeXParser parser, String url, TeXObject text)
+     throws IOException;
+
    public Writeable getWriteable();
 
    public TeXApp getTeXApp();

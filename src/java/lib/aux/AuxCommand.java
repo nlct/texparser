@@ -62,7 +62,7 @@ public class AuxCommand extends ControlSequence
    {
       AuxParser auxParser = (AuxParser)parser.getListener();
 
-      TeXObject[] args = new TeXObjectList[numArgs];
+      TeXObject[] args = new TeXObject[numArgs];
 
       for (int i = 0; i < numArgs; i++)
       {
@@ -77,7 +77,7 @@ public class AuxCommand extends ControlSequence
    {
       AuxParser auxParser = (AuxParser)parser.getListener();
 
-      TeXObject[] args = new TeXObjectList[numArgs];
+      TeXObject[] args = new TeXObject[numArgs];
 
       for (int i = 0; i < numArgs; i++)
       {

@@ -93,6 +93,10 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       putControlSequence("verb", new Verb());
       putControlSequence("(", new MathCs());
       putControlSequence("[", new DisplayMathCs());
+      putControlSequence("nolinkurl", new NoLinkUrl());
+      putControlSequence("\\", new Cr("\\"));
+      putControlSequence("cr", new Cr("cr"));
+      putControlSequence("href", new Href());
 
       // Font declarations
       addFontWeightDeclaration("mdseries", "textmd", TeXSettings.WEIGHT_MD);

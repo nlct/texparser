@@ -53,12 +53,15 @@ public class AuxParser extends DefaultTeXParserListener
       return texApp;
    }
 
-   public void parseAuxFile(File auxFile)
+   public TeXParser parseAuxFile(File auxFile)
      throws IOException
    {
       TeXParser parser = new TeXParser(this);
 
+      parser.setCatCode('@', TeXParser.TYPE_LETTER);
       parser.parse(auxFile);
+
+      return parser;
    }
 
    protected void addPredefined()
@@ -140,6 +143,11 @@ public class AuxParser extends DefaultTeXParserListener
    {
    }
 
+   public void href(TeXParser parser, String url, TeXObject text)
+      throws IOException
+   {
+   }
+
    public void subscript(TeXParser parser, TeXObject arg)
      throws IOException
    {
@@ -153,13 +161,11 @@ public class AuxParser extends DefaultTeXParserListener
    public void endParse(TeXParser parser, File file)
       throws IOException
    {
-      parser.setCatCode('@', TeXParser.TYPE_OTHER);
    }
 
    public void beginParse(TeXParser parser, File file)
       throws IOException
    {
-      parser.setCatCode('@', TeXParser.TYPE_LETTER);
    }
 
    public void addAuxData(AuxData data)
@@ -180,6 +186,11 @@ public class AuxParser extends DefaultTeXParserListener
       }
 
       return list;
+   }
+
+   public Vector<AuxData> getAuxData()
+   {
+      return auxData;
    }
 
    private Vector<AuxData> auxData;

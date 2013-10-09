@@ -62,6 +62,24 @@ public class AuxData
       return args[idx];
    }
 
+   public String toString(TeXParser parser)
+   {
+      StringBuilder builder = new StringBuilder();
+
+      String esc = ""+parser.getEscChar();
+      String bg = ""+parser.getBgChar();
+      String eg = ""+parser.getEgChar();
+
+      builder.append(esc+name);
+
+      for (int i = 0; i < args.length; i++)
+      {
+         builder.append(bg+args[i].toString(parser)+eg);
+      }
+
+      return builder.toString();
+   }
+
    private String name;
 
    private TeXObject[] args;
