@@ -124,8 +124,9 @@ public class TeXPath
                }
             }
          }
-         catch (InterruptedException e)
+         catch (Exception e)
          {
+            // Not on TeX path
          }
       }
    }
