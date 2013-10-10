@@ -348,6 +348,11 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       return loadedPackages.contains(name);
    }
 
+   public Vector<String> getLoadedPackages()
+   {
+      return loadedPackages;
+   }
+
    public void input(TeXParser parser, TeXPath path)
      throws IOException
    {
