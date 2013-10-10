@@ -89,7 +89,7 @@ public class Begin extends Command
       }
       else
       {
-         name = expanded.toString();
+         name = expanded.toString(parser);
       }
 
       if (name.equals("document"))
