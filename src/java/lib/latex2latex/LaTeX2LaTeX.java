@@ -380,20 +380,6 @@ public class LaTeX2LaTeX extends LaTeXParserListener
       }
    }
 
-   public void input(TeXParser parser, TeXPath path)
-     throws IOException
-   {
-      super.input(parser, path);
-
-      if (path.toString().endsWith("tcilatex.tex"))
-      {
-         // Hopefully this will be in the preamble!
-
-         usepackage(parser, null, "graphicx");
-         usepackage(parser, null, "amsmath");
-      }
-   }
-
    public void writeCodePoint(int charCode) throws IOException
    {
       if (writer != null)
