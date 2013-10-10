@@ -354,6 +354,7 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       if (path.toString().endsWith("tcilatex.tex"))
       {
          usepackage(parser, null, "amsmath");
+         usepackage(parser, null, "graphicx");
          addSpecialListener(new SWSpecialListener());
 
          putControlSequence("FRAME", new SWFrame());
