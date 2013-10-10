@@ -249,6 +249,11 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
    public abstract void environment(TeXParser parser, Environment env)
      throws IOException;
 
+   public boolean isInDocEnv()
+   {
+      return docEnvFound;
+   }
+
    public void beginDocument(TeXParser parser)
      throws IOException
    {
