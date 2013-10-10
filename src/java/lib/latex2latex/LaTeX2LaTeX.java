@@ -58,6 +58,7 @@ public class LaTeX2LaTeX extends LaTeXParserListener
 
       putControlSequence("(", new L2LMathCs());
       putControlSequence("[", new L2LDisplayMathCs());
+      putControlSequence("bibliography", new L2LBibliography());
    }
 
    public boolean isVerbatim(String name)
@@ -375,6 +376,28 @@ public class LaTeX2LaTeX extends LaTeXParserListener
                 {
                    getTeXApp().error(e);
                 }
+             }
+         }
+      }
+   }
+
+   public void bibliography(TeXParser parser, TeXPath[] bibPaths)
+     throws IOException
+   {
+      for (int i = 0; i < bibPaths.length; i++)
+      {
+         File file = bibPaths[i].getFile();
+
+         if (file.exists())
+         {
+             try
+             {
+                getTeXApp().copyFile(file, 
+                  outPath.resolve(bibPaths[i].getRelative()).toFile());
+             }
+             catch (InterruptedException e)
+             {
+                getTeXApp().error(e);
              }
          }
       }
@@ -745,7 +768,8 @@ public class LaTeX2LaTeX extends LaTeXParserListener
       "includegraphics", "usepackage", "graphicspath",
       "documentclass", "documentstyle", "begin", "end",
       "FRAME", "Qcb", "verb", "[", "(", "input",
-      "newcommand", "renewcommand", "providecommand"
+      "newcommand", "renewcommand", "providecommand",
+      "bibliography"
    };
 
    public static final String[] SKIP_CMDS = new String[]
