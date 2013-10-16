@@ -6,7 +6,7 @@ PURPOSE
 
 My Java application MakeJmlrBookGUI needs to parse LaTeX files so
 that it can fix common problems. This mainly involves replacing
-obsolete/problematic code and removing ".eps" from include graphics, 
+obsolete/problematic code and removing ".eps" from included graphics, 
 so that the book correctly compiles with pdflatex and my jmlrbook class.
 Since TeX4HT no longer works with my jmlrbook class, I started to
 extend the TeX parsing code so that it could convert the article
@@ -62,11 +62,7 @@ Font changing commands, such as \bf, are changed to the
 corresponding LaTeX2e font declarations (such as \bfseries) in text mode
 and the corresponding LaTeX2e math font commands (such as \mathbf)
 in math mode. The commands are unchanged if they occur in the
-argument of \verb. (I haven't implemented a check for
-\begin{verbatim} yet. I also need to check for instances of \bf etc
-in the argument of command definitions, such as \newcommand, and
-leave them unchanged, as there's often no way of knowing if the
-command is to be used in text or math mode.)
+argument of \verb or in a command definition.
 
 Example 2:
 _________

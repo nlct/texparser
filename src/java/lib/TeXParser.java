@@ -169,7 +169,7 @@ public class TeXParser extends TeXObjectList
       return verbatim.contains(csname);
    }
 
-   private boolean parseEOL(StringBuilder macro, int c, TeXObjectList list)
+   private boolean parseEOL(int c, TeXObjectList list)
      throws IOException
    {
       boolean isNotEof = true;
@@ -190,7 +190,7 @@ public class TeXParser extends TeXObjectList
 
             isNotEof = skipNextEols(list);
 
-            parFound(macro, list);
+            parFound(list);
          }
          else if (c == '\r')
          {
@@ -209,7 +209,7 @@ public class TeXParser extends TeXObjectList
 
                isNotEof = skipNextEols(list);
 
-               parFound(macro, list);
+               parFound(list);
             }
             else
             {
@@ -217,7 +217,7 @@ public class TeXParser extends TeXObjectList
 
                reader.reset();
 
-               eolFound(macro, list);
+               eolFound(list);
             }
          }
          else if (isCatCode(TYPE_EOL, (char)c))
@@ -229,7 +229,7 @@ public class TeXParser extends TeXObjectList
 
             isNotEof = skipNextEols(list);
 
-            parFound(macro,  list);
+            parFound(list);
          }
          else
          {
@@ -244,7 +244,7 @@ public class TeXParser extends TeXObjectList
                throw new EOFException();
             }
 
-            eolFound(macro, list);
+            eolFound(list);
          }
       }
       else if (c == '\r')
@@ -263,7 +263,7 @@ public class TeXParser extends TeXObjectList
 
             isNotEof = skipNextEols(list);
 
-            parFound(macro, list);
+            parFound(list);
          }
          else if (c == '\n')
          {
@@ -282,7 +282,7 @@ public class TeXParser extends TeXObjectList
 
                isNotEof = skipNextEols(list);
 
-               parFound(macro, list);
+               parFound(list);
             }
             else
             {
@@ -290,7 +290,7 @@ public class TeXParser extends TeXObjectList
 
                reader.reset();
 
-               eolFound(macro, list);
+               eolFound(list);
             }
          }
          else if (isCatCode(TYPE_EOL, (char)c))
@@ -302,14 +302,14 @@ public class TeXParser extends TeXObjectList
 
             isNotEof = skipNextEols(list);
 
-            parFound(macro, list);
+            parFound(list);
          }
          else
          {
             // not a paragraph break, just one LF
             reader.reset();
 
-            eolFound(macro, list);
+            eolFound(list);
          }
       }
       else // Neither CR nor LF
@@ -331,7 +331,7 @@ public class TeXParser extends TeXObjectList
 
             isNotEof = skipNextEols(list);
 
-            parFound(macro, list);
+            parFound(list);
          }
          else
          {
@@ -339,7 +339,7 @@ public class TeXParser extends TeXObjectList
 
             reader.reset();
 
-            eolFound(macro, list);
+            eolFound(list);
          }
       }
 
@@ -432,38 +432,15 @@ public class TeXParser extends TeXObjectList
       return c != -1;
    }
 
-   private void eolFound(StringBuilder macro, TeXObjectList list)
+   private void eolFound(TeXObjectList list)
      throws IOException
    {
-      if (macro == null || macro.length() == 0)
-      {
-         list.add(listener.getEol());
-      }
-      else if (macro.length() == 1)
-      {
-         list.add(listener.getControlSequence(" "));
-      }
-      else
-      {
-         list.add(listener.getControlSequence(macro.toString()));
-      }
+      list.add(listener.getEol());
    }
 
-   private void parFound(StringBuilder macro, TeXObjectList list)
+   private void parFound(TeXObjectList list)
      throws IOException
    {
-      if (macro == null || macro.length() == 0)
-      {
-      }
-      else if (macro.length() == 1)
-      {
-         list.add(listener.getControlSequence(" "));
-      }
-      else
-      {
-         list.add(listener.getControlSequence(macro.toString()));
-      }
-
       list.add(listener.getPar());
    }
 
@@ -866,13 +843,18 @@ public class TeXParser extends TeXObjectList
    public boolean fetchNext(TeXObjectList list, boolean isShort)
      throws IOException
    {
+      if (reader == null)
+      {
+         return false;
+      }
+
       int c = reader.read();
 
       if (c == -1) return false;
 
       if (isCatCode(TYPE_EOL, (char)c))
       {
-         parseEOL(null, c, list);
+         parseEOL(c, list);
       }
       else if (isCatCode(TYPE_ESC, (char)c))
       {
@@ -902,7 +884,7 @@ public class TeXParser extends TeXObjectList
 
                   list.add(cs);
 
-                  parseEOL(macro, c, list);
+                  parseEOL(c, list);
                }
                else if (macro.length() == 0)
                {
@@ -1074,6 +1056,7 @@ public class TeXParser extends TeXObjectList
             }
             catch (EOFException e)
             {
+               return;
             }
             catch (TeXSyntaxException e)
             {

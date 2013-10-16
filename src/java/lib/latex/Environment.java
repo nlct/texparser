@@ -201,7 +201,6 @@ public class Environment extends Group
             }
          }
       }
-
    }
 
    public void popGroup(TeXParser parser)

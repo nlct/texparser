@@ -588,8 +588,11 @@ public class LaTeX2LaTeX extends LaTeXParserListener
 
    public void par() throws IOException
    {
-      writer.println();
-      writer.println();
+      if (writer != null)
+      {
+         writer.println();
+         writer.println();
+      }
    }
 
    public void skipping(TeXParser parser, Ignoreable ignoreable)
