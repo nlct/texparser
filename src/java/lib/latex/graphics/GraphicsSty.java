@@ -33,6 +33,7 @@ public class GraphicsSty extends LaTeXSty
    public void addDefinitions(LaTeXParserListener listener)
    {
       listener.putControlSequence("includegraphics", new IncludeGraphics());
+      listener.putControlSequence("graphicspath", new GraphicsPath());
       listener.putControlSequence("epsfig", new Epsfig("epsfig"));
       listener.putControlSequence("psfig", new Epsfig("psfig"));
    }

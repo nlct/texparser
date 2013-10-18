@@ -1205,6 +1205,16 @@ public class TeXParser extends TeXObjectList
       return writer;
    }
 
+   public Reader getReader()
+   {
+      return reader;
+   }
+
+   public void setReader(Reader reader)
+   {
+      this.reader = reader;
+   }
+
    public TeXParserListener getListener()
    {
       return listener;

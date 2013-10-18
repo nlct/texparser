@@ -24,6 +24,7 @@ import java.io.File;
 import java.io.PrintWriter;
 import java.util.Hashtable;
 import java.util.Vector;
+import java.util.Iterator;
 import java.nio.file.Path;
 import java.nio.file.Files;
 
@@ -42,14 +43,31 @@ public class LaTeX2LaTeX extends LaTeXParserListener
    public LaTeX2LaTeX(TeXApp texApp, File outDir)
      throws IOException
    {
+      this(texApp, outDir, false);
+   }
+
+   public LaTeX2LaTeX(TeXApp texApp, File outDir, boolean replaceGraphicsPath)
+     throws IOException
+   {
       super(null);
       this.outPath = outDir.toPath();
       this.texApp = texApp;
+      setReplaceGraphicsPath(replaceGraphicsPath);
 
       setWriteable(this);
 
       specialListener = new L2LSpecialListener();
 
+   }
+
+   public void setReplaceGraphicsPath(boolean replaceGraphicsPath)
+   {
+      this.replaceGraphicsPath = replaceGraphicsPath;
+   }
+
+   public boolean isReplaceGraphicsPathEnabled()
+   {
+      return replaceGraphicsPath;
    }
 
    protected void addPredefined()
@@ -281,10 +299,165 @@ public class LaTeX2LaTeX extends LaTeXParserListener
         original, replacement);
    }
 
+   protected void copyImageFile(File file, File destFile)
+    throws IOException,InterruptedException
+   {
+      getTeXApp().copyFile(file, destFile);
+
+      String name = destFile.getName();
+
+      if (name.toLowerCase().endsWith(".wmf"))
+      {
+         File epsFile = new File(destFile.getParentFile(),
+            name.substring(0, name.length()-3)+"eps");
+
+         getTeXApp().wmftoeps(destFile, epsFile);
+
+         destFile = epsFile;
+         name = destFile.getName();
+      }
+
+      if (name.toLowerCase().endsWith(".eps"))
+      {
+         File pdfFile = new File(destFile.getParentFile(),
+            name.substring(0, name.length()-3)+"pdf");
+
+         getTeXApp().epstopdf(destFile, pdfFile);
+      }
+   }
+
+   protected Path copyImageFile(String[] grpaths, TeXPath path)
+    throws IOException,InterruptedException
+   {
+      if (grpaths == null)
+      {
+         File file = path.getFile();
+
+         if (file.exists())
+         {
+            File destFile = outPath.resolve(path.getRelative()).toFile();
+
+            copyImageFile(file, destFile);
+
+            return path.getRelative();
+         }
+      }
+      else
+      {
+         Path basePath = path.getBaseDir();
+
+         for (int i = 0; i < grpaths.length; i++)
+         {
+            Path subPath = 
+            (new File(File.separatorChar == '/' ?
+              grpaths[i] : 
+              grpaths[i].replaceAll("/", File.separator)
+            ).toPath()).resolve(path.getRelative());
+
+            File file = (basePath == null ?  subPath :
+              basePath.resolve(subPath)).toFile();
+
+            if (file.exists())
+            {
+               File destFile = outPath.resolve(subPath).toFile();
+
+               copyImageFile(file, destFile);
+
+               return subPath;
+            }
+         }
+      }
+
+      return null;
+   }
+
    public void includegraphics(TeXParser parser, 
      KeyValList options, String imgName)
      throws IOException
    {
+      TeXObjectList graphicsPath = getGraphicsPath();
+
+      String[] grpaths = null;
+
+      if (graphicsPath != null && graphicsPath.size() > 0)
+      {
+         int n = graphicsPath.size();
+
+         grpaths = new String[n];
+
+         for (int i = 0; i < n; i++)
+         {
+            TeXObject object = graphicsPath.get(i);
+
+            TeXObjectList expanded = null;
+
+            if (object instanceof Expandable)
+            {
+               expanded = ((Expandable)object).expandfully(parser);
+            }
+
+            if (expanded != null)
+            {
+               grpaths[i] = expanded.toString(parser);
+            }
+            else
+            {
+               grpaths[i] = object.toString(parser);
+            }
+         }
+      }
+
+      Path imagePath = null;
+
+      try
+      {
+         if (imgName.contains("."))
+         {
+            TeXPath path = new TeXPath(parser, imgName);
+
+            imagePath = copyImageFile(grpaths, path);
+         }
+         else
+         {
+            for (int i = 0; i < IMAGE_EXT.length; i++)
+            {
+                String name = imgName+"."+IMAGE_EXT[i];
+
+                TeXPath path = new TeXPath(parser, name);
+
+                imagePath = copyImageFile(grpaths, path);
+
+                if (imagePath != null)
+                {
+                   break;
+                }
+            }
+         }
+      }
+      catch (InterruptedException e)
+      {
+         getTeXApp().error(e);
+      }
+
+      if (isReplaceGraphicsPathEnabled() && imagePath != null)
+      {
+         StringBuilder builder = new StringBuilder();
+
+         Iterator<Path> it = imagePath.iterator();
+
+         while (it.hasNext())
+         {
+            if (builder.length() > 0)
+            {
+               builder.append('/');
+            }
+
+            builder.append(it.next().toString());
+         }
+
+         imgName = builder.toString();
+      }
+
       write(parser.getEscChar());
       write("includegraphics");
 
@@ -312,72 +485,29 @@ public class LaTeX2LaTeX extends LaTeXParserListener
 
       write(parser.getEgChar());
 
-      TeXPath path;
+   }
 
-      if (imgName.contains("."))
+   public void setGraphicsPath(TeXParser parser, TeXObjectList paths)
+     throws IOException
+   {
+      super.setGraphicsPath(parser, paths);
+
+      if (!isReplaceGraphicsPathEnabled())
       {
-         path = new TeXPath(parser, imgName);
+         write(parser.getEscChar());
+         write("graphicspath");
 
-         File file = path.getFile();
+         String bg = ""+parser.getBgChar();
+         String eg = ""+parser.getEgChar();
 
-         if (file.exists())
+         write(bg);
+
+         for (TeXObject path : paths)
          {
-            try
-            {
-               File destFile = outPath.resolve(path.getRelative()).toFile();
-
-               getTeXApp().copyFile(file, destFile);
-
-               String name = destFile.getName();
-
-               if (name.toLowerCase().endsWith(".wmf"))
-               {
-                  File epsFile = new File(destFile.getParentFile(),
-                     name.substring(0, name.length()-3)+"eps");
-
-                  getTeXApp().wmftoeps(destFile, epsFile);
-
-                  destFile = epsFile;
-                  name = destFile.getName();
-               }
-
-               if (name.toLowerCase().endsWith(".eps"))
-               {
-                  File pdfFile = new File(destFile.getParentFile(),
-                     name.substring(0, name.length()-3)+"pdf");
-
-                  getTeXApp().epstopdf(destFile, pdfFile);
-               }
-            }
-            catch (InterruptedException e)
-            {
-               getTeXApp().error(e);
-            }
+            write(bg+path.toString(parser)+eg);
          }
-      }
-      else
-      {
-         for (int i = 0; i < IMAGE_EXT.length; i++)
-         {
-             String name = imgName+"."+IMAGE_EXT[i];
 
-             path = new TeXPath(parser, name);
-
-             File file = path.getFile();
-
-             if (file.exists())
-             {
-                try
-                {
-                   getTeXApp().copyFile(file, 
-                     outPath.resolve(path.getRelative()).toFile());
-                }
-                catch (InterruptedException e)
-                {
-                   getTeXApp().error(e);
-                }
-             }
-         }
+         write(eg);
       }
    }
 
@@ -440,6 +570,14 @@ public class LaTeX2LaTeX extends LaTeXParserListener
       if (writer != null)
       {
          writer.println(c);
+      }
+   }
+
+   public void writeln() throws IOException
+   {
+      if (writer != null)
+      {
+         writer.println();
       }
    }
 
@@ -588,11 +726,8 @@ public class LaTeX2LaTeX extends LaTeXParserListener
 
    public void par() throws IOException
    {
-      if (writer != null)
-      {
-         writer.println();
-         writer.println();
-      }
+      writeln();
+      writeln();
    }
 
    public void skipping(TeXParser parser, Ignoreable ignoreable)
@@ -759,6 +894,8 @@ public class LaTeX2LaTeX extends LaTeXParserListener
 
    private Path outPath, basePath;
    private PrintWriter writer;
+
+   private boolean replaceGraphicsPath = false;
 
    private TeXApp texApp;
 

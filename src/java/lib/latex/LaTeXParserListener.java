@@ -381,11 +381,24 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       }
    }
 
+   public void setGraphicsPath(TeXParser parser, TeXObjectList paths)
+     throws IOException
+   {
+      graphicsPath = paths;
+   }
+
+   public TeXObjectList getGraphicsPath()
+   {
+      return graphicsPath;
+   }
+
    private Hashtable<String,Environment> envTable;
 
    private Vector<String> inLineMathEnv, displayMathEnv;
 
    private Vector<String> loadedPackages;
+
+   private TeXObjectList graphicsPath = null;
 
    private boolean docEnvFound = false, docClsFound=false;
 }
