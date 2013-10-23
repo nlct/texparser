@@ -71,11 +71,18 @@ public class Lipsum extends ControlSequence
          refs = sty.getDefaultRange();
       }
 
+      Writeable writeable = parser.getListener().getWriteable();
+
       String[] split = refs.split(",");
 
       for (int j = 0; j < split.length; j++)
       {
          String[] range = split[j].split("-");
+
+         if (range == null || range.length == 0)
+         {
+            continue;
+         }
 
          try
          {
@@ -86,18 +93,7 @@ public class Lipsum extends ControlSequence
 
             for (int i = firstIdx-1; i < lastIdx; i++)
             {
-               StringCharacterIterator it 
-                 = new StringCharacterIterator(LIPSUM_TEXT[i]);
-
-               for (char c = it.first(); c != CharacterIterator.DONE;
-                    c = it.next())
-               {
-                  TeXObject obj = (parser.isCatCode(TeXParser.TYPE_LETTER, c) ?
-                    parser.getListener().getLetter((int)c) :
-                    parser.getListener().getOther((int)c));
-
-                  obj.process(parser);
-               }
+               writeable.write(LIPSUM_TEXT[i]);
 
                if (!isStar)
                {
@@ -107,6 +103,8 @@ public class Lipsum extends ControlSequence
          }
          catch (NumberFormatException e)
          {
+            throw new TeXSyntaxException(parser.getLineNumber(),
+              TeXSyntaxException.ERROR_NUMBER_EXPECTED);
          }
       }
 
@@ -115,7 +113,7 @@ public class Lipsum extends ControlSequence
    public void process(TeXParser parser, TeXObjectList list)
      throws IOException
    {
-      TeXObject next = list.peek();
+      TeXObject next = list.pop();
 
       boolean isStar = false;
 
@@ -123,6 +121,10 @@ public class Lipsum extends ControlSequence
        && ((CharObject)next).getCharCode() == (int)'*')
       {
          isStar = true;
+      }
+      else
+      {
+         list.push(next);
       }
 
       TeXObject optArg = list.popArg(parser, '[', ']');
@@ -133,7 +135,7 @@ public class Lipsum extends ControlSequence
    public void process(TeXParser parser)
      throws IOException
    {
-      TeXObject next = parser.peek();
+      TeXObject next = parser.popStack();
 
       boolean isStar = false;
 
@@ -141,6 +143,10 @@ public class Lipsum extends ControlSequence
        && ((CharObject)next).getCharCode() == (int)'*')
       {
          isStar = true;
+      }
+      else if (next != null)
+      {
+         parser.push(next);
       }
 
       TeXObject optArg = parser.popNextArg('[', ']');
