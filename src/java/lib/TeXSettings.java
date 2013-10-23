@@ -182,6 +182,11 @@ public class TeXSettings
       return currentFontSize;
    }
 
+   public int getCurrentMathFont()
+   {
+      return currentMathFont;
+   }
+
    public int getMathFont()
    {
       if (currentMathFont == INHERIT)

@@ -236,7 +236,7 @@ public abstract class DefaultTeXParserListener implements TeXParserListener
       throws IOException;
 
    public abstract void overwithdelims(TeXParser parser, TeXObject first,
-     TeXObject second, TeXObjectList before, TeXObjectList after)
+     TeXObject second, TeXObject before, TeXObject after)
     throws IOException;
 
    public String map(String key)

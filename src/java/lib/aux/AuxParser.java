@@ -113,13 +113,14 @@ public class AuxParser extends DefaultTeXParserListener
    }
 
    public void overwithdelims(TeXParser parser, TeXObject firstDelim,
-     TeXObject secondDelim, TeXObjectList before, TeXObjectList after)
+     TeXObject secondDelim, TeXObject before, TeXObject after)
     throws IOException
    {
    }
 
    public void abovewithdelims(TeXParser parser, TeXObject firstDelim,
-     TeXObject secondDelim, TeXDimension thickness, TeXObjectList before, TeXObjectList after)
+     TeXObject secondDelim, TeXDimension thickness, TeXObject before, 
+     TeXObject after)
     throws IOException
    {
    }

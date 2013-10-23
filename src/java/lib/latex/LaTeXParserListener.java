@@ -98,6 +98,20 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       putControlSequence("\\", new Cr("\\"));
       putControlSequence("cr", new Cr("cr"));
       putControlSequence("href", new Href());
+      putControlSequence("frac", new Frac());
+
+      // Math font commands
+
+      addMathFontCommand("mathrm",TeXSettings.MATH_STYLE_RM);
+      addMathFontCommand("mathsf",TeXSettings.MATH_STYLE_SF);
+      addMathFontCommand("mathtt",TeXSettings.MATH_STYLE_TT);
+      addMathFontCommand("mathit",TeXSettings.MATH_STYLE_IT);
+      addMathFontCommand("mathbf",TeXSettings.MATH_STYLE_BF);
+      addMathFontCommand("mathcal",TeXSettings.MATH_STYLE_CAL);
+      addMathFontCommand("mathbb",TeXSettings.MATH_STYLE_BB);
+      addMathFontCommand("mathfrak",TeXSettings.MATH_STYLE_FRAK);
+      addMathFontCommand("boldsymbol",TeXSettings.MATH_STYLE_BOLDSYMBOL);
+      addMathFontCommand("pmb",TeXSettings.MATH_STYLE_PMB);
 
       // Font declarations
       addFontWeightDeclaration("mdseries", "textmd", TeXSettings.WEIGHT_MD);
@@ -128,6 +142,11 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       super.addPredefined();
 
       putControlSequence("documentstyle", new DocumentStyle());
+   }
+
+   protected void addMathFontCommand(String name, int style)
+   {
+      putControlSequence(name, new MathFontCommand(name, style));
    }
 
    public void newcommand(TeXParser parser, String type, String csName, boolean isShort,

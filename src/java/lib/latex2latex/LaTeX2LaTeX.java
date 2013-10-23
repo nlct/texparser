@@ -577,7 +577,7 @@ public class LaTeX2LaTeX extends LaTeXParserListener
    }
 
    public void overwithdelims(TeXParser parser, TeXObject firstDelim,
-     TeXObject secondDelim, TeXObjectList before, TeXObjectList after)
+     TeXObject secondDelim, TeXObject before, TeXObject after)
     throws IOException
    {
       char esc = parser.getEscChar();
@@ -651,7 +651,8 @@ public class LaTeX2LaTeX extends LaTeXParserListener
    }
 
    public void abovewithdelims(TeXParser parser, TeXObject firstDelim,
-     TeXObject secondDelim, TeXDimension thickness, TeXObjectList before, TeXObjectList after)
+     TeXObject secondDelim, TeXDimension thickness, 
+     TeXObject before, TeXObject after)
     throws IOException
    {
       char esc = parser.getEscChar();

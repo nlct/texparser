@@ -157,7 +157,14 @@ public abstract class L2HConverter extends LaTeXParserListener
          writer.write("<span style=\""+style+"\">");
       }
 
-      writer.write(codePoint);
+      if (codePoint >= 32 && codePoint <= 126)
+      {
+         writer.write((char)codePoint);
+      }
+      else
+      {
+         writer.write("&#x"+Integer.toHexString(codePoint)+";");
+      }
 
       if (!style.isEmpty())
       {
@@ -225,34 +232,51 @@ public abstract class L2HConverter extends LaTeXParserListener
 
    // TODO sort out MathML stuff
    // This is just temporary HTML approximation
+   // Maybe better just to use MathJax
 
    public void overwithdelims(TeXParser parser, TeXObject firstDelim,
-     TeXObject secondDelim, TeXObjectList before, TeXObjectList after)
+     TeXObject secondDelim, TeXObject before, TeXObject after)
     throws IOException
    {
-      firstDelim.process(parser);
-      write("<table><tr><td>");
+      if (firstDelim != null)
+      {
+        firstDelim.process(parser);
+      }
+
+      write("<table style=\"display: inline;\"><tr style=\"border-bottom-style: solid;\"><td>");
       before.process(parser);
       write("</td></tr>");
       write("<tr><td>");
       after.process(parser);
       write("</td></tr><table>");
-      secondDelim.process(parser);
+
+      if (secondDelim != null)
+      {
+         secondDelim.process(parser);
+      }
    }
 
    public void abovewithdelims(TeXParser parser, TeXObject firstDelim,
      TeXObject secondDelim, TeXDimension thickness,
-     TeXObjectList before, TeXObjectList after)
+     TeXObject before, TeXObject after)
     throws IOException
    {
-      firstDelim.process(parser);
+      if (firstDelim != null)
+      {
+         firstDelim.process(parser);
+      }
+
       write("<table><tr><td>");
       before.process(parser);
       write("</td></tr>");
       write("<tr><td>");
       after.process(parser);
       write("</td></tr><table>");
-      secondDelim.process(parser);
+
+      if (secondDelim != null)
+      {
+         secondDelim.process(parser);
+      }
    }
 
    public void subscript(TeXParser parser, TeXObject arg)

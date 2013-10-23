@@ -82,6 +82,20 @@ public class MathGroup extends Group
       return builder.toString();
    }
 
+   public void process(TeXParser parser)
+    throws IOException
+   {
+      parser.startGroup();
+      TeXSettings settings = parser.getSettings();
+
+      settings.setMode(isinline ? TeXSettings.MODE_INLINE_MATH :
+         TeXSettings.MODE_DISPLAY_MATH);
+
+      processList(parser);
+
+      parser.endGroup();
+   }
+
    private boolean isinline;
 }
 

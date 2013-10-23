@@ -73,6 +73,11 @@ public class Group extends TeXObjectList
       {
          TeXObject object = list.pop();
 
+         if (object == null)
+         {
+            break;
+         }
+
          if (object instanceof MidControlSequence)
          {
             midcs = (MidControlSequence)object;
