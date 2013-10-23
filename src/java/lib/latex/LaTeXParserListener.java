@@ -29,6 +29,7 @@ import com.dickimawbooks.texparserlib.generic.*;
 import com.dickimawbooks.texparserlib.latex.graphics.*;
 import com.dickimawbooks.texparserlib.latex.amsmath.*;
 import com.dickimawbooks.texparserlib.latex.tcilatex.*;
+import com.dickimawbooks.texparserlib.latex.lipsum.*;
 
 public abstract class LaTeXParserListener extends DefaultTeXParserListener
 {
@@ -246,8 +247,11 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       return env == null ? new Environment(name) : (Environment)env.clone();
    }
 
-   public abstract void environment(TeXParser parser, Environment env)
-     throws IOException;
+   public void environment(TeXParser parser, Environment env)
+     throws IOException
+   {
+      env.process(parser);
+   }
 
    public boolean isInDocEnv()
    {
@@ -328,6 +332,11 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       if (styName.equals("amsmath"))
       {
          return new AmsmathSty(styName);
+      }
+
+      if (styName.equals("lipsum"))
+      {
+         return new LipsumSty(styName);
       }
 
       return null;

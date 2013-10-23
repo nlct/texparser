@@ -205,11 +205,6 @@ public class LaTeX2LaTeX extends LaTeXParserListener
       return new L2LMathGroup();
    }
 
-   public void environment(TeXParser parser, Environment env)
-     throws IOException
-   {
-   }
-
    public void beginDocument(TeXParser parser)
      throws IOException
    {

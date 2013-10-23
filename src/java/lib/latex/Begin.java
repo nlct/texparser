@@ -102,7 +102,7 @@ public class Begin extends Command
 
       env.popGroup(parser, list);
 
-      env.process(parser, list);
+      listener.environment(parser, env);
    }
 
    public void process(TeXParser parser)
@@ -139,7 +139,7 @@ public class Begin extends Command
 
       env.popGroup(parser);
 
-      env.process(parser);
+      listener.environment(parser, env);
    }
 
 }

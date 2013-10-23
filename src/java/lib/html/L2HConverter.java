@@ -198,7 +198,7 @@ public abstract class L2HConverter extends LaTeXParserListener
    {
       if (writer == null) return;
 
-      write(str+"<br>");
+      write(str+"\n");
    }
 
    public void href(TeXParser parser, String url, TeXObject text)
@@ -221,12 +221,6 @@ public abstract class L2HConverter extends LaTeXParserListener
    public void skipping(TeXParser parser, Ignoreable ignoreable)
      throws IOException
    {
-   }
-
-   public void environment(TeXParser parser, Environment env)
-    throws IOException
-   {
-      env.process(parser);
    }
 
    // TODO sort out MathML stuff
