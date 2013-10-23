@@ -118,7 +118,12 @@ public abstract class DefaultTeXParserListener implements TeXParserListener
    {
       ControlSequence cs = csTable.get(map(name));
 
-      return cs == null ? new Undefined(name) : cs;
+      return cs == null ? createUndefinedCs(name) : cs;
+   }
+
+   public ControlSequence createUndefinedCs(String name)
+   {
+      return new Undefined(name);
    }
 
    // Gets active character identified by charCode.
