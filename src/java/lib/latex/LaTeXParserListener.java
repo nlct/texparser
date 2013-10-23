@@ -336,7 +336,7 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
 
       if (styName.equals("lipsum"))
       {
-         return new LipsumSty(styName);
+         return new LipsumSty();
       }
 
       return null;

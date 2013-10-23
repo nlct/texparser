@@ -16,9 +16,11 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
-package com.dickimawbooks.texparserlib.latex.lipsum
+package com.dickimawbooks.texparserlib.latex.lipsum;
 
 import java.io.IOException;
+import java.text.CharacterIterator;
+import java.text.StringCharacterIterator;
 
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.*;
@@ -71,15 +73,15 @@ public class Lipsum extends ControlSequence
 
       String[] split = refs.split(",");
 
-      for (int i = 0; i < split.length; i++)
+      for (int j = 0; j < split.length; j++)
       {
-         String[] range = split[i].split("-");
+         String[] range = split[j].split("-");
 
          try
          {
             int firstIdx = Integer.parseInt(range[0]);
 
-            int lastIdx = (range.length() == 1 ? firstIdx : 
+            int lastIdx = (range.length == 1 ? firstIdx : 
               Integer.parseInt(range[1]));
 
             for (int i = firstIdx-1; i < lastIdx; i++)
@@ -90,9 +92,9 @@ public class Lipsum extends ControlSequence
                for (char c = it.first(); c != CharacterIterator.DONE;
                     c = it.next())
                {
-                  TeXObject obj = (parser.isCatCode(TeXParser.TYPE_LETTER) ?
-                    parser.getLetter((int)c) :
-                    parser.getOther((int)c));
+                  TeXObject obj = (parser.isCatCode(TeXParser.TYPE_LETTER, c) ?
+                    parser.getListener().getLetter((int)c) :
+                    parser.getListener().getOther((int)c));
 
                   obj.process(parser);
                }
