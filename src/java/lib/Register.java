@@ -19,6 +19,13 @@
 package com.dickimawbooks.texparserlib;
 
 
-public abstract class Register extends ControlSequence
+public abstract class Register extends ControlSequence implements Numerical
 {
+   public abstract void advance(int increment);
+
+   public abstract void divide(int divisor);
+
+   public abstract void multiply(int factor);
+
+   public abstract void setValue(int value);
 }
