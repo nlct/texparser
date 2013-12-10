@@ -21,7 +21,7 @@ package com.dickimawbooks.texparserlib;
 import java.io.IOException;
 import java.util.Vector;
 
-public class CountRegister extends Register implements Numerical,TeXNumber
+public class CountRegister extends Register implements TeXNumber
 {
    public CountRegister(String name)
    {
@@ -69,7 +69,7 @@ public class CountRegister extends Register implements Numerical,TeXNumber
       value /= divisor;
    }
 
-   public void multiple(int factor)
+   public void multiply(int factor)
    {
       value *= factor;
    }
