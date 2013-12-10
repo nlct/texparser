@@ -20,6 +20,9 @@ package com.dickimawbooks.texparserlib;
 
 import java.util.Iterator;
 import java.util.Vector;
+import java.util.Hashtable;
+import java.text.CharacterIterator;
+import java.text.StringCharacterIterator;
 import java.io.*;
 import java.nio.file.Path;
 
@@ -38,6 +41,65 @@ public class TeXParser extends TeXObjectList
       verbatim.add("verb");
 
       initDefCatCodes();
+   }
+
+   private void initRegisters()
+   {
+      CountRegister reg = new CountRegister("count@");
+      allocCount(255, reg);
+
+      reg = new CountRegister("count"+ALLOC_COUNT, 22);
+      settings.putRegister(reg);
+      allocCount(ALLOC_COUNT, reg);
+
+      reg = new CountRegister("count"+ALLOC_DIMEN, 9);
+      settings.putRegister(reg);
+      allocCount(ALLOC_DIMEN, reg);
+
+      reg = new CountRegister("count"+ALLOC_SKIP, 9);
+      settings.putRegister(reg);
+      allocCount(ALLOC_SKIP, reg);
+
+      reg = new CountRegister("count"+ALLOC_MUSKIP, 9);
+      settings.putRegister(reg);
+      allocCount(ALLOC_MUSKIP, reg);
+
+      reg = new CountRegister("count"+ALLOC_BOX, 9);
+      settings.putRegister(reg);
+      allocCount(ALLOC_BOX, reg);
+
+      reg = new CountRegister("count"+ALLOC_TOKS, 9);
+      settings.putRegister(reg);
+      allocCount(ALLOC_TOKS, reg);
+
+      reg = new CountRegister("count"+ALLOC_INPUT, -1);
+      settings.putRegister(reg);
+      allocCount(ALLOC_INPUT, reg);
+
+      reg = new CountRegister("count"+ALLOC_OUTPUT, -1);
+      settings.putRegister(reg);
+      allocCount(ALLOC_OUTPUT, reg);
+
+      reg = new CountRegister("count"+ALLOC_MATHFAM, 3);
+      settings.putRegister(reg);
+      allocCount(ALLOC_MATHFAM, reg);
+
+      reg = new CountRegister("count"+ALLOC_LANGUAGE, 0);
+      settings.putRegister(reg);
+      allocCount(ALLOC_LANGUAGE, reg);
+
+      reg = new CountRegister("insc@unt", 255);
+      settings.putRegister(reg);
+      allocCount(INS_COUNT, reg);
+
+      reg = new CountRegister("allocationnumber");
+      settings.putRegister(reg);
+      allocCount(ALLOC_NUMBER, reg);
+
+      reg = new CountRegister("m@ne", -1);
+      settings.putRegister(reg);
+      allocCount(MINUS_ONE, reg);
+
    }
 
    private void initDefCatCodes()
@@ -158,6 +220,20 @@ public class TeXParser extends TeXObjectList
    public boolean isLetter(char c)
    {
       return isCatCode(TYPE_LETTER, c);
+   }
+
+   public TeXObjectList string(String text)
+   {
+      TeXObjectList list = new TeXObjectList();
+
+      StringCharacterIterator it = new StringCharacterIterator(text);
+
+      for (char c = it.first(); c != CharacterIterator.DONE; c = it.next())
+      {
+         list.add(isLetter(c) ? new Letter(c) : new Other(c));
+      }
+
+      return list;
    }
 
    public void addVerbCommand(String csname)
@@ -1327,7 +1403,92 @@ public class TeXParser extends TeXObjectList
       return builder.toString();
    }
 
+   /*
+    * Allocation of registers.
+    * 255 and 0 to 9 are always free for scratch purposes. 
+    * \count10 to \count20 hold the register numbers that were most
+    * recently allocated.
+    */
+
+   public void allocCount(int index, CountRegister reg)
+   {
+      allocCount(new Integer(index), reg);
+   }
+
+   public void allocCount(Integer index, CountRegister reg)
+   {
+      countAlloc.put(index, reg);
+      reg.setAllocation(index.intValue());
+   }
+
+   public void allocCount(CountRegister reg)
+   {
+      // Get the most recently allocated number
+
+      CountRegister allocReg = countAlloc.get(ALLOC_COUNT);
+
+      int alloc = allocReg.number()+1;
+
+      while (countAlloc.containsKey(new Integer(alloc)))
+      {
+         alloc++;
+      }
+
+      allocCount(alloc, reg);
+      allocReg.setValue(alloc);
+      countAlloc.get(ALLOC_NUMBER).setValue(alloc);
+   }
+
+   public void allocDimen(int index, DimenRegister reg)
+   {
+      allocDimen(new Integer(index), reg);
+   }
+
+   public void allocDimen(Integer index, DimenRegister reg)
+   {
+      dimenAlloc.put(index, reg);
+      reg.setAllocation(index.intValue());
+   }
+
+   public void allocDimen(DimenRegister reg)
+   {
+      // Get the most recently allocated number
+
+      CountRegister allocReg = countAlloc.get(ALLOC_DIMEN);
+
+      int alloc = allocReg.number()+1;
+
+      while (countAlloc.containsKey(new Integer(alloc)))
+      {
+         alloc++;
+      }
+
+      allocDimen(alloc, reg);
+      allocReg.setValue(alloc);
+      countAlloc.get(ALLOC_NUMBER).setValue(alloc);
+   }
+
    private TeXSettings settings;
+
+   private Hashtable<Integer,CountRegister> countAlloc
+     = new Hashtable<Integer,CountRegister>();
+
+   private Hashtable<Integer,DimenRegister> dimenAlloc
+     = new Hashtable<Integer,DimenRegister>();
+
+   public static final Integer ALLOC_COUNT = new Integer(10);
+   public static final Integer ALLOC_DIMEN = new Integer(11);
+   public static final Integer ALLOC_SKIP = new Integer(12);
+   public static final Integer ALLOC_MUSKIP = new Integer(13);
+   public static final Integer ALLOC_BOX = new Integer(14);
+   public static final Integer ALLOC_TOKS = new Integer(15);
+   public static final Integer ALLOC_INPUT = new Integer(16);
+   public static final Integer ALLOC_OUTPUT = new Integer(17);
+   public static final Integer ALLOC_MATHFAM = new Integer(18);
+   public static final Integer ALLOC_LANGUAGE = new Integer(19);
+   public static final Integer INS_COUNT = new Integer(20);
+   public static final Integer ALLOC_NUMBER = new Integer(21);
+   public static final Integer MINUS_ONE = new Integer(22);
 
    private File currentParentFile;
 

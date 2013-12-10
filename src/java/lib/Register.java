@@ -21,6 +21,28 @@ package com.dickimawbooks.texparserlib;
 
 public abstract class Register extends ControlSequence implements Numerical
 {
+   public Register(String name)
+   {
+      this.name = name;
+   }
+
+   public String getName()
+   {
+      return name;
+   }
+
+   public void setAllocation(int alloc)
+   {
+      this.allocation = alloc;
+   }
+
+   public int getAllocation()
+   {
+      return allocation;
+   }
+
+   public abstract TeXObject the(TeXParser parser);
+
    public abstract void advance(int increment);
 
    public abstract void divide(int divisor);
@@ -28,4 +50,8 @@ public abstract class Register extends ControlSequence implements Numerical
    public abstract void multiply(int factor);
 
    public abstract void setValue(int value);
+
+   protected String name;
+
+   protected int allocation = -1;
 }

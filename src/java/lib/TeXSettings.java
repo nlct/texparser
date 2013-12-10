@@ -392,8 +392,38 @@ public class TeXSettings
       return reg;
    }
 
-   public void putRegister(Register register)
+   public void countdef(String name, int alloc)
    {
+      CountRegister reg = new CountRegister(name);
+      parser.allocCount(alloc, reg);
+      putRegister(reg);
+   }
+
+   public void newcount(String name)
+   {
+      CountRegister reg = new CountRegister(name);
+      parser.allocCount(reg);
+      putRegister(reg);
+   }
+
+   public void dimendef(String name, int alloc)
+   {
+      DimenRegister reg = new DimenRegister(name);
+      parser.allocDimen(alloc, reg);
+      putRegister(reg);
+   }
+
+   public void newdimen(String name)
+   {
+      DimenRegister reg = new DimenRegister(name);
+      parser.allocDimen(reg);
+      putRegister(reg);
+   }
+
+   protected Register putRegister(Register register)
+   {
+      Register rootReg = register;
+
       String name = register.getName();
 
       TeXSettings root = parser.getSettings();
@@ -404,11 +434,13 @@ public class TeXSettings
 
          if (reg == null)
          {
-            root.putRegister((Register)register.clone());
+            rootReg = root.putRegister((Register)register.clone());
          }
       }
 
       localRegisters.put(name, register);
+
+      return rootReg;
    }
 
    public void localSetRegister(String name, Numerical value)
@@ -436,7 +468,7 @@ public class TeXSettings
          }
       }
 
-      reg.setValue(value.number(parser));
+      reg.setValue(value.number());
    }
 
    public void globalSetRegister(String name, Numerical value)
@@ -454,7 +486,7 @@ public class TeXSettings
                TeXSyntaxException.ERROR_REGISTER_UNDEF, name);
          }
 
-         reg.setValue(value.number(parser));
+         reg.setValue(value.number());
 
          return;
       }
@@ -477,11 +509,11 @@ public class TeXSettings
 
       if (reg == globalReg)
       {
-         globalReg.setValue(value.number(parser));
+         globalReg.setValue(value.number());
          return;
       }
 
-      reg.setValue(value.number(parser));
+      reg.setValue(value.number());
       root.localRegisters.put(name, reg);
 
       settings.removeLocalRegister(name);
@@ -512,7 +544,7 @@ public class TeXSettings
          }
       }
 
-      reg.advance(value.number(parser));
+      reg.advance(value.number());
    }
 
    public void globalAdvanceRegister(String name, Numerical value)
@@ -530,7 +562,7 @@ public class TeXSettings
                TeXSyntaxException.ERROR_REGISTER_UNDEF, name);
          }
 
-         reg.advance(value.number(parser));
+         reg.advance(value.number());
 
          return;
       }
@@ -553,11 +585,11 @@ public class TeXSettings
 
       if (reg == globalReg)
       {
-         globalReg.advance(value.number(parser));
+         globalReg.advance(value.number());
          return;
       }
 
-      reg.advance(value.number(parser));
+      reg.advance(value.number());
       root.localRegisters.put(name, reg);
 
       settings.removeLocalRegister(name);
@@ -588,7 +620,7 @@ public class TeXSettings
          }
       }
 
-      reg.multiply(value.number(parser));
+      reg.multiply(value.number());
    }
 
    public void globalMultiplyRegister(String name, Numerical value)
@@ -606,7 +638,7 @@ public class TeXSettings
                TeXSyntaxException.ERROR_REGISTER_UNDEF, name);
          }
 
-         reg.multiply(value.number(parser));
+         reg.multiply(value.number());
 
          return;
       }
@@ -629,11 +661,11 @@ public class TeXSettings
 
       if (reg == globalReg)
       {
-         globalReg.multiply(value.number(parser));
+         globalReg.multiply(value.number());
          return;
       }
 
-      reg.multiply(value.number(parser));
+      reg.multiply(value.number());
       root.localRegisters.put(name, reg);
 
       settings.removeLocalRegister(name);
@@ -664,7 +696,7 @@ public class TeXSettings
          }
       }
 
-      reg.divide(value.number(parser));
+      reg.divide(value.number());
    }
 
    public void globalDivideRegister(String name, Numerical value)
@@ -682,7 +714,7 @@ public class TeXSettings
                TeXSyntaxException.ERROR_REGISTER_UNDEF, name);
          }
 
-         reg.divide(value.number(parser));
+         reg.divide(value.number());
 
          return;
       }
@@ -705,11 +737,11 @@ public class TeXSettings
 
       if (reg == globalReg)
       {
-         globalReg.divide(value.number(parser));
+         globalReg.divide(value.number());
          return;
       }
 
-      reg.divide(value.number(parser));
+      reg.divide(value.number());
       root.localRegisters.put(name, reg);
 
       settings.removeLocalRegister(name);

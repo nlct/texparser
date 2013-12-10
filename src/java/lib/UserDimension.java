@@ -44,7 +44,7 @@ public class UserDimension implements TeXDimension
       return new UserDimension(value, (TeXUnit)unit.clone());
    }
 
-   public int number(TeXParser parser)
+   public int number()
    {
       return (int)(value*unit.getSpScaleFactor());
    }

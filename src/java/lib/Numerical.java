@@ -20,5 +20,5 @@ package com.dickimawbooks.texparserlib;
 
 public interface Numerical
 {
-   public int number(TeXParser parser);
+   public int number();
 }

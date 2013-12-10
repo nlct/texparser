@@ -30,13 +30,8 @@ public class CountRegister extends Register implements TeXNumber
 
    public CountRegister(String name, int value)
    {
-      this.name = name;
+      super(name);
       setValue(value);
-   }
-
-   public String getName()
-   {
-      return name;
    }
 
    public void setValue(int value)
@@ -49,9 +44,14 @@ public class CountRegister extends Register implements TeXNumber
       return value;
    }
 
-   public int number(TeXParser parser)
+   public int number()
    {
       return value;
+   }
+
+   public TeXObject the(TeXParser parser)
+   {
+      return parser.string(""+value);
    }
 
    public void advance()
@@ -86,10 +86,12 @@ public class CountRegister extends Register implements TeXNumber
 
    public Object clone()
    {
-      return new CountRegister(getName(), value);
-   }
+      CountRegister reg = new CountRegister(getName(), value);
 
-   private String name;
+      reg.allocation = allocation;
+
+      return reg;
+   }
 
    private int value = 0;
 }

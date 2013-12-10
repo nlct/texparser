@@ -19,22 +19,29 @@
 package com.dickimawbooks.texparserlib;
 
 import java.io.IOException;
+import java.util.Vector;
 
-public class UserNumber implements TeXNumber
+public class DimenRegister extends Register implements TeXDimension
 {
-   public UserNumber()
+   public DimenRegister(String name)
    {
-      this(0);
+      this(name, 0);
    }
 
-   public UserNumber(int num)
+   public DimenRegister(String name, int value)
    {
-      value = num;
+      super(name);
+      setValue(value);
    }
 
-   public Object clone()
+   public void setValue(int value)
    {
-      return new UserNumber(value);
+      this.value = value;
+   }
+
+   public float getValue()
+   {
+      return (float)value;
    }
 
    public int number()
@@ -42,26 +49,52 @@ public class UserNumber implements TeXNumber
       return value;
    }
 
-   public int getValue()
+   public TeXObject the(TeXParser parser)
    {
-      return value;
+      return parser.string(""+((float)value/65536.0f)+"pt");
    }
 
-   public String toString(TeXParser parser)
+   public void advance()
    {
-      return ""+value;
+      advance(1);
    }
 
-   public void process(TeXParser parser) throws IOException
+   public void advance(int increment)
    {
-      parser.getListener().getWriteable().write(""+value);
+      value += increment;
+   }
+
+   public void divide(int divisor)
+   {
+      value /= divisor;
+   }
+
+   public void multiply(int factor)
+   {
+      value *= factor;
+   }
+
+   public void process(TeXParser parser)
+      throws IOException
+   {
    }
 
    public void process(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
-      process(parser);
    }
 
-   private int value;
+   public Object clone()
+   {
+      return new DimenRegister(getName(), value);
+   }
+
+   public TeXUnit getUnit()
+   {
+      return unit;
+   }
+
+   private int value = 0;
+
+   private static TeXUnit unit = new TeXUnit(TeXUnit.UNIT_SP);
 }
