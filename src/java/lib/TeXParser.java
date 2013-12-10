@@ -31,6 +31,7 @@ public class TeXParser extends TeXObjectList
    {
       this.listener = listener;
       reader = null;
+      settings = new TeXSettings(this);
 
       verbatim = new Vector<String>();
 
@@ -1227,7 +1228,7 @@ public class TeXParser extends TeXObjectList
 
    public void startGroup()
    {
-      settings = new TeXSettings(settings);
+      settings = new TeXSettings(settings, this);
    }
 
    public void endGroup()
@@ -1326,7 +1327,7 @@ public class TeXParser extends TeXObjectList
       return builder.toString();
    }
 
-   private TeXSettings settings = new TeXSettings();
+   private TeXSettings settings;
 
    private File currentParentFile;
 
