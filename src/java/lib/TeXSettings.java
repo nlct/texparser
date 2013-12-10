@@ -23,14 +23,19 @@ import java.util.Hashtable;
 
 public class TeXSettings
 {
-   public TeXSettings()
+   private TeXSettings()
    {
-      this(null);
    }
 
-   public TeXSettings(TeXSettings parent)
+   public TeXSettings(TeXParser parser)
+   {
+      this(null, parser);
+   }
+
+   public TeXSettings(TeXSettings parent, TeXParser parser)
    {
       this.parent = parent;
+      this.parser = parser;
    }
 
    public int getCurrentMode()
@@ -375,13 +380,13 @@ public class TeXSettings
       currentBgColor = color;
    }
 
-   public Register getRegister(String name, boolean recurse)
+   public Register getRegister(String name)
    {
       Register reg = localRegisters.get(name);
 
-      if (reg == null && parent != null && recurse)
+      if (reg == null && parent != null)
       {
-         reg = parent.getRegister(name, recurse);
+         reg = parent.getRegister(name);
       }
 
       return reg;
@@ -389,7 +394,339 @@ public class TeXSettings
 
    public void putRegister(Register register)
    {
-      localRegisters.put(register.getName(), register);
+      String name = register.getName();
+
+      TeXSettings root = parser.getSettings();
+
+      if (this != root)
+      {
+         Register reg = root.getRegister(name);
+
+         if (reg == null)
+         {
+            root.putRegister((Register)register.clone());
+         }
+      }
+
+      localRegisters.put(name, register);
+   }
+
+   public void localSetRegister(String name, Numerical value)
+     throws TeXSyntaxException
+   {
+      Register reg = localRegisters.get(name);
+
+      if (reg == null)
+      {
+         if (parent != null)
+         {
+            reg = parent.getRegister(name);
+         }
+
+         if (reg == null)
+         {
+            throw new TeXSyntaxException(parser.getLineNumber(),
+               TeXSyntaxException.ERROR_REGISTER_UNDEF, name);
+         }
+
+         if (parent != null)
+         {
+            reg = (Register)reg.clone();
+            localRegisters.put(name, reg);
+         }
+      }
+
+      reg.setValue(value.number(parser));
+   }
+
+   public void globalSetRegister(String name, Numerical value)
+     throws TeXSyntaxException
+   {
+      TeXSettings root = parser.getSettings();
+
+      Register reg = localRegisters.get(name);
+
+      if (this == root || parent == null)
+      {
+         if (reg == null)
+         {
+            throw new TeXSyntaxException(parser.getLineNumber(),
+               TeXSyntaxException.ERROR_REGISTER_UNDEF, name);
+         }
+
+         reg.setValue(value.number(parser));
+
+         return;
+      }
+
+      TeXSettings settings = this;
+
+      if (reg == null)
+      {
+         reg = parent.getRegister(name);
+         settings = parent;
+      }
+
+      Register globalReg = root.localRegisters.get(name);
+
+      if (globalReg == null || reg == null)
+      {
+         throw new TeXSyntaxException(parser.getLineNumber(),
+            TeXSyntaxException.ERROR_REGISTER_UNDEF, name);
+      }
+
+      if (reg == globalReg)
+      {
+         globalReg.setValue(value.number(parser));
+         return;
+      }
+
+      reg.setValue(value.number(parser));
+      root.localRegisters.put(name, reg);
+
+      settings.removeLocalRegister(name);
+   }
+
+   public void localAdvanceRegister(String name, Numerical value)
+     throws TeXSyntaxException
+   {
+      Register reg = localRegisters.get(name);
+
+      if (reg == null)
+      {
+         if (parent != null)
+         {
+            reg = parent.getRegister(name);
+         }
+
+         if (reg == null)
+         {
+            throw new TeXSyntaxException(parser.getLineNumber(),
+               TeXSyntaxException.ERROR_REGISTER_UNDEF, name);
+         }
+
+         if (parent != null)
+         {
+            reg = (Register)reg.clone();
+            localRegisters.put(name, reg);
+         }
+      }
+
+      reg.advance(value.number(parser));
+   }
+
+   public void globalAdvanceRegister(String name, Numerical value)
+     throws TeXSyntaxException
+   {
+      TeXSettings root = parser.getSettings();
+
+      Register reg = localRegisters.get(name);
+
+      if (this == root || parent == null)
+      {
+         if (reg == null)
+         {
+            throw new TeXSyntaxException(parser.getLineNumber(),
+               TeXSyntaxException.ERROR_REGISTER_UNDEF, name);
+         }
+
+         reg.advance(value.number(parser));
+
+         return;
+      }
+
+      TeXSettings settings = this;
+
+      if (reg == null)
+      {
+         reg = parent.getRegister(name);
+         settings = parent;
+      }
+
+      Register globalReg = root.localRegisters.get(name);
+
+      if (globalReg == null || reg == null)
+      {
+         throw new TeXSyntaxException(parser.getLineNumber(),
+            TeXSyntaxException.ERROR_REGISTER_UNDEF, name);
+      }
+
+      if (reg == globalReg)
+      {
+         globalReg.advance(value.number(parser));
+         return;
+      }
+
+      reg.advance(value.number(parser));
+      root.localRegisters.put(name, reg);
+
+      settings.removeLocalRegister(name);
+   }
+
+   public void localMultiplyRegister(String name, Numerical value)
+     throws TeXSyntaxException
+   {
+      Register reg = localRegisters.get(name);
+
+      if (reg == null)
+      {
+         if (parent != null)
+         {
+            reg = parent.getRegister(name);
+         }
+
+         if (reg == null)
+         {
+            throw new TeXSyntaxException(parser.getLineNumber(),
+               TeXSyntaxException.ERROR_REGISTER_UNDEF, name);
+         }
+
+         if (parent != null)
+         {
+            reg = (Register)reg.clone();
+            localRegisters.put(name, reg);
+         }
+      }
+
+      reg.multiply(value.number(parser));
+   }
+
+   public void globalMultiplyRegister(String name, Numerical value)
+     throws TeXSyntaxException
+   {
+      TeXSettings root = parser.getSettings();
+
+      Register reg = localRegisters.get(name);
+
+      if (this == root || parent == null)
+      {
+         if (reg == null)
+         {
+            throw new TeXSyntaxException(parser.getLineNumber(),
+               TeXSyntaxException.ERROR_REGISTER_UNDEF, name);
+         }
+
+         reg.multiply(value.number(parser));
+
+         return;
+      }
+
+      TeXSettings settings = this;
+
+      if (reg == null)
+      {
+         reg = parent.getRegister(name);
+         settings = parent;
+      }
+
+      Register globalReg = root.localRegisters.get(name);
+
+      if (globalReg == null || reg == null)
+      {
+         throw new TeXSyntaxException(parser.getLineNumber(),
+            TeXSyntaxException.ERROR_REGISTER_UNDEF, name);
+      }
+
+      if (reg == globalReg)
+      {
+         globalReg.multiply(value.number(parser));
+         return;
+      }
+
+      reg.multiply(value.number(parser));
+      root.localRegisters.put(name, reg);
+
+      settings.removeLocalRegister(name);
+   }
+
+   public void localDivideRegister(String name, Numerical value)
+     throws TeXSyntaxException
+   {
+      Register reg = localRegisters.get(name);
+
+      if (reg == null)
+      {
+         if (parent != null)
+         {
+            reg = parent.getRegister(name);
+         }
+
+         if (reg == null)
+         {
+            throw new TeXSyntaxException(parser.getLineNumber(),
+               TeXSyntaxException.ERROR_REGISTER_UNDEF, name);
+         }
+
+         if (parent != null)
+         {
+            reg = (Register)reg.clone();
+            localRegisters.put(name, reg);
+         }
+      }
+
+      reg.divide(value.number(parser));
+   }
+
+   public void globalDivideRegister(String name, Numerical value)
+     throws TeXSyntaxException
+   {
+      TeXSettings root = parser.getSettings();
+
+      Register reg = localRegisters.get(name);
+
+      if (this == root || parent == null)
+      {
+         if (reg == null)
+         {
+            throw new TeXSyntaxException(parser.getLineNumber(),
+               TeXSyntaxException.ERROR_REGISTER_UNDEF, name);
+         }
+
+         reg.divide(value.number(parser));
+
+         return;
+      }
+
+      TeXSettings settings = this;
+
+      if (reg == null)
+      {
+         reg = parent.getRegister(name);
+         settings = parent;
+      }
+
+      Register globalReg = root.localRegisters.get(name);
+
+      if (globalReg == null || reg == null)
+      {
+         throw new TeXSyntaxException(parser.getLineNumber(),
+            TeXSyntaxException.ERROR_REGISTER_UNDEF, name);
+      }
+
+      if (reg == globalReg)
+      {
+         globalReg.divide(value.number(parser));
+         return;
+      }
+
+      reg.divide(value.number(parser));
+      root.localRegisters.put(name, reg);
+
+      settings.removeLocalRegister(name);
+   }
+
+   private void removeLocalRegister(String name)
+   {
+      TeXSettings root = parser.getSettings();
+
+      if (this == root || parent == null)
+      {
+         return;
+      }
+
+      localRegisters.remove(name);
+
+      parent.removeLocalRegister(name);
    }
 
    public boolean isMathBold()
@@ -1843,6 +2180,8 @@ public class TeXSettings
 
    private Color currentFgColor = null;
    private Color currentBgColor = null;
+
+   private TeXParser parser;
 
    private Hashtable<String,Register> localRegisters 
      = new Hashtable<String,Register>();
