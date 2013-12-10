@@ -624,6 +624,9 @@ public class TeXParserApp implements TeXApp
          case TeXSyntaxException.ERROR_NUMBER_EXPECTED:
            message = getLabelWithValue("error.number_expected", e.getParam());
          break;
+         case TeXSyntaxException.ERROR_REGISTER_UNDEF:
+           message = getLabelWithValue("error.register_undef", e.getParam());
+         break;
          default:
            message = e.getMessage();
       }

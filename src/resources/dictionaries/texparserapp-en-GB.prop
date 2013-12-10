@@ -64,6 +64,7 @@ error.expected=Expected $1
 error.undefined=Undefined command $1
 error.cs_expected=Control sequence expected (found '$1')
 error.number_expected=Number expected (found '$1')
+error.register_undef=Unknown register '$1'
 error.unknown=Unknown error
 error.multi_begin_doc=Only one \\begin{document} permitted
 error.no_begin_doc=No \\begin{document} found
