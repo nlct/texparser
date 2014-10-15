@@ -34,6 +34,14 @@ public abstract class WhiteSpace implements TeXObject
       parser.getListener().getWriteable().write(' ');
    }
 
+   public TeXObjectList string(TeXParser parser) throws IOException
+   {
+      TeXObjectList list = new TeXObjectList();
+
+      list.add(new Other((int)' '));
+      return list;
+   }
+
    public abstract Object clone();
 }
 

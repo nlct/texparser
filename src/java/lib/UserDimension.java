@@ -64,6 +64,11 @@ public class UserDimension implements TeXDimension
       return ""+value+unit.toString(parser);
    }
 
+   public TeXObjectList string(TeXParser parser) throws IOException
+   {
+      return parser.string(toString(parser));
+   }
+
    public void process(TeXParser parser) throws IOException
    {
       parser.getListener().getWriteable().write(""+value);

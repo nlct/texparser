@@ -441,6 +441,21 @@ public class TeXObjectList extends Vector<TeXObject> implements TeXObject,Expand
       return builder.toString();
    }
 
+   public TeXObjectList string(TeXParser parser)
+     throws IOException
+   {
+      if (size() == 0)
+      {
+         return this;
+      }
+
+      TeXObjectList list = pop().string(parser);
+
+      addAll(0, list);
+
+      return this;
+   }
+
    public void pushDeclaration(Declaration decl)
    {
       declarations.add(decl);
