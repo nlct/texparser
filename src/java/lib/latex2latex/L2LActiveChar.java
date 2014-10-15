@@ -22,7 +22,7 @@ import java.io.IOException;
 
 import com.dickimawbooks.texparserlib.*;
 
-public class L2LActiveChar implements ActiveChar
+public class L2LActiveChar extends ActiveChar
 {
    public L2LActiveChar(int charCode)
    {
