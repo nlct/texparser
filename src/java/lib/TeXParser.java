@@ -34,6 +34,8 @@ public class TeXParser extends TeXObjectList
    {
       this.listener = listener;
       reader = null;
+      parentReader = null;
+      markedReader = null;
       settings = new TeXSettings(this);
 
       verbatim = new Vector<String>();
@@ -45,60 +47,75 @@ public class TeXParser extends TeXObjectList
 
    private void initRegisters()
    {
-      CountRegister reg = new CountRegister("count@");
-      allocCount(255, reg);
+      CountRegister countReg = new CountRegister("count@");
+      allocCount(255, countReg);
 
-      reg = new CountRegister("count"+ALLOC_COUNT, 22);
-      settings.putRegister(reg);
-      allocCount(ALLOC_COUNT, reg);
+      DimenRegister dimenReg = new DimenRegister("dimen@");
+      allocDimen(0, dimenReg);
 
-      reg = new CountRegister("count"+ALLOC_DIMEN, 9);
-      settings.putRegister(reg);
-      allocCount(ALLOC_DIMEN, reg);
+      dimenReg = new DimenRegister("dimen@i");
+      allocDimen(1, dimenReg);
+      dimenReg = new DimenRegister("dimen@ii");
+      allocDimen(2, dimenReg);
 
-      reg = new CountRegister("count"+ALLOC_SKIP, 9);
-      settings.putRegister(reg);
-      allocCount(ALLOC_SKIP, reg);
+      for (int i=0; i < 10; i++)
+      {
+         countReg = new CountRegister("count"+i);
+         settings.putRegister(countReg);
+         allocCount(ALLOC_COUNT, countReg);
+      }
 
-      reg = new CountRegister("count"+ALLOC_MUSKIP, 9);
-      settings.putRegister(reg);
-      allocCount(ALLOC_MUSKIP, reg);
+      countReg = new CountRegister("count"+ALLOC_COUNT, 22);
+      settings.putRegister(countReg);
+      allocCount(ALLOC_COUNT, countReg);
 
-      reg = new CountRegister("count"+ALLOC_BOX, 9);
-      settings.putRegister(reg);
-      allocCount(ALLOC_BOX, reg);
+      countReg = new CountRegister("count"+ALLOC_DIMEN, 9);
+      settings.putRegister(countReg);
+      allocCount(ALLOC_DIMEN, countReg);
 
-      reg = new CountRegister("count"+ALLOC_TOKS, 9);
-      settings.putRegister(reg);
-      allocCount(ALLOC_TOKS, reg);
+      countReg = new CountRegister("count"+ALLOC_SKIP, 9);
+      settings.putRegister(countReg);
+      allocCount(ALLOC_SKIP, countReg);
 
-      reg = new CountRegister("count"+ALLOC_INPUT, -1);
-      settings.putRegister(reg);
-      allocCount(ALLOC_INPUT, reg);
+      countReg = new CountRegister("count"+ALLOC_MUSKIP, 9);
+      settings.putRegister(countReg);
+      allocCount(ALLOC_MUSKIP, countReg);
 
-      reg = new CountRegister("count"+ALLOC_OUTPUT, -1);
-      settings.putRegister(reg);
-      allocCount(ALLOC_OUTPUT, reg);
+      countReg = new CountRegister("count"+ALLOC_BOX, 9);
+      settings.putRegister(countReg);
+      allocCount(ALLOC_BOX, countReg);
 
-      reg = new CountRegister("count"+ALLOC_MATHFAM, 3);
-      settings.putRegister(reg);
-      allocCount(ALLOC_MATHFAM, reg);
+      countReg = new CountRegister("count"+ALLOC_TOKS, 9);
+      settings.putRegister(countReg);
+      allocCount(ALLOC_TOKS, countReg);
 
-      reg = new CountRegister("count"+ALLOC_LANGUAGE, 0);
-      settings.putRegister(reg);
-      allocCount(ALLOC_LANGUAGE, reg);
+      countReg = new CountRegister("count"+ALLOC_INPUT, -1);
+      settings.putRegister(countReg);
+      allocCount(ALLOC_INPUT, countReg);
 
-      reg = new CountRegister("insc@unt", 255);
-      settings.putRegister(reg);
-      allocCount(INS_COUNT, reg);
+      countReg = new CountRegister("count"+ALLOC_OUTPUT, -1);
+      settings.putRegister(countReg);
+      allocCount(ALLOC_OUTPUT, countReg);
 
-      reg = new CountRegister("allocationnumber");
-      settings.putRegister(reg);
-      allocCount(ALLOC_NUMBER, reg);
+      countReg = new CountRegister("count"+ALLOC_MATHFAM, 3);
+      settings.putRegister(countReg);
+      allocCount(ALLOC_MATHFAM, countReg);
 
-      reg = new CountRegister("m@ne", -1);
-      settings.putRegister(reg);
-      allocCount(MINUS_ONE, reg);
+      countReg = new CountRegister("count"+ALLOC_LANGUAGE, 0);
+      settings.putRegister(countReg);
+      allocCount(ALLOC_LANGUAGE, countReg);
+
+      countReg = new CountRegister("insc@unt", 255);
+      settings.putRegister(countReg);
+      allocCount(INS_COUNT, countReg);
+
+      countReg = new CountRegister("allocationnumber");
+      settings.putRegister(countReg);
+      allocCount(ALLOC_NUMBER, countReg);
+
+      countReg = new CountRegister("m@ne", -1);
+      settings.putRegister(countReg);
+      allocCount(MINUS_ONE, countReg);
 
    }
 
@@ -222,6 +239,108 @@ public class TeXParser extends TeXObjectList
       return isCatCode(TYPE_LETTER, c);
    }
 
+   private int read() throws IOException
+   {
+      int c = reader.read();
+
+      if (c == -1 && parentReader != null)
+      {
+         reader = parentReader;
+         parentReader = null;
+         c = reader.read();
+      }
+
+      return c;
+   }
+
+   private void mark(int limit) throws IOException
+   {
+      reader.mark(limit);
+      markedReader = reader;
+   }
+
+   private void reset() throws IOException
+   {
+      if (markedReader != reader)
+      {
+         parentReader = reader;
+         reader = markedReader;
+      }
+
+      reader.reset();
+      markedReader = null;
+   }
+
+   public void scan(String text, TeXObjectList stack)
+     throws IOException
+   {
+      Reader orgParentReader = parentReader;
+      parentReader = reader;
+
+      StringReader strReader = new StringReader(text);
+      reader = strReader;
+
+      try
+      {
+         while (reader == strReader)
+         {
+            if (!fetchNext(stack))
+            {
+               break;
+            }
+         }
+      }
+      catch (EOFException e)
+      {
+      }
+
+      reader = parentReader;
+      parentReader = orgParentReader;
+   }
+
+   public TeXObjectList string(TeXParser parser)
+    throws IOException
+   {
+      return string();
+   }
+
+   public TeXObjectList string()
+    throws IOException
+   {
+      String text;
+
+      if (size() == 0)
+      {
+         int c = read();
+
+         while (isCatCode(TYPE_SPACE, (char)c))
+         {
+            c = read();
+         }
+
+         if (isCatCode(TYPE_EOL, (char)c))
+         {
+            parseEOL(c, this);
+            text = pop().toString(this);
+         }
+         else if (isCatCode(TYPE_ESC, (char)c))
+         {
+            readControlSequence(this, true);
+            text = pop().toString(this);
+         }
+         else
+         {
+            text = ""+c;
+         }
+      }
+      else
+      {
+         return pop().string(this);
+      }
+
+      return string(text);
+   }
+
    public TeXObjectList string(String text)
    {
       TeXObjectList list = new TeXObjectList();
@@ -256,9 +375,9 @@ public class TeXParser extends TeXObjectList
          // Is this just LF or is it LF+CR?
          // Or is it \n\n (paragraph break?)
 
-         reader.mark(1);
+         mark(1);
 
-         c = reader.read();
+         c = read();
 
          if (c == (int)'\n')
          {
@@ -275,9 +394,9 @@ public class TeXParser extends TeXObjectList
 
             // Is this followed by another eol character?
 
-            reader.mark(1);
+            mark(1);
 
-            c = reader.read();
+            c = read();
 
             if (isCatCode(TYPE_EOL, (char)c))
             {
@@ -292,7 +411,7 @@ public class TeXParser extends TeXObjectList
             {
                // not a paragraph break
 
-               reader.reset();
+               reset();
 
                eolFound(list);
             }
@@ -314,7 +433,7 @@ public class TeXParser extends TeXObjectList
 
             try
             {
-               reader.reset();
+               reset();
             }
             catch (IOException e)
             {
@@ -329,9 +448,9 @@ public class TeXParser extends TeXObjectList
          // Is this just CR or is it CR+LF?
          // Or is it \r\r (paragraph break?)
 
-         reader.mark(1);
+         mark(1);
 
-         c = reader.read();
+         c = read();
 
          if (c == (int)'\r')
          {
@@ -348,9 +467,9 @@ public class TeXParser extends TeXObjectList
 
             // Is this followed by another eol character?
 
-            reader.mark(1);
+            mark(1);
 
-            c = reader.read();
+            c = read();
 
             if (isCatCode(TYPE_EOL, (char)c))
             {
@@ -365,7 +484,7 @@ public class TeXParser extends TeXObjectList
             {
                // not a paragraph break
 
-               reader.reset();
+               reset();
 
                eolFound(list);
             }
@@ -384,7 +503,7 @@ public class TeXParser extends TeXObjectList
          else
          {
             // not a paragraph break, just one LF
-            reader.reset();
+            reset();
 
             eolFound(list);
          }
@@ -394,9 +513,9 @@ public class TeXParser extends TeXObjectList
          // User has assigned another character the EOL
          // category code
 
-         reader.mark(1);
+         mark(1);
 
-         c = reader.read();
+         c = read();
 
          // Do we have a paragraph break?
 
@@ -414,7 +533,7 @@ public class TeXParser extends TeXObjectList
          {
             // not a paragraph break
 
-            reader.reset();
+            reset();
 
             eolFound(list);
          }
@@ -435,15 +554,15 @@ public class TeXParser extends TeXObjectList
    {
       int c = -1;
 
-      reader.mark(1);
+      mark(1);
 
       SkippedEols skipped = null;
 
-      while ((c = reader.read()) != -1)
+      while ((c = read()) != -1)
       {
          if (!isCatCode(TYPE_EOL, (char)c))
          {
-            reader.reset();
+            reset();
             break;
          }
 
@@ -456,7 +575,7 @@ public class TeXParser extends TeXObjectList
          eol.setEol(""+(char)c);
          skipped.add(eol);
 
-         reader.mark(1);
+         mark(1);
       }
 
       if (skipped != null)
@@ -472,15 +591,15 @@ public class TeXParser extends TeXObjectList
    {
       int c = -1;
 
-      reader.mark(1);
+      mark(1);
 
       SkippedSpaces skipped = null;
 
-      while ((c = reader.read()) != -1)
+      while ((c = read()) != -1)
       {
          if (!isCatCode(TYPE_SPACE, (char)c))
          {
-            reader.reset();
+            reset();
             break;
          }
 
@@ -493,12 +612,12 @@ public class TeXParser extends TeXObjectList
          space.setSpace(c);
          skipped.add(space);
 
-         reader.mark(1);
+         mark(1);
       }
 
       if (c == -1)
       {
-         reader.reset();
+         reset();
       }
 
       if (skipped != null)
@@ -528,20 +647,20 @@ public class TeXParser extends TeXObjectList
 
       int c = -1;
 
-      while ((c = reader.read()) != -1)
+      while ((c = read()) != -1)
       {
          if (isCatCode(TYPE_EOL, (char)c))
          {
             if (c == (int)'\n')
             {
-               reader.mark(1);
-               c = reader.read();
+               mark(1);
+               c = read();
 
                if (c == (int)'\r')
                {
                   // LF+CR
-                  reader.mark(1);
-                  c = reader.read();
+                  mark(1);
+                  c = read();
 
                   if (isCatCode(TYPE_EOL, (char)c))
                   {
@@ -583,20 +702,20 @@ public class TeXParser extends TeXObjectList
                   // LF
 
                   list.add(comment);
-                  reader.reset();
+                  reset();
                   return skipNextSpaces(list);
                }
             }
             else if (c == (int)'\r')
             {
-               reader.mark(1);
-               c = reader.read();
+               mark(1);
+               c = read();
 
                if (c == (int)'\n')
                {
                   // CR+LF
-                  reader.mark(1);
-                  c = reader.read();
+                  mark(1);
+                  c = read();
 
                   if (isCatCode(TYPE_EOL, (char)c))
                   {
@@ -638,7 +757,7 @@ public class TeXParser extends TeXObjectList
                   // CR
 
                   list.add(comment);
-                  reader.reset();
+                  reset();
                   return skipNextSpaces(list);
                }
             }
@@ -646,8 +765,8 @@ public class TeXParser extends TeXObjectList
             {
                // EOL
 
-               reader.mark(1);
-               c = reader.read();
+               mark(1);
+               c = read();
 
                if (isCatCode(TYPE_EOL, (char)c))
                {
@@ -668,7 +787,7 @@ public class TeXParser extends TeXObjectList
                   // EOL
 
                   list.add(comment);
-                  reader.reset();
+                  reset();
                   return skipNextSpaces(list);
                }
             }
@@ -689,7 +808,7 @@ public class TeXParser extends TeXObjectList
    private boolean readParam(TeXObjectList list)
      throws IOException
    {
-      int c = reader.read();
+      int c = read();
 
       if (c == -1)
       {
@@ -699,7 +818,7 @@ public class TeXParser extends TeXObjectList
 
       if (isCatCode(TYPE_PARAM, (char)c))
       {
-         c = reader.read();
+         c = read();
 
          if (c > (int)'0' && c <= (int)'9')
          {
@@ -733,16 +852,16 @@ public class TeXParser extends TeXObjectList
    {
       int c;
 
-      reader.mark(1);
+      mark(1);
 
-      while ((c = reader.read()) != -1)
+      while ((c = read()) != -1)
       {
          if (isCatCode(TYPE_EG, (char)c))
          {
             return true;
          }
 
-         reader.reset();
+         reset();
 
          fetchNext(group, isShort);
 
@@ -752,7 +871,7 @@ public class TeXParser extends TeXObjectList
                TeXSyntaxException.ERROR_PAR_BEFORE_EG);
          }
 
-         reader.mark(1);
+         mark(1);
       }
 
       if (c == -1)
@@ -767,8 +886,8 @@ public class TeXParser extends TeXObjectList
    private void readMath(MathGroup math)
      throws IOException
    {
-      reader.mark(1);
-      int c = reader.read();
+      mark(1);
+      int c = read();
 
       if (c == -1)
       {
@@ -782,7 +901,7 @@ public class TeXParser extends TeXObjectList
       }
       else
       {
-         reader.reset();
+         reset();
          math.setInLine(true);
          readInLineMath(math);
       }
@@ -791,21 +910,21 @@ public class TeXParser extends TeXObjectList
    private void readInLineMath(MathGroup math)
      throws IOException
    {
-      reader.mark(1);
+      mark(1);
       int c;
 
-      while ((c = reader.read()) != -1)
+      while ((c = read()) != -1)
       {
          if (isCatCode(TYPE_MATH, (char)c))
          {
             return;
          }
 
-         reader.reset();
+         reset();
 
          fetchNext(math, true);
 
-         reader.mark(1);
+         mark(1);
       }
 
       throw new EOFException();
@@ -814,15 +933,15 @@ public class TeXParser extends TeXObjectList
    private void readDisplayMath(MathGroup math)
      throws IOException
    {
-      reader.mark(1);
+      mark(1);
       int c;
 
-      while ((c = reader.read()) != -1)
+      while ((c = read()) != -1)
       {
          if (isCatCode(TYPE_MATH, (char)c))
          {
-            reader.mark(1);
-            c = reader.read();
+            mark(1);
+            c = read();
 
             if (c == -1)
             {
@@ -832,7 +951,7 @@ public class TeXParser extends TeXObjectList
 
             if (!isCatCode(TYPE_MATH, (char)c))
             {
-               reader.reset();
+               reset();
                throw new TeXSyntaxException(getLineNumber(),
                   TeXSyntaxException.ERROR_DOLLAR2_ENDED_WITH_DOLLAR);
             }
@@ -840,11 +959,11 @@ public class TeXParser extends TeXObjectList
             return;
          }
 
-         reader.reset();
+         reset();
 
          fetchNext(math, true);
 
-         reader.mark(1);
+         mark(1);
       }
 
       throw new EOFException();
@@ -854,7 +973,7 @@ public class TeXParser extends TeXObjectList
      throws IOException
    {
       int n = terminator.length();
-      reader.mark(n);
+      mark(n);
 
       readTo(terminator, list, n, 0);
    }
@@ -863,7 +982,7 @@ public class TeXParser extends TeXObjectList
      int n, int idx)
      throws IOException
    {
-      int c = reader.read();
+      int c = read();
 
       if (c == -1)
       {
@@ -885,7 +1004,7 @@ public class TeXParser extends TeXObjectList
       }
       else
       {
-         reader.reset();
+         reset();
 
          if (!fetchNext(list))
          {
@@ -893,10 +1012,148 @@ public class TeXParser extends TeXObjectList
                TeXSyntaxException.ERROR_NOT_FOUND, terminator);
          }
 
-         reader.mark(n);
+         mark(n);
 
          readTo(terminator, list, n, 0);
       }
+   }
+
+   private boolean readControlSequence(TeXObjectList list)
+     throws IOException
+   {
+      return readControlSequence(list, false);
+   }
+
+   private boolean readControlSequence(TeXObjectList list, boolean doingString)
+     throws IOException
+   {
+      StringBuilder macro = new StringBuilder();
+
+      int c = -1;
+      mark(1);
+
+      while ((c = read()) != -1)
+      {
+         if (!isLetter((char)c))
+         {
+            ControlSequence cs;
+
+            if (isCatCode(TYPE_EOL, (char)c))
+            {
+               // Control sequence ended with EOL
+
+               if (macro.length() == 0)
+               {
+                  cs = listener.getControlSequence(" ");
+               }
+               else
+               {
+                  cs = listener.getControlSequence(macro.toString());
+               }
+
+               list.add(cs);
+
+               parseEOL(c, list);
+            }
+            else if (macro.length() == 0)
+            {
+               // Control Symbol
+
+               cs = listener.getControlSequence(""+(char)c);
+
+               list.add(cs);
+            }
+            else if (isCatCode(TYPE_SPACE, (char)c))
+            {
+               // Control word ended by a space
+
+               cs = listener.getControlSequence(macro.toString());
+               list.add(cs);
+
+               if (!skipNextSpaces(list))
+               {
+                  return false;
+               }
+            }
+            else
+            {
+               // Control word ended by non-space
+
+               reset();
+               cs = listener.getControlSequence(macro.toString());
+               list.add(cs);
+            }
+
+            if (doingString) return true;
+
+            if (isVerbCommand(cs.getName()))
+            {
+               c = read();
+
+               if (c == (int)'*')
+               {
+                  list.add(new Other(c));
+                  c = read();
+               }
+
+               int delim = c;
+
+               TeXObjectList charList = new TeXObjectList();
+                  list.add(charList);
+
+               charList.add(new Other(c));
+
+               while (c != -1)
+               {
+                  c = read();
+
+                  charList.add(new Other(c));
+
+                  if (c == delim)
+                  {
+                     break;
+                  }
+               }
+            }
+            else if (cs.getName().equals("string"))
+            {
+               mark(1);
+               c = read();
+
+               while (isCatCode(TYPE_SPACE, (char)c))
+               {
+                  mark(1);
+                  c = read();
+               }
+
+               if (isCatCode(TYPE_ESC, (char)c))
+               {
+                  reset();
+               }
+               else if (isCatCode(TYPE_LETTER, (char)c))
+               {
+                  list.add(new Letter(c));
+               }
+               else
+               {
+                  list.add(new Other(c));
+               }
+            }
+
+            return true;
+         }
+
+         mark(1);
+         macro.appendCodePoint(c);    
+      }
+
+      if (c == -1)
+      {
+         list.add(listener.getControlSequence(" "));
+         return false;
+      }
+
+      return true;
    }
 
    public boolean fetchNext()
@@ -925,7 +1182,7 @@ public class TeXParser extends TeXObjectList
          return false;
       }
 
-      int c = reader.read();
+      int c = read();
 
       if (c == -1) return false;
 
@@ -935,106 +1192,7 @@ public class TeXParser extends TeXObjectList
       }
       else if (isCatCode(TYPE_ESC, (char)c))
       {
-         StringBuilder macro = new StringBuilder();
-
-         c = -1;
-         reader.mark(1);
-
-         while ((c = reader.read()) != -1)
-         {
-            if (!isLetter((char)c))
-            {
-               ControlSequence cs;
-
-               if (isCatCode(TYPE_EOL, (char)c))
-               {
-                  // Control sequence ended with EOL
-
-                  if (macro.length() == 0)
-                  {
-                     cs = listener.getControlSequence(" ");
-                  }
-                  else
-                  {
-                     cs = listener.getControlSequence(macro.toString());
-                  }
-
-                  list.add(cs);
-
-                  parseEOL(c, list);
-               }
-               else if (macro.length() == 0)
-               {
-                  // Control Symbol
-
-                  cs = listener.getControlSequence(""+(char)c);
-
-                  list.add(cs);
-               }
-               else if (isCatCode(TYPE_SPACE, (char)c))
-               {
-                  // Control word ended by a space
-
-                  cs = listener.getControlSequence(macro.toString());
-                  list.add(cs);
-
-                  if (!skipNextSpaces(list))
-                  {
-                     return false;
-                  }
-               }
-               else
-               {
-                  // Control word ended by non-space
-
-                  reader.reset();
-                  cs = listener.getControlSequence(macro.toString());
-                  list.add(cs);
-               }
-
-               if (isVerbCommand(cs.getName()))
-               {
-                  c = reader.read();
-
-                  if (c == (int)'*')
-                  {
-                     list.add(new Other(c));
-                     c = reader.read();
-                  }
-
-                  int delim = c;
-
-                  TeXObjectList charList = new TeXObjectList();
-                  list.add(charList);
-
-                  charList.add(new Other(c));
-
-                  while (c != -1)
-                  {
-                     c = reader.read();
-
-                     charList.add(new Other(c));
-
-                     if (c == delim)
-                     {
-                        break;
-                     }
-                  }
-               }
-
-               return true;
-            }
-
-            reader.mark(1);
-            macro.appendCodePoint(c);    
-         }
-
-         if (c == -1)
-         {
-            list.add(listener.getControlSequence(" "));
-            return false;
-         }
-
+        return readControlSequence(list);
       }
       else if (isCatCode(TYPE_COMMENT, (char)c))
       {
@@ -1091,7 +1249,7 @@ public class TeXParser extends TeXObjectList
 
       try
       {
-         reader.mark(1);
+         mark(1);
       }
       catch (IOException e)
       {
@@ -1112,38 +1270,47 @@ public class TeXParser extends TeXObjectList
    public void parse(Reader reader, int mode)
      throws IOException
    {
+      Reader orgParentReader = this.parentReader;
+      this.parentReader = this.reader;
       this.reader = reader;
 
       settings.setMode(mode);
 
-      while (fetchNext())
+      try
       {
-         if (size() == 0)
+         while (fetchNext())
          {
-            break;
-         }
+            if (size() == 0)
+            {
+               break;
+            }
 
-         while (size() > 0)
-         {
-            TeXObject object = pop();
+            while (size() > 0)
+            {
+               TeXObject object = pop();
 
-            try
-            {
-               object.process(this);
-            }
-            catch (EOFException e)
-            {
-               return;
-            }
-            catch (TeXSyntaxException e)
-            {
-               listener.getTeXApp().error(e);
-            }
-            catch (LaTeXSyntaxException e)
-            {
-               listener.getTeXApp().error(e);
+               try
+               {
+                  object.process(this);
+               }
+               catch (EOFException e)
+               {
+                  return;
+               }
+               catch (TeXSyntaxException e)
+               {
+                  listener.getTeXApp().error(e);
+               }
+               catch (LaTeXSyntaxException e)
+               {
+                  listener.getTeXApp().error(e);
+               }
             }
          }
+      }
+      finally
+      {
+         this.parentReader = orgParentReader;
       }
    }
 
@@ -1264,6 +1431,7 @@ public class TeXParser extends TeXObjectList
          currentParentFile = orgParentFile;
          resetLineNum(orgLineNum);
          listener.endParse(this, file);
+
          if (reader != null)
          {
             reader.close();
@@ -1492,7 +1660,7 @@ public class TeXParser extends TeXObjectList
 
    private File currentParentFile;
 
-   private Reader reader;
+   private Reader reader, parentReader, markedReader;
 
    private Writer writer;
 
