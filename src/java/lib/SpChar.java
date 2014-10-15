@@ -36,6 +36,15 @@ public class SpChar implements TeXObject
       return ""+parser.getSpChar();
    }
 
+   public TeXObjectList string(TeXParser parser)
+     throws IOException
+   {
+      TeXObjectList list = new TeXObjectList();
+      list.add(new Other((int)parser.getSpChar()));
+
+      return list;
+   }
+
    public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
