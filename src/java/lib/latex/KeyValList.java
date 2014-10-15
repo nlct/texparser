@@ -132,6 +132,11 @@ public class KeyValList extends HashMap<String,TeXObject>
       return keyValList;
    }
 
+   public TeXObjectList string(TeXParser parser) throws IOException
+   {
+      return new TeXObjectList();
+   }
+
    public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
