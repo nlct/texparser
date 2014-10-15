@@ -41,6 +41,14 @@ public abstract class CharObject implements TeXObject
       return builder.toString();
    }
 
+   public TeXObjectList string(TeXParser parser)
+     throws IOException
+   {
+      TeXObjectList list = new TeXObjectList();
+      list.add(this);
+      return list;
+   }
+
    public int getCharCode()
    {
       return charCode;
