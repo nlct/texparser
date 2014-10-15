@@ -22,7 +22,7 @@ import java.io.IOException;
 
 import com.dickimawbooks.texparserlib.*;
 
-public class Nbsp implements ActiveChar
+public class Nbsp extends ActiveChar
 {
    public Nbsp()
    {
