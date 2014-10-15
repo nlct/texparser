@@ -68,6 +68,12 @@ public class TeXUnit implements TeXObject
       return id;
    }
 
+   public TeXObjectList string(TeXParser parser)
+     throws IOException
+   {
+      return parser.string(toString());
+   }
+
    public String toString(TeXParser parser)
    {
       return toString();
