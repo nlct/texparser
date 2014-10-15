@@ -37,6 +37,11 @@ public abstract class Ignoreable implements TeXObject
       }
    }
 
+   public TeXObjectList string(TeXParser parser) throws IOException
+   {
+      return new TeXObjectList();
+   } 
+
    public abstract Object clone();
 }
 

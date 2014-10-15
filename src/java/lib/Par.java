@@ -42,6 +42,12 @@ public class Par implements TeXObject
       return "\\par ";
    }
 
+   public TeXObjectList string(TeXParser parser)
+     throws IOException
+   {
+      return parser.string(""+parser.getEscChar()+"par");
+   }
+
    public void process(TeXParser parser, TeXObjectList list)
       throws IOException
    {

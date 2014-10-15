@@ -52,6 +52,16 @@ public class DoubleParam implements TeXObject
       return "#"+getParam().toString();
    }
 
+   public TeXObjectList string(TeXParser parser)
+     throws IOException
+   {
+      TeXObjectList list = new TeXObjectList();
+      list.add(new Other((int)parser.getParamChar()));
+      list.add(getParam());
+
+      return list;
+   }
+
    public void process(TeXParser parser, TeXObjectList list)
      throws IOException
    {

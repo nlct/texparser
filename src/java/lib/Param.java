@@ -62,6 +62,16 @@ public class Param implements TeXObject
       return "#"+digit;
    }
 
+   public TeXObjectList string(TeXParser parser)
+     throws IOException
+   {
+      TeXObjectList list = new TeXObjectList();
+      list.add(new Other((int)parser.getParamChar()));
+      list.add(new Other(0x30+digit));
+
+      return list;
+   }
+
    private int digit;
 }
 

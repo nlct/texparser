@@ -18,6 +18,8 @@
 */
 package com.dickimawbooks.texparserlib;
 
+import java.io.IOException;
+
 public class Comment extends Ignoreable
 {
    public Comment()
@@ -56,6 +58,18 @@ public class Comment extends Ignoreable
    public String toString()
    {
       return "%"+builder.toString();
+   }
+
+   public TeXObjectList string(TeXParser parser)
+     throws IOException
+   {
+      TeXObjectList list = new TeXObjectList();
+
+      list.add(new Other(parser.getCommentChar()));
+
+      parser.scan(builder.toString(), list);
+
+      return list; 
    }
 
    private StringBuilder builder;
