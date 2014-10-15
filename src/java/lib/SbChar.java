@@ -36,6 +36,15 @@ public class SbChar implements TeXObject
       return ""+parser.getSbChar();
    }
 
+   public TeXObjectList string(TeXParser parser)
+     throws IOException
+   {
+      TeXObjectList list = new TeXObjectList();
+      list.add(new Other((int)parser.getSbChar()));
+
+      return list;
+   }
+
    public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
