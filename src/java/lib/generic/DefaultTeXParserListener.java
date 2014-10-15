@@ -64,6 +64,7 @@ public abstract class DefaultTeXParserListener implements TeXParserListener
       csTable.put("overwithdelims", new OverWithDelims());
       csTable.put("a", new Accent("a"));
       csTable.put("relax", new Relax());
+      csTable.put("string", new StringCs());
       csTable.put("endinput", new EndInput());
       csTable.put("par", new ParCs());
       csTable.put("special", new Special());
