@@ -18,11 +18,24 @@
 */
 package com.dickimawbooks.texparserlib;
 
-public interface ActiveChar extends TeXObject,Expandable
+import java.io.IOException;
+
+public abstract class ActiveChar implements TeXObject,Expandable
 {
    // Character
 
-   public Character getChar();
+   public abstract Character getChar();
 
+   public String toString()
+   {
+      return getChar().toString();
+   }
+
+   public TeXObjectList string(TeXParser parser) throws IOException
+   {
+      return parser.string(toString());
+   }
+
+   public abstract Object clone();
 }
 
