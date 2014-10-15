@@ -80,6 +80,24 @@ public class AuxData
       return builder.toString();
    }
 
+   public String toString()
+   {
+      StringBuilder builder = new StringBuilder();
+
+      String esc = "\\";
+      String bg = "{";
+      String eg = "}";
+
+      builder.append(esc+name);
+
+      for (int i = 0; i < args.length; i++)
+      {
+         builder.append(bg+args[i].toString()+eg);
+      }
+
+      return builder.toString();
+   }
+
    private String name;
 
    private TeXObject[] args;
