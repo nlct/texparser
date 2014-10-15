@@ -52,6 +52,12 @@ public class Space extends WhiteSpace
       return toString();
    }
 
+   public TeXObjectList string(TeXParser parser)
+    throws IOException
+   {
+      return parser.string(" ");
+   }
+
    public String toString()
    {
       return ""+(char)charCode;

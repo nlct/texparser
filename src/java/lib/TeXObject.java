@@ -38,5 +38,8 @@ public interface TeXObject extends Cloneable
    public Object clone();
 
    public String toString(TeXParser parser);
+
+   public TeXObjectList string(TeXParser parser)
+    throws IOException;
 }
 

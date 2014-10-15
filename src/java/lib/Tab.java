@@ -41,6 +41,15 @@ public class Tab implements TeXObject
       return "&";
    }
 
+   public TeXObjectList string(TeXParser parser)
+     throws IOException
+   {
+      TeXObjectList list = new TeXObjectList();
+      list.add(new Other((int)parser.getTabChar()));
+
+      return list;
+   }
+
    public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
