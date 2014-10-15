@@ -74,5 +74,17 @@ public class SkippedSpaces extends Ignoreable
       return builder.toString();
    }
 
+   public String toString()
+   {
+      StringBuilder builder = new StringBuilder();
+
+      for (Space sp : contents)
+      {
+         builder.appendCodePoint(sp.getSpace());
+      }
+
+      return builder.toString();
+   }
+
    private Vector<Space> contents;
 }
