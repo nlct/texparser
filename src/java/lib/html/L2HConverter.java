@@ -35,6 +35,13 @@ public abstract class L2HConverter extends LaTeXParserListener
       setWriteable(this);
    }
 
+   protected void addPredefined()
+   {
+      super.addPredefined();
+      putControlSequence("\\", new L2HCr("\\"));
+      putControlSequence("nobreakspace", new L2HNoBreakSpace());
+   }
+
    public void setWriter(Writer writer)
    {
       this.writer = writer;
