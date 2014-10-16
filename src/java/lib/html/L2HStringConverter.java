@@ -26,38 +26,42 @@ import com.dickimawbooks.texparserlib.latex.*;
 
 public class L2HStringConverter extends L2HConverter
 {
-   protected L2HStringConverter(TeXApp app)
+   public L2HStringConverter(TeXApp app)
    {
       super(app);
 
       setWriteable(this);
    }
 
-   public static String convert(String str, boolean atIsLetter)
-    throws IOException
+   public L2HStringConverter()
    {
-      return convert(new TeXAppAdapter(), str, atIsLetter);
+      this(new TeXAppAdapter());
    }
 
    public static String convert(TeXApp app, String str, boolean atIsLetter)
     throws IOException
    {
-      L2HStringConverter listener = new L2HStringConverter(app);
-      StringWriter writer = new StringWriter();
-      listener.setWriter(writer);
+      return (new L2HStringConverter(app)).convert(str, atIsLetter);
+   }
 
-      listener.setTeXParser(new TeXParser(listener));
+   public String convert(String str, boolean atIsLetter)
+    throws IOException
+   {
+      StringWriter writer = new StringWriter();
+      setWriter(writer);
+
+      setTeXParser(new TeXParser(this));
 
       if (atIsLetter)
       {
-         listener.parser.setCatCode('@', TeXParser.TYPE_LETTER);
+         parser.setCatCode('@', TeXParser.TYPE_LETTER);
       }
 
       StringReader reader = new StringReader(str);
-      listener.parser.parse(reader);
+      parser.parse(reader);
 
       String html = writer.toString();
-      listener.setWriter(null);
+      setWriter(null);
 
       return html;
    }
