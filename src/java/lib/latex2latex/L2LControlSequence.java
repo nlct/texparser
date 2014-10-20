@@ -47,27 +47,6 @@ public class L2LControlSequence extends ControlSequence
       Writeable writeable = parser.getListener().getWriteable();
 
       writeable.write(toString(parser));
-
-      while (stack.size() > 0)
-      {
-         TeXObject nextObj = stack.pop();
-
-         if (nextObj == null)
-         {
-            break;
-         }
-
-         if (nextObj instanceof Ignoreable
-           ||nextObj instanceof Writeable)
-         {
-            writeable.write(nextObj.toString(parser));
-         }
-         else
-         {
-            nextObj.process(parser, stack);
-         }
-
-      }
    }
 
    public void process(TeXParser parser)
@@ -76,21 +55,6 @@ public class L2LControlSequence extends ControlSequence
       Writeable writeable = parser.getListener().getWriteable();
 
       writeable.write(toString(parser));
-
-      TeXObject nextObj = parser.pop();
-
-      while (nextObj instanceof Ignoreable
-           ||nextObj instanceof WhiteSpace)
-      {
-         writeable.write(nextObj.toString(parser));
-
-         nextObj = parser.pop();
-      }
-
-      if (nextObj != null)
-      {
-         nextObj.process(parser);
-      }
    }
 
    private String name;
