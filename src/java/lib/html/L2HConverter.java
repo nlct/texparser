@@ -39,6 +39,7 @@ public abstract class L2HConverter extends LaTeXParserListener
    {
       super.addPredefined();
       putControlSequence("\\", new L2HCr("\\"));
+      putControlSequence("&", new L2HAmp());
       putControlSequence("nobreakspace", new L2HNoBreakSpace());
    }
 
@@ -212,7 +213,7 @@ public abstract class L2HConverter extends LaTeXParserListener
    {
       if (writer == null) return;
 
-      write(str+"\n");
+      write(String.format("%s%n", str));
    }
 
    public void href(TeXParser parser, String url, TeXObject text)
