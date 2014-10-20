@@ -41,25 +41,17 @@ public class L2LGroup extends Group
       return group;
    }
 
-   public void process(TeXParser parser, TeXObjectList stack)
+   private void preprocess(TeXParser parser)
       throws IOException
    {
-      process(parser);
-   }
+      if (size() == 0)
+      {
+         return;
+      }
 
-   public void process(TeXParser parser)
-      throws IOException
-   {
       LaTeX2LaTeX listener = (LaTeX2LaTeX)parser.getListener();
 
       Writeable writeable = listener.getWriteable();
-
-      if (size() == 0)
-      {
-         writeable.write(parser.getBgChar());
-         writeable.write(parser.getEgChar());
-         return;
-      }
 
       TeXObject object = pop();
 
@@ -90,10 +82,34 @@ public class L2LGroup extends Group
       }
 
       push(object);
+   }
 
+   public void process(TeXParser parser, TeXObjectList stack)
+      throws IOException
+   {
+      preprocess(parser);
+
+      LaTeX2LaTeX listener = (LaTeX2LaTeX)parser.getListener();
+
+      Writeable writeable = listener.getWriteable();
       writeable.write(parser.getBgChar());
 
-      super.process(parser);
+      processList(parser);
+
+      writeable.write(parser.getEgChar());
+   }
+
+   public void process(TeXParser parser)
+      throws IOException
+   {
+      preprocess(parser);
+
+      LaTeX2LaTeX listener = (LaTeX2LaTeX)parser.getListener();
+
+      Writeable writeable = listener.getWriteable();
+      writeable.write(parser.getBgChar());
+
+      processList(parser);
 
       writeable.write(parser.getEgChar());
    }
