@@ -49,25 +49,6 @@ public class L2LSpace extends Space
    {
       Writeable writeable = parser.getListener().getWriteable();
       writeable.write(toString(parser));
-
-      TeXObject nextObj = parser.pop();
-
-      if (nextObj instanceof ControlSequence
-       && ((ControlSequence)nextObj).getName().equals(" "))
-      {
-          // skip
-
-         nextObj = parser.pop();
-      }
-
-      while (nextObj instanceof Ignoreable
-           ||nextObj instanceof WhiteSpace)
-      {
-         writeable.write(nextObj.toString(parser));
-         nextObj = parser.pop();
-      }
-
-      nextObj.process(parser);
    }
 
    public void process(TeXParser parser, TeXObjectList stack) 
@@ -75,13 +56,6 @@ public class L2LSpace extends Space
    {
       Writeable writeable = parser.getListener().getWriteable();
       writeable.write(toString(parser));
-
-      while (stack.size() > 0)
-      {
-         TeXObject nextObj = stack.pop();
-
-         writeable.write(nextObj.toString(parser));
-      }
    }
 }
 
