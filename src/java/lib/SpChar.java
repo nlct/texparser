@@ -52,7 +52,9 @@ public class SpChar implements TeXObject
 
       if (object == null)
       {
-         throw new TeXSyntaxException(parser.getLineNumber(),
+         throw new TeXSyntaxException(
+            parser.getListenerFile(),
+            parser.getLineNumber(),
             TeXSyntaxException.ERROR_MISSING_PARAM, ""+parser.getSpChar());
       }
 

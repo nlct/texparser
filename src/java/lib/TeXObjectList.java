@@ -59,7 +59,9 @@ public class TeXObjectList extends Vector<TeXObject> implements TeXObject,Expand
       if (object == null)
       {
          parser.push(new TeXUnit());
-         throw new TeXSyntaxException(parser.getLineNumber(),
+         throw new TeXSyntaxException(
+            parser.getListenerFile(),
+            parser.getLineNumber(),
             TeXSyntaxException.ERROR_MISSING_UNIT);
       }
 
@@ -82,7 +84,9 @@ public class TeXObjectList extends Vector<TeXObject> implements TeXObject,Expand
          {
             push(object);
             push(new TeXUnit());
-            throw new TeXSyntaxException(parser.getLineNumber(),
+            throw new TeXSyntaxException(
+               parser.getListenerFile(),
+               parser.getLineNumber(),
                TeXSyntaxException.ERROR_MISSING_UNIT);
          }
 
@@ -92,7 +96,9 @@ public class TeXObjectList extends Vector<TeXObject> implements TeXObject,Expand
          {
             push(object);
             push(new TeXUnit());
-            throw new TeXSyntaxException(parser.getLineNumber(),
+            throw new TeXSyntaxException(
+               parser.getListenerFile(),
+               parser.getLineNumber(),
                TeXSyntaxException.ERROR_MISSING_UNIT);
          }
 
@@ -110,7 +116,9 @@ public class TeXObjectList extends Vector<TeXObject> implements TeXObject,Expand
          push(object);
          push(nextObj);
          push(new TeXUnit());
-         throw new TeXSyntaxException(parser.getLineNumber(),
+         throw new TeXSyntaxException(
+               parser.getListenerFile(),
+               parser.getLineNumber(),
                TeXSyntaxException.ERROR_MISSING_UNIT);
       }
 
@@ -122,7 +130,9 @@ public class TeXObjectList extends Vector<TeXObject> implements TeXObject,Expand
          {
             push(object);
             push(new TeXUnit());
-            throw new TeXSyntaxException(parser.getLineNumber(),
+            throw new TeXSyntaxException(
+               parser.getListenerFile(),
+               parser.getLineNumber(),
                TeXSyntaxException.ERROR_MISSING_UNIT);
          }
 
@@ -138,7 +148,9 @@ public class TeXObjectList extends Vector<TeXObject> implements TeXObject,Expand
 
       push(object);
       push(new TeXUnit());
-      throw new TeXSyntaxException(parser.getLineNumber(),
+      throw new TeXSyntaxException(
+               parser.getListenerFile(),
+               parser.getLineNumber(),
                TeXSyntaxException.ERROR_MISSING_UNIT);
    }
 
@@ -150,7 +162,9 @@ public class TeXObjectList extends Vector<TeXObject> implements TeXObject,Expand
       if (object == null)
       {
          push(new UserDimension());
-         throw new TeXSyntaxException(parser.getLineNumber(),
+         throw new TeXSyntaxException(
+               parser.getListenerFile(),
+               parser.getLineNumber(),
                TeXSyntaxException.ERROR_MISSING_PARAM);
 
       }
@@ -178,7 +192,9 @@ public class TeXObjectList extends Vector<TeXObject> implements TeXObject,Expand
          {
             push(object);
             push(new UserDimension());
-            throw new TeXSyntaxException(parser.getLineNumber(),
+            throw new TeXSyntaxException(
+               parser.getListenerFile(),
+               parser.getLineNumber(),
                TeXSyntaxException.ERROR_DIMEN_EXPECTED);
 
          }
@@ -204,7 +220,9 @@ public class TeXObjectList extends Vector<TeXObject> implements TeXObject,Expand
       push(object);
 
       push(new UserDimension());
-      throw new TeXSyntaxException(parser.getLineNumber(),
+      throw new TeXSyntaxException(
+               parser.getListenerFile(),
+               parser.getLineNumber(),
                TeXSyntaxException.ERROR_DIMEN_EXPECTED);
 
    }
@@ -228,7 +246,8 @@ public class TeXObjectList extends Vector<TeXObject> implements TeXObject,Expand
 
       if (object == null)
       {
-         throw new TeXSyntaxException(TeXSyntaxException.ERROR_MISSING_PARAM);
+         throw new TeXSyntaxException(
+            TeXSyntaxException.ERROR_MISSING_PARAM);
       }
 
       if (object instanceof Group
@@ -283,7 +302,9 @@ public class TeXObjectList extends Vector<TeXObject> implements TeXObject,Expand
          list.add(object);
       }
 
-      throw new TeXSyntaxException(parser.getLineNumber(),
+      throw new TeXSyntaxException(
+               parser.getListenerFile(),
+               parser.getLineNumber(),
                TeXSyntaxException.ERROR_MISSING_CLOSING,
         ""+closeDelim);
    }

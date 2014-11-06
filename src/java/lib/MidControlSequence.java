@@ -28,13 +28,17 @@ public abstract class MidControlSequence extends ControlSequence
 
    public void process(TeXParser parser) throws IOException
    {
-      throw new TeXSyntaxException(parser.getLineNumber(),
+      throw new TeXSyntaxException(
+         parser.getListenerFile(),
+         parser.getLineNumber(),
          TeXSyntaxException.ERROR_AMBIGUOUS_MIDCS, getName());
    }
 
    public void process(TeXParser parser, TeXObjectList stack) throws IOException
    {
-      throw new TeXSyntaxException(parser.getLineNumber(),
+      throw new TeXSyntaxException(
+         parser.getListenerFile(),
+         parser.getLineNumber(),
          TeXSyntaxException.ERROR_AMBIGUOUS_MIDCS, getName());
    }
 
