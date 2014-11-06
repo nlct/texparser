@@ -19,6 +19,7 @@
 package com.dickimawbooks.texparserlib.latex.jmlr;
 
 import java.util.Hashtable;
+import java.io.IOException;
 
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.*;
