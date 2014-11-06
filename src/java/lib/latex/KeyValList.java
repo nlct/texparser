@@ -24,6 +24,7 @@ import java.util.Set;
 import java.util.Iterator;
 
 import com.dickimawbooks.texparserlib.*;
+import com.dickimawbooks.texparserlib.generic.Empty;
 
 public class KeyValList extends HashMap<String,TeXObject>
   implements TeXObject
@@ -72,7 +73,7 @@ public class KeyValList extends HashMap<String,TeXObject>
                   }
                   else if (charCode == (int)',')
                   {
-                     keyValList.put(keyBuilder.toString().trim(), null);
+                     keyValList.put(keyBuilder.toString().trim(), new Empty());
                      keyBuilder.setLength(0);
                      continue;
                   }
@@ -116,7 +117,7 @@ public class KeyValList extends HashMap<String,TeXObject>
 
          if (!key.isEmpty())
          {
-            keyValList.put(key, valBuilder);
+            keyValList.put(key, valBuilder == null ? new Empty() : valBuilder);
          }
       }
       else
@@ -125,7 +126,7 @@ public class KeyValList extends HashMap<String,TeXObject>
 
          if (!key.isEmpty())
          {
-            keyValList.put(key, null);
+            keyValList.put(key, new Empty());
          }
       }
 
