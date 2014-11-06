@@ -30,6 +30,7 @@ import com.dickimawbooks.texparserlib.latex.graphics.*;
 import com.dickimawbooks.texparserlib.latex.amsmath.*;
 import com.dickimawbooks.texparserlib.latex.tcilatex.*;
 import com.dickimawbooks.texparserlib.latex.lipsum.*;
+import com.dickimawbooks.texparserlib.latex.jmlr.*;
 
 public abstract class LaTeXParserListener extends DefaultTeXParserListener
 {
@@ -323,6 +324,24 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       docCls = new LaTeXFile(parser, options, clsName, "cls");
 
       addFileReference(docCls);
+
+      LaTeXCls cls = getLaTeXCls(parser, clsName);
+
+      if (cls != null)
+      {
+         cls.load(this, parser, options);
+      }
+   }
+
+   public LaTeXCls getLaTeXCls(TeXParser parser, String clsName)
+    throws IOException
+   {
+      if (clsName.equals("jmlr"))
+      {
+         return new JmlrCls();
+      }
+
+      return null;
    }
 
    public void usepackage(TeXParser parser, KeyValList options,
@@ -340,7 +359,7 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
 
          if (sty != null)
          {
-            sty.addDefinitions(this);
+            sty.load(this, parser, options);
          }
       }
    }

@@ -31,6 +31,13 @@ public abstract class LaTeXSty
 
    public abstract void addDefinitions(LaTeXParserListener listener);
 
+   public void load(LaTeXParserListener listener,
+      TeXParser parser, KeyValList options)
+   throws IOException
+   {
+      addDefinitions(listener);
+   }
+
    public String getName()
    {
       return name;
