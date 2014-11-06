@@ -23,7 +23,7 @@ import java.io.IOException;
 
 import com.dickimawbooks.texparserlib.*;
 
-public class LaTeXCls extends LaTeXSty
+public abstract class LaTeXCls extends LaTeXSty
 {
    public LaTeXCls(String name)
    {
