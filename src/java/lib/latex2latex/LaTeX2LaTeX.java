@@ -791,6 +791,11 @@ public class LaTeX2LaTeX extends LaTeXParserListener
       return true;
    }
 
+   public File getFile()
+   {
+      return inFile;
+   }
+
    public void beginParse(TeXParser parser, File file)
      throws IOException
    {
