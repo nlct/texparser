@@ -81,7 +81,8 @@ public class Accent extends ControlSequence
          }
          else
          {
-            throw new TeXSyntaxException(TeXSyntaxException.ERROR_INVALID_ACCENT, 
+            throw new TeXSyntaxException(parser,
+              TeXSyntaxException.ERROR_INVALID_ACCENT, 
               object.toString(parser));
          }
 
@@ -194,7 +195,9 @@ public class Accent extends ControlSequence
          }
          else
          {
-            throw new TeXSyntaxException(TeXSyntaxException.ERROR_INVALID_ACCENT, object.toString(parser));
+            throw new TeXSyntaxException(parser,
+              TeXSyntaxException.ERROR_INVALID_ACCENT,
+              object.toString(parser));
          }
 
          if (remaining != null && remaining.size() > 0)
@@ -278,7 +281,10 @@ public class Accent extends ControlSequence
       else
       {
          object.process(parser, remaining);
-         throw new TeXSyntaxException(TeXSyntaxException.ERROR_INVALID_ACCENT, object.toString(parser));
+         throw new TeXSyntaxException(
+             parser,
+             TeXSyntaxException.ERROR_INVALID_ACCENT,
+             object.toString(parser));
       }
       
       if (remaining != null && remaining.size() > 0)
