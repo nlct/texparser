@@ -321,6 +321,13 @@ public abstract class L2HConverter extends LaTeXParserListener
       write("<tt>"+text+"</tt>");
    }
 
+   public void includegraphics(TeXParser parser, KeyValList options, String file)
+     throws IOException
+   {
+      // This doesn't take the options or file format into account.
+      write(String.format("<img src=\"%s\"/>", file));
+   }
+
    public TeXApp getTeXApp()
    {
       return texApp;
@@ -329,11 +336,18 @@ public abstract class L2HConverter extends LaTeXParserListener
    public void endParse(TeXParser parser, File file)
     throws IOException
    {
+      this.file = null;
    }
 
    public void beginParse(TeXParser parser, File file)
     throws IOException
    {
+      this.file = file;
+   }
+
+   public File getFile()
+   {
+      return file;
    }
 
    private Writer writer;
@@ -341,4 +355,6 @@ public abstract class L2HConverter extends LaTeXParserListener
    private TeXApp texApp;
 
    protected TeXParser parser;
+
+   private File file;
 }
