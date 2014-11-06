@@ -65,7 +65,7 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
 
    protected void addPredefined()
    {
-      loadedPackages = new Vector<String>();
+      loadedPackages = new Vector<LaTeXFile>();
       envTable = new Hashtable<String,Environment>();
       inLineMathEnv = new Vector<String>();
       displayMathEnv = new Vector<String>();
@@ -99,6 +99,7 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       putControlSequence("cr", new Cr("cr"));
       putControlSequence("href", new Href());
       putControlSequence("frac", new Frac());
+      putControlSequence("@empty", new Empty("@empty"));
 
       // Math font commands
 
@@ -283,6 +284,7 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       if (docEnvFound)
       {
          throw new LaTeXSyntaxException(
+            parser,
             LaTeXSyntaxException.ERROR_MULTI_BEGIN_DOC);
       }
 
@@ -295,36 +297,46 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       if (!docEnvFound)
       {
          throw new LaTeXSyntaxException(
+            parser,
             LaTeXSyntaxException.ERROR_NO_BEGIN_DOC);
       }
 
       throw new EOFException();
    }
 
+   public LaTeXFile getDocumentClass()
+   {
+      return docCls;
+   }
+
    public void documentclass(TeXParser parser, KeyValList options,
      String clsName)
      throws IOException
    {
-      if (docClsFound)
+      if (docCls != null)
       {
          throw new LaTeXSyntaxException(
+            parser,
             LaTeXSyntaxException.ERROR_MULTI_CLS);
       }
 
-      addFileReference(new TeXPath(parser, clsName, "cls"));
+      docCls = new LaTeXFile(parser, options, clsName, "cls");
 
-      docClsFound = true;
+      addFileReference(docCls);
    }
 
    public void usepackage(TeXParser parser, KeyValList options,
-     String styName) throws IOException
+     String styName)
+   throws IOException
    {
       if (!isStyLoaded(styName))
       {
-         addFileReference(new TeXPath(parser, styName, "sty"));
-         loadedPackages.add(styName);
+         LaTeXFile lfile = new LaTeXFile(parser, options, styName, "sty");
 
-         LaTeXSty sty = getLaTeXSty(styName);
+         addFileReference(lfile);
+         loadedPackages.add(lfile);
+
+         LaTeXSty sty = getLaTeXSty(parser, styName);
 
          if (sty != null)
          {
@@ -333,7 +345,8 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       }
    }
 
-   public LaTeXSty getLaTeXSty(String styName)
+   public LaTeXSty getLaTeXSty(TeXParser parser, String styName)
+   throws IOException
    {
       if (styName.equals("graphics")
         || styName.equals("graphicx")
@@ -342,7 +355,10 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
          if (styName.equals("epsfig")
            && !isStyLoaded("graphicx"))
          {
-            loadedPackages.add("graphicx");
+            LaTeXFile lfile = new LaTeXFile(parser, null, "graphicx", "sty");
+
+            addFileReference(lfile);
+            loadedPackages.add(lfile);
          }
 
          return new GraphicsSty(styName);
@@ -365,18 +381,24 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
     String original, String replacement)
      throws IOException;
 
-   public void includegraphics(TeXParser parser, 
+   public abstract void includegraphics(TeXParser parser, 
      KeyValList options, String imgName)
-     throws IOException
-   {
-   }
+     throws IOException;
 
    public boolean isStyLoaded(String name)
    {
-      return loadedPackages.contains(name);
+      for (LaTeXFile f : loadedPackages)
+      {
+         if (f.getName().equals(name))
+         {
+            return true;
+         }
+      }
+
+      return false;
    }
 
-   public Vector<String> getLoadedPackages()
+   public Vector<LaTeXFile> getLoadedPackages()
    {
       return loadedPackages;
    }
@@ -424,9 +446,11 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
 
    private Vector<String> inLineMathEnv, displayMathEnv;
 
-   private Vector<String> loadedPackages;
+   private Vector<LaTeXFile> loadedPackages;
+
+   private LaTeXFile docCls;
 
    private TeXObjectList graphicsPath = null;
 
-   private boolean docEnvFound = false, docClsFound=false;
+   private boolean docEnvFound = false;
 }
