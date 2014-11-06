@@ -812,7 +812,8 @@ public class TeXParser extends TeXObjectList
 
       if (c == -1)
       {
-         throw new TeXSyntaxException(getLineNumber(),
+         throw new TeXSyntaxException(
+            getListenerFile(), getLineNumber(),
             TeXSyntaxException.ERROR_BAD_PARAM, "EOF");
       }
 
@@ -827,7 +828,9 @@ public class TeXParser extends TeXObjectList
          }
          else
          {
-            throw new TeXSyntaxException(getLineNumber(),
+            throw new TeXSyntaxException(
+               getListenerFile(),
+               getLineNumber(),
                TeXSyntaxException.ERROR_BAD_PARAM, ""+((int)c));
          }
       }
@@ -839,7 +842,9 @@ public class TeXParser extends TeXObjectList
          }
          else
          {
-            throw new TeXSyntaxException(getLineNumber(),
+            throw new TeXSyntaxException(
+               getListenerFile(),
+               getLineNumber(),
                TeXSyntaxException.ERROR_BAD_PARAM, ""+((int)c));
          }
       }
@@ -867,7 +872,9 @@ public class TeXParser extends TeXObjectList
 
          if (isShort && (group.lastElement() instanceof Par))
          {
-            throw new TeXSyntaxException(getLineNumber(),
+            throw new TeXSyntaxException(
+               getListenerFile(),
+               getLineNumber(),
                TeXSyntaxException.ERROR_PAR_BEFORE_EG);
          }
 
@@ -876,7 +883,9 @@ public class TeXParser extends TeXObjectList
 
       if (c == -1)
       {
-         throw new TeXSyntaxException(getLineNumber(),
+         throw new TeXSyntaxException(
+            getListenerFile(),
+            getLineNumber(),
             TeXSyntaxException.ERROR_NO_EG);
       }
 
@@ -891,7 +900,9 @@ public class TeXParser extends TeXObjectList
 
       if (c == -1)
       {
-         throw new TeXSyntaxException(getLineNumber(),
+         throw new TeXSyntaxException(
+            getListenerFile(),
+            getLineNumber(),
             TeXSyntaxException.ERROR_MISSING_ENDMATH);
       }
       else if (isCatCode(TYPE_MATH, (char)c))
@@ -945,14 +956,18 @@ public class TeXParser extends TeXObjectList
 
             if (c == -1)
             {
-               throw new TeXSyntaxException(getLineNumber(),
+               throw new TeXSyntaxException(
+                  getListenerFile(),
+                  getLineNumber(),
                   TeXSyntaxException.ERROR_MISSING_ENDMATH);
             }
 
             if (!isCatCode(TYPE_MATH, (char)c))
             {
                reset();
-               throw new TeXSyntaxException(getLineNumber(),
+               throw new TeXSyntaxException(
+                  getListenerFile(),
+                  getLineNumber(),
                   TeXSyntaxException.ERROR_DOLLAR2_ENDED_WITH_DOLLAR);
             }
 
@@ -986,7 +1001,9 @@ public class TeXParser extends TeXObjectList
 
       if (c == -1)
       {
-         throw new TeXSyntaxException(getLineNumber(),
+         throw new TeXSyntaxException(
+            getListenerFile(),
+            getLineNumber(),
             TeXSyntaxException.ERROR_NOT_FOUND, terminator);
       }
 
@@ -1008,7 +1025,9 @@ public class TeXParser extends TeXObjectList
 
          if (!fetchNext(list))
          {
-            throw new TeXSyntaxException(getLineNumber(),
+            throw new TeXSyntaxException(
+               getListenerFile(),
+               getLineNumber(),
                TeXSyntaxException.ERROR_NOT_FOUND, terminator);
          }
 
@@ -1228,7 +1247,9 @@ public class TeXParser extends TeXObjectList
       }
       else if (isCatCode(TYPE_EG, (char)c))
       {
-         throw new TeXSyntaxException(getLineNumber(),
+         throw new TeXSyntaxException(
+            getListenerFile(),
+            getLineNumber(),
             TeXSyntaxException.ERROR_UNEXPECTED_EG);
       }
       else if (isCatCode(TYPE_SPACE, (char)c))
@@ -1463,6 +1484,11 @@ public class TeXParser extends TeXObjectList
    public TeXParserListener getListener()
    {
       return listener;
+   }
+
+   public File getListenerFile()
+   {
+      return listener == null ? null : listener.getFile();
    }
 
    public boolean isMathMode()
