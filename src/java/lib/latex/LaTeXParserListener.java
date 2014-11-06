@@ -341,6 +341,11 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
          return new JmlrCls();
       }
 
+      if (clsName.equals("jmlrbook"))
+      {
+         return new JmlrBookCls();
+      }
+
       return null;
    }
 
