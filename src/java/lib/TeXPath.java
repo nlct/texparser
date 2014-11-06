@@ -189,6 +189,11 @@ public class TeXPath
       return relative;
    }
 
+   public Path getFileName()
+   {
+      return relative.getFileName();
+   }
+
    public boolean exists()
    {
       return getFile().exists();
