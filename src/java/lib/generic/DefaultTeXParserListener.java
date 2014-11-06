@@ -68,6 +68,7 @@ public abstract class DefaultTeXParserListener implements TeXParserListener
       csTable.put("endinput", new EndInput());
       csTable.put("par", new ParCs());
       csTable.put("special", new Special());
+      csTable.put("empty", new Empty());
 
       // TeX font changing declarations
 
@@ -321,6 +322,11 @@ public abstract class DefaultTeXParserListener implements TeXParserListener
       }
    }
 
+   public Vector<TeXPath> getFileList()
+   {
+      return referencedFiles;
+   }
+
    protected Hashtable<String,ControlSequence> csTable;
 
    protected Hashtable<Integer,ActiveChar> activeTable;
@@ -332,5 +338,4 @@ public abstract class DefaultTeXParserListener implements TeXParserListener
    protected Vector<TeXPath> referencedFiles;
 
    protected Vector<SpecialListener> specialListeners;
-
 }
