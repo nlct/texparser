@@ -69,7 +69,8 @@ public class End extends ControlSequence
          return;
       }
 
-      throw new LaTeXSyntaxException(LaTeXSyntaxException.ERROR_EXTRA_END, name);
+      throw new LaTeXSyntaxException(
+          parser, LaTeXSyntaxException.ERROR_EXTRA_END, name);
    }
 
    public void process(TeXParser parser)
@@ -103,7 +104,8 @@ public class End extends ControlSequence
          return;
       }
 
-      throw new LaTeXSyntaxException(LaTeXSyntaxException.ERROR_EXTRA_END, name);
+      throw new LaTeXSyntaxException(
+         parser, LaTeXSyntaxException.ERROR_EXTRA_END, name);
    }
 
 }

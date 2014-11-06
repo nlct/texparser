@@ -93,7 +93,9 @@ public class Environment extends Group
 
             if (!str.equals(name))
             {
-               throw new TeXSyntaxException(TeXSyntaxException.ERROR_EXPECTED,
+               throw new TeXSyntaxException(
+                 parser,
+                 TeXSyntaxException.ERROR_EXPECTED,
                  object.toString(parser)+
                  parser.getBgChar()+name+parser.getEgChar());
             }
@@ -138,7 +140,9 @@ public class Environment extends Group
 
             if (!str.equals(name))
             {
-               throw new TeXSyntaxException(TeXSyntaxException.ERROR_EXPECTED,
+               throw new TeXSyntaxException(
+                 parser,
+                 TeXSyntaxException.ERROR_EXPECTED,
                  object.toString(parser)+
                  parser.getBgChar()+name+parser.getEgChar());
             }

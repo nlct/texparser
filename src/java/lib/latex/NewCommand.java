@@ -89,8 +89,10 @@ public class NewCommand extends Command
 
       if (!(object instanceof ControlSequence))
       {
-         throw new TeXSyntaxException(parser.getLineNumber(),
-            TeXSyntaxException.ERROR_CS_EXPECTED, object.toString());
+         throw new TeXSyntaxException(
+            parser,
+            TeXSyntaxException.ERROR_CS_EXPECTED,
+            object.toString());
       }
 
       String csName = ((ControlSequence)object).getName();
@@ -128,7 +130,8 @@ public class NewCommand extends Command
             }
             catch (NumberFormatException e)
             {
-               throw new TeXSyntaxException(parser.getLineNumber(),
+               throw new TeXSyntaxException(
+                 parser,
                  TeXSyntaxException.ERROR_NUMBER_EXPECTED, 
                   object.toString(parser));
             }
@@ -164,7 +167,7 @@ public class NewCommand extends Command
 
       if (!(object instanceof ControlSequence))
       {
-         throw new TeXSyntaxException(parser.getLineNumber(),
+         throw new TeXSyntaxException(parser,
             TeXSyntaxException.ERROR_CS_EXPECTED, object.toString());
       }
 
@@ -203,7 +206,7 @@ public class NewCommand extends Command
             }
             catch (NumberFormatException e)
             {
-               throw new TeXSyntaxException(parser.getLineNumber(),
+               throw new TeXSyntaxException(parser,
                  TeXSyntaxException.ERROR_NUMBER_EXPECTED, 
                   object.toString(parser));
             }
