@@ -162,11 +162,18 @@ public class AuxParser extends DefaultTeXParserListener
    public void endParse(TeXParser parser, File file)
       throws IOException
    {
+      this.file = null;
    }
 
    public void beginParse(TeXParser parser, File file)
       throws IOException
    {
+      this.file = file;
+   }
+
+   public File getFile()
+   {
+      return file;
    }
 
    public void addAuxData(AuxData data)
@@ -196,4 +203,6 @@ public class AuxParser extends DefaultTeXParserListener
 
    private Vector<AuxData> auxData;
    private TeXApp texApp;
+
+   private File file;
 }
