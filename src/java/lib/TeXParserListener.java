@@ -33,6 +33,9 @@ public interface TeXParserListener
    public void endParse(TeXParser parser, File file)
       throws IOException;
 
+   // Gets the current file being parsed or null if not known
+   public File getFile();
+
    // Gets control sequence identified by name (doesn't include
    // leading backslash)
    public ControlSequence getControlSequence(String name);
