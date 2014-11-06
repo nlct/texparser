@@ -19,27 +19,67 @@
 package com.dickimawbooks.texparserlib.latex;
 
 import java.io.IOException;
+import java.io.File;
+
+import com.dickimawbooks.texparserlib.TeXParser;
 
 public class LaTeXSyntaxException extends IOException
 {
    public LaTeXSyntaxException(int errorCode)
    {
-      this(-1, errorCode, null);
+      this(null, -1, errorCode, null);
+   }
+
+   public LaTeXSyntaxException(File file, int errorCode)
+   {
+      this(file, -1, errorCode, null);
    }
 
    public LaTeXSyntaxException(int lineNumber, int errorCode)
    {
-      this(lineNumber, errorCode, null);
+      this(null, lineNumber, errorCode, null);
+   }
+
+   public LaTeXSyntaxException(File file, int lineNumber, int errorCode)
+   {
+      this(file, lineNumber, errorCode, null);
    }
 
    public LaTeXSyntaxException(int errorCode, String param)
    {
-      this(-1, errorCode, param);
+      this(null, -1, errorCode, param);
+   }
+
+   public LaTeXSyntaxException(File file, int errorCode, String param)
+   {
+      this(file, -1, errorCode, param);
    }
 
    public LaTeXSyntaxException(int lineNumber, int errorCode, String param)
    {
+      this(null, lineNumber, errorCode, param);
+   }
+
+   public LaTeXSyntaxException(TeXParser parser, int errorCode, String param)
+   {
+      this(parser.getListenerFile(), 
+           parser.getLineNumber(),
+           errorCode,
+           param);
+   }
+
+   public LaTeXSyntaxException(TeXParser parser, int errorCode)
+   {
+      this(parser.getListenerFile(), 
+           parser.getLineNumber(),
+           errorCode,
+           null);
+   }
+
+   public LaTeXSyntaxException(File file, int lineNumber, int errorCode, String param)
+   {
       super("LaTeX syntax error code "+errorCode);
+      this.file = file;
       this.errorCode = errorCode;
       this.param = param;
       this.lineNum = lineNumber;
@@ -65,9 +105,20 @@ public class LaTeXSyntaxException extends IOException
       return lineNum;
    }
 
+   public File getFile()
+   {
+      return file;
+   }
+
+   public void setFile(File file)
+   {
+      this.file = file;
+   }
+
    private int errorCode;
    private String param;
    private int lineNum;
+   private File file;
 
    public static final int ERROR_MULTI_BEGIN_DOC=1,
       ERROR_NO_BEGIN_DOC=2, ERROR_MULTI_CLS=3,

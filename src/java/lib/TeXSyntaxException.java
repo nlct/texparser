@@ -19,27 +19,65 @@
 package com.dickimawbooks.texparserlib;
 
 import java.io.IOException;
+import java.io.File;
 
 public class TeXSyntaxException extends IOException
 {
    public TeXSyntaxException(int errorCode)
    {
-      this(-1, errorCode, null);
+      this(null, -1, errorCode, null);
+   }
+
+   public TeXSyntaxException(File file, int errorCode)
+   {
+      this(file, -1, errorCode, null);
    }
 
    public TeXSyntaxException(int lineNumber, int errorCode)
    {
-      this(lineNumber, errorCode, null);
+      this(null, lineNumber, errorCode, null);
+   }
+
+   public TeXSyntaxException(File file, int lineNumber, int errorCode)
+   {
+      this(file, lineNumber, errorCode, null);
    }
 
    public TeXSyntaxException(int errorCode, String param)
    {
-      this(-1, errorCode, param);
+      this(null, -1, errorCode, param);
+   }
+
+   public TeXSyntaxException(File file, int errorCode, String param)
+   {
+      this(file, -1, errorCode, param);
    }
 
    public TeXSyntaxException(int lineNumber, int errorCode, String param)
    {
+      this(null, lineNumber, errorCode, param);
+   }
+
+   public TeXSyntaxException(TeXParser parser, int errorCode, String param)
+   {
+      this(parser.getListenerFile(),
+           parser.getLineNumber(), 
+           errorCode,
+           param);
+   }
+
+   public TeXSyntaxException(TeXParser parser, int errorCode)
+   {
+      this(parser.getListenerFile(),
+           parser.getLineNumber(), 
+           errorCode,
+           null);
+   }
+
+   public TeXSyntaxException(File file, int lineNumber, int errorCode, String param)
+   {
       super("TeX syntax error code "+errorCode);
+      this.file = file;
       this.errorCode = errorCode;
       this.param = param;
       this.lineNum = lineNumber;
@@ -65,9 +103,20 @@ public class TeXSyntaxException extends IOException
       return lineNum;
    }
 
+   public File getFile()
+   {
+      return file;
+   }
+
+   public void setFile(File file)
+   {
+      this.file = file;
+   }
+
    private int errorCode;
    private String param;
    private int lineNum = -1;
+   private File file = null;
 
    public static final int ERROR_BAD_PARAM = 0, ERROR_NO_EG = 1,
      ERROR_PAR_BEFORE_EG = 2, ERROR_UNEXPECTED_EG = 3,
