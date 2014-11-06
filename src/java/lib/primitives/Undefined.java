@@ -50,7 +50,8 @@ public class Undefined extends Primitive
    public void process(TeXParser parser)
       throws IOException
    {
-      throw new TeXSyntaxException(TeXSyntaxException.ERROR_UNDEFINED, getName());
+      throw new TeXSyntaxException(
+         parser, TeXSyntaxException.ERROR_UNDEFINED, getName());
    }
 
    private String name;

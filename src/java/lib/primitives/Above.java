@@ -51,7 +51,9 @@ public class Above extends MidControlSequence
       if (following == null || following.size() == 0)
       {
          before.process(parser);
-         throw new TeXSyntaxException(TeXSyntaxException.ERROR_MISSING_PARAM,
+         throw new TeXSyntaxException(
+           parser,
+           TeXSyntaxException.ERROR_MISSING_PARAM,
            getName());
       }
 

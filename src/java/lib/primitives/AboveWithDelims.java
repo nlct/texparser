@@ -45,7 +45,9 @@ public class AboveWithDelims extends MidControlSequence
    {
       if (!parser.isMathMode())
       {
-         throw new TeXSyntaxException(TeXSyntaxException.ERROR_NOT_MATH_MODE,
+         throw new TeXSyntaxException(
+           parser,
+           TeXSyntaxException.ERROR_NOT_MATH_MODE,
            getName());
       }
 
@@ -54,7 +56,9 @@ public class AboveWithDelims extends MidControlSequence
 
       if (following == null || following.size() == 0)
       {
-         throw new TeXSyntaxException(TeXSyntaxException.ERROR_MISSING_PARAM,
+         throw new TeXSyntaxException(
+          parser,
+          TeXSyntaxException.ERROR_MISSING_PARAM,
           getName());
       }
 
@@ -62,7 +66,9 @@ public class AboveWithDelims extends MidControlSequence
 
       if (following.size() == 0)
       {
-         throw new TeXSyntaxException(TeXSyntaxException.ERROR_MISSING_PARAM,
+         throw new TeXSyntaxException(
+          parser,
+          TeXSyntaxException.ERROR_MISSING_PARAM,
           toString(parser));
       }
 
@@ -70,7 +76,9 @@ public class AboveWithDelims extends MidControlSequence
 
       if (following.size() == 0)
       {
-         throw new TeXSyntaxException(TeXSyntaxException.ERROR_MISSING_PARAM,
+         throw new TeXSyntaxException(
+          parser,
+          TeXSyntaxException.ERROR_MISSING_PARAM,
           second.toString(parser));
       }
 
