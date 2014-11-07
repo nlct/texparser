@@ -45,7 +45,7 @@ public class EndCsname extends Primitive
    {
       throw new TeXSyntaxException(parser,
         TeXSyntaxException.ERROR_EXTRA,
-        getString(parser));
+        toString(parser));
    }
 
    public void process(TeXParser parser)
@@ -53,6 +53,6 @@ public class EndCsname extends Primitive
    {
       throw new TeXSyntaxException(parser,
         TeXSyntaxException.ERROR_EXTRA,
-        getString(parser));
+        toString(parser));
    }
 }

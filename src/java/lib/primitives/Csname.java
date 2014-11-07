@@ -40,7 +40,7 @@ public class Csname extends Primitive
       return new Csname(getName());
    }
 
-   public void csname(TeXParser parser, TeXObjectList stack)
+   public String csname(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
       TeXObjectList list = new TeXObjectList();
