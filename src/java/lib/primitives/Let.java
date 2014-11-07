@@ -23,90 +23,85 @@ import java.io.EOFException;
 
 import com.dickimawbooks.texparserlib.*;
 
-public class Def extends Primitive
+public class Let extends Primitive
 {
-   public Def()
+   public Let()
    {
-      this("def");
+      this("let");
    }
 
-   public Def(String name)
+   public Let(String name)
    {
-      this(name, true, true);
-   }
-
-   public Def(String name, boolean isShort, boolean isLocal)
-   {
-      super(name);
-      this.isShort = isShort;
-      this.isLocal = isLocal;
+      super(name, true);
    }
 
    public Object clone()
    {
-      return new Def(getName(), isShort, isLocal);
+      return new Let(getName());
    }
 
    public void process(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
-      TeXObject cs = stack.popStack();
+      TeXObject firstArg = stack.popStack();
 
-      if (cs == null)
+      if (firstArg == null)
       {
-         stack = parser;
+         process(parser);
+         return;
       }
 
-      TeXObjectList syntax = new TeXObjectList();
-      TeXObject nextObject = stack.popStack();
+      TeXObject secondArg = stack.popStack();
 
-      while (!(nextObject instanceof Group))
+      if (secondArg == null)
       {
-         syntax.add(nextObject);
-         nextObject = stack.popStack();
+         secondArg = parser.popNextArg();
       }
 
-      TeXObjectList definition = ((Group)nextObject).toList();
-
-      if (cs instanceof ControlSequence)
-      {
-         parser.putControlSequence(isLocal, 
-           new GenericCommand(((ControlSequence)cs).getName(),
-             syntax, definition));
-      }
-      else
-      {
-         // TODO
-      }
+      doAssignment(parser, firstArg, secondArg);
    }
 
    public void process(TeXParser parser)
       throws IOException
    {
-      TeXObject cs = parser.popStack();
+      TeXObject firstArg = parser.popStack();
 
-      TeXObjectList syntax = new TeXObjectList();
-      TeXObject nextObject = parser.popStack(isShort);
-
-      while (!(nextObject instanceof Group))
+      if (firstArg == null)
       {
-         syntax.add(nextObject);
-         nextObject = parser.popStack(isShort);
+         throw new EOFException();
       }
 
-      TeXObjectList definition = ((Group)nextObject).toList();
+      TeXObject secondArg = parser.popStack();
 
-      if (cs instanceof ControlSequence)
+      if (secondArg == null)
       {
-         parser.putControlSequence(isLocal, 
-           new GenericCommand(((ControlSequence)cs).getName(),
-             syntax, definition));
+         throw new EOFException();
+      }
+
+      doAssignment(parser, firstArg, secondArg);
+   }
+
+   private void doAssignment(TeXParser parser,
+     TeXObject firstArg, TeXObject secondArg)
+   {
+      TeXObject obj = (TeXObject)secondArg.clone();
+
+      if (obj instanceof ControlSequence
+       && firstArg instanceof ControlSequence)
+      {
+         ControlSequence cs = (ControlSequence)obj;
+
+         cs.setName(((ControlSequence)firstArg).getName());
+
+         parser.putControlSequence(getPrefix() != PREFIX_GLOBAL,
+          cs);
       }
       else
       {
          // TODO
       }
+
+      clearPrefix();
    }
 
-   private boolean isShort, isLocal;
 }
