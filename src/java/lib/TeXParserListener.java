@@ -127,7 +127,7 @@ public abstract class TeXParserListener
    // Add all predefined commands
    protected abstract void addPredefined();
 
-   protected void setParser(TeXParser parser)
+   public void setParser(TeXParser parser)
    {
       this.parser = parser;
       addPredefined();
