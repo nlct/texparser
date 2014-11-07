@@ -25,7 +25,13 @@ public abstract class ControlSequence implements TeXObject
 {
    public ControlSequence(String name)
    {
+      this(name, true);
+   }
+
+   public ControlSequence(String name, boolean isShort)
+   {
       setName(name);
+      setShort(isShort);
    }
 
    public abstract Object clone();
@@ -75,7 +81,59 @@ public abstract class ControlSequence implements TeXObject
       return parser.string(""+parser.getEscChar()+getName());
    }
 
+   public boolean getAllowsPrefix()
+   {
+      return allowsPrefix;
+   }
+
+   protected void setAllowsPrefix(boolean allow)
+   {
+      allowsPrefix = allow;
+   }
+
+   public boolean isShort()
+   {
+      return isShort;
+   }
+
+   protected void setShort(boolean isShort)
+   {
+      this.isShort = isShort;
+   }
+
+   protected void setPrefix(byte prefix)
+   {
+      if (allowsPrefix)
+      {
+         this.prefix = prefix;
+      }
+   }
+
+   public byte getPrefix()
+   {
+      return allowsPrefix ? prefix : PREFIX_NONE;
+   }
+
+   protected void clearPrefix()
+   {
+      prefix = PREFIX_NONE;
+   }
+
    // control sequence name without initial backslash
 
    protected String name;
+
+   // Is this a short command?
+
+   protected boolean isShort = true;
+
+   // Is this command allowed a prefix?
+
+   protected boolean allowsPrefix = false;
+
+   public static final byte PREFIX_NONE = (byte)0;
+   public static final byte PREFIX_LONG = (byte)1;
+   public static final byte PREFIX_GLOBAL = (byte)2;
+
+   protected byte prefix = PREFIX_NONE;
 }

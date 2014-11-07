@@ -380,6 +380,5 @@ public class GenericCommand extends Command
 
    private TeXObjectList syntax, definition;
    private int numArgs=0;
-   private boolean isShort;
    private boolean isDelimited;
 }
