@@ -64,36 +64,119 @@ public class GenericCommand extends Command
       }
    }
 
+   private GenericCommand(boolean isShort, String name, TeXObjectList syntax,
+      TeXObjectList definition, boolean isDelimited, int numArgs)
+   {
+      super(name);
+      this.isShort = isShort;
+      this.syntax = syntax;
+      this.definition = definition;
+      this.isDelimited = isDelimited;
+      this.numArgs = numArgs;
+   }
+
+   public GenericCommand(boolean isShort, String name, TeXObject[] syntaxArray,
+      TeXObject[] definitionArray)
+   {
+      super(name);
+      this.isShort = isShort;
+      this.isDelimited = false;
+
+      numArgs = 0;
+
+      if (syntaxArray == null || syntaxArray.length == 0)
+      {
+         syntax = null;
+      }
+      else
+      {
+         syntax = new TeXObjectList(syntaxArray.length);
+
+         for (int i = 0; i < syntaxArray.length; i++)
+         {
+            if (syntaxArray[i] instanceof Param)
+            {
+               if (((Param)syntaxArray[i]).getDigit() == -1)
+               {
+                  isDelimited = true;
+               }
+               else
+               {
+                  numArgs++;
+               }
+            }
+
+            syntax.add(syntaxArray[i]);
+         }
+      }
+
+      definition = new TeXObjectList(
+        definitionArray == null || definitionArray.length == 0 ?
+        1 : definitionArray.length);
+
+      if (definitionArray != null)
+      {
+         for (int i = 0; i < definitionArray.length; i++)
+         {
+            definition.add(definitionArray[i]);
+         }
+      }
+   }
+
    public Object clone()
    {
-      return new GenericCommand(isShort, getName(), syntax, definition);
+      return new GenericCommand(isShort, getName(), syntax, definition,
+        isDelimited, numArgs);
+   }
+
+   public boolean equals(Object obj)
+   {
+      if (obj == null || !(obj instanceof GenericCommand)) return false;
+
+      if (this == obj) return true;
+
+      GenericCommand cs = (GenericCommand)obj;
+
+      if (isShort != cs.isShort || isDelimited != cs.isDelimited
+        || numArgs != cs.numArgs
+        || (syntax == null && cs.syntax != null)
+        || (syntax != null && cs.syntax == null)
+        || !definition.equals(cs.definition))
+      {
+         return false;
+      }
+
+      if (syntax == cs.syntax) return true;
+
+      return syntax.equals(cs.syntax);
    }
 
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList list)
      throws IOException
    {
-      return null;
+      return getReplacement(parser, list);
    }
 
    public TeXObjectList expandonce(TeXParser parser)
      throws IOException
    {
-      return null;
+      return getReplacement(parser);
    }
 
    public TeXObjectList expandfully(TeXParser parser, TeXObjectList list)
      throws IOException
    {
-      return null;
+      return getReplacement(parser, list).expandfully(parser, list);
    }
 
    public TeXObjectList expandfully(TeXParser parser)
      throws IOException
    {
-      return null;
+      return getReplacement(parser).expandfully(parser);
    }
 
-   public void process(TeXParser parser, TeXObjectList remainingStack)
+   private TeXObjectList getReplacement(TeXParser parser,
+     TeXObjectList remainingStack)
      throws IOException
    {
       TeXObject[] args = (numArgs == 0 ? null : new TeXObject[numArgs]);
@@ -149,16 +232,20 @@ public class GenericCommand extends Command
          {
             stack.add(args[((Param)obj).getDigit()]);
          }
+         else if (obj instanceof DoubleParam)
+         {
+            stack.add(((DoubleParam)obj).getParam());
+         }
          else
          {
             stack.add(obj);
          }
       }
 
-      stack.process(parser, remainingStack);
+      return stack;
    }
 
-   public void process(TeXParser parser)
+   private TeXObjectList getReplacement(TeXParser parser)
      throws IOException
    {
       TeXObject[] args = (numArgs == 0 ? null : new TeXObject[numArgs]);
@@ -220,13 +307,29 @@ public class GenericCommand extends Command
          {
             stack.add(args[((Param)obj).getDigit()]);
          }
+         else if (obj instanceof DoubleParam)
+         {
+            stack.add(((DoubleParam)obj).getParam());
+         }
          else
          {
             stack.add(obj);
          }
       }
 
-      stack.process(parser);
+      return stack;
+   }
+
+   public void process(TeXParser parser, TeXObjectList stack)
+     throws IOException
+   {
+      getReplacement(parser, stack).process(parser, stack);
+   }
+
+   public void process(TeXParser parser)
+     throws IOException
+   {
+      getReplacement(parser).process(parser);
    }
 
    public String meaning(TeXParser parser)
