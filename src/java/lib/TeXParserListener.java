@@ -23,104 +23,120 @@ import java.io.File;
 
 import com.dickimawbooks.texparserlib.generic.*;
 
-public interface TeXParserListener
+public abstract class TeXParserListener
 {
    // Called when parser starts to parse file
-   public void beginParse(TeXParser parser, File file)
+   public abstract void beginParse(File file)
       throws IOException;
 
    // Called when parser finishes parse file
-   public void endParse(TeXParser parser, File file)
+   public abstract void endParse(File file)
       throws IOException;
 
    // Gets the current file being parsed or null if not known
-   public File getFile();
+   public abstract File getFile();
 
    // Gets control sequence identified by name (doesn't include
    // leading backslash)
-   public ControlSequence getControlSequence(String name);
+   public abstract ControlSequence getControlSequence(String name);
 
    // Gets active character identified by charCode.
-   public ActiveChar getActiveChar(int charCode);
+   public abstract ActiveChar getActiveChar(int charCode);
 
-   public Eol getEol();
+   public abstract Eol getEol();
 
-   public Par getPar();
+   public abstract Par getPar();
 
-   public Space getSpace();
+   public abstract Space getSpace();
 
-   public Param getParam(int digit);
+   public abstract Param getParam(int digit);
 
-   public DoubleParam getDoubleParam(Param param);
+   public abstract DoubleParam getDoubleParam(Param param);
 
-   public Tab getTab();
+   public abstract Tab getTab();
 
-   public Letter getLetter(int charCode);
+   public abstract Letter getLetter(int charCode);
 
-   public Other getOther(int charCode);
+   public abstract Other getOther(int charCode);
 
-   public BigOperator createBigOperator(String name, int code1, int code2);
+   public abstract BigOperator createBigOperator(String name, int code1, int code2);
 
-   public Symbol createSymbol(String name, int code);
+   public abstract Symbol createSymbol(String name, int code);
 
-   public GreekSymbol createGreekSymbol(String name, int code);
+   public abstract GreekSymbol createGreekSymbol(String name, int code);
 
-   public BinarySymbol createBinarySymbol(String name, int code);
+   public abstract BinarySymbol createBinarySymbol(String name, int code);
 
-   public MathSymbol createMathSymbol(String name, int code);
+   public abstract MathSymbol createMathSymbol(String name, int code);
 
-   public Group createGroup();
+   public abstract Group createGroup();
 
-   public MathGroup createMathGroup();
+   public abstract MathGroup createMathGroup();
 
-   public SpChar createSpChar();
+   public abstract SpChar createSpChar();
 
-   public SbChar createSbChar();
+   public abstract SbChar createSbChar();
 
-   public Comment createComment();
+   public abstract Comment createComment();
 
-   public SkippedSpaces createSkippedSpaces();
+   public abstract SkippedSpaces createSkippedSpaces();
 
-   public SkippedEols createSkippedEols();
+   public abstract SkippedEols createSkippedEols();
 
-   public void skipping(TeXParser parser, Ignoreable ignoreable)
+   public abstract void skipping(Ignoreable ignoreable)
       throws IOException;
 
-   public void subscript(TeXParser parser, TeXObject arg)
+   public abstract void subscript(TeXObject arg)
      throws IOException;
 
-   public void superscript(TeXParser parser, TeXObject arg)
+   public abstract void superscript(TeXObject arg)
      throws IOException;
 
-   public void tab(TeXParser parser)
+   public abstract void tab()
      throws IOException;
 
-   public void overwithdelims(TeXParser parser, TeXObject firstDelim,
+   public abstract void overwithdelims(TeXObject firstDelim,
      TeXObject secondDelim, TeXObject before, TeXObject after)
     throws IOException;
 
-   public void abovewithdelims(TeXParser parser, TeXObject firstDelim,
+   public abstract void abovewithdelims(TeXObject firstDelim,
      TeXObject secondDelim, TeXDimension thickness, TeXObject before, TeXObject after)
     throws IOException;
 
-   public void input(TeXParser parser, TeXPath path)
+   public abstract void input(TeXPath path)
     throws IOException;
 
-   public void par() throws IOException;
+   public abstract void par() throws IOException;
 
-   public boolean special(TeXParser parser, String param)
+   public abstract boolean special(String param)
      throws IOException;
 
-   public void verb(TeXParser parser, boolean isStar, char delim,
+   public abstract void verb(boolean isStar, char delim,
      String text)
      throws IOException;
 
-   public void addFileReference(TeXPath texPath);
+   public abstract void addFileReference(TeXPath texPath);
 
-   public void href(TeXParser parser, String url, TeXObject text)
+   public abstract void href(String url, TeXObject text)
      throws IOException;
 
-   public Writeable getWriteable();
+   public abstract Writeable getWriteable();
 
-   public TeXApp getTeXApp();
+   public abstract TeXApp getTeXApp();
+
+   // Add all predefined commands
+   protected abstract void addPredefined();
+
+   protected void setParser(TeXParser parser)
+   {
+      this.parser = parser;
+      addPredefined();
+   }
+
+   public TeXParser getParser()
+   {
+      return parser;
+   }
+
+   protected TeXParser parser;
 }
