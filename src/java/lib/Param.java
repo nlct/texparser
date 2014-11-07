@@ -54,12 +54,13 @@ public class Param implements TeXObject
 
    public String toString(TeXParser parser)
    {
-      return ""+parser.getParamChar()+digit;
+      return ""+(digit == -1 ? parser.getParamChar()
+                           : parser.getParamChar()+digit);
    }
 
    public String toString()
    {
-      return "#"+digit;
+      return (digit == -1 ? "#" : "#"+digit);
    }
 
    public TeXObjectList string(TeXParser parser)
@@ -67,11 +68,16 @@ public class Param implements TeXObject
    {
       TeXObjectList list = new TeXObjectList();
       list.add(new Other((int)parser.getParamChar()));
-      list.add(new Other(0x30+digit));
+
+      if (digit != -1)
+      {
+         list.add(new Other(0x30+digit));
+      }
 
       return list;
    }
 
+   // -1 indicates #{
    private int digit;
 }
 

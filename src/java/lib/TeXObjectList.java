@@ -34,7 +34,13 @@ public class TeXObjectList extends Vector<TeXObject> implements TeXObject,Expand
       super(capacity);
    }
 
-   public TeXObject popStack()
+   public TeXObject popStack() throws IOException
+   {
+      return popStack(false);
+   }
+
+// TODO check for paragraph breaks if short
+   public TeXObject popStack(boolean isShort)
      throws IOException
    {
       while (size() > 0 && (get(0) instanceof Ignoreable))
@@ -49,6 +55,43 @@ public class TeXObjectList extends Vector<TeXObject> implements TeXObject,Expand
      throws IOException
    {
       return size() == 0 ? null : remove(0);
+   }
+
+// TODO check for paragraph breaks if short
+   public TeXObjectList popToGroup(TeXParser parser, boolean isShort)
+     throws IOException
+   {
+      TeXObjectList list = new TeXObjectList();
+
+      while (true)
+      {
+         if (size() == 0)
+         {
+            throw new TeXSyntaxException(parser,
+              TeXSyntaxException.ERROR_SYNTAX,
+              toString(parser));
+         }
+
+         TeXObject obj = firstElement();
+
+         if (obj instanceof Group)
+         {
+            break;
+         }
+
+         obj = remove(0);
+
+         if (obj instanceof Ignoreable)
+         {
+            parser.getListener().skipping((Ignoreable)obj);
+         }
+         else
+         {
+            list.add(obj);
+         }
+      }
+
+      return list;
    }
 
    public TeXUnit popUnit(TeXParser parser)

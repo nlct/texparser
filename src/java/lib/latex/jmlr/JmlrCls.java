@@ -64,6 +64,17 @@ public class JmlrCls extends LaTeXCls
       opts.put("ruled", new Empty());
       listener.usepackage(opts, "algorithm2e");
 
+      ControlSequence cs = parser.getControlSequence("jmlrprehyperref");
+
+      if (cs == null)
+      {
+         parser.putControlSequence(new GenericCommand("jmlrprehyperref"));
+      }
+      else
+      {
+         cs.process(parser);
+      }
+
       listener.usepackage(null, "hyperref");
       listener.usepackage(null, "nameref");
       addDefinitions(listener);

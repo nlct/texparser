@@ -59,9 +59,9 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       return displayMathEnv.contains(name);
    }
 
-   public void addEnvironment(String name, Environment env)
+   public void putEnvironment(Environment env)
    {
-      envTable.put(name, env);
+      envTable.put(env.getName(), env);
    }
 
    protected void addPredefined()
@@ -75,8 +75,8 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       addDisplayMathEnv("displaymath");
       addDisplayMathEnv("equation");
 
-      addEnvironment("verbatim", new Verbatim());
-      addEnvironment("verbatim*", new Verbatim("verbatim*"));
+      putEnvironment(new Verbatim());
+      putEnvironment(new Verbatim("verbatim*"));
 
       parser.putControlSequence(new Begin());
       parser.putControlSequence(new End());

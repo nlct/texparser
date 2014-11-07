@@ -27,13 +27,26 @@ public class GenericCommand extends Command
    {
    }
 
+   public GenericCommand(String name)
+   {
+      this(name, null, new TeXObjectList());
+   }
+
    public GenericCommand(String name, TeXObjectList syntax,
       TeXObjectList definition)
    {
+      this(true, name, syntax, definition);
+   }
+
+   public GenericCommand(boolean isShort, String name, TeXObjectList syntax,
+      TeXObjectList definition)
+   {
       super();
+      this.isShort = isShort;
       this.name = name;
       this.syntax = syntax;
       this.definition = definition;
+      this.isDelimited = false;
 
       if (syntax != null)
       {
@@ -43,7 +56,14 @@ public class GenericCommand extends Command
          {
             if (obj instanceof Param)
             {
-               numArgs++;
+               if (((Param)obj).getDigit() == -1)
+               {
+                  isDelimited = true;
+               }
+               else
+               {
+                  numArgs++;
+               }
             }
          }
       }
@@ -56,7 +76,7 @@ public class GenericCommand extends Command
 
    public Object clone()
    {
-      return new GenericCommand(name, syntax, definition);
+      return new GenericCommand(isShort, name, syntax, definition);
    }
 
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList list)
@@ -94,24 +114,32 @@ public class GenericCommand extends Command
       {
          for (TeXObject obj : syntax)
          {
-            TeXObject nextObj = remainingStack.popArg();
+            if (obj instanceof Param)
+            {
+               if (((Param)obj).getDigit() != -1)
+               {
+                  if (isDelimited && n == numArgs-1)
+                  {
+                     args[n] = remainingStack.popToGroup(parser, isShort);
+                  }
+                  else
+                  {
+                     args[n] = remainingStack.popStack(isShort);
+                  }
 
-            if (nextObj == null)
-            {
-               throw new TeXSyntaxException(parser,
-                 TeXSyntaxException.ERROR_SYNTAX,
-                 toString(parser));
+                  n++;
+               }
             }
-            else if (obj instanceof Param)
+            else
             {
-               args[n] = nextObj;
-               n++;
-            }
-            else if (!obj.equals(nextObj))
-            {
-               throw new TeXSyntaxException(parser,
-                 TeXSyntaxException.ERROR_SYNTAX,
-                 toString(parser));
+               TeXObject nextObj = remainingStack.popArg();
+
+               if (nextObj == null || !obj.equals(nextObj))
+               {
+                  throw new TeXSyntaxException(parser,
+                    TeXSyntaxException.ERROR_SYNTAX,
+                    toString(parser));
+               }
             }
          }
       }
@@ -151,24 +179,38 @@ public class GenericCommand extends Command
       {
          for (TeXObject obj : syntax)
          {
-            TeXObject nextObj = parser.popNextArg();
+            if (obj instanceof Param)
+            {
+               if (((Param)obj).getDigit() != -1)
+               {
+                  if (isDelimited && n == numArgs-1)
+                  {
+                     args[n] = parser.popToGroup(isShort);
+                  }
+                  else
+                  {
+                     args[n] = parser.popNextArg(isShort);
+                  }
 
-            if (nextObj == null)
-            {
-               throw new TeXSyntaxException(parser,
-                 TeXSyntaxException.ERROR_SYNTAX,
-                 toString(parser));
+                  n++;
+               }
             }
-            else if (obj instanceof Param)
+            else
             {
-               args[n] = nextObj;
-               n++;
-            }
-            else if (!obj.equals(nextObj))
-            {
-               throw new TeXSyntaxException(parser,
-                 TeXSyntaxException.ERROR_SYNTAX,
-                 toString(parser));
+               TeXObject nextObj = parser.popNextArg(isShort);
+
+               if (nextObj == null)
+               {
+                  throw new TeXSyntaxException(parser,
+                    TeXSyntaxException.ERROR_SYNTAX,
+                    toString(parser));
+               }
+               else if (!obj.equals(nextObj))
+               {
+                  throw new TeXSyntaxException(parser,
+                    TeXSyntaxException.ERROR_SYNTAX,
+                    toString(parser));
+               }
             }
          }
       }
@@ -200,4 +242,6 @@ public class GenericCommand extends Command
    private String name;
    private TeXObjectList syntax, definition;
    private int numArgs=0;
+   private boolean isShort;
+   private boolean isDelimited;
 }

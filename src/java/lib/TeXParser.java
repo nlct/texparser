@@ -818,6 +818,7 @@ public class TeXParser extends TeXObjectList
    private boolean readParam(TeXObjectList list)
      throws IOException
    {
+      mark(1);
       int c = read();
 
       if (c == -1)
@@ -829,12 +830,19 @@ public class TeXParser extends TeXObjectList
 
       if (isCatCode(TYPE_PARAM, (char)c))
       {
+         mark(1);
          c = read();
 
          if (c > (int)'0' && c <= (int)'9')
          {
             list.add(listener.getDoubleParam(
               listener.getParam(c-(int)'0')));
+         }
+         else if (isCatCode(TYPE_BG, (char)c))
+         {
+            list.add(listener.getDoubleParam(
+              listener.getParam(-1)));
+            reset();
          }
          else
          {
@@ -849,6 +857,11 @@ public class TeXParser extends TeXObjectList
          if (c >= (int)'0' && c <= (int)'9')
          {
             list.add(listener.getParam(c-(int)'0'));
+         }
+         else if (isCatCode(TYPE_BG, (char)c))
+         {
+            list.add(listener.getParam(-1));
+            reset();
          }
          else
          {
@@ -1395,12 +1408,17 @@ public class TeXParser extends TeXObjectList
       return popArg(this, openDelim, closeDelim);
    }
 
-   public TeXObject popStack()
+   public TeXObject popStack() throws IOException
+   {
+      return popStack(false);
+   }
+
+   public TeXObject popStack(boolean isShort)
      throws IOException
    {
       if (size() == 0)
       {
-         fetchNext();
+         fetchNext(isShort);
       }
 
       if (size() == 0)
@@ -1414,10 +1432,49 @@ public class TeXParser extends TeXObjectList
       {
          listener.skipping((Ignoreable)object);
 
-         return popStack();
+         return popStack(isShort);
       }
 
       return object;
+   }
+
+   public TeXObjectList popToGroup(boolean isShort)
+     throws IOException
+   {
+      TeXObjectList list = new TeXObjectList();
+
+      while (true)
+      {
+         if (size() == 0)
+         {
+            fetchNext(isShort);
+         }
+
+         if (size() == 0)
+         {
+            throw new EOFException();
+         }
+
+         TeXObject obj = firstElement();
+
+         if (obj instanceof Group)
+         {
+            break;
+         }
+
+         obj = remove(0);
+
+         if (obj instanceof Ignoreable)
+         {
+            listener.skipping((Ignoreable)obj);
+         }
+         else
+         {
+            list.add(obj);
+         }
+      }
+
+      return list;
    }
 
    public TeXObject peekStack()
