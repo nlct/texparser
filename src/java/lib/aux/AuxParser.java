@@ -77,7 +77,7 @@ public class AuxParser extends DefaultTeXParserListener
 
    public void addAuxCommand(String name, int numArgs)
    {
-      putControlSequence(name, new AuxCommand(name, numArgs));
+      putControlSequence(new AuxCommand(name, numArgs));
    }
 
    public ControlSequence getControlSequence(String name)
@@ -112,13 +112,13 @@ public class AuxParser extends DefaultTeXParserListener
    {
    }
 
-   public void overwithdelims(TeXParser parser, TeXObject firstDelim,
+   public void overwithdelims(TeXObject firstDelim,
      TeXObject secondDelim, TeXObject before, TeXObject after)
     throws IOException
    {
    }
 
-   public void abovewithdelims(TeXParser parser, TeXObject firstDelim,
+   public void abovewithdelims(TeXObject firstDelim,
      TeXObject secondDelim, TeXDimension thickness, TeXObject before, 
      TeXObject after)
     throws IOException
@@ -129,43 +129,43 @@ public class AuxParser extends DefaultTeXParserListener
    {
    }
 
-   public void input(TeXParser parser, TeXPath path)
+   public void input(TeXPath path)
     throws IOException
    {
    }
 
-   public void tab(TeXParser parser)
+   public void tab()
      throws IOException
    {
    }
 
-   public void skipping(TeXParser parser, Ignoreable ignoreable)
+   public void skipping(Ignoreable ignoreable)
       throws IOException
    {
    }
 
-   public void href(TeXParser parser, String url, TeXObject text)
+   public void href(String url, TeXObject text)
       throws IOException
    {
    }
 
-   public void subscript(TeXParser parser, TeXObject arg)
+   public void subscript(TeXObject arg)
      throws IOException
    {
    }
 
-   public void superscript(TeXParser parser, TeXObject arg)
+   public void superscript(TeXObject arg)
      throws IOException
    {
    }
 
-   public void endParse(TeXParser parser, File file)
+   public void endParse(File file)
       throws IOException
    {
       this.file = null;
    }
 
-   public void beginParse(TeXParser parser, File file)
+   public void beginParse(File file)
       throws IOException
    {
       this.file = file;

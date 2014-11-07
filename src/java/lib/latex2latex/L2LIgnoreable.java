@@ -50,7 +50,7 @@ public class L2LIgnoreable extends ControlSequence
    public void process(TeXParser parser)
      throws IOException
    {
-      ((LaTeX2LaTeX)parser.getListener()).substituting(parser, 
+      ((LaTeX2LaTeX)parser.getListener()).substituting( 
         ""+parser.getEscChar()+name, "");
    }
 

@@ -111,7 +111,7 @@ public class Epsfig extends ControlSequence
       replacement.add(grp);
 
       LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
-      listener.substituting(parser, originalStr, replacement.toString(parser));
+      listener.substituting(originalStr, replacement.toString(parser));
 
       list.push(grp);
 

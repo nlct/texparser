@@ -42,7 +42,7 @@ public class Href extends ControlSequence
    protected void process(TeXParser parser, TeXObject url, TeXObject text)
      throws IOException
    {
-      parser.getListener().href(parser, url.toString(parser), text);
+      parser.getListener().href(url.toString(parser), text);
    }
 
    public void process(TeXParser parser) throws IOException

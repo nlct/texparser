@@ -103,7 +103,7 @@ public class Symbol extends ControlSequence
       codePoint = charCode;
    }
 
-   public static void addCommands(Hashtable<String,ControlSequence> csTable,
+   public static void addCommands(TeXParser parser,
      TeXParserListener listener)
    {
       for (int i = 0; i < GENERIC_SYMBOLS.length; i++)
@@ -111,7 +111,7 @@ public class Symbol extends ControlSequence
          String name = GENERIC_SYMBOLS[i][0].toString();
          int code = ((Integer)GENERIC_SYMBOLS[i][1]).intValue();
 
-         csTable.put(name, listener.createSymbol(name, code));
+         parser.putControlSequence(listener.createSymbol(name, code));
       }
 
       for (int i = 0; i < TEXT_SYMBOLS.length; i++)
@@ -119,7 +119,7 @@ public class Symbol extends ControlSequence
          String name = TEXT_SYMBOLS[i][0].toString();
          int code = ((Integer)TEXT_SYMBOLS[i][1]).intValue();
 
-         csTable.put(name, listener.createSymbol(name, code));
+         parser.putControlSequence(listener.createSymbol(name, code));
       }
 
       for (int i = 0; i < GREEK_SYMBOLS.length; i++)
@@ -127,7 +127,7 @@ public class Symbol extends ControlSequence
          String name = GREEK_SYMBOLS[i][0].toString();
          int code = ((Integer)GREEK_SYMBOLS[i][1]).intValue();
 
-         csTable.put(name, listener.createGreekSymbol(name, code));
+         parser.putControlSequence(listener.createGreekSymbol(name, code));
       }
 
       for (int i = 0; i < MATH_SYMBOLS.length; i++)
@@ -135,7 +135,7 @@ public class Symbol extends ControlSequence
          String name = MATH_SYMBOLS[i][0].toString();
          int code = ((Integer)MATH_SYMBOLS[i][1]).intValue();
 
-         csTable.put(name, listener.createMathSymbol(name, code));
+         parser.putControlSequence(listener.createMathSymbol(name, code));
       }
 
       for (int i = 0; i < BINARY_MATH_SYMBOLS.length; i++)
@@ -143,7 +143,7 @@ public class Symbol extends ControlSequence
          String name = BINARY_MATH_SYMBOLS[i][0].toString();
          int code = ((Integer)BINARY_MATH_SYMBOLS[i][1]).intValue();
 
-         csTable.put(name, listener.createBinarySymbol(name, code));
+         parser.putControlSequence(listener.createBinarySymbol(name, code));
       }
 
       for (int i = 0; i < BIG_MATH_SYMBOLS.length; i++)
@@ -152,7 +152,7 @@ public class Symbol extends ControlSequence
          int code1 = ((Integer)BIG_MATH_SYMBOLS[i][1]).intValue();
          int code2 = ((Integer)BIG_MATH_SYMBOLS[i][2]).intValue();
 
-         csTable.put(name, listener.createBigOperator(name, code1, code2));
+         parser.putControlSequence(listener.createBigOperator(name, code1, code2));
       }
    }
 

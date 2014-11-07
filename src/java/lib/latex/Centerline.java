@@ -66,7 +66,7 @@ public class Centerline extends ControlSequence
 
       replacement.add(group);
 
-      listener.substituting(parser, original, replacement.toString(parser));
+      listener.substituting(original, replacement.toString(parser));
 
       if (stack == null)
       {

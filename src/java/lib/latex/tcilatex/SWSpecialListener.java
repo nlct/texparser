@@ -97,7 +97,7 @@ public class SWSpecialListener implements SpecialListener
 
       LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
 
-      listener.includegraphics(parser, keyValList, fileName);
+      listener.includegraphics(keyValList, fileName);
 
       return true;
    }

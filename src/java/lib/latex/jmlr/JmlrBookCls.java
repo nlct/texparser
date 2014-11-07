@@ -35,7 +35,7 @@ public class JmlrBookCls extends JmlrCls
       TeXParser parser, KeyValList options)
    throws IOException
    {
-      listener.usepackage(parser, null, "setspace");
+      listener.usepackage(null, "setspace");
       super.load(listener, parser, options);
    }
 }

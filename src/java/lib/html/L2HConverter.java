@@ -38,9 +38,9 @@ public abstract class L2HConverter extends LaTeXParserListener
    protected void addPredefined()
    {
       super.addPredefined();
-      putControlSequence("\\", new L2HCr("\\"));
-      putControlSequence("&", new L2HAmp());
-      putControlSequence("nobreakspace", new L2HNoBreakSpace());
+      putControlSequence(new L2HCr("\\"));
+      putControlSequence(new L2HAmp());
+      putControlSequence(new L2HNoBreakSpace());
    }
 
    public void setWriter(Writer writer)
@@ -51,16 +51,6 @@ public abstract class L2HConverter extends LaTeXParserListener
    public Writer getWriter()
    {
       return writer;
-   }
-
-   public void setTeXParser(TeXParser parser)
-   {
-      this.parser = parser;
-   }
-
-   public TeXParser getParser()
-   {
-      return parser;
    }
 
    public String getStyle()
@@ -216,7 +206,7 @@ public abstract class L2HConverter extends LaTeXParserListener
       write(String.format("%s%n", str));
    }
 
-   public void href(TeXParser parser, String url, TeXObject text)
+   public void href(String url, TeXObject text)
      throws IOException
    {
       if (writer == null) return;
@@ -228,12 +218,12 @@ public abstract class L2HConverter extends LaTeXParserListener
       writer.write("</a>");
    }
 
-   public void substituting(TeXParser parser, String original, String replacement)
+   public void substituting(String original, String replacement)
    {
       texApp.substituting(parser.getLineNumber(), original, replacement);
    }
 
-   public void skipping(TeXParser parser, Ignoreable ignoreable)
+   public void skipping(Ignoreable ignoreable)
      throws IOException
    {
    }
@@ -242,7 +232,7 @@ public abstract class L2HConverter extends LaTeXParserListener
    // This is just temporary HTML approximation
    // Maybe better just to use MathJax
 
-   public void overwithdelims(TeXParser parser, TeXObject firstDelim,
+   public void overwithdelims(TeXObject firstDelim,
      TeXObject secondDelim, TeXObject before, TeXObject after)
     throws IOException
    {
@@ -264,7 +254,7 @@ public abstract class L2HConverter extends LaTeXParserListener
       }
    }
 
-   public void abovewithdelims(TeXParser parser, TeXObject firstDelim,
+   public void abovewithdelims(TeXObject firstDelim,
      TeXObject secondDelim, TeXDimension thickness,
      TeXObject before, TeXObject after)
     throws IOException
@@ -287,7 +277,7 @@ public abstract class L2HConverter extends LaTeXParserListener
       }
    }
 
-   public void subscript(TeXParser parser, TeXObject arg)
+   public void subscript(TeXObject arg)
     throws IOException
    {
       write("<sb>");
@@ -295,7 +285,7 @@ public abstract class L2HConverter extends LaTeXParserListener
       write("</sb>");
    }
 
-   public void superscript(TeXParser parser, TeXObject arg)
+   public void superscript(TeXObject arg)
     throws IOException
    {
       write("<sp>");
@@ -303,7 +293,7 @@ public abstract class L2HConverter extends LaTeXParserListener
       write("</sp>");
    }
 
-   public void tab(TeXParser parser)
+   public void tab()
      throws IOException
    {
       // TODO
@@ -314,14 +304,14 @@ public abstract class L2HConverter extends LaTeXParserListener
       write("<p>");
    }
 
-   public void verb(TeXParser parser, boolean isStar, char delim,
+   public void verb(boolean isStar, char delim,
      String text)
     throws IOException
    {
       write("<tt>"+text+"</tt>");
    }
 
-   public void includegraphics(TeXParser parser, KeyValList options, String file)
+   public void includegraphics(KeyValList options, String file)
      throws IOException
    {
       // This doesn't take the options or file format into account.
@@ -333,13 +323,13 @@ public abstract class L2HConverter extends LaTeXParserListener
       return texApp;
    }
 
-   public void endParse(TeXParser parser, File file)
+   public void endParse(File file)
     throws IOException
    {
       this.file = null;
    }
 
-   public void beginParse(TeXParser parser, File file)
+   public void beginParse(File file)
     throws IOException
    {
       this.file = file;
@@ -353,8 +343,6 @@ public abstract class L2HConverter extends LaTeXParserListener
    private Writer writer;
 
    private TeXApp texApp;
-
-   protected TeXParser parser;
 
    private File file;
 }

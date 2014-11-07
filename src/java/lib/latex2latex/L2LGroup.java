@@ -69,7 +69,7 @@ public class L2LGroup extends Group
 
             String replacement = cs.toString(parser);
 
-            listener.substituting(parser,
+            listener.substituting(
                original.toString(parser), 
                replacement);
 

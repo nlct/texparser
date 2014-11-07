@@ -72,7 +72,7 @@ public class DocumentClass extends ControlSequence
 
       LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
 
-      listener.documentclass(parser, keyValList, clsName);
+      listener.documentclass(keyValList, clsName);
    }
 
    public void process(TeXParser parser)
@@ -109,6 +109,6 @@ public class DocumentClass extends ControlSequence
 
       LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
 
-      listener.documentclass(parser, keyValList, clsName);
+      listener.documentclass(keyValList, clsName);
    }
 }

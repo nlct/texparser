@@ -32,19 +32,19 @@ public class ParAlign extends Declaration
       this.orgAlign = TeXSettings.INHERIT;
    }
 
-   public static void addCommands(Hashtable<String,ControlSequence> csTable)
+   public static void addCommands(TeXParser parser)
    {
-      csTable.put("centering",
+      parser.putControlSequence(
          new ParAlign("centering", TeXSettings.PAR_ALIGN_CENTER));
-      csTable.put("raggedright",
+      parser.putControlSequence(
          new ParAlign("raggedright", TeXSettings.PAR_ALIGN_LEFT));
-      csTable.put("raggedleft",
+      parser.putControlSequence(
          new ParAlign("raggedleft", TeXSettings.PAR_ALIGN_RIGHT));
-      csTable.put("center",
+      parser.putControlSequence(
          new ParAlign("center", TeXSettings.PAR_ALIGN_CENTER));
-      csTable.put("flushright",
+      parser.putControlSequence(
          new ParAlign("flushright", TeXSettings.PAR_ALIGN_RIGHT));
-      csTable.put("flushleft",
+      parser.putControlSequence(
          new ParAlign("flushleft", TeXSettings.PAR_ALIGN_LEFT));
    }
 

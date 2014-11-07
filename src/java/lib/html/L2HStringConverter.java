@@ -50,7 +50,7 @@ public class L2HStringConverter extends L2HConverter
       StringWriter writer = new StringWriter();
       setWriter(writer);
 
-      setTeXParser(new TeXParser(this));
+      TeXParser parser = new TeXParser(this);
 
       if (atIsLetter)
       {

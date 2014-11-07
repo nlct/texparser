@@ -64,7 +64,7 @@ public class GraphicsPath extends ControlSequence
          paths.add(arg);
       }
 
-      ((LaTeXParserListener)parser.getListener()).setGraphicsPath(parser, paths);
+      ((LaTeXParserListener)parser.getListener()).setGraphicsPath(paths);
    }
 
    public void process(TeXParser parser, TeXObjectList stack)

@@ -95,7 +95,7 @@ public class Input extends ControlSequence
 
       listener.addFileReference(texPath);
 
-      listener.input(parser, texPath);
+      listener.input(texPath);
    }
 
    public void process(TeXParser parser)
@@ -112,6 +112,6 @@ public class Input extends ControlSequence
 
       listener.addFileReference(texPath);
 
-      listener.input(parser, texPath);
+      listener.input(texPath);
    }
 }

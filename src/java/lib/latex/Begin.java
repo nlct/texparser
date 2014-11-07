@@ -94,7 +94,7 @@ public class Begin extends Command
 
       if (name.equals("document"))
       {
-         listener.beginDocument(parser);
+         listener.beginDocument();
          return;
       }
 
@@ -102,7 +102,7 @@ public class Begin extends Command
 
       env.popGroup(parser, list);
 
-      listener.environment(parser, env);
+      listener.environment(env);
    }
 
    public void process(TeXParser parser)
@@ -131,7 +131,7 @@ public class Begin extends Command
 
       if (name.equals("document"))
       {
-         listener.beginDocument(parser);
+         listener.beginDocument();
          return;
       }
 
@@ -139,7 +139,7 @@ public class Begin extends Command
 
       env.popGroup(parser);
 
-      listener.environment(parser, env);
+      listener.environment(env);
    }
 
 }

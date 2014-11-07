@@ -76,7 +76,7 @@ public class UsePackage extends ControlSequence
 
       for (int i = 0; i < split.length; i++)
       {
-         listener.usepackage(parser, keyValList, split[i].trim());
+         listener.usepackage(keyValList, split[i].trim());
       }
    }
 
@@ -118,7 +118,7 @@ public class UsePackage extends ControlSequence
 
       for (int i = 0; i < split.length; i++)
       {
-         listener.usepackage(parser, keyValList, split[i].trim());
+         listener.usepackage(keyValList, split[i].trim());
       }
    }
 }

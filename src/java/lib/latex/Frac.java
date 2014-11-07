@@ -42,7 +42,7 @@ public class Frac extends ControlSequence
    protected void process(TeXParser parser, TeXObject above, TeXObject below)
      throws IOException
    {
-      parser.getListener().overwithdelims(parser, null, null, above, below);
+      parser.getListener().overwithdelims(null, null, above, below);
    }
 
    public void process(TeXParser parser) throws IOException

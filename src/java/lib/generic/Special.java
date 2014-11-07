@@ -43,7 +43,7 @@ public class Special extends ControlSequence
    {
       TeXObject param = list.popArg();
 
-      parser.getListener().special(parser, param.toString(parser));
+      parser.getListener().special(param.toString(parser));
    }
 
    public void process(TeXParser parser)
@@ -51,7 +51,7 @@ public class Special extends ControlSequence
    {
       TeXObject param = parser.popNextArg();
 
-      parser.getListener().special(parser, param.toString(parser));
+      parser.getListener().special(param.toString(parser));
    }
 
 }

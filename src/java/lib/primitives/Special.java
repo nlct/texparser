@@ -51,7 +51,7 @@ public class Special extends Primitive
          expanded = ((Expandable)arg).expandfully(parser, stack);
       }
 
-      parser.getListener().special(parser, expanded == null ?
+      parser.getListener().special(expanded == null ?
         arg.toString(parser) : expanded.toString(parser));
    }
 
@@ -67,7 +67,7 @@ public class Special extends Primitive
          expanded = ((Expandable)arg).expandfully(parser);
       }
 
-      parser.getListener().special(parser, expanded == null ?
+      parser.getListener().special(expanded == null ?
         arg.toString(parser) : expanded.toString(parser));
    }
 }

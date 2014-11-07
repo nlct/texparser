@@ -78,29 +78,29 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       addEnvironment("verbatim", new Verbatim());
       addEnvironment("verbatim*", new Verbatim("verbatim*"));
 
-      putControlSequence("begin", new Begin());
-      putControlSequence("end", new End());
-      putControlSequence("documentclass", new DocumentClass());
-      putControlSequence("usepackage", new UsePackage());
-      putControlSequence("newcommand", new NewCommand());
-      putControlSequence("renewcommand", new NewCommand("renewcommand"));
-      putControlSequence("providecommand", new NewCommand("providecommand"));
+      parser.putControlSequence(new Begin());
+      parser.putControlSequence(new End());
+      parser.putControlSequence(new DocumentClass());
+      parser.putControlSequence(new UsePackage());
+      parser.putControlSequence(new NewCommand());
+      parser.putControlSequence(new NewCommand("renewcommand"));
+      parser.putControlSequence(new NewCommand("providecommand"));
 
-      putControlSequence("input", new Input());
-      putControlSequence("InputIfFileExists", new InputIfFileExists());
-      putControlSequence("IfFileExists", new IfFileExists());
-      putControlSequence("makeatletter", new MakeAtLetter());
-      putControlSequence("makeatother", new MakeAtOther());
-      putControlSequence("centerline", new Centerline());
-      putControlSequence("verb", new Verb());
-      putControlSequence("(", new MathCs());
-      putControlSequence("[", new DisplayMathCs());
-      putControlSequence("nolinkurl", new NoLinkUrl());
-      putControlSequence("\\", new Cr("\\"));
-      putControlSequence("cr", new Cr("cr"));
-      putControlSequence("href", new Href());
-      putControlSequence("frac", new Frac());
-      putControlSequence("@empty", new Empty("@empty"));
+      parser.putControlSequence(new Input());
+      parser.putControlSequence(new InputIfFileExists());
+      parser.putControlSequence(new IfFileExists());
+      parser.putControlSequence(new MakeAtLetter());
+      parser.putControlSequence(new MakeAtOther());
+      parser.putControlSequence(new Centerline());
+      parser.putControlSequence(new Verb());
+      parser.putControlSequence(new MathCs());
+      parser.putControlSequence(new DisplayMathCs());
+      parser.putControlSequence(new NoLinkUrl());
+      parser.putControlSequence(new Cr("\\"));
+      parser.putControlSequence(new Cr("cr"));
+      parser.putControlSequence(new Href());
+      parser.putControlSequence(new Frac());
+      parser.putControlSequence(new Empty("@empty"));
 
       // Math font commands
 
@@ -143,52 +143,53 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
 
       super.addPredefined();
 
-      putControlSequence("documentstyle", new DocumentStyle());
+      parser.putControlSequence(new DocumentStyle());
    }
 
    protected void addMathFontCommand(String name, int style)
    {
-      putControlSequence(name, new MathFontCommand(name, style));
+      parser.putControlSequence(new MathFontCommand(name, style));
    }
 
-   public void newcommand(TeXParser parser, String type, String csName, boolean isShort,
+   public void newcommand(String type, String csName, boolean isShort,
      int numParams, TeXObject defValue, TeXObject definition)
    throws IOException
    {
-      putControlSequence(csName,
+      putControlSequence(true,
         new LaTeXCommand(csName, isShort, numParams, defValue, definition));
    }
 
-   private void addFontWeightDeclaration(String declName, String textblockName,
-       int weight)
+   private void addFontWeightDeclaration(
+       String declName, String textblockName, int weight)
    {
       Declaration decl = getFontWeightDeclaration(declName, weight);
-      putControlSequence(declName, decl);
-      putControlSequence(textblockName, new TextBlockCommand(textblockName, decl));
+      parser.putControlSequence(decl);
+      parser.putControlSequence(new TextBlockCommand(textblockName, decl));
    }
 
-   private void addFontShapeDeclaration(String declName, String textblockName,
-       int shape)
+   private void addFontShapeDeclaration(
+       String declName, String textblockName, int shape)
    {
       Declaration decl = getFontShapeDeclaration(declName, shape);
-      putControlSequence(declName, decl);
-      putControlSequence(textblockName, new TextBlockCommand(textblockName, decl));
+      parser.putControlSequence(decl);
+      parser.putControlSequence(new TextBlockCommand(textblockName, decl));
    }
 
    private void addFontSizeDeclaration(String name, int size)
    {
-      putControlSequence(name, getFontSizeDeclaration(name, size));
+      parser.putControlSequence(getFontSizeDeclaration(name, size));
    }
 
-   private void addFontFamilyDeclaration(String declName, String textblockName,
-       int family)
+   private void addFontFamilyDeclaration(
+       String declName, String textblockName, int family)
    {
       Declaration decl =  getFontFamilyDeclaration(declName, family);
-      putControlSequence(declName, decl);
-      putControlSequence(textblockName, new TextBlockCommand(textblockName, decl));
+      parser.putControlSequence(decl);
+      parser.putControlSequence(new TextBlockCommand(textblockName, decl));
    }
 
-   public ControlSequence getTeXFontFamilyDeclaration(String name, int family)
+   public ControlSequence getTeXFontFamilyDeclaration(
+      String name, int family)
    {
       ControlSequence decl = super.getTeXFontFamilyDeclaration(name, family);
 
@@ -199,7 +200,8 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       return newDecl == null ? decl : new Obsolete(decl, newDecl);
    }
 
-   public ControlSequence getTeXFontWeightDeclaration(String name, int weight)
+   public ControlSequence getTeXFontWeightDeclaration(
+      String name, int weight)
    {
       ControlSequence decl = super.getTeXFontWeightDeclaration(name, weight);
 
@@ -210,12 +212,13 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       return newDecl == null ? decl : new Obsolete(decl, newDecl);
    }
 
-   public ControlSequence getTeXFontShapeDeclaration(String name, int shape)
+   public ControlSequence getTeXFontShapeDeclaration(
+      String name, int shape)
    {
       if (name.equals("em"))
       {
          Declaration decl = getFontShapeDeclaration("em", TeXSettings.SHAPE_EM);
-         putControlSequence("emph", new TextBlockCommand("emph", decl));
+         putControlSequence(new TextBlockCommand("emph", decl));
          return decl;
       }
 
@@ -268,7 +271,7 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       return env == null ? new Environment(name) : (Environment)env.clone();
    }
 
-   public void environment(TeXParser parser, Environment env)
+   public void environment(Environment env)
      throws IOException
    {
       env.process(parser);
@@ -279,7 +282,7 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       return docEnvFound;
    }
 
-   public void beginDocument(TeXParser parser)
+   public void beginDocument()
      throws IOException
    {
       if (docEnvFound)
@@ -292,7 +295,7 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       docEnvFound = true;
    }
 
-   public void endDocument(TeXParser parser)
+   public void endDocument()
      throws IOException
    {
       if (!docEnvFound)
@@ -310,7 +313,7 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       return docCls;
    }
 
-   public void documentclass(TeXParser parser, KeyValList options,
+   public void documentclass(KeyValList options,
      String clsName)
      throws IOException
    {
@@ -325,7 +328,7 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
 
       addFileReference(docCls);
 
-      LaTeXCls cls = getLaTeXCls(parser, clsName);
+      LaTeXCls cls = getLaTeXCls(clsName);
 
       if (cls != null)
       {
@@ -333,7 +336,7 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       }
    }
 
-   public LaTeXCls getLaTeXCls(TeXParser parser, String clsName)
+   public LaTeXCls getLaTeXCls(String clsName)
     throws IOException
    {
       if (clsName.equals("jmlr"))
@@ -349,8 +352,7 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       return null;
    }
 
-   public void usepackage(TeXParser parser, KeyValList options,
-     String styName)
+   public void usepackage(KeyValList options, String styName)
    throws IOException
    {
       if (!isStyLoaded(styName))
@@ -360,7 +362,7 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
          addFileReference(lfile);
          loadedPackages.add(lfile);
 
-         LaTeXSty sty = getLaTeXSty(parser, styName);
+         LaTeXSty sty = getLaTeXSty(styName);
 
          if (sty != null)
          {
@@ -369,7 +371,7 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       }
    }
 
-   public LaTeXSty getLaTeXSty(TeXParser parser, String styName)
+   public LaTeXSty getLaTeXSty(String styName)
    throws IOException
    {
       if (styName.equals("graphics")
@@ -401,11 +403,11 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       return null;
    }
 
-   public abstract void substituting(TeXParser parser, 
+   public abstract void substituting( 
     String original, String replacement)
      throws IOException;
 
-   public abstract void includegraphics(TeXParser parser, 
+   public abstract void includegraphics( 
      KeyValList options, String imgName)
      throws IOException;
 
@@ -427,35 +429,35 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       return loadedPackages;
    }
 
-   public void input(TeXParser parser, TeXPath path)
+   public void input(TeXPath path)
      throws IOException
    {
       if (path.toString().endsWith("tcilatex.tex"))
       {
-         usepackage(parser, null, "amsmath");
-         usepackage(parser, null, "graphicx");
+         usepackage(null, "amsmath");
+         usepackage(null, "graphicx");
          addSpecialListener(new SWSpecialListener());
 
-         putControlSequence("FRAME", new SWFrame());
-         putControlSequence("Qcb", new Qcb());
-         putControlSequence("BF", new BF());
-         putControlSequence("NEG", new NEG());
-         putControlSequence("QATOP", new QATOP());
-         putControlSequence("QTATOP", new QTATOP());
-         putControlSequence("QDATOP", new QDATOP());
-         putControlSequence("QABOVE", new QABOVE());
-         putControlSequence("QTABOVE", new QTABOVE());
-         putControlSequence("QDABOVE", new QDABOVE());
-         putControlSequence("QOVERD", new QOVERD());
-         putControlSequence("QTOVERD", new QTOVERD());
-         putControlSequence("QDOVERD", new QDOVERD());
-         putControlSequence("QATOPD", new QATOPD());
-         putControlSequence("QTATOPD", new QTATOPD());
-         putControlSequence("QDATOPD", new QDATOPD());
+         parser.putControlSequence(new SWFrame());
+         parser.putControlSequence(new Qcb());
+         parser.putControlSequence(new BF());
+         parser.putControlSequence(new NEG());
+         parser.putControlSequence(new QATOP());
+         parser.putControlSequence(new QTATOP());
+         parser.putControlSequence(new QDATOP());
+         parser.putControlSequence(new QABOVE());
+         parser.putControlSequence(new QTABOVE());
+         parser.putControlSequence(new QDABOVE());
+         parser.putControlSequence(new QOVERD());
+         parser.putControlSequence(new QTOVERD());
+         parser.putControlSequence(new QDOVERD());
+         parser.putControlSequence(new QATOPD());
+         parser.putControlSequence(new QTATOPD());
+         parser.putControlSequence(new QDATOPD());
       }
    }
 
-   public void setGraphicsPath(TeXParser parser, TeXObjectList paths)
+   public void setGraphicsPath(TeXObjectList paths)
      throws IOException
    {
       graphicsPath = paths;

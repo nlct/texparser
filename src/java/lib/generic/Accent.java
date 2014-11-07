@@ -293,23 +293,23 @@ public class Accent extends ControlSequence
       }
    }
 
-   public static void addCommands(Hashtable<String,ControlSequence> csTable)
+   public static void addCommands(TeXParser parser)
    {
-      csTable.put("'", new Accent("'"));
-      csTable.put("`", new Accent("`"));
-      csTable.put("\"", new Accent("\""));
-      csTable.put("u", new Accent("u"));
-      csTable.put("c", new Accent("c"));
-      csTable.put("~", new Accent("~"));
-      csTable.put("^", new Accent("^"));
-      csTable.put("r", new Accent("r"));
-      csTable.put("b", new Accent("b"));
-      csTable.put("d", new Accent("d"));
-      csTable.put("=", new Accent("="));
-      csTable.put(".", new Accent("."));
-      csTable.put("v", new Accent("v"));
-      csTable.put("H", new Accent("H"));
-      csTable.put("t", new Accent("t"));
+      parser.putControlSequence(new Accent("'"));
+      parser.putControlSequence(new Accent("`"));
+      parser.putControlSequence(new Accent("\""));
+      parser.putControlSequence(new Accent("u"));
+      parser.putControlSequence(new Accent("c"));
+      parser.putControlSequence(new Accent("~"));
+      parser.putControlSequence(new Accent("^"));
+      parser.putControlSequence(new Accent("r"));
+      parser.putControlSequence(new Accent("b"));
+      parser.putControlSequence(new Accent("d"));
+      parser.putControlSequence(new Accent("="));
+      parser.putControlSequence(new Accent("."));
+      parser.putControlSequence(new Accent("v"));
+      parser.putControlSequence(new Accent("H"));
+      parser.putControlSequence(new Accent("t"));
    }
 
    private String getText(String accent, int codePoint)

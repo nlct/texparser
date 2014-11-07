@@ -37,7 +37,7 @@ public class JmlrCls extends LaTeXCls
       super(name);
    }
 
-   public void addDefinitions(LaTeXParserListener listener)
+   protected void addDefinitions(LaTeXParserListener listener)
    {
    }
 
@@ -45,27 +45,27 @@ public class JmlrCls extends LaTeXCls
       TeXParser parser, KeyValList options)
    throws IOException
    {
-      listener.usepackage(parser, null, "xkeyval");
-      listener.usepackage(parser, null, "calc");
-      listener.usepackage(parser, null, "etoolbox");
+      listener.usepackage(null, "xkeyval");
+      listener.usepackage(null, "calc");
+      listener.usepackage(null, "etoolbox");
 
-      listener.usepackage(parser, null, "amsmath");
-      listener.usepackage(parser, null, "amssymb");
-      listener.usepackage(parser, null, "natbib");
-      listener.usepackage(parser, null, "graphicx");
-      listener.usepackage(parser, null, "url");
+      listener.usepackage(null, "amsmath");
+      listener.usepackage(null, "amssymb");
+      listener.usepackage(null, "natbib");
+      listener.usepackage(null, "graphicx");
+      listener.usepackage(null, "url");
 
       KeyValList opts = new KeyValList();
       opts.put("x11names", new Empty());
-      listener.usepackage(parser, opts, "xcolor");
+      listener.usepackage(opts, "xcolor");
 
       opts = new KeyValList();
       opts.put("algo2e", new Empty());
       opts.put("ruled", new Empty());
-      listener.usepackage(parser, opts, "algorithm2e");
+      listener.usepackage(opts, "algorithm2e");
 
-      listener.usepackage(parser, null, "hyperref");
-      listener.usepackage(parser, null, "nameref");
+      listener.usepackage(null, "hyperref");
+      listener.usepackage(null, "nameref");
       addDefinitions(listener);
    }
 }

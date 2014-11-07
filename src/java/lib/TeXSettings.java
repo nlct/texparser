@@ -25,6 +25,8 @@ public class TeXSettings
 {
    private TeXSettings()
    {
+      activeTable = new Hashtable<Integer,ActiveChar>();
+      csTable = new Hashtable<String,ControlSequence>();
    }
 
    public TeXSettings(TeXParser parser)
@@ -34,6 +36,7 @@ public class TeXSettings
 
    public TeXSettings(TeXSettings parent, TeXParser parser)
    {
+      this();
       this.parent = parent;
       this.parser = parser;
    }
@@ -390,6 +393,41 @@ public class TeXSettings
       }
 
       return reg;
+   }
+
+   public ControlSequence getControlSequence(String name)
+   {
+      ControlSequence cs = csTable.get(name);
+
+      if (cs == null && parent != null)
+      {
+         cs = parent.getControlSequence(name);
+      }
+
+      return cs;
+   }
+
+   public void putControlSequence(ControlSequence cs)
+   {
+      csTable.put(cs.getName(), cs);
+   }
+
+   public ActiveChar getActiveChar(Integer code)
+   {
+      ActiveChar ac = activeTable.get(code);
+
+      if (ac == null && parent != null)
+      {
+         ac = parent.getActiveChar(code);
+      }
+
+      return ac;
+   }
+
+   public void putActiveChar(ActiveChar activeChar)
+   {
+      activeTable.put(new Integer((int)activeChar.getChar().charValue()),
+        activeChar);
    }
 
    public void countdef(String name, int alloc)
@@ -2241,5 +2279,9 @@ public class TeXSettings
 
    private Hashtable<String,Register> localRegisters 
      = new Hashtable<String,Register>();
+
+   protected Hashtable<String,ControlSequence> csTable;
+
+   protected Hashtable<Integer,ActiveChar> activeTable;
 }
 

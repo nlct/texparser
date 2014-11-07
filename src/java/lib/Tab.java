@@ -59,7 +59,7 @@ public class Tab implements TeXObject
    public void process(TeXParser parser)
      throws IOException
    {
-      parser.getListener().tab(parser);
+      parser.getListener().tab();
    }
 
 }

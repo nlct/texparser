@@ -28,7 +28,7 @@ import java.text.StringCharacterIterator;
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.primitives.*;
 
-public abstract class DefaultTeXParserListener implements TeXParserListener
+public abstract class DefaultTeXParserListener extends TeXParserListener
 {
    public DefaultTeXParserListener(Writeable writeable)
    {
@@ -38,65 +38,55 @@ public abstract class DefaultTeXParserListener implements TeXParserListener
 
    private void init()
    {
-      activeTable = new Hashtable<Integer,ActiveChar>();
-      csTable = new Hashtable<String,ControlSequence>();
       map = new Hashtable<String,String>();
       referencedFiles = new Vector<TeXPath>();
       specialListeners = new Vector<SpecialListener>();
-
-      addPredefined();
    }
 
    protected void addPredefined()
    {
-      Nbsp nbsp = new Nbsp();
-      activeTable.put(new Integer((int)nbsp.getChar().charValue()), nbsp);
+      parser.putActiveChar(new Nbsp());
 
-      Accent.addCommands(csTable);
-      Symbol.addCommands(csTable, this);
-      ParAlign.addCommands(csTable);
+      Accent.addCommands(parser);
+      Symbol.addCommands(parser, this);
+      ParAlign.addCommands(parser);
 
-      csTable.put("above", new Above());
-      csTable.put("abovewithdelims", new AboveWithDelims());
-      csTable.put(" ", new ControlSpace());
-      csTable.put("-", new DiscretionaryHyphen());
-      csTable.put("/", new ItalicCorrection());
-      csTable.put("overwithdelims", new OverWithDelims());
-      csTable.put("a", new Accent("a"));
-      csTable.put("relax", new Relax());
-      csTable.put("string", new StringCs());
-      csTable.put("endinput", new EndInput());
-      csTable.put("par", new ParCs());
-      csTable.put("special", new Special());
-      csTable.put("empty", new Empty());
+      parser.putControlSequence(new Above());
+      parser.putControlSequence(new AboveWithDelims());
+      parser.putControlSequence(new ControlSpace());
+      parser.putControlSequence(new DiscretionaryHyphen());
+      parser.putControlSequence(new ItalicCorrection());
+      parser.putControlSequence(new OverWithDelims());
+      parser.putControlSequence(new Accent("a"));
+      parser.putControlSequence(new Relax());
+      parser.putControlSequence(new StringCs());
+      parser.putControlSequence(new EndInput());
+      parser.putControlSequence(new ParCs());
+      parser.putControlSequence(new Special());
+      parser.putControlSequence(new Empty());
 
       // TeX font changing declarations
 
-      csTable.put("rm", getTeXFontFamilyDeclaration("rm", 
+      parser.putControlSequence(getTeXFontFamilyDeclaration("rm", 
          TeXSettings.FAMILY_RM));
-      csTable.put("sf", getTeXFontFamilyDeclaration("sf", 
+      parser.putControlSequence(getTeXFontFamilyDeclaration("sf", 
          TeXSettings.FAMILY_SF));
-      csTable.put("tt", getTeXFontFamilyDeclaration("tt", 
+      parser.putControlSequence(getTeXFontFamilyDeclaration("tt", 
          TeXSettings.FAMILY_TT));
-      csTable.put("cal", getTeXFontFamilyDeclaration("cal", 
+      parser.putControlSequence(getTeXFontFamilyDeclaration("cal", 
          TeXSettings.FAMILY_CAL));
 
-      csTable.put("bf", getTeXFontWeightDeclaration("bf",
+      parser.putControlSequence(getTeXFontWeightDeclaration("bf",
          TeXSettings.WEIGHT_BF));
 
-      csTable.put("it", getTeXFontShapeDeclaration("it",
+      parser.putControlSequence(getTeXFontShapeDeclaration("it",
          TeXSettings.SHAPE_IT));
-      csTable.put("sl", getTeXFontShapeDeclaration("sl",
+      parser.putControlSequence(getTeXFontShapeDeclaration("sl",
          TeXSettings.SHAPE_SL));
-      csTable.put("em", getTeXFontShapeDeclaration("em",
+      parser.putControlSequence(getTeXFontShapeDeclaration("em",
          TeXSettings.SHAPE_EM));
-      csTable.put("sc", getTeXFontShapeDeclaration("sc",
+      parser.putControlSequence(getTeXFontShapeDeclaration("sc",
          TeXSettings.SHAPE_SC));
-   }
-
-   public void putControlSequence(String name, ControlSequence cs)
-   {
-      csTable.put(name, cs);
    }
 
    public ControlSequence getTeXFontFamilyDeclaration(String name, int family)
@@ -114,11 +104,21 @@ public abstract class DefaultTeXParserListener implements TeXParserListener
       return new TeXFontWeightDeclaration(name, weight);
    }
 
+   public void putControlSequence(ControlSequence cs)
+   {
+      getParser().putControlSequence(cs);
+   }
+
+   public void putControlSequence(boolean isLocal, ControlSequence cs)
+   {
+      getParser().putControlSequence(isLocal, cs);
+   }
+
    // Gets control sequence identified by name (doesn't include
    // leading backslash)
    public ControlSequence getControlSequence(String name)
    {
-      ControlSequence cs = csTable.get(map(name));
+      ControlSequence cs = getParser().getControlSequence(map(name));
 
       return cs == null ? createUndefinedCs(name) : cs;
    }
@@ -131,7 +131,12 @@ public abstract class DefaultTeXParserListener implements TeXParserListener
    // Gets active character identified by charCode.
    public ActiveChar getActiveChar(int charCode)
    {
-      return activeTable.get(new Integer(charCode));
+      return getParser().getActiveChar(new Integer(charCode));
+   }
+
+   public void putActiveChar(ActiveChar activeChar)
+   {
+      getParser().putActiveChar(activeChar);
    }
 
    public Eol getEol()
@@ -239,13 +244,6 @@ public abstract class DefaultTeXParserListener implements TeXParserListener
       return new Comment();
    }
 
-   public abstract void skipping(TeXParser parser, Ignoreable ignoreable)
-      throws IOException;
-
-   public abstract void overwithdelims(TeXParser parser, TeXObject first,
-     TeXObject second, TeXObject before, TeXObject after)
-    throws IOException;
-
    public String map(String key)
    {
       String value = map.get(key);
@@ -281,7 +279,7 @@ public abstract class DefaultTeXParserListener implements TeXParserListener
       specialListeners.remove(listener);
    }
 
-   public boolean special(TeXParser parser, String param)
+   public boolean special(String param)
      throws IOException
    {
       for (SpecialListener listener : specialListeners)
@@ -295,8 +293,7 @@ public abstract class DefaultTeXParserListener implements TeXParserListener
       return false;
    }
 
-   public void verb(TeXParser parser, boolean isStar, 
-     char delim, String text)
+   public void verb(boolean isStar, char delim, String text)
      throws IOException
    {
       if (isStar)
@@ -326,10 +323,6 @@ public abstract class DefaultTeXParserListener implements TeXParserListener
    {
       return referencedFiles;
    }
-
-   protected Hashtable<String,ControlSequence> csTable;
-
-   protected Hashtable<Integer,ActiveChar> activeTable;
 
    protected Hashtable<String,String> map;
 

@@ -84,7 +84,7 @@ public class AboveWithDelims extends MidControlSequence
 
       TeXDimension dimen = following.popDimension(parser);
 
-      parser.getListener().abovewithdelims(parser, first, second, dimen, before,
+      parser.getListener().abovewithdelims(first, second, dimen, before,
         following);
    }
 }

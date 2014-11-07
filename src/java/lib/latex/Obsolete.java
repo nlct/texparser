@@ -45,7 +45,7 @@ public class Obsolete extends ControlSequence
    public void process(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
-      ((LaTeXParserListener)parser.getListener()).substituting(parser, 
+      ((LaTeXParserListener)parser.getListener()).substituting( 
         orgCommand.toString(parser), replacementCommand.toString(parser));
 
       replacementCommand.process(parser, stack);
@@ -54,7 +54,7 @@ public class Obsolete extends ControlSequence
    public void process(TeXParser parser)
       throws IOException
    {
-      ((LaTeXParserListener)parser.getListener()).substituting(parser, 
+      ((LaTeXParserListener)parser.getListener()).substituting( 
          orgCommand.toString(parser), replacementCommand.toString(parser));
 
       replacementCommand.process(parser);

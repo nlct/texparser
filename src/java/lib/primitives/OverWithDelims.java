@@ -74,7 +74,7 @@ public class OverWithDelims extends MidControlSequence
 
       second = following.pop();
 
-      parser.getListener().overwithdelims(parser, first, second, before,
+      parser.getListener().overwithdelims(first, second, before,
         following);
    }
 

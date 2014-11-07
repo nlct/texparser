@@ -66,7 +66,7 @@ public class InputIfFileExists extends ControlSequence
       if (texPath.exists())
       {
          truePart.process(parser, stack);
-         listener.input(parser, texPath);
+         listener.input(texPath);
       }
       else
       {
@@ -101,7 +101,7 @@ public class InputIfFileExists extends ControlSequence
       if (texPath.exists())
       {
          truePart.process(parser);
-         listener.input(parser, texPath);
+         listener.input(texPath);
       }
       else
       {

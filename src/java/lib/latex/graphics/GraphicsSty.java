@@ -30,11 +30,11 @@ public class GraphicsSty extends LaTeXSty
       super(name);
    }
 
-   public void addDefinitions(LaTeXParserListener listener)
+   protected void addDefinitions(LaTeXParserListener listener)
    {
-      listener.putControlSequence("includegraphics", new IncludeGraphics());
-      listener.putControlSequence("graphicspath", new GraphicsPath());
-      listener.putControlSequence("epsfig", new Epsfig("epsfig"));
-      listener.putControlSequence("psfig", new Epsfig("psfig"));
+      listener.putControlSequence(new IncludeGraphics());
+      listener.putControlSequence(new GraphicsPath());
+      listener.putControlSequence(new Epsfig("epsfig"));
+      listener.putControlSequence(new Epsfig("psfig"));
    }
 }

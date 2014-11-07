@@ -29,9 +29,8 @@ public class LipsumSty extends LaTeXSty
 
    public void addDefinitions(LaTeXParserListener listener)
    {
-      listener.putControlSequence("lipsum", new Lipsum(this));
-      listener.putControlSequence("setlipsumdefault", 
-        new SetLipsumDefault(this));
+      listener.putControlSequence(new Lipsum(this));
+      listener.putControlSequence(new SetLipsumDefault(this));
    }
 
    public String getDefaultRange()

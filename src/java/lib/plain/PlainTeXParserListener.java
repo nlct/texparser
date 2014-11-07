@@ -35,8 +35,8 @@ public abstract class PlainTeXParserListener extends DefaultTeXParserListener
 
    protected void addPredefined()
    {
-      csTable.put("bye", new Bye());
-      csTable.put("input", new Input());
+      putControlSequence(new Bye());
+      putControlSequence(new Input());
 
       super.addPredefined();
    }

@@ -143,7 +143,7 @@ public class NewCommand extends Command
       TeXObject definition = stack.popArg();
 
       ((LaTeXParserListener)parser.getListener()).newcommand(
-         parser, name, csName, isStar, numParams, defValue, definition);
+         name, csName, isStar, numParams, defValue, definition);
    }
 
    public void process(TeXParser parser)
@@ -218,7 +218,7 @@ public class NewCommand extends Command
       TeXObject definition = parser.popNextArg(isStar);
 
       ((LaTeXParserListener)parser.getListener()).newcommand(
-         parser, name, csName, isStar, numParams, defValue, definition);
+         name, csName, isStar, numParams, defValue, definition);
    }
 
 

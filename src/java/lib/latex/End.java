@@ -65,7 +65,7 @@ public class End extends ControlSequence
 
       if (name.equals("document"))
       {
-         listener.endDocument(parser);
+         listener.endDocument();
          return;
       }
 
@@ -100,7 +100,7 @@ public class End extends ControlSequence
 
       if (name.equals("document"))
       {
-         listener.endDocument(parser);
+         listener.endDocument();
          return;
       }
 

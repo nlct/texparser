@@ -56,7 +56,7 @@ public class L2LBibliography extends L2LControlSequence
          bibPaths[i] = new TeXPath(parser, bibList[i].trim(), "bib");
       }
 
-      listener.bibliography(parser, bibPaths);
+      listener.bibliography(bibPaths);
    }
 
    public void process(TeXParser parser, TeXObjectList stack)

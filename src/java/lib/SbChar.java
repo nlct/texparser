@@ -58,7 +58,7 @@ public class SbChar implements TeXObject
             TeXSyntaxException.ERROR_MISSING_PARAM, ""+parser.getSbChar());
       }
 
-      parser.getListener().subscript(parser, object);
+      parser.getListener().subscript(object);
    }
 
    public void process(TeXParser parser)
@@ -66,7 +66,7 @@ public class SbChar implements TeXObject
    {
       TeXObject object = parser.popNextArg();
 
-      parser.getListener().subscript(parser, object);
+      parser.getListener().subscript(object);
    }
 
 

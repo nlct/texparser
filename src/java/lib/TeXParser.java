@@ -36,6 +36,10 @@ public class TeXParser extends TeXObjectList
       reader = null;
       parentReader = null;
       markedReader = null;
+
+      activeTable = new Hashtable<Integer,ActiveChar>();
+      csTable = new Hashtable<String,ControlSequence>();
+
       settings = new TeXSettings(this);
 
       verbatim = new Vector<String>();
@@ -43,6 +47,12 @@ public class TeXParser extends TeXObjectList
       verbatim.add("verb");
 
       initDefCatCodes();
+
+      listener.setParser(this);
+   }
+
+   private TeXParser()
+   {
    }
 
    private void initRegisters()
@@ -1402,7 +1412,7 @@ public class TeXParser extends TeXObjectList
 
       if (object instanceof Ignoreable)
       {
-         listener.skipping(this, (Ignoreable)object);
+         listener.skipping((Ignoreable)object);
 
          return popStack();
       }
@@ -1441,7 +1451,7 @@ public class TeXParser extends TeXObjectList
 
       try
       {
-         listener.beginParse(this, file);
+         listener.beginParse(file);
          parse(new LineNumberReader(new FileReader(file)));
       }
       catch (EOFException e)
@@ -1451,7 +1461,7 @@ public class TeXParser extends TeXObjectList
       {
          currentParentFile = orgParentFile;
          resetLineNum(orgLineNum);
-         listener.endParse(this, file);
+         listener.endParse(file);
 
          if (reader != null)
          {
@@ -1494,6 +1504,67 @@ public class TeXParser extends TeXObjectList
    public boolean isMathMode()
    {
       return settings.getMode() != TeXSettings.MODE_TEXT;
+   }
+
+   public void putControlSequence(ControlSequence cs)
+   {
+      csTable.put(cs.getName(), cs);
+   }
+
+   public void putControlSequence(boolean isLocal, ControlSequence cs)
+   {
+      if (isLocal)
+      {
+         settings.putControlSequence(cs);
+      }
+      else
+      {
+         putControlSequence(cs);
+      }
+   }
+
+   public ControlSequence getControlSequence(String name)
+   {
+      ControlSequence cs = settings.getControlSequence(name);
+
+      if (cs != null)
+      {
+         return cs;
+      }
+
+      return csTable.get(name);
+   }
+
+   public void putActiveChar(ActiveChar activeChar)
+   {
+      activeTable.put(new Integer((int)activeChar.getChar().charValue()),
+        activeChar);
+   }
+
+   public void putActiveChar(boolean isLocal, ActiveChar activeChar)
+   {
+      if (isLocal)
+      {
+         settings.putActiveChar(activeChar);
+      }
+      else
+      {
+         putActiveChar(activeChar);
+      }
+   }
+
+   public ActiveChar getActiveChar(int charCode)
+   {
+      Integer intCode = new Integer(charCode);
+
+      ActiveChar activeChar = settings.getActiveChar(intCode);
+
+      if (activeChar != null)
+      {
+         return activeChar;
+      }
+
+      return activeTable.get(intCode);
    }
 
    public void startGroup()
@@ -1683,6 +1754,10 @@ public class TeXParser extends TeXObjectList
    public static final Integer INS_COUNT = new Integer(20);
    public static final Integer ALLOC_NUMBER = new Integer(21);
    public static final Integer MINUS_ONE = new Integer(22);
+
+   protected Hashtable<String,ControlSequence> csTable;
+
+   protected Hashtable<Integer,ActiveChar> activeTable;
 
    private File currentParentFile;
 

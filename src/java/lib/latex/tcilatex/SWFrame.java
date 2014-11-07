@@ -113,7 +113,7 @@ public class SWFrame extends ControlSequence
          env.add(contentsArg);
       }
 
-      listener.substituting(parser, originalStr, env.toString(parser));
+      listener.substituting(originalStr, env.toString(parser));
 
       env.process(parser);
    }

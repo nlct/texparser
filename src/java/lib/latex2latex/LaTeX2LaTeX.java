@@ -74,9 +74,9 @@ public class LaTeX2LaTeX extends LaTeXParserListener
    {
       super.addPredefined();
 
-      putControlSequence("(", new L2LMathCs());
-      putControlSequence("[", new L2LDisplayMathCs());
-      putControlSequence("bibliography", new L2LBibliography());
+      putControlSequence(new L2LMathCs());
+      putControlSequence(new L2LDisplayMathCs());
+      putControlSequence(new L2LBibliography());
    }
 
    public boolean isVerbatim(String name)
@@ -205,10 +205,10 @@ public class LaTeX2LaTeX extends LaTeXParserListener
       return new L2LMathGroup();
    }
 
-   public void beginDocument(TeXParser parser)
+   public void beginDocument()
      throws IOException
    {
-      super.beginDocument(parser);
+      super.beginDocument();
 
       write(parser.getEscChar());
       write("begin");
@@ -217,7 +217,7 @@ public class LaTeX2LaTeX extends LaTeXParserListener
       write(parser.getEgChar());
    }
 
-   public void endDocument(TeXParser parser)
+   public void endDocument()
      throws IOException
    {
       try
@@ -228,7 +228,7 @@ public class LaTeX2LaTeX extends LaTeXParserListener
          write("document");
          writeln(parser.getEgChar());
 
-         super.endDocument(parser);
+         super.endDocument();
       }
       finally
       {
@@ -240,11 +240,10 @@ public class LaTeX2LaTeX extends LaTeXParserListener
       }
    }
 
-   public void documentclass(TeXParser parser, KeyValList options,
-     String clsName)
+   public void documentclass(KeyValList options, String clsName)
      throws IOException
    {
-      super.documentclass(parser, options, clsName);
+      super.documentclass(options, clsName);
 
       write(parser.getEscChar()+"documentclass");
 
@@ -258,8 +257,7 @@ public class LaTeX2LaTeX extends LaTeXParserListener
       write(parser.getBgChar()+clsName+parser.getEgChar());
    }
 
-   public void usepackage(TeXParser parser, KeyValList options,
-     String styName) throws IOException
+   public void usepackage(KeyValList options, String styName) throws IOException
    {
       if (styName.equals("graphics") || styName.equals("epsfig"))
       {
@@ -269,7 +267,7 @@ public class LaTeX2LaTeX extends LaTeXParserListener
          styName = "graphicx";
       }
 
-      super.usepackage(parser, options, styName);
+      super.usepackage(options, styName);
 
       write(parser.getEscChar());
       write("usepackage");
@@ -286,8 +284,7 @@ public class LaTeX2LaTeX extends LaTeXParserListener
       writeln(parser.getEgChar());
    }
 
-   public void substituting(TeXParser parser, 
-    String original, String replacement)
+   public void substituting(String original, String replacement)
      throws IOException
    {
       getTeXApp().substituting(parser.getLineNumber(),
@@ -366,8 +363,7 @@ public class LaTeX2LaTeX extends LaTeXParserListener
       return null;
    }
 
-   public void includegraphics(TeXParser parser, 
-     KeyValList options, String imgName)
+   public void includegraphics(KeyValList options, String imgName)
      throws IOException
    {
       TeXObjectList graphicsPath = getGraphicsPath();
@@ -482,10 +478,10 @@ public class LaTeX2LaTeX extends LaTeXParserListener
 
    }
 
-   public void setGraphicsPath(TeXParser parser, TeXObjectList paths)
+   public void setGraphicsPath(TeXObjectList paths)
      throws IOException
    {
-      super.setGraphicsPath(parser, paths);
+      super.setGraphicsPath(paths);
 
       if (!isReplaceGraphicsPathEnabled())
       {
@@ -506,7 +502,7 @@ public class LaTeX2LaTeX extends LaTeXParserListener
       }
    }
 
-   public void bibliography(TeXParser parser, TeXPath[] bibPaths)
+   public void bibliography(TeXPath[] bibPaths)
      throws IOException
    {
       for (int i = 0; i < bibPaths.length; i++)
@@ -576,7 +572,7 @@ public class LaTeX2LaTeX extends LaTeXParserListener
       }
    }
 
-   public void overwithdelims(TeXParser parser, TeXObject firstDelim,
+   public void overwithdelims(TeXObject firstDelim,
      TeXObject secondDelim, TeXObject before, TeXObject after)
     throws IOException
    {
@@ -650,7 +646,7 @@ public class LaTeX2LaTeX extends LaTeXParserListener
       }
    }
 
-   public void abovewithdelims(TeXParser parser, TeXObject firstDelim,
+   public void abovewithdelims(TeXObject firstDelim,
      TeXObject secondDelim, TeXDimension thickness, 
      TeXObject before, TeXObject after)
     throws IOException
@@ -726,12 +722,12 @@ public class LaTeX2LaTeX extends LaTeXParserListener
       writeln();
    }
 
-   public void skipping(TeXParser parser, Ignoreable ignoreable)
+   public void skipping(Ignoreable ignoreable)
      throws IOException
    {
    }
 
-   public void subscript(TeXParser parser, TeXObject arg)
+   public void subscript(TeXObject arg)
      throws IOException
    {
       write(parser.getSbChar());
@@ -740,7 +736,7 @@ public class LaTeX2LaTeX extends LaTeXParserListener
       write(parser.getEgChar());
    }
 
-   public void superscript(TeXParser parser, TeXObject arg)
+   public void superscript(TeXObject arg)
      throws IOException
    {
       write(parser.getSpChar());
@@ -749,7 +745,7 @@ public class LaTeX2LaTeX extends LaTeXParserListener
       write(parser.getEgChar());
    }
 
-   public void tab(TeXParser parser)
+   public void tab()
      throws IOException
    {
       write(parser.getTabChar());
@@ -780,10 +776,10 @@ public class LaTeX2LaTeX extends LaTeXParserListener
       return false;
    }
 
-   public boolean special(TeXParser parser, String param)
+   public boolean special(String param)
      throws IOException
    {
-      if (!super.special(parser, param))
+      if (!super.special(param))
       {
          return specialListener.process(parser, param);
       }
@@ -796,7 +792,7 @@ public class LaTeX2LaTeX extends LaTeXParserListener
       return inFile;
    }
 
-   public void beginParse(TeXParser parser, File file)
+   public void beginParse(File file)
      throws IOException
    {
       inFile = file;
@@ -818,7 +814,7 @@ public class LaTeX2LaTeX extends LaTeXParserListener
       writer = new PrintWriter(outFile);
    }
 
-   public void endParse(TeXParser parser, File file)
+   public void endParse(File file)
     throws IOException
    {
       if (writer != null)
@@ -828,7 +824,7 @@ public class LaTeX2LaTeX extends LaTeXParserListener
       }
    }
 
-   public void href(TeXParser parser, String url, TeXObject text)
+   public void href(String url, TeXObject text)
     throws IOException
    {
       String bg = ""+parser.getBgChar();
@@ -839,8 +835,7 @@ public class LaTeX2LaTeX extends LaTeXParserListener
       write(bg+text.toString(parser)+eg);
    }
 
-   public void verb(TeXParser parser, boolean isStar, 
-     char delim, String text)
+   public void verb(boolean isStar, char delim, String text)
      throws IOException
    {
       write(parser.getEscChar()+"verb");
@@ -859,8 +854,7 @@ public class LaTeX2LaTeX extends LaTeXParserListener
       write(delim);
    }
 
-   public void newcommand(TeXParser parser, String type,
-     String csName, boolean isShort,
+   public void newcommand(String type, String csName, boolean isShort,
      int numParams, TeXObject defValue, TeXObject definition)
     throws IOException
    {

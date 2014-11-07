@@ -107,7 +107,7 @@ public class L2LMathGroup extends MathGroup
 
          if (!delim.equals(openDelim) && !endDelim.equals(closeDelim))
          {
-            listener.substituting(parser, 
+            listener.substituting( 
                 orgDelim+argStr+orgDelim, delim+argStr+endDelim);
          }
 
@@ -134,7 +134,7 @@ public class L2LMathGroup extends MathGroup
                "math"+original.getName());
 
             String replacement = cs.toString(parser);
-            listener.substituting(parser, original.toString(parser), replacement);
+            listener.substituting(original.toString(parser), replacement);
 
             Group grp = parser.getListener().createGroup();
 
