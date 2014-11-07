@@ -28,6 +28,11 @@ public abstract class Command extends ControlSequence implements Expandable
       super(name);
    }
 
+   public Command(String name, boolean isShort)
+   {
+      super(name, isShort);
+   }
+
    public TeXObjectList expandonce(TeXParser parser)
      throws IOException
    {

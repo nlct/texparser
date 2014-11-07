@@ -157,7 +157,10 @@ public class TeXAppAdapter implements TeXApp
            message = "Number expected (found "+ e.getParam()+")";
          break;
          case TeXSyntaxException.ERROR_SYNTAX:
-           message = "Invalid syntax for "+ e.getParam()+"";
+           message = "Invalid syntax for "+ e.getParam();
+         break;
+         case TeXSyntaxException.ERROR_EXTRA:
+           message = "Extra "+ e.getParam();
          break;
          default:
            message = e.getMessage();

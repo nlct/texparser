@@ -627,6 +627,12 @@ public class TeXParserApp implements TeXApp
          case TeXSyntaxException.ERROR_REGISTER_UNDEF:
            message = getLabelWithValue("error.register_undef", e.getParam());
          break;
+         case TeXSyntaxException.ERROR_SYNTAX:
+           message = getLabelWithValue("error.syntax", e.getParam());
+         break;
+         case TeXSyntaxException.ERROR_EXTRA:
+           message = getLabelWithValue("error.extra", e.getParam());
+         break;
          default:
            message = e.getMessage();
       }

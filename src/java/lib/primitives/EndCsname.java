@@ -19,19 +19,40 @@
 package com.dickimawbooks.texparserlib.primitives;
 
 import java.io.IOException;
-import java.io.Writer;
+import java.io.EOFException;
 
 import com.dickimawbooks.texparserlib.*;
 
-public abstract class Primitive extends ControlSequence
+public class EndCsname extends Primitive
 {
-   public Primitive(String name)
+   public EndCsname()
+   {
+      this("endcsname");
+   }
+
+   public EndCsname(String name)
    {
       super(name);
    }
 
-   public Primitive(String name, boolean isShort)
+   public Object clone()
    {
-      super(name, isShort);
+      return new EndCsname(getName());
+   }
+
+   public void process(TeXParser parser, TeXObjectList stack)
+      throws IOException
+   {
+      throw new TeXSyntaxException(parser,
+        TeXSyntaxException.ERROR_EXTRA,
+        getString(parser));
+   }
+
+   public void process(TeXParser parser)
+      throws IOException
+   {
+      throw new TeXSyntaxException(parser,
+        TeXSyntaxException.ERROR_EXTRA,
+        getString(parser));
    }
 }
