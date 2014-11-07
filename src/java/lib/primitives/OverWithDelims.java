@@ -27,16 +27,17 @@ public class OverWithDelims extends MidControlSequence
 {
    public OverWithDelims()
    {
+      this("overwithdelims");
    }
 
-   public String getName()
+   public OverWithDelims(String name)
    {
-      return "overwithdelims";
+      super(name);
    }
 
    public Object clone()
    {
-      return new OverWithDelims();
+      return new OverWithDelims(getName());
    }
 
    public void process(TeXParser parser, 

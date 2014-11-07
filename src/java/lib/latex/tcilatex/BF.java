@@ -32,16 +32,17 @@ public class BF extends ControlSequence
 {
    public BF()
    {
+      this("BF");
    }
 
-   public String getName()
+   public BF(String name)
    {
-      return "BF";
+      super(name);
    }
 
    public Object clone()
    {
-      return new BF();
+      return new BF(getName());
    }
 
    public void process(TeXParser parser, TeXObjectList stack)

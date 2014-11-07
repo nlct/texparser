@@ -26,16 +26,17 @@ public class End extends ControlSequence
 {
    public End()
    {
+      this("end");
    }
 
-   public String getName()
+   public End(String name)
    {
-      return "end";
+      super(name);
    }
 
    public Object clone()
    {
-      return new End();
+      return new End(getName());
    }
 
    public void process(TeXParser parser, TeXObjectList list)

@@ -30,11 +30,12 @@ public class DocumentStyle extends ControlSequence
 {
    public DocumentStyle()
    {
+      this("documentstyle");
    }
 
-   public String getName()
+   public DocumentStyle(String name)
    {
-      return "documentstyle";
+      super(name);
    }
 
    public Object clone()

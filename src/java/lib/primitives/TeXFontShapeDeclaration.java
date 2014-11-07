@@ -27,21 +27,16 @@ public class TeXFontShapeDeclaration extends TeXFontDeclaration
 {
    public TeXFontShapeDeclaration(String name, int shape)
    {
-      this.name = name;
+      super(name);
       this.shape = shape;
       this.orgWeight = TeXSettings.INHERIT;
       this.orgFamily = TeXSettings.INHERIT;
       this.orgShape = TeXSettings.INHERIT;
    }
 
-   public String getName()
-   {
-      return name;
-   }
-
    public Object clone()
    {
-      return new TeXFontShapeDeclaration(name, shape);
+      return new TeXFontShapeDeclaration(getName(), shape);
    }
 
    public void process(TeXParser parser) throws IOException
@@ -70,6 +65,5 @@ public class TeXFontShapeDeclaration extends TeXFontDeclaration
       settings.setFontFamily(orgFamily);
    }
 
-   private String name;
    private int shape, orgWeight, orgFamily, orgShape;
 }

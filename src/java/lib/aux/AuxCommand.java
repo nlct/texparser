@@ -38,13 +38,8 @@ public class AuxCommand extends ControlSequence
 {
    public AuxCommand(String name, int numArgs)
    {
-      this.name = name;
+      super(name);
       this.numArgs = numArgs;
-   }
-
-   public String getName()
-   {
-      return name;
    }
 
    public int getNumArgs()
@@ -86,8 +81,6 @@ public class AuxCommand extends ControlSequence
 
       auxParser.addAuxData(new AuxData(getName(), args));
    }
-
-   private String name;
 
    private int numArgs;
 }

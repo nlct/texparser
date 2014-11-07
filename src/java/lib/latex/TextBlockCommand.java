@@ -27,18 +27,13 @@ public class TextBlockCommand extends ControlSequence
 {
    public TextBlockCommand(String name, Declaration declaration)
    {
-      this.name = name;
+      super(name);
       this.declaration = declaration;
-   }
-
-   public String getName()
-   {
-      return name;
    }
 
    public Object clone()
    {
-      return new TextBlockCommand(name, (Declaration)declaration.clone());
+      return new TextBlockCommand(getName(), (Declaration)declaration.clone());
    }
 
    public void process(TeXParser parser) throws IOException
@@ -59,6 +54,5 @@ public class TextBlockCommand extends ControlSequence
       declaration.end(parser);
    }
 
-   private String name;
    private Declaration declaration;
 }

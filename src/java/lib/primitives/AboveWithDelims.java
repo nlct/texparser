@@ -27,16 +27,17 @@ public class AboveWithDelims extends MidControlSequence
 {
    public AboveWithDelims()
    {
+      this("abovewithdelims");
    }
 
-   public String getName()
+   public AboveWithDelims(String name)
    {
-      return "abovewithdelims";
+      super(name);
    }
 
    public Object clone()
    {
-      return new AboveWithDelims();
+      return new AboveWithDelims(getName());
    }
 
    public void process(TeXParser parser, 

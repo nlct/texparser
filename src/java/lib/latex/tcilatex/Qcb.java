@@ -33,16 +33,17 @@ public class Qcb extends ControlSequence
 {
    public Qcb()
    {
+      this("Qcb");
    }
 
-   public String getName()
+   public Qcb(String name)
    {
-      return "Qcb";
+      super(name);
    }
 
    public Object clone()
    {
-      return new Qcb();
+      return new Qcb(getName());
    }
 
    public void process(TeXParser parser, TeXObjectList stack)

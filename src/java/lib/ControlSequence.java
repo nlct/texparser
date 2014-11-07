@@ -23,11 +23,22 @@ import java.util.Vector;
 
 public abstract class ControlSequence implements TeXObject
 {
+   public ControlSequence(String name)
+   {
+      setName(name);
+   }
+
    public abstract Object clone();
 
-   // control sequence name without initial backslash
+   public String getName()
+   {
+      return name;
+   }
 
-   public abstract String getName();
+   public void setName(String name)
+   {
+      this.name = name;
+   }
 
    public String toString()
    {
@@ -64,4 +75,7 @@ public abstract class ControlSequence implements TeXObject
       return parser.string(""+parser.getEscChar()+getName());
    }
 
+   // control sequence name without initial backslash
+
+   protected String name;
 }

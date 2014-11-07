@@ -27,16 +27,17 @@ public class Frac extends ControlSequence
 {
    public Frac()
    {
+      this("frac");
    }
 
-   public String getName()
+   public Frac(String name)
    {
-      return "frac";
+      super(name);
    }
 
    public Object clone()
    {
-      return new Frac();
+      return new Frac(getName());
    }
 
    protected void process(TeXParser parser, TeXObject above, TeXObject below)

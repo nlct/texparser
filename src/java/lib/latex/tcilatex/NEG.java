@@ -32,16 +32,17 @@ public class NEG extends ControlSequence
 {
    public NEG()
    {
+      this("NEG");
    }
 
-   public String getName()
+   public NEG(String name)
    {
-      return "NEG";
+      super(name);
    }
 
    public Object clone()
    {
-      return new NEG();
+      return new NEG(getName());
    }
 
    public void process(TeXParser parser, TeXObjectList stack)

@@ -33,16 +33,17 @@ public class SWFrame extends ControlSequence
 {
    public SWFrame()
    {
+      this("FRAME");
    }
 
-   public String getName()
+   public SWFrame(String name)
    {
-      return "FRAME";
+      super(name);
    }
 
    public Object clone()
    {
-      return new SWFrame();
+      return new SWFrame(getName());
    }
 
    private void addArg(TeXParser parser, TeXObjectList list, TeXObject arg)

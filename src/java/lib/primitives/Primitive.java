@@ -25,4 +25,8 @@ import com.dickimawbooks.texparserlib.*;
 
 public abstract class Primitive extends ControlSequence
 {
+   public Primitive(String name)
+   {
+      super(name);
+   }
 }

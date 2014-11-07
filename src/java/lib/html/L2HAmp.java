@@ -25,14 +25,19 @@ import com.dickimawbooks.texparserlib.*;
 
 public class L2HAmp extends ControlSequence
 {
-   public String getName()
+   public L2HAmp()
    {
-      return "&";
+      this("&");
+   }
+
+   public L2HAmp(String name)
+   {
+      super(name);
    }
 
    public Object clone()
    {
-      return new L2HAmp();
+      return new L2HAmp(getName());
    }
 
    public void process(TeXParser parser)

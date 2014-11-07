@@ -26,16 +26,17 @@ public class Centerline extends ControlSequence
 {
    public Centerline()
    {
+      this("centerline");
    }
 
-   public String getName()
+   public Centerline(String name)
    {
-      return "centerline";
+      super(name);
    }
 
    public Object clone()
    {
-      return new Centerline();
+      return new Centerline(getName());
    }
 
    private void processArg(TeXParser parser, TeXObject arg, TeXObjectList stack)

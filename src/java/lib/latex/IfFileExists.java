@@ -27,16 +27,17 @@ public class IfFileExists extends ControlSequence
 {
    public IfFileExists()
    {
+      this("IfFileExists");
    }
 
-   public String getName()
+   public IfFileExists(String name)
    {
-      return "IfFileExists";
+      super(name);
    }
 
    public Object clone()
    {
-      return new IfFileExists();
+      return new IfFileExists(getName());
    }
 
    public void process(TeXParser parser, TeXObjectList stack)

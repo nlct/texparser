@@ -23,12 +23,7 @@ public abstract class Register extends ControlSequence implements Numerical
 {
    public Register(String name)
    {
-      this.name = name;
-   }
-
-   public String getName()
-   {
-      return name;
+      super(name);
    }
 
    public void setAllocation(int alloc)
@@ -50,8 +45,6 @@ public abstract class Register extends ControlSequence implements Numerical
    public abstract void multiply(int factor);
 
    public abstract void setValue(int value);
-
-   protected String name;
 
    protected int allocation = -1;
 }

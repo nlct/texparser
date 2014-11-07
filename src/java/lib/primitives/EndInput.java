@@ -27,16 +27,17 @@ public class EndInput extends Primitive
 {
    public EndInput()
    {
+      this("endinput");
    }
 
-   public String getName()
+   public EndInput(String name)
    {
-      return "endinput";
+      super(name);
    }
 
    public Object clone()
    {
-      return new EndInput();
+      return new EndInput(getName());
    }
 
    public void process(TeXParser parser, TeXObjectList stack)

@@ -27,16 +27,17 @@ public class Bye extends ControlSequence
 {
    public Bye()
    {
+      this("bye");
    }
 
-   public String getName()
+   public Bye(String name)
    {
-      return "bye";
+      super(name);
    }
 
    public Object clone()
    {
-      return new Bye();
+      return new Bye(getName());
    }
 
    public void process(TeXParser parser, TeXObjectList stack)

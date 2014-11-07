@@ -26,16 +26,17 @@ public class Begin extends Command
 {
    public Begin()
    {
+      this("begin");
    }
 
-   public String getName()
+   public Begin(String name)
    {
-      return "begin";
+      super(name);
    }
 
    public Object clone()
    {
-      return new Begin();
+      return new Begin(getName());
    }
 
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList list)

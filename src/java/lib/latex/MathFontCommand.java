@@ -27,18 +27,13 @@ public class MathFontCommand extends ControlSequence
 {
    public MathFontCommand(String name, int style)
    {
-      this.name = name;
+      super(name);
       this.style = style;
-   }
-
-   public String getName()
-   {
-      return name;
    }
 
    public Object clone()
    {
-      return new MathFontCommand(name, style);
+      return new MathFontCommand(getName(), style);
    }
 
    public void process(TeXParser parser) throws IOException
@@ -72,7 +67,5 @@ public class MathFontCommand extends ControlSequence
       settings.setMathFont(orgStyle);
    }
 
-
-   private String name;
    private int style;
 }

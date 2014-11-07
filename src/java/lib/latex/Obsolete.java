@@ -27,13 +27,9 @@ public class Obsolete extends ControlSequence
 {
    public Obsolete(ControlSequence orgCommand, ControlSequence replacementCommand)
    {
+      super(orgCommand.getName());
       this.orgCommand = orgCommand;
       this.replacementCommand = replacementCommand;
-   }
-
-   public String getName()
-   {
-      return orgCommand.getName();
    }
 
    public Object clone()

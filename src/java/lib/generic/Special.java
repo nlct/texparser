@@ -26,16 +26,17 @@ public class Special extends ControlSequence
 {
    public Special()
    {
+      this("special");
    }
 
-   public String getName()
+   public Special(String name)
    {
-      return "special";
+      super(name);
    }
 
    public Object clone()
    {
-      return new Special();
+      return new Special(getName());
    }
 
    public void process(TeXParser parser, TeXObjectList list)

@@ -27,18 +27,13 @@ public class Symbol extends ControlSequence
 {
    public Symbol(String name, int codePoint)
    {
-      this.name = name;
+      super(name);
       this.codePoint = codePoint;
-   }
-
-   public String getName()
-   {
-      return name;
    }
 
    public Object clone()
    {
-      return new Symbol(name, codePoint);
+      return new Symbol(getName(), codePoint);
    }
 
    public TeXObjectList expandonce(TeXParser parser)
@@ -493,6 +488,5 @@ public class Symbol extends ControlSequence
       new Object[]{"eqqcolon", new Integer(0x2255)},
    };
 
-   private String name;
    protected int codePoint;
 }

@@ -27,19 +27,14 @@ public class FontShapeDeclaration extends Declaration
 {
    public FontShapeDeclaration(String name, int shape)
    {
-      this.name = name;
+      super(name);
       this.shape = shape;
       this.orgShape = TeXSettings.INHERIT;
    }
 
-   public String getName()
-   {
-      return name;
-   }
-
    public Object clone()
    {
-      return new FontShapeDeclaration(name, shape);
+      return new FontShapeDeclaration(getName(), shape);
    }
 
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList list)

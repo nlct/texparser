@@ -26,16 +26,17 @@ public class Verb extends Command
 {
    public Verb()
    {
+      this("verb");
    }
 
-   public String getName()
+   public Verb(String name)
    {
-      return "verb";
+      super(name);
    }
 
    public Object clone()
    {
-      return new Verb();
+      return new Verb(getName());
    }
 
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList list)

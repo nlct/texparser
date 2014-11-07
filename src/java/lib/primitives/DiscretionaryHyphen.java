@@ -27,16 +27,17 @@ public class DiscretionaryHyphen extends Primitive
 {
    public DiscretionaryHyphen()
    {
+      this("-");
    }
 
-   public String getName()
+   public DiscretionaryHyphen(String name)
    {
-      return "-";
+      super(name);
    }
 
    public Object clone()
    {
-      return new DiscretionaryHyphen();
+      return new DiscretionaryHyphen(getName());
    }
 
    public void process(TeXParser parser)

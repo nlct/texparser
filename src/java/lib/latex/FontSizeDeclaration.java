@@ -27,19 +27,14 @@ public class FontSizeDeclaration extends Declaration
 {
    public FontSizeDeclaration(String name, int size)
    {
-      this.name = name;
+      super(name);
       this.size = size;
       this.orgSize = TeXSettings.INHERIT;
    }
 
-   public String getName()
-   {
-      return name;
-   }
-
    public Object clone()
    {
-      return new FontSizeDeclaration(name, size);
+      return new FontSizeDeclaration(getName(), size);
    }
 
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList list)
@@ -86,6 +81,5 @@ public class FontSizeDeclaration extends Declaration
       settings.setFontSize(orgSize);
    }
 
-   private String name;
    private int size, orgSize;
 }

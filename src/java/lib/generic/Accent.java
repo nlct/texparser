@@ -27,12 +27,7 @@ public class Accent extends ControlSequence
 {
    public Accent(String name)
    {
-      this.name = name;
-   }
-
-   public String getName()
-   {
-      return name;
+      super(name);
    }
 
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
@@ -449,7 +444,7 @@ public class Accent extends ControlSequence
 
    public Object clone()
    {
-      return new Accent(name);
+      return new Accent(getName());
    }
 
    public static final int[][] ACUTE_ACCENTS =
@@ -694,5 +689,4 @@ public class Accent extends ControlSequence
       new int[] {(int)'u', 0x0171},
    };
 
-   private String name;
 }

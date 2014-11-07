@@ -27,19 +27,14 @@ public class FontFamilyDeclaration extends Declaration
 {
    public FontFamilyDeclaration(String name, int family)
    {
-      this.name = name;
+      super(name);
       this.family = family;
       this.orgFamily = TeXSettings.INHERIT;
    }
 
-   public String getName()
-   {
-      return name;
-   }
-
    public Object clone()
    {
-      return new FontFamilyDeclaration(name, family);
+      return new FontFamilyDeclaration(getName(), family);
    }
 
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList list)
@@ -86,6 +81,5 @@ public class FontFamilyDeclaration extends Declaration
       settings.setFontFamily(orgFamily);
    }
 
-   private String name;
    private int family, orgFamily;
 }

@@ -26,16 +26,17 @@ public class UsePackage extends ControlSequence
 {
    public UsePackage()
    {
+      this("usepackage");
    }
 
-   public String getName()
+   public UsePackage(String name)
    {
-      return "usepackage";
+      super(name);
    }
 
    public Object clone()
    {
-      return new UsePackage();
+      return new UsePackage(getName());
    }
 
    public void process(TeXParser parser, TeXObjectList list)

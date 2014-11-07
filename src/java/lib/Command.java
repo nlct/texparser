@@ -23,6 +23,11 @@ import java.util.Vector;
 
 public abstract class Command extends ControlSequence implements Expandable
 {
+   public Command(String name)
+   {
+      super(name);
+   }
+
    public TeXObjectList expandonce(TeXParser parser)
      throws IOException
    {

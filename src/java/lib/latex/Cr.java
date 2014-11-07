@@ -25,19 +25,19 @@ import com.dickimawbooks.texparserlib.*;
 
 public class Cr extends ControlSequence
 {
-   public Cr(String name)
+   public Cr()
    {
-      this.name = name;
+      this("cr");
    }
 
-   public String getName()
+   public Cr(String name)
    {
-      return name;
+      super(name);
    }
 
    public Object clone()
    {
-      return new Cr(name);
+      return new Cr(getName());
    }
 
    public void process(TeXParser parser, boolean isStar,
@@ -99,5 +99,4 @@ public class Cr extends ControlSequence
       }
    }
 
-   private String name;
 }

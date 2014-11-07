@@ -31,17 +31,12 @@ public class NewCommand extends Command
 
    public NewCommand(String name)
    {
-      this.name = name;
-   }
-
-   public String getName()
-   {
-      return name;
+      super(name);
    }
 
    public Object clone()
    {
-      return new NewCommand(name);
+      return new NewCommand(getName());
    }
 
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList list)
@@ -221,6 +216,4 @@ public class NewCommand extends Command
          name, csName, isStar, numParams, defValue, definition);
    }
 
-
-   private String name;
 }

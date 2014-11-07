@@ -27,16 +27,17 @@ public class Above extends MidControlSequence
 {
    public Above()
    {
+      this("above");
    }
 
-   public String getName()
+   public Above(String name)
    {
-      return "above";
+      super(name);
    }
 
    public Object clone()
    {
-      return new Above();
+      return new Above(getName());
    }
 
    public void process(TeXParser parser, TeXObjectList stack)

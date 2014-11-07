@@ -27,16 +27,17 @@ public class StringCs extends Primitive implements Expandable
 {
    public StringCs()
    {
+      this("string");
    }
 
-   public String getName()
+   public StringCs(String name)
    {
-      return "string";
+      super(name);
    }
 
    public Object clone()
    {
-      return new StringCs();
+      return new StringCs(getName());
    }
 
    public TeXObjectList string(TeXParser parser)

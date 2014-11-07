@@ -27,12 +27,17 @@ public class L2LBibliography extends L2LControlSequence
 {
    public L2LBibliography()
    {
-      super("bibliography");
+      this("bibliography");
+   }
+
+   public L2LBibliography(String name)
+   {
+      super(name);
    }
 
    public Object clone()
    {
-      return new L2LBibliography();
+      return new L2LBibliography(getName());
    }
 
    private void processBib(TeXParser parser, TeXObject arg)

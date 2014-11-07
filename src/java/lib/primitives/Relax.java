@@ -27,16 +27,17 @@ public class Relax extends Primitive
 {
    public Relax()
    {
+      this("relax");
    }
 
-   public String getName()
+   public Relax(String name)
    {
-      return "relax";
+      super(name);
    }
 
    public Object clone()
    {
-      return new Relax();
+      return new Relax(getName());
    }
 
    public void process(TeXParser parser, TeXObjectList stack)

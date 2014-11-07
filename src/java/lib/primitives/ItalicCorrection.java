@@ -27,16 +27,17 @@ public class ItalicCorrection extends Primitive
 {
    public ItalicCorrection()
    {
+      this("/");
    }
 
-   public String getName()
+   public ItalicCorrection(String name)
    {
-      return "/";
+      super(name);
    }
 
    public Object clone()
    {
-      return new ItalicCorrection();
+      return new ItalicCorrection(getName());
    }
 
    public void process(TeXParser parser)

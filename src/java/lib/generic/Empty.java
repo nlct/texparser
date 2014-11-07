@@ -31,8 +31,7 @@ public class Empty extends Command
 
    public Empty(String name)
    {
-      super();
-      this.name = name;
+      super(name);
    }
 
    public String toString(TeXParser parser)
@@ -43,11 +42,6 @@ public class Empty extends Command
    public String toString()
    {
       return "";
-   }
-
-   public String getName()
-   {
-      return name;
    }
 
    public void process(TeXParser parser, TeXObjectList list)
@@ -86,8 +80,6 @@ public class Empty extends Command
 
    public Object clone()
    {
-      return new Empty(name);
+      return new Empty(getName());
    }
-
-   private String name;
 }

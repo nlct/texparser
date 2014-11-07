@@ -27,16 +27,17 @@ public class IncludeGraphics extends ControlSequence
 {
    public IncludeGraphics()
    {
+      this("includegraphics");
    }
 
-   public String getName()
+   public IncludeGraphics(String name)
    {
-      return "includegraphics";
+      super(name);
    }
 
    public Object clone()
    {
-      return new IncludeGraphics();
+      return new IncludeGraphics(getName());
    }
 
    protected void processGraphics(TeXParser parser, TeXObjectList list)

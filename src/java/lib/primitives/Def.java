@@ -32,25 +32,24 @@ public class Def extends Primitive
 
    public Def(String name)
    {
-      this.name = name;
+      this(name, true, true);
    }
 
-   public String getName()
+   public Def(String name, boolean isShort, boolean isLocal)
    {
-      return name;
+      super(name);
+      this.isShort = isShort;
+      this.isLocal = isLocal;
    }
 
    public Object clone()
    {
-      return new Def(name);
+      return new Def(getName(), isShort, isLocal);
    }
 
    public void process(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
-      boolean isShort = true;// TODO check for prefix
-      boolean isLocal = name.equals("def");
-
       TeXObject cs = stack.popStack();
 
       if (cs == null)
@@ -84,9 +83,6 @@ public class Def extends Primitive
    public void process(TeXParser parser)
       throws IOException
    {
-      boolean isShort = true;// TODO check for prefix
-      boolean isLocal = name.equals("def");
-
       TeXObject cs = parser.popStack();
 
       TeXObjectList syntax = new TeXObjectList();
@@ -112,5 +108,5 @@ public class Def extends Primitive
       }
    }
 
-   private String name;
+   private boolean isShort, isLocal;
 }

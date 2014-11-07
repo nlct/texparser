@@ -29,17 +29,18 @@ public class Lipsum extends ControlSequence
 {
    public Lipsum(LipsumSty sty)
    {
-      this.sty = sty;
+      this("lipsum", sty);
    }
 
-   public String getName()
+   public Lipsum(String name, LipsumSty sty)
    {
-      return "lipsum";
+      super(name);
+      this.sty = sty;
    }
 
    public Object clone()
    {
-      return new Lipsum(sty);
+      return new Lipsum(getName(), sty);
    }
 
    private void lipsum(TeXParser parser, TeXObjectList stack,

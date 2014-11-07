@@ -32,16 +32,17 @@ public class QATOPD extends ControlSequence
 {
    public QATOPD()
    {
+      this("QATOPD");
    }
 
-   public String getName()
+   public QATOPD(String name)
    {
-      return "QATOPD";
+      super(name);
    }
 
    public Object clone()
    {
-      return new QATOPD();
+      return new QATOPD(getName());
    }
 
    public void process(TeXParser parser, TeXObjectList stack)

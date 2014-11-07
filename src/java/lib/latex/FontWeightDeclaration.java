@@ -27,19 +27,14 @@ public class FontWeightDeclaration extends Declaration
 {
    public FontWeightDeclaration(String name, int weight)
    {
-      this.name = name;
+      super(name);
       this.weight = weight;
       this.orgWeight = TeXSettings.INHERIT;
    }
 
-   public String getName()
-   {
-      return name;
-   }
-
    public Object clone()
    {
-      return new FontWeightDeclaration(name, weight);
+      return new FontWeightDeclaration(getName(), weight);
    }
 
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList list)
@@ -86,6 +81,5 @@ public class FontWeightDeclaration extends Declaration
       settings.setFontWeight(orgWeight);
    }
 
-   private String name;
    private int weight, orgWeight;
 }

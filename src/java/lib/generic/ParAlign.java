@@ -27,7 +27,7 @@ public class ParAlign extends Declaration
 {
    public ParAlign(String name, int align)
    {
-      this.name = name;
+      super(name);
       this.align = align;
       this.orgAlign = TeXSettings.INHERIT;
    }
@@ -77,9 +77,8 @@ public class ParAlign extends Declaration
 
    public Object clone()
    {
-      return new ParAlign(name, align);
+      return new ParAlign(getName(), align);
    }
-
 
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList list)
       throws IOException
@@ -105,6 +104,5 @@ public class ParAlign extends Declaration
       return null;
    }
 
-   private String name;
    private int align, orgAlign;
 }

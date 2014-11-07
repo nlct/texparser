@@ -25,19 +25,19 @@ import com.dickimawbooks.texparserlib.latex.*;
 
 public class Epsfig extends ControlSequence
 {
-   public Epsfig(String name)
+   public Epsfig()
    {
-      this.name = name;
+      this("epsfig");
    }
 
-   public String getName()
+   public Epsfig(String name)
    {
-      return name;
+      super(name);
    }
 
    public Object clone()
    {
-      return new Epsfig(name);
+      return new Epsfig(getName());
    }
 
    public void process(TeXParser parser, TeXObjectList list)
@@ -132,5 +132,4 @@ public class Epsfig extends ControlSequence
       process(parser, parser);
    }
 
-   private String name;
 }

@@ -26,16 +26,17 @@ public class MakeAtOther extends ControlSequence
 {
    public MakeAtOther()
    {
+      this("makeatother");
    }
 
-   public String getName()
+   public MakeAtOther(String name)
    {
-      return "makeatother";
+      super(name);
    }
 
    public Object clone()
    {
-      return new MakeAtOther();
+      return new MakeAtOther(getName());
    }
 
    public void process(TeXParser parser, TeXObjectList list)

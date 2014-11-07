@@ -27,13 +27,7 @@ public class L2LControlSequence extends ControlSequence
 {
    public L2LControlSequence(String name)
    {
-      super();
-      this.name = name;
-   }
-
-   public String getName()
-   {
-      return name;
+      super(name);
    }
 
    public Object clone()
@@ -56,6 +50,4 @@ public class L2LControlSequence extends ControlSequence
 
       writeable.write(toString(parser));
    }
-
-   private String name;
 }

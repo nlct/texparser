@@ -27,16 +27,17 @@ public class InputIfFileExists extends ControlSequence
 {
    public InputIfFileExists()
    {
+      this("InputIfFileExists");
    }
 
-   public String getName()
+   public InputIfFileExists(String name)
    {
-      return "InputIfFileExists";
+      super(name);
    }
 
    public Object clone()
    {
-      return new InputIfFileExists();
+      return new InputIfFileExists(getName());
    }
 
    public void process(TeXParser parser, TeXObjectList stack)

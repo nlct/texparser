@@ -28,17 +28,12 @@ public class L2LIgnoreable extends ControlSequence
 {
    public L2LIgnoreable(String name)
    {
-      this.name = name;
-   }
-
-   public String getName()
-   {
-      return name;
+      super(name);
    }
 
    public Object clone()
    {
-      return new L2LIgnoreable(name);
+      return new L2LIgnoreable(getName());
    }
 
    public void process(TeXParser parser, TeXObjectList stack)
@@ -53,6 +48,4 @@ public class L2LIgnoreable extends ControlSequence
       ((LaTeX2LaTeX)parser.getListener()).substituting( 
         ""+parser.getEscChar()+name, "");
    }
-
-   private String name;
 }

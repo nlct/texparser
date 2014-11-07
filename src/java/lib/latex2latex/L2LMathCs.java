@@ -27,11 +27,17 @@ public class L2LMathCs extends MathCs
 {
    public L2LMathCs()
    {
+      super();
+   }
+
+   public L2LMathCs(String name)
+   {
+      super(name);
    }
 
    public Object clone()
    {
-      return new L2LMathCs();
+      return new L2LMathCs(getName());
    }
 
    public void process(TeXParser parser, TeXObjectList stack)

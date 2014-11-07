@@ -26,16 +26,17 @@ public class DocumentClass extends ControlSequence
 {
    public DocumentClass()
    {
+      this("documentclass");
    }
 
-   public String getName()
+   public DocumentClass(String name)
    {
-      return "documentclass";
+      super(name);
    }
 
    public Object clone()
    {
-      return new DocumentClass();
+      return new DocumentClass(getName());
    }
 
    public void process(TeXParser parser, TeXObjectList list)

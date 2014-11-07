@@ -25,15 +25,14 @@ import com.dickimawbooks.texparserlib.*;
 
 public class Undefined extends Primitive
 {
-   public Undefined(String name)
+   public Undefined()
    {
-      super();
-      this.name = name;
+      this("undefined");
    }
 
-   public String getName()
+   public Undefined(String name)
    {
-      return name;
+      super(name);
    }
 
    public Object clone()
@@ -53,6 +52,4 @@ public class Undefined extends Primitive
       throw new TeXSyntaxException(
          parser, TeXSyntaxException.ERROR_UNDEFINED, getName());
    }
-
-   private String name;
 }

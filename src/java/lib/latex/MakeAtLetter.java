@@ -26,16 +26,17 @@ public class MakeAtLetter extends ControlSequence
 {
    public MakeAtLetter()
    {
+      this("makeatletter");
    }
 
-   public String getName()
+   public MakeAtLetter(String name)
    {
-      return "makeatletter";
+      super(name);
    }
 
    public Object clone()
    {
-      return new MakeAtLetter();
+      return new MakeAtLetter(getName());
    }
 
    public void process(TeXParser parser, TeXObjectList list)

@@ -32,16 +32,17 @@ public class QDABOVE extends ControlSequence
 {
    public QDABOVE()
    {
+      this("QDABOVE");
    }
 
-   public String getName()
+   public QDABOVE(String name)
    {
-      return "QDABOVE";
+      super(name);
    }
 
    public Object clone()
    {
-      return new QDABOVE();
+      return new QDABOVE(getName());
    }
 
    public void process(TeXParser parser, TeXObjectList stack)

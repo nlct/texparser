@@ -26,16 +26,17 @@ public class ParCs extends ControlSequence
 {
    public ParCs()
    {
+      this("par");
    }
 
-   public String getName()
+   public ParCs(String name)
    {
-      return "par";
+      super(name);
    }
 
    public Object clone()
    {
-      return new ParCs();
+      return new ParCs(getName());
    }
 
    public void process(TeXParser parser, TeXObjectList list)

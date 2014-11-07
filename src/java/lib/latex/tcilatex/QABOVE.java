@@ -32,16 +32,17 @@ public class QABOVE extends ControlSequence
 {
    public QABOVE()
    {
+      this("QABOVE");
    }
 
-   public String getName()
+   public QABOVE(String name)
    {
-      return "QABOVE";
+      super(name);
    }
 
    public Object clone()
    {
-      return new QABOVE();
+      return new QABOVE(getName());
    }
 
    public void process(TeXParser parser, TeXObjectList stack)

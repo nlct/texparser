@@ -23,6 +23,11 @@ import java.io.IOException;
 
 public abstract class MidControlSequence extends ControlSequence
 {
+   public MidControlSequence(String name)
+   {
+      super(name);
+   }
+
    public abstract void process(TeXParser parser, 
       TeXObjectList before, TeXObjectList after) throws IOException;
 

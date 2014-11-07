@@ -27,16 +27,17 @@ public class GraphicsPath extends ControlSequence
 {
    public GraphicsPath()
    {
+      this("graphicspath");
    }
 
-   public String getName()
+   public GraphicsPath(String name)
    {
-      return "graphicspath";
+      super(name);
    }
 
    public Object clone()
    {
-      return new GraphicsPath();
+      return new GraphicsPath(getName());
    }
 
    private void processPath(TeXParser parser, TeXObject arg)

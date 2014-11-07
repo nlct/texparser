@@ -27,17 +27,18 @@ public class SetLipsumDefault extends ControlSequence
 {
    public SetLipsumDefault(LipsumSty sty)
    {
-      this.sty = sty;
+      this("setlipsumdefault", sty);
    }
 
-   public String getName()
+   public SetLipsumDefault(String name, LipsumSty sty)
    {
-      return "setlipsumdefault";
+      super(name);
+      this.sty = sty;
    }
 
    public Object clone()
    {
-      return new SetLipsumDefault(sty);
+      return new SetLipsumDefault(getName(), sty);
    }
 
    public void process(TeXParser parser, TeXObjectList list)

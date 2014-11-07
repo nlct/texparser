@@ -27,16 +27,17 @@ public class NoLinkUrl extends ControlSequence
 {
    public NoLinkUrl()
    {
+      this("nolinkurl");
    }
 
-   public String getName()
+   public NoLinkUrl(String name)
    {
-      return "nolinkurl";
+      super(name);
    }
 
    public Object clone()
    {
-      return new NoLinkUrl();
+      return new NoLinkUrl(getName());
    }
 
    protected void process(TeXParser parser, TeXObject arg)

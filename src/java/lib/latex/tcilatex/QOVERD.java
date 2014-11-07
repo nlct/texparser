@@ -32,16 +32,17 @@ public class QOVERD extends ControlSequence
 {
    public QOVERD()
    {
+      this("QOVERD");
    }
 
-   public String getName()
+   public QOVERD(String name)
    {
-      return "QOVERD";
+      super(name);
    }
 
    public Object clone()
    {
-      return new QOVERD();
+      return new QOVERD(getName());
    }
 
    public void process(TeXParser parser, TeXObjectList stack)

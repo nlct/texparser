@@ -27,16 +27,17 @@ public class Href extends ControlSequence
 {
    public Href()
    {
+      this("href");
    }
 
-   public String getName()
+   public Href(String name)
    {
-      return "href";
+      super(name);
    }
 
    public Object clone()
    {
-      return new Href();
+      return new Href(getName());
    }
 
    protected void process(TeXParser parser, TeXObject url, TeXObject text)

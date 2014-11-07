@@ -27,16 +27,17 @@ public class Input extends ControlSequence
 {
    public Input()
    {
+      this("input");
    }
 
-   public String getName()
+   public Input(String name)
    {
-      return "input";
+      super(name);
    }
 
    public Object clone()
    {
-      return new Input();
+      return new Input(getName());
    }
 
    private boolean fetchArg(TeXParser parser, TeXObjectList stack,

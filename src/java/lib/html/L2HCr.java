@@ -25,19 +25,19 @@ import com.dickimawbooks.texparserlib.*;
 
 public class L2HCr extends ControlSequence
 {
-   public L2HCr(String name)
+   public L2HCr()
    {
-      this.name = name;
+      this("cr");
    }
 
-   public String getName()
+   public L2HCr(String name)
    {
-      return name;
+      super(name);
    }
 
    public Object clone()
    {
-      return new L2HCr(name);
+      return new L2HCr(getName());
    }
 
    // TODO check for enclosing tabular
@@ -100,5 +100,4 @@ public class L2HCr extends ControlSequence
       }
    }
 
-   private String name;
 }

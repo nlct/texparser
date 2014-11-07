@@ -22,5 +22,10 @@ import java.io.IOException;
 
 public abstract class Declaration extends Command
 {
+   public Declaration(String name)
+   {
+      super(name);
+   }
+
    public abstract void end(TeXParser parser) throws IOException;
 }

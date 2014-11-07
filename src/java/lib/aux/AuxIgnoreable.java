@@ -28,17 +28,12 @@ public class AuxIgnoreable extends ControlSequence
 {
    public AuxIgnoreable(String name)
    {
-      this.name = name;
-   }
-
-   public String getName()
-   {
-      return name;
+      super(name);
    }
 
    public Object clone()
    {
-      return new AuxIgnoreable(name);
+      return new AuxIgnoreable(getName());
    }
 
    public void process(TeXParser parser, TeXObjectList stack)
@@ -50,6 +45,4 @@ public class AuxIgnoreable extends ControlSequence
      throws IOException
    {
    }
-
-   private String name;
 }

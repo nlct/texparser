@@ -27,16 +27,17 @@ public class ControlSpace extends Primitive
 {
    public ControlSpace()
    {
+      this(" ");
    }
 
-   public String getName()
+   public ControlSpace(String name)
    {
-      return " ";
+      super(name);
    }
 
    public Object clone()
    {
-      return new ControlSpace();
+      return new ControlSpace(getName());
    }
 
    public void process(TeXParser parser)

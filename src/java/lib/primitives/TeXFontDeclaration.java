@@ -24,6 +24,10 @@ import com.dickimawbooks.texparserlib.*;
 
 public abstract class TeXFontDeclaration extends Declaration
 {
+   public TeXFontDeclaration(String name)
+   {
+      super(name);
+   }
 
    public TeXObjectList expandonce(TeXParser parser)
      throws IOException

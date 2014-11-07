@@ -32,16 +32,17 @@ public class QTABOVE extends ControlSequence
 {
    public QTABOVE()
    {
+      this("QTABOVE");
    }
 
-   public String getName()
+   public QTABOVE(String name)
    {
-      return "QTABOVE";
+      super(name);
    }
 
    public Object clone()
    {
-      return new QTABOVE();
+      return new QTABOVE(getName());
    }
 
    public void process(TeXParser parser, TeXObjectList stack)

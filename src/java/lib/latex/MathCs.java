@@ -26,16 +26,17 @@ public class MathCs extends ControlSequence
 {
    public MathCs()
    {
+      this("(");
    }
 
-   public String getName()
+   public MathCs(String name)
    {
-      return "(";
+      super(name);
    }
 
    public Object clone()
    {
-      return new MathCs();
+      return new MathCs(getName());
    }
 
    public void process(TeXParser parser, TeXObjectList stack)

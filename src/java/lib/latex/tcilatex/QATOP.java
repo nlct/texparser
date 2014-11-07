@@ -32,16 +32,17 @@ public class QATOP extends ControlSequence
 {
    public QATOP()
    {
+      this("QATOP");
    }
 
-   public String getName()
+   public QATOP(String name)
    {
-      return "QATOP";
+      super(name);
    }
 
    public Object clone()
    {
-      return new QATOP();
+      return new QATOP(getName());
    }
 
    public void process(TeXParser parser, TeXObjectList stack)

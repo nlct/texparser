@@ -23,10 +23,6 @@ import java.util.Vector;
 
 public class GenericCommand extends Command
 {
-   private GenericCommand()
-   {
-   }
-
    public GenericCommand(String name)
    {
       this(name, null, new TeXObjectList());
@@ -41,9 +37,8 @@ public class GenericCommand extends Command
    public GenericCommand(boolean isShort, String name, TeXObjectList syntax,
       TeXObjectList definition)
    {
-      super();
+      super(name);
       this.isShort = isShort;
-      this.name = name;
       this.syntax = syntax;
       this.definition = definition;
       this.isDelimited = false;
@@ -69,14 +64,9 @@ public class GenericCommand extends Command
       }
    }
 
-   public String getName()
-   {
-      return name;
-   }
-
    public Object clone()
    {
-      return new GenericCommand(isShort, name, syntax, definition);
+      return new GenericCommand(isShort, getName(), syntax, definition);
    }
 
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList list)
@@ -239,7 +229,52 @@ public class GenericCommand extends Command
       stack.process(parser);
    }
 
-   private String name;
+   public String meaning(TeXParser parser)
+    throws IOException
+   {
+      StringBuilder builder = new StringBuilder();
+
+      if (!isShort)
+      {
+         builder.append(parser.getEscChar());
+         builder.append("long ");
+      }
+
+      builder.append("macro:");
+
+      if (syntax != null)
+      {
+         for (TeXObject obj : syntax)
+         {
+            if (obj instanceof Param
+             && ((Param)obj).getDigit() == -1)
+            {
+               builder.append(parser.getBgChar());
+            }
+            else
+            {
+               builder.append(obj.toString(parser));
+            }
+         }
+      }
+
+      builder.append("->");
+
+      for (TeXObject obj : definition)
+      {
+         builder.append(obj.toString(parser));
+      }
+
+      builder.append(".");
+
+      if (isDelimited)
+      {
+         builder.append(parser.getBgChar());
+      }
+
+      return builder.toString();
+   }
+
    private TeXObjectList syntax, definition;
    private int numArgs=0;
    private boolean isShort;

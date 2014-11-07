@@ -32,17 +32,12 @@ public class L2HNoBreakSpace extends ControlSequence
 
    public L2HNoBreakSpace(String name)
    {
-      this.name = name;
-   }
-
-   public String getName()
-   {
-      return name;
+      super(name);
    }
 
    public Object clone()
    {
-      return new L2HNoBreakSpace(name);
+      return new L2HNoBreakSpace(getName());
    }
 
    public void process(TeXParser parser, boolean isStar,
@@ -61,6 +56,4 @@ public class L2HNoBreakSpace extends ControlSequence
    {
       parser.getListener().getWriteable().writeln("&nbsp;");
    }
-
-   private String name;
 }

@@ -27,21 +27,16 @@ public class LaTeXCommand extends Command
    public LaTeXCommand(String name, boolean isShort, int numParams,
      TeXObject defValue, TeXObject definition)
    {
-      this.name = name;
+      super(name);
       this.isShort = isShort;
       this.numParams = numParams;
       this.defValue = defValue;
       this.definition = definition;
    }
 
-   public String getName()
-   {
-      return name;
-   }
-
    public Object clone()
    {
-      return new LaTeXCommand(name, isShort, numParams,
+      return new LaTeXCommand(getName(), isShort, numParams,
         defValue == null ? null : (TeXObject)defValue.clone(),
         (TeXObject)definition.clone());
    }
@@ -204,7 +199,6 @@ public class LaTeXCommand extends Command
    }
 
 
-   private String name;
    private int numParams;
    private boolean isShort;
    private TeXObject defValue, definition;

@@ -26,16 +26,17 @@ public class DisplayMathCs extends ControlSequence
 {
    public DisplayMathCs()
    {
+      this("[");
    }
 
-   public String getName()
+   public DisplayMathCs(String name)
    {
-      return "[";
+      super(name);
    }
 
    public Object clone()
    {
-      return new DisplayMathCs();
+      return new DisplayMathCs(getName());
    }
 
    public void process(TeXParser parser, TeXObjectList stack)

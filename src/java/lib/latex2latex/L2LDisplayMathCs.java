@@ -27,11 +27,17 @@ public class L2LDisplayMathCs extends DisplayMathCs
 {
    public L2LDisplayMathCs()
    {
+      super();
+   }
+
+   public L2LDisplayMathCs(String name)
+   {
+      super(name);
    }
 
    public Object clone()
    {
-      return new L2LDisplayMathCs();
+      return new L2LDisplayMathCs(getName());
    }
 
    public void process(TeXParser parser, TeXObjectList stack)

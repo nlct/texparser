@@ -27,21 +27,16 @@ public class TeXFontWeightDeclaration extends TeXFontDeclaration
 {
    public TeXFontWeightDeclaration(String name, int weight)
    {
-      this.name = name;
+      super(name);
       this.weight = weight;
       this.orgWeight = TeXSettings.INHERIT;
       this.orgFamily = TeXSettings.INHERIT;
       this.orgShape = TeXSettings.INHERIT;
    }
 
-   public String getName()
-   {
-      return name;
-   }
-
    public Object clone()
    {
-      return new TeXFontWeightDeclaration(name, weight);
+      return new TeXFontWeightDeclaration(getName(), weight);
    }
 
    public void process(TeXParser parser) throws IOException
@@ -70,6 +65,5 @@ public class TeXFontWeightDeclaration extends TeXFontDeclaration
       settings.setFontFamily(orgFamily);
    }
 
-   private String name;
    private int weight, orgWeight, orgFamily, orgShape;
 }
