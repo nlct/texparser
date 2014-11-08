@@ -557,6 +557,9 @@ public class TeXParserApp implements TeXApp
          case LaTeXSyntaxException.ERROR_UNACCESSIBLE:
             message = getLabelWithValue("error.unaccessible", e.getParam());
          break;
+         case LaTeXSyntaxException.ERROR_DEFINED:
+            message = getLabelWithValue("error.defined", e.getParam());
+         break;
          default:
             message = e.getMessage();
       }

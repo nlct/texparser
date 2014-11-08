@@ -74,6 +74,7 @@ error.multi_cls=Only one \\documentclass permitted
 error.missing_key=Missing '$1' key
 error.extra_end=Extra \\end{$1} found
 error.unaccessible=Unaccessible '$1'
+error.defined='$1' already defined
 error.exec_failed=Failed to execute: $1
 error.app_failed=$1 failed with exit code $2
 error.interrupted=Process interrupted

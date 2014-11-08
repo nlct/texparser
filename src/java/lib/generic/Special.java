@@ -33,7 +33,7 @@ public class Special extends ControlSequence
    {
       super(name);
 
-      setSyntax(new TeXObject[] {new Param(1)});
+      setSyntax(1);
    }
 
    public Object clone()

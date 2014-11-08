@@ -89,6 +89,9 @@ public class TeXAppAdapter implements TeXApp
          case LaTeXSyntaxException.ERROR_UNACCESSIBLE:
             message = "Unaccessible '" + e.getParam()+"'";
          break;
+         case LaTeXSyntaxException.ERROR_DEFINED:
+            message = "" + e.getParam()+" already defined";
+         break;
          default:
             message = e.getMessage();
       }

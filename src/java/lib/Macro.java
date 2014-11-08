@@ -92,6 +92,26 @@ public abstract class Macro implements TeXObject
 
    }
 
+   protected void setSyntax(int numberOfArguments)
+   {
+      this.isDelimited = false;
+      this.numArgs = numberOfArguments;
+
+      if (numArgs == 0)
+      {
+         syntax = null;
+      }
+      else
+      {
+         syntax = new TeXObjectList(numArgs);
+
+         for (int i = 1; i <= numArgs; i++)
+         {
+            syntax.add(new Param(i));
+         }
+      }
+   }
+
    protected void setSyntax(TeXObject[] syntaxArray)
    {
       this.isDelimited = false;

@@ -84,8 +84,10 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       parser.putControlSequence(new DocumentClass());
       parser.putControlSequence(new UsePackage());
       parser.putControlSequence(new NewCommand());
-      parser.putControlSequence(new NewCommand("renewcommand"));
-      parser.putControlSequence(new NewCommand("providecommand"));
+      parser.putControlSequence(new NewCommand("renewcommand",
+        NewCommand.OVERWRITE_FORBID));
+      parser.putControlSequence(new NewCommand("providecommand",
+        NewCommand.OVERWRITE_SKIP));
 
       parser.putControlSequence(new Input());
       parser.putControlSequence(new InputIfFileExists());
@@ -152,10 +154,36 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       parser.putControlSequence(new MathFontCommand(name, style));
    }
 
-   public void newcommand(String type, String csName, boolean isShort,
+   public void newcommand(byte overwrite, 
+     String type, String csName, boolean isShort,
      int numParams, TeXObject defValue, TeXObject definition)
    throws IOException
    {
+      ControlSequence cs = parser.getControlSequence(csName);
+
+      if (cs == null)
+      {
+         if (overwrite == NewCommand.OVERWRITE_FORCE)
+         {
+            throw new TeXSyntaxException(parser,
+             TeXSyntaxException.ERROR_UNDEFINED,
+             ""+parser.getEscChar()+csName);
+         }
+      }
+      else
+      {
+         if (overwrite == NewCommand.OVERWRITE_FORBID)
+         {
+            throw new LaTeXSyntaxException(parser,
+             LaTeXSyntaxException.ERROR_DEFINED,
+             cs.toString(parser));
+         }
+         else if (overwrite == NewCommand.OVERWRITE_SKIP)
+         {
+            return;
+         }
+      }
+
       putControlSequence(true,
         new LaTeXCommand(csName, isShort, numParams, defValue, definition));
    }

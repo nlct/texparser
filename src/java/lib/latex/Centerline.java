@@ -32,6 +32,7 @@ public class Centerline extends ControlSequence
    public Centerline(String name)
    {
       super(name);
+      setSyntax(1);
    }
 
    public Object clone()

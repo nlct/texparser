@@ -24,7 +24,7 @@ public class SbChar extends Macro
 {
    public SbChar()
    {
-      setSyntax(new TeXObject[] {new Param(1)});
+      setSyntax(1);
    }
 
    public Object clone()

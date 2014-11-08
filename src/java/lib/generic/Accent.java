@@ -31,11 +31,11 @@ public class Accent extends ControlSequence
 
       if (name.equals("a"))
       {
-         setSyntax(new TeXObject[] {new Param(1), new Param(2)});
+         setSyntax(2);
       }
       else
       {
-         setSyntax(new TeXObject[] {new Param(1)});
+         setSyntax(1);
       }
    }
 
