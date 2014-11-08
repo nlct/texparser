@@ -25,7 +25,12 @@ public class GenericCommand extends Command
 {
    public GenericCommand(String name)
    {
-      this(name, null, new TeXObjectList());
+      this(true, name);
+   }
+
+   public GenericCommand(boolean isShort, String name)
+   {
+      this(isShort, name, null, new TeXObjectList(), false, 0);
    }
 
    public GenericCommand(String name, TeXObjectList syntax,
@@ -332,7 +337,12 @@ public class GenericCommand extends Command
       getReplacement(parser).process(parser);
    }
 
-   public String meaning(TeXParser parser)
+   public boolean isEmpty()
+   {
+      return definition.isEmpty();
+   }
+
+   public String show(TeXParser parser)
     throws IOException
    {
       StringBuilder builder = new StringBuilder();
