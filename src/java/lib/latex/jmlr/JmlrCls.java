@@ -56,12 +56,12 @@ public class JmlrCls extends LaTeXCls
       listener.usepackage(null, "url");
 
       KeyValList opts = new KeyValList();
-      opts.put("x11names", new Empty());
+      opts.put("x11names", new GenericCommand("empty"));
       listener.usepackage(opts, "xcolor");
 
       opts = new KeyValList();
-      opts.put("algo2e", new Empty());
-      opts.put("ruled", new Empty());
+      opts.put("algo2e", new GenericCommand("empty"));
+      opts.put("ruled", new GenericCommand("empty"));
       listener.usepackage(opts, "algorithm2e");
 
       ControlSequence cs = parser.getControlSequence("jmlrprehyperref");

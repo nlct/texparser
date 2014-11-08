@@ -100,7 +100,7 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       parser.putControlSequence(new Cr("cr"));
       parser.putControlSequence(new Href());
       parser.putControlSequence(new Frac());
-      parser.putControlSequence(new Empty("@empty"));
+      parser.putControlSequence(new GenericCommand("@empty"));
 
       // Math font commands
 

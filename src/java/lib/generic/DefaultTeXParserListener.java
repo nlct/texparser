@@ -63,7 +63,7 @@ public abstract class DefaultTeXParserListener extends TeXParserListener
       parser.putControlSequence(new EndInput());
       parser.putControlSequence(new ParCs());
       parser.putControlSequence(new Special());
-      parser.putControlSequence(new Empty());
+      parser.putControlSequence(new GenericCommand("empty"));
       parser.putControlSequence(new Def());
 
       // TeX font changing declarations
