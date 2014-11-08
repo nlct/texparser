@@ -104,6 +104,7 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       parser.putControlSequence(new Href());
       parser.putControlSequence(new Frac());
       parser.putControlSequence(new GenericCommand("@empty"));
+      parser.putControlSequence(new AtIfNextChar());
 
       // Math font commands
 
@@ -184,8 +185,67 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
          }
       }
 
+      addLaTeXCommand(csName, isShort, numParams, defValue, definition);
+   }
+
+   public void addLaTeXCommand(String name, 
+     boolean isShort, int numParams,
+     TeXObject defValue, TeXObject definition)
+     throws IOException
+   {
+      TeXObjectList defList;
+
+      if (definition instanceof TeXObjectList)
+      {
+         defList = (TeXObjectList)definition;
+      }
+      else
+      {
+         defList = new TeXObjectList(1);
+         defList.add(definition);
+      }
+
+      if (defValue == null)
+      {
+         putControlSequence(true,// local
+           new GenericCommand(isShort, name, numParams, defList));
+
+         return;
+      }
+
+      String innerName = ""+parser.getEscChar()+name;
+
+      Group noOpt = new Group();
+      noOpt.add(new TeXCsRef(innerName));
+      noOpt.add(new Other('['));
+      noOpt.add(defValue);
+      noOpt.add(new Other(']'));
+
       putControlSequence(true,
-        new LaTeXCommand(csName, isShort, numParams, defValue, definition));
+       new GenericCommand(isShort, name, null, 
+         new TeXObject[]
+         {
+            new TeXCsRef("@ifnextchar"),
+            new Other('['),
+            new TeXCsRef(innerName),
+            noOpt
+         })
+      );
+
+      TeXObjectList syntax = new TeXObjectList();
+
+      syntax.add(new Other('['));
+      syntax.add(new Param(1));
+      syntax.add(new Other(']'));
+
+      for (int i = 2; i <= numParams; i++)
+      {
+         syntax.add(new Param(i));
+      }
+
+      putControlSequence(true,
+         new GenericCommand(isShort, innerName, syntax, defList)
+      );
    }
 
    private void addFontWeightDeclaration(

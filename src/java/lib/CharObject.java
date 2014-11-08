@@ -27,6 +27,14 @@ public abstract class CharObject implements TeXObject
       setCharCode(charCode);
    }
 
+   public boolean equals(Object obj)
+   {
+      if (this == obj) return true;
+
+      if (!(obj instanceof CharObject) || obj == null) return false;
+      return ((CharObject)obj).getCharCode() == getCharCode();
+   }
+
    public abstract Object clone();
 
    public String toString(TeXParser parser)

@@ -81,6 +81,19 @@ public abstract class ControlSequence extends Macro
       return parser.string(""+parser.getEscChar()+getName());
    }
 
+   public boolean equals(Object obj)
+   {
+      if (this == obj) return true;
+
+      if (!(obj instanceof ControlSequence) || obj == null) return false;
+
+      ControlSequence other = (ControlSequence)obj;
+
+      return getName().equals(other.getName())
+          && isShort() == other.isShort()
+          && hasSyntax(other);
+   }
+
    // control sequence name without initial backslash
 
    protected String name;
