@@ -31,6 +31,7 @@ import com.dickimawbooks.texparserlib.latex.amsmath.*;
 import com.dickimawbooks.texparserlib.latex.tcilatex.*;
 import com.dickimawbooks.texparserlib.latex.lipsum.*;
 import com.dickimawbooks.texparserlib.latex.jmlr.*;
+import com.dickimawbooks.texparserlib.latex.etoolbox.*;
 
 public abstract class LaTeXParserListener extends DefaultTeXParserListener
 {
@@ -398,6 +399,11 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       if (styName.equals("lipsum"))
       {
          return new LipsumSty();
+      }
+
+      if (styName.equals("etoolbox"))
+      {
+         return new EtoolboxSty();
       }
 
       return null;

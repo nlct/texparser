@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.EOFException;
 
 import com.dickimawbooks.texparserlib.*;
+import com.dickimawbooks.texparserlib.latex.LaTeXSyntaxException;
 
 public class Def extends Primitive
 {
@@ -55,6 +56,7 @@ public class Def extends Primitive
       if (cs == null)
       {
          stack = parser;
+         cs = stack.popStack();
       }
 
       TeXObjectList syntax = new TeXObjectList();
@@ -74,38 +76,25 @@ public class Def extends Primitive
            new GenericCommand(((ControlSequence)cs).getName(),
              syntax, definition));
       }
+      else if (cs instanceof TeXCsRef)
+      {
+         parser.putControlSequence(isLocal, 
+           new GenericCommand(((TeXCsRef)cs).getName(),
+             syntax, definition));
+      }
       else
       {
-         // TODO
+// TODO
+         throw new LaTeXSyntaxException(parser,
+           LaTeXSyntaxException.ERROR_UNACCESSIBLE,
+           cs.toString());
       }
    }
 
    public void process(TeXParser parser)
       throws IOException
    {
-      TeXObject cs = parser.popStack();
-
-      TeXObjectList syntax = new TeXObjectList();
-      TeXObject nextObject = parser.popStack(isShort);
-
-      while (!(nextObject instanceof Group))
-      {
-         syntax.add(nextObject);
-         nextObject = parser.popStack(isShort);
-      }
-
-      TeXObjectList definition = ((Group)nextObject).toList();
-
-      if (cs instanceof ControlSequence)
-      {
-         parser.putControlSequence(isLocal, 
-           new GenericCommand(((ControlSequence)cs).getName(),
-             syntax, definition));
-      }
-      else
-      {
-         // TODO
-      }
+      process(parser, parser);
    }
 
    private boolean isShort, isLocal;

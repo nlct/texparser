@@ -44,29 +44,9 @@ public class GenericCommand extends Command
    {
       super(name);
       this.isShort = isShort;
-      this.syntax = syntax;
       this.definition = definition;
-      this.isDelimited = false;
 
-      if (syntax != null)
-      {
-         numArgs = 0;
-
-         for (TeXObject obj : syntax)
-         {
-            if (obj instanceof Param)
-            {
-               if (((Param)obj).getDigit() == -1)
-               {
-                  isDelimited = true;
-               }
-               else
-               {
-                  numArgs++;
-               }
-            }
-         }
-      }
+      setSyntax(syntax);
    }
 
    private GenericCommand(boolean isShort, String name, TeXObjectList syntax,
@@ -85,35 +65,8 @@ public class GenericCommand extends Command
    {
       super(name);
       this.isShort = isShort;
-      this.isDelimited = false;
 
-      numArgs = 0;
-
-      if (syntaxArray == null || syntaxArray.length == 0)
-      {
-         syntax = null;
-      }
-      else
-      {
-         syntax = new TeXObjectList(syntaxArray.length);
-
-         for (int i = 0; i < syntaxArray.length; i++)
-         {
-            if (syntaxArray[i] instanceof Param)
-            {
-               if (((Param)syntaxArray[i]).getDigit() == -1)
-               {
-                  isDelimited = true;
-               }
-               else
-               {
-                  numArgs++;
-               }
-            }
-
-            syntax.add(syntaxArray[i]);
-         }
-      }
+      setSyntax(syntaxArray);
 
       definition = new TeXObjectList(
         definitionArray == null || definitionArray.length == 0 ?
@@ -388,7 +341,10 @@ public class GenericCommand extends Command
       return builder.toString();
    }
 
-   private TeXObjectList syntax, definition;
-   private int numArgs=0;
-   private boolean isDelimited;
+   public TeXObjectList getDefinition()
+   {
+      return definition;
+   }
+
+   private TeXObjectList definition;
 }

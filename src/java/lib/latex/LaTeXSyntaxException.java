@@ -122,5 +122,6 @@ public class LaTeXSyntaxException extends IOException
 
    public static final int ERROR_MULTI_BEGIN_DOC=1,
       ERROR_NO_BEGIN_DOC=2, ERROR_MULTI_CLS=3,
-      ERROR_MISSING_KEY=4, ERROR_EXTRA_END=5;
+      ERROR_MISSING_KEY=4, ERROR_EXTRA_END=5,
+      ERROR_UNACCESSIBLE=6;
 }

@@ -86,6 +86,9 @@ public class TeXAppAdapter implements TeXApp
          case LaTeXSyntaxException.ERROR_EXTRA_END:
             message = "Extra \\end{" + e.getParam()+"} found";
          break;
+         case LaTeXSyntaxException.ERROR_UNACCESSIBLE:
+            message = "Unaccessible '" + e.getParam()+"'";
+         break;
          default:
             message = e.getMessage();
       }

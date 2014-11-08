@@ -19,31 +19,48 @@
 package com.dickimawbooks.texparserlib;
 
 import java.io.IOException;
-import java.util.Vector;
 
-public abstract class ControlSequence extends Macro
+public class TeXCsRef implements TeXObject
 {
-   public ControlSequence(String name)
-   {
-      this(name, true);
-   }
-
-   public ControlSequence(String name, boolean isShort)
-   {
-      setName(name);
-      setShort(isShort);
-   }
-
-   public abstract Object clone();
-
-   public String getName()
-   {
-      return name;
-   }
-
-   public void setName(String name)
+   public TeXCsRef(String name)
    {
       this.name = name;
+   }
+
+   public void process(TeXParser parser)
+      throws IOException
+   {
+      ControlSequence cs = parser.getListener().getControlSequence(name);
+
+      cs.process(parser);
+   }
+
+   public void process(TeXParser parser, TeXObjectList stack)
+      throws IOException
+   {
+      ControlSequence cs = parser.getListener().getControlSequence(name);
+
+      cs.process(parser, stack);
+   }
+
+   public Object clone()
+   {
+      return new TeXCsRef(name);
+   }
+
+   public String toString(TeXParser parser)
+   {
+      String name = getName();
+
+      int lastCh = name.charAt(name.length()-1);
+
+      if ((lastCh >= (int)'a' && lastCh <= (int)'z')
+         ||lastCh >= (int)'A' && lastCh <= (int)'Z')
+      {
+         return ""+parser.getEscChar()+name+" ";
+      }
+
+      return ""+parser.getEscChar()+name;
    }
 
    public String toString()
@@ -61,27 +78,17 @@ public abstract class ControlSequence extends Macro
       return "\\"+name;
    }
 
-   public String toString(TeXParser parser)
-   {
-      String name = getName();
-
-      char lastCh = name.charAt(name.length()-1);
-
-      if (parser.isCatCode(TeXParser.TYPE_LETTER, lastCh))
-      {
-         return ""+parser.getEscChar()+name+" ";
-      }
-
-      return ""+parser.getEscChar()+name;
-   }
-
    public TeXObjectList string(TeXParser parser)
      throws IOException
    {
       return parser.string(""+parser.getEscChar()+getName());
    }
 
-   // control sequence name without initial backslash
+   public String getName()
+   {
+      return name;
+   }
 
-   protected String name;
+   private String name;
 }
+

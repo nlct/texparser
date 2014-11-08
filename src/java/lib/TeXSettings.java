@@ -268,6 +268,7 @@ public class TeXSettings
          case FAMILY_RM:
          case FAMILY_SF:
          case FAMILY_TT:
+         case FAMILY_CAL:
            currentFontFamily = setting;
          break;
          default:

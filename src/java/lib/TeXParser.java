@@ -1078,7 +1078,7 @@ public class TeXParser extends TeXObjectList
       {
          if (!isLetter((char)c))
          {
-            ControlSequence cs;
+            TeXCsRef cs;
 
             if (isCatCode(TYPE_EOL, (char)c))
             {
@@ -1086,11 +1086,11 @@ public class TeXParser extends TeXObjectList
 
                if (macro.length() == 0)
                {
-                  cs = listener.getControlSequence(" ");
+                  cs = new TeXCsRef(" ");
                }
                else
                {
-                  cs = listener.getControlSequence(macro.toString());
+                  cs = new TeXCsRef(macro.toString());
                }
 
                list.add(cs);
@@ -1101,7 +1101,7 @@ public class TeXParser extends TeXObjectList
             {
                // Control Symbol
 
-               cs = listener.getControlSequence(""+(char)c);
+               cs = new TeXCsRef(""+(char)c);
 
                list.add(cs);
             }
@@ -1109,7 +1109,7 @@ public class TeXParser extends TeXObjectList
             {
                // Control word ended by a space
 
-               cs = listener.getControlSequence(macro.toString());
+               cs = new TeXCsRef(macro.toString());
                list.add(cs);
 
                if (!skipNextSpaces(list))
@@ -1122,7 +1122,7 @@ public class TeXParser extends TeXObjectList
                // Control word ended by non-space
 
                reset();
-               cs = listener.getControlSequence(macro.toString());
+               cs = new TeXCsRef(macro.toString());
                list.add(cs);
             }
 
@@ -1191,7 +1191,7 @@ public class TeXParser extends TeXObjectList
 
       if (c == -1)
       {
-         list.add(listener.getControlSequence(" "));
+         list.add(new TeXCsRef(" "));
          return false;
       }
 
@@ -1589,7 +1589,9 @@ public class TeXParser extends TeXObjectList
          return cs;
       }
 
-      return csTable.get(name);
+      cs = csTable.get(name);
+
+      return cs;
    }
 
    public void putActiveChar(ActiveChar activeChar)

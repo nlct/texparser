@@ -38,7 +38,15 @@ public abstract class TeXParserListener
 
    // Gets control sequence identified by name (doesn't include
    // leading backslash)
-   public abstract ControlSequence getControlSequence(String name);
+
+   public ControlSequence getControlSequence(String name)
+   {
+      ControlSequence cs = getParser().getControlSequence(name);
+
+      return cs == null ? createUndefinedCs(name) : cs;
+   }
+
+   public abstract ControlSequence createUndefinedCs(String name);
 
    // Gets active character identified by charCode.
    public abstract ActiveChar getActiveChar(int charCode);

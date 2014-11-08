@@ -20,7 +20,7 @@ package com.dickimawbooks.texparserlib;
 
 import java.io.IOException;
 
-public abstract class ActiveChar implements TeXObject,Expandable
+public abstract class ActiveChar extends Macro implements Expandable
 {
    // Character
 

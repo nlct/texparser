@@ -20,10 +20,11 @@ package com.dickimawbooks.texparserlib;
 
 import java.io.IOException;
 
-public class SbChar implements TeXObject
+public class SbChar extends Macro
 {
    public SbChar()
    {
+      setSyntax(new TeXObject[] {new Param(1)});
    }
 
    public Object clone()
@@ -70,5 +71,10 @@ public class SbChar implements TeXObject
    }
 
 
+   public String show(TeXParser parser)
+    throws IOException
+   {
+      return "subscript character "+parser.getSbChar();
+   }
 }
 

@@ -55,7 +55,7 @@ public class Let extends Primitive
 
       if (secondArg == null)
       {
-         secondArg = parser.popNextArg();
+         secondArg = parser.popStack();
       }
 
       doAssignment(parser, firstArg, secondArg);
@@ -64,21 +64,7 @@ public class Let extends Primitive
    public void process(TeXParser parser)
       throws IOException
    {
-      TeXObject firstArg = parser.popStack();
-
-      if (firstArg == null)
-      {
-         throw new EOFException();
-      }
-
-      TeXObject secondArg = parser.popStack();
-
-      if (secondArg == null)
-      {
-         throw new EOFException();
-      }
-
-      doAssignment(parser, firstArg, secondArg);
+      process(parser, parser);
    }
 
    private void doAssignment(TeXParser parser,

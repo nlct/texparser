@@ -16,46 +16,22 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
-package com.dickimawbooks.texparserlib.generic;
+package com.dickimawbooks.texparserlib.latex.etoolbox;
 
-import java.io.IOException;
+import java.util.Hashtable;
 
 import com.dickimawbooks.texparserlib.*;
+import com.dickimawbooks.texparserlib.latex.*;
 
-public class Special extends ControlSequence
+public class EtoolboxSty extends LaTeXSty
 {
-   public Special()
+   public EtoolboxSty()
    {
-      this("special");
+      super("etoolbox");
    }
 
-   public Special(String name)
+   protected void addDefinitions(LaTeXParserListener listener)
    {
-      super(name);
-
-      setSyntax(new TeXObject[] {new Param(1)});
+      listener.putControlSequence(new PreTo());
    }
-
-   public Object clone()
-   {
-      return new Special(getName());
-   }
-
-   public void process(TeXParser parser, TeXObjectList list)
-      throws IOException
-   {
-      TeXObject param = list.popArg();
-
-      parser.getListener().special(param.toString(parser));
-   }
-
-   public void process(TeXParser parser)
-      throws IOException
-   {
-      TeXObject param = parser.popNextArg();
-
-      parser.getListener().special(param.toString(parser));
-   }
-
 }
-

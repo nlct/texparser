@@ -38,7 +38,6 @@ public abstract class DefaultTeXParserListener extends TeXParserListener
 
    private void init()
    {
-      map = new Hashtable<String,String>();
       referencedFiles = new Vector<TeXPath>();
       specialListeners = new Vector<SpecialListener>();
    }
@@ -65,6 +64,7 @@ public abstract class DefaultTeXParserListener extends TeXParserListener
       parser.putControlSequence(new Special());
       parser.putControlSequence(new GenericCommand("empty"));
       parser.putControlSequence(new Def());
+      parser.putControlSequence(new Let());
 
       // TeX font changing declarations
 
@@ -113,15 +113,6 @@ public abstract class DefaultTeXParserListener extends TeXParserListener
    public void putControlSequence(boolean isLocal, ControlSequence cs)
    {
       getParser().putControlSequence(isLocal, cs);
-   }
-
-   // Gets control sequence identified by name (doesn't include
-   // leading backslash)
-   public ControlSequence getControlSequence(String name)
-   {
-      ControlSequence cs = getParser().getControlSequence(map(name));
-
-      return cs == null ? createUndefinedCs(name) : cs;
    }
 
    public ControlSequence createUndefinedCs(String name)
@@ -245,13 +236,6 @@ public abstract class DefaultTeXParserListener extends TeXParserListener
       return new Comment();
    }
 
-   public String map(String key)
-   {
-      String value = map.get(key);
-
-      return value == null ? key : value;
-   }
-
    public Writeable getWriteable()
    {
       return writeable;
@@ -324,8 +308,6 @@ public abstract class DefaultTeXParserListener extends TeXParserListener
    {
       return referencedFiles;
    }
-
-   protected Hashtable<String,String> map;
 
    protected Writeable writeable;
 
