@@ -72,6 +72,25 @@ public class PreambleParser extends LaTeXParserListener
       return listener.getInputEncoding();
    }
 
+   public static LaTeXFile getDocumentClass(TeXApp app, File texFile)
+   throws IOException
+   {
+      PreambleParser listener = new PreambleParser(app)
+      {
+         public void documentclass(KeyValList options, String clsName)
+            throws IOException
+         {
+            super.documentclass(options, clsName);
+            throw new EOFException();
+         }
+      };
+
+      TeXParser parser = new TeXParser(listener);
+      parser.parse(texFile);
+
+      return listener.getDocumentClass();
+   }
+
    public Writeable getWriteable()
    {
       return this;
