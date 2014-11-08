@@ -20,11 +20,63 @@ package com.dickimawbooks.texparserlib;
 
 import java.io.IOException;
 
-public class TeXCsRef implements TeXObject
+public class TeXCsRef implements TeXObject,Expandable
 {
    public TeXCsRef(String name)
    {
       this.name = name;
+   }
+
+   public TeXObjectList expandonce(TeXParser parser)
+      throws IOException
+   {
+      ControlSequence cs = parser.getListener().getControlSequence(name);
+
+      if (!(cs instanceof Expandable))
+      {
+         return null;
+      }
+
+      return ((Expandable)cs).expandonce(parser);
+   }
+
+   public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
+      throws IOException
+   {
+      ControlSequence cs = parser.getListener().getControlSequence(name);
+
+      if (!(cs instanceof Expandable))
+      {
+         return null;
+      }
+
+      return ((Expandable)cs).expandonce(parser, stack);
+   }
+
+   public TeXObjectList expandfully(TeXParser parser)
+      throws IOException
+   {
+      ControlSequence cs = parser.getListener().getControlSequence(name);
+
+      if (!(cs instanceof Expandable))
+      {
+         return null;
+      }
+
+      return ((Expandable)cs).expandfully(parser);
+   }
+
+   public TeXObjectList expandfully(TeXParser parser, TeXObjectList stack)
+      throws IOException
+   {
+      ControlSequence cs = parser.getListener().getControlSequence(name);
+
+      if (!(cs instanceof Expandable))
+      {
+         return null;
+      }
+
+      return ((Expandable)cs).expandfully(parser, stack);
    }
 
    public void process(TeXParser parser)
