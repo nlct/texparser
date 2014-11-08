@@ -41,6 +41,19 @@ public abstract class L2HConverter extends LaTeXParserListener
       putControlSequence(new L2HCr("\\"));
       putControlSequence(new L2HAmp());
       putControlSequence(new L2HNoBreakSpace());
+
+      try
+      {
+         LaTeXSty sty = getLaTeXSty("hyperref");
+
+         if (sty != null)
+         {
+            sty.load(this, parser, null);
+         }
+      }
+      catch (IOException e)
+      {
+      }
    }
 
    public void setWriter(Writer writer)

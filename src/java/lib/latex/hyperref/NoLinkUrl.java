@@ -16,44 +16,72 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
-package com.dickimawbooks.texparserlib.latex;
+package com.dickimawbooks.texparserlib.latex.hyperref;
 
 import java.io.IOException;
 import java.util.Vector;
 
 import com.dickimawbooks.texparserlib.*;
 
-public class Href extends ControlSequence
+public class NoLinkUrl extends ControlSequence
 {
-   public Href()
+   public NoLinkUrl()
    {
-      this("href");
+      this("nolinkurl");
    }
 
-   public Href(String name)
+   public NoLinkUrl(String name)
    {
       super(name);
    }
 
    public Object clone()
    {
-      return new Href(getName());
+      return new NoLinkUrl(getName());
    }
 
-   protected void process(TeXParser parser, TeXObject url, TeXObject text)
+   protected void process(TeXParser parser, TeXObjectList stack, TeXObject arg)
      throws IOException
    {
-      parser.getListener().href(url.toString(parser), text);
+      TeXSettings settings = parser.getSettings();
+
+      int family = settings.getCurrentFontFamily();
+      settings.setFontFamily(TeXSettings.FAMILY_TT);
+
+      TeXObjectList expanded = null;
+
+      if (arg instanceof Expandable)
+      {
+         if (parser == stack)
+         {
+            expanded = ((Expandable)arg).expandfully(parser);
+         }
+         else
+         {
+            expanded = ((Expandable)arg).expandfully(parser, stack);
+         }
+      }
+
+      if (expanded == null)
+      {
+         parser.getListener().getWriteable().write(arg.toString(parser));
+      }
+      else
+      {
+         parser.getListener().getWriteable().write(expanded.toString(parser));
+      }
+
+      settings.setFontFamily(family);
    }
 
    public void process(TeXParser parser) throws IOException
    {
-      process(parser, parser.popNextArg(), parser.popNextArg());
+      process(parser, parser, parser.popNextArg());
    }
 
    public void process(TeXParser parser, TeXObjectList list) throws IOException
    {
-      process(parser, list.popArg(), list.popArg());
+      process(parser, list, list.popArg());
    }
 
 }

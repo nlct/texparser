@@ -32,6 +32,7 @@ import com.dickimawbooks.texparserlib.latex.tcilatex.*;
 import com.dickimawbooks.texparserlib.latex.lipsum.*;
 import com.dickimawbooks.texparserlib.latex.jmlr.*;
 import com.dickimawbooks.texparserlib.latex.etoolbox.*;
+import com.dickimawbooks.texparserlib.latex.hyperref.*;
 
 public abstract class LaTeXParserListener extends DefaultTeXParserListener
 {
@@ -98,10 +99,8 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       parser.putControlSequence(new Verb());
       parser.putControlSequence(new MathCs());
       parser.putControlSequence(new DisplayMathCs());
-      parser.putControlSequence(new NoLinkUrl());
       parser.putControlSequence(new Cr("\\"));
       parser.putControlSequence(new Cr("cr"));
-      parser.putControlSequence(new Href());
       parser.putControlSequence(new Frac());
       parser.putControlSequence(new GenericCommand("@empty"));
       parser.putControlSequence(new AtIfNextChar());
@@ -492,6 +491,11 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       if (styName.equals("etoolbox"))
       {
          return new EtoolboxSty();
+      }
+
+      if (styName.equals("hyperref"))
+      {
+         return new HyperrefSty();
       }
 
       return null;

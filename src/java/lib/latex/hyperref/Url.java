@@ -16,51 +16,50 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
-package com.dickimawbooks.texparserlib.latex;
+package com.dickimawbooks.texparserlib.latex.hyperref;
 
 import java.io.IOException;
 import java.util.Vector;
 
 import com.dickimawbooks.texparserlib.*;
 
-public class NoLinkUrl extends ControlSequence
+public class Url extends ControlSequence
 {
-   public NoLinkUrl()
+   public Url(HyperrefSty sty)
    {
-      this("nolinkurl");
+      this("url", sty);
    }
 
-   public NoLinkUrl(String name)
+   public Url(String name, HyperrefSty sty)
    {
       super(name);
+      this.sty = sty;
    }
 
    public Object clone()
    {
-      return new NoLinkUrl(getName());
+      return new Url(getName(), sty);
    }
 
-   protected void process(TeXParser parser, TeXObject arg)
+   protected void process(TeXParser parser, TeXObject url, TeXObject text)
      throws IOException
    {
-      TeXSettings settings = parser.getSettings();
+      TeXObjectList list = new TeXObjectList(2);
+      list.add(new TeXCsRef("nolinkurl"));
+      list.add(text);
 
-      int family = settings.getCurrentFontFamily();
-      settings.setFontFamily(TeXSettings.FAMILY_TT);
-
-      parser.getListener().getWriteable().write(arg.toString(parser));
-
-      settings.setFontFamily(family);
+      parser.getListener().href(url.toString(parser), list);
    }
 
    public void process(TeXParser parser) throws IOException
    {
-      process(parser, parser.popNextArg());
+      process(parser, parser.popNextArg(), parser.popStack());
    }
 
    public void process(TeXParser parser, TeXObjectList list) throws IOException
    {
-      process(parser, list.popArg());
+      process(parser, list.popArg(), list.popStack());
    }
 
+   private HyperrefSty sty;
 }
