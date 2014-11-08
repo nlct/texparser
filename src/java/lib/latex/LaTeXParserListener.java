@@ -33,6 +33,7 @@ import com.dickimawbooks.texparserlib.latex.lipsum.*;
 import com.dickimawbooks.texparserlib.latex.jmlr.*;
 import com.dickimawbooks.texparserlib.latex.etoolbox.*;
 import com.dickimawbooks.texparserlib.latex.hyperref.*;
+import com.dickimawbooks.texparserlib.latex.inputenc.*;
 
 public abstract class LaTeXParserListener extends DefaultTeXParserListener
 {
@@ -498,6 +499,11 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
          return new HyperrefSty();
       }
 
+      if (styName.equals("inputenc"))
+      {
+         return new InputEncSty();
+      }
+
       return null;
    }
 
@@ -566,6 +572,16 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       return graphicsPath;
    }
 
+   public String getInputEncoding()
+   {
+      return inputEncoding;
+   }
+
+   public void setInputEncoding(String enc)
+   {
+      inputEncoding = enc;
+   }
+
    private Hashtable<String,Environment> envTable;
 
    private Vector<String> inLineMathEnv, displayMathEnv;
@@ -577,4 +593,6 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
    private TeXObjectList graphicsPath = null;
 
    private boolean docEnvFound = false;
+
+   private String inputEncoding = null;
 }

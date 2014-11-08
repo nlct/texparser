@@ -62,6 +62,16 @@ public class PreambleParser extends LaTeXParserListener
       return parser;
    }
 
+   public static String getSourceInputEncoding(TeXApp app, File texFile)
+   throws IOException
+   {
+      PreambleParser listener = new PreambleParser(app);
+      TeXParser parser = new TeXParser(listener);
+      parser.parse(texFile);
+    
+      return listener.getInputEncoding();
+   }
+
    public Writeable getWriteable()
    {
       return this;
