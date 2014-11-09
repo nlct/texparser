@@ -30,7 +30,7 @@ public class GraphicsSty extends LaTeXSty
       super(name);
    }
 
-   protected void addDefinitions(LaTeXParserListener listener)
+   public void addDefinitions(LaTeXParserListener listener)
    {
       listener.putControlSequence(new IncludeGraphics());
       listener.putControlSequence(new GraphicsPath());

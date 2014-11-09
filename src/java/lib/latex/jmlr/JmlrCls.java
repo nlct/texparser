@@ -37,7 +37,7 @@ public class JmlrCls extends LaTeXCls
       super(name);
    }
 
-   protected void addDefinitions(LaTeXParserListener listener)
+   public void addDefinitions(LaTeXParserListener listener)
    {
    }
 

@@ -76,12 +76,6 @@ public class Def extends Primitive
            new GenericCommand(((ControlSequence)cs).getName(),
              syntax, definition));
       }
-      else if (cs instanceof TeXCsRef)
-      {
-         parser.putControlSequence(isLocal, 
-           new GenericCommand(((TeXCsRef)cs).getName(),
-             syntax, definition));
-      }
       else
       {
 // TODO

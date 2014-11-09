@@ -20,17 +20,17 @@ package com.dickimawbooks.texparserlib;
 
 import java.io.IOException;
 
-public class TeXCsRef implements TeXObject,Expandable
+public class TeXCsRef extends ControlSequence implements Expandable
 {
    public TeXCsRef(String name)
    {
-      this.name = name;
+      super(name);
    }
 
    public TeXObjectList expandonce(TeXParser parser)
       throws IOException
    {
-      ControlSequence cs = parser.getListener().getControlSequence(name);
+      ControlSequence cs = parser.getListener().getControlSequence(getName());
 
       if (cs == null) return null;
 
@@ -47,7 +47,7 @@ public class TeXCsRef implements TeXObject,Expandable
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
-      ControlSequence cs = parser.getListener().getControlSequence(name);
+      ControlSequence cs = parser.getListener().getControlSequence(getName());
 
       if (cs == null) return null;
 
@@ -64,7 +64,7 @@ public class TeXCsRef implements TeXObject,Expandable
    public TeXObjectList expandfully(TeXParser parser)
       throws IOException
    {
-      ControlSequence cs = parser.getListener().getControlSequence(name);
+      ControlSequence cs = parser.getListener().getControlSequence(getName());
 
       if (cs == null) return null;
 
@@ -81,7 +81,7 @@ public class TeXCsRef implements TeXObject,Expandable
    public TeXObjectList expandfully(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
-      ControlSequence cs = parser.getListener().getControlSequence(name);
+      ControlSequence cs = parser.getListener().getControlSequence(getName());
 
       if (cs == null) return null;
 
@@ -98,7 +98,7 @@ public class TeXCsRef implements TeXObject,Expandable
    public void process(TeXParser parser)
       throws IOException
    {
-      ControlSequence cs = parser.getListener().getControlSequence(name);
+      ControlSequence cs = parser.getListener().getControlSequence(getName());
 
       cs.process(parser);
    }
@@ -106,57 +106,15 @@ public class TeXCsRef implements TeXObject,Expandable
    public void process(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
-      ControlSequence cs = parser.getListener().getControlSequence(name);
+      ControlSequence cs = parser.getListener().getControlSequence(getName());
 
       cs.process(parser, stack);
    }
 
    public Object clone()
    {
-      return new TeXCsRef(name);
+      return new TeXCsRef(getName());
    }
 
-   public String toString(TeXParser parser)
-   {
-      String name = getName();
-
-      int lastCh = name.charAt(name.length()-1);
-
-      if ((lastCh >= (int)'a' && lastCh <= (int)'z')
-         ||lastCh >= (int)'A' && lastCh <= (int)'Z')
-      {
-         return ""+parser.getEscChar()+name+" ";
-      }
-
-      return ""+parser.getEscChar()+name;
-   }
-
-   public String toString()
-   {
-      String name = getName();
-
-      int lastCh = name.charAt(name.length()-1);
-
-      if ((lastCh >= (int)'a' && lastCh <= (int)'z')
-         ||lastCh >= (int)'A' && lastCh <= (int)'Z')
-      {
-         return "\\"+name+" ";
-      }
-
-      return "\\"+name;
-   }
-
-   public TeXObjectList string(TeXParser parser)
-     throws IOException
-   {
-      return parser.string(""+parser.getEscChar()+getName());
-   }
-
-   public String getName()
-   {
-      return name;
-   }
-
-   private String name;
 }
 

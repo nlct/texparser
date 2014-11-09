@@ -30,7 +30,7 @@ public abstract class LaTeXSty
       this.name = name;
    }
 
-   protected abstract void addDefinitions(LaTeXParserListener listener);
+   public abstract void addDefinitions(LaTeXParserListener listener);
 
    public void load(LaTeXParserListener listener,
       TeXParser parser, KeyValList options)

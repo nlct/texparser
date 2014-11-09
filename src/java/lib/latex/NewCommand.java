@@ -89,10 +89,6 @@ public class NewCommand extends Command
       {
          csName = ((ControlSequence)object).getName();
       }
-      else if (object instanceof TeXCsRef)
-      {
-         csName = ((TeXCsRef)object).getName();
-      }
       else
       {
          throw new TeXSyntaxException(

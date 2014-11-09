@@ -30,7 +30,7 @@ public class EtoolboxSty extends LaTeXSty
       super("etoolbox");
    }
 
-   protected void addDefinitions(LaTeXParserListener listener)
+   public void addDefinitions(LaTeXParserListener listener)
    {
       listener.putControlSequence(new PreTo());
    }
