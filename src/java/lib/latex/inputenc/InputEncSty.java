@@ -20,6 +20,8 @@ package com.dickimawbooks.texparserlib.latex.inputenc;
 
 import java.io.IOException;
 import java.util.Iterator;
+import java.nio.charset.Charset;
+import java.nio.charset.IllegalCharsetNameException;
 
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.*;
@@ -57,4 +59,22 @@ public class InputEncSty extends LaTeXSty
       addDefinitions(listener);
    }
 
+   public static Charset getCharSet(String encoding)
+    throws IllegalCharsetNameException
+   {
+      if (encoding.equals("ascii"))
+      {
+         return Charset.forName("US-ASCII");
+      }
+      else if (encoding.equals("utf8"))
+      {
+         return Charset.forName("UTF-8");
+      }
+      else if (encoding.equals("latin1"))
+      {
+         return Charset.forName("ISO-8859-1");
+      }
+
+      return Charset.forName(encoding);
+   }
 }

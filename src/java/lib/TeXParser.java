@@ -25,6 +25,9 @@ import java.text.CharacterIterator;
 import java.text.StringCharacterIterator;
 import java.io.*;
 import java.nio.file.Path;
+import java.nio.charset.Charset;
+import java.nio.charset.IllegalCharsetNameException;
+import java.nio.file.Files;
 
 import com.dickimawbooks.texparserlib.latex.LaTeXSyntaxException;
 
@@ -1500,6 +1503,12 @@ public class TeXParser extends TeXObjectList
    public void parse(File file)
      throws IOException
    {
+      parse(file, null);
+   }
+
+   public void parse(File file, Charset charset)
+     throws IOException
+   {
       int orgLineNum = currentLineNum;
       File orgParentFile = currentParentFile;
       resetLineNum();
@@ -1509,7 +1518,15 @@ public class TeXParser extends TeXObjectList
       try
       {
          listener.beginParse(file);
-         parse(new LineNumberReader(new FileReader(file)));
+
+         if (charset == null)
+         {
+            parse(new LineNumberReader(new FileReader(file)));
+         }
+         else
+         {
+            parse(new LineNumberReader(Files.newBufferedReader(file.toPath(), charset)));
+         }
       }
       catch (EOFException e)
       {
