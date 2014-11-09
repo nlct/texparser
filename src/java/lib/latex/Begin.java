@@ -63,25 +63,26 @@ public class Begin extends Command
       return null;
    }
 
-   public void process(TeXParser parser, TeXObjectList list)
+   public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
       LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
 
-      if (list == null)
-      {
-         process(parser);
-         return;
-      }
-
-      TeXObject object = list.popArg();
+      TeXObject object = (parser == stack ? parser.popNextArg() : stack.popArg());
 
       String name;
       TeXObjectList expanded = null;
 
       if (object instanceof Expandable)
       {
-         expanded = ((Expandable)object).expandfully(parser, list);
+         if (parser == stack)
+         {
+            expanded = ((Expandable)object).expandfully(parser);
+         }
+         else
+         {
+            expanded = ((Expandable)object).expandfully(parser, stack);
+         }
       }
 
       if (expanded == null)
@@ -99,48 +100,79 @@ public class Begin extends Command
          return;
       }
 
-      Environment env = listener.createEnvironment(name);
+      if (listener.isVerbEnv(name))
+      {
+         ControlSequence cs = listener.getControlSequence(name);
 
-      env.popGroup(parser, list);
+         TeXObjectList contents = new TeXObjectList();
+         String endEnv = String.format("%c%s%c",
+            parser.getBgChar(), name, parser.getEgChar());
 
-      listener.environment(env);
+         while (true)
+         {
+            object = stack.popStack();
+
+            if (object instanceof End
+             || (object instanceof TeXCsRef
+                 && ((TeXCsRef)object).getName().equals("end")))
+            {
+               TeXObject arg = stack.popStack();
+
+               if (endEnv.equals(arg.toString(parser)))
+               {
+                  break;
+               }
+               else
+               {
+                  contents.add(object);
+                  contents.add(arg);
+               }
+            }
+            else
+            {
+               contents.add(object);
+            }
+         }
+
+         cs.process(parser, contents);
+
+         return;
+      }
+
+      parser.startGroup();
+
+      parser.putControlSequence(true,// local
+        new GenericCommand(true, "@currenvir", null, new TeXObjectList(name)));
+
+      if (parser == stack)
+      {
+         doBegin(parser, parser, name);
+      }
+      else
+      {
+         doBegin(parser, stack, name);
+      }
+   }
+
+   protected void doBegin(TeXParser parser, TeXObjectList stack, String name)
+     throws IOException
+   {
+      ControlSequence cs = parser.getListener().getControlSequence(name);
+
+      if (stack == parser)
+      {
+         cs.process(parser);
+      }
+      else
+      {
+         cs.process(parser, stack);
+      }
    }
 
    public void process(TeXParser parser)
      throws IOException
    {
-      LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
-
-      TeXObject object = parser.popNextArg();
-
-      String name;
-      TeXObjectList expanded = null;
-
-      if (object instanceof Expandable)
-      {
-         expanded = ((Expandable)object).expandfully(parser);
-      }
-
-      if (expanded == null)
-      {
-         name = object.toString(parser);
-      }
-      else
-      {
-         name = expanded.toString(parser);
-      }
-
-      if (name.equals("document"))
-      {
-         listener.beginDocument();
-         return;
-      }
-
-      Environment env = listener.createEnvironment(name);
-
-      env.popGroup(parser);
-
-      listener.environment(env);
+      process(parser, parser);
    }
 
 }

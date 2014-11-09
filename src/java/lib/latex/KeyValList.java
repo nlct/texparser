@@ -73,7 +73,7 @@ public class KeyValList extends HashMap<String,TeXObject>
                   else if (charCode == (int)',')
                   {
                      keyValList.put(keyBuilder.toString().trim(), 
-                       new GenericCommand("empty"));
+                       new TeXObjectList());
                      keyBuilder.setLength(0);
                      continue;
                   }
@@ -118,7 +118,7 @@ public class KeyValList extends HashMap<String,TeXObject>
          if (!key.isEmpty())
          {
             keyValList.put(key, valBuilder == null ? 
-             new GenericCommand("empty") : valBuilder);
+             new TeXObjectList() : valBuilder);
          }
       }
       else
@@ -127,7 +127,7 @@ public class KeyValList extends HashMap<String,TeXObject>
 
          if (!key.isEmpty())
          {
-            keyValList.put(key, new GenericCommand("empty"));
+            keyValList.put(key, new TeXObjectList());
          }
       }
 
@@ -190,6 +190,12 @@ public class KeyValList extends HashMap<String,TeXObject>
 
          builder.append(key);
          TeXObject value = get(key);
+
+         if (value instanceof TeXObjectList
+          && ((TeXObjectList)value).isEmpty())
+         {
+            value = null;
+         }
 
          if (value != null)
          {

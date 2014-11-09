@@ -25,6 +25,11 @@ public class Letter extends CharObject
       super(charCode);
    }
 
+   public Letter(char c)
+   {
+      super((int)c);
+   }
+
    public Object clone()
    {
       return new Letter(getCharCode());

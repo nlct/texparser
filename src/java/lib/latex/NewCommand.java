@@ -161,6 +161,11 @@ public class NewCommand extends Command
       process(parser, parser);
    }
 
+   public byte getOverwrite()
+   {
+      return overwrite;
+   }
+
    public static final byte OVERWRITE_FORBID=(byte)0;
    public static final byte OVERWRITE_FORCE=(byte)1;
    public static final byte OVERWRITE_SKIP=(byte)2;

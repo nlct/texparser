@@ -16,72 +16,46 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
-package com.dickimawbooks.texparserlib.latex2latex;
+package com.dickimawbooks.texparserlib.latex.amsmath;
 
 import java.io.IOException;
 
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.*;
 
-public class L2LDisplayMathCs extends DisplayMathCs
+public class Align extends MathDeclaration
 {
-   public L2LDisplayMathCs()
+   public Align()
    {
-      super();
+      this("align", TeXSettings.MODE_DISPLAY_MATH, true);
    }
 
-   public L2LDisplayMathCs(String name)
+   public Align(String name, boolean numbered)
    {
-      super(name);
+      this(name, TeXSettings.MODE_DISPLAY_MATH, numbered);
+   }
+
+   public Align(String name, int mode, boolean numbered)
+   {
+      super(name, mode, numbered);
    }
 
    public Object clone()
    {
-      return new L2LDisplayMathCs(getName());
+      return new Align(getName(), getMode(), isNumbered());
    }
 
    public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      char esc = parser.getEscChar();
-      MathGroup list = new L2LMathGroup(false, esc+"[", esc+"]");
-
-      while (stack.size() > 0)
-      {
-         TeXObject object = stack.pop();
-
-         if (object instanceof ControlSequence
-          && ((ControlSequence)object).getName().equals("]"))
-         {
-            break;
-         }
-
-         list.add(object);
-      }
-
-      list.process(parser, stack);
+      super.process(parser, stack);
    }
 
    public void process(TeXParser parser)
      throws IOException
    {
-      char esc = parser.getEscChar();
-      MathGroup list = new L2LMathGroup(false, esc+"[", esc+"]");
+      super.process(parser);
 
-      while (true)
-      {
-         TeXObject object = parser.pop();
-
-         if (object instanceof ControlSequence
-          && ((ControlSequence)object).getName().equals("]"))
-         {
-            break;
-         }
-
-         list.add(object);
-      }
-
-      list.process(parser);
    }
 
 }

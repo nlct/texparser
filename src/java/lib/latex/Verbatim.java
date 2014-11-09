@@ -22,7 +22,7 @@ import java.io.IOException;
 
 import com.dickimawbooks.texparserlib.*;
 
-public class Verbatim extends Environment
+public class Verbatim extends Declaration
 {
    public Verbatim()
    {
@@ -36,116 +36,48 @@ public class Verbatim extends Environment
 
    public Object clone()
    {
-      Verbatim env = new Verbatim(getName());
-
-      env.addAll(this);
-
-      return env;
+      return new Verbatim(getName());
    }
 
-   public String toString(TeXParser parser)
+   public TeXObjectList expandonce(TeXParser parser) throws IOException
    {
-      StringBuilder builder = new StringBuilder();
-
-      char esc = parser.getEscChar();
-      char bg = parser.getBgChar();
-      char eg = parser.getEgChar();
-
-      builder.append(esc);
-      builder.append("begin");
-      builder.append(bg);
-      builder.append(getName());
-      builder.append(eg);
-
-      boolean isStar = (getName().endsWith("*"));
-
-      for (TeXObject object : this)
-      {
-         if (isStar && (object instanceof Space))
-         {
-            builder.appendCodePoint(0x2423);
-         }
-         else
-         {
-            builder.append(object.toString(parser));
-         }
-      }
-
-      builder.append(esc);
-      builder.append("end");
-      builder.append(bg);
-      builder.append(getName());
-      builder.append(eg);
-
-      return builder.toString();
+      return null;
    }
 
-   public void popGroup(TeXParser parser, TeXObjectList list)
-     throws IOException
+   public TeXObjectList expandfully(TeXParser parser) throws IOException
    {
-      popGroup(parser);
+      return null;
    }
 
-   public void popGroup(TeXParser parser)
-     throws IOException
+   public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
+   throws IOException
    {
-      while (true)
-      {
-         TeXObject object = parser.pop();
+      return null;
+   }
 
-         if ((object instanceof ControlSequence)
-          && ((ControlSequence)object).getName().equals("end"))
-         {
-            TeXObjectList list = new TeXObjectList();
-
-            TeXObject arg = parser.pop();
-
-            while (arg instanceof WhiteSpace)
-            {
-               list.add(arg);
-               arg = parser.pop();
-            }
-
-            String envName;
-
-            if (arg instanceof Group)
-            {
-               envName = ((Group)arg).toList().toString(parser);
-            }
-            else
-            {
-               envName = arg.toString(parser);
-            }
-
-            if (envName.equals(getName()))
-            {
-               // Found end of this environment
-
-               break;
-            }
-
-            // Found end of something else (still part of verbatim)
-
-            add(object);
-            addAll(list);
-            add(arg);
-         }
-         else
-         {
-            add(object);
-         }
-      }
-
+   public TeXObjectList expandfully(TeXParser parser, TeXObjectList stack)
+   throws IOException
+   {
+      return null;
    }
 
    public void process(TeXParser parser)
     throws IOException
    {
+   }
+
+   public void process(TeXParser parser, TeXObjectList list)
+    throws IOException
+   {
+      TeXSettings settings = parser.getSettings();
+      orgFamily = settings.getCurrentFontFamily();
+      settings.setFontFamily(TeXSettings.FAMILY_TT);
+
       Writeable writeable = parser.getListener().getWriteable();
 
       boolean isStar = (getName().endsWith("*"));
 
-      for (TeXObject object : this)
+      for (TeXObject object : list)
       {
          if (isStar && (object instanceof Space))
          {
@@ -158,4 +90,16 @@ public class Verbatim extends Environment
       }
    }
 
+   public void end(TeXParser parser) throws IOException
+   {
+      TeXSettings settings = parser.getSettings();
+      settings.setFontFamily(orgFamily);
+   }
+
+   public boolean isModeSwitcher()
+   {
+      return false;
+   }
+
+   private int orgFamily;
 }

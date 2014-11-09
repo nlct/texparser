@@ -28,4 +28,18 @@ public abstract class Declaration extends Command
    }
 
    public abstract void end(TeXParser parser) throws IOException;
+
+   public abstract boolean isModeSwitcher();
+
+   public EndDeclaration getEndDeclaration()
+   {
+      return endDeclaration;
+   }
+
+   public void setEndDeclaration(EndDeclaration decl)
+   {
+      endDeclaration = decl;
+   }
+
+   protected EndDeclaration endDeclaration;
 }

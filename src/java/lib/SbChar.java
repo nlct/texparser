@@ -24,7 +24,6 @@ public class SbChar extends Macro
 {
    public SbChar()
    {
-      setSyntax(1);
    }
 
    public Object clone()

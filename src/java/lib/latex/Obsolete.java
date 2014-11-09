@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.util.Vector;
 
 import com.dickimawbooks.texparserlib.*;
+import com.dickimawbooks.texparserlib.primitives.*;
 
 public class Obsolete extends ControlSequence
 {
@@ -41,7 +42,54 @@ public class Obsolete extends ControlSequence
    public void process(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
-      ((LaTeXParserListener)parser.getListener()).substituting( 
+      LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
+
+      if (parser.isMathMode() && orgCommand instanceof TeXFontDeclaration)
+      {
+         String mathdecl = "math"+orgCommand.getName();
+
+         ControlSequence cs = parser.getControlSequence(mathdecl);
+
+         if (cs != null)
+         {
+            TeXObjectList repl = new TeXObjectList();
+
+            repl.add(cs);
+
+            Group grp = listener.createGroup();
+            repl.add(grp);
+
+            StringBuilder builder = new StringBuilder();
+            builder.append(orgCommand.toString(parser));
+
+            while (stack.size() > 0)
+            {
+               TeXObject obj = stack.peek();
+
+               if ((obj instanceof Declaration
+                    && ((Declaration)obj).isModeSwitcher())
+                 || obj instanceof TeXFontDeclaration)
+               {
+                  break;
+               }
+
+               builder.append(obj.toString(parser));
+               grp.add(stack.pop());
+            }
+
+            listener.substituting(builder.toString(), repl.toString(parser));
+
+            repl.process(parser, stack);
+
+            return;
+         }
+
+         orgCommand.process(parser, stack);
+
+         return;
+      }
+
+      listener.substituting( 
         orgCommand.toString(parser), replacementCommand.toString(parser));
 
       replacementCommand.process(parser, stack);
@@ -50,7 +98,100 @@ public class Obsolete extends ControlSequence
    public void process(TeXParser parser)
       throws IOException
    {
-      ((LaTeXParserListener)parser.getListener()).substituting( 
+      LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
+
+      if (parser.isMathMode() && orgCommand instanceof TeXFontDeclaration)
+      {
+         String mathdecl = "math"+orgCommand.getName();
+
+         ControlSequence cs = parser.getControlSequence(mathdecl);
+
+         if (cs != null)
+         {
+            TeXObjectList repl = new TeXObjectList();
+
+            repl.add(cs);
+
+            Group grp = listener.createGroup();
+            repl.add(grp);
+
+            StringBuilder builder = new StringBuilder();
+            builder.append(orgCommand.toString(parser));
+
+            while (true)
+            {
+               if (parser.size() == 0)
+               {
+                  parser.fetchNext(true);
+               }
+
+               TeXObject obj = parser.peekStack();
+
+               if (obj instanceof TeXCsRef)
+               {
+                  obj = listener.getControlSequence(((TeXCsRef)obj).getName());
+               }
+
+               if (obj == null
+                || (obj instanceof Declaration
+                     && ((Declaration)obj).isModeSwitcher())
+                || obj instanceof TeXFontDeclaration
+                || (obj instanceof EndDeclaration
+                  && ((EndDeclaration)obj).isModeSwitcher(parser)))
+               {
+                  break;
+               }
+
+               if (obj instanceof End)
+               {
+                  obj = parser.popStack();
+
+                  if (parser.size() == 0)
+                  {
+                     parser.fetchNext(true);
+                  }
+
+                  TeXObject nextObj = parser.peekStack();
+
+                  if (nextObj instanceof Group)
+                  {
+                     String envName = ((Group)nextObj).toList().toString(parser);
+                     ControlSequence envCs = 
+                       listener.getControlSequence(envName);
+
+                     if (envCs instanceof Declaration)
+                     {
+                        if (((Declaration)envCs).isModeSwitcher())
+                        {
+                           parser.push(obj);
+                           break;
+                        }
+                     }
+                  }
+
+                  builder.append(obj.toString(parser));
+                  grp.add(obj);
+
+                  obj = nextObj;
+               }
+
+               builder.append(obj.toString(parser));
+               grp.add(parser.popStack());
+            }
+
+            listener.substituting(builder.toString(), repl.toString(parser));
+
+            repl.process(parser);
+
+            return;
+         }
+
+         orgCommand.process(parser);
+
+         return;
+      }
+
+      listener.substituting( 
          orgCommand.toString(parser), replacementCommand.toString(parser));
 
       replacementCommand.process(parser);

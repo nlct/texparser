@@ -49,14 +49,14 @@ public class GenericCommand extends Command
       setSyntax(syntax);
    }
 
-   public GenericCommand(boolean isShort, String name, int numberOfArgs,
-      TeXObjectList definition)
+   public GenericCommand(TeXParserListener listener,
+      boolean isShort, String name, int numberOfArgs, TeXObjectList definition)
    {
       super(name);
       this.isShort = isShort;
       this.definition = definition;
 
-      setSyntax(numberOfArgs);
+      setSyntax(listener, numberOfArgs);
    }
 
    private GenericCommand(boolean isShort, String name, TeXObjectList syntax,

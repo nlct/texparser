@@ -37,45 +37,38 @@ public class L2LVerbatim extends Verbatim
 
    public Object clone()
    {
-      L2LVerbatim env = new L2LVerbatim(getName());
-
-      env.addAll(this);
-
-      return env;
+      return new L2LVerbatim(getName());
    }
 
-   public String toString(TeXParser parser)
+   public void process(TeXParser parser, TeXObjectList stack)
+    throws IOException
    {
-      StringBuilder builder = new StringBuilder();
+      process(parser);
 
-      char esc = parser.getEscChar();
-      char bg = parser.getBgChar();
-      char eg = parser.getEgChar();
-
-      builder.append(esc);
-      builder.append("begin");
-      builder.append(bg);
-      builder.append(getName());
-      builder.append(eg);
-
-      for (TeXObject object : this)
+      for (TeXObject obj : stack)
       {
-         builder.append(object.toString(parser));
+         parser.getListener().getWriteable().write(obj.toString(parser));
       }
 
-      builder.append(esc);
-      builder.append("end");
-      builder.append(bg);
-      builder.append(getName());
-      builder.append(eg);
-
-      return builder.toString();
+      end(parser);
    }
 
    public void process(TeXParser parser)
     throws IOException
    {
-      parser.getListener().getWriteable().write(toString(parser));
+      parser.getListener().getWriteable().write(
+        String.format("%cbegin%c%s%c",
+          parser.getEscChar(), parser.getBgChar(), getName(),
+          parser.getEgChar()));
+   }
+
+   public void end(TeXParser parser)
+    throws IOException
+   {
+      parser.getListener().getWriteable().write(
+        String.format("%cend%c%s%c",
+          parser.getEscChar(), parser.getBgChar(), getName(),
+          parser.getEgChar()));
    }
 
 }

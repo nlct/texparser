@@ -29,7 +29,7 @@ import com.dickimawbooks.texparserlib.latex.*;
  * command is actually supposed to do.
  */
 
-public class Qcb extends ControlSequence
+public class Qcb extends Command
 {
    public Qcb()
    {
@@ -44,6 +44,36 @@ public class Qcb extends ControlSequence
    public Object clone()
    {
       return new Qcb(getName());
+   }
+
+   public TeXObjectList expandonce(TeXParser parser)
+     throws IOException
+   {
+      TeXObjectList expanded = new TeXObjectList();
+
+      ControlSequence cs = parser.getListener().getControlSequence("caption");
+
+      expanded.add(cs);
+
+      return expanded;
+   }
+
+   public TeXObjectList expandonce(TeXParser parser, TeXObjectList list)
+     throws IOException
+   {
+      return expandonce(parser);
+   }
+
+   public TeXObjectList expandfully(TeXParser parser)
+     throws IOException
+   {
+      return expandonce(parser);
+   }
+
+   public TeXObjectList expandfully(TeXParser parser, TeXObjectList list)
+     throws IOException
+   {
+      return expandonce(parser, list);
    }
 
    public void process(TeXParser parser, TeXObjectList stack)

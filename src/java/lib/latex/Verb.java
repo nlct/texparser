@@ -82,7 +82,7 @@ public class Verb extends Command
 
       text = text.substring(1, text.length()-1);
 
-      parser.getListener().verb(isStar, delim, text);
+      parser.getListener().verb(getName(), isStar, delim, text);
    }
 
    public void process(TeXParser parser)
@@ -104,7 +104,7 @@ public class Verb extends Command
 
       text = text.substring(1, text.length()-1);
 
-      parser.getListener().verb(isStar, delim, text);
+      parser.getListener().verb(getName(), isStar, delim, text);
    }
 
 }

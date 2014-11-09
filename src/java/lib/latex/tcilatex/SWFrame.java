@@ -99,7 +99,32 @@ public class SWFrame extends ControlSequence
       String envName = (expanded == null ? typeArg.toString(parser)
          : expanded.toString(parser)).toLowerCase();
 
-      Environment env = listener.createEnvironment(envName);
+      TeXObjectList env = new TeXObjectList();
+
+      if (contentsArg instanceof Expandable)
+      {
+         expanded = ((Expandable)contentsArg).expandonce(parser);
+
+         if (expanded != null)
+         {
+            contentsArg = expanded;
+         }
+      }
+
+      if (captionArg instanceof Expandable)
+      {
+         expanded = ((Expandable)captionArg).expandonce(parser);
+
+         if (expanded != null)
+         {
+            captionArg = expanded;
+         }
+      }
+
+      Group grpName = new Group(envName);
+
+      env.add(listener.getControlSequence("begin"));
+      env.add(grpName);
 
       env.add(listener.getControlSequence("centering"));
 
@@ -113,6 +138,9 @@ public class SWFrame extends ControlSequence
          env.add(captionArg);
          env.add(contentsArg);
       }
+
+      env.add(listener.getControlSequence("end"));
+      env.add(grpName);
 
       listener.substituting(originalStr, env.toString(parser));
 

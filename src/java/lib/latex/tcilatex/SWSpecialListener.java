@@ -33,12 +33,12 @@ public class SWSpecialListener implements SpecialListener
    {
    }
 
-   public boolean process(TeXParser parser, String param)
+   public TeXObjectList process(TeXParser parser, String param)
      throws IOException
    {
       if (!param.contains("language \"Scientific Word\""))
       {
-         return false;
+         return null;
       }
 
       String[] split = param.split(";");
@@ -97,9 +97,15 @@ public class SWSpecialListener implements SpecialListener
 
       LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
 
-      listener.includegraphics(keyValList, fileName);
+      TeXObjectList stack = new TeXObjectList();
 
-      return true;
+      stack.add(listener.getControlSequence("includegraphics"));
+      stack.add(listener.getOther((int)'['));
+      stack.add(keyValList);
+      stack.add(listener.getOther((int)']'));
+      stack.add(listener.createGroup(fileName));
+
+      return stack;
    }
 
    private static final Pattern HEIGHT_PATTERN = 

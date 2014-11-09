@@ -79,6 +79,8 @@ public abstract class TeXParserListener
 
    public abstract Group createGroup();
 
+   public abstract Group createGroup(String text);
+
    public abstract MathGroup createMathGroup();
 
    public abstract SpChar createSpChar();
@@ -116,10 +118,10 @@ public abstract class TeXParserListener
 
    public abstract void par() throws IOException;
 
-   public abstract boolean special(String param)
+   public abstract TeXObjectList special(String param)
      throws IOException;
 
-   public abstract void verb(boolean isStar, char delim,
+   public abstract void verb(String name, boolean isStar, char delim,
      String text)
      throws IOException;
 

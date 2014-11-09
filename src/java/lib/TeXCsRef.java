@@ -32,9 +32,13 @@ public class TeXCsRef implements TeXObject,Expandable
    {
       ControlSequence cs = parser.getListener().getControlSequence(name);
 
+      if (cs == null) return null;
+
       if (!(cs instanceof Expandable))
       {
-         return null;
+         TeXObjectList list = new TeXObjectList();
+         list.add(cs);
+         return list;
       }
 
       return ((Expandable)cs).expandonce(parser);
@@ -45,9 +49,13 @@ public class TeXCsRef implements TeXObject,Expandable
    {
       ControlSequence cs = parser.getListener().getControlSequence(name);
 
+      if (cs == null) return null;
+
       if (!(cs instanceof Expandable))
       {
-         return null;
+         TeXObjectList list = new TeXObjectList();
+         list.add(cs);
+         return list;
       }
 
       return ((Expandable)cs).expandonce(parser, stack);
@@ -58,9 +66,13 @@ public class TeXCsRef implements TeXObject,Expandable
    {
       ControlSequence cs = parser.getListener().getControlSequence(name);
 
+      if (cs == null) return null;
+
       if (!(cs instanceof Expandable))
       {
-         return null;
+         TeXObjectList list = new TeXObjectList();
+         list.add(cs);
+         return list;
       }
 
       return ((Expandable)cs).expandfully(parser);
@@ -71,9 +83,13 @@ public class TeXCsRef implements TeXObject,Expandable
    {
       ControlSequence cs = parser.getListener().getControlSequence(name);
 
+      if (cs == null) return null;
+
       if (!(cs instanceof Expandable))
       {
-         return null;
+         TeXObjectList list = new TeXObjectList();
+         list.add(cs);
+         return list;
       }
 
       return ((Expandable)cs).expandfully(parser, stack);

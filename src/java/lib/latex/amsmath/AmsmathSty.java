@@ -32,7 +32,8 @@ public class AmsmathSty extends LaTeXSty
 
    public void addDefinitions(LaTeXParserListener listener)
    {
-      listener.addDisplayMathEnv("align");
-      listener.addDisplayMathEnv("align*");
+      TeXParser parser = listener.getParser();
+      parser.putControlSequence(new Align());
+      parser.putControlSequence(new Align("align*", false));
    }
 }

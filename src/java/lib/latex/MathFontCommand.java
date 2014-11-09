@@ -67,5 +67,10 @@ public class MathFontCommand extends ControlSequence
       settings.setMathFont(orgStyle);
    }
 
+   public int getStyle()
+   {
+      return style;
+   }
+
    private int style;
 }

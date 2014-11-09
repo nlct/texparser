@@ -81,5 +81,10 @@ public class FontWeightDeclaration extends Declaration
       settings.setFontWeight(orgWeight);
    }
 
+   public boolean isModeSwitcher()
+   {
+      return false;
+   }
+
    private int weight, orgWeight;
 }

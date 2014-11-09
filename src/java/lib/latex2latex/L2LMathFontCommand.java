@@ -19,23 +19,34 @@
 package com.dickimawbooks.texparserlib.latex2latex;
 
 import java.io.IOException;
+import java.io.Writer;
 
 import com.dickimawbooks.texparserlib.*;
-import com.dickimawbooks.texparserlib.generic.*;
+import com.dickimawbooks.texparserlib.latex.*;
 
-public class L2LSpecialListener implements SpecialListener
+public class L2LMathFontCommand extends MathFontCommand
 {
-   public boolean process(TeXParser parser, String param)
-     throws IOException
+   public L2LMathFontCommand(String name, int style)
    {
-      Writeable writeable = parser.getListener().getWriteable(); 
+      super(name, style);
+   }
 
-      writeable.write(parser.getEscChar());
-      writeable.write("special");
-      writeable.write(parser.getBgChar());
-      writeable.write(param);
-      writeable.write(parser.getEgChar());
+   public Object clone()
+   {
+      return new L2LMathFontCommand(getName(), getStyle());
+   }
 
-      return true;
+   public void process(TeXParser parser, TeXObjectList stack)
+      throws IOException
+   {
+      process(parser);
+   }
+
+   public void process(TeXParser parser)
+      throws IOException
+   {
+      Writeable writeable = parser.getListener().getWriteable();
+
+      writeable.write(toString(parser));
    }
 }

@@ -81,6 +81,11 @@ public class FontShapeDeclaration extends Declaration
       settings.setFontShape(orgShape);
    }
 
+   public boolean isModeSwitcher()
+   {
+      return false;
+   }
+
    private String name;
    private int shape, orgShape;
 }

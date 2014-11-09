@@ -33,7 +33,6 @@ public class AtIfNextChar extends Command
    {
       super(name);
       setShort(false);
-      setSyntax(4);
    }
 
    public Object clone()

@@ -34,6 +34,16 @@ public class TeXObjectList extends Vector<TeXObject> implements TeXObject,Expand
       super(capacity);
    }
 
+   public TeXObjectList(String text)
+   {
+      this(text.length() > 0 ? text.length() : 10);
+
+      for (int i = 0, n = text.length(); i < n; i++)
+      {
+         add(new Letter(text.codePointAt(i)));
+      }
+   }
+
    public TeXObject popStack() throws IOException
    {
       return popStack(false);
@@ -352,6 +362,15 @@ public class TeXObjectList extends Vector<TeXObject> implements TeXObject,Expand
         ""+closeDelim);
    }
 
+   public Object clone()
+   {
+      TeXObjectList list = new TeXObjectList(Math.min(10, size()));
+
+      list.addAll(this);
+
+      return list;
+   }
+
    public TeXObjectList expandonce(TeXParser parser)
      throws IOException
    {
@@ -387,6 +406,10 @@ public class TeXObjectList extends Vector<TeXObject> implements TeXObject,Expand
             {
                list.add(object);
             }
+            else if (expanded instanceof Group)
+            {
+               list.add(expanded);
+            }
             else
             {
                list.addAll(expanded);
@@ -397,15 +420,6 @@ public class TeXObjectList extends Vector<TeXObject> implements TeXObject,Expand
             list.add(object);
          }
       }
-
-      return list;
-   }
-
-   public Object clone()
-   {
-      TeXObjectList list = new TeXObjectList(Math.min(10, size()));
-
-      list.addAll(this);
 
       return list;
    }
@@ -428,6 +442,10 @@ public class TeXObjectList extends Vector<TeXObject> implements TeXObject,Expand
             if (expanded == null)
             {
                list.add(object);
+            }
+            else if (expanded instanceof Group)
+            {
+               list.add(expanded);
             }
             else
             {

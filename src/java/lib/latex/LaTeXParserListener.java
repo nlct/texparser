@@ -42,44 +42,25 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       super(writeable);
    }
 
-   public void addInlineMathEnv(String name)
+   public void addVerbEnv(String name)
    {
-      inLineMathEnv.add(name);
+      verbEnv.add(name);
    }
 
-   public void addDisplayMathEnv(String name)
+   public boolean isVerbEnv(String name)
    {
-      displayMathEnv.add(name);
-   }
-
-   public boolean isInlineMathEnv(String name)
-   {
-      return inLineMathEnv.contains(name);
-   }
-
-   public boolean isDisplayMathEnv(String name)
-   {
-      return displayMathEnv.contains(name);
-   }
-
-   public void putEnvironment(Environment env)
-   {
-      envTable.put(env.getName(), env);
+      return verbEnv.contains(name);
    }
 
    protected void addPredefined()
    {
       loadedPackages = new Vector<LaTeXFile>();
-      envTable = new Hashtable<String,Environment>();
-      inLineMathEnv = new Vector<String>();
-      displayMathEnv = new Vector<String>();
+      verbEnv = new Vector<String>();
 
-      addInlineMathEnv("math");
-      addDisplayMathEnv("displaymath");
-      addDisplayMathEnv("equation");
-
-      putEnvironment(new Verbatim());
-      putEnvironment(new Verbatim("verbatim*"));
+      addVerbEnv("verbatim");
+      addVerbEnv("verbatim*");
+      addVerbEnv("filecontents");
+      addVerbEnv("filecontents*");
 
       parser.putControlSequence(new Begin());
       parser.putControlSequence(new End());
@@ -98,13 +79,28 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       parser.putControlSequence(new MakeAtOther());
       parser.putControlSequence(new Centerline());
       parser.putControlSequence(new Verb());
-      parser.putControlSequence(new MathCs());
-      parser.putControlSequence(new DisplayMathCs());
       parser.putControlSequence(new Cr("\\"));
       parser.putControlSequence(new Cr("cr"));
       parser.putControlSequence(new Frac());
       parser.putControlSequence(new GenericCommand("@empty"));
       parser.putControlSequence(new AtIfNextChar());
+      parser.putControlSequence(new Verbatim());
+      parser.putControlSequence(new Verbatim("verbatim*"));
+
+      parser.putControlSequence(new MathDeclaration("math"));
+
+      MathDeclaration begMathDecl = new MathDeclaration("(");
+      parser.putControlSequence(begMathDecl);
+      parser.putControlSequence(new EndDeclaration(")", begMathDecl));
+      parser.putControlSequence(
+         new MathDeclaration("displaymath", TeXSettings.MODE_DISPLAY_MATH));
+
+      MathDeclaration begDispDecl = new MathDeclaration("[", TeXSettings.MODE_DISPLAY_MATH);
+
+      parser.putControlSequence(begDispDecl);
+      parser.putControlSequence(new EndDeclaration("]", begDispDecl));
+      parser.putControlSequence(
+         new MathDeclaration("equation", TeXSettings.MODE_DISPLAY_MATH, true));
 
       // Math font commands
 
@@ -126,7 +122,6 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       addFontFamilyDeclaration("rmfamily", "textrm", TeXSettings.FAMILY_RM);
       addFontFamilyDeclaration("sffamily", "textsf", TeXSettings.FAMILY_SF);
       addFontFamilyDeclaration("ttfamily", "texttt", TeXSettings.FAMILY_TT);
-      addFontFamilyDeclaration("calfamily", "textcal", TeXSettings.FAMILY_CAL);
 
       addFontShapeDeclaration("upshape", "textup", TeXSettings.SHAPE_UP);
       addFontShapeDeclaration("itshape", "textit", TeXSettings.SHAPE_IT);
@@ -208,25 +203,25 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       if (defValue == null)
       {
          putControlSequence(true,// local
-           new GenericCommand(isShort, name, numParams, defList));
+           new GenericCommand(this, isShort, name, numParams, defList));
 
          return;
       }
 
       String innerName = ""+parser.getEscChar()+name;
 
-      Group noOpt = new Group();
+      Group noOpt = createGroup();
       noOpt.add(new TeXCsRef(innerName));
-      noOpt.add(new Other('['));
+      noOpt.add(getOther((int)'['));
       noOpt.add(defValue);
-      noOpt.add(new Other(']'));
+      noOpt.add(getOther((int)']'));
 
       putControlSequence(true,
        new GenericCommand(isShort, name, null, 
          new TeXObject[]
          {
             new TeXCsRef("@ifnextchar"),
-            new Other('['),
+            getOther('['),
             new TeXCsRef(innerName),
             noOpt
          })
@@ -234,13 +229,13 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
 
       TeXObjectList syntax = new TeXObjectList();
 
-      syntax.add(new Other('['));
-      syntax.add(new Param(1));
-      syntax.add(new Other(']'));
+      syntax.add(getOther((int)'['));
+      syntax.add(getParam(1));
+      syntax.add(getOther((int)']'));
 
       for (int i = 2; i <= numParams; i++)
       {
-         syntax.add(new Param(i));
+         syntax.add(getParam(i));
       }
 
       putControlSequence(true,
@@ -338,32 +333,6 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
    public FontFamilyDeclaration getFontFamilyDeclaration(String name, int family)
    {
       return new FontFamilyDeclaration(name, family);
-   }
-
-   public Environment createEnvironment(String name)
-   {
-      Environment env = envTable.get(name);
-
-      if (env == null)
-      {
-         if (isInlineMathEnv(name))
-         {
-            return new Environment(name, TeXSettings.MODE_INLINE_MATH);
-         }
-
-         if (isDisplayMathEnv(name))
-         {
-            return new Environment(name, TeXSettings.MODE_DISPLAY_MATH);
-         }
-      }
-
-      return env == null ? new Environment(name) : (Environment)env.clone();
-   }
-
-   public void environment(Environment env)
-     throws IOException
-   {
-      env.process(parser);
    }
 
    public boolean isInDocEnv()
@@ -582,9 +551,7 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       inputEncoding = enc;
    }
 
-   private Hashtable<String,Environment> envTable;
-
-   private Vector<String> inLineMathEnv, displayMathEnv;
+   private Vector<String> verbEnv;
 
    private Vector<LaTeXFile> loadedPackages;
 

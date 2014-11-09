@@ -1566,6 +1566,12 @@ public class TeXParser extends TeXObjectList
    public void putControlSequence(ControlSequence cs)
    {
       csTable.put(cs.getName(), cs);
+
+      if (cs instanceof Declaration && isLetter(cs.getName().charAt(0)))
+      {
+         EndDeclaration endDec = new EndDeclaration(cs.getName());
+         csTable.put(endDec.getName(), endDec);
+      }
    }
 
    public void putControlSequence(boolean isLocal, ControlSequence cs)
@@ -1573,6 +1579,12 @@ public class TeXParser extends TeXObjectList
       if (isLocal)
       {
          settings.putControlSequence(cs);
+
+         if (cs instanceof Declaration)
+         {
+            EndDeclaration endDec = new EndDeclaration(cs.getName());
+            settings.putControlSequence(endDec);
+         }
       }
       else
       {

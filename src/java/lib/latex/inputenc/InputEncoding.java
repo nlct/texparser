@@ -34,7 +34,6 @@ public class InputEncoding extends ControlSequence
    public InputEncoding(String name)
    {
       super(name);
-      setSyntax(1);
    }
 
    public Object clone()
@@ -58,7 +57,7 @@ public class InputEncoding extends ControlSequence
          arg = expanded;
       }
 
-      ((LaTeXParserListener)parser.getListener()).setInputEncoding(arg.toString());
+      ((LaTeXParserListener)parser.getListener()).setInputEncoding(arg.toString(parser));
    }
 
    public void process(TeXParser parser, TeXObjectList list) throws IOException
@@ -77,7 +76,7 @@ public class InputEncoding extends ControlSequence
          arg = expanded;
       }
 
-      ((LaTeXParserListener)parser.getListener()).setInputEncoding(arg.toString());
+      ((LaTeXParserListener)parser.getListener()).setInputEncoding(arg.toString(parser));
    }
 
 }

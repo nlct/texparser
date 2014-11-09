@@ -38,9 +38,7 @@ public class L2LControlSequence extends ControlSequence
    public void process(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
-      Writeable writeable = parser.getListener().getWriteable();
-
-      writeable.write(toString(parser));
+      process(parser);
    }
 
    public void process(TeXParser parser)

@@ -104,5 +104,10 @@ public class ParAlign extends Declaration
       return null;
    }
 
+   public boolean isModeSwitcher()
+   {
+      return false;
+   }
+
    private int align, orgAlign;
 }

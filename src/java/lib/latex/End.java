@@ -70,8 +70,33 @@ public class End extends ControlSequence
          return;
       }
 
-      throw new LaTeXSyntaxException(
-          parser, LaTeXSyntaxException.ERROR_EXTRA_END, name);
+      TeXObject currenv = parser.getControlSequence("@currenvir");
+
+      if (currenv == null)
+      {
+         throw new LaTeXSyntaxException(
+             parser, LaTeXSyntaxException.ERROR_EXTRA_END, name);
+      }
+
+      if (currenv instanceof Expandable)
+      {
+         expanded = ((Expandable)currenv).expandfully(parser);
+
+         if (expanded != null)
+         {
+            currenv = expanded;
+         }
+      }
+
+      if (!name.equals(currenv.toString(parser)))
+      {
+         throw new LaTeXSyntaxException(
+             parser, LaTeXSyntaxException.ERROR_EXTRA_END, name);
+      }
+
+      doEnd(parser, name);
+
+      parser.endGroup();
    }
 
    public void process(TeXParser parser)
@@ -105,8 +130,43 @@ public class End extends ControlSequence
          return;
       }
 
-      throw new LaTeXSyntaxException(
-         parser, LaTeXSyntaxException.ERROR_EXTRA_END, name);
+      TeXObject currenv = parser.getControlSequence("@currenvir");
+
+      if (currenv == null)
+      {
+         throw new LaTeXSyntaxException(
+             parser, LaTeXSyntaxException.ERROR_EXTRA_END, name);
+      }
+
+      if (currenv instanceof Expandable)
+      {
+         expanded = ((Expandable)currenv).expandfully(parser);
+
+         if (expanded != null)
+         {
+            currenv = expanded;
+         }
+      }
+
+      if (!name.equals(currenv.toString(parser)))
+      {
+         throw new LaTeXSyntaxException(
+             parser, LaTeXSyntaxException.ERROR_EXTRA_END, name);
+      }
+
+      doEnd(parser, name);
+
+      parser.endGroup();
    }
 
+   protected void doEnd(TeXParser parser, String name)
+      throws IOException
+   {
+      ControlSequence cs = parser.getListener().getControlSequence(name);
+
+      if (cs instanceof Declaration)
+      {
+         ((Declaration)cs).end(parser);
+      }
+   }
 }

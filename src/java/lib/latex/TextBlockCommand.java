@@ -28,7 +28,6 @@ public class TextBlockCommand extends ControlSequence
    public TextBlockCommand(String name, Declaration declaration)
    {
       super(name);
-      setSyntax(1);
       this.declaration = declaration;
    }
 

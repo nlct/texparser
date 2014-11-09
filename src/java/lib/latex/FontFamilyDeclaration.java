@@ -81,5 +81,10 @@ public class FontFamilyDeclaration extends Declaration
       settings.setFontFamily(orgFamily);
    }
 
+   public boolean isModeSwitcher()
+   {
+      return false;
+   }
+
    private int family, orgFamily;
 }

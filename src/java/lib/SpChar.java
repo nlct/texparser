@@ -24,7 +24,6 @@ public class SpChar extends Macro
 {
    public SpChar()
    {
-      setSyntax(1);
    }
 
    public Object clone()

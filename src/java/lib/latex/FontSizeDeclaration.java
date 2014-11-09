@@ -81,5 +81,10 @@ public class FontSizeDeclaration extends Declaration
       settings.setFontSize(orgSize);
    }
 
+   public boolean isModeSwitcher()
+   {
+      return false;
+   }
+
    private int size, orgSize;
 }

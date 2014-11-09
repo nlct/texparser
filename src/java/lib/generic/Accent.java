@@ -28,15 +28,6 @@ public class Accent extends ControlSequence
    public Accent(String name)
    {
       super(name);
-
-      if (name.equals("a"))
-      {
-         setSyntax(2);
-      }
-      else
-      {
-         setSyntax(1);
-      }
    }
 
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)

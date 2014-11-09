@@ -16,14 +16,45 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
-package com.dickimawbooks.texparserlib.generic;
+package com.dickimawbooks.texparserlib.latex2latex;
 
 import java.io.IOException;
 
 import com.dickimawbooks.texparserlib.*;
+import com.dickimawbooks.texparserlib.latex.*;
 
-public interface SpecialListener
+public class L2LEnd extends End
 {
-   public boolean process(TeXParser parser, String param)
-     throws IOException;
+   public L2LEnd()
+   {
+      this("end");
+   }
+
+   public L2LEnd(String name)
+   {
+      super(name);
+   }
+
+   public Object clone()
+   {
+      return new L2LEnd(getName());
+   }
+
+   protected void doEnd(TeXParser parser, String name)
+     throws IOException
+   {
+      LaTeX2LaTeX listener = ((LaTeX2LaTeX)parser.getListener());
+
+      ControlSequence cs = listener.getControlSequence(name);
+
+      if (cs instanceof MathDeclaration)
+      {
+         MathDeclaration decl = (MathDeclaration)cs;
+         decl.revertModeSwitch(parser);
+      }
+
+      listener.write(String.format("%c%s%c%s%c",
+        parser.getEscChar(), getName(), 
+        parser.getBgChar(), name, parser.getEgChar()));
+   }
 }

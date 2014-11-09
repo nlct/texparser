@@ -23,6 +23,21 @@ import java.util.Vector;
 
 public class Group extends TeXObjectList
 {
+   public Group()
+   {
+      super();
+   }
+
+   public Group(int capacity)
+   {
+      super(capacity);
+   }
+
+   public Group(String text)
+   {
+      super(text);
+   }
+
    public TeXObjectList toList()
    {
       return (TeXObjectList)super.clone();
@@ -120,6 +135,102 @@ public class Group extends TeXObjectList
 
       processEndDeclarations(parser);
 
+   }
+
+   public TeXObjectList expandonce(TeXParser parser)
+     throws IOException
+   {
+      return expandonce(parser, null);
+   }
+
+   public TeXObjectList expandonce(TeXParser parser, 
+        TeXObjectList stack)
+     throws IOException
+   {
+      Group list = parser.getListener().createGroup();
+
+      TeXObjectList remaining = (TeXObjectList)clone();
+
+      if (stack != null)
+      {
+         while (stack.size() > 0)
+         {
+            remaining.add(stack.remove(0));
+         }
+      }
+
+      while (remaining.size() > 0)
+      {
+         TeXObject object = remaining.remove(0);
+
+         if (object instanceof Expandable)
+         {
+            TeXObjectList expanded = ((Expandable)object).expandonce(parser,
+                remaining);
+
+            if (expanded == null)
+            {
+               list.add(object);
+            }
+            else if (expanded instanceof Group)
+            {
+               list.add(expanded);
+            }
+            else
+            {
+               list.addAll(expanded);
+            }
+         }
+         else
+         {
+            list.add(object);
+         }
+      }
+
+      return list;
+   }
+
+   public TeXObjectList expandfully(TeXParser parser) throws IOException
+   {
+      Group list = parser.getListener().createGroup();
+
+      TeXObjectList remaining = (TeXObjectList)clone();
+
+      while (remaining.size() > 0)
+      {
+         TeXObject object = remaining.popStack();
+
+         if (object instanceof Expandable)
+         {
+            TeXObjectList expanded = ((Expandable)object).expandfully(parser,
+                remaining);
+
+            if (expanded == null)
+            {
+               list.add(object);
+            }
+            else if (expanded instanceof Group)
+            {
+               list.add(expanded);
+            }
+            else
+            {
+               list.addAll(expanded);
+            }
+         }
+         else
+         {
+            list.add(object);
+         }
+      }
+
+      return list;
+   }
+
+   public TeXObjectList expandfully(TeXParser parser,
+        TeXObjectList stack) throws IOException
+   {
+      return expandfully(parser);
    }
 
    public String toString(TeXParser parser)

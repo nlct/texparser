@@ -54,4 +54,8 @@ public abstract class TeXFontDeclaration extends Declaration
       return null;
    }
 
+   public boolean isModeSwitcher()
+   {
+      return false;
+   }
 }

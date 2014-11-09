@@ -55,9 +55,6 @@ public class LaTeX2LaTeX extends LaTeXParserListener
       setReplaceGraphicsPath(replaceGraphicsPath);
 
       setWriteable(this);
-
-      specialListener = new L2LSpecialListener();
-
    }
 
    public void setReplaceGraphicsPath(boolean replaceGraphicsPath)
@@ -74,35 +71,42 @@ public class LaTeX2LaTeX extends LaTeXParserListener
    {
       super.addPredefined();
 
-      putControlSequence(new L2LMathCs());
-      putControlSequence(new L2LDisplayMathCs());
+      putControlSequence(new L2LMathDeclaration("math"));
+
+      L2LMathDeclaration begMathDecl = new L2LMathDeclaration("(");
+      putControlSequence(begMathDecl);
+      putControlSequence(new EndDeclaration(")", begMathDecl));
+
+      L2LMathDeclaration begDispDecl =
+         new L2LMathDeclaration("[", TeXSettings.MODE_DISPLAY_MATH);
+
+      putControlSequence(begDispDecl);
+      putControlSequence(new EndDeclaration("]", begDispDecl));
+
+      putControlSequence(
+         new L2LMathDeclaration("displaymath", TeXSettings.MODE_DISPLAY_MATH));
+      putControlSequence(
+         new L2LMathDeclaration("equation", TeXSettings.MODE_DISPLAY_MATH, true));
+      putControlSequence(
+         new L2LMathDeclaration("equation*", TeXSettings.MODE_DISPLAY_MATH));
+
+      putControlSequence(
+         new L2LMathDeclaration("align", TeXSettings.MODE_DISPLAY_MATH, true));
+      putControlSequence(
+         new L2LMathDeclaration("align*", TeXSettings.MODE_DISPLAY_MATH));
+
       putControlSequence(new L2LBibliography());
+      putControlSequence(new L2LVerbatim());
+      putControlSequence(new L2LVerbatim("verbatim*"));
+      putControlSequence(new L2LVerbatim("lstlisting"));
+      putControlSequence(new L2LBegin());
+      putControlSequence(new L2LEnd());
+      putControlSequence(new Verb("lstinline"));
    }
 
-   public boolean isVerbatim(String name)
+   protected void addMathFontCommand(String name, int style)
    {
-      return name.equals("verbatim") || name.equals("verbatim*")
-       || name.equals("lstlisting");
-   }
-
-   public Environment createEnvironment(String name)
-   {
-      if (isInlineMathEnv(name))
-      {
-         return new L2LEnvironment(name, TeXSettings.MODE_INLINE_MATH);
-      }
-
-      if (isDisplayMathEnv(name))
-      {
-         return new L2LEnvironment(name, TeXSettings.MODE_DISPLAY_MATH);
-      }
-
-      if (isVerbatim(name))
-      {
-         return new L2LVerbatim(name);
-      }
-
-      return new L2LEnvironment(name);
+      parser.putControlSequence(new L2LMathFontCommand(name, style));
    }
 
    public ControlSequence getControlSequence(String name)
@@ -198,6 +202,11 @@ public class LaTeX2LaTeX extends LaTeXParserListener
    public Group createGroup()
    {
       return new L2LGroup();
+   }
+
+   public Group createGroup(String text)
+   {
+      return new L2LGroup(text);
    }
 
    public MathGroup createMathGroup()
@@ -776,17 +785,6 @@ public class LaTeX2LaTeX extends LaTeXParserListener
       return false;
    }
 
-   public boolean special(String param)
-     throws IOException
-   {
-      if (!super.special(param))
-      {
-         return specialListener.process(parser, param);
-      }
-
-      return true;
-   }
-
    public File getFile()
    {
       return inFile;
@@ -835,14 +833,14 @@ public class LaTeX2LaTeX extends LaTeXParserListener
       write(bg+text.toString(parser)+eg);
    }
 
-   public void verb(boolean isStar, char delim, String text)
+   public void verb(String name, boolean isStar, char delim, String text)
      throws IOException
    {
-      write(parser.getEscChar()+"verb");
+      write(parser.getEscChar()+name);
 
       if (isStar)
       {
-         write(" *");
+         write("*");
       }
       else if (parser.isLetter(delim))
       {
@@ -854,10 +852,13 @@ public class LaTeX2LaTeX extends LaTeXParserListener
       write(delim);
    }
 
-   public void newcommand(String type, String csName, boolean isShort,
+   public void newcommand(byte overwrite,
+     String type, String csName, boolean isShort,
      int numParams, TeXObject defValue, TeXObject definition)
     throws IOException
    {
+      super.newcommand(overwrite, type, csName, isShort, numParams,
+        defValue, definition);
       
       char bg = parser.getBgChar();
       char eg = parser.getEgChar();
@@ -894,16 +895,20 @@ public class LaTeX2LaTeX extends LaTeXParserListener
 
    private TeXApp texApp;
 
-   private SpecialListener specialListener;
-
    public static final String[] CHECK_CMDS = new String[]
    {
       "epsfig", "psfig", "centerline", "special", 
       "rm", "tt", "sf", "bf", "it", "sl", "sc", "cal",
       "includegraphics", "usepackage", "graphicspath",
       "documentclass", "documentstyle", "begin", "end",
-      "FRAME", "Qcb", "verb", "[", "(", "input",
-      "newcommand", "renewcommand", "providecommand",
+      "FRAME", "Qcb",
+      "verb", "lstinline", "verbatim", "endverbatim",
+      "lstlistings", "lstlistings*",
+      "[", "]", "(", ")",
+      "displaymath", "enddisplaymath", "math", "endmath",
+      "equation", "endequation", "equation*", "endequation*",
+      "align", "endalign", "align*", "endalign*",
+      "input", "newcommand", "renewcommand", "providecommand",
       "bibliography"
    };
 

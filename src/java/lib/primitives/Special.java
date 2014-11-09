@@ -23,7 +23,7 @@ import java.io.EOFException;
 
 import com.dickimawbooks.texparserlib.*;
 
-public class Special extends Primitive
+public class Special extends Primitive implements Expandable
 {
    public Special()
    {
@@ -40,7 +40,7 @@ public class Special extends Primitive
       return new Special(getName());
    }
 
-   public void process(TeXParser parser, TeXObjectList stack)
+   public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
       TeXObject arg = stack.popArg();
@@ -52,11 +52,15 @@ public class Special extends Primitive
          expanded = ((Expandable)arg).expandfully(parser, stack);
       }
 
-      parser.getListener().special(expanded == null ?
-        arg.toString(parser) : expanded.toString(parser));
+      if (expanded != null)
+      {
+         arg = expanded;
+      }
+
+      return parser.getListener().special(arg.toString(parser));
    }
 
-   public void process(TeXParser parser)
+   public TeXObjectList expandonce(TeXParser parser)
       throws IOException
    {
       TeXObject arg = parser.popNextArg();
@@ -68,7 +72,44 @@ public class Special extends Primitive
          expanded = ((Expandable)arg).expandfully(parser);
       }
 
-      parser.getListener().special(expanded == null ?
-        arg.toString(parser) : expanded.toString(parser));
+      if (expanded != null)
+      {
+         arg = expanded;
+      }
+
+      return parser.getListener().special(arg.toString(parser));
+   }
+
+   public TeXObjectList expandfully(TeXParser parser, TeXObjectList stack)
+   throws IOException
+   {
+      return expandonce(parser, stack);
+   }
+
+   public TeXObjectList expandfully(TeXParser parser) throws IOException
+   {
+      return expandonce(parser);
+   }
+
+   public void process(TeXParser parser, TeXObjectList stack)
+      throws IOException
+   {
+      TeXObjectList expanded = expandonce(parser, stack);
+
+      if (expanded != null)
+      {
+         expanded.process(parser, stack);
+      }
+   }
+
+   public void process(TeXParser parser)
+      throws IOException
+   {
+      TeXObjectList expanded = expandonce(parser);
+
+      if (expanded != null)
+      {
+         expanded.process(parser);
+      }
    }
 }

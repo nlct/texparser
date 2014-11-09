@@ -23,65 +23,39 @@ import java.io.IOException;
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.*;
 
-public class L2LMathCs extends MathCs
+public class L2LBegin extends Begin
 {
-   public L2LMathCs()
+   public L2LBegin()
    {
-      super();
+      this("begin");
    }
 
-   public L2LMathCs(String name)
+   public L2LBegin(String name)
    {
       super(name);
    }
 
    public Object clone()
    {
-      return new L2LMathCs(getName());
+      return new L2LBegin(getName());
    }
 
-   public void process(TeXParser parser, TeXObjectList stack)
+   protected void doBegin(TeXParser parser, TeXObjectList stack, String name)
      throws IOException
    {
-      char esc = parser.getEscChar();
-      MathGroup list = new L2LMathGroup(true, esc+"(", esc+")");
+      LaTeX2LaTeX listener = ((LaTeX2LaTeX)parser.getListener());
 
-      while (stack.size() > 0)
+      ControlSequence cs = listener.getControlSequence(name);
+
+      if (cs instanceof MathDeclaration)
       {
-         TeXObject object = stack.pop();
-
-         if (object instanceof ControlSequence
-          && ((ControlSequence)object).getName().equals(")"))
-         {
-            break;
-         }
-
-         list.add(object);
+         MathDeclaration decl = (MathDeclaration)cs;
+         decl.doModeSwitch(parser);
       }
 
-      list.process(parser, stack);
+      listener.write(String.format("%c%s%c%s%c",
+        parser.getEscChar(), getName(), 
+        parser.getBgChar(), name, parser.getEgChar()));
+
    }
-
-   public void process(TeXParser parser)
-     throws IOException
-   {
-      char esc = parser.getEscChar();
-      MathGroup list = new L2LMathGroup(true, esc+"(", esc+")");
-
-      while (true)
-      {
-         TeXObject object = parser.pop();
-
-         if (object instanceof ControlSequence
-          && ((ControlSequence)object).getName().equals(")"))
-         {
-            break;
-         }
-
-         list.add(object);
-      }
-
-      list.process(parser);
-   }
-
 }

@@ -92,7 +92,7 @@ public abstract class Macro implements TeXObject
 
    }
 
-   protected void setSyntax(int numberOfArguments)
+   protected void setSyntax(TeXParserListener listener, int numberOfArguments)
    {
       this.isDelimited = false;
       this.numArgs = numberOfArguments;
@@ -107,7 +107,7 @@ public abstract class Macro implements TeXObject
 
          for (int i = 1; i <= numArgs; i++)
          {
-            syntax.add(new Param(i));
+            syntax.add(listener.getParam(i));
          }
       }
    }

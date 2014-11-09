@@ -32,6 +32,16 @@ public class L2LGroup extends Group
       super();
    }
 
+   public L2LGroup(int capacity)
+   {
+      super(capacity);
+   }
+
+   public L2LGroup(String text)
+   {
+      super(text);
+   }
+
    public Object clone()
    {
       L2LGroup group = new L2LGroup();

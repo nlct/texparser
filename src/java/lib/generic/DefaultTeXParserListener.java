@@ -65,6 +65,7 @@ public abstract class DefaultTeXParserListener extends TeXParserListener
       parser.putControlSequence(new GenericCommand("empty"));
       parser.putControlSequence(new Def());
       parser.putControlSequence(new Let());
+      parser.putControlSequence(new Special());
 
       // TeX font changing declarations
 
@@ -216,6 +217,11 @@ public abstract class DefaultTeXParserListener extends TeXParserListener
       return new Group();
    }
 
+   public Group createGroup(String text)
+   {
+      return new Group(text);
+   }
+
    public MathGroup createMathGroup()
    {
       return new MathGroup();
@@ -264,21 +270,23 @@ public abstract class DefaultTeXParserListener extends TeXParserListener
       specialListeners.remove(listener);
    }
 
-   public boolean special(String param)
+   public TeXObjectList special(String param)
      throws IOException
    {
       for (SpecialListener listener : specialListeners)
       {
-         if (listener.process(parser, param))
+         TeXObjectList expanded = listener.process(parser, param);
+
+         if (expanded != null)
          {
-            return true;
+            return expanded;
          }
       }
 
-      return false;
+      return null;
    }
 
-   public void verb(boolean isStar, char delim, String text)
+   public void verb(String name, boolean isStar, char delim, String text)
      throws IOException
    {
       if (isStar)
