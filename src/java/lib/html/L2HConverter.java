@@ -42,6 +42,21 @@ public abstract class L2HConverter extends LaTeXParserListener
       putControlSequence(new L2HAmp());
       putControlSequence(new L2HNoBreakSpace());
 
+      parser.putControlSequence(new L2LMathDeclaration("math"));
+
+      MathDeclaration begMathDecl = new L2LMathDeclaration("(");
+      parser.putControlSequence(begMathDecl);
+      parser.putControlSequence(new EndDeclaration(")", begMathDecl));
+      parser.putControlSequence(
+         new L2LMathDeclaration("displaymath", TeXSettings.MODE_DISPLAY_MATH));
+
+      MathDeclaration begDispDecl = new L2LMathDeclaration("[", TeXSettings.MODE_DISPLAY_MATH);
+
+      parser.putControlSequence(begDispDecl);
+      parser.putControlSequence(new EndDeclaration("]", begDispDecl));
+      parser.putControlSequence(
+         new L2LMathDeclaration("equation", TeXSettings.MODE_DISPLAY_MATH, true));
+
       try
       {
          LaTeXSty sty = getLaTeXSty("hyperref");
@@ -241,14 +256,59 @@ public abstract class L2HConverter extends LaTeXParserListener
    {
    }
 
-   // TODO sort out MathML stuff
-   // This is just temporary HTML approximation
-   // Maybe better just to use MathJax
+   public boolean useMathJax()
+   {
+      return useMathJax;
+   }
+
+   public void setUseMathJax(boolean useMathJax)
+   {
+      this.useMathJax = useMathJax;
+   }
+
+   public void writeMathJaxHeader()
+     throws IOException
+   {
+      setUseMathJax(true);
+
+      writeable.writeln("<!-- MathJax -->");
+      writeable.writeln("<script type=\"text/x-mathjax-config\">");
+      writeable.writeln("MathJax.Hub.Config({tex2jax: { inlineMath: [['$','$'],['\\\\(','\\\\)']] }});");
+      writeable.writeln("</script>");
+
+      writeable.write("<script type=\"text/javascript\" src=");
+      writeable.writeln(
+       "\"http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML\">");
+      writeable.writeln("</script>");
+   }
 
    public void overwithdelims(TeXObject firstDelim,
      TeXObject secondDelim, TeXObject before, TeXObject after)
     throws IOException
    {
+      if (useMathJax)
+      {
+         if (firstDelim != null || secondDelim != null)
+         {
+            write("\\left");
+            write(firstDelim==null?".":firstDelim.toString(getParser()));
+         }
+
+         write("\\frac{");
+         write(before.toString(getParser()));
+         write("}{");
+         write(after.toString(getParser()));
+         write("}");
+
+         if (firstDelim != null || secondDelim != null)
+         {
+            write("\\right");
+            write(secondDelim==null?".":secondDelim.toString(getParser()));
+         }
+
+         return;
+      }
+
       if (firstDelim != null)
       {
         firstDelim.process(parser);
@@ -272,6 +332,19 @@ public abstract class L2HConverter extends LaTeXParserListener
      TeXObject before, TeXObject after)
     throws IOException
    {
+      if (useMathJax())
+      {
+         write(before.toString(getParser()));
+         write("\\abovewithdelims ");
+         write(firstDelim==null?".":firstDelim.toString(getParser()));
+         write(secondDelim==null?".":secondDelim.toString(getParser()));
+         write(thickness.toString(getParser()));
+
+         write(after.toString(getParser()));
+
+         return;
+      }
+
       if (firstDelim != null)
       {
          firstDelim.process(parser);
@@ -293,17 +366,31 @@ public abstract class L2HConverter extends LaTeXParserListener
    public void subscript(TeXObject arg)
     throws IOException
    {
-      write("<sb>");
-      arg.process(parser);
-      write("</sb>");
+      if (useMathJax())
+      {
+         write("_{"+arg.toString(getParser())+"}");
+      }
+      else
+      {
+         write("<sb>");
+         arg.process(parser);
+         write("</sb>");
+      }
    }
 
    public void superscript(TeXObject arg)
     throws IOException
    {
-      write("<sp>");
-      arg.process(parser);
-      write("</sp>");
+      if (useMathJax())
+      {
+         write("^{"+arg.toString(getParser())+"}");
+      }
+      else
+      {
+         write("<sp>");
+         arg.process(parser);
+         write("</sp>");
+      }
    }
 
    public void tab()
@@ -358,4 +445,6 @@ public abstract class L2HConverter extends LaTeXParserListener
    private TeXApp texApp;
 
    private File file;
+
+   private boolean useMathJax=true;
 }
