@@ -102,6 +102,8 @@ public class LaTeX2LaTeX extends LaTeXParserListener
       putControlSequence(new L2LBegin());
       putControlSequence(new L2LEnd());
       putControlSequence(new Verb("lstinline"));
+      putControlSequence(new Input());
+      putControlSequence(new Input("include"));
    }
 
    protected void addMathFontCommand(String name, int style)

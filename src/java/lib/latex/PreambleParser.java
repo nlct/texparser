@@ -133,11 +133,6 @@ public class PreambleParser extends LaTeXParserListener
    {
    }
 
-   public void input(TeXPath path)
-    throws IOException
-   {
-   }
-
    public void tab()
      throws IOException
    {

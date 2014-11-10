@@ -20,6 +20,7 @@ package com.dickimawbooks.texparserlib;
 
 import java.io.IOException;
 import java.io.File;
+import java.nio.charset.Charset;
 
 import com.dickimawbooks.texparserlib.generic.*;
 
@@ -113,8 +114,11 @@ public abstract class TeXParserListener
      TeXObject secondDelim, TeXDimension thickness, TeXObject before, TeXObject after)
     throws IOException;
 
-   public abstract void input(TeXPath path)
+   // Returns true if the path is processed
+   public abstract boolean input(TeXPath path)
     throws IOException;
+
+   public abstract Charset getCharSet();
 
    public abstract void par() throws IOException;
 

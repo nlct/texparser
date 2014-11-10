@@ -23,6 +23,8 @@ import java.io.EOFException;
 import java.io.File;
 import java.util.Hashtable;
 import java.util.Vector;
+import java.nio.charset.Charset;
+import java.nio.charset.IllegalCharsetNameException;
 
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.generic.*;
@@ -502,7 +504,7 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       return loadedPackages;
    }
 
-   public void input(TeXPath path)
+   public boolean input(TeXPath path)
      throws IOException
    {
       if (path.toString().endsWith("tcilatex.tex"))
@@ -527,7 +529,31 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
          parser.putControlSequence(new QATOPD());
          parser.putControlSequence(new QTATOPD());
          parser.putControlSequence(new QDATOPD());
+
+         return true;
       }
+
+      return super.input(path);
+   }
+
+   public Charset getCharSet()
+   {
+      Charset charset = null;
+
+      if (inputEncoding != null && !inputEncoding.equals("utf8"))
+      {
+         try
+         {
+            charset = InputEncSty.getCharSet(inputEncoding);
+         }
+         catch (IllegalCharsetNameException e)
+         {
+            getTeXApp().error(e);
+            charset = null;
+         }
+      }
+
+      return charset;
    }
 
    public void setGraphicsPath(TeXObjectList paths)

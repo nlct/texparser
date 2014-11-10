@@ -55,14 +55,8 @@ public class Input extends ControlSequence
          }
       }
 
-      TeXParserListener listener = parser.getListener();
-
-      TeXPath texPath = new TeXPath(parser, arg.toString(parser));
-
-      listener.addFileReference(texPath);
-
-      listener.input(texPath);
-   }
+      doInput(parser, arg);
+    }
 
    public void process(TeXParser parser)
       throws IOException
@@ -79,12 +73,20 @@ public class Input extends ControlSequence
          }
       }
 
+      doInput(parser, arg);
+   }
+
+   protected boolean doInput(TeXParser parser, TeXObject arg)
+       throws IOException
+   {
+
       TeXParserListener listener = parser.getListener();
 
       TeXPath texPath = new TeXPath(parser, arg.toString(parser));
 
       listener.addFileReference(texPath);
 
-      listener.input(texPath);
-   }
+      return listener.input(texPath);
+  }
+
 }

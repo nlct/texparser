@@ -26,6 +26,7 @@ import java.util.Hashtable;
 import java.util.Vector;
 import java.nio.file.Path;
 import java.nio.file.Files;
+import java.nio.charset.Charset;
 
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.generic.*;
@@ -40,8 +41,15 @@ public class AuxParser extends DefaultTeXParserListener
    public AuxParser(TeXApp texApp)
      throws IOException
    {
+      this(texApp, null);
+   }
+
+   public AuxParser(TeXApp texApp, Charset charset)
+     throws IOException
+   {
       super(null);
       this.texApp = texApp;
+      this.charset = charset;
 
       setWriteable(this);
 
@@ -56,6 +64,13 @@ public class AuxParser extends DefaultTeXParserListener
    public TeXParser parseAuxFile(File auxFile)
      throws IOException
    {
+      return parseAuxFile(auxFile, null);
+   }
+
+   public TeXParser parseAuxFile(File auxFile, Charset charset)
+     throws IOException
+   {
+      this.charset=charset;
       TeXParser parser = new TeXParser(this);
 
       parser.setCatCode('@', TeXParser.TYPE_LETTER);
@@ -129,11 +144,6 @@ public class AuxParser extends DefaultTeXParserListener
    {
    }
 
-   public void input(TeXPath path)
-    throws IOException
-   {
-   }
-
    public void tab()
      throws IOException
    {
@@ -201,8 +211,15 @@ public class AuxParser extends DefaultTeXParserListener
       return auxData;
    }
 
+   public Charset getCharSet()
+   {
+      return charset;
+   }
+
    private Vector<AuxData> auxData;
    private TeXApp texApp;
 
    private File file;
+
+   private Charset charset=null;
 }

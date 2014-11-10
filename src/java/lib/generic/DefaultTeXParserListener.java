@@ -24,6 +24,7 @@ import java.util.Hashtable;
 import java.util.Vector;
 import java.text.CharacterIterator;
 import java.text.StringCharacterIterator;
+import java.nio.charset.Charset;
 
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.primitives.*;
@@ -240,6 +241,23 @@ public abstract class DefaultTeXParserListener extends TeXParserListener
    public Comment createComment()
    {
       return new Comment();
+   }
+
+   public boolean input(TeXPath path)
+    throws IOException
+   {
+      File file = path.getFile();
+
+      if (file != null && file.exists())
+      {
+         Charset charset = getCharSet();
+
+         getParser().parse(file, charset);
+
+         return true;
+      }
+
+      return false;
    }
 
    public Writeable getWriteable()
