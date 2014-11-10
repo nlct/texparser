@@ -25,6 +25,7 @@ import java.util.Hashtable;
 import java.util.Vector;
 import java.nio.charset.Charset;
 import java.nio.charset.IllegalCharsetNameException;
+import java.nio.file.Path;
 
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.generic.*;
@@ -577,6 +578,125 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       inputEncoding = enc;
    }
 
+   protected File getImageFile(String[] grpaths, TeXPath path)
+    throws IOException,InterruptedException
+   {
+      if (grpaths == null)
+      {
+         File file = path.getFile();
+
+         if (file.exists())
+         {
+            return file;
+         }
+
+      }
+      else
+      {
+         Path basePath = path.getBaseDir();
+
+         for (int i = 0; i < grpaths.length; i++)
+         {
+            Path subPath = 
+            (new File(File.separatorChar == '/' ?
+              grpaths[i] : 
+              grpaths[i].replaceAll("/", File.separator)
+            ).toPath()).resolve(path.getRelative());
+
+            File file = (basePath == null ?  subPath :
+              basePath.resolve(subPath)).toFile();
+
+            if (file.exists())
+            {
+               return file;
+            }
+         }
+      }
+
+      String name = getTeXApp().kpsewhich(path.getFileName().toString());
+
+      if (name != null && !name.isEmpty())
+      {
+         return new File(name);
+      }
+
+      return null;
+   }
+
+   public String[] getGraphicsPaths()
+     throws IOException
+   {
+      TeXObjectList graphicsPath = getGraphicsPath();
+
+      String[] grpaths = null;
+
+      if (graphicsPath != null && graphicsPath.size() > 0)
+      {
+         int n = graphicsPath.size();
+
+         grpaths = new String[n];
+
+         for (int i = 0; i < n; i++)
+         {
+            TeXObject object = graphicsPath.get(i);
+
+            TeXObjectList expanded = null;
+
+            if (object instanceof Expandable)
+            {
+               expanded = ((Expandable)object).expandfully(parser);
+            }
+
+            if (expanded != null)
+            {
+               grpaths[i] = expanded.toString(parser);
+            }
+            else
+            {
+               grpaths[i] = object.toString(parser);
+            }
+         }
+      }
+
+      return grpaths;
+   }
+
+   public File getImage(String[] grpaths, String imgName)
+     throws IOException
+   {
+      try
+      {
+         if (imgName.contains("."))
+         {
+            TeXPath path = new TeXPath(parser, imgName);
+
+            return getImageFile(grpaths, path);
+         }
+         else
+         {
+            for (int i = 0; i < IMAGE_EXT.length; i++)
+            {
+                String name = imgName+"."+IMAGE_EXT[i];
+
+                TeXPath path = new TeXPath(parser, name);
+
+                File file = getImageFile(grpaths, path);
+
+                if (file != null)
+                {
+                   return file;
+                }
+            }
+         }
+      }
+      catch (InterruptedException e)
+      {
+         getTeXApp().error(e);
+      }
+
+      return null;
+   }
+
    private Vector<String> verbEnv;
 
    private Vector<LaTeXFile> loadedPackages;
@@ -588,4 +708,10 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
    private boolean docEnvFound = false;
 
    private String inputEncoding = null;
+
+   public static final String[] IMAGE_EXT = new String[]
+   {
+      "pdf", "PDF", "png", "PNG", "jpg", "JPG", "jpeg", "JPEG",
+      "eps", "EPS", "ps", "PS"
+   };
 }

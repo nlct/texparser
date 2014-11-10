@@ -230,6 +230,182 @@ public class TeXSettings
       return currentParAlign;
    }
 
+   public int getCurrentAlignMode()
+   {
+      return currentAlignMode;
+   }
+
+   public int getAlignMode()
+   {
+      if (currentAlignMode == INHERIT)
+      {
+         if (parent == null)
+         {
+            return ALIGN_MODE_FALSE;
+         }
+
+         return parent.getAlignMode();
+      }
+
+      return currentAlignMode;
+   }
+
+   public void setAlignMode(int setting)
+   {
+      if (setting == INHERIT
+       || setting == ALIGN_MODE_FALSE
+       || setting == ALIGN_MODE_TRUE)
+      {
+         currentAlignMode = setting;
+
+         if (setting == ALIGN_MODE_TRUE)
+         {
+            setStartRowMode(START_ROW_MODE_TRUE);
+         }
+
+         return;
+      }
+
+      throw new IllegalArgumentException(
+          "Invalid argument '"+setting+"' for setAlignMode(int)");
+   }
+
+   public int getCurrentStartRowMode()
+   {
+      return currentStartRowMode;
+   }
+
+   public int getStartRowMode()
+   {
+      if (currentStartRowMode == INHERIT)
+      {
+         if (parent == null)
+         {
+            return START_ROW_MODE_FALSE;
+         }
+
+         return parent.getStartRowMode();
+      }
+
+      return currentStartRowMode;
+   }
+
+   public void setStartRowMode(int setting)
+   {
+      if (setting == INHERIT
+       || setting == START_ROW_MODE_FALSE
+       || setting == START_ROW_MODE_TRUE)
+      {
+         currentStartRowMode = setting;
+
+         if (setting == START_ROW_MODE_TRUE)
+         {
+            resetAlignmentColumn();
+            setStartColumnMode(START_COLUMN_MODE_TRUE);
+         }
+
+         return;
+      }
+
+      throw new IllegalArgumentException(
+          "Invalid argument '"+setting+"' for setStartRowMode(int)");
+   }
+
+   public int getCurrentStartColumnMode()
+   {
+      return currentStartColumnMode;
+   }
+
+   public int getStartColumnMode()
+   {
+      if (currentStartColumnMode == INHERIT)
+      {
+         if (parent == null)
+         {
+            return START_COLUMN_MODE_FALSE;
+         }
+
+         return parent.getStartColumnMode();
+      }
+
+      return currentStartColumnMode;
+   }
+
+   public void setStartColumnMode(int setting)
+   {
+      if (setting == INHERIT
+       || setting == START_COLUMN_MODE_FALSE
+       || setting == START_COLUMN_MODE_TRUE)
+      {
+         currentStartColumnMode = setting;
+
+         if (setting == START_COLUMN_MODE_TRUE)
+         {
+            incAlignmentColumn();
+         }
+
+         return;
+      }
+
+      throw new IllegalArgumentException(
+          "Invalid argument '"+setting+"' for setStartColumnMode(int)");
+   }
+
+   public int getCurrentAlignmentColumn()
+   {
+      return currentAlignmentColumn;
+   }
+
+   public int getAlignmentColumn()
+   {
+      if (currentAlignmentColumn == INHERIT)
+      {
+         if (parent == null)
+         {
+            return 0;
+         }
+
+         return parent.getAlignmentColumn();
+      }
+
+      return currentAlignmentColumn;
+   }
+
+   public void resetAlignmentColumn()
+   {
+      currentAlignmentColumn = 0;
+   }
+
+   public void incAlignmentColumn()
+   {
+      currentAlignmentColumn = getAlignmentColumn()+1;
+   }
+
+   public int getCurrentAlignmentColumnCount()
+   {
+      return currentAlignmentColumnCount;
+   }
+
+   public int getAlignmentColumnCount()
+   {
+      if (currentAlignmentColumnCount == INHERIT)
+      {
+         if (parent == null)
+         {
+            return 0;
+         }
+
+         return parent.getAlignmentColumnCount();
+      }
+
+      return currentAlignmentColumnCount;
+   }
+
+   public void setAlignmentColumnCount(int count)
+   {
+      currentAlignmentColumnCount = count;
+   }
+
    public Color getFgColor()
    {
       if (currentFgColor == null)
@@ -1186,6 +1362,12 @@ public class TeXSettings
       MODE_DISPLAY_MATH = 2;
 
    public static final int CHAR_MAP_OFF = 0, CHAR_MAP_ON = 1;
+
+   public static final int ALIGN_MODE_FALSE=0, ALIGN_MODE_TRUE=1;
+
+   public static final int START_ROW_MODE_FALSE=0, START_ROW_MODE_TRUE=1;
+
+   public static final int START_COLUMN_MODE_FALSE=0, START_COLUMN_MODE_TRUE=1;
 
    public static final int[][] BLACKBOARD_BOLD =
    {
@@ -2272,6 +2454,13 @@ public class TeXSettings
    private int currentMode = INHERIT;
 
    private int currentCharMapMode = INHERIT;
+
+   private int currentAlignMode = INHERIT;
+   private int currentStartRowMode = INHERIT;
+   private int currentStartColumnMode = INHERIT;
+
+   private int currentAlignmentColumnCount = INHERIT;
+   private int currentAlignmentColumn = INHERIT;
 
    private Color currentFgColor = null;
    private Color currentBgColor = null;

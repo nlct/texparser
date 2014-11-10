@@ -243,6 +243,13 @@ public abstract class DefaultTeXParserListener extends TeXParserListener
       return new Comment();
    }
 
+   public void tab() throws IOException
+   {
+      TeXSettings settings = getParser().getSettings();
+
+      settings.setStartColumnMode(TeXSettings.START_COLUMN_MODE_TRUE);
+   }
+
    public boolean input(TeXPath path)
     throws IOException
    {

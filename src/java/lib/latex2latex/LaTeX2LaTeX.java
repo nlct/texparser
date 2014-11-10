@@ -377,37 +377,7 @@ public class LaTeX2LaTeX extends LaTeXParserListener
    public void includegraphics(KeyValList options, String imgName)
      throws IOException
    {
-      TeXObjectList graphicsPath = getGraphicsPath();
-
-      String[] grpaths = null;
-
-      if (graphicsPath != null && graphicsPath.size() > 0)
-      {
-         int n = graphicsPath.size();
-
-         grpaths = new String[n];
-
-         for (int i = 0; i < n; i++)
-         {
-            TeXObject object = graphicsPath.get(i);
-
-            TeXObjectList expanded = null;
-
-            if (object instanceof Expandable)
-            {
-               expanded = ((Expandable)object).expandfully(parser);
-            }
-
-            if (expanded != null)
-            {
-               grpaths[i] = expanded.toString(parser);
-            }
-            else
-            {
-               grpaths[i] = object.toString(parser);
-            }
-         }
-      }
+      String[] grpaths = getGraphicsPaths();
 
       Path imagePath = null;
 
@@ -917,11 +887,5 @@ public class LaTeX2LaTeX extends LaTeXParserListener
    public static final String[] SKIP_CMDS = new String[]
    {
       "bigskip"
-   };
-
-   public static final String[] IMAGE_EXT = new String[]
-   {
-      "pdf", "PDF", "png", "PNG", "jpg", "JPG", "jpeg", "JPEG",
-      "eps", "EPS", "ps", "PS"
    };
 }

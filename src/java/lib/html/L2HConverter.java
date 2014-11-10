@@ -19,6 +19,7 @@
 package com.dickimawbooks.texparserlib.html;
 
 import java.io.*;
+import java.nio.file.Path;
 
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.generic.*;
@@ -29,8 +30,14 @@ public abstract class L2HConverter extends LaTeXParserListener
 {
    public L2HConverter(TeXApp app)
    {
+      this(app, null);
+   }
+
+   public L2HConverter(TeXApp app, File outDir)
+   {
       super(null);
       this.texApp = app;
+      this.outPath = (outDir == null ? null : outDir.toPath());
 
       setWriteable(this);
    }
@@ -445,6 +452,8 @@ public abstract class L2HConverter extends LaTeXParserListener
    private TeXApp texApp;
 
    private File file;
+
+   private Path outPath;
 
    private boolean useMathJax=true;
 }
