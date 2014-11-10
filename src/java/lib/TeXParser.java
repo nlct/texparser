@@ -215,8 +215,12 @@ public class TeXParser extends TeXObjectList
          }
       }
 
-      // add it to its new catcode list
-      catcodes[catCode].add(character);
+      // "Other" cat code list is null
+      if (catcodes[catCode] != null)
+      {
+         // add it to its new catcode list
+         catcodes[catCode].add(character);
+      }
    }
 
    // gets the cat code of c
