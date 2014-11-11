@@ -105,6 +105,11 @@ public class L2HConverter extends LaTeXParserListener
       return new L2HPar();
    }
 
+   public MathGroup createMathGroup()
+   {
+      return new L2HMathGroup();
+   }
+
    public void setWriter(Writer writer)
    {
       this.writer = writer;
@@ -320,6 +325,7 @@ public class L2HConverter extends LaTeXParserListener
    public void writeCssStyles()
      throws IOException
    {
+      writeln(".displaymath { display: block; text-align: center; }");
       writeln(".table { display: block; }");
       writeln(".figure { display: block; }");
       writeln(".caption { display: block; text-align: center; }");
@@ -339,6 +345,11 @@ public class L2HConverter extends LaTeXParserListener
       writeable.writeln("<style type=\"text/css\">");
       writeCssStyles();
       writeable.writeln("</style>");
+
+      if (useMathJax())
+      {
+         writeMathJaxHeader();
+      }
    }
 
    public void beginDocument()

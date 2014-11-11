@@ -19,51 +19,35 @@
 package com.dickimawbooks.texparserlib.html;
 
 import java.io.IOException;
+import java.util.Vector;
 
 import com.dickimawbooks.texparserlib.*;
-import com.dickimawbooks.texparserlib.latex.*;
 
-public class L2LMathDeclaration extends MathDeclaration
+public class L2HMathGroup extends MathGroup
 {
-   public L2LMathDeclaration()
+   public L2HMathGroup()
    {
       super();
    }
 
-   public L2LMathDeclaration(String name)
-   {
-      super(name);
-   }
-
-   public L2LMathDeclaration(String name, int mode)
-   {
-      super(name, mode);
-   }
-
-   public L2LMathDeclaration(String name, int mode, boolean numbered)
-   {
-      super(name, mode, numbered);
-   }
-
    public Object clone()
    {
-      return new L2LMathDeclaration(getName(), getMode(), isNumbered());
+      MathGroup math = new L2HMathGroup();
+      math.setInLine(isInLine());
+
+      for (TeXObject object : this)
+      {
+         math.add((TeXObject)object.clone());
+      }
+
+      return math;
    }
 
-   public void process(TeXParser parser, TeXObjectList stack)
-     throws IOException
+   public void process(TeXParser parser) throws IOException
    {
-      process(parser);
-   }
-
-   public void process(TeXParser parser)
-     throws IOException
-   {
-      super.process(parser);
-
       L2HConverter listener = (L2HConverter)parser.getListener();
 
-      if (getMode() == TeXSettings.MODE_DISPLAY_MATH)
+      if (!isInLine())
       {
          listener.write("<div id=\"displaymath\">");
       }
@@ -71,23 +55,44 @@ public class L2LMathDeclaration extends MathDeclaration
       if (listener.useMathJax())
       {
          listener.write("$");
-      }
-   }
-
-   public void end(TeXParser parser) throws IOException
-   {
-      super.end(parser);
-
-      L2HConverter listener = (L2HConverter)parser.getListener();
-
-      if (listener.useMathJax())
-      {
+         super.process(parser);
          listener.write("$");
       }
+      else
+      {
+         super.process(parser);
+      }
 
-      if (getMode() == TeXSettings.MODE_DISPLAY_MATH)
+      if (!isInLine())
       {
          listener.write("</div>");
       }
    }
+
+   public void process(TeXParser parser, TeXObjectList list) throws IOException
+   {
+      L2HConverter listener = (L2HConverter)parser.getListener();
+
+      if (!isInLine())
+      {
+         listener.write("<div id=\"displaymath\">");
+      }
+
+      if (listener.useMathJax())
+      {
+         listener.write("$");
+         super.process(parser, list);
+         listener.write("$");
+      }
+      else
+      {
+         super.process(parser, list);
+      }
+
+      if (!isInLine())
+      {
+         listener.write("</div>");
+      }
+   }
+
 }
