@@ -84,11 +84,14 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       parser.putControlSequence(new Verb());
       parser.putControlSequence(new Cr("\\"));
       parser.putControlSequence(new Cr("cr"));
+      parser.putControlSequence(new Cr("tabularnewline"));
       parser.putControlSequence(new Frac());
       parser.putControlSequence(new GenericCommand("@empty"));
       parser.putControlSequence(new AtIfNextChar());
       parser.putControlSequence(new Verbatim());
       parser.putControlSequence(new Verbatim("verbatim*"));
+      parser.putControlSequence(new Tabular());
+      parser.putControlSequence(new Tabular("array"));
 
       parser.putControlSequence(new MathDeclaration("math"));
 
@@ -697,6 +700,17 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       return null;
    }
 
+   public void cr(boolean isStar, TeXObject optArg)
+     throws IOException
+   {
+      TeXSettings settings = getParser().getSettings();
+
+      if (settings.getAlignMode() == TeXSettings.ALIGN_MODE_TRUE)
+      {
+         settings.setStartRowMode(TeXSettings.START_ROW_MODE_TRUE);
+      }
+   }
+
    private Vector<String> verbEnv;
 
    private Vector<LaTeXFile> loadedPackages;
@@ -712,6 +726,6 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
    public static final String[] IMAGE_EXT = new String[]
    {
       "pdf", "PDF", "png", "PNG", "jpg", "JPG", "jpeg", "JPEG",
-      "eps", "EPS", "ps", "PS"
+      "eps", "EPS", "ps", "PS", "gif", "GIF"
    };
 }

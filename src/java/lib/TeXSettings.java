@@ -258,16 +258,35 @@ public class TeXSettings
       {
          currentAlignMode = setting;
 
-         if (setting == ALIGN_MODE_TRUE)
-         {
-            setStartRowMode(START_ROW_MODE_TRUE);
-         }
-
          return;
       }
 
       throw new IllegalArgumentException(
           "Invalid argument '"+setting+"' for setAlignMode(int)");
+   }
+
+   public void endAlignment()
+   {
+      setAlignMode(ALIGN_MODE_FALSE);
+      setStartRowMode(START_ROW_MODE_FALSE);
+      setStartColumnMode(START_COLUMN_MODE_FALSE);
+   }
+
+   public void startAlignment()
+   {
+      setAlignMode(ALIGN_MODE_TRUE);
+      startRow();
+   }
+
+   public void startRow()
+   {
+      setStartRowMode(START_ROW_MODE_TRUE);
+      startColumn();
+   }
+
+   public void startColumn()
+   {
+      setStartColumnMode(START_COLUMN_MODE_TRUE);
    }
 
    public int getCurrentStartRowMode()
@@ -371,12 +390,12 @@ public class TeXSettings
       return currentAlignmentColumn;
    }
 
-   public void resetAlignmentColumn()
+   private void resetAlignmentColumn()
    {
       currentAlignmentColumn = 0;
    }
 
-   public void incAlignmentColumn()
+   private void incAlignmentColumn()
    {
       currentAlignmentColumn = getAlignmentColumn()+1;
    }

@@ -166,14 +166,19 @@ public class LaTeX2LaTeX extends LaTeXParserListener
       return new L2LDoubleParam((L2LParam)param);
    }
 
-   public Tab getTab()
-   {
-      return new Tab();
-   }
-
    public Other getOther(int charCode)
    {
       return new L2LOther(charCode);
+   }
+
+   public Par getPar()
+   {
+      return new L2LPar();
+   }
+
+   public Tab getTab()
+   {
+      return new L2LTab();
    }
 
    public BigOperator createBigOperator(String name, int code1, int code2)
@@ -697,12 +702,6 @@ public class LaTeX2LaTeX extends LaTeXParserListener
       }
    }
 
-   public void par() throws IOException
-   {
-      writeln();
-      writeln();
-   }
-
    public void skipping(Ignoreable ignoreable)
      throws IOException
    {
@@ -724,12 +723,6 @@ public class LaTeX2LaTeX extends LaTeXParserListener
       write(parser.getBgChar());
       write(arg.toString(parser));
       write(parser.getEgChar());
-   }
-
-   public void tab()
-     throws IOException
-   {
-      write(parser.getTabChar());
    }
 
    public TeXApp getTeXApp()
@@ -769,28 +762,31 @@ public class LaTeX2LaTeX extends LaTeXParserListener
 
       getTeXApp().message(TeXApp.MESSAGE_READING, file.getAbsolutePath());
 
-      if (writer != null)
-      {
-         writer.close();
-      }
-
       basePath = file.getParentFile().toPath();
 
-      Files.createDirectories(outPath);
+      if (writer == null)
+      {
+         Files.createDirectories(outPath);
 
-      File outFile = new File(outPath.toFile(), file.getName());
+         File outFile = new File(outPath.toFile(), file.getName());
 
-      getTeXApp().message(TeXApp.MESSAGE_WRITING, outFile.getAbsolutePath());
-      writer = new PrintWriter(outFile);
+         getTeXApp().message(TeXApp.MESSAGE_WRITING, outFile.getAbsolutePath());
+         writer = new PrintWriter(outFile);
+      }
    }
 
    public void endParse(File file)
     throws IOException
    {
-      if (writer != null)
+      if (getParser().getCurrentParentFile() == null)
       {
-         writer.close();
-         writer = null;
+         inFile = null;
+
+         if (writer != null)
+         {
+            writer.close();
+            writer = null;
+         }
       }
    }
 

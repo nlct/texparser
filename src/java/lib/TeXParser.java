@@ -1263,6 +1263,10 @@ public class TeXParser extends TeXObjectList
       {
          list.add(listener.createSbChar());
       }
+      else if (isCatCode(TYPE_TAB, (char)c))
+      {
+         list.add(listener.getTab());
+      }
       else if (isCatCode(TYPE_MATH, (char)c))
       {
          MathGroup math = listener.createMathGroup();
@@ -1537,9 +1541,9 @@ public class TeXParser extends TeXObjectList
       }
       finally
       {
+         listener.endParse(file);
          currentParentFile = orgParentFile;
          resetLineNum(orgLineNum);
-         listener.endParse(file);
 
          if (reader != null)
          {

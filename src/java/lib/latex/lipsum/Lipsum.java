@@ -98,7 +98,7 @@ public class Lipsum extends ControlSequence
 
                if (!isStar)
                {
-                  parser.getListener().par();
+                  parser.getListener().getPar().process(parser);
                }
             }
          }

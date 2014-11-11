@@ -44,7 +44,7 @@ public class Cr extends ControlSequence
      TeXObject optArg)
       throws IOException
    {
-      parser.getListener().getWriteable().writeln("");
+      ((LaTeXParserListener)parser.getListener()).cr(isStar, optArg);
    }
 
    public void process(TeXParser parser) throws IOException
@@ -69,7 +69,7 @@ public class Cr extends ControlSequence
       }
       else
       {
-         parser.getListener().getWriteable().writeln("");
+         process(parser, false, null);
       }
    }
 
@@ -95,7 +95,7 @@ public class Cr extends ControlSequence
       }
       else
       {
-         parser.getListener().getWriteable().writeln("");
+         process(parser, false, null);
       }
    }
 

@@ -140,15 +140,6 @@ public class AuxParser extends DefaultTeXParserListener
    {
    }
 
-   public void par() throws IOException
-   {
-   }
-
-   public void tab()
-     throws IOException
-   {
-   }
-
    public void skipping(Ignoreable ignoreable)
       throws IOException
    {

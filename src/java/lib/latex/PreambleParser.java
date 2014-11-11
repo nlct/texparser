@@ -129,15 +129,6 @@ public class PreambleParser extends LaTeXParserListener
    {
    }
 
-   public void par() throws IOException
-   {
-   }
-
-   public void tab()
-     throws IOException
-   {
-   }
-
    public void skipping(Ignoreable ignoreable)
       throws IOException
    {

@@ -1,7 +1,7 @@
 APP_VERSION:=$(shell grep "public static final String appVersion" java/app/TeXParserApp.java | sed "s/public\sstatic\sfinal\sString\sappVersion=//" | tr -d "\"\; ")
 IZPACKDIR=/usr/local/IzPack
 
-test	: test-obs test-sw
+test	: test-obs test-sw test-abs
 
 tests/output	:
 	mkdir -p tests/output
@@ -13,6 +13,10 @@ test-obs	: app tests/output
 test-sw	: app tests/output
 	rm -f -r tests/output/test-sw
 	bin/texparserapp --in tests/test-sw/test-sw.tex --output tests/output/test-sw
+
+test-abs : app tests/output
+	rm -f -r tests/output/test-abs
+	bin/texparserapp --in tests/test-abs/test-abs.tex --output tests/output/test-abs --html
 
 app     : lib lib/texparserlib.jar lib/texparserapp.jar \
 	  lib/resources lib/texparser-splash.png \

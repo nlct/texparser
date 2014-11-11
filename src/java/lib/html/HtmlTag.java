@@ -16,40 +16,55 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
-package com.dickimawbooks.texparserlib.generic;
+package com.dickimawbooks.texparserlib.html;
 
 import java.io.IOException;
+import java.util.Vector;
 
 import com.dickimawbooks.texparserlib.*;
 
-public class ParCs extends ControlSequence
+public class HtmlTag implements TeXObject
 {
-   public ParCs()
+   public HtmlTag(String tag)
    {
-      this("par");
-   }
-
-   public ParCs(String name)
-   {
-      super(name);
+      this.tag = tag;
    }
 
    public Object clone()
    {
-      return new ParCs(getName());
+      return new HtmlTag(getTag());
    }
 
-   public void process(TeXParser parser, TeXObjectList list)
-      throws IOException
+   public TeXObjectList string(TeXParser parser)
    {
-      parser.getListener().getPar().process(parser, list);
+      return new TeXObjectList(getTag());
+   }
+
+   public String toString()
+   {
+      return getTag();
+   }
+
+   public String toString(TeXParser parser)
+   {
+      return getTag();
    }
 
    public void process(TeXParser parser)
       throws IOException
    {
-      parser.getListener().getPar().process(parser);
+      parser.getListener().getWriteable().write(tag);
    }
 
-}
+   public void process(TeXParser parser, TeXObjectList list) throws IOException
+   {
+      process(parser);
+   }
 
+   public String getTag()
+   {
+      return tag;
+   }
+
+   private String tag;
+}

@@ -16,14 +16,14 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
-package com.dickimawbooks.texparserlib.latex;
+package com.dickimawbooks.texparserlib.html;
 
 import java.io.IOException;
 import java.util.Vector;
 
 import com.dickimawbooks.texparserlib.*;
 
-public class L2HNoBreakSpace extends ControlSequence
+public class L2HNoBreakSpace extends Command
 {
    public L2HNoBreakSpace()
    {
@@ -40,20 +40,41 @@ public class L2HNoBreakSpace extends ControlSequence
       return new L2HNoBreakSpace(getName());
    }
 
-   public void process(TeXParser parser, boolean isStar,
-     TeXObject optArg)
+   public TeXObjectList expandonce(TeXParser parser) throws IOException
+   {
+      TeXObjectList list = new TeXObjectList(1);
+      list.add(new HtmlTag("&nbsp;"));
+      return list;
+   }
+
+   public TeXObjectList expandonce(TeXParser parser, TeXObjectList List)
       throws IOException
    {
-      parser.getListener().getWriteable().writeln("&nbsp;");
+      return expandonce(parser);
+   }
+
+   public TeXObjectList expandfully(TeXParser parser)
+      throws IOException
+   {
+      return expandonce(parser);
+   }
+
+   public TeXObjectList expandfully(TeXParser parser, TeXObjectList List)
+      throws IOException
+   {
+      return expandfully(parser);
    }
 
    public void process(TeXParser parser) throws IOException
    {
-      parser.getListener().getWriteable().writeln("&nbsp;");
+      if (((L2HConverter)parser.getListener()).isInDocEnv())
+      {
+         parser.getListener().getWriteable().writeln("&nbsp;");
+      }
    }
 
    public void process(TeXParser parser, TeXObjectList list) throws IOException
    {
-      parser.getListener().getWriteable().writeln("&nbsp;");
+      process(parser, list);
    }
 }

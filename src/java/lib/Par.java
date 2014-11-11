@@ -51,15 +51,11 @@ public class Par implements TeXObject
    public void process(TeXParser parser, TeXObjectList list)
       throws IOException
    {
-      process(parser);
    }
 
    public void process(TeXParser parser)
       throws IOException
    {
-      parser.getListener().par();
    }
-
-
 }
 

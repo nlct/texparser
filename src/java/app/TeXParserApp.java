@@ -32,6 +32,7 @@ import com.dickimawbooks.texparserlib.plain.*;
 import com.dickimawbooks.texparserlib.generic.*;
 import com.dickimawbooks.texparserlib.latex.*;
 import com.dickimawbooks.texparserlib.latex2latex.*;
+import com.dickimawbooks.texparserlib.html.*;
 
 import com.dickimawbooks.texparserapp.gui.*;
 import com.dickimawbooks.texparserapp.io.*;
@@ -67,7 +68,7 @@ public class TeXParserApp implements TeXApp
       currentProcessListeners = new Vector<ProcessListener>();
    }
 
-   private void doBatchProcess()
+   private void doBatchProcess(String outputFormat)
    {
       errorListener = new ErrorListener()
       {
@@ -103,7 +104,19 @@ public class TeXParserApp implements TeXApp
                getLabel("error.syntax.batch.missing_out"));
          }
 
-         latex2latex(inFileName, outDir);
+         if (outputFormat.equals("latex"))
+         {
+            latex2latex(inFileName, outDir);
+         }
+         else if (outputFormat.equals("html"))
+         {
+            latex2html(inFileName, outDir);
+         }
+         else
+         {
+            throw new InvalidSyntaxException(
+               getLabelWithValue("error.syntax.batch.unknown_format", outputFormat));
+         }
       }
       catch (IOException e)
       {
@@ -130,6 +143,25 @@ public class TeXParserApp implements TeXApp
       }
 
       LaTeX2LaTeX listener = new LaTeX2LaTeX(this, outDir);
+
+      TeXParser parser = new TeXParser(listener);
+
+      parser.parse(new File(inFileName));
+   }
+
+   public void latex2html(String inFileName, File outDir)
+     throws IOException
+   {
+      this.inFileName = inFileName;
+      this.outDir = outDir;
+
+      if (outDir.exists())
+      {
+         throw new IOException(getLabelWithValue(
+            "error.exists", outDir.getAbsolutePath()));
+      }
+
+      L2HConverter listener = new L2HConverter(this, outDir);
 
       TeXParser parser = new TeXParser(listener);
 
@@ -665,6 +697,8 @@ public class TeXParserApp implements TeXApp
       System.out.println(getLabelWithValues("syntax.in", 
         new String[]{"--in", "-i", appName}));
       System.out.println(getLabelWithValues("syntax.out", "--output", "-o"));
+      System.out.println(getLabelWithValue("syntax.latex", "--latex"));
+      System.out.println(getLabelWithValue("syntax.html", "--html"));
       System.out.println(getLabelWithValues("syntax.version", "--version", "-v"));
       System.out.println(getLabelWithValues("syntax.help", "--help", "-h"));
       System.out.println(getLabelWithValue("syntax.debug", "--debug"));
@@ -1027,6 +1061,7 @@ public class TeXParserApp implements TeXApp
    public static void main(String[] args)
    {
       final TeXParserApp app = new TeXParserApp();
+      String outputFormat = "latex";
 
       try
       {
@@ -1069,6 +1104,14 @@ public class TeXParserApp implements TeXApp
             else if (args[i].equals("--batch") || args[i].equals("-b"))
             {
                app.guiMode = false;
+            }
+            else if (args[i].equals("--latex"))
+            {
+               outputFormat = "latex";
+            }
+            else if (args[i].equals("--html"))
+            {
+               outputFormat = "html";
             }
             else if (args[i].equals("--debug"))
             {
@@ -1164,7 +1207,7 @@ public class TeXParserApp implements TeXApp
       } 
       else
       {
-         app.doBatchProcess();
+         app.doBatchProcess(outputFormat);
       }
    }
 

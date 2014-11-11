@@ -20,12 +20,13 @@ package com.dickimawbooks.texparserlib.html;
 
 import java.io.*;
 import java.nio.file.Path;
+import java.nio.file.Files;
 
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.generic.*;
 import com.dickimawbooks.texparserlib.latex.*;
 
-public abstract class L2HConverter extends LaTeXParserListener
+public class L2HConverter extends LaTeXParserListener
    implements Writeable
 {
    public L2HConverter(TeXApp app)
@@ -33,13 +34,24 @@ public abstract class L2HConverter extends LaTeXParserListener
       this(app, null);
    }
 
+   public L2HConverter(TeXApp app, boolean useMathJax)
+   {
+      this(app, useMathJax, null);
+   }
+
    public L2HConverter(TeXApp app, File outDir)
+   {
+      this(app, true, outDir);
+   }
+
+   public L2HConverter(TeXApp app, boolean useMathJax, File outDir)
    {
       super(null);
       this.texApp = app;
       this.outPath = (outDir == null ? null : outDir.toPath());
 
       setWriteable(this);
+      setUseMathJax(useMathJax);
    }
 
    protected void addPredefined()
@@ -76,6 +88,21 @@ public abstract class L2HConverter extends LaTeXParserListener
       catch (IOException e)
       {
       }
+   }
+
+   public Letter getLetter(int charCode)
+   {
+      return new L2HLetter(charCode);
+   }
+
+   public Other getOther(int charCode)
+   {
+      return new L2HOther(charCode);
+   }
+
+   public Par getPar()
+   {
+      return new L2HPar();
    }
 
    public void setWriter(Writer writer)
@@ -239,6 +266,7 @@ public abstract class L2HConverter extends LaTeXParserListener
       if (writer == null) return;
 
       write(String.format("%s%n", str));
+      writer.flush();
    }
 
    public void href(String url, TeXObject text)
@@ -287,6 +315,46 @@ public abstract class L2HConverter extends LaTeXParserListener
       writeable.writeln(
        "\"http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML\">");
       writeable.writeln("</script>");
+   }
+
+   public void writeCssStyles()
+     throws IOException
+   {
+      writeln(".table { display: block; }");
+      writeln(".figure { display: block; }");
+      writeln(".caption { display: block; text-align: center; }");
+      writeln(".marginpar { float: right; }");
+   }
+
+   public void documentclass(KeyValList options, String clsName)
+     throws IOException
+   {
+      super.documentclass(options, clsName);
+
+      writeable.writeln("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 3.2 Final//EN\">");
+      writeable.writeln("<html>");
+      writeable.writeln("<head>");
+
+
+      writeable.writeln("<style type=\"text/css\">");
+      writeCssStyles();
+      writeable.writeln("</style>");
+   }
+
+   public void beginDocument()
+     throws IOException
+   {
+      writeable.writeln("</head>");
+      writeable.writeln("<body>");
+      super.beginDocument();
+   }
+
+   public void endDocument()
+     throws IOException
+   {
+      writeable.writeln("</body>");
+      writeable.writeln("</html>");
+      super.endDocument();
    }
 
    public void overwithdelims(TeXObject firstDelim,
@@ -400,17 +468,6 @@ public abstract class L2HConverter extends LaTeXParserListener
       }
    }
 
-   public void tab()
-     throws IOException
-   {
-      // TODO
-   }
-
-   public void par() throws IOException
-   {
-      write("<p>");
-   }
-
    public void verb(boolean isStar, char delim,
      String text)
     throws IOException
@@ -433,18 +490,59 @@ public abstract class L2HConverter extends LaTeXParserListener
    public void endParse(File file)
     throws IOException
    {
-      this.file = null;
+      if (getParser().getCurrentParentFile() == null)
+      {
+         this.file = null;
+
+         if (writer != null)
+         {
+            writer.close();
+            writer = null;
+         }
+      }
    }
 
    public void beginParse(File file)
     throws IOException
    {
       this.file = file;
+      getTeXApp().message(TeXApp.MESSAGE_READING, file.getAbsolutePath());
+
+      basePath = file.getParentFile().toPath();
+
+      if (writer == null)
+      {
+         Files.createDirectories(outPath);
+
+         String baseName = file.getName();
+
+         int idx = baseName.lastIndexOf(".");
+
+         if (idx > -1)
+         {
+            baseName = baseName.substring(0,idx);
+         }
+
+         File outFile = new File(outPath.toFile(), baseName+"."+getSuffix());
+
+         getTeXApp().message(TeXApp.MESSAGE_WRITING, outFile.getAbsolutePath());
+         writer = new PrintWriter(outFile);
+      }
    }
 
    public File getFile()
    {
       return file;
+   }
+
+   public void setSuffix(String suffix)
+   {
+      this.suffix = suffix;
+   }
+
+   public String getSuffix()
+   {
+      return suffix;
    }
 
    private Writer writer;
@@ -453,7 +551,9 @@ public abstract class L2HConverter extends LaTeXParserListener
 
    private File file;
 
-   private Path outPath;
+   private Path outPath, basePath;
 
    private boolean useMathJax=true;
+
+   private String suffix = "html";
 }

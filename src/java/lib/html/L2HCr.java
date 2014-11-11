@@ -16,7 +16,7 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
-package com.dickimawbooks.texparserlib.latex;
+package com.dickimawbooks.texparserlib.html;
 
 import java.io.IOException;
 import java.util.Vector;
@@ -40,12 +40,40 @@ public class L2HCr extends ControlSequence
       return new L2HCr(getName());
    }
 
+   public TeXObjectList expandonce(TeXParser parser) throws IOException
+   {
+      TeXObjectList list = new TeXObjectList(1);
+      list.add(new HtmlTag("<br>"));
+      return list;
+   }
+
+   public TeXObjectList expandonce(TeXParser parser, TeXObject List)
+      throws IOException
+   {
+      return expandonce(parser);
+   }
+
+   public TeXObjectList expandfully(TeXParser parser)
+      throws IOException
+   {
+      return expandonce(parser);
+   }
+
+   public TeXObjectList expandfully(TeXParser parser, TeXObject List)
+      throws IOException
+   {
+      return expandfully(parser);
+   }
+
    // TODO check for enclosing tabular
    public void process(TeXParser parser, boolean isStar,
      TeXObject optArg)
       throws IOException
    {
-      parser.getListener().getWriteable().writeln("<br>");
+      if (((L2HConverter)parser.getListener()).isInDocEnv())
+      {
+         parser.getListener().getWriteable().writeln("<br>");
+      }
    }
 
    public void process(TeXParser parser) throws IOException

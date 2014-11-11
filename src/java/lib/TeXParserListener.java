@@ -103,9 +103,6 @@ public abstract class TeXParserListener
    public abstract void superscript(TeXObject arg)
      throws IOException;
 
-   public abstract void tab()
-     throws IOException;
-
    public abstract void overwithdelims(TeXObject firstDelim,
      TeXObject secondDelim, TeXObject before, TeXObject after)
     throws IOException;
@@ -119,8 +116,6 @@ public abstract class TeXParserListener
     throws IOException;
 
    public abstract Charset getCharSet();
-
-   public abstract void par() throws IOException;
 
    public abstract TeXObjectList special(String param)
      throws IOException;

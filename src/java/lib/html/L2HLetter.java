@@ -16,40 +16,44 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
-package com.dickimawbooks.texparserlib.generic;
+package com.dickimawbooks.texparserlib.html;
 
 import java.io.IOException;
+import java.util.Vector;
 
 import com.dickimawbooks.texparserlib.*;
 
-public class ParCs extends ControlSequence
+public class L2HLetter extends Letter
 {
-   public ParCs()
+   public L2HLetter(int charCode)
    {
-      this("par");
+      super(charCode);
    }
 
-   public ParCs(String name)
+   public L2HLetter(char c)
    {
-      super(name);
+      super(c);
    }
 
    public Object clone()
    {
-      return new ParCs(getName());
-   }
-
-   public void process(TeXParser parser, TeXObjectList list)
-      throws IOException
-   {
-      parser.getListener().getPar().process(parser, list);
+      return new L2HLetter(getCharCode());
    }
 
    public void process(TeXParser parser)
       throws IOException
    {
-      parser.getListener().getPar().process(parser);
+      if (((L2HConverter)parser.getListener()).isInDocEnv())
+      {
+         super.process(parser);
+      }
    }
 
+   public void process(TeXParser parser, TeXObjectList list) throws IOException
+   {
+      if (((L2HConverter)parser.getListener()).isInDocEnv())
+      {
+         super.process(parser);
+      }
+   }
 }
-
