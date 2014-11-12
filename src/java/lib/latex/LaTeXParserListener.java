@@ -346,23 +346,28 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       return docEnvFound;
    }
 
+   public void setIsInDocEnv(boolean inDocEnv)
+   {
+      this.docEnvFound = inDocEnv;
+   }
+
    public void beginDocument()
      throws IOException
    {
-      if (docEnvFound)
+      if (isInDocEnv())
       {
          throw new LaTeXSyntaxException(
             parser,
             LaTeXSyntaxException.ERROR_MULTI_BEGIN_DOC);
       }
 
-      docEnvFound = true;
+      setIsInDocEnv(true);
    }
 
    public void endDocument()
      throws IOException
    {
-      if (!docEnvFound)
+      if (!isInDocEnv())
       {
          throw new LaTeXSyntaxException(
             parser,
