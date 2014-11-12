@@ -47,6 +47,7 @@ public class L2HStringConverter extends L2HConverter
    public String convert(String str, boolean atIsLetter)
     throws IOException
    {
+      setIsInDocEnv(true);
       StringWriter writer = new StringWriter();
       setWriter(writer);
 
