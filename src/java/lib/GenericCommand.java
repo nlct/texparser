@@ -34,17 +34,27 @@ public class GenericCommand extends Command
    }
 
    public GenericCommand(String name, TeXObjectList syntax,
-      TeXObjectList definition)
+      TeXObject definition)
    {
       this(true, name, syntax, definition);
    }
 
    public GenericCommand(boolean isShort, String name, TeXObjectList syntax,
-      TeXObjectList definition)
+      TeXObject def)
    {
       super(name);
       this.isShort = isShort;
-      this.definition = definition;
+
+      if (def instanceof TeXObjectList
+      && !(def instanceof Group))
+      {
+         this.definition = (TeXObjectList)def;
+      }
+      else
+      {
+         this.definition = new TeXObjectList();
+         this.definition.add(def);
+      }
 
       setSyntax(syntax);
    }

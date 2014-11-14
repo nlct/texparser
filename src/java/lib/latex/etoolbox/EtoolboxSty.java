@@ -19,6 +19,7 @@
 package com.dickimawbooks.texparserlib.latex.etoolbox;
 
 import java.util.Hashtable;
+import java.io.IOException;
 
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.*;
@@ -33,5 +34,15 @@ public class EtoolboxSty extends LaTeXSty
    public void addDefinitions(LaTeXParserListener listener)
    {
       listener.putControlSequence(new PreTo());
+   }
+
+   public void processOption(LaTeXParserListener listener, String option)
+    throws IOException
+   {
+   }
+
+   protected void preOptions(LaTeXParserListener listener)
+     throws IOException
+   {
    }
 }

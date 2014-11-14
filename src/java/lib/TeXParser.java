@@ -1517,6 +1517,18 @@ public class TeXParser extends TeXObjectList
    public void parse(File file, Charset charset)
      throws IOException
    {
+      if (jobname == null)
+      {
+         jobname = file.getName();
+
+         int idx = jobname.lastIndexOf(".");
+
+         if (idx > 0)
+         {
+            jobname = jobname.substring(0, idx);
+         }
+      }
+
       int orgLineNum = currentLineNum;
       File orgParentFile = currentParentFile;
       resetLineNum();
@@ -1740,6 +1752,11 @@ public class TeXParser extends TeXObjectList
       currentParentFile = file;
    }
 
+   public String getJobname()
+   {
+      return jobname;
+   }
+
    public String toString()
    {
       StringBuilder builder = new StringBuilder();
@@ -1873,4 +1890,6 @@ public class TeXParser extends TeXObjectList
    private CatCodeList[] catcodes;
 
    private Vector<String> verbatim;
+
+   private String jobname = null;
 }

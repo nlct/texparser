@@ -20,6 +20,7 @@ package com.dickimawbooks.texparserlib.latex;
 
 import java.util.Hashtable;
 import java.io.IOException;
+import java.util.Iterator;
 
 import com.dickimawbooks.texparserlib.*;
 
@@ -32,11 +33,49 @@ public abstract class LaTeXSty
 
    public abstract void addDefinitions(LaTeXParserListener listener);
 
-   public void load(LaTeXParserListener listener,
-      TeXParser parser, KeyValList options)
+   public abstract void processOption(LaTeXParserListener listener, String option)
+    throws IOException;
+
+   public void processOptions(LaTeXParserListener listener,
+     KeyValList options)
    throws IOException
    {
+      if (options == null) return;
+
+      for (Iterator<String> it = options.keySet().iterator(); it.hasNext();)
+      {
+         String option = it.next();
+
+         if (option != null && !option.isEmpty())
+         {
+            processOption(listener, option);
+         }
+      }
+   }
+
+   protected abstract void preOptions(LaTeXParserListener listener)
+     throws IOException;
+
+   protected void postOptions(LaTeXParserListener listener)
+     throws IOException
+   {
       addDefinitions(listener);
+   }
+
+   public void load(LaTeXParserListener listener, KeyValList options)
+   throws IOException
+   {
+      preOptions(listener);
+
+      KeyValList clsOptions = listener.getDocumentClassOptions();
+
+      if (clsOptions != options)
+      {
+         processOptions(listener, clsOptions);
+      }
+
+      processOptions(listener, options);
+      postOptions(listener);
    }
 
    public String getName()

@@ -52,6 +52,12 @@ public class PreambleParser extends LaTeXParserListener
       return texApp;
    }
 
+   // Ignore unknown commands
+   public ControlSequence createUndefinedCs(String name)
+   {
+      return new GenericCommand(name);
+   }
+
    public TeXParser parse(File texFile)
      throws IOException
    {

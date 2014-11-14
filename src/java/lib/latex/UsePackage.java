@@ -119,7 +119,14 @@ public class UsePackage extends ControlSequence
 
       for (int i = 0; i < split.length; i++)
       {
-         listener.usepackage(keyValList, split[i].trim());
+         String styName = split[i].trim();
+
+         if (styName.equals("mnsymbol"))
+         {
+            styName = "MnSymbol";
+         }
+
+         listener.usepackage(keyValList, styName);
       }
    }
 }

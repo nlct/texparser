@@ -68,6 +68,11 @@ public class Space extends WhiteSpace
       return new Space(charCode);
    }
 
+   public boolean isEol()
+   {
+      return charCode == (int)'\n' || charCode == (int)'\r';
+   }
+
    private int charCode;
 }
 

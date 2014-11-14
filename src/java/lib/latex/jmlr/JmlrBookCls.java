@@ -31,11 +31,10 @@ public class JmlrBookCls extends JmlrCls
       super("jmlrbook");
    }
 
-   public void load(LaTeXParserListener listener, 
-      TeXParser parser, KeyValList options)
+   protected void preOptions(LaTeXParserListener listener)
    throws IOException
    {
       listener.usepackage(null, "setspace");
-      super.load(listener, parser, options);
+      super.preOptions(listener);
    }
 }

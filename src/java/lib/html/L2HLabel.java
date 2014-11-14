@@ -16,28 +16,40 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
-package com.dickimawbooks.texparserlib;
+package com.dickimawbooks.texparserlib.html;
 
 import java.io.IOException;
+import java.io.EOFException;
 
-public abstract class Ignoreable implements TeXObject
+import com.dickimawbooks.texparserlib.*;
+import com.dickimawbooks.texparserlib.latex.*;
+
+public class L2HLabel extends Label
 {
-   // Does nothing
-   public void process(TeXParser parser)
-      throws IOException
+   public L2HLabel()
    {
+      this("label");
    }
 
-   public void process(TeXParser parser, TeXObjectList stack) 
-      throws IOException
+   public L2HLabel(String name)
    {
+      super(name);
    }
 
-   public TeXObjectList string(TeXParser parser) throws IOException
+   public Object clone()
    {
-      return new TeXObjectList();
-   } 
+      return new L2HLabel(getName());
+   }
 
-   public abstract Object clone();
+   protected void doLabel(TeXParser parser, TeXObject arg)
+       throws IOException
+   {
+      L2HConverter listener = (L2HConverter)parser.getListener();
+
+      String label = arg.toString(parser);
+
+      // TODO strip awkward characters from label
+
+      listener.write("<a name=\""+label+"\"/>");
+   }
 }
-

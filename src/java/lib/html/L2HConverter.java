@@ -21,22 +21,34 @@ package com.dickimawbooks.texparserlib.html;
 import java.io.*;
 import java.nio.file.Path;
 import java.nio.file.Files;
+import java.util.Vector;
 
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.generic.*;
 import com.dickimawbooks.texparserlib.latex.*;
+import com.dickimawbooks.texparserlib.aux.*;
 
 public class L2HConverter extends LaTeXParserListener
    implements Writeable
 {
    public L2HConverter(TeXApp app)
    {
-      this(app, null);
+      this(app, true, null, null, false);
    }
 
-   public L2HConverter(TeXApp app, boolean useMathJax)
+   public L2HConverter(TeXApp app, Vector<AuxData> auxData)
    {
-      this(app, useMathJax, null);
+      this(app, null, auxData);
+   }
+
+   public L2HConverter(TeXApp app, boolean useMathJax, boolean parseAux)
+   {
+      this(app, useMathJax, null, parseAux);
+   }
+
+   public L2HConverter(TeXApp app, boolean useMathJax, Vector<AuxData> auxData)
+   {
+      this(app, useMathJax, null, auxData);
    }
 
    public L2HConverter(TeXApp app, File outDir)
@@ -44,9 +56,32 @@ public class L2HConverter extends LaTeXParserListener
       this(app, true, outDir);
    }
 
+   public L2HConverter(TeXApp app, File outDir, Vector<AuxData> auxData)
+   {
+      this(app, true, outDir, auxData);
+   }
+
    public L2HConverter(TeXApp app, boolean useMathJax, File outDir)
    {
-      super(null);
+      this(app, useMathJax, outDir, null);
+   }
+
+   public L2HConverter(TeXApp app, boolean useMathJax, File outDir,
+     Vector<AuxData> auxData)
+   {
+      this(app, useMathJax, outDir, auxData, false);
+   }
+
+   public L2HConverter(TeXApp app, boolean useMathJax, File outDir,
+     boolean parseAux)
+   {
+      this(app, useMathJax, outDir, null, parseAux);
+   }
+
+   public L2HConverter(TeXApp app, boolean useMathJax, File outDir,
+     Vector<AuxData> auxData, boolean parseAux)
+   {
+      super(null, auxData, parseAux);
       this.texApp = app;
       this.outPath = (outDir == null ? null : outDir.toPath());
 
@@ -60,6 +95,13 @@ public class L2HConverter extends LaTeXParserListener
       putControlSequence(new L2HCr("\\"));
       putControlSequence(new L2HAmp());
       putControlSequence(new L2HNoBreakSpace());
+      parser.putControlSequence(new L2HLabel());
+      parser.putControlSequence(new L2HRef());
+      parser.putControlSequence(new L2HPageRef());
+      parser.putControlSequence(new L2HNameRef());
+
+      parser.putControlSequence(new L2HFloat("figure"));
+      parser.putControlSequence(new L2HFloat("table"));
 
       parser.putControlSequence(new L2LMathDeclaration("math"));
 
@@ -82,7 +124,7 @@ public class L2HConverter extends LaTeXParserListener
 
          if (sty != null)
          {
-            sty.load(this, parser, null);
+            sty.load(this, null);
          }
       }
       catch (IOException e)

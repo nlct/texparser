@@ -70,11 +70,17 @@ public class AuxParser extends DefaultTeXParserListener
    public TeXParser parseAuxFile(File auxFile, Charset charset)
      throws IOException
    {
-      this.charset=charset;
+      if (charset != null)
+      {
+         this.charset=charset;
+      }
+
       TeXParser parser = new TeXParser(this);
 
+      int code = parser.getCatCode('@');
       parser.setCatCode('@', TeXParser.TYPE_LETTER);
       parser.parse(auxFile);
+      parser.setCatCode('@', code);
 
       return parser;
    }

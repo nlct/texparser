@@ -29,6 +29,7 @@ import java.nio.file.Path;
 
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.generic.*;
+import com.dickimawbooks.texparserlib.aux.*;
 import com.dickimawbooks.texparserlib.latex.graphics.*;
 import com.dickimawbooks.texparserlib.latex.amsmath.*;
 import com.dickimawbooks.texparserlib.latex.tcilatex.*;
@@ -42,7 +43,67 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
 {
    public LaTeXParserListener(Writeable writeable)
    {
+      this(writeable, null, false);
+   }
+
+   public LaTeXParserListener(Writeable writeable, boolean parseAux)
+   {
+      this(writeable, null, true);
+   }
+
+   public LaTeXParserListener(Writeable writeable, Vector<AuxData> auxData)
+   {
+      this(writeable, auxData, false);
+   }
+
+   public LaTeXParserListener(Writeable writeable, Vector<AuxData> auxData, boolean parseAux)
+   {
       super(writeable);
+      setAuxData(auxData);
+      setParseAuxEnabled(parseAux);
+   }
+
+   public boolean isParseAuxEnabled()
+   {
+      return parseAux;
+   }
+
+   public void setParseAuxEnabled(boolean parseAux)
+   {
+      this.parseAux = parseAux;
+   }
+
+   public TeXObject getReference(TeXObject label)
+      throws IOException
+   {
+      if (auxData == null)
+      {
+         return new TeXObjectList("??");
+      }
+
+      return AuxData.getReference(auxData, getParser(), label);
+   }
+
+   public TeXObject getPageReference(TeXObject label)
+      throws IOException
+   {
+      if (auxData == null)
+      {
+         return new TeXObjectList("??");
+      }
+
+      return AuxData.getPageReference(auxData, getParser(), label);
+   }
+
+   public TeXObject getNameReference(TeXObject label)
+      throws IOException
+   {
+      if (auxData == null)
+      {
+         return new TeXObjectList("??");
+      }
+
+      return AuxData.getNameReference(auxData, getParser(), label);
    }
 
    public void addVerbEnv(String name)
@@ -75,6 +136,10 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       parser.putControlSequence(new NewCommand("providecommand",
         NewCommand.OVERWRITE_SKIP));
 
+      parser.putControlSequence(new Label());
+      parser.putControlSequence(new Ref());
+      parser.putControlSequence(new PageRef());
+      parser.putControlSequence(new NameRef());
       parser.putControlSequence(new Input());
       parser.putControlSequence(new InputIfFileExists());
       parser.putControlSequence(new IfFileExists());
@@ -92,6 +157,11 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       parser.putControlSequence(new Verbatim("verbatim*"));
       parser.putControlSequence(new Tabular());
       parser.putControlSequence(new Tabular("array"));
+
+      parser.putControlSequence(new StoreDataCs("title"));
+      parser.putControlSequence(new StoreDataCs("author"));
+      parser.putControlSequence(new StoreDataCs("date"));
+      parser.putControlSequence(new GenericCommand("@date", null, new TeXCsRef("today")));
 
       parser.putControlSequence(new MathDeclaration("math"));
 
@@ -362,6 +432,18 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       }
 
       setIsInDocEnv(true);
+
+      if (parseAux)
+      {
+         File auxFile = getAuxFile();
+
+         if (auxFile != null && auxFile.exists())
+         {
+            AuxParser auxListener = new AuxParser(getTeXApp(), getCharSet());
+            auxListener.parseAuxFile(auxFile);
+            auxData = auxListener.getAuxData();
+         }
+      }
    }
 
    public void endDocument()
@@ -380,6 +462,11 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
    public LaTeXFile getDocumentClass()
    {
       return docCls;
+   }
+
+   public KeyValList getDocumentClassOptions()
+   {
+      return docCls == null ? null : docCls.getOptions();
    }
 
    public void documentclass(KeyValList options,
@@ -401,7 +488,7 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
 
       if (cls != null)
       {
-         cls.load(this, parser, options);
+         cls.load(this, options);
       }
    }
 
@@ -435,7 +522,7 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
 
          if (sty != null)
          {
-            sty.load(this, parser, options);
+            sty.load(this, options);
          }
       }
    }
@@ -716,9 +803,44 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       }
    }
 
+   public void setAuxData(Vector<AuxData> auxData)
+   {
+      this.auxData = auxData;
+   }
+
+   public Vector<AuxData> getAuxData()
+   {
+      return auxData;
+   }
+
+   public File getAuxFile()
+   {
+      return getAuxFile("aux");
+   }
+
+   public File getBblFile()
+   {
+      return getAuxFile("bbl");
+   }
+
+   public File getAuxFile(String ext)
+   {
+      if (getParser() == null) return null;
+
+      File dir = getParser().getCurrentParentFile();
+
+      if (dir == null) return null;
+
+      String jobname = parser.getJobname();
+
+      return new File(dir, jobname+"."+ext);
+   }
+
    private Vector<String> verbEnv;
 
    private Vector<LaTeXFile> loadedPackages;
+
+   private Vector<AuxData> auxData;
 
    private LaTeXFile docCls;
 
@@ -727,6 +849,8 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
    private boolean docEnvFound = false;
 
    private String inputEncoding = null;
+
+   private boolean parseAux = false;
 
    public static final String[] IMAGE_EXT = new String[]
    {

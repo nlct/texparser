@@ -161,7 +161,7 @@ public class TeXParserApp implements TeXApp
             "error.exists", outDir.getAbsolutePath()));
       }
 
-      L2HConverter listener = new L2HConverter(this, outDir);
+      L2HConverter listener = new L2HConverter(this, true, outDir, true);
 
       TeXParser parser = new TeXParser(listener);
 

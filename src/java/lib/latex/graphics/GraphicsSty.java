@@ -19,6 +19,7 @@
 package com.dickimawbooks.texparserlib.latex.graphics;
 
 import java.util.Hashtable;
+import java.io.IOException;
 
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.*;
@@ -32,9 +33,19 @@ public class GraphicsSty extends LaTeXSty
 
    public void addDefinitions(LaTeXParserListener listener)
    {
-      listener.putControlSequence(new IncludeGraphics());
+      listener.putControlSequence(new IncludeGraphics(this));
       listener.putControlSequence(new GraphicsPath());
       listener.putControlSequence(new Epsfig("epsfig"));
       listener.putControlSequence(new Epsfig("psfig"));
+   }
+
+   public void processOption(LaTeXParserListener listener, String option)
+    throws IOException
+   {
+   }
+
+   protected void preOptions(LaTeXParserListener listener)
+     throws IOException
+   {
    }
 }

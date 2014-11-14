@@ -39,11 +39,34 @@ public class JmlrCls extends LaTeXCls
 
    public void addDefinitions(LaTeXParserListener listener)
    {
+      TeXParser parser = listener.getParser();
+
+      parser.putControlSequence(new StoreDataCs("jmlrworkshop"));
+      parser.putControlSequence(new StoreDataCs("jmlryear"));
+      parser.putControlSequence(new StoreDataCs("jmlrvolume"));
+      parser.putControlSequence(new StoreDataCs("jmlrissue"));
+      parser.putControlSequence(new StoreDataCs("jmlrpages"));
+      parser.putControlSequence(new StoreDataCs("jmlrsubmitted"));
+      parser.putControlSequence(new StoreDataCs("jmlrpublished"));
+      parser.putControlSequence(
+         new StoreDataCs("jmlrauthors", "@jmlr@authors"));
+      parser.putControlSequence(new StoreDataCs("editor"));
+      parser.putControlSequence(new StoreDataCs("editors"));
+
+      parser.putControlSequence(
+         new StoreDataCs("title", "@shorttitle", "@title"));
+      parser.putControlSequence(
+         new StoreDataCs("author", "@shortauthor", "@author"));
+
+      parser.putControlSequence(new GenericCommand("editorname",
+       null, new TeXObjectList("Editor")));
+
+      parser.putControlSequence(new GenericCommand("editorsname",
+       null, new TeXObjectList("Editors")));
    }
 
-   public void load(LaTeXParserListener listener, 
-      TeXParser parser, KeyValList options)
-   throws IOException
+   protected void loadPreHyperrefPackages(LaTeXParserListener listener)
+     throws IOException
    {
       listener.usepackage(null, "xkeyval");
       listener.usepackage(null, "calc");
@@ -64,6 +87,14 @@ public class JmlrCls extends LaTeXCls
       opts.put("ruled", new GenericCommand("empty"));
       listener.usepackage(opts, "algorithm2e");
 
+   }
+
+   protected void preOptions(LaTeXParserListener listener)
+     throws IOException
+   {
+      TeXParser parser = listener.getParser();
+      loadPreHyperrefPackages(listener);
+
       ControlSequence cs = parser.getControlSequence("jmlrprehyperref");
 
       if (cs == null)
@@ -77,6 +108,40 @@ public class JmlrCls extends LaTeXCls
 
       listener.usepackage(null, "hyperref");
       listener.usepackage(null, "nameref");
-      addDefinitions(listener);
+
+      listener.putControlSequence(new GenericCommand("@jmlrproceedings",
+       null, new TeXObjectList("Journal of Machine Learning Research")));
+      listener.putControlSequence(new GenericCommand("@jmlrabbrvproceedings",
+       null, new TeXObjectList("JMLR")));
+      listener.putControlSequence(new JmlrProceedings());
+
+      TeXObjectList def = new TeXObjectList();
+      def.add(new TeXCsRef("jmlrproceedings"));
+      def.add(listener.createGroup("JMLR"));
+      def.add(listener.createGroup("Journal of Machine Learning Research"));
+      listener.putControlSequence(new GenericCommand("jmlrnowcp", null, def));
+
+      def = new TeXObjectList();
+      def.add(new TeXCsRef("jmlrproceedings"));
+      Group grp = listener.createGroup("JMLR ");
+      grp.add(new TeXCsRef("&"));
+      grp.add(listener.getLetter('C'));
+      grp.add(listener.getLetter('P'));
+      def.add(grp);
+      def.add(listener.createGroup("JMLR: Workshop and Conference Proceedings"));
+      listener.putControlSequence(new GenericCommand("jmlrwcp", null, def));
+   }
+
+   public void processOption(LaTeXParserListener listener, String option)
+     throws IOException
+   {
+      if (option.equals("nowcp"))
+      {
+         listener.getControlSequence("jmlrnowcp").process(listener.getParser());
+      }
+      else if (option.equals("wcp"))
+      {
+         listener.getControlSequence("jmlrwcp").process(listener.getParser());
+      }
    }
 }

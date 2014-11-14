@@ -16,35 +16,47 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
-package com.dickimawbooks.texparserlib.latex.amsmath;
+package com.dickimawbooks.texparserlib.latex.jmlr;
 
-import java.util.Hashtable;
 import java.io.IOException;
 
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.*;
 
-public class AmsmathSty extends LaTeXSty
+public class JmlrProceedings extends ControlSequence
 {
-   public AmsmathSty(String name)
+   public JmlrProceedings()
+   {
+      this("jmlrproceedings");
+   }
+
+   public JmlrProceedings(String name)
    {
       super(name);
    }
 
-   public void addDefinitions(LaTeXParserListener listener)
+   public Object clone()
    {
-      TeXParser parser = listener.getParser();
-      parser.putControlSequence(new Align());
-      parser.putControlSequence(new Align("align*", false));
+      return new JmlrProceedings(getName());
    }
 
-   public void processOption(LaTeXParserListener listener, String option)
-    throws IOException
+   protected void setData(TeXParser parser, TeXObject arg1, TeXObject arg2)
    {
+      parser.putControlSequence(
+        new GenericCommand("@jmlrabbrvproceedings", null, arg1));
+      parser.putControlSequence(
+        new GenericCommand("@jmlrproceedings", null, arg2));
    }
 
-   protected void preOptions(LaTeXParserListener listener)
-     throws IOException
+   public void process(TeXParser parser, TeXObjectList stack)
+      throws IOException
    {
+      setData(parser, stack.popArg(), stack.popArg());
+   }
+
+   public void process(TeXParser parser)
+      throws IOException
+   {
+      setData(parser, parser.popNextArg(), parser.popNextArg());
    }
 }

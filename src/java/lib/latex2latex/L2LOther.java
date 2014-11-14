@@ -41,26 +41,36 @@ public class L2LOther extends Other
       {
          TeXObject nextObj = parser.pop();
 
-         if (nextObj instanceof Other
+         if (nextObj != null
+          && nextObj instanceof Other
           && ((Other)nextObj).getCharCode() == (int)'.')
          {
             TeXObject nextObj2 = parser.pop();
 
-            if (nextObj2 instanceof Other
+            if (nextObj2 != null
+              && nextObj2 instanceof Other
               && ((Other)nextObj2).getCharCode() == (int)'.')
             {
                parser.getListener().getControlSequence("ldots").process(parser);
             }
             else
             {
-               parser.push(nextObj2);
+               if (nextObj2 != null)
+               {
+                  parser.push(nextObj2);
+               }
+
                parser.push(nextObj);
                super.process(parser);
             }
          }
          else
          {
-            parser.push(nextObj);
+            if (nextObj != null)
+            {
+               parser.push(nextObj);
+            }
+
             super.process(parser);
          }
       }
@@ -77,26 +87,36 @@ public class L2LOther extends Other
       {
          TeXObject nextObj = stack.pop();
 
-         if (nextObj instanceof Other
+         if (nextObj != null
+          && nextObj instanceof Other
           && ((Other)nextObj).getCharCode() == (int)'.')
          {
             TeXObject nextObj2 = stack.pop();
 
-            if (nextObj2 instanceof Other
+            if (nextObj2 != null
+              && nextObj2 instanceof Other
               && ((Other)nextObj2).getCharCode() == (int)'.')
             {
                parser.getListener().getControlSequence("ldots").process(parser, stack);
             }
             else
             {
-               stack.push(nextObj2);
+               if (nextObj2 != null)
+               {
+                  stack.push(nextObj2);
+               }
+
                stack.push(nextObj);
                super.process(parser, stack);
             }
          }
          else
          {
-            stack.push(nextObj);
+            if (nextObj != null)
+            {
+               stack.push(nextObj);
+            }
+
             super.process(parser, stack);
          }
       }

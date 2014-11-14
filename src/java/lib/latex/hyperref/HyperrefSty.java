@@ -18,6 +18,8 @@
 */
 package com.dickimawbooks.texparserlib.latex.hyperref;
 
+import java.io.IOException;
+
 import com.dickimawbooks.texparserlib.latex.*;
 
 public class HyperrefSty extends LaTeXSty
@@ -34,4 +36,13 @@ public class HyperrefSty extends LaTeXSty
       listener.putControlSequence(new Url(this));
    }
 
+   public void processOption(LaTeXParserListener listener, String option)
+    throws IOException
+   {
+   }
+
+   protected void preOptions(LaTeXParserListener listener)
+     throws IOException
+   {
+   }
 }

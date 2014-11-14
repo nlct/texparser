@@ -16,28 +16,46 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
-package com.dickimawbooks.texparserlib;
+package com.dickimawbooks.texparserlib.html;
 
 import java.io.IOException;
+import java.util.Vector;
 
-public abstract class Ignoreable implements TeXObject
+import com.dickimawbooks.texparserlib.*;
+import com.dickimawbooks.texparserlib.latex.*;
+
+public class L2HFloat extends LaTeXFloat
 {
-   // Does nothing
-   public void process(TeXParser parser)
-      throws IOException
+   public L2HFloat(String name)
    {
+      super(name);
    }
 
-   public void process(TeXParser parser, TeXObjectList stack) 
-      throws IOException
+   public Object clone()
    {
+      return new L2HFloat(getName());
    }
 
-   public TeXObjectList string(TeXParser parser) throws IOException
+   public void startFloat(String placement, TeXParser parser, 
+     TeXObjectList stack)
+   throws IOException
    {
-      return new TeXObjectList();
-   } 
+      startFloat(placement, parser);
+   }
 
-   public abstract Object clone();
+   public void startFloat(String placement, TeXParser parser)
+   throws IOException
+   {
+      L2HConverter listener = (L2HConverter)parser.getListener();
+
+      listener.write("<div id=\""+getName()+"\">");
+   }
+
+   public void end(TeXParser parser)
+   throws IOException
+   {
+      L2HConverter listener = (L2HConverter)parser.getListener();
+
+      listener.write("</div>");
+   }
 }
-

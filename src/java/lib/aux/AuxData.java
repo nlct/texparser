@@ -98,6 +98,179 @@ public class AuxData
       return builder.toString();
    }
 
+   public static TeXObject getReference(Vector<AuxData> auxData,
+    TeXParser parser, TeXObject object)
+    throws IOException
+   {
+      TeXObjectList expanded = null;
+
+      if (object instanceof Group)
+      {
+         object = ((Group)object).toList();
+      }
+
+      if (object instanceof Expandable)
+      {
+         expanded = ((Expandable)object).expandfully(parser);
+      }
+
+      String label = (expanded == null ?
+                      object.toString(parser) : 
+                      expanded.toString(parser));
+
+      return getReference(auxData, parser, label);
+   }
+
+   public static TeXObject getReference(Vector<AuxData> auxData,
+     TeXParser parser, String label)
+   throws IOException
+   {
+      for (AuxData data : auxData)
+      {
+         if (data.getName().equals("newlabel"))
+         {
+            TeXObject arg = data.getArg(0);
+
+            if (label.equals(arg.toString(parser)))
+            {
+               TeXObject params = data.getArg(1);
+
+               if (params instanceof TeXObjectList)
+               {
+                  TeXObject ref = ((TeXObjectList)params).firstElement();
+
+                  if (ref instanceof Group)
+                  {
+                     return ((Group)ref).toList();
+                  }
+
+                  return ref;
+               }
+
+               return params;
+            }
+         }
+      }
+
+      return new TeXObjectList("??");
+   }
+
+   public static TeXObject getPageReference(Vector<AuxData> auxData,
+    TeXParser parser, TeXObject object)
+    throws IOException
+   {
+      TeXObjectList expanded = null;
+
+      if (object instanceof Group)
+      {
+         object = ((Group)object).toList();
+      }
+
+      if (object instanceof Expandable)
+      {
+         expanded = ((Expandable)object).expandfully(parser);
+      }
+
+      String label = (expanded == null ?
+                      object.toString(parser) : 
+                      expanded.toString(parser));
+
+      return getPageReference(auxData, parser, label);
+   }
+
+   public static TeXObject getPageReference(Vector<AuxData> auxData,
+     TeXParser parser, String label)
+    throws IOException
+   {
+      for (AuxData data : auxData)
+      {
+         if (data.getName().equals("newlabel"))
+         {
+            TeXObject arg = data.getArg(0);
+
+            if (label.equals(arg.toString(parser)))
+            {
+               TeXObject params = data.getArg(1);
+
+               if (params instanceof TeXObjectList
+               && (((TeXObjectList)params).size() > 1))
+               {
+                  TeXObject ref = ((TeXObjectList)params).get(1);
+
+                  if (ref instanceof Group)
+                  {
+                     return ((Group)ref).toList();
+                  }
+
+                  return ref;
+               }
+
+               return params;
+            }
+         }
+      }
+
+      return new TeXObjectList("??");
+   }
+
+   public static TeXObject getNameReference(Vector<AuxData> auxData,
+    TeXParser parser, TeXObject object)
+    throws IOException
+   {
+      TeXObjectList expanded = null;
+
+      if (object instanceof Group)
+      {
+         object = ((Group)object).toList();
+      }
+
+      if (object instanceof Expandable)
+      {
+         expanded = ((Expandable)object).expandfully(parser);
+      }
+
+      String label = (expanded == null ?
+                      object.toString(parser) : 
+                      expanded.toString(parser));
+
+      return getNameReference(auxData, parser, label);
+   }
+
+   public static TeXObject getNameReference(Vector<AuxData> auxData,
+     TeXParser parser, String label)
+    throws IOException
+   {
+      for (AuxData data : auxData)
+      {
+         if (data.getName().equals("newlabel"))
+         {
+            TeXObject arg = data.getArg(0);
+
+            if (label.equals(arg.toString(parser)))
+            {
+               TeXObject params = data.getArg(1);
+
+               if (params instanceof TeXObjectList
+               && (((TeXObjectList)params).size() > 2))
+               {
+                  TeXObject ref = ((TeXObjectList)params).get(2);
+
+                  if (ref instanceof Group)
+                  {
+                     return ((Group)ref).toList();
+                  }
+
+                  return ref;
+               }
+
+               return params;
+            }
+         }
+      }
+
+      return new TeXObjectList("??");
+   }
+
    private String name;
 
    private TeXObject[] args;

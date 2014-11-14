@@ -86,5 +86,18 @@ public class SkippedSpaces extends Ignoreable
       return builder.toString();
    }
 
+   public boolean containsEol()
+   {
+      for (Space sp : contents)
+      {
+         if (sp.isEol())
+         {
+            return true;
+         }
+      }
+
+      return false;
+   }
+
    private Vector<Space> contents;
 }

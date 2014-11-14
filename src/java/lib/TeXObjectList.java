@@ -285,6 +285,16 @@ public class TeXObjectList extends Vector<TeXObject> implements TeXObject,Expand
       add(0, object);
    }
 
+   public void add(int index, TeXObject object)
+   {
+      if (object == null)
+      {
+         throw new NullPointerException();
+      }
+
+      super.add(index, object);
+   }
+
    public TeXObject peek()
    {
       return firstElement();

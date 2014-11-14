@@ -38,25 +38,18 @@ public class InputEncSty extends LaTeXSty
       listener.putControlSequence(new InputEncoding());
    }
 
-   public void load(LaTeXParserListener listener,
-      TeXParser parser, KeyValList options)
-   throws IOException
+   public void processOption(LaTeXParserListener listener, String option)
+    throws IOException
    {
-      if (options != null)
+      if (isKnownEncoding(option))
       {
-         for (Iterator<String> en=options.keySet().iterator();
-              en.hasNext();)
-         {
-            String key = en.next();
-
-            if (!key.equals(""))
-            {
-               listener.setInputEncoding(key);
-            }
-         }
+         listener.setInputEncoding(option);
       }
+   }
 
-      addDefinitions(listener);
+   protected void preOptions(LaTeXParserListener listener)
+     throws IOException
+   {
    }
 
    public static Charset getCharSet(String encoding)
@@ -77,4 +70,23 @@ public class InputEncSty extends LaTeXSty
 
       return Charset.forName(encoding);
    }
+
+   public boolean isKnownEncoding(String value)
+   {
+      for (int i = 0; i < KNOWN_ENCODINGS.length; i++)
+      {
+         if (KNOWN_ENCODINGS[i].equals(value))
+         {
+            return true;
+         }
+      }
+
+      return false;
+   }
+
+   public static final String[] KNOWN_ENCODINGS = new String[]
+   {"ascii", "latin1", "latin2", "latin3", "latin4", "latin5",
+    "latin9", "latin10", "decmulti", "cp850", "cp852", "cp858",
+    "cp437", "cp437de", "cp865", "applemac", "macce", "next",
+    "cp1250", "cp1252", "cp1257", "ansinew", "utf8"};
 }

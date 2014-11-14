@@ -39,7 +39,7 @@ public class Def extends Primitive
    public Def(String name, boolean isShort, boolean isLocal)
    {
       super(name);
-      this.isShort = isShort;
+      setShort(isShort);
       this.isLocal = isLocal;
    }
 
@@ -91,5 +91,10 @@ public class Def extends Primitive
       process(parser, parser);
    }
 
-   private boolean isShort, isLocal;
+   public boolean isLocal()
+   {
+      return this.isLocal;
+   }
+
+   private boolean isLocal;
 }

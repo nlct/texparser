@@ -126,6 +126,11 @@ public class LaTeX2LaTeX extends LaTeXParserListener
       return new L2LControlSequence(name);
    }
 
+   public ControlSequence createUndefinedCs(String name)
+   {
+      return new L2LControlSequence(name);
+   }
+
    public Comment createComment()
    {
       return new L2LComment();
@@ -297,7 +302,7 @@ public class LaTeX2LaTeX extends LaTeXParserListener
 
       write(parser.getBgChar());
       write(styName);
-      writeln(parser.getEgChar());
+      write(parser.getEgChar());
    }
 
    public void substituting(String original, String replacement)

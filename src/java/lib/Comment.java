@@ -52,12 +52,12 @@ public class Comment extends Ignoreable
 
    public String toString(TeXParser parser)
    {
-      return ""+parser.getCommentChar()+builder.toString();
+      return String.format("%c%s%n", parser.getCommentChar(), builder.toString());
    }
 
    public String toString()
    {
-      return "%"+builder.toString();
+      return String.format("%c%s%n", '%', builder.toString());
    }
 
    public TeXObjectList string(TeXParser parser)

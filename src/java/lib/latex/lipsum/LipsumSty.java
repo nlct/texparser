@@ -18,6 +18,8 @@
 */
 package com.dickimawbooks.texparserlib.latex.lipsum;
 
+import java.io.IOException;
+
 import com.dickimawbooks.texparserlib.latex.*;
 
 public class LipsumSty extends LaTeXSty
@@ -31,6 +33,16 @@ public class LipsumSty extends LaTeXSty
    {
       listener.putControlSequence(new Lipsum(this));
       listener.putControlSequence(new SetLipsumDefault(this));
+   }
+
+   public void processOption(LaTeXParserListener listener, String option)
+    throws IOException
+   {
+   }
+
+   protected void preOptions(LaTeXParserListener listener)
+     throws IOException
+   {
    }
 
    public String getDefaultRange()

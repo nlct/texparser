@@ -25,19 +25,20 @@ import com.dickimawbooks.texparserlib.latex.*;
 
 public class IncludeGraphics extends ControlSequence
 {
-   public IncludeGraphics()
+   public IncludeGraphics(GraphicsSty sty)
    {
-      this("includegraphics");
+      this("includegraphics", sty);
    }
 
-   public IncludeGraphics(String name)
+   public IncludeGraphics(String name, GraphicsSty sty)
    {
       super(name);
+      this.sty = sty;
    }
 
    public Object clone()
    {
-      return new IncludeGraphics(getName());
+      return new IncludeGraphics(getName(), getSty());
    }
 
    protected void processGraphics(TeXParser parser, TeXObjectList list)
@@ -86,7 +87,7 @@ public class IncludeGraphics extends ControlSequence
       TeXObjectList urx = null;
       TeXObjectList ury = null;
 
-      KeyValList keyValList = null;
+      KeyValList keyValList = new KeyValList();
 
       if (option1List != null)
       {
@@ -231,13 +232,13 @@ public class IncludeGraphics extends ControlSequence
    {
       LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
 
-      if (listener.isStyLoaded("graphicx"))
+      if (this != null && this.getName().equals("graphics"))
       {
-         processGraphicx(parser, list);
+         processGraphics(parser, list);
       }
       else
       {
-         processGraphics(parser, list);
+         processGraphicx(parser, list);
       }
    }
 
@@ -246,4 +247,11 @@ public class IncludeGraphics extends ControlSequence
    {
       process(parser, parser);
    }
+
+   public GraphicsSty getSty()
+   {
+      return sty;
+   }
+
+   private GraphicsSty sty;
 }
