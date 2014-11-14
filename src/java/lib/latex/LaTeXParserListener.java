@@ -163,6 +163,11 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       parser.putControlSequence(new StoreDataCs("date"));
       parser.putControlSequence(new GenericCommand("@date", null, new TeXCsRef("today")));
 
+      parser.putControlSequence(
+        new GenericCommand("figurename", null, new TeXObjectList("Figure")));
+      parser.putControlSequence(
+        new GenericCommand("tablename", null, new TeXObjectList("Table")));
+
       parser.putControlSequence(new MathDeclaration("math"));
 
       MathDeclaration begMathDecl = new MathDeclaration("(");

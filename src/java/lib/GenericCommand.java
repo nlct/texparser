@@ -208,7 +208,7 @@ public class GenericCommand extends Command
       {
          if (obj instanceof Param)
          {
-            stack.add(args[((Param)obj).getDigit()]);
+            stack.add(args[((Param)obj).getDigit()-1]);
          }
          else if (obj instanceof DoubleParam)
          {

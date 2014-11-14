@@ -99,6 +99,8 @@ public class L2HConverter extends LaTeXParserListener
       parser.putControlSequence(new L2HRef());
       parser.putControlSequence(new L2HPageRef());
       parser.putControlSequence(new L2HNameRef());
+      parser.putControlSequence(new L2HCaption());
+      parser.putControlSequence(new L2HAtMakeCaption());
 
       parser.putControlSequence(new L2HFloat("figure"));
       parser.putControlSequence(new L2HFloat("table"));
@@ -596,6 +598,11 @@ public class L2HConverter extends LaTeXParserListener
    public String getSuffix()
    {
       return suffix;
+   }
+
+   public ControlSequence createUndefinedCs(String name)
+   {
+      return new L2HUndefined(name);
    }
 
    private Writer writer;

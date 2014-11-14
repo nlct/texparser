@@ -19,62 +19,38 @@
 package com.dickimawbooks.texparserlib.html;
 
 import java.io.IOException;
-import java.util.Vector;
+import java.io.Writer;
 
 import com.dickimawbooks.texparserlib.*;
+import com.dickimawbooks.texparserlib.primitives.*;
 
-public class L2HNoBreakSpace extends Command
+public class L2HUndefined extends Undefined
 {
-   public L2HNoBreakSpace()
+   public L2HUndefined()
    {
-      this("nobreakspace");
+      this("undefined");
    }
 
-   public L2HNoBreakSpace(String name)
+   public L2HUndefined(String name)
    {
       super(name);
    }
 
    public Object clone()
    {
-      return new L2HNoBreakSpace(getName());
+      return new L2HUndefined(getName());
    }
 
-   public TeXObjectList expandonce(TeXParser parser) throws IOException
-   {
-      TeXObjectList list = new TeXObjectList(1);
-      list.add(new HtmlTag("&nbsp;"));
-      return list;
-   }
-
-   public TeXObjectList expandonce(TeXParser parser, TeXObjectList List)
+   public void process(TeXParser parser, TeXObjectList stack)
       throws IOException
-   {
-      return expandonce(parser);
-   }
-
-   public TeXObjectList expandfully(TeXParser parser)
-      throws IOException
-   {
-      return expandonce(parser);
-   }
-
-   public TeXObjectList expandfully(TeXParser parser, TeXObjectList List)
-      throws IOException
-   {
-      return expandfully(parser);
-   }
-
-   public void process(TeXParser parser) throws IOException
-   {
-      if (((L2HConverter)parser.getListener()).isInDocEnv())
-      {
-         parser.getListener().getWriteable().write("&nbsp;");
-      }
-   }
-
-   public void process(TeXParser parser, TeXObjectList list) throws IOException
    {
       process(parser);
+   }
+
+   public void process(TeXParser parser)
+      throws IOException
+   {
+      parser.getListener().getTeXApp().error(new TeXSyntaxException(
+         parser, TeXSyntaxException.ERROR_UNDEFINED, getName()));
    }
 }

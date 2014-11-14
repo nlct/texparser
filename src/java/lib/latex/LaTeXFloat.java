@@ -80,6 +80,9 @@ public abstract class LaTeXFloat extends Declaration
          placement = arg.toString(parser);
       }
 
+      parser.putControlSequence(true, 
+         new GenericCommand("@captype", null, new TeXObjectList(getName())));
+
       startFloat(placement, parser, stack);
    }
 
@@ -103,6 +106,9 @@ public abstract class LaTeXFloat extends Declaration
 
          placement = arg.toString(parser);
       }
+
+      parser.putControlSequence(true, 
+         new GenericCommand("@captype", null, new TeXObjectList(getName())));
 
       startFloat(placement, parser);
    }
