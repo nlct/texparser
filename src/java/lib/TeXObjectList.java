@@ -207,77 +207,224 @@ public class TeXObjectList extends Vector<TeXObject> implements TeXObject,Expand
                TeXSyntaxException.ERROR_MISSING_UNIT);
    }
 
-   public TeXDimension popDimension(TeXParser parser)
-    throws IOException
+   public Numerical popNumerical(TeXParser parser)
+   throws IOException
    {
-      TeXObject object = popStack();
+      TeXObject object = peek();
 
-      if (object == null)
+      if (object instanceof TeXCsRef)
       {
-         push(new UserDimension());
-         throw new TeXSyntaxException(
-               parser.getListenerFile(),
-               parser.getLineNumber(),
-               TeXSyntaxException.ERROR_MISSING_PARAM);
+         object = parser.getListener().getControlSequence(((TeXCsRef)object).getName());
+      }
 
+      if (object instanceof Register)
+      {
+         pop();
+         return (Register)object;
       }
 
       if (object instanceof TeXDimension)
       {
+         pop();
          return (TeXDimension)object;
       }
 
-      if (object instanceof TeXNumber)
+      Float value = popFloat(parser);
+
+      try
       {
-         TeXNumber number = (TeXNumber)object;
-
          TeXUnit unit = popUnit(parser);
-
-         return new UserDimension(number, unit);
+         return new UserDimension(value, unit);
       }
+      catch (TeXSyntaxException e)
+      {
+         String str = value.toString();
+
+         int idx = str.indexOf(".");
+
+         if (idx > -1)
+         {
+            push(new TeXObjectList(str.substring(idx)));
+            return new UserNumber((int)Math.floor(value.floatValue()));
+         }
+
+         return new UserNumber(value.intValue());
+      }
+   }
+
+   public TeXDimension popDimension(TeXParser parser)
+    throws IOException
+   {
+      TeXObject object = peek();
+
+      if (object instanceof TeXDimension)
+      {
+         pop();
+         return (TeXDimension)object;
+      }
+
+      Float value = popFloat(parser);
+
+      TeXUnit unit = popUnit(parser);
+
+      return new UserDimension(value, unit);
+   }
+
+   public Float popFloat(TeXParser parser)
+    throws IOException
+   {
+      TeXObject object = popStack();
+
+      StringBuilder builder = new StringBuilder();
+      
+      popFloat(parser, object, builder);
+
+      try
+      {
+         return Float.valueOf(builder.toString());
+      }
+      catch (NumberFormatException e)
+      {
+         throw new TeXSyntaxException(
+                  parser.getListenerFile(),
+                  parser.getLineNumber(),
+                  TeXSyntaxException.ERROR_NUMBER_EXPECTED);
+      }
+   }
+
+   protected void popFloat(TeXParser parser, TeXObject object, StringBuilder builder)
+   throws IOException
+   {
+      if (object == null) return;
 
       if (object instanceof Expandable)
       {
-         TeXObjectList expanded = ((Expandable)object).expandfully(parser,
-          this);
+         TeXObjectList expanded = ((Expandable)object).expandfully(parser, this);
 
-         if (expanded == null || expanded.size() == 0)
+         if (expanded != null)
          {
-            push(object);
-            push(new UserDimension());
-            throw new TeXSyntaxException(
-               parser.getListenerFile(),
-               parser.getLineNumber(),
-               TeXSyntaxException.ERROR_DIMEN_EXPECTED);
+            for (int i = 0, n = expanded.size(); i < n; i++)
+            {
+               TeXObject obj = expanded.get(i);
 
-         }
+               String str = obj.toString(parser);
 
-         if (expanded.firstElement() instanceof TeXDimension)
-         {
-            TeXDimension dimen = (TeXDimension)expanded.pop();
-            addAll(0, expanded);
+               try
+               {
+                  Float.parseFloat(builder.toString()+str+"0");
+               }
+               catch (NumberFormatException e)
+               {
+                  addAll(0, expanded.subList(i, n-1));
 
-            return dimen;
-         }
+                  return;
+               }
 
-         if (expanded.firstElement() instanceof TeXNumber)
-         {
-            TeXNumber number = (TeXNumber)expanded.pop();
+               builder.append(str);
+            }
 
-            TeXUnit unit = expanded.popUnit(parser);
-
-            return new UserDimension(number, unit);
+            object = popStack();
+            popFloat(parser, object, builder);
+            return;
          }
       }
 
-      push(object);
+      String str = object.toString(parser);
 
-      push(new UserDimension());
-      throw new TeXSyntaxException(
-               parser.getListenerFile(),
-               parser.getLineNumber(),
-               TeXSyntaxException.ERROR_DIMEN_EXPECTED);
+      try
+      {
+         Float.parseFloat(builder.toString()+str+"0");
+      }
+      catch (NumberFormatException e)
+      {
+         push(object);
+         return;
+      }
 
+      builder.append(str);
+
+      popFloat(parser, popStack(), builder);
+   }
+
+   public TeXNumber popNumber(TeXParser parser)
+    throws IOException
+   {
+      TeXObject object = popStack();
+
+      if (object instanceof TeXNumber)
+      {
+         return (TeXNumber)object;
+      }
+
+      StringBuilder builder = new StringBuilder();
+      
+      popNumber(parser, object, builder);
+
+      try
+      {
+         return new UserNumber(Integer.parseInt(builder.toString()));
+      }
+      catch (NumberFormatException e)
+      {
+         throw new TeXSyntaxException(
+                  parser.getListenerFile(),
+                  parser.getLineNumber(),
+                  TeXSyntaxException.ERROR_NUMBER_EXPECTED);
+      }
+   }
+
+   protected void popNumber(TeXParser parser, TeXObject object, StringBuilder builder)
+   throws IOException
+   {
+      if (object == null) return;
+
+      if (object instanceof Expandable)
+      {
+         TeXObjectList expanded = ((Expandable)object).expandfully(parser, this);
+
+         if (expanded != null)
+         {
+            for (int i = 0, n = expanded.size(); i < n; i++)
+            {
+               TeXObject obj = expanded.get(i);
+
+               String str = obj.toString(parser);
+
+               try
+               {
+                  Integer.parseInt(builder.toString()+str);
+               }
+               catch (NumberFormatException e)
+               {
+                  addAll(0, expanded.subList(i, n-1));
+
+                  return;
+               }
+
+               builder.append(str);
+            }
+
+            object = popStack();
+            popNumber(parser, object, builder);
+            return;
+         }
+      }
+
+      String str = object.toString(parser);
+
+      try
+      {
+         Integer.parseInt(builder.toString()+str);
+      }
+      catch (NumberFormatException e)
+      {
+         push(object);
+         return;
+      }
+
+      builder.append(str);
+
+      popNumber(parser, popStack(), builder);
    }
 
    public void push(TeXObject object)

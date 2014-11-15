@@ -67,6 +67,8 @@ public class L2HCaption extends ControlSequence
 
          String type = capType.toString(parser);
 
+         listener.stepcounter(type);
+
          grp.add(listener.getControlSequence(type+"name"));
          grp.add(listener.getControlSequence("nobreakspace"));
          grp.add(listener.getControlSequence("the"+type));
@@ -106,6 +108,8 @@ public class L2HCaption extends ControlSequence
          }
 
          String type = capType.toString(parser);
+
+         listener.stepcounter(type);
 
          grp.add(listener.getControlSequence(type+"name"));
          grp.add(listener.getControlSequence("nobreakspace"));

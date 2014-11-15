@@ -61,6 +61,7 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       super(writeable);
       setAuxData(auxData);
       setParseAuxEnabled(parseAux);
+      counters = new Hashtable<String,Vector<String>>();
    }
 
    public boolean isParseAuxEnabled()
@@ -167,6 +168,17 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
         new GenericCommand("figurename", null, new TeXObjectList("Figure")));
       parser.putControlSequence(
         new GenericCommand("tablename", null, new TeXObjectList("Table")));
+
+      newcounter("part");
+      newcounter("section");
+      newcounter("subsection", "section");
+      newcounter("subsubsection", "subsection");
+      newcounter("paragraph", "subsubsection");
+      newcounter("subparagraph", "paragraph");
+      newcounter("figure");
+      newcounter("table");
+      newcounter("equation");
+      newcounter("footnote");
 
       parser.putControlSequence(new MathDeclaration("math"));
 
@@ -841,11 +853,79 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       return new File(dir, jobname+"."+ext);
    }
 
+   public void newcounter(String name)
+   {
+      newcounter(name, null);
+   }
+
+   public void newcounter(String name, String parent)
+   {
+      // counters are global
+      parser.getSettings().newcount(false, "c@"+name);
+
+      parser.putControlSequence(new GenericCommand(true, "the"+name, null,
+          new TeXObject[] {new TeXCsRef("number"), new TeXCsRef("c@"+name)}));
+
+      if (parent != null)
+      {
+         addtoreset(name, parent);
+      }
+   }
+
+   public void addtoreset(String name, String parent)
+   {
+      Vector<String> dependents = counters.get(parent);
+
+      if (dependents == null)
+      {
+         dependents = new Vector<String>();
+         counters.put(parent, dependents);
+      }
+
+      dependents.add(name);
+   }
+
+   public void addtocounter(String name, Numerical value)
+     throws TeXSyntaxException
+   {
+      parser.getSettings().globalAdvanceRegister("c@"+name, value);
+   }
+
+   public void setcounter(String name, Numerical value)
+     throws TeXSyntaxException
+   {
+      parser.getSettings().globalSetRegister("c@"+name, value);
+   }
+
+   public void resetcounter(String name)
+     throws TeXSyntaxException
+   {
+      setcounter(name, ZERO);
+   }
+
+   public void stepcounter(String name)
+     throws TeXSyntaxException
+   {
+      addtocounter(name, ONE);
+
+      Vector<String> dependents = counters.get(name);
+
+      if (dependents != null)
+      {
+         for (String dep : dependents)
+         {
+            resetcounter(dep);
+         }
+      }
+   }
+
    private Vector<String> verbEnv;
 
    private Vector<LaTeXFile> loadedPackages;
 
    private Vector<AuxData> auxData;
+
+   private Hashtable<String,Vector<String>> counters;
 
    private LaTeXFile docCls;
 
@@ -856,6 +936,9 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
    private String inputEncoding = null;
 
    private boolean parseAux = false;
+
+   public static final UserNumber ZERO = new UserNumber(0);
+   public static final UserNumber ONE = new UserNumber(1);
 
    public static final String[] IMAGE_EXT = new String[]
    {

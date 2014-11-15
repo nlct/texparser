@@ -64,7 +64,11 @@ public class Let extends Primitive
    public void process(TeXParser parser)
       throws IOException
    {
-      process(parser, parser);
+      TeXObject firstArg = parser.popStack();
+
+      TeXObject secondArg = parser.popStack();
+
+      doAssignment(parser, firstArg, secondArg);
    }
 
    private void doAssignment(TeXParser parser,

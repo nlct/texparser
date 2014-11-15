@@ -33,6 +33,11 @@ public class UserDimension implements TeXDimension
       unit = texUnit;
    }
 
+   public UserDimension(Float num, TeXUnit texUnit)
+   {
+      this(num.floatValue(), texUnit);
+   }
+
    public UserDimension(TeXNumber num, TeXUnit texUnit)
    {
       value = num.getValue();

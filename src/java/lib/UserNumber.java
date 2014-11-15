@@ -47,6 +47,11 @@ public class UserNumber implements TeXNumber
       return value;
    }
 
+   public String toString()
+   {
+      return ""+value;
+   }
+
    public String toString(TeXParser parser)
    {
       return ""+value;

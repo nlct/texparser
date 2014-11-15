@@ -50,6 +50,7 @@ public class TeXParser extends TeXObjectList
       verbatim.add("verb");
 
       initDefCatCodes();
+      initRegisters();
 
       listener.setParser(this);
    }
@@ -1486,6 +1487,24 @@ public class TeXParser extends TeXObjectList
       }
 
       return list;
+   }
+
+   public TeXNumber popNumber()
+     throws IOException
+   {
+      return popNumber(this);
+   }
+
+   public TeXDimension popDimension()
+     throws IOException
+   {
+      return popDimension(this);
+   }
+
+   public Numerical popNumerical()
+     throws IOException
+   {
+      return popNumerical(this);
    }
 
    public TeXObject peekStack()
