@@ -158,6 +158,7 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       parser.putControlSequence(new Verbatim("verbatim*"));
       parser.putControlSequence(new Tabular());
       parser.putControlSequence(new Tabular("array"));
+      parser.putControlSequence(new Bibliography());
 
       parser.putControlSequence(new StoreDataCs("title"));
       parser.putControlSequence(new StoreDataCs("author"));
@@ -647,6 +648,12 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       }
 
       return super.input(path);
+   }
+
+   public boolean bibliography(TeXPath[] bibPaths, TeXPath bblPath)
+    throws IOException
+   {
+      return (bblPath.exists() ? input(bblPath) : false);
    }
 
    public Charset getCharSet()
