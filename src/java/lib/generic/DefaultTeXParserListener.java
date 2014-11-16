@@ -54,6 +54,7 @@ public abstract class DefaultTeXParserListener extends TeXParserListener
       parser.putControlSequence(new Above());
       parser.putControlSequence(new AboveWithDelims());
       parser.putControlSequence(new ControlSpace());
+      parser.putControlSequence(new SpaceCs());
       parser.putControlSequence(new DiscretionaryHyphen());
       parser.putControlSequence(new ItalicCorrection());
       parser.putControlSequence(new OverWithDelims());
@@ -69,6 +70,7 @@ public abstract class DefaultTeXParserListener extends TeXParserListener
       parser.putControlSequence(new Special());
       parser.putControlSequence(new Jobname());
       parser.putControlSequence(new NumberCs());
+      parser.putControlSequence(new RomanNumeral());
       parser.putControlSequence(new TheCs());
       parser.putControlSequence(new ExpandAfter());
       parser.putControlSequence(new Csname());

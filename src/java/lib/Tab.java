@@ -64,5 +64,10 @@ public class Tab implements TeXObject
       settings.startColumn();
    }
 
+   public boolean isPar()
+   {
+      return false;
+   }
+
 }
 

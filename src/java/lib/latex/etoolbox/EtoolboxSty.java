@@ -26,22 +26,22 @@ import com.dickimawbooks.texparserlib.latex.*;
 
 public class EtoolboxSty extends LaTeXSty
 {
-   public EtoolboxSty()
+   public EtoolboxSty(LaTeXParserListener listener)
    {
-      super("etoolbox");
+      super("etoolbox", listener);
    }
 
-   public void addDefinitions(LaTeXParserListener listener)
+   public void addDefinitions()
    {
-      listener.putControlSequence(new PreTo());
+      registerControlSequence(new PreTo());
    }
 
-   public void processOption(LaTeXParserListener listener, String option)
+   public void processOption(String option)
     throws IOException
    {
    }
 
-   protected void preOptions(LaTeXParserListener listener)
+   protected void preOptions()
      throws IOException
    {
    }

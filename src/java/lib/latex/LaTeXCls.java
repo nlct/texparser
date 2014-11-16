@@ -25,8 +25,8 @@ import com.dickimawbooks.texparserlib.*;
 
 public abstract class LaTeXCls extends LaTeXSty
 {
-   public LaTeXCls(String name)
+   public LaTeXCls(String name, LaTeXParserListener listener)
    {
-      super(name);
+      super(name, listener);
    }
 }

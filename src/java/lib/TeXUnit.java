@@ -100,6 +100,10 @@ public class TeXUnit implements TeXObject
       process(parser);
    }
 
+   public boolean isPar()
+   {
+      return false;
+   }
 
    private int id;
 

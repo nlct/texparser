@@ -16,38 +16,53 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
-package com.dickimawbooks.texparserlib.html;
+package com.dickimawbooks.texparserlib.latex;
 
 import java.io.IOException;
-import java.io.EOFException;
 
 import com.dickimawbooks.texparserlib.*;
-import com.dickimawbooks.texparserlib.latex.*;
 
-public class L2HLabel extends Label
+public class UnknownReference extends TeXObjectList
 {
-   public L2HLabel()
+   public UnknownReference(TeXObject labelObj)
    {
-      this("label");
+      this(labelObj, null);
    }
 
-   public L2HLabel(String name)
+   public UnknownReference(String label)
    {
-      super(name);
+      this(null, label);
+   }
+
+   public UnknownReference(TeXObject labelObj, String label)
+   {
+      super("??");
+      this.labelObject = labelObj;
+      this.label = label;
    }
 
    public Object clone()
    {
-      return new L2HLabel(getName());
+      return new UnknownReference(getLabelObject(), getLabel());
    }
 
-   protected void doLabel(TeXParser parser, TeXObject arg)
-       throws IOException
+   public TeXObject getLabelObject()
    {
-      L2HConverter listener = (L2HConverter)parser.getListener();
-
-      String label = arg.toString(parser);
-
-      listener.write("<a name=\""+HtmlTag.getUriFragment(label)+"\"/>");
+      return labelObject;
    }
+
+   public String getLabel()
+   {
+      return label;
+   }
+
+   public String getLabel(TeXParser parser)
+   {
+      return label == null ?
+             (labelObject == null ? "??" : labelObject.toString(parser)) :
+             label;
+   }
+
+   private TeXObject labelObject=null;
+   private String label=null;
 }

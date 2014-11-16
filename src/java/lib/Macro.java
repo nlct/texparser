@@ -158,6 +158,11 @@ public abstract class Macro implements TeXObject
       return syntax.equals(list);
    }
 
+   public boolean isPar()
+   {
+      return false;
+   }
+
    public abstract Object clone();
 
    // Is this a short macro?

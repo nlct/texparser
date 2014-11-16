@@ -215,4 +215,10 @@ public class KeyValList extends HashMap<String,TeXObject>
 
       return builder.toString();
    }
+
+   public boolean isPar()
+   {
+      return false;
+   }
+
 }

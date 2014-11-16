@@ -26,25 +26,25 @@ import com.dickimawbooks.texparserlib.latex.*;
 
 public class GraphicsSty extends LaTeXSty
 {
-   public GraphicsSty(String name)
+   public GraphicsSty(String name, LaTeXParserListener listener)
    {
-      super(name);
+      super(name, listener);
    }
 
-   public void addDefinitions(LaTeXParserListener listener)
+   public void addDefinitions()
    {
-      listener.putControlSequence(new IncludeGraphics(this));
-      listener.putControlSequence(new GraphicsPath());
-      listener.putControlSequence(new Epsfig("epsfig"));
-      listener.putControlSequence(new Epsfig("psfig"));
+      registerControlSequence(new IncludeGraphics(this));
+      registerControlSequence(new GraphicsPath());
+      registerControlSequence(new Epsfig("epsfig"));
+      registerControlSequence(new Epsfig("psfig"));
    }
 
-   public void processOption(LaTeXParserListener listener, String option)
+   public void processOption(String option)
     throws IOException
    {
    }
 
-   protected void preOptions(LaTeXParserListener listener)
+   protected void preOptions()
      throws IOException
    {
    }

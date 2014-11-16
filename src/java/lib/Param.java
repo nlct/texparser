@@ -77,6 +77,11 @@ public class Param implements TeXObject
       return list;
    }
 
+   public boolean isPar()
+   {
+      return false;
+   }
+
    // -1 indicates #{
    private int digit;
 }

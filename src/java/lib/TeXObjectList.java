@@ -49,7 +49,6 @@ public class TeXObjectList extends Vector<TeXObject> implements TeXObject,Expand
       return popStack(false);
    }
 
-// TODO check for paragraph breaks if short
    public TeXObject popStack(boolean isShort)
      throws IOException
    {
@@ -58,7 +57,20 @@ public class TeXObjectList extends Vector<TeXObject> implements TeXObject,Expand
          remove(0);
       }
 
-      return size() == 0 ? null : remove(0);
+      if (size() == 0)
+      {
+         return null;
+      }
+
+      TeXObject obj = remove(0);
+
+      if (isShort && obj.isPar())
+      {
+            throw new TeXSyntaxException(
+               TeXSyntaxException.ERROR_PAR_BEFORE_EG);
+      }
+
+      return obj;
    }
 
    public TeXObject pop()
@@ -210,7 +222,7 @@ public class TeXObjectList extends Vector<TeXObject> implements TeXObject,Expand
    public Numerical popNumerical(TeXParser parser)
    throws IOException
    {
-      TeXObject object = peek();
+      TeXObject object = peekStack();
 
       if (object instanceof TeXCsRef)
       {
@@ -219,47 +231,27 @@ public class TeXObjectList extends Vector<TeXObject> implements TeXObject,Expand
 
       if (object instanceof Register)
       {
-         pop();
+         popStack();
          return (Register)object;
       }
 
       if (object instanceof TeXDimension)
       {
-         pop();
+         popStack();
          return (TeXDimension)object;
       }
 
-      Float value = popFloat(parser);
-
-      try
-      {
-         TeXUnit unit = popUnit(parser);
-         return new UserDimension(value, unit);
-      }
-      catch (TeXSyntaxException e)
-      {
-         String str = value.toString();
-
-         int idx = str.indexOf(".");
-
-         if (idx > -1)
-         {
-            push(new TeXObjectList(str.substring(idx)));
-            return new UserNumber((int)Math.floor(value.floatValue()));
-         }
-
-         return new UserNumber(value.intValue());
-      }
+      return popNumber(parser);
    }
 
    public TeXDimension popDimension(TeXParser parser)
     throws IOException
    {
-      TeXObject object = peek();
+      TeXObject object = peekStack();
 
       if (object instanceof TeXDimension)
       {
-         pop();
+         popStack();
          return (TeXDimension)object;
       }
 
@@ -444,7 +436,25 @@ public class TeXObjectList extends Vector<TeXObject> implements TeXObject,Expand
 
    public TeXObject peek()
    {
-      return firstElement();
+      return size() == 0 ? null : firstElement();
+   }
+
+   public TeXObject peekStack()
+    throws IOException
+   {
+      if (size() == 0) return null;
+
+      for (int i = 0, n = size(); i < n; i++)
+      {
+         TeXObject obj = get(i);
+
+         if (!(obj instanceof Ignoreable))
+         {
+            return obj;
+         }
+      }
+
+      return null;
    }
 
    // Pops an argument off the stack. Removes any top level
@@ -668,6 +678,37 @@ public class TeXObjectList extends Vector<TeXObject> implements TeXObject,Expand
       process(parser);
    }
 
+   public String toString()
+   {
+      StringBuilder builder = new StringBuilder();
+      builder.append('[');
+
+      for (int i = 0, n = size(); i < n; i++)
+      {
+         TeXObject object = get(i);
+
+         if (i > 0)
+         {
+            builder.append(", ");
+         }
+
+         if (object instanceof CharObject)
+         {
+            builder.append('\'');
+            builder.append(object.toString());
+            builder.append('\'');
+         }
+         else
+         {
+            builder.append(object.toString());
+         }
+      }
+
+      builder.append(']');
+
+      return builder.toString();
+   }
+
    public String toString(TeXParser parser)
    {
       StringBuilder builder = new StringBuilder();
@@ -707,6 +748,11 @@ public class TeXObjectList extends Vector<TeXObject> implements TeXObject,Expand
       {
          declarations.pollLast().end(parser);
       }
+   }
+
+   public boolean isPar()
+   {
+      return size() == 1 && firstElement().isPar();
    }
 
    private ArrayDeque<Declaration> declarations

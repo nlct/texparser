@@ -19,35 +19,42 @@
 package com.dickimawbooks.texparserlib.html;
 
 import java.io.IOException;
-import java.io.EOFException;
+import java.util.Vector;
 
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.*;
 
-public class L2HLabel extends Label
+public class L2HTheBibliography extends TheBibliography
 {
-   public L2HLabel()
+   public L2HTheBibliography()
    {
-      this("label");
+      this("thebibliography");
    }
 
-   public L2HLabel(String name)
+   public L2HTheBibliography(String name)
    {
       super(name);
    }
 
    public Object clone()
    {
-      return new L2HLabel(getName());
+      return new L2HTheBibliography(getName());
    }
 
-   protected void doLabel(TeXParser parser, TeXObject arg)
-       throws IOException
+   protected void startBibliography(TeXParser parser, 
+     TeXObject widest)
+     throws IOException
    {
       L2HConverter listener = (L2HConverter)parser.getListener();
 
-      String label = arg.toString(parser);
+      listener.write("<dl><dt></dt><dd>");
+   }
 
-      listener.write("<a name=\""+HtmlTag.getUriFragment(label)+"\"/>");
+   public void end(TeXParser parser)
+   throws IOException
+   {
+      L2HConverter listener = (L2HConverter)parser.getListener();
+
+      listener.write("</dd></dl>");
    }
 }

@@ -24,23 +24,23 @@ import com.dickimawbooks.texparserlib.latex.*;
 
 public class LipsumSty extends LaTeXSty
 {
-   public LipsumSty()
+   public LipsumSty(LaTeXParserListener listener)
    {
-      super("lipsum");
+      super("lipsum", listener);
    }
 
-   public void addDefinitions(LaTeXParserListener listener)
+   public void addDefinitions()
    {
-      listener.putControlSequence(new Lipsum(this));
-      listener.putControlSequence(new SetLipsumDefault(this));
+      registerControlSequence(new Lipsum(this));
+      registerControlSequence(new SetLipsumDefault(this));
    }
 
-   public void processOption(LaTeXParserListener listener, String option)
+   public void processOption(String option)
     throws IOException
    {
    }
 
-   protected void preOptions(LaTeXParserListener listener)
+   protected void preOptions()
      throws IOException
    {
    }

@@ -24,24 +24,24 @@ import com.dickimawbooks.texparserlib.latex.*;
 
 public class HyperrefSty extends LaTeXSty
 {
-   public HyperrefSty()
+   public HyperrefSty(LaTeXParserListener listener)
    {
-      super("hyperref");
+      super("hyperref", listener);
    }
 
-   public void addDefinitions(LaTeXParserListener listener)
+   public void addDefinitions()
    {
-      listener.putControlSequence(new Href(this));
-      listener.putControlSequence(new NoLinkUrl());
-      listener.putControlSequence(new Url(this));
+      registerControlSequence(new Href(this));
+      registerControlSequence(new NoLinkUrl());
+      registerControlSequence(new Url(this));
    }
 
-   public void processOption(LaTeXParserListener listener, String option)
+   public void processOption(String option)
     throws IOException
    {
    }
 
-   protected void preOptions(LaTeXParserListener listener)
+   protected void preOptions()
      throws IOException
    {
    }

@@ -26,18 +26,23 @@ import com.dickimawbooks.texparserlib.*;
 
 public abstract class LaTeXSty
 {
-   public LaTeXSty(String name)
+   public LaTeXSty(String name, LaTeXParserListener listener)
    {
       this.name = name;
+      this.listener = listener;
    }
 
-   public abstract void addDefinitions(LaTeXParserListener listener);
+   public abstract void addDefinitions();
 
-   public abstract void processOption(LaTeXParserListener listener, String option)
+   public void registerControlSequence(ControlSequence cs)
+   {
+      listener.registerControlSequence(this, cs);
+   }
+
+   public abstract void processOption(String option)
     throws IOException;
 
-   public void processOptions(LaTeXParserListener listener,
-     KeyValList options)
+   public void processOptions(KeyValList options)
    throws IOException
    {
       if (options == null) return;
@@ -48,34 +53,34 @@ public abstract class LaTeXSty
 
          if (option != null && !option.isEmpty())
          {
-            processOption(listener, option);
+            processOption(option);
          }
       }
    }
 
-   protected abstract void preOptions(LaTeXParserListener listener)
+   protected abstract void preOptions()
      throws IOException;
 
-   protected void postOptions(LaTeXParserListener listener)
+   protected void postOptions()
      throws IOException
    {
-      addDefinitions(listener);
+      addDefinitions();
    }
 
-   public void load(LaTeXParserListener listener, KeyValList options)
+   public void load(KeyValList options)
    throws IOException
    {
-      preOptions(listener);
+      preOptions();
 
       KeyValList clsOptions = listener.getDocumentClassOptions();
 
       if (clsOptions != options)
       {
-         processOptions(listener, clsOptions);
+         processOptions(clsOptions);
       }
 
-      processOptions(listener, options);
-      postOptions(listener);
+      processOptions(options);
+      postOptions();
    }
 
    public String getName()
@@ -90,5 +95,12 @@ public abstract class LaTeXSty
       return name.equals(((LaTeXSty)obj).getName());
    }
 
+   public LaTeXParserListener getListener()
+   {
+      return listener;
+   }
+
    private String name;
+
+   private LaTeXParserListener listener;
 }

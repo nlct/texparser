@@ -20,6 +20,8 @@ package com.dickimawbooks.texparserlib.html;
 
 import java.io.IOException;
 import java.util.Vector;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 import com.dickimawbooks.texparserlib.*;
 
@@ -64,6 +66,39 @@ public class HtmlTag implements TeXObject
    public String getTag()
    {
       return tag;
+   }
+
+   public boolean isPar()
+   {
+      return false;
+   }
+
+   public static String getUriFragment(String label)
+   {
+      try
+      {
+         URI uri = new URI(null, null, label);
+
+         return uri.getRawFragment();
+      }
+      catch (URISyntaxException e)
+      {
+         StringBuilder builder = new StringBuilder();
+
+         for (int i = 0, n = label.length(); i < n; i++)
+         {
+            char c = label.charAt(i);
+
+            if ((c >= 'A' && c <= 'Z')
+             || (c >= 'a' && c <= 'z')
+             || c == ':' || c == '-' || c == '_' || c == '+')
+            {
+               builder.append(c);
+            }
+         }
+
+         return builder.toString();
+      }
    }
 
    private String tag;

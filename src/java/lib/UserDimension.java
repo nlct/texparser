@@ -85,6 +85,11 @@ public class UserDimension implements TeXDimension
       process(parser);
    }
 
+   public boolean isPar()
+   {
+      return false;
+   }
+
    private float value;
 
    private TeXUnit unit;

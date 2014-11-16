@@ -658,6 +658,11 @@ public class TeXParser extends TeXObjectList
       list.add(listener.getPar());
    }
 
+   public static boolean isPar(TeXObject obj)
+   {
+      return obj != null && obj.isPar();
+   }
+
    private boolean readComment(TeXObjectList list)
      throws IOException
    {
@@ -901,7 +906,7 @@ public class TeXParser extends TeXObjectList
 
          fetchNext(group, isShort);
 
-         if (isShort && (group.lastElement() instanceof Par))
+         if (isShort && isPar(group.lastElement()))
          {
             throw new TeXSyntaxException(
                getListenerFile(),
@@ -1508,8 +1513,30 @@ public class TeXParser extends TeXObjectList
    }
 
    public TeXObject peekStack()
+     throws IOException
    {
-      return size() == 0 ? null : firstElement();
+      int idx = 0;
+
+      if (size() == 0)
+      {
+         fetchNext();
+      }
+
+      TeXObject obj = firstElement();
+
+      while (obj instanceof Ignoreable)
+      {
+         idx++;
+
+         if (size() == idx)
+         {
+            fetchNext();
+         }
+
+         obj = get(idx);
+      }
+
+      return obj;
    }
 
    public TeXObject peekStack(int index)

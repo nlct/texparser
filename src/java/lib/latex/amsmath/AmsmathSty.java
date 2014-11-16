@@ -26,24 +26,23 @@ import com.dickimawbooks.texparserlib.latex.*;
 
 public class AmsmathSty extends LaTeXSty
 {
-   public AmsmathSty(String name)
+   public AmsmathSty(String name, LaTeXParserListener listener)
    {
-      super(name);
+      super(name, listener);
    }
 
-   public void addDefinitions(LaTeXParserListener listener)
+   public void addDefinitions()
    {
-      TeXParser parser = listener.getParser();
-      parser.putControlSequence(new Align());
-      parser.putControlSequence(new Align("align*", false));
+      registerControlSequence(new Align());
+      registerControlSequence(new Align("align*", false));
    }
 
-   public void processOption(LaTeXParserListener listener, String option)
+   public void processOption(String option)
     throws IOException
    {
    }
 
-   protected void preOptions(LaTeXParserListener listener)
+   protected void preOptions()
      throws IOException
    {
    }

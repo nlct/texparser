@@ -51,5 +51,9 @@ public class ParCs extends ControlSequence
       parser.getListener().getPar().process(parser);
    }
 
+   public boolean isPar()
+   {
+      return true;
+   }
 }
 

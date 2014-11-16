@@ -92,20 +92,34 @@ public class L2HConverter extends LaTeXParserListener
    protected void addPredefined()
    {
       super.addPredefined();
+
+      putControlSequence(new L2HHypertarget());
+      putControlSequence(new L2HHyperlink());
+
       putControlSequence(new L2HCr("\\"));
       putControlSequence(new L2HAmp());
       putControlSequence(new L2HNoBreakSpace());
-      parser.putControlSequence(new L2HLabel());
-      parser.putControlSequence(new L2HRef());
-      parser.putControlSequence(new L2HPageRef());
-      parser.putControlSequence(new L2HNameRef());
-      parser.putControlSequence(new L2HCaption());
-      parser.putControlSequence(new L2HAtMakeCaption());
+      putControlSequence(new SpaceCs("newblock"));
+      putControlSequence(new L2HLabel());
+      putControlSequence(new L2HRef());
+      putControlSequence(new L2HPageRef());
+      putControlSequence(new L2HNameRef());
+      putControlSequence(new L2HTheBibliography());
 
-      parser.putControlSequence(new L2HFloat("figure"));
-      parser.putControlSequence(new L2HFloat("table"));
+      putControlSequence(new L2HSection());
+      putControlSequence(new L2HSection("subsection"));
+      putControlSequence(new L2HSection("subsubsection"));
+      putControlSequence(new L2HSection("paragraph"));
+      putControlSequence(new L2HSection("subparagraph"));
+      putControlSequence(new L2HSection("part"));
 
-      parser.putControlSequence(new L2LMathDeclaration("math"));
+      putControlSequence(new L2HCaption());
+      putControlSequence(new L2HAtMakeCaption());
+
+      putControlSequence(new L2HFloat("figure"));
+      putControlSequence(new L2HFloat("table"));
+
+      putControlSequence(new L2LMathDeclaration("math"));
 
       MathDeclaration begMathDecl = new L2LMathDeclaration("(");
       parser.putControlSequence(begMathDecl);
@@ -126,7 +140,7 @@ public class L2HConverter extends LaTeXParserListener
 
          if (sty != null)
          {
-            sty.load(this, null);
+            sty.load(null);
          }
       }
       catch (IOException e)

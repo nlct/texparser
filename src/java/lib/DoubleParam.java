@@ -72,6 +72,11 @@ public class DoubleParam implements TeXObject
    {
    }
 
+   public boolean isPar()
+   {
+      return false;
+   }
+
    private Param param;
 }
 

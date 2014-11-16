@@ -64,7 +64,8 @@ public class L2HPageRef extends PageRef
       if (ref == null) return null;
 
       TeXObjectList list = new TeXObjectList();
-      list.add(new HtmlTag("<a href=\"#"+arg.toString(parser)+"\">"));
+      list.add(new HtmlTag("<a href=\"#"
+        +HtmlTag.getUriFragment(arg.toString(parser))+"\">"));
       list.add(ref);
       list.add(new HtmlTag("</a>"));
 
@@ -94,7 +95,8 @@ public class L2HPageRef extends PageRef
       if (ref == null) return null;
 
       TeXObjectList list = new TeXObjectList();
-      list.add(new HtmlTag("<a href=\"#"+arg.toString(parser)+"\">"));
+      list.add(new HtmlTag("<a href=\"#"
+        +HtmlTag.getUriFragment(arg.toString(parser))+"\">"));
       list.add(ref);
       list.add(new HtmlTag("</a>"));
 
@@ -125,7 +127,8 @@ public class L2HPageRef extends PageRef
 
       TeXObject ref = listener.getPageReference(arg);
 
-      listener.write("<a href=\"#"+arg.toString(parser)+"\">");
+      listener.write("<a href=\"#"
+       +HtmlTag.getUriFragment(arg.toString(parser))+"\">");
       ref.process(parser, stack);
       listener.write("</a>");
    }
@@ -149,7 +152,8 @@ public class L2HPageRef extends PageRef
 
       TeXObject ref = listener.getPageReference(arg);
 
-      listener.write("<a href=\"#"+arg.toString(parser)+"\">");
+      listener.write("<a href=\"#"
+         +HtmlTag.getUriFragment(arg.toString(parser))+"\">");
       ref.process(parser);
       listener.write("</a>");
    }

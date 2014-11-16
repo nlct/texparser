@@ -90,4 +90,27 @@ public abstract class Command extends ControlSequence implements Expandable
 
       return list;
    }
+
+   public void process(TeXParser parser, TeXObjectList stack)
+      throws IOException
+   {
+      TeXObjectList expanded = expandonce(parser, stack);
+
+      if (expanded != null)
+      {
+         expanded.process(parser, stack);
+      }
+   }
+
+   public void process(TeXParser parser)
+      throws IOException
+   {
+      TeXObjectList expanded = expandonce(parser);
+
+      if (expanded != null)
+      {
+         expanded.process(parser);
+      }
+   }
+
 }

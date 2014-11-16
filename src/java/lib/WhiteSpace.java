@@ -42,6 +42,11 @@ public abstract class WhiteSpace implements TeXObject
       return list;
    }
 
+   public boolean isPar()
+   {
+      return false;
+   }
+
    public abstract Object clone();
 }
 

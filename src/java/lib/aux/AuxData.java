@@ -29,6 +29,7 @@ import java.nio.file.Files;
 
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.generic.*;
+import com.dickimawbooks.texparserlib.latex.UnknownReference;
 
 /**
  * Aux data.
@@ -152,7 +153,7 @@ public class AuxData
          }
       }
 
-      return new TeXObjectList("??");
+      return new UnknownReference(label);
    }
 
    public static TeXObject getPageReference(Vector<AuxData> auxData,
@@ -210,7 +211,7 @@ public class AuxData
          }
       }
 
-      return new TeXObjectList("??");
+      return new UnknownReference(label);
    }
 
    public static TeXObject getNameReference(Vector<AuxData> auxData,
@@ -268,7 +269,50 @@ public class AuxData
          }
       }
 
-      return new TeXObjectList("??");
+      return new UnknownReference(label);
+   }
+
+   public static TeXObject getCitation(Vector<AuxData> auxData,
+    TeXParser parser, TeXObject object)
+    throws IOException
+   {
+      TeXObjectList expanded = null;
+
+      if (object instanceof Group)
+      {
+         object = ((Group)object).toList();
+      }
+
+      if (object instanceof Expandable)
+      {
+         expanded = ((Expandable)object).expandfully(parser);
+      }
+
+      String label = (expanded == null ?
+                      object.toString(parser) : 
+                      expanded.toString(parser));
+
+      return getCitation(auxData, parser, label);
+   }
+
+   public static TeXObject getCitation(Vector<AuxData> auxData,
+     TeXParser parser, String label)
+   throws IOException
+   {
+      for (AuxData data : auxData)
+      {
+         if (data.getName().equals("bibcite"))
+         {
+            TeXObject arg = data.getArg(0);
+
+            if (label.equals(arg.toString(parser)))
+            {
+               return data.getArg(1);
+            }
+         }
+      }
+
+      return new UnknownReference(label);
    }
 
    private String name;

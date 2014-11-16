@@ -16,32 +16,39 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
-package com.dickimawbooks.texparserlib;
+package com.dickimawbooks.texparserlib.generic;
 
 import java.io.IOException;
 
-public interface TeXObject extends Cloneable
+import com.dickimawbooks.texparserlib.*;
+
+public class SpaceCs extends ControlSequence
 {
-   // Process this. Arguments can be fetched with
-   // parser.popStack()
+   public SpaceCs()
+   {
+      this("space");
+   }
+
+   public SpaceCs(String name)
+   {
+      super(name);
+   }
+
+   public Object clone()
+   {
+      return new SpaceCs(getName());
+   }
+
+   public void process(TeXParser parser, TeXObjectList list)
+      throws IOException
+   {
+      parser.getListener().getSpace().process(parser, list);
+   }
+
    public void process(TeXParser parser)
-      throws IOException;
-
-   // Process with local stack.
-   // If stack is null or empty, same as process(parser)
-   // otherwise arguments can be fetched with stack.popArg()
-   // If you need more arguments once stack is empty, use
-   // parser.popNextArg()
-   public void process(TeXParser parser, TeXObjectList stack)
-      throws IOException;
-
-   public Object clone();
-
-   public String toString(TeXParser parser);
-
-   public TeXObjectList string(TeXParser parser)
-    throws IOException;
-
-   public boolean isPar();
+      throws IOException
+   {
+      parser.getListener().getSpace().process(parser);
+   }
 }
 

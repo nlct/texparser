@@ -46,6 +46,8 @@ public class L2HCaption extends ControlSequence
    {
       TeXObject optArg = stack.popArg(parser, '[', ']');
 
+      TeXObject arg = stack.popStack();
+
       L2HConverter listener = (L2HConverter)parser.getListener();
 
       TeXObject capType = parser.getControlSequence("@captype");
@@ -74,8 +76,51 @@ public class L2HCaption extends ControlSequence
          grp.add(listener.getControlSequence("the"+type));
       }
 
+      // Is there a label following the caption?
+
+      TeXObject object = stack.popStack();
+
+      while (object instanceof WhiteSpace)
+      {
+         object = stack.popStack();
+      }
+
+      if (object instanceof TeXCsRef)
+      {
+         object = listener.getControlSequence(((TeXCsRef)object).getName());
+
+         if (object instanceof Label)
+         {
+            TeXObject label = stack.popArg();
+
+            if (label == null)
+            {
+               label = parser.popNextArg();
+            }
+
+            if (label instanceof Expandable)
+            {
+               TeXObjectList expanded = ((Expandable)label).expandfully(parser, stack);
+
+               if (expanded != null)
+               {
+                  label = expanded;
+               }
+            }
+
+            grp.push(new HtmlTag("<a name=\""
+              +HtmlTag.getUriFragment(label.toString(parser))+"\"/>"));
+            grp.add(new HtmlTag("</a>"));
+         }
+         else
+         {
+            stack.push(object);
+         }
+      }
+
       listener.write("<div id=\"caption\">");
 
+      stack.push(arg);
       stack.push(grp);
 
       listener.getControlSequence("@makecaption").process(parser, stack);
@@ -87,6 +132,8 @@ public class L2HCaption extends ControlSequence
    throws IOException
    {
       TeXObject optArg = parser.popNextArg('[', ']');
+
+      TeXObject arg = parser.popStack();
 
       L2HConverter listener = (L2HConverter)parser.getListener();
 
@@ -116,10 +163,47 @@ public class L2HCaption extends ControlSequence
          grp.add(listener.getControlSequence("the"+type));
       }
 
+      // Is there a label following the caption?
+
+      TeXObject object = parser.popStack();
+
+      while (object instanceof WhiteSpace)
+      {
+         object = parser.popStack();
+      }
+
+      if (object instanceof TeXCsRef)
+      {
+         object = listener.getControlSequence(((TeXCsRef)object).getName());
+
+         if (object instanceof Label)
+         {
+            TeXObject label = parser.popNextArg();
+
+            if (label instanceof Expandable)
+            {
+               TeXObjectList expanded = ((Expandable)label).expandfully(parser);
+
+               if (expanded != null)
+               {
+                  label = expanded;
+               }
+            }
+
+            grp.push(new HtmlTag("<a name=\""
+              +HtmlTag.getUriFragment(label.toString(parser))+"\"/>"));
+            grp.add(new HtmlTag("</a>"));
+         }
+         else
+         {
+            parser.push(object);
+         }
+      }
+
       listener.write("<div id=\"caption\">");
 
-
       ControlSequence cs = listener.getControlSequence("@makecaption");
+      parser.push(arg);
       parser.push(grp);
 
       cs.process(parser);

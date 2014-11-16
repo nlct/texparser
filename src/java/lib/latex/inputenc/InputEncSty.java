@@ -28,26 +28,26 @@ import com.dickimawbooks.texparserlib.latex.*;
 
 public class InputEncSty extends LaTeXSty
 {
-   public InputEncSty()
+   public InputEncSty(LaTeXParserListener listener)
    {
-      super("inputenc");
+      super("inputenc", listener);
    }
 
-   public void addDefinitions(LaTeXParserListener listener)
+   public void addDefinitions()
    {
-      listener.putControlSequence(new InputEncoding());
+      registerControlSequence(new InputEncoding());
    }
 
-   public void processOption(LaTeXParserListener listener, String option)
+   public void processOption(String option)
     throws IOException
    {
       if (isKnownEncoding(option))
       {
-         listener.setInputEncoding(option);
+         getListener().setInputEncoding(option);
       }
    }
 
-   protected void preOptions(LaTeXParserListener listener)
+   protected void preOptions()
      throws IOException
    {
    }

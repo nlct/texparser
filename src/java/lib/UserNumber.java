@@ -73,5 +73,10 @@ public class UserNumber implements TeXNumber
       process(parser);
    }
 
+   public boolean isPar()
+   {
+      return false;
+   }
+
    private int value;
 }

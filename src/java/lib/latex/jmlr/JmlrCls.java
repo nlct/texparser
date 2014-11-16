@@ -27,47 +27,47 @@ import com.dickimawbooks.texparserlib.generic.*;
 
 public class JmlrCls extends LaTeXCls
 {
-   public JmlrCls()
+   public JmlrCls(LaTeXParserListener listener)
    {
-      this("jmlr");
+      this("jmlr", listener);
    }
 
-   public JmlrCls(String name)
+   public JmlrCls(String name, LaTeXParserListener listener)
    {
-      super(name);
+      super(name, listener);
    }
 
-   public void addDefinitions(LaTeXParserListener listener)
+   public void addDefinitions()
    {
-      TeXParser parser = listener.getParser();
-
-      parser.putControlSequence(new StoreDataCs("jmlrworkshop"));
-      parser.putControlSequence(new StoreDataCs("jmlryear"));
-      parser.putControlSequence(new StoreDataCs("jmlrvolume"));
-      parser.putControlSequence(new StoreDataCs("jmlrissue"));
-      parser.putControlSequence(new StoreDataCs("jmlrpages"));
-      parser.putControlSequence(new StoreDataCs("jmlrsubmitted"));
-      parser.putControlSequence(new StoreDataCs("jmlrpublished"));
-      parser.putControlSequence(
+      registerControlSequence(new StoreDataCs("jmlrworkshop"));
+      registerControlSequence(new StoreDataCs("jmlryear"));
+      registerControlSequence(new StoreDataCs("jmlrvolume"));
+      registerControlSequence(new StoreDataCs("jmlrissue"));
+      registerControlSequence(new StoreDataCs("jmlrpages"));
+      registerControlSequence(new StoreDataCs("jmlrsubmitted"));
+      registerControlSequence(new StoreDataCs("jmlrpublished"));
+      registerControlSequence(
          new StoreDataCs("jmlrauthors", "@jmlr@authors"));
-      parser.putControlSequence(new StoreDataCs("editor"));
-      parser.putControlSequence(new StoreDataCs("editors"));
+      registerControlSequence(new StoreDataCs("editor"));
+      registerControlSequence(new StoreDataCs("editors"));
 
-      parser.putControlSequence(
+      registerControlSequence(
          new StoreDataCs("title", "@shorttitle", "@title"));
-      parser.putControlSequence(
+      registerControlSequence(
          new StoreDataCs("author", "@shortauthor", "@author"));
 
-      parser.putControlSequence(new GenericCommand("editorname",
+      registerControlSequence(new GenericCommand("editorname",
        null, new TeXObjectList("Editor")));
 
-      parser.putControlSequence(new GenericCommand("editorsname",
+      registerControlSequence(new GenericCommand("editorsname",
        null, new TeXObjectList("Editors")));
    }
 
-   protected void loadPreHyperrefPackages(LaTeXParserListener listener)
+   protected void loadPreHyperrefPackages()
      throws IOException
    {
+      LaTeXParserListener listener = getListener();
+
       listener.usepackage(null, "xkeyval");
       listener.usepackage(null, "calc");
       listener.usepackage(null, "etoolbox");
@@ -89,17 +89,19 @@ public class JmlrCls extends LaTeXCls
 
    }
 
-   protected void preOptions(LaTeXParserListener listener)
+   protected void preOptions()
      throws IOException
    {
+      LaTeXParserListener listener = getListener();
       TeXParser parser = listener.getParser();
-      loadPreHyperrefPackages(listener);
+
+      loadPreHyperrefPackages();
 
       ControlSequence cs = parser.getControlSequence("jmlrprehyperref");
 
       if (cs == null)
       {
-         parser.putControlSequence(new GenericCommand("jmlrprehyperref"));
+         registerControlSequence(new GenericCommand("jmlrprehyperref"));
       }
       else
       {
@@ -109,17 +111,17 @@ public class JmlrCls extends LaTeXCls
       listener.usepackage(null, "hyperref");
       listener.usepackage(null, "nameref");
 
-      listener.putControlSequence(new GenericCommand("@jmlrproceedings",
+      registerControlSequence(new GenericCommand("@jmlrproceedings",
        null, new TeXObjectList("Journal of Machine Learning Research")));
-      listener.putControlSequence(new GenericCommand("@jmlrabbrvproceedings",
+      registerControlSequence(new GenericCommand("@jmlrabbrvproceedings",
        null, new TeXObjectList("JMLR")));
-      listener.putControlSequence(new JmlrProceedings());
+      registerControlSequence(new JmlrProceedings());
 
       TeXObjectList def = new TeXObjectList();
       def.add(new TeXCsRef("jmlrproceedings"));
       def.add(listener.createGroup("JMLR"));
       def.add(listener.createGroup("Journal of Machine Learning Research"));
-      listener.putControlSequence(new GenericCommand("jmlrnowcp", null, def));
+      registerControlSequence(new GenericCommand("jmlrnowcp", null, def));
 
       def = new TeXObjectList();
       def.add(new TeXCsRef("jmlrproceedings"));
@@ -129,12 +131,14 @@ public class JmlrCls extends LaTeXCls
       grp.add(listener.getLetter('P'));
       def.add(grp);
       def.add(listener.createGroup("JMLR: Workshop and Conference Proceedings"));
-      listener.putControlSequence(new GenericCommand("jmlrwcp", null, def));
+      registerControlSequence(new GenericCommand("jmlrwcp", null, def));
    }
 
-   public void processOption(LaTeXParserListener listener, String option)
+   public void processOption(String option)
      throws IOException
    {
+      LaTeXParserListener listener = getListener();
+
       if (option.equals("nowcp"))
       {
          listener.getControlSequence("jmlrnowcp").process(listener.getParser());

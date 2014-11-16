@@ -80,5 +80,10 @@ public abstract class CharObject implements TeXObject
       process(parser);
    }
 
+   public boolean isPar()
+   {
+      return false;
+   }
+
    protected int charCode;
 }

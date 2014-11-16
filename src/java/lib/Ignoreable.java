@@ -38,6 +38,11 @@ public abstract class Ignoreable implements TeXObject
       return new TeXObjectList();
    } 
 
+   public boolean isPar()
+   {
+      return false;
+   }
+
    public abstract Object clone();
 }
 

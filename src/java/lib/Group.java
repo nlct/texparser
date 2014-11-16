@@ -45,7 +45,7 @@ public class Group extends TeXObjectList
 
    public Object clone()
    {
-      Group group = new Group();
+      Group group = new Group(capacity());
 
       for (TeXObject object : this)
       {

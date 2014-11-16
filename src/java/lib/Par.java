@@ -57,5 +57,10 @@ public class Par implements TeXObject
       throws IOException
    {
    }
+
+   public boolean isPar()
+   {
+      return true;
+   }
 }
 

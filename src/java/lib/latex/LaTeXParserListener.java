@@ -37,6 +37,7 @@ import com.dickimawbooks.texparserlib.latex.lipsum.*;
 import com.dickimawbooks.texparserlib.latex.jmlr.*;
 import com.dickimawbooks.texparserlib.latex.etoolbox.*;
 import com.dickimawbooks.texparserlib.latex.hyperref.*;
+import com.dickimawbooks.texparserlib.latex.natbib.*;
 import com.dickimawbooks.texparserlib.latex.inputenc.*;
 
 public abstract class LaTeXParserListener extends DefaultTeXParserListener
@@ -74,12 +75,23 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       this.parseAux = parseAux;
    }
 
+   public TeXObject getCitation(TeXObject label)
+      throws IOException
+   {
+      if (auxData == null)
+      {
+         return new UnknownReference(label);
+      }
+
+      return AuxData.getCitation(auxData, getParser(), label);
+   }
+
    public TeXObject getReference(TeXObject label)
       throws IOException
    {
       if (auxData == null)
       {
-         return new TeXObjectList("??");
+         return new UnknownReference(label);
       }
 
       return AuxData.getReference(auxData, getParser(), label);
@@ -90,7 +102,7 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
    {
       if (auxData == null)
       {
-         return new TeXObjectList("??");
+         return new UnknownReference(label);
       }
 
       return AuxData.getPageReference(auxData, getParser(), label);
@@ -101,7 +113,7 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
    {
       if (auxData == null)
       {
-         return new TeXObjectList("??");
+         return new UnknownReference(label);
       }
 
       return AuxData.getNameReference(auxData, getParser(), label);
@@ -159,6 +171,15 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       parser.putControlSequence(new Tabular());
       parser.putControlSequence(new Tabular("array"));
       parser.putControlSequence(new Bibliography());
+      parser.putControlSequence(new Cite());
+
+      bibliographySection = new TeXObjectList();
+      bibliographySection.add(new TeXCsRef("section"));
+      bibliographySection.add(getOther('*'));
+      bibliographySection.add(new TeXCsRef("refname"));
+
+      parser.putControlSequence(
+        new GenericCommand("refname", null, new TeXObjectList("References")));
 
       parser.putControlSequence(new StoreDataCs("title"));
       parser.putControlSequence(new StoreDataCs("author"));
@@ -180,6 +201,11 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       newcounter("table");
       newcounter("equation");
       newcounter("footnote");
+      newcounter("mpfootnote");
+      newcounter("enumi");
+      newcounter("enumii");
+      newcounter("enumiii");
+      newcounter("enumiv");
 
       parser.putControlSequence(new MathDeclaration("math"));
 
@@ -242,6 +268,11 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
    protected void addMathFontCommand(String name, int style)
    {
       parser.putControlSequence(new MathFontCommand(name, style));
+   }
+
+   public void registerControlSequence(LaTeXSty sty, ControlSequence cs)
+   {
+      parser.putControlSequence(cs);
    }
 
    public void newcommand(byte overwrite, 
@@ -506,7 +537,7 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
 
       if (cls != null)
       {
-         cls.load(this, options);
+         cls.load(options);
       }
    }
 
@@ -515,12 +546,12 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
    {
       if (clsName.equals("jmlr"))
       {
-         return new JmlrCls();
+         return new JmlrCls(this);
       }
 
       if (clsName.equals("jmlrbook"))
       {
-         return new JmlrBookCls();
+         return new JmlrBookCls(this);
       }
 
       return null;
@@ -540,7 +571,7 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
 
          if (sty != null)
          {
-            sty.load(this, options);
+            sty.load(options);
          }
       }
    }
@@ -561,32 +592,37 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
             loadedPackages.add(lfile);
          }
 
-         return new GraphicsSty(styName);
+         return new GraphicsSty(styName, this);
       }
 
       if (styName.equals("amsmath"))
       {
-         return new AmsmathSty(styName);
+         return new AmsmathSty(styName, this);
       }
 
       if (styName.equals("lipsum"))
       {
-         return new LipsumSty();
+         return new LipsumSty(this);
       }
 
       if (styName.equals("etoolbox"))
       {
-         return new EtoolboxSty();
+         return new EtoolboxSty(this);
       }
 
       if (styName.equals("hyperref"))
       {
-         return new HyperrefSty();
+         return new HyperrefSty(this);
       }
 
       if (styName.equals("inputenc"))
       {
-         return new InputEncSty();
+         return new InputEncSty(this);
+      }
+
+      if (styName.equals("natbib"))
+      {
+         return new NatbibSty(this);
       }
 
       return null;
@@ -926,6 +962,16 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       }
    }
 
+   public TeXObjectList getBibliographySection()
+   {
+      return bibliographySection;
+   }
+
+   public void setBibiographySection(TeXObjectList object)
+   {
+      bibliographySection = object;
+   }
+
    private Vector<String> verbEnv;
 
    private Vector<LaTeXFile> loadedPackages;
@@ -943,6 +989,8 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
    private String inputEncoding = null;
 
    private boolean parseAux = false;
+
+   private TeXObjectList bibliographySection;
 
    public static final UserNumber ZERO = new UserNumber(0);
    public static final UserNumber ONE = new UserNumber(1);
