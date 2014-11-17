@@ -50,7 +50,7 @@ public class Today extends Command
    public TeXObjectList expandonce(TeXParser parser)
      throws IOException
    {
-      return new TeXObjectList(DateFormat.getDateInstance().format(new Date()));
+      return parser.getListener().createString(DateFormat.getDateInstance().format(new Date()));
    }
 
    public TeXObjectList expandfully(TeXParser parser, TeXObjectList stack)

@@ -39,7 +39,7 @@ public class HtmlTag implements TeXObject
 
    public TeXObjectList string(TeXParser parser)
    {
-      return new TeXObjectList(getTag());
+      return parser.getListener().createString(getTag());
    }
 
    public String toString()

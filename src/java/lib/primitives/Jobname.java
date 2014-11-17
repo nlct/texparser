@@ -45,7 +45,7 @@ public class Jobname extends Primitive implements Expandable
    {
       String jobname = parser.getJobname();
 
-      return new TeXObjectList(jobname == null ? "texput": jobname);
+      return parser.getListener().createString(jobname == null ? "texput": jobname);
    }
 
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)

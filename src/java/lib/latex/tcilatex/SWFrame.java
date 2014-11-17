@@ -121,7 +121,7 @@ public class SWFrame extends ControlSequence
          }
       }
 
-      Group grpName = new Group(envName);
+      Group grpName = listener.createGroup(envName);
 
       env.add(listener.getControlSequence("begin"));
       env.add(grpName);

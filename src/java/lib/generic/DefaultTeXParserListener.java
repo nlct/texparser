@@ -187,6 +187,11 @@ public abstract class DefaultTeXParserListener extends TeXParserListener
       return new Other(charCode);
    }
 
+   public TeXObjectList createString(String string)
+   {
+      return new TeXObjectList(this, string);
+   }
+
    public SkippedSpaces createSkippedSpaces()
    {
       return new SkippedSpaces();
@@ -234,7 +239,7 @@ public abstract class DefaultTeXParserListener extends TeXParserListener
 
    public Group createGroup(String text)
    {
-      return new Group(text);
+      return new Group(this, text);
    }
 
    public MathGroup createMathGroup()

@@ -34,13 +34,13 @@ public class TeXObjectList extends Vector<TeXObject> implements TeXObject,Expand
       super(capacity);
    }
 
-   public TeXObjectList(String text)
+   public TeXObjectList(TeXParserListener listener, String text)
    {
       this(text.length() > 0 ? text.length() : 10);
 
       for (int i = 0, n = text.length(); i < n; i++)
       {
-         add(new Letter(text.codePointAt(i)));
+         add(listener.getOther(text.codePointAt(i)));
       }
    }
 
@@ -346,6 +346,11 @@ public class TeXObjectList extends Vector<TeXObject> implements TeXObject,Expand
       if (object instanceof TeXNumber)
       {
          return (TeXNumber)object;
+      }
+
+      if (object instanceof Group)
+      {
+         return ((Group)object).toList().popNumber(parser);
       }
 
       StringBuilder builder = new StringBuilder();

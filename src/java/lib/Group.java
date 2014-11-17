@@ -33,9 +33,9 @@ public class Group extends TeXObjectList
       super(capacity);
    }
 
-   public Group(String text)
+   public Group(TeXParserListener listener, String text)
    {
-      super(text);
+      super(listener, text);
    }
 
    public TeXObjectList toList()

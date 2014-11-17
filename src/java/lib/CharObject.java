@@ -39,7 +39,25 @@ public abstract class CharObject implements TeXObject
 
    public String toString(TeXParser parser)
    {
-      return toString();
+      StringBuilder builder = new StringBuilder(2);
+
+      int code = parser.getSettings().getCharCode(getCharCode());
+
+      if (code == -1)
+      {
+         code = getCharCode();
+      }
+
+      try
+      {
+         builder.appendCodePoint(code);
+      }
+      catch (IllegalArgumentException e)
+      {
+         builder.appendCodePoint(getCharCode());
+      }
+
+      return builder.toString();
    }
 
    public String toString()

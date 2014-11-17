@@ -40,6 +40,25 @@ public class L2HLetter extends Letter
       return new L2HLetter(getCharCode());
    }
 
+   public String toString(TeXParser parser)
+   {
+      L2HConverter listener = (L2HConverter)parser.getListener();
+
+      int code = parser.getSettings().getCharCode(getCharCode());
+
+      if (code == -1)
+      {
+         code = getCharCode();
+      }
+
+      if (code >= 32 && code <= 126)
+      {
+         return toString();
+      }
+
+      return "&#x"+Integer.toHexString(code)+";";
+   }
+
    public void process(TeXParser parser)
       throws IOException
    {

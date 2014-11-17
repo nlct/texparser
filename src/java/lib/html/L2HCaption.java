@@ -118,7 +118,7 @@ public class L2HCaption extends ControlSequence
          }
       }
 
-      listener.write("<div id=\"caption\">");
+      listener.write("<div class=\"caption\">");
 
       stack.push(arg);
       stack.push(grp);
@@ -200,7 +200,7 @@ public class L2HCaption extends ControlSequence
          }
       }
 
-      listener.write("<div id=\"caption\">");
+      listener.write("<div class=\"caption\">");
 
       ControlSequence cs = listener.getControlSequence("@makecaption");
       parser.push(arg);

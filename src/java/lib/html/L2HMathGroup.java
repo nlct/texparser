@@ -49,7 +49,7 @@ public class L2HMathGroup extends MathGroup
 
       if (!isInLine())
       {
-         listener.write("<div id=\"displaymath\">");
+         listener.write("<div class=\"displaymath\">");
       }
 
       if (listener.useMathJax())
@@ -75,7 +75,7 @@ public class L2HMathGroup extends MathGroup
 
       if (!isInLine())
       {
-         listener.write("<div id=\"displaymath\">");
+         listener.write("<div class=\"displaymath\">");
       }
 
       if (listener.useMathJax())

@@ -39,6 +39,8 @@ public class JmlrCls extends LaTeXCls
 
    public void addDefinitions()
    {
+      LaTeXParserListener listener = getListener();
+
       registerControlSequence(new StoreDataCs("jmlrworkshop"));
       registerControlSequence(new StoreDataCs("jmlryear"));
       registerControlSequence(new StoreDataCs("jmlrvolume"));
@@ -57,10 +59,10 @@ public class JmlrCls extends LaTeXCls
          new StoreDataCs("author", "@shortauthor", "@author"));
 
       registerControlSequence(new GenericCommand("editorname",
-       null, new TeXObjectList("Editor")));
+       null, listener.createString("Editor")));
 
       registerControlSequence(new GenericCommand("editorsname",
-       null, new TeXObjectList("Editors")));
+       null, listener.createString("Editors")));
 
       registerControlSequence(new JmlrKeywords());
    }
@@ -114,9 +116,9 @@ public class JmlrCls extends LaTeXCls
       listener.usepackage(null, "nameref");
 
       registerControlSequence(new GenericCommand("@jmlrproceedings",
-       null, new TeXObjectList("Journal of Machine Learning Research")));
+       null, listener.createString("Journal of Machine Learning Research")));
       registerControlSequence(new GenericCommand("@jmlrabbrvproceedings",
-       null, new TeXObjectList("JMLR")));
+       null, listener.createString("JMLR")));
       registerControlSequence(new JmlrProceedings());
 
       TeXObjectList def = new TeXObjectList();

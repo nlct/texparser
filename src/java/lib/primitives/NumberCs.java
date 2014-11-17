@@ -83,7 +83,7 @@ public class NumberCs extends Primitive implements Expandable
    {
       Numerical arg = stack.popNumerical(parser);
 
-      return new TeXObjectList(String.format("%d", arg.number()));
+      return parser.getListener().createString(String.format("%d", arg.number()));
    }
 
    public TeXObjectList expandfully(TeXParser parser)
@@ -91,7 +91,7 @@ public class NumberCs extends Primitive implements Expandable
    {
       Numerical arg = parser.popNumerical();
 
-      return new TeXObjectList(String.format("%d", arg.number()));
+      return parser.getListener().createString(String.format("%d", arg.number()));
    }
 
    public void process(TeXParser parser, TeXObjectList stack)

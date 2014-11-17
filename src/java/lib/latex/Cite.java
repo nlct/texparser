@@ -217,10 +217,11 @@ public class Cite extends Command
        TeXObject opt1, TeXObject opt2, TeXObject arg)
    throws IOException
    {
-      TeXObject cite = 
-         ((LaTeXParserListener)parser.getListener()).getCitation(arg);
+      LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
 
-      return cite == null ? new UnknownReference(arg) : cite;
+      TeXObject cite = listener.getCitation(arg);
+
+      return cite == null ? listener.createUnknownReference(arg) : cite;
    }
 
    public void addLinkCitation(TeXParser parser, TeXObjectList list,

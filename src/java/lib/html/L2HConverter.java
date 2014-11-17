@@ -119,20 +119,20 @@ public class L2HConverter extends LaTeXParserListener
 
       putControlSequence(new L2HAbstract());
 
-      putControlSequence(new L2LMathDeclaration("math"));
+      putControlSequence(new L2HMathDeclaration("math"));
 
-      MathDeclaration begMathDecl = new L2LMathDeclaration("(");
+      MathDeclaration begMathDecl = new L2HMathDeclaration("(");
       parser.putControlSequence(begMathDecl);
       parser.putControlSequence(new EndDeclaration(")", begMathDecl));
       parser.putControlSequence(
-         new L2LMathDeclaration("displaymath", TeXSettings.MODE_DISPLAY_MATH));
+         new L2HMathDeclaration("displaymath", TeXSettings.MODE_DISPLAY_MATH));
 
-      MathDeclaration begDispDecl = new L2LMathDeclaration("[", TeXSettings.MODE_DISPLAY_MATH);
+      MathDeclaration begDispDecl = new L2HMathDeclaration("[", TeXSettings.MODE_DISPLAY_MATH);
 
       parser.putControlSequence(begDispDecl);
       parser.putControlSequence(new EndDeclaration("]", begDispDecl));
       parser.putControlSequence(
-         new L2LMathDeclaration("equation", TeXSettings.MODE_DISPLAY_MATH, true));
+         new L2HMathDeclaration("equation", TeXSettings.MODE_DISPLAY_MATH, true));
 
       try
       {
@@ -411,15 +411,15 @@ public class L2HConverter extends LaTeXParserListener
    public void writeCssStyles()
      throws IOException
    {
-      writeln(".displaymath { display: block; text-align: center; }");
-      writeln(".table { display: block; }");
-      writeln(".figure { display: block; }");
-      writeln(".caption { display: block; text-align: center; }");
-      writeln(".marginpar { float: right; }");
-      writeln(".abstract { display: block; margin-right: 4em; margin-left: 4em;}");
-      writeln(".title { display: block; text-align: center; font-size: x-large;}");
-      writeln(".author { display: block; text-align: center; font-size: large;}");
-      writeln(".date { display: block; text-align: center; font-size: medium;}");
+      writeln("div.displaymath { display: block; text-align: center; }");
+      writeln("div.table { display: block; }");
+      writeln("div.figure { display: block; }");
+      writeln("div.caption { display: block; text-align: center; }");
+      writeln("div.marginpar { float: right; }");
+      writeln("div.abstract { display: block; margin-right: 4em; margin-left: 4em;}");
+      writeln("div.title { display: block; text-align: center; font-size: x-large;}");
+      writeln("div.author { display: block; text-align: center; font-size: large;}");
+      writeln("div.date { display: block; text-align: center; font-size: medium;}");
    }
 
    public void documentclass(KeyValList options, String clsName)
@@ -466,7 +466,10 @@ public class L2HConverter extends LaTeXParserListener
 
       writeable.writeln("</head>");
       writeable.writeln("<body>");
+
       super.beginDocument();
+
+      getParser().getSettings().setCharMapMode(TeXSettings.CHAR_MAP_ON);
    }
 
    public void endDocument()
@@ -481,7 +484,7 @@ public class L2HConverter extends LaTeXParserListener
      TeXObject secondDelim, TeXObject before, TeXObject after)
     throws IOException
    {
-      if (useMathJax)
+      if (useMathJax())
       {
          if (firstDelim != null || secondDelim != null)
          {

@@ -46,7 +46,7 @@ public class L2HMaketitle extends ControlSequence
    {
       L2HConverter listener = (L2HConverter)parser.getListener();
 
-      listener.write("<div id=\"title\">");
+      listener.write("<div class=\"title\">");
 
       ControlSequence cs = listener.getControlSequence("@title");
 
@@ -54,7 +54,7 @@ public class L2HMaketitle extends ControlSequence
 
       listener.write("</div>");
 
-      listener.write("<div id=\"author\">");
+      listener.write("<div class=\"author\">");
 
       cs = listener.getControlSequence("@author");
 
@@ -62,7 +62,7 @@ public class L2HMaketitle extends ControlSequence
 
       listener.write("</div>");
 
-      listener.write("<div id=\"date\">");
+      listener.write("<div class=\"date\">");
 
       cs = listener.getControlSequence("@date");
 

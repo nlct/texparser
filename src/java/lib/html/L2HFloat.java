@@ -48,7 +48,7 @@ public class L2HFloat extends LaTeXFloat
    {
       L2HConverter listener = (L2HConverter)parser.getListener();
 
-      listener.write("<div id=\""+getName()+"\">");
+      listener.write("<div class=\""+getName()+"\">");
    }
 
    public void end(TeXParser parser)

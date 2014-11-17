@@ -47,7 +47,7 @@ public class RomanNumeral extends Primitive implements Expandable
 
       TeXObjectList list = new TeXObjectList();
 
-      return new TeXObjectList(romannumeral(arg.number()));
+      return parser.getListener().createString(romannumeral(arg.number()));
    }
 
    public TeXObjectList expandonce(TeXParser parser)
@@ -55,7 +55,7 @@ public class RomanNumeral extends Primitive implements Expandable
    {
       Numerical arg = parser.popNumerical();
 
-      return new TeXObjectList(romannumeral(arg.number()));
+      return parser.getListener().createString(romannumeral(arg.number()));
    }
 
    public TeXObjectList expandfully(TeXParser parser, TeXObjectList stack)

@@ -51,7 +51,7 @@ public class L2HSection extends Section
 
       if (tag == null)
       {
-         listener.write("<div id=\""+getName()+"\">");
+         listener.write("<div class=\""+getName()+"\">");
       }
       else
       {
@@ -89,7 +89,7 @@ public class L2HSection extends Section
 
       if (tag == null)
       {
-         list.add(new HtmlTag("<div id=\""+getName()+"\">"));
+         list.add(new HtmlTag("<div class=\""+getName()+"\">"));
       }
       else
       {

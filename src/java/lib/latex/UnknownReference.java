@@ -24,26 +24,38 @@ import com.dickimawbooks.texparserlib.*;
 
 public class UnknownReference extends TeXObjectList
 {
-   public UnknownReference(TeXObject labelObj)
+   public UnknownReference(TeXParserListener listener, TeXObject labelObj)
    {
-      this(labelObj, null);
+      this(listener, labelObj, null);
    }
 
-   public UnknownReference(String label)
+   public UnknownReference(TeXParserListener listener, String label)
    {
-      this(null, label);
+      this(listener, null, label);
    }
 
-   public UnknownReference(TeXObject labelObj, String label)
+   public UnknownReference(TeXParserListener listener, 
+     TeXObject labelObj, String label)
    {
-      super("??");
+      super(listener, "??");
+      this.labelObject = labelObj;
+      this.label = label;
+   }
+
+   private UnknownReference(TeXObject labelObj, String label)
+   {
+      super();
       this.labelObject = labelObj;
       this.label = label;
    }
 
    public Object clone()
    {
-      return new UnknownReference(getLabelObject(), getLabel());
+      UnknownReference cs = new UnknownReference(getLabelObject(), getLabel());
+
+      cs.addAll(this);
+
+      return cs;
    }
 
    public TeXObject getLabelObject()

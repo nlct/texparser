@@ -30,6 +30,7 @@ import java.nio.file.Files;
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.generic.*;
 import com.dickimawbooks.texparserlib.latex.UnknownReference;
+import com.dickimawbooks.texparserlib.latex.LaTeXParserListener;
 
 /**
  * Aux data.
@@ -153,7 +154,14 @@ public class AuxData
          }
       }
 
-      return new UnknownReference(label);
+      TeXParserListener listener = parser.getListener();
+
+      if (listener instanceof LaTeXParserListener)
+      {
+         return ((LaTeXParserListener)listener).createUnknownReference(label);
+      }
+
+      return new UnknownReference(listener, label);
    }
 
    public static TeXObject getPageReference(Vector<AuxData> auxData,
@@ -211,7 +219,14 @@ public class AuxData
          }
       }
 
-      return new UnknownReference(label);
+      TeXParserListener listener = parser.getListener();
+
+      if (listener instanceof LaTeXParserListener)
+      {
+         return ((LaTeXParserListener)listener).createUnknownReference(label);
+      }
+
+      return new UnknownReference(listener, label);
    }
 
    public static TeXObject getNameReference(Vector<AuxData> auxData,
@@ -269,7 +284,14 @@ public class AuxData
          }
       }
 
-      return new UnknownReference(label);
+      TeXParserListener listener = parser.getListener();
+
+      if (listener instanceof LaTeXParserListener)
+      {
+         return ((LaTeXParserListener)listener).createUnknownReference(label);
+      }
+
+      return new UnknownReference(listener, label);
    }
 
    public static TeXObject getCitation(Vector<AuxData> auxData,
@@ -312,7 +334,14 @@ public class AuxData
          }
       }
 
-      return new UnknownReference(label);
+      TeXParserListener listener = parser.getListener();
+
+      if (listener instanceof LaTeXParserListener)
+      {
+         return ((LaTeXParserListener)listener).createUnknownReference(label);
+      }
+
+      return new UnknownReference(listener, label);
    }
 
    private String name;

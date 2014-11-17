@@ -67,10 +67,11 @@ public abstract class TheBibliography extends Declaration
    {
       TeXObject arg = parser.popNextArg();
 
-      parser.putControlSequence(true, 
-       new GenericCommand(true, "@listctr", null, new TeXObjectList("enumiv")));
-
       LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
+
+      parser.putControlSequence(true, 
+       new GenericCommand(true, "@listctr", null, 
+          listener.createString("enumiv")));
 
       listener.getBibliographySection().process(parser);
 

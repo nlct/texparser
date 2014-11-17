@@ -23,31 +23,31 @@ import java.io.IOException;
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.*;
 
-public class L2LMathDeclaration extends MathDeclaration
+public class L2HMathDeclaration extends MathDeclaration
 {
-   public L2LMathDeclaration()
+   public L2HMathDeclaration()
    {
       super();
    }
 
-   public L2LMathDeclaration(String name)
+   public L2HMathDeclaration(String name)
    {
       super(name);
    }
 
-   public L2LMathDeclaration(String name, int mode)
+   public L2HMathDeclaration(String name, int mode)
    {
       super(name, mode);
    }
 
-   public L2LMathDeclaration(String name, int mode, boolean numbered)
+   public L2HMathDeclaration(String name, int mode, boolean numbered)
    {
       super(name, mode, numbered);
    }
 
    public Object clone()
    {
-      return new L2LMathDeclaration(getName(), getMode(), isNumbered());
+      return new L2HMathDeclaration(getName(), getMode(), isNumbered());
    }
 
    public void process(TeXParser parser, TeXObjectList stack)
@@ -65,7 +65,7 @@ public class L2LMathDeclaration extends MathDeclaration
 
       if (getMode() == TeXSettings.MODE_DISPLAY_MATH)
       {
-         listener.write("<div id=\"displaymath\">");
+         listener.write("<div class=\"displaymath\">");
       }
 
       if (listener.useMathJax())

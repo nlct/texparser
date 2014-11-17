@@ -218,7 +218,7 @@ public class LaTeX2LaTeX extends LaTeXParserListener
 
    public Group createGroup(String text)
    {
-      return new L2LGroup(text);
+      return new L2LGroup(this, text);
    }
 
    public MathGroup createMathGroup()

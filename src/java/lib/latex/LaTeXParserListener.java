@@ -80,7 +80,7 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
    {
       if (auxData == null)
       {
-         return new UnknownReference(label);
+         return createUnknownReference(label);
       }
 
       return AuxData.getCitation(auxData, getParser(), label);
@@ -91,7 +91,7 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
    {
       if (auxData == null)
       {
-         return new UnknownReference(label);
+         return createUnknownReference(label);
       }
 
       return AuxData.getReference(auxData, getParser(), label);
@@ -102,7 +102,7 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
    {
       if (auxData == null)
       {
-         return new UnknownReference(label);
+         return createUnknownReference(label);
       }
 
       return AuxData.getPageReference(auxData, getParser(), label);
@@ -113,7 +113,7 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
    {
       if (auxData == null)
       {
-         return new UnknownReference(label);
+         return createUnknownReference(label);
       }
 
       return AuxData.getNameReference(auxData, getParser(), label);
@@ -180,10 +180,10 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       bibliographySection.add(new TeXCsRef("refname"));
 
       parser.putControlSequence(
-        new GenericCommand("refname", null, new TeXObjectList("References")));
+        new GenericCommand("refname", null, createString("References")));
 
       parser.putControlSequence(
-        new GenericCommand("abstractname", null, new TeXObjectList("Abstract")));
+        new GenericCommand("abstractname", null, createString("Abstract")));
       parser.putControlSequence(new AbstractDec());
 
       parser.putControlSequence(new Today());
@@ -193,9 +193,9 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       parser.putControlSequence(new GenericCommand("@date", null, new TeXCsRef("today")));
 
       parser.putControlSequence(
-        new GenericCommand("figurename", null, new TeXObjectList("Figure")));
+        new GenericCommand("figurename", null, createString("Figure")));
       parser.putControlSequence(
-        new GenericCommand("tablename", null, new TeXObjectList("Table")));
+        new GenericCommand("tablename", null, createString("Table")));
 
       newcounter("part");
       newcounter("section");
@@ -466,6 +466,16 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       return new FontFamilyDeclaration(name, family);
    }
 
+   public UnknownReference createUnknownReference(String label)
+   {
+      return new UnknownReference(this, label);
+   }
+
+   public UnknownReference createUnknownReference(TeXObject label)
+   {
+      return new UnknownReference(this, label);
+   }
+
    public boolean isInDocEnv()
    {
       return docEnvFound;
@@ -485,6 +495,8 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
             parser,
             LaTeXSyntaxException.ERROR_MULTI_BEGIN_DOC);
       }
+
+      getParser().getSettings().setCharMapMode(TeXSettings.CHAR_MAP_OFF);
 
       setIsInDocEnv(true);
 

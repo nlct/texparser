@@ -82,6 +82,8 @@ public abstract class TeXParserListener
 
    public abstract Group createGroup(String text);
 
+   public abstract TeXObjectList createString(String text);
+
    public abstract MathGroup createMathGroup();
 
    public abstract SpChar createSpChar();

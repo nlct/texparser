@@ -142,7 +142,8 @@ public class Begin extends Command
       parser.startGroup();
 
       parser.putControlSequence(true,// local
-        new GenericCommand(true, "@currenvir", null, new TeXObjectList(name)));
+        new GenericCommand(true, "@currenvir", null,
+           parser.getListener().createString(name)));
 
       if (parser == stack)
       {

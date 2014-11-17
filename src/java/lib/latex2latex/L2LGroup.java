@@ -37,9 +37,9 @@ public class L2LGroup extends Group
       super(capacity);
    }
 
-   public L2LGroup(String text)
+   public L2LGroup(TeXParserListener listener, String text)
    {
-      super(text);
+      super(listener, text);
    }
 
    public Object clone()

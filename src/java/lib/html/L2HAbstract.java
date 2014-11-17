@@ -43,14 +43,14 @@ public class L2HAbstract extends AbstractDec
 
    public void process(TeXParser parser) throws IOException
    {
-      parser.getListener().getWriteable().write("<div id=\"abstract\">");
+      parser.getListener().getWriteable().write("<div class=\"abstract\">");
 
       super.process(parser);
    }
 
    public void process(TeXParser parser, TeXObjectList stack) throws IOException
    {
-      parser.getListener().getWriteable().write("<div id=\"abstract\">");
+      parser.getListener().getWriteable().write("<div class=\"abstract\">");
 
       super.process(parser, stack);
    }
