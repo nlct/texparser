@@ -23,7 +23,7 @@ import java.io.EOFException;
 
 import com.dickimawbooks.texparserlib.*;
 
-public class Label extends ControlSequence
+public class Label extends Command
 {
    public Label()
    {
@@ -40,25 +40,7 @@ public class Label extends ControlSequence
       return new Label(getName());
    }
 
-   public void process(TeXParser parser, TeXObjectList stack)
-      throws IOException
-   {
-      TeXObject arg = stack.popArg();
-
-      if (arg instanceof Expandable)
-      {
-         TeXObjectList expanded = ((Expandable)arg).expandfully(parser, stack);
-
-         if (expanded != null)
-         {
-            arg = expanded;
-         }
-      }
-
-      doLabel(parser, arg);
-    }
-
-   public void process(TeXParser parser)
+   public TeXObjectList expandonce(TeXParser parser)
       throws IOException
    {
       TeXObject arg = parser.popNextArg();
@@ -73,11 +55,92 @@ public class Label extends ControlSequence
          }
       }
 
-      doLabel(parser, arg);
+      return expandlabel(parser, arg);
    }
 
-   protected void doLabel(TeXParser parser, TeXObject arg)
-       throws IOException
+   public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
+      throws IOException
    {
+      TeXObject arg = stack.popArg();
+
+      if (arg instanceof Expandable)
+      {
+         TeXObjectList expanded = ((Expandable)arg).expandfully(parser, stack);
+
+         if (expanded != null)
+         {
+            arg = expanded;
+         }
+      }
+
+      return expandlabel(parser, arg);
+   }
+
+   protected TeXObjectList expandlabel(TeXParser parser, TeXObject arg)
+   throws IOException
+   {
+      LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
+
+      TeXObjectList list = new TeXObjectList();
+
+      if (listener.isStyLoaded("hyperref"))
+      {
+         list.add(new TeXCsRef("hypertarget"));
+
+         if (arg instanceof Group)
+         {
+            list.add(arg);
+         }
+         else
+         {
+            Group grp = listener.createGroup();
+
+            if (arg instanceof TeXObjectList)
+            {
+               grp.addAll((TeXObjectList)arg);
+            }
+            else
+            {
+               grp.add(arg);
+            }
+
+            list.add(grp);
+         }
+
+         list.add(listener.createGroup());
+      }
+      else
+      {
+         if (arg instanceof TeXObjectList)
+         {
+            return (TeXObjectList)arg;
+         }
+
+         list.add(arg);
+      }
+
+      return list;
+   }
+
+   public void process(TeXParser parser, TeXObjectList stack)
+      throws IOException
+   {
+      TeXObjectList expanded = expandonce(parser, stack);
+
+      if (expanded != null)
+      {
+         expanded.process(parser, stack);
+      }
+   }
+
+   public void process(TeXParser parser)
+      throws IOException
+   {
+      TeXObjectList expanded = expandonce(parser);
+
+      if (expanded != null)
+      {
+         expanded.process(parser);
+      }
    }
 }

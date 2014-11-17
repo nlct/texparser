@@ -55,20 +55,7 @@ public class Ref extends Command
          }
       }
 
-      TeXObject ref =
-         ((LaTeXParserListener)parser.getListener()).getReference(arg);
-
-      if (ref instanceof TeXObjectList)
-      {
-         return (TeXObjectList)ref;
-      }
-
-      if (ref == null) return null;
-
-      TeXObjectList list = new TeXObjectList();
-      list.add(ref);
-
-      return list;
+      return expandref(parser, arg);
    }
 
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
@@ -86,18 +73,73 @@ public class Ref extends Command
          }
       }
 
-      TeXObject ref = 
-         ((LaTeXParserListener)parser.getListener()).getReference(arg);
+      return expandref(parser, arg);
+   }
 
-      if (ref instanceof TeXObjectList)
-      {
-         return (TeXObjectList)ref;
-      }
+   protected TeXObjectList expandref(TeXParser parser, TeXObject arg)
+   throws IOException
+   {
+      LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
+
+      TeXObject ref = listener.getReference(arg);
 
       if (ref == null) return null;
 
       TeXObjectList list = new TeXObjectList();
-      list.add(ref);
+
+      if (listener.isStyLoaded("hyperref"))
+      {
+         list.add(new TeXCsRef("hyperlink"));
+
+         if (arg instanceof Group)
+         {
+            list.add(arg);
+         }
+         else
+         {
+            Group grp = listener.createGroup();
+
+            if (arg instanceof TeXObjectList)
+            {
+               grp.addAll((TeXObjectList)arg);
+            }
+            else
+            {
+               grp.add(arg);
+            }
+
+            list.add(grp);
+         }
+
+         if (ref instanceof Group)
+         {
+            list.add(ref);
+         }
+         else
+         {
+            Group grp = listener.createGroup();
+
+            if (ref instanceof TeXObjectList)
+            {
+               grp.addAll((TeXObjectList)ref);
+            }
+            else
+            {
+               grp.add(ref);
+            }
+
+            list.add(grp);
+         }
+      }
+      else
+      {
+         if (ref instanceof TeXObjectList)
+         {
+            return (TeXObjectList)ref;
+         }
+
+         list.add(ref);
+      }
 
       return list;
    }

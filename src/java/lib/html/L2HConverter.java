@@ -100,10 +100,6 @@ public class L2HConverter extends LaTeXParserListener
       putControlSequence(new L2HAmp());
       putControlSequence(new L2HNoBreakSpace());
       putControlSequence(new SpaceCs("newblock"));
-      putControlSequence(new L2HLabel());
-      putControlSequence(new L2HRef());
-      putControlSequence(new L2HPageRef());
-      putControlSequence(new L2HNameRef());
       putControlSequence(new L2HTheBibliography());
 
       putControlSequence(new L2HSection());
@@ -118,6 +114,8 @@ public class L2HConverter extends LaTeXParserListener
 
       putControlSequence(new L2HFloat("figure"));
       putControlSequence(new L2HFloat("table"));
+
+      putControlSequence(new L2HAbstract());
 
       putControlSequence(new L2LMathDeclaration("math"));
 
@@ -388,6 +386,7 @@ public class L2HConverter extends LaTeXParserListener
       writeln(".figure { display: block; }");
       writeln(".caption { display: block; text-align: center; }");
       writeln(".marginpar { float: right; }");
+      writeln(".abstract { display: block; margin-right: 4em; margin-left: 4em;}");
    }
 
    public void documentclass(KeyValList options, String clsName)

@@ -181,6 +181,10 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       parser.putControlSequence(
         new GenericCommand("refname", null, new TeXObjectList("References")));
 
+      parser.putControlSequence(
+        new GenericCommand("abstractname", null, new TeXObjectList("Abstract")));
+      parser.putControlSequence(new AbstractDec());
+
       parser.putControlSequence(new StoreDataCs("title"));
       parser.putControlSequence(new StoreDataCs("author"));
       parser.putControlSequence(new StoreDataCs("date"));
