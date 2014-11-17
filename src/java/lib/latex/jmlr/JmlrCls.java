@@ -61,6 +61,8 @@ public class JmlrCls extends LaTeXCls
 
       registerControlSequence(new GenericCommand("editorsname",
        null, new TeXObjectList("Editors")));
+
+      registerControlSequence(new JmlrKeywords());
    }
 
    protected void loadPreHyperrefPackages()

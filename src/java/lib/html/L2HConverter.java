@@ -24,6 +24,7 @@ import java.nio.file.Files;
 import java.util.Vector;
 
 import com.dickimawbooks.texparserlib.*;
+import com.dickimawbooks.texparserlib.primitives.*;
 import com.dickimawbooks.texparserlib.generic.*;
 import com.dickimawbooks.texparserlib.latex.*;
 import com.dickimawbooks.texparserlib.aux.*;
@@ -101,6 +102,7 @@ public class L2HConverter extends LaTeXParserListener
       putControlSequence(new L2HNoBreakSpace());
       putControlSequence(new SpaceCs("newblock"));
       putControlSequence(new L2HTheBibliography());
+      putControlSequence(new L2HMaketitle());
 
       putControlSequence(new L2HSection());
       putControlSequence(new L2HSection("subsection"));
@@ -266,17 +268,39 @@ public class L2HConverter extends LaTeXParserListener
       return style;
    }
 
+   public FontWeightDeclaration getFontWeightDeclaration(String name, int weight)
+   {
+      return new L2HFontWeightDeclaration(name, weight);
+   }
+
+   public FontSizeDeclaration getFontSizeDeclaration(String name, int size)
+   {
+      return new L2HFontSizeDeclaration(name, size);
+   }
+
+   public FontShapeDeclaration getFontShapeDeclaration(String name, int shape)
+   {
+      return new L2HFontShapeDeclaration(name, shape);
+   }
+
+   public FontFamilyDeclaration getFontFamilyDeclaration(String name, int family)
+   {
+      return new L2HFontFamilyDeclaration(name, family);
+   }
+
    public void writeCodePoint(int codePoint)
      throws IOException
    {
       if (writer == null) return;
 
+/*
       String style = getStyle();
 
       if (!style.isEmpty())
       {
          writer.write("<span style=\""+style+"\">");
       }
+*/
 
       if (codePoint >= 32 && codePoint <= 126)
       {
@@ -287,10 +311,12 @@ public class L2HConverter extends LaTeXParserListener
          writer.write("&#x"+Integer.toHexString(codePoint)+";");
       }
 
+/*
       if (!style.isEmpty())
       {
          writer.write("</span>");
       }
+*/
    }
 
    public void write(String str)
@@ -298,19 +324,23 @@ public class L2HConverter extends LaTeXParserListener
    {
       if (writer == null) return;
 
+/*
       String style = getStyle();
 
       if (!style.isEmpty())
       {
          writer.write("<span style=\""+style+"\">");
       }
+*/
 
       writer.write(str);
 
+/*
       if (!style.isEmpty())
       {
          writer.write("</span>");
       }
+*/
    }
 
    public void write(char c)
@@ -387,6 +417,9 @@ public class L2HConverter extends LaTeXParserListener
       writeln(".caption { display: block; text-align: center; }");
       writeln(".marginpar { float: right; }");
       writeln(".abstract { display: block; margin-right: 4em; margin-left: 4em;}");
+      writeln(".title { display: block; text-align: center; font-size: x-large;}");
+      writeln(".author { display: block; text-align: center; font-size: large;}");
+      writeln(".date { display: block; text-align: center; font-size: medium;}");
    }
 
    public void documentclass(KeyValList options, String clsName)
@@ -412,6 +445,25 @@ public class L2HConverter extends LaTeXParserListener
    public void beginDocument()
      throws IOException
    {
+      TeXObject cs = getParser().getControlSequence("@title");
+
+      if (!(cs instanceof Undefined) && cs != null)
+      {
+         if (cs instanceof Expandable)
+         {
+            TeXObjectList expanded = ((Expandable)cs).expandfully(getParser());
+
+            if (expanded != null)
+            {
+               cs = expanded;
+            }
+         }
+
+         writeable.write("<title>");
+         writeable.write(cs.toString(getParser()));
+         writeable.writeln("</title>");
+      }
+
       writeable.writeln("</head>");
       writeable.writeln("<body>");
       super.beginDocument();

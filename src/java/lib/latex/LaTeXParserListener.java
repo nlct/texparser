@@ -158,6 +158,7 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       parser.putControlSequence(new IfFileExists());
       parser.putControlSequence(new MakeAtLetter());
       parser.putControlSequence(new MakeAtOther());
+      parser.putControlSequence(new Ignorespaces());
       parser.putControlSequence(new Centerline());
       parser.putControlSequence(new Verb());
       parser.putControlSequence(new Cr("\\"));
@@ -185,6 +186,7 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
         new GenericCommand("abstractname", null, new TeXObjectList("Abstract")));
       parser.putControlSequence(new AbstractDec());
 
+      parser.putControlSequence(new Today());
       parser.putControlSequence(new StoreDataCs("title"));
       parser.putControlSequence(new StoreDataCs("author"));
       parser.putControlSequence(new StoreDataCs("date"));

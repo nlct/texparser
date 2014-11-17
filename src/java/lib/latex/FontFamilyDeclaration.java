@@ -86,5 +86,10 @@ public class FontFamilyDeclaration extends Declaration
       return false;
    }
 
+   public int getFamily()
+   {
+      return family;
+   }
+
    private int family, orgFamily;
 }

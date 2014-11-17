@@ -86,6 +86,11 @@ public class FontShapeDeclaration extends Declaration
       return false;
    }
 
+   public int getShape()
+   {
+      return shape;
+   }
+
    private String name;
    private int shape, orgShape;
 }

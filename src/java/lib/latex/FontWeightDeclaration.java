@@ -86,5 +86,10 @@ public class FontWeightDeclaration extends Declaration
       return false;
    }
 
+   public int getWeight()
+   {
+      return weight;
+   }
+
    private int weight, orgWeight;
 }

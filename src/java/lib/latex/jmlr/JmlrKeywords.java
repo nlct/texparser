@@ -16,25 +16,29 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
-package com.dickimawbooks.texparserlib.latex;
+package com.dickimawbooks.texparserlib.latex.jmlr;
 
 import java.io.IOException;
 import java.util.Vector;
 
 import com.dickimawbooks.texparserlib.*;
+import com.dickimawbooks.texparserlib.latex.*;
 
-public class FontSizeDeclaration extends Declaration
+public class JmlrKeywords extends Declaration
 {
-   public FontSizeDeclaration(String name, int size)
+   public JmlrKeywords()
+   {
+      this("keywords");
+   }
+
+   public JmlrKeywords(String name)
    {
       super(name);
-      this.size = size;
-      this.orgSize = TeXSettings.INHERIT;
    }
 
    public Object clone()
    {
-      return new FontSizeDeclaration(getName(), size);
+      return new JmlrKeywords(getName());
    }
 
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList list)
@@ -63,33 +67,49 @@ public class FontSizeDeclaration extends Declaration
 
    public void process(TeXParser parser) throws IOException
    {
-      TeXSettings settings = parser.getSettings();
+      Group grp = parser.getListener().createGroup("Keywords:");
 
-      orgSize = settings.getCurrentFontSize();
-
-      settings.setFontSize(size);
+      parser.push(new TeXCsRef("ignorespaces"));
+      parser.push(parser.getListener().getSpace());
+      parser.push(grp);
+      parser.push(new TeXCsRef("textbf"));
+      parser.push(new TeXCsRef("small"));
    }
 
-   public void process(TeXParser parser, TeXObjectList list) throws IOException
+   public void process(TeXParser parser, TeXObjectList stack) throws IOException
    {
-      process(parser);
+      Group grp = parser.getListener().createGroup("Keywords:");
+
+      stack.push(new TeXCsRef("ignorespaces"));
+      stack.push(parser.getListener().getSpace());
+      stack.push(grp);
+      stack.push(new TeXCsRef("textbf"));
+
+      (new TeXCsRef("small")).process(parser, stack);
    }
 
-   public void end(TeXParser parser) throws IOException
+   public void end(TeXParser parser)
+    throws IOException
    {
-      TeXSettings settings = parser.getSettings();
-      settings.setFontSize(orgSize);
+      ControlSequence cs = parser.getControlSequence("endsmall");
+
+      if (cs == null)
+      {
+         cs = parser.getListener().getControlSequence("small");
+
+         if (cs instanceof Declaration)
+         {
+            ((Declaration)cs).end(parser);
+         }
+
+         return;
+      }
+
+      cs.process(parser);
    }
 
    public boolean isModeSwitcher()
    {
       return false;
    }
-
-   public int getSize()
-   {
-      return size;
-   }
-
-   private int size, orgSize;
 }

@@ -19,64 +19,50 @@
 package com.dickimawbooks.texparserlib.latex;
 
 import java.io.IOException;
-import java.util.Vector;
 
 import com.dickimawbooks.texparserlib.*;
 
-public class TextBlockCommand extends ControlSequence
+public class Ignorespaces extends ControlSequence
 {
-   public TextBlockCommand(String name, Declaration declaration)
+   public Ignorespaces()
+   {
+      this("ignorespaces");
+   }
+
+   public Ignorespaces(String name)
    {
       super(name);
-      this.declaration = declaration;
    }
 
    public Object clone()
    {
-      return new TextBlockCommand(getName(), (Declaration)declaration.clone());
+      return new Ignorespaces(getName());
    }
 
-   public void process(TeXParser parser) throws IOException
+   public void process(TeXParser parser, TeXObjectList stack)
+     throws IOException
    {
-      TeXObject arg = parser.popStack();
+      TeXObject obj = stack.popStack();
 
-      if (arg instanceof Group)
+      while (obj instanceof WhiteSpace && stack.size() > 0)
       {
-         ((Group)arg).push(declaration);
-      }
-      else
-      {
-         Group grp = parser.getListener().createGroup();
-
-         grp.add(declaration);
-         grp.add(arg);
-
-         arg = grp;
+         obj = stack.popStack();
       }
 
-      arg.process(parser);
+      stack.push(obj);
    }
 
-   public void process(TeXParser parser, TeXObjectList stack) throws IOException
+   public void process(TeXParser parser)
+     throws IOException
    {
-      TeXObject arg = stack.popStack();
+      TeXObject obj = parser.popStack();
 
-      if (arg instanceof Group)
+      while (obj instanceof WhiteSpace)
       {
-         ((Group)arg).push(declaration);
-      }
-      else
-      {
-         Group grp = parser.getListener().createGroup();
-
-         grp.add(declaration);
-         grp.add(arg);
-
-         arg = grp;
+         obj = parser.popStack();
       }
 
-      arg.process(parser, stack);
+      parser.push(obj);
    }
 
-   private Declaration declaration;
 }
