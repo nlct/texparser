@@ -82,15 +82,16 @@ public abstract class DefaultTeXParserListener extends TeXParserListener
       parser.putControlSequence(new Else());
       parser.putControlSequence(new Fi());
       parser.putControlSequence(new MathAccent("vec", 8407));
-      parser.putControlSequence(new MathAccent("hat", 0x0302));
-      parser.putControlSequence(new MathAccent("check", 0x030C));
-      parser.putControlSequence(new MathAccent("breve", 0x0306));
+      parser.putControlSequence(new MathAccent("hat", 0x0302, 0x02C6));
+      parser.putControlSequence(new MathAccent("check", 0x030C, 0x02C7));
+      parser.putControlSequence(new MathAccent("breve", 0x0306, 0x02D8));
       parser.putControlSequence(new MathAccent("acute", 0x0301, 0x00B4));
       parser.putControlSequence(new MathAccent("grave", 0x0300, 0x0060));
-      parser.putControlSequence(new MathAccent("tilde", 0x0303, 0x007E));
+      parser.putControlSequence(new MathAccent("tilde", 0x0303, 0x02DC));
       parser.putControlSequence(new MathAccent("bar", 0x0304, 0x00AF));
-      parser.putControlSequence(new MathAccent("dot", 0x0307));
+      parser.putControlSequence(new MathAccent("dot", 0x0307, 0x02D9));
       parser.putControlSequence(new MathAccent("ddot", 0x0308, 0x00A8));
+      parser.putControlSequence(new DoubleLetterAccent("t", 0x035C, 0x203F));
 
       // TeX font changing declarations
 
