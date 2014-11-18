@@ -46,7 +46,7 @@ public class MathAccent extends ControlSequence
    {
       TeXObject arg = parser.popNextArg();
 
-      if (arg instanceof TeXObjectList && ((TexObjectList)arg).size() == 0)
+      if (arg instanceof TeXObjectList && ((TeXObjectList)arg).size() == 0)
       {
          if (noCharCodePt == -1)
          {
@@ -70,7 +70,7 @@ public class MathAccent extends ControlSequence
    {
       TeXObject arg = stack.popArg();
 
-      if (arg instanceof TeXObjectList && ((TexObjectList)arg).size() == 0)
+      if (arg instanceof TeXObjectList && ((TeXObjectList)arg).size() == 0)
       {
          if (noCharCodePt == -1)
          {
