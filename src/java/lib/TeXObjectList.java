@@ -343,6 +343,11 @@ public class TeXObjectList extends Vector<TeXObject> implements TeXObject,Expand
    {
       TeXObject object = popStack();
 
+      if (object instanceof TeXCsRef)
+      {
+         object = parser.getListener().getControlSequence(((TeXCsRef)object).getName());
+      }
+
       if (object instanceof TeXNumber)
       {
          return (TeXNumber)object;
@@ -646,6 +651,12 @@ public class TeXObjectList extends Vector<TeXObject> implements TeXObject,Expand
       {
          TeXObject object = remove(0);
 
+         if (object instanceof TeXCsRef)
+         {
+            object = parser.getListener().getControlSequence(
+               ((TeXCsRef)object).getName());
+         }
+
          if (object instanceof Declaration)
          {
             pushDeclaration((Declaration)object);
@@ -667,6 +678,12 @@ public class TeXObjectList extends Vector<TeXObject> implements TeXObject,Expand
          while (stack.size() > 0)
          {
             TeXObject object = stack.remove(0);
+
+            if (object instanceof TeXCsRef)
+            {
+               object = parser.getListener().getControlSequence(
+                  ((TeXCsRef)object).getName());
+            }
 
             if (object instanceof Declaration)
             {

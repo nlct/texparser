@@ -16,45 +16,60 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
-package com.dickimawbooks.texparserlib.html;
+package com.dickimawbooks.texparserlib.latex;
 
 import java.io.IOException;
-import java.util.Vector;
+import java.io.EOFException;
 
 import com.dickimawbooks.texparserlib.*;
-import com.dickimawbooks.texparserlib.latex.*;
 
-public class L2HTheBibliography extends TheBibliography
+public class Maketitle extends ControlSequence
 {
-   public L2HTheBibliography()
+   public Maketitle()
    {
-      this("thebibliography");
+      this("maketitle");
    }
 
-   public L2HTheBibliography(String name)
+   public Maketitle(String name)
    {
       super(name);
    }
 
    public Object clone()
    {
-      return new L2HTheBibliography(getName());
+      return new Maketitle(getName());
    }
 
-   protected void startBibliography(TeXParser parser, 
-     TeXObject widest)
-     throws IOException
+   public void preProcess(TeXParser parser)
+      throws IOException
    {
-      L2HConverter listener = (L2HConverter)parser.getListener();
+      parser.startGroup();
 
-      listener.write("<div class=\"bibliography\"><div>");
+      parser.putControlSequence(true,
+        new GenericCommand(true, "thefootnote", null,
+        new TeXObject[] 
+         {new TeXCsRef("@fnsymbol"), new TeXCsRef("c@footnote")}));
    }
 
-   public void end(TeXParser parser)
+   public void postProcess(TeXParser parser)
+      throws IOException
+   {
+      parser.endGroup();
+
+      ((LaTeXParserListener)parser.getListener()).resetcounter("footnote");
+   }
+
+   public void process(TeXParser parser)
    throws IOException
    {
-      L2HConverter listener = (L2HConverter)parser.getListener();
+      preProcess(parser);
+      postProcess(parser);
+   }
 
-      listener.write("</div></div>");
+   public void process(TeXParser parser, TeXObjectList stack)
+   throws IOException
+   {
+      preProcess(parser);
+      postProcess(parser);
    }
 }

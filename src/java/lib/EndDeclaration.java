@@ -105,6 +105,11 @@ public class EndDeclaration extends ControlSequence
    {
    }
 
+   public String getDeclarationName()
+   {
+      return declName;
+   }
+
    private String declName;
 
 }

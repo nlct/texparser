@@ -53,7 +53,103 @@ public class L2HMathDeclaration extends MathDeclaration
    public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      process(parser);
+      super.process(parser, stack);
+
+      L2HConverter listener = (L2HConverter)parser.getListener();
+
+      if (getMode() == TeXSettings.MODE_DISPLAY_MATH)
+      {
+         listener.write("<div class=\"displaymath\">");
+      }
+
+      if (listener.useMathJax())
+      {
+         if (isNumbered())
+         {
+            // Find label if there is one
+
+            TeXObjectList list = new TeXObjectList();
+
+            while (stack.size() > 0)
+            {
+               TeXObject obj = stack.popStack();
+
+               if (obj instanceof TeXCsRef)
+               {
+                  obj = listener.getControlSequence(((TeXCsRef)obj).getName());
+               }
+
+               if (obj instanceof Label)
+               {
+                  obj.process(parser, stack);
+
+                  break;
+               }
+
+               if (obj instanceof Expandable)
+               {
+                  TeXObjectList expanded = 
+                     ((Expandable)obj).expandonce(parser, stack);
+
+                  if (expanded != null)
+                  {
+                     obj = expanded;
+                  }
+               }
+
+               if (obj instanceof TeXObjectList
+                && !(obj instanceof Group))
+               {
+                  stack.addAll(0, (TeXObjectList)obj);
+
+                  obj = stack.popStack();
+               }
+
+               if (obj instanceof TeXCsRef)
+               {
+                  obj = listener.getControlSequence(((TeXCsRef)obj).getName());
+               }
+
+               if (obj instanceof End)
+               {
+                  TeXObject arg = stack.peekStack();
+
+                  if (arg instanceof Group)
+                  {
+                     arg = ((Group)arg).toList();
+                  }
+
+                  if (getName().equals(arg.toString(parser)))
+                  {
+                     list.add(obj);
+
+                     break;
+                  }
+               }
+               else if (obj instanceof EndDeclaration)
+               {
+                  if (((EndDeclaration)obj).getDeclarationName().equals(getName()))
+                  {
+                     list.add(obj);
+
+                     break;
+                  }
+               }
+               else if (obj instanceof Label)
+               {
+                  obj.process(parser, stack);
+
+                  break;
+               }
+
+               list.add(obj);
+            }
+
+            stack.addAll(0, list);
+         }
+
+         listener.write("$");
+      }
    }
 
    public void process(TeXParser parser)
@@ -70,6 +166,90 @@ public class L2HMathDeclaration extends MathDeclaration
 
       if (listener.useMathJax())
       {
+         if (isNumbered())
+         {
+            // Find label if there is one
+
+            TeXObjectList list = new TeXObjectList();
+
+            while (true)
+            {
+               TeXObject obj = parser.popStack();
+
+               if (obj instanceof TeXCsRef)
+               {
+                  obj = listener.getControlSequence(((TeXCsRef)obj).getName());
+               }
+
+               if (obj instanceof Label)
+               {
+                  obj.process(parser);
+
+                  break;
+               }
+
+               if (obj instanceof Expandable)
+               {
+                  TeXObjectList expanded = 
+                     ((Expandable)obj).expandonce(parser);
+
+                  if (expanded != null)
+                  {
+                     obj = expanded;
+                  }
+               }
+
+               if (obj instanceof TeXObjectList
+                && !(obj instanceof Group))
+               {
+                  parser.addAll(0, (TeXObjectList)obj);
+
+                  obj = parser.popStack();
+               }
+
+               if (obj instanceof TeXCsRef)
+               {
+                  obj = listener.getControlSequence(((TeXCsRef)obj).getName());
+               }
+
+               if (obj instanceof End)
+               {
+                  TeXObject arg = parser.peekStack();
+
+                  if (arg instanceof Group)
+                  {
+                     arg = ((Group)arg).toList();
+                  }
+
+                  if (getName().equals(arg.toString(parser)))
+                  {
+                     list.add(obj);
+
+                     break;
+                  }
+               }
+               else if (obj instanceof EndDeclaration)
+               {
+                  if (((EndDeclaration)obj).getDeclarationName().equals(getName()))
+                  {
+                     list.add(obj);
+
+                     break;
+                  }
+               }
+               else if (obj instanceof Label)
+               {
+                  obj.process(parser);
+
+                  break;
+               }
+
+               list.add(obj);
+            }
+
+            parser.addAll(0, list);
+         }
+
          listener.write("$");
       }
    }
@@ -83,6 +263,13 @@ public class L2HMathDeclaration extends MathDeclaration
       if (listener.useMathJax())
       {
          listener.write("$");
+      }
+
+      if (isNumbered())
+      {
+         listener.write("<div class=\"eqno\">(");
+         listener.getControlSequence("theequation").process(parser);
+         listener.write(")</div>");
       }
 
       if (getMode() == TeXSettings.MODE_DISPLAY_MATH)

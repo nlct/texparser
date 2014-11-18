@@ -19,42 +19,46 @@
 package com.dickimawbooks.texparserlib.html;
 
 import java.io.IOException;
-import java.util.Vector;
+import java.io.EOFException;
 
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.*;
 
-public class L2HTheBibliography extends TheBibliography
+public class L2HTextSuperscript extends ControlSequence
 {
-   public L2HTheBibliography()
+   public L2HTextSuperscript()
    {
-      this("thebibliography");
+      this("textsuperscript");
    }
 
-   public L2HTheBibliography(String name)
+   public L2HTextSuperscript(String name)
    {
       super(name);
    }
 
    public Object clone()
    {
-      return new L2HTheBibliography(getName());
+      return new L2HTextSuperscript(getName());
    }
 
-   protected void startBibliography(TeXParser parser, 
-     TeXObject widest)
-     throws IOException
-   {
-      L2HConverter listener = (L2HConverter)parser.getListener();
-
-      listener.write("<div class=\"bibliography\"><div>");
-   }
-
-   public void end(TeXParser parser)
+   public void process(TeXParser parser, TeXObjectList stack)
    throws IOException
    {
-      L2HConverter listener = (L2HConverter)parser.getListener();
+      TeXObject arg = stack.popArg();
 
-      listener.write("</div></div>");
+      stack.push(new HtmlTag("</sup>"));
+      stack.push(arg);
+      stack.push(new HtmlTag("<sup>"));
    }
+
+   public void process(TeXParser parser)
+   throws IOException
+   {
+      TeXObject arg = parser.popNextArg();
+
+      parser.push(new HtmlTag("</sup>"));
+      parser.push(arg);
+      parser.push(new HtmlTag("<sup>"));
+   }
+
 }

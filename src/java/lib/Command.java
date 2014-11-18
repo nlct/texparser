@@ -45,12 +45,26 @@ public abstract class Command extends ControlSequence implements Expandable
 
    public TeXObjectList expandfully(TeXParser parser) throws IOException
    {
-      return expandfully(parser, null);
+      TeXObjectList expanded = expandonce(parser);
+
+      if (expanded == null)
+      {
+         return null;
+      }
+
+      TeXObjectList result = expanded.expandfully(parser);
+
+      return result == null ? expanded : result;
    }
 
    public TeXObjectList expandfully(TeXParser parser,
         TeXObjectList stack) throws IOException
    {
+      if (stack == null)
+      {
+         return expandfully(parser);
+      }
+
       TeXObjectList expanded = expandonce(parser, stack);
 
       if (expanded == null)

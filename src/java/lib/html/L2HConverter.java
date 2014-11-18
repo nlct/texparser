@@ -102,7 +102,11 @@ public class L2HConverter extends LaTeXParserListener
       putControlSequence(new L2HNoBreakSpace());
       putControlSequence(new SpaceCs("newblock"));
       putControlSequence(new L2HTheBibliography());
+      putControlSequence(new L2HBibItem());
       putControlSequence(new L2HMaketitle());
+      putControlSequence(new L2HMbox());
+
+      putControlSequence(new L2HTextSuperscript());
 
       putControlSequence(new L2HSection());
       putControlSequence(new L2HSection("subsection"));
@@ -412,6 +416,7 @@ public class L2HConverter extends LaTeXParserListener
      throws IOException
    {
       writeln("div.displaymath { display: block; text-align: center; }");
+      writeln("div.eqno { float: right; }");
       writeln("div.table { display: block; }");
       writeln("div.figure { display: block; }");
       writeln("div.caption { display: block; text-align: center; }");
@@ -420,6 +425,19 @@ public class L2HConverter extends LaTeXParserListener
       writeln("div.title { display: block; text-align: center; font-size: x-large;}");
       writeln("div.author { display: block; text-align: center; font-size: large;}");
       writeln("div.date { display: block; text-align: center; font-size: medium;}");
+      writeln("div.bibliography { display: block; margin-left: 4em; }");
+      writeln("div.bibitem { display: inline; float: left; text-indent: -3em; }");
+      writeln("div.mbox { display: inline; }");
+
+      for (String style : extraCssStyles)
+      {
+         writeln(style);
+      }
+   }
+
+   public void addCssStyle(String style)
+   {
+      extraCssStyles.add(style);
    }
 
    public void documentclass(KeyValList options, String clsName)
@@ -475,6 +493,8 @@ public class L2HConverter extends LaTeXParserListener
    public void endDocument()
      throws IOException
    {
+      processFootnotes();
+
       writeable.writeln("</body>");
       writeable.writeln("</html>");
       super.endDocument();
@@ -673,6 +693,11 @@ public class L2HConverter extends LaTeXParserListener
       return new L2HUndefined(name);
    }
 
+   public void doFootnoteRule() throws IOException
+   {
+      writeln("<p><hr><p>");
+   }
+
    private Writer writer;
 
    private TeXApp texApp;
@@ -684,4 +709,6 @@ public class L2HConverter extends LaTeXParserListener
    private boolean useMathJax=true;
 
    private String suffix = "html";
+
+   private Vector<String> extraCssStyles = new Vector<String>();
 }

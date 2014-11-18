@@ -88,6 +88,12 @@ public class Group extends TeXObjectList
       {
          TeXObject object = list.pop();
 
+         if (object instanceof TeXCsRef)
+         {
+            object = parser.getListener().getControlSequence(
+               ((TeXCsRef)object).getName());
+         }
+
          if (object == null)
          {
             break;

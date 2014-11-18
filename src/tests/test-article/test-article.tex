@@ -1,0 +1,66 @@
+% arara: pdflatex
+% arara: bibtex
+% arara: pdflatex
+% arara: pdflatex
+\documentclass{article}
+
+\usepackage{lipsum}
+\usepackage[colorlinks]{hyperref}
+
+\title{Sample Article}
+\author{Nicola Talbot\thanks{Some attribution}}
+
+\begin{document}
+\maketitle
+
+\tableofcontents
+
+\begin{abstract}
+\lipsum[1]
+\end{abstract}
+
+\section*{An Unnumbered Section}
+\addcontentsline{toc}{section}{An Unnumbered Section}
+
+\lipsum[4-5]
+
+\section{Introduction}
+\label{sec:intro}
+
+This is an example section. An unnumbered equation:
+\[
+  f(\vec{a}; x) = \sum_{i=1}^n a_i x^i
+\]
+
+A numbered equation:
+\begin{equation}
+y = m x + c
+\label{eq:mx+c}
+\end{equation}
+
+Some \textbf{bold text}, \textit{italic text}, 
+\textsf{sans-serif text}, \textsc{small caps}.
+Here's a footnote.\footnote{Here's the footnote text.}
+
+\section{Another Section}
+
+Some cross-references: section~\ref{sec:intro},
+equation~\ref{eq:mx+c} and some
+citations~\cite{article-full,incollection-full}
+and~\cite[some text]{inproceedings-full}.
+
+\lipsum[2-3]
+
+\subsection{A Subsection}
+
+\lipsum[6-7]
+
+\section*{Another Unnumbered Section}
+\addcontentsline{toc}{section}{Another Unnumbered Section}
+
+\lipsum[8-9]
+
+\bibliographystyle{plain}
+\bibliography{xampl}
+
+\end{document}

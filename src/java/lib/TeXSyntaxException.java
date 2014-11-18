@@ -66,6 +66,15 @@ public class TeXSyntaxException extends IOException
            param);
    }
 
+   public TeXSyntaxException(TeXParser parser, int errorCode, String param, Throwable cause)
+   {
+      this(parser.getListenerFile(),
+           parser.getLineNumber(), 
+           errorCode,
+           param,
+           cause);
+   }
+
    public TeXSyntaxException(TeXParser parser, int errorCode)
    {
       this(parser.getListenerFile(),
@@ -74,9 +83,28 @@ public class TeXSyntaxException extends IOException
            null);
    }
 
+   public TeXSyntaxException(TeXParser parser, int errorCode,
+     Throwable cause)
+   {
+      this(parser.getListenerFile(),
+           parser.getLineNumber(), 
+           errorCode,
+           null,
+           cause);
+   }
+
    public TeXSyntaxException(File file, int lineNumber, int errorCode, String param)
    {
       super("TeX syntax error code "+errorCode);
+      this.file = file;
+      this.errorCode = errorCode;
+      this.param = param;
+      this.lineNum = lineNumber;
+   }
+
+   public TeXSyntaxException(File file, int lineNumber, int errorCode, String param, Throwable cause)
+   {
+      super("TeX syntax error code "+errorCode, cause);
       this.file = file;
       this.errorCode = errorCode;
       this.param = param;

@@ -73,6 +73,7 @@ public abstract class Section extends ControlSequence
 
       if (isStar)
       {
+         ((LaTeXParserListener)parser.getListener()).stepcounter(getName()+"*");
          unnumbered(parser, stack, arg);
       }
       else

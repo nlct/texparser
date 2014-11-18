@@ -304,7 +304,6 @@ public class Accent extends ControlSequence
       parser.putControlSequence(new Accent("."));
       parser.putControlSequence(new Accent("v"));
       parser.putControlSequence(new Accent("H"));
-      parser.putControlSequence(new Accent("t"));
    }
 
    private String getText(String accent, int codePoint)
@@ -312,27 +311,27 @@ public class Accent extends ControlSequence
    {
       if (accent.equals("'"))
       {
-         return getAccent(codePoint, ACUTE_ACCENTS, 0x02CA);
+         return getAccent(codePoint, ACUTE_ACCENTS, 0x0301);
       }
 
       if (accent.equals("`"))
       {
-         return getAccent(codePoint, GRAVE_ACCENTS, 0x02CB);
+         return getAccent(codePoint, GRAVE_ACCENTS, 0x0300);
       }
 
       if (accent.equals("\""))
       {
-         return getAccent(codePoint, UMLAUT_ACCENTS, 0x00A8);
+         return getAccent(codePoint, UMLAUT_ACCENTS, 0x0308);
       }
 
       if (accent.equals("u"))
       {
-         return getAccent(codePoint, BREVE_ACCENTS, 0x02D8);
+         return getAccent(codePoint, BREVE_ACCENTS, 0x0306);
       }
 
       if (accent.equals("c"))
       {
-         return getAccent(codePoint, CEDILLA_ACCENTS, 0x00B8);
+         return getAccent(codePoint, CEDILLA_ACCENTS, 0x0327);
       }
 
       if (accent.equals("~"))
@@ -342,17 +341,17 @@ public class Accent extends ControlSequence
 
       if (accent.equals("^"))
       {
-         return getAccent(codePoint, CIRCUM_ACCENTS, 0x02C6);
+         return getAccent(codePoint, CIRCUM_ACCENTS, 0x0302);
       }
 
       if (accent.equals("r"))
       {
-         return getAccent(codePoint, RING_ACCENTS, 0x02DA);
+         return getAccent(codePoint, RING_ACCENTS, 0x030A);
       }
 
       if (accent.equals("b"))
       {
-         return getAccent(codePoint, UNDERBAR_ACCENTS, 0x02CD);
+         return getAccent(codePoint, UNDERBAR_ACCENTS, 0x0320);
       }
 
       if (accent.equals("d"))
@@ -362,39 +361,22 @@ public class Accent extends ControlSequence
 
       if (accent.equals("="))
       {
-         return getAccent(codePoint, MACRON_ACCENTS, 0x02C9);
+         return getAccent(codePoint, MACRON_ACCENTS, 0x0304);
       }
 
       if (accent.equals("."))
       {
-         return getAccent(codePoint, DOT_ACCENTS, 0x02D9);
+         return getAccent(codePoint, DOT_ACCENTS, 0x0307);
       }
 
       if (accent.equals("v"))
       {
-         return getAccent(codePoint, CARON_ACCENTS, 0x02C7);
+         return getAccent(codePoint, CARON_ACCENTS, 0x030C);
       }
 
       if (accent.equals("H"))
       {
-         return getAccent(codePoint, DOUBLE_ACUTE_ACCENTS, 0x02DD);
-      }
-
-      if (accent.equals("t"))
-      {
-         StringBuilder builder = new StringBuilder(2);
-         builder.appendCodePoint(0x0361);
-
-         if (codePoint == -1)
-         {
-            builder.append(' ');
-         }
-         else
-         {
-            builder.appendCodePoint(codePoint);
-         }
-
-         return builder.toString();
+         return getAccent(codePoint, DOUBLE_ACUTE_ACCENTS, 0x030B);
       }
 
       return ""+(char)codePoint;
@@ -406,19 +388,19 @@ public class Accent extends ControlSequence
       return getAccent(codePoint, array, -1);
    }
 
-   private String getAccent(int codePoint, int[][] array, int defVal)
+   private String getAccent(int codePoint, int[][] array, int combiningCode)
       throws IOException
    {
       StringBuilder builder = new StringBuilder(2);
 
       if (codePoint == -1)
       {
-         if (defVal != -1)
-         {
-            builder.appendCodePoint(defVal);
-         }
-
          builder.append(' ');
+
+         if (combiningCode != -1)
+         {
+            builder.appendCodePoint(combiningCode);
+         }
 
          return builder.toString();
       }
@@ -432,12 +414,12 @@ public class Accent extends ControlSequence
          }
       }
 
-      if (defVal != -1)
-      {
-         builder.appendCodePoint(defVal);
-      }
-
       builder.appendCodePoint(codePoint);
+
+      if (combiningCode != -1)
+      {
+         builder.appendCodePoint(combiningCode);
+      }
 
       return builder.toString();
    }

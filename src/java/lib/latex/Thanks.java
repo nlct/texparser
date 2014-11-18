@@ -16,45 +16,52 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
-package com.dickimawbooks.texparserlib.html;
+package com.dickimawbooks.texparserlib.latex;
 
 import java.io.IOException;
 import java.util.Vector;
 
 import com.dickimawbooks.texparserlib.*;
-import com.dickimawbooks.texparserlib.latex.*;
 
-public class L2HTheBibliography extends TheBibliography
+public class Thanks extends Footnote
 {
-   public L2HTheBibliography()
+   public Thanks()
    {
-      this("thebibliography");
+      this("thanks");
    }
 
-   public L2HTheBibliography(String name)
+   public Thanks(String name)
    {
       super(name);
    }
 
    public Object clone()
    {
-      return new L2HTheBibliography(getName());
+      return new Thanks(getName());
    }
 
-   protected void startBibliography(TeXParser parser, 
-     TeXObject widest)
-     throws IOException
-   {
-      L2HConverter listener = (L2HConverter)parser.getListener();
-
-      listener.write("<div class=\"bibliography\"><div>");
-   }
-
-   public void end(TeXParser parser)
+   public String getTargetName(TeXParser parser, String counter, TeXObject thempfn)
    throws IOException
    {
-      L2HConverter listener = (L2HConverter)parser.getListener();
+      TeXObject thehcounter = parser.getControlSequence("theH"+counter);
 
-      listener.write("</div></div>");
+      if (thehcounter == null)
+      {
+         return "thanks."
+          +((LaTeXParserListener)parser.getListener()).getcountervalue(counter);
+      }
+
+      if (thehcounter instanceof Expandable)
+      {
+         TeXObjectList expanded = ((Expandable)thehcounter).expandfully(parser);
+
+         if (expanded != null)
+         {
+            thehcounter = expanded;
+         }
+      }
+
+      return "thanks."+thehcounter.toString(parser);
    }
+
 }

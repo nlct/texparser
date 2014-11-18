@@ -73,6 +73,8 @@ public abstract class TheBibliography extends Declaration
        new GenericCommand(true, "@listctr", null, 
           listener.createString("enumiv")));
 
+      listener.resetcounter("enumiv");
+
       listener.getBibliographySection().process(parser);
 
       startBibliography(parser, arg);
@@ -83,6 +85,12 @@ public abstract class TheBibliography extends Declaration
       TeXObject arg = list.popArg();
 
       LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
+
+      parser.putControlSequence(true, 
+       new GenericCommand(true, "@listctr", null, 
+          listener.createString("enumiv")));
+
+      listener.resetcounter("enumiv");
 
       listener.getBibliographySection().process(parser);
 

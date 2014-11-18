@@ -58,6 +58,39 @@ public class L2HSection extends Section
          listener.write("<"+tag+">");
       }
 
+      TeXObject cs = parser.getControlSequence("theH"+getName()+"*");
+
+      if (cs == null)
+      {
+         cs = parser.getControlSequence("the"+getName()+"*");
+      }
+
+      if (cs != null)
+      {
+         if (cs instanceof Expandable)
+         {
+            TeXObjectList expanded;
+
+            if (parser == stack || stack == null)
+            {
+               expanded = ((Expandable)cs).expandfully(parser);
+            }
+            else
+            {
+               expanded = ((Expandable)cs).expandfully(parser, stack);
+            }
+
+            if (expanded != null)
+            {
+               cs = expanded;
+            }
+         }
+
+         listener.write("<a name=\""
+           +HtmlTag.getUriFragment(getName()+"*."+cs.toString(parser))
+           +"\"></a>");
+      }
+
       if (parser == stack || stack == null)
       {
          arg.process(parser);
@@ -175,6 +208,39 @@ public class L2HSection extends Section
          else
          {
             stack.push(object);
+         }
+
+         TeXObject cs = parser.getControlSequence("theH"+getName());
+
+         if (cs == null)
+         {
+            cs = parser.getControlSequence("the"+getName());
+         }
+
+         if (cs != null)
+         {
+            if (cs instanceof Expandable)
+            {
+               TeXObjectList expanded;
+
+               if (parser == stack || stack == null)
+               {
+                  expanded = ((Expandable)cs).expandfully(parser);
+               }
+               else
+               {
+                  expanded = ((Expandable)cs).expandfully(parser, stack);
+               }
+
+               if (expanded != null)
+               {
+                  cs = expanded;
+               }
+            }
+
+            list.add(1, new HtmlTag("<a name=\""
+              +HtmlTag.getUriFragment(getName()+"."+cs.toString(parser))+"\">"));
+            list.add(new HtmlTag("</a>"));
          }
       }
 

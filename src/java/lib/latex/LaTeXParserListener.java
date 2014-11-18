@@ -63,6 +63,8 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       setAuxData(auxData);
       setParseAuxEnabled(parseAux);
       counters = new Hashtable<String,Vector<String>>();
+
+      footnotes = new TeXObjectList();
    }
 
    public boolean isParseAuxEnabled()
@@ -172,7 +174,10 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       parser.putControlSequence(new Tabular());
       parser.putControlSequence(new Tabular("array"));
       parser.putControlSequence(new Bibliography());
+      parser.putControlSequence(new BibliographyStyle());
+      parser.putControlSequence(new BibItem());
       parser.putControlSequence(new Cite());
+      parser.putControlSequence(new AddContentsLine());
 
       bibliographySection = new TeXObjectList();
       bibliographySection.add(new TeXCsRef("section"));
@@ -203,15 +208,32 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       newcounter("subsubsection", "subsection");
       newcounter("paragraph", "subsubsection");
       newcounter("subparagraph", "paragraph");
+
+      newcounter("part*");
+      newcounter("section*");
+      newcounter("subsection*", "section*");
+      newcounter("subsubsection*", "subsection*");
+      newcounter("paragraph*", "subsubsection*");
+      newcounter("subparagraph*", "paragraph*");
+
       newcounter("figure");
       newcounter("table");
       newcounter("equation");
-      newcounter("footnote");
-      newcounter("mpfootnote");
       newcounter("enumi");
       newcounter("enumii");
       newcounter("enumiii");
       newcounter("enumiv");
+
+      newcounter("footnote");
+      newcounter("mpfootnote");
+
+      parser.putControlSequence(
+        new GenericCommand("@mpfn", null, createString("footnote")));
+      parser.putControlSequence(
+        new GenericCommand("thempfn", null, new TeXCsRef("thefootnote")));
+      parser.putControlSequence(new Footnote());
+      parser.putControlSequence(new Thanks());
+      parser.putControlSequence(new AtFnSymbol());
 
       parser.putControlSequence(new MathDeclaration("math"));
 
@@ -516,6 +538,8 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
    public void endDocument()
      throws IOException
    {
+      processFootnotes();
+
       if (!isInDocEnv())
       {
          throw new LaTeXSyntaxException(
@@ -524,6 +548,26 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       }
 
       throw new EOFException();
+   }
+
+   public void processFootnotes()
+   throws IOException
+   {
+      if (footnotes.size() > 0)
+      {
+         doFootnoteRule();
+
+         while (footnotes.size() > 0)
+         {
+            footnotes.pop().process(getParser());
+            getPar().process(getParser());
+         }
+      }
+
+   }
+
+   public void doFootnoteRule() throws IOException
+   {
    }
 
    public LaTeXFile getDocumentClass()
@@ -924,11 +968,20 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       // counters are global
       parser.getSettings().newcount(false, "c@"+name);
 
-      parser.putControlSequence(new GenericCommand(true, "the"+name, null,
-          new TeXObject[] {new TeXCsRef("number"), new TeXCsRef("c@"+name)}));
-
-      if (parent != null)
+      if (parent == null)
       {
+         parser.putControlSequence(new GenericCommand(true, "the"+name, null,
+             new TeXObject[] {new TeXCsRef("number"), new TeXCsRef("c@"+name)}));
+
+      }
+      else
+      {
+         parser.putControlSequence(new GenericCommand(true, "the"+name, null,
+             new TeXObject[] {
+               new TeXCsRef("the"+parent),
+               getOther('.'),
+               new TeXCsRef("number"),
+               new TeXCsRef("c@"+name)}));
          addtoreset(name, parent);
       }
    }
@@ -944,6 +997,13 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       }
 
       dependents.add(name);
+   }
+
+   public int getcountervalue(String name)
+   {
+      Register reg = parser.getSettings().getRegister("c@"+name);
+
+      return reg == null ? 0 : reg.number();
    }
 
    public void addtocounter(String name, Numerical value)
@@ -990,6 +1050,11 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       bibliographySection = object;
    }
 
+   public void addFootnote(TeXObject footnote)
+   {
+      footnotes.add(footnote);
+   }
+
    private Vector<String> verbEnv;
 
    private Vector<LaTeXFile> loadedPackages;
@@ -1009,6 +1074,8 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
    private boolean parseAux = false;
 
    private TeXObjectList bibliographySection;
+
+   private TeXObjectList footnotes;
 
    public static final UserNumber ZERO = new UserNumber(0);
    public static final UserNumber ONE = new UserNumber(1);

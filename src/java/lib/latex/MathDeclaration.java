@@ -92,12 +92,22 @@ public class MathDeclaration extends Declaration
      throws IOException
    {
       doModeSwitch(parser);
+
+      if (isNumbered())
+      {
+         ((LaTeXParserListener)parser.getListener()).stepcounter("equation");
+      }
    }
 
    public void process(TeXParser parser)
      throws IOException
    {
       doModeSwitch(parser);
+
+      if (isNumbered())
+      {
+         ((LaTeXParserListener)parser.getListener()).stepcounter("equation");
+      }
    }
 
    public void end(TeXParser parser) throws IOException

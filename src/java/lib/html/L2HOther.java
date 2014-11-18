@@ -43,16 +43,95 @@ public class L2HOther extends Other
    public void process(TeXParser parser)
       throws IOException
    {
-      if (((L2HConverter)parser.getListener()).isInDocEnv())
-      {
-         super.process(parser);
-      }
+      process(parser, parser);
    }
 
-   public void process(TeXParser parser, TeXObjectList list) throws IOException
+   public void process(TeXParser parser, TeXObjectList stack) throws IOException
    {
-      if (((L2HConverter)parser.getListener()).isInDocEnv())
+      L2HConverter listener = (L2HConverter)parser.getListener();
+
+      if (listener.isInDocEnv())
       {
+         if (parser.isMathMode())
+         {
+            super.process(parser);
+            return;
+         }
+
+         int c = getCharCode();
+
+         if (c == (int)'\'')
+         {
+            TeXObject obj = stack.peekStack();
+
+            if (obj instanceof CharObject
+             && (((CharObject)obj).getCharCode() == c))
+            {
+               stack.popStack();
+               listener.writeCodePoint(0x201D);
+               return;
+            }
+         }
+         else if (c == (int)'`')
+         {
+            TeXObject obj = stack.peekStack();
+
+            if (obj instanceof CharObject
+             && (((CharObject)obj).getCharCode() == c))
+            {
+               stack.popStack();
+               listener.writeCodePoint(0x201C);
+               return;
+            }
+         }
+         else if (c == (int)'-')
+         {
+            TeXObject obj = stack.peekStack();
+
+            if (obj instanceof CharObject
+             && (((CharObject)obj).getCharCode() == c))
+            {
+               stack.popStack();
+
+               obj = stack.peekStack();
+
+               if (obj instanceof CharObject
+                && (((CharObject)obj).getCharCode() == c))
+               {
+                  stack.popStack();
+                  listener.writeCodePoint(0x2014);
+                  return;
+               }
+
+               listener.writeCodePoint(0x2013);
+               return;
+            }
+         }
+         else if (c == (int)'?')
+         {
+            TeXObject obj = stack.peekStack();
+
+            if (obj instanceof CharObject
+             && (((CharObject)obj).getCharCode() == (int)'`'))
+            {
+               stack.popStack();
+               listener.writeCodePoint(0x00BF);
+               return;
+            }
+         }
+         else if (c == (int)'!')
+         {
+            TeXObject obj = stack.peekStack();
+
+            if (obj instanceof CharObject
+             && (((CharObject)obj).getCharCode() == (int)'`'))
+            {
+               stack.popStack();
+               listener.writeCodePoint(0x00A1);
+               return;
+            }
+         }
+
          super.process(parser);
       }
    }

@@ -45,6 +45,11 @@ public class Label extends Command
    {
       TeXObject arg = parser.popNextArg();
 
+      if (arg == null)
+      {
+         return null;
+      }
+
       if (arg instanceof Expandable)
       {
          TeXObjectList expanded = ((Expandable)arg).expandfully(parser);
@@ -61,7 +66,17 @@ public class Label extends Command
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
+      if (stack == null)
+      {
+         return expandonce(parser);
+      }
+
       TeXObject arg = stack.popArg();
+
+      if (arg == null)
+      {
+         return null;
+      }
 
       if (arg instanceof Expandable)
       {

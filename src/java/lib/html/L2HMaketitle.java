@@ -24,7 +24,7 @@ import java.io.EOFException;
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.*;
 
-public class L2HMaketitle extends ControlSequence
+public class L2HMaketitle extends Maketitle
 {
    public L2HMaketitle()
    {
@@ -44,6 +44,8 @@ public class L2HMaketitle extends ControlSequence
    public void process(TeXParser parser)
    throws IOException
    {
+      preProcess(parser);
+
       L2HConverter listener = (L2HConverter)parser.getListener();
 
       listener.write("<div class=\"title\">");
@@ -69,6 +71,8 @@ public class L2HMaketitle extends ControlSequence
       cs.process(parser);
 
       listener.write("</div>");
+
+      postProcess(parser);
    }
 
    public void process(TeXParser parser, TeXObjectList stack)
