@@ -169,6 +169,9 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       parser.putControlSequence(new Frac());
       parser.putControlSequence(new GenericCommand("@empty"));
       parser.putControlSequence(new AtIfNextChar());
+      parser.putControlSequence(new AtFirstOfTwo());
+      parser.putControlSequence(new AtSecondOfTwo());
+      parser.putControlSequence(new AtGobble());
       parser.putControlSequence(new Verbatim());
       parser.putControlSequence(new Verbatim("verbatim*"));
       parser.putControlSequence(new Tabular());
@@ -186,6 +189,9 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
 
       parser.putControlSequence(
         new GenericCommand("refname", null, createString("References")));
+
+      parser.putControlSequence(
+        new GenericCommand("contentsname", null, createString("Contents")));
 
       parser.putControlSequence(
         new GenericCommand("abstractname", null, createString("Abstract")));
@@ -522,7 +528,7 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
 
       setIsInDocEnv(true);
 
-      if (parseAux)
+      if (isParseAuxEnabled())
       {
          File auxFile = getAuxFile();
 
@@ -751,7 +757,7 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
    public boolean bibliography(TeXPath[] bibPaths, TeXPath bblPath)
     throws IOException
    {
-      return (bblPath.exists() ? input(bblPath) : false);
+      return (bblPath.exists() ? super.input(bblPath) : false);
    }
 
    public Charset getCharSet()

@@ -102,6 +102,8 @@ public class L2HConverter extends LaTeXParserListener
       putControlSequence(new L2HNoBreakSpace());
       putControlSequence(new SpaceCs("newblock"));
       putControlSequence(new L2HTheBibliography());
+      putControlSequence(new L2HTableOfContents());
+      putControlSequence(new L2HContentsLine());
       putControlSequence(new L2HBibItem());
       putControlSequence(new L2HMaketitle());
       putControlSequence(new L2HMbox());

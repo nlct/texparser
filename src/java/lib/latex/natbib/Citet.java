@@ -118,9 +118,8 @@ public class Citet extends Cite
 
       list.add(sty.getCloseBracket());
 
-      return cite;
+      return list;
    }
-
 
    public NatbibSty getSty()
    {

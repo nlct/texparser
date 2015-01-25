@@ -56,6 +56,7 @@ public class Input extends ControlSequence
       }
 
       doInput(parser, arg);
+
     }
 
    public void process(TeXParser parser)

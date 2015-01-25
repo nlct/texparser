@@ -1369,10 +1369,80 @@ public class TeXParser extends TeXObjectList
             }
          }
       }
+      catch (EOFException e)
+      {
+      }
       finally
       {
          this.parentReader = orgParentReader;
       }
+   }
+
+   public void parse(File file)
+     throws IOException
+   {
+      parse(file, null);
+   }
+
+   public void parse(File file, Charset charset)
+     throws IOException
+   {
+      if (jobname == null)
+      {
+         jobname = file.getName();
+
+         int idx = jobname.lastIndexOf(".");
+
+         if (idx > 0)
+         {
+            jobname = jobname.substring(0, idx);
+         }
+      }
+
+      int orgLineNum = currentLineNum;
+      File orgParentFile = currentParentFile;
+      resetLineNum();
+
+      currentParentFile = file.getParentFile();
+
+      try
+      {
+         listener.beginParse(file);
+
+         if (charset == null)
+         {
+            parse(new LineNumberReader(new FileReader(file)));
+         }
+         else
+         {
+            parse(new LineNumberReader(Files.newBufferedReader(file.toPath(), charset)));
+         }
+      }
+      catch (EOFException e)
+      {
+      }
+      finally
+      {
+         listener.endParse(file);
+         currentParentFile = orgParentFile;
+         resetLineNum(orgLineNum);
+
+         if (reader != null)
+         {
+            reader.close();
+            reader = null;
+         }
+      }
+   }
+
+   public void resetLineNum()
+   {
+      resetLineNum(-1);
+   }
+
+   public void resetLineNum(int number)
+   {
+      currentLineNum  = number;
    }
 
    public TeXObject pop()
@@ -1542,73 +1612,6 @@ public class TeXParser extends TeXObjectList
    public TeXObject peekStack(int index)
    {
       return size() <= index ? null : get(index);
-   }
-
-   public void resetLineNum()
-   {
-      resetLineNum(-1);
-   }
-
-   public void resetLineNum(int number)
-   {
-      currentLineNum  = number;
-   }
-
-   public void parse(File file)
-     throws IOException
-   {
-      parse(file, null);
-   }
-
-   public void parse(File file, Charset charset)
-     throws IOException
-   {
-      if (jobname == null)
-      {
-         jobname = file.getName();
-
-         int idx = jobname.lastIndexOf(".");
-
-         if (idx > 0)
-         {
-            jobname = jobname.substring(0, idx);
-         }
-      }
-
-      int orgLineNum = currentLineNum;
-      File orgParentFile = currentParentFile;
-      resetLineNum();
-
-      currentParentFile = file.getParentFile();
-
-      try
-      {
-         listener.beginParse(file);
-
-         if (charset == null)
-         {
-            parse(new LineNumberReader(new FileReader(file)));
-         }
-         else
-         {
-            parse(new LineNumberReader(Files.newBufferedReader(file.toPath(), charset)));
-         }
-      }
-      catch (EOFException e)
-      {
-      }
-      finally
-      {
-         listener.endParse(file);
-         currentParentFile = orgParentFile;
-         resetLineNum(orgLineNum);
-
-         if (reader != null)
-         {
-            reader.close();
-            reader = null;
-         }
-      }
    }
 
    public void setWriter(Writer writer)

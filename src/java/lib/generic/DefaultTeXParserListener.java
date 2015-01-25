@@ -19,6 +19,7 @@
 package com.dickimawbooks.texparserlib.generic;
 
 import java.io.IOException;
+import java.io.EOFException;
 import java.io.File;
 import java.util.Hashtable;
 import java.util.Vector;
