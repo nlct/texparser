@@ -84,7 +84,7 @@ public class AtFirstOfOne extends Command
 
          if (arg1 instanceof TeXObjectList)
          {
-            return arg1;
+            return (TeXObjectList)arg1;
          }
       }
 
@@ -112,7 +112,7 @@ public class AtFirstOfOne extends Command
 
          if (arg1 instanceof TeXObjectList)
          {
-            return arg1;
+            return (TeXObjectList)arg1;
          }
       }
 

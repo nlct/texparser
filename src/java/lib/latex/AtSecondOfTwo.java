@@ -87,7 +87,7 @@ public class AtSecondOfTwo extends Command
 
          if (arg instanceof TeXObjectList)
          {
-            return arg;
+            return (TeXObjectList)arg;
          }
       }
 
@@ -116,7 +116,7 @@ public class AtSecondOfTwo extends Command
 
          if (arg instanceof TeXObjectList)
          {
-            return arg;
+            return (TeXObjectList)arg;
          }
       }
 
