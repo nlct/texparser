@@ -39,6 +39,12 @@ public class UsePackage extends ControlSequence
       return new UsePackage(getName());
    }
 
+   public void preProcess(TeXParser parser, TeXObjectList stack, 
+      KeyValList keyvalList, String styNameList)
+   throws IOException
+   {
+   }
+
    public void process(TeXParser parser, TeXObjectList list)
      throws IOException
    {
@@ -72,6 +78,8 @@ public class UsePackage extends ControlSequence
       }
 
       LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
+
+      preProcess(parser, list, keyvalList, styNameList);
 
       String[] split = styNameList.split(",");
 
@@ -114,6 +122,8 @@ public class UsePackage extends ControlSequence
       }
 
       LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
+
+      preProcess(parser, parser, keyvalList, styNameList);
 
       String[] split = styNameList.split(",");
 
