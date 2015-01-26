@@ -43,56 +43,67 @@ public class L2HMathGroup extends MathGroup
       return math;
    }
 
+   public void processList(TeXParser parser, TeXObjectList stack)
+    throws IOException
+   {
+      while (size() > 0)
+      {
+         TeXObject object = pop();
+
+         if (stack != parser && size() == 0)
+         {
+            object.process(parser, stack);
+         }
+         else
+         {
+            object.process(parser, this);
+         }
+      }
+   }
+
    public void process(TeXParser parser) throws IOException
    {
-      L2HConverter listener = (L2HConverter)parser.getListener();
-
-      if (!isInLine())
-      {
-         listener.write("<div class=\"displaymath\">");
-      }
-
-      if (listener.useMathJax())
-      {
-         listener.write("$");
-         super.process(parser);
-         listener.write("$");
-      }
-      else
-      {
-         super.process(parser);
-      }
-
-      if (!isInLine())
-      {
-         listener.write("</div>");
-      }
+      process(parser, parser);
    }
 
    public void process(TeXParser parser, TeXObjectList list) throws IOException
    {
       L2HConverter listener = (L2HConverter)parser.getListener();
 
+      parser.startGroup();
+
+      int orgMode = parser.getSettings().getCurrentMode();
+
       if (!isInLine())
       {
+         parser.getSettings().setMode(TeXSettings.MODE_DISPLAY_MATH);
+
          listener.write("<div class=\"displaymath\">");
+      }
+      else
+      {
+         parser.getSettings().setMode(TeXSettings.MODE_INLINE_MATH);
       }
 
       if (listener.useMathJax())
       {
          listener.write("$");
-         super.process(parser, list);
+         processList(parser, list);
          listener.write("$");
       }
       else
       {
-         super.process(parser, list);
+         processList(parser, list);
       }
 
       if (!isInLine())
       {
          listener.write("</div>");
       }
+
+      parser.getSettings().setMode(orgMode);
+
+      parser.endGroup();
    }
 
 }

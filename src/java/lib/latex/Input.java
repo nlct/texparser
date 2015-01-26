@@ -56,7 +56,6 @@ public class Input extends ControlSequence
       }
 
       doInput(parser, arg);
-
     }
 
    public void process(TeXParser parser)
@@ -80,7 +79,6 @@ public class Input extends ControlSequence
    protected boolean doInput(TeXParser parser, TeXObject arg)
        throws IOException
    {
-
       TeXParserListener listener = parser.getListener();
 
       TeXPath texPath = new TeXPath(parser, arg.toString(parser));

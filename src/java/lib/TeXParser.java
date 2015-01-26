@@ -37,8 +37,6 @@ public class TeXParser extends TeXObjectList
    {
       this.listener = listener;
       reader = null;
-      parentReader = null;
-      markedReader = null;
 
       activeTable = new Hashtable<Integer,ActiveChar>();
       csTable = new Hashtable<String,ControlSequence>();
@@ -242,14 +240,7 @@ public class TeXParser extends TeXObjectList
 
    public int getLineNumber()
    {
-      if (reader == null || !(reader instanceof LineNumberReader))
-      {
-         return currentLineNum;
-      }
-
-      currentLineNum = ((LineNumberReader)reader).getLineNumber()+1;
-
-      return currentLineNum;
+      return reader == null ? -1 : reader.getLineNumber();
    }
 
    public boolean isLetter(char c)
@@ -261,11 +252,27 @@ public class TeXParser extends TeXObjectList
    {
       int c = reader.read();
 
-      if (c == -1 && parentReader != null)
+      if (c == -1)
       {
+         TeXReader parentReader = reader.getParent();
+
+         if (parentReader == null)
+         {
+            return -1;
+         }
+
+         try
+         {
+            reader.close();
+         }
+         catch (IOException e)
+         {
+            listener.getTeXApp().error(e);
+         }
+
          reader = parentReader;
-         parentReader = null;
-         c = reader.read();
+
+         return read();
       }
 
       return c;
@@ -274,28 +281,17 @@ public class TeXParser extends TeXObjectList
    private void mark(int limit) throws IOException
    {
       reader.mark(limit);
-      markedReader = reader;
    }
 
    private void reset() throws IOException
    {
-      if (markedReader != reader)
-      {
-         parentReader = reader;
-         reader = markedReader;
-      }
-
       reader.reset();
-      markedReader = null;
    }
 
    public void scan(String text, TeXObjectList stack)
      throws IOException
    {
-      Reader orgParentReader = parentReader;
-      parentReader = reader;
-
-      StringReader strReader = new StringReader(text);
+      TeXReader strReader = new TeXReader(reader, text);
       reader = strReader;
 
       try
@@ -311,9 +307,6 @@ public class TeXParser extends TeXObjectList
       catch (EOFException e)
       {
       }
-
-      reader = parentReader;
-      parentReader = orgParentReader;
    }
 
    public TeXObjectList string(TeXParser parser)
@@ -1322,18 +1315,20 @@ public class TeXParser extends TeXObjectList
       return true;
    }
 
-   public void parse(Reader reader)
+   public void parse(TeXReader reader)
      throws IOException
    {
       parse(reader, TeXSettings.INHERIT);
    }
 
-   public void parse(Reader reader, int mode)
+   public void parse(TeXReader reader, int mode)
      throws IOException
    {
-      Reader orgParentReader = this.parentReader;
-      this.parentReader = this.reader;
-      this.reader = reader;
+      if (reader != this.reader)
+      {
+         reader.setParent(this.reader);
+         this.reader = reader;
+      }
 
       settings.setMode(mode);
 
@@ -1371,10 +1366,10 @@ public class TeXParser extends TeXObjectList
       }
       catch (EOFException e)
       {
-      }
-      finally
-      {
-         this.parentReader = orgParentReader;
+         if (this.reader == reader)
+         {
+            this.reader = reader.getParent();
+         }
       }
    }
 
@@ -1399,24 +1394,11 @@ public class TeXParser extends TeXObjectList
          }
       }
 
-      int orgLineNum = currentLineNum;
-      File orgParentFile = currentParentFile;
-      resetLineNum();
-
-      currentParentFile = file.getParentFile();
-
       try
       {
          listener.beginParse(file);
 
-         if (charset == null)
-         {
-            parse(new LineNumberReader(new FileReader(file)));
-         }
-         else
-         {
-            parse(new LineNumberReader(Files.newBufferedReader(file.toPath(), charset)));
-         }
+         parse(new TeXReader(this.reader, file, charset));
       }
       catch (EOFException e)
       {
@@ -1424,25 +1406,13 @@ public class TeXParser extends TeXObjectList
       finally
       {
          listener.endParse(file);
-         currentParentFile = orgParentFile;
-         resetLineNum(orgLineNum);
 
          if (reader != null)
          {
             reader.close();
-            reader = null;
+            reader = reader.getParent();
          }
       }
-   }
-
-   public void resetLineNum()
-   {
-      resetLineNum(-1);
-   }
-
-   public void resetLineNum(int number)
-   {
-      currentLineNum  = number;
    }
 
    public TeXObject pop()
@@ -1624,12 +1594,29 @@ public class TeXParser extends TeXObjectList
       return writer;
    }
 
-   public Reader getReader()
+   public TeXReader getReader()
    {
       return reader;
    }
 
-   public void setReader(Reader reader)
+   public File getCurrentParentFile()
+   {
+      if (reader == null)
+      {
+         return null;
+      }
+
+      Object source = reader.getSource();
+
+      if (source != null && (source instanceof File))
+      {
+         return ((File)source).getParentFile();
+      }
+
+      return null;
+   }
+
+   public void setReader(TeXReader reader)
    {
       this.reader = reader;
    }
@@ -1791,16 +1778,6 @@ public class TeXParser extends TeXObjectList
       return catcodes[TYPE_TAB].firstElement().charValue();
    }
 
-   public File getCurrentParentFile()
-   {
-      return currentParentFile;
-   }
-
-   public void setCurrentParentFile(File file)
-   {
-      currentParentFile = file;
-   }
-
    public String getJobname()
    {
       return jobname;
@@ -1921,15 +1898,11 @@ public class TeXParser extends TeXObjectList
 
    protected Hashtable<Integer,ActiveChar> activeTable;
 
-   private File currentParentFile;
-
-   private Reader reader, parentReader, markedReader;
-
    private Writer writer;
 
-   private TeXParserListener listener;
+   private TeXReader reader;
 
-   private int currentLineNum = -1;
+   private TeXParserListener listener;
 
    public static final int TYPE_ESC = 0, TYPE_BG=1, TYPE_EG=2,
      TYPE_MATH=3, TYPE_TAB=4, TYPE_EOL=5, TYPE_PARAM=6, TYPE_SP=7,

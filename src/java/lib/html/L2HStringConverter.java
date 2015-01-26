@@ -58,8 +58,7 @@ public class L2HStringConverter extends L2HConverter
          parser.setCatCode('@', TeXParser.TYPE_LETTER);
       }
 
-      StringReader reader = new StringReader(str);
-      parser.parse(reader);
+      parser.parse(new TeXReader(str));
 
       String html = writer.toString();
       setWriter(null);
