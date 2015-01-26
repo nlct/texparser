@@ -43,30 +43,12 @@ public class L2LEol extends Eol
       throws IOException
    {
       parser.getListener().getWriteable().write(toString(parser));
-
-      TeXObject nextObj = parser.pop();
-
-      while (nextObj instanceof Ignoreable
-           ||nextObj instanceof WhiteSpace)
-      {
-         nextObj.process(parser);
-         nextObj = parser.pop();
-      }
-
-      nextObj.process(parser);
    }
 
    public void process(TeXParser parser, TeXObjectList stack) 
       throws IOException
    {
       parser.getListener().getWriteable().write(toString(parser));
-
-      while (stack.size() > 0)
-      {
-         TeXObject nextObj = stack.pop();
-
-         nextObj.process(parser, stack);
-      }
    }
 }
 

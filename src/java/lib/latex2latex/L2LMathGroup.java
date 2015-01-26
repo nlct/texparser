@@ -57,15 +57,17 @@ public class L2LMathGroup extends MathGroup
       return math;
    }
 
-   public void process(TeXParser parser, TeXObjectList stack)
-      throws IOException
-   {
-      process(parser);
-   }
-
    public void process(TeXParser parser)
       throws IOException
    {
+      process(parser, parser);
+   }
+
+   public void process(TeXParser parser, TeXObjectList stack)
+      throws IOException
+   {
+      parser.startGroup();
+
       Writeable writeable = parser.getListener().getWriteable();
 
       String delim = parser.getMathDelim(isInLine());
@@ -152,7 +154,14 @@ public class L2LMathGroup extends MathGroup
          }
          else
          {
-            object.process(parser, this);
+            if (stack != parser && size() == 0)
+            {
+               object.process(parser, stack);
+            }
+            else
+            {
+               object.process(parser, this);
+            }
          }
       }
 
@@ -160,18 +169,7 @@ public class L2LMathGroup extends MathGroup
 
       writeable.write(endDelim);
 
-      TeXObject nextObj = parser.popStack();
-
-      while (nextObj != null)
-      {
-         if (!(nextObj instanceof Ignoreable))
-         {
-            nextObj.process(parser);
-            break;
-         }
-
-         writeable.write(nextObj.toString(parser));
-      }
+      parser.endGroup();
    }
 
    private String openDelim, closeDelim;

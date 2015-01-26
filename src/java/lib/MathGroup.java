@@ -82,7 +82,7 @@ public class MathGroup extends Group
       return builder.toString();
    }
 
-   public void process(TeXParser parser)
+   public void process(TeXParser parser, TeXObjectList stack)
     throws IOException
    {
       parser.startGroup();
@@ -91,7 +91,7 @@ public class MathGroup extends Group
       settings.setMode(isinline ? TeXSettings.MODE_INLINE_MATH :
          TeXSettings.MODE_DISPLAY_MATH);
 
-      processList(parser);
+      processList(parser, stack);
 
       parser.endGroup();
    }

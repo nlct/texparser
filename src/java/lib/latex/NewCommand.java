@@ -37,7 +37,7 @@ public class NewCommand extends Command
 
    public Object clone()
    {
-      return new NewCommand(getName(), overwrite);
+      return new NewCommand(getName(), getOverwrite());
    }
 
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList list)

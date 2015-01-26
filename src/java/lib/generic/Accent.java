@@ -306,6 +306,22 @@ public class Accent extends ControlSequence
       parser.putControlSequence(new Accent("H"));
    }
 
+   public static boolean isAccentCommand(String csName)
+   {
+      if (csName.length() != 1)
+      {
+         return false;
+      }
+
+      char c = csName.charAt(0);
+
+      return c == '`' || c == '\'' || c == '"'
+          || c == 'u' || c == 'c' || c == '~'
+          || c == '^' || c == 'r' || c == 'b'
+          || c == 'd' || c == '=' || c == '.'
+          || c == 'v' || c == 'H';
+   }
+
    private String getText(String accent, int codePoint)
       throws IOException
    {

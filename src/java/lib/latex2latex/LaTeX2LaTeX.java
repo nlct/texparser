@@ -830,9 +830,6 @@ public class LaTeX2LaTeX extends LaTeXParserListener
      int numParams, TeXObject defValue, TeXObject definition)
     throws IOException
    {
-      super.newcommand(overwrite, type, csName, isShort, numParams,
-        defValue, definition);
-      
       char bg = parser.getBgChar();
       char eg = parser.getEgChar();
       char esc = parser.getEscChar();

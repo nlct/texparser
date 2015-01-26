@@ -88,15 +88,15 @@ public class End extends ControlSequence
          }
       }
 
+      doEnd(parser, name);
+
+      parser.endGroup();
+
       if (!name.equals(currenv.toString(parser)))
       {
          throw new LaTeXSyntaxException(
              parser, LaTeXSyntaxException.ERROR_EXTRA_END, name);
       }
-
-      doEnd(parser, name);
-
-      parser.endGroup();
    }
 
    public void process(TeXParser parser)
@@ -148,15 +148,15 @@ public class End extends ControlSequence
          }
       }
 
+      doEnd(parser, name);
+
+      parser.endGroup();
+
       if (!name.equals(currenv.toString(parser)))
       {
          throw new LaTeXSyntaxException(
              parser, LaTeXSyntaxException.ERROR_EXTRA_END, name);
       }
-
-      doEnd(parser, name);
-
-      parser.endGroup();
    }
 
    protected void doEnd(TeXParser parser, String name)

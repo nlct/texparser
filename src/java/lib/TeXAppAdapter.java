@@ -49,6 +49,11 @@ public class TeXAppAdapter implements TeXApp
    {
    }
 
+   public void warning(TeXParser parser, String message)
+   {
+      System.out.println(message);
+   }
+
    public void error(Exception e)
    {
       if (e instanceof LaTeXSyntaxException)

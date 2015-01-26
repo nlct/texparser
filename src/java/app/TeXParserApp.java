@@ -183,6 +183,11 @@ public class TeXParserApp implements TeXApp
       System.out.println(arg);
    }
 
+   public void warning(TeXParser parser, String message)
+   {
+      System.err.println(appName+": "+message);
+   }
+
    public String tag(String string)
    {
       return string;

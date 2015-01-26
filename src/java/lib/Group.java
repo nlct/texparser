@@ -61,20 +61,20 @@ public class Group extends TeXObjectList
    public void process(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
-      process(parser);
+      parser.startGroup();
+
+      processList(parser, stack);
+
+      parser.endGroup();
    }
 
    public void process(TeXParser parser)
     throws IOException
    {
-      parser.startGroup();
-
-      processList(parser);
-
-      parser.endGroup();
+      process(parser, parser);
    }
 
-   protected void processList(TeXParser parser)
+   protected void processList(TeXParser parser, TeXObjectList stack)
     throws IOException
    {
       TeXObjectList before = new TeXObjectList();
@@ -82,11 +82,9 @@ public class Group extends TeXObjectList
 
       MidControlSequence midcs = null;
 
-      TeXObjectList list = (TeXObjectList)this.clone();
-
-      while (list.size() > 0)
+      for (int i = 0; i < size(); i++)
       {
-         TeXObject object = list.pop();
+         TeXObject object = get(i);
 
          if (object instanceof TeXCsRef)
          {
@@ -117,13 +115,22 @@ public class Group extends TeXObjectList
 
       if (midcs == null)
       {
-         while (before.size() != 0)
+         before = null;
+         after = null;
+
+         while (size() != 0)
          {
-            TeXObject object = before.pop();
+            TeXObject object = remove(0);
 
             if (object == null)
             {
                break;
+            }
+
+            if (object instanceof TeXCsRef)
+            {
+               object = parser.getListener().getControlSequence(
+                  ((TeXCsRef)object).getName());
             }
 
             if (object instanceof Declaration)
@@ -131,11 +138,19 @@ public class Group extends TeXObjectList
                pushDeclaration((Declaration)object);
             }
 
-            object.process(parser, before);
+            if (size() == 0 && stack != parser)
+            {
+               object.process(parser, stack);
+            }
+            else
+            {
+               object.process(parser, this);
+            }
          }
       }
       else
       {
+         clear();
          midcs.process(parser, before, after);
       }
 

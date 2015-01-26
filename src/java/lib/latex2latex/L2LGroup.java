@@ -104,24 +104,14 @@ public class L2LGroup extends Group
       Writeable writeable = listener.getWriteable();
       writeable.write(parser.getBgChar());
 
-      processList(parser);
+      parser.startGroup();
+
+      processList(parser, stack);
+
+      parser.endGroup();
 
       writeable.write(parser.getEgChar());
    }
 
-   public void process(TeXParser parser)
-      throws IOException
-   {
-      preprocess(parser);
-
-      LaTeX2LaTeX listener = (LaTeX2LaTeX)parser.getListener();
-
-      Writeable writeable = listener.getWriteable();
-      writeable.write(parser.getBgChar());
-
-      processList(parser);
-
-      writeable.write(parser.getEgChar());
-   }
 
 }

@@ -39,6 +39,8 @@ public interface TeXApp
 
    public void message(int messageType, String arg);
 
+   public void warning(TeXParser parser, String message);
+
    public void error(Exception e);
 
    public void copyFile(File orgFile, File newFile)

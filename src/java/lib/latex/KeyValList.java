@@ -200,11 +200,19 @@ public class KeyValList extends HashMap<String,TeXObject>
          if (value != null)
          {
             builder.append('=');
-            builder.append(parser.getBgChar());
 
-            builder.append(value.toString(parser));
+            String strVal = value.toString(parser);
 
-            builder.append(parser.getEgChar());
+            if (strVal.matches(".*[^\\w].*"))
+            {
+               builder.append(parser.getBgChar());
+               builder.append(strVal);
+               builder.append(parser.getEgChar());
+            }
+            else
+            {
+               builder.append(strVal);
+            }
          }
 
          if (it.hasNext())

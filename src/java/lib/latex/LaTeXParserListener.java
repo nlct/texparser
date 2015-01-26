@@ -147,7 +147,7 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       parser.putControlSequence(new UsePackage());
       parser.putControlSequence(new NewCommand());
       parser.putControlSequence(new NewCommand("renewcommand",
-        NewCommand.OVERWRITE_FORBID));
+        NewCommand.OVERWRITE_FORCE));
       parser.putControlSequence(new NewCommand("providecommand",
         NewCommand.OVERWRITE_SKIP));
 
