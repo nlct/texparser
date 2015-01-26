@@ -40,7 +40,25 @@ public class L2LComment extends Comment
    public void process(TeXParser parser)
       throws IOException
    {
-      parser.getListener().getWriteable().writeln(toString(parser));
+      String comment = toString(parser);
+
+      int n = comment.length();
+
+      if (n == 0)
+      {
+         comment = String.format("%n");
+      }
+      else
+      {
+         char c = comment.charAt(n-1);
+
+         if (c != '\n' && c != '\r')
+         {
+            comment = String.format("%s%n", comment);
+         }
+      }
+
+      parser.getListener().getWriteable().write(comment);
    }
 
    public void process(TeXParser parser, TeXObjectList stack) 
