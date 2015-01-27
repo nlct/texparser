@@ -65,6 +65,11 @@ public class L2LGroup extends Group
 
       TeXObject object = pop();
 
+      if (object instanceof TeXCsRef)
+      {
+         object = listener.getControlSequence(((TeXCsRef)object).getName());
+      }
+
       if (parser.isMathMode() && object instanceof Obsolete)
       {
          Obsolete obs = (Obsolete)object;
@@ -74,6 +79,15 @@ public class L2LGroup extends Group
 
          if (original instanceof TeXFontDeclaration)
          {
+            // Remove any following spaces
+
+            TeXObject nextObj = firstElement();
+
+            if (nextObj instanceof SkippedSpaces)
+            {
+               pop();
+            }
+
             ControlSequence cs = listener.getControlSequence(
                "math"+original.getName());
 
@@ -84,8 +98,6 @@ public class L2LGroup extends Group
                replacement);
 
             writeable.write(replacement);
-
-            process(parser);
 
             return;
          }
@@ -112,6 +124,4 @@ public class L2LGroup extends Group
 
       writeable.write(parser.getEgChar());
    }
-
-
 }

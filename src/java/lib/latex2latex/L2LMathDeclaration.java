@@ -53,7 +53,34 @@ public class L2LMathDeclaration extends MathDeclaration
    public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      process(parser);
+      doModeSwitch(parser);
+
+      LaTeX2LaTeX listener = (LaTeX2LaTeX)parser.getListener();
+
+      EndDeclaration endDec = getEndDeclaration();
+
+      if (endDec != null)
+      {
+         Writeable writeable = parser.getListener().getWriteable();
+
+         writeable.write(String.format("%c%s",
+           parser.getEscChar(), getName()));
+
+         if (parser.isLetter(getName().charAt(0)))
+         {
+            TeXObject nextObj = stack.peek();
+
+            if (nextObj instanceof Letter)
+            {
+               writeable.write(" ");
+            }
+         }
+      }
+      else
+      {
+         listener.write(String.format("%cbegin%c%s%c", 
+          parser.getEscChar(), parser.getBgChar(), getName(), parser.getEgChar()));
+      }
    }
 
    public void process(TeXParser parser)
@@ -67,7 +94,25 @@ public class L2LMathDeclaration extends MathDeclaration
 
       if (endDec != null)
       {
-         listener.write(toString(parser));
+         Writeable writeable = parser.getListener().getWriteable();
+
+         writeable.write(String.format("%c%s",
+           parser.getEscChar(), getName()));
+   
+         if (parser.isLetter(getName().charAt(0)))
+         {
+            if (parser.size() == 0)
+            {
+               parser.fetchNext();
+            }
+      
+            TeXObject nextObj = parser.firstElement();
+
+            if (nextObj instanceof Letter)
+            {
+               writeable.write(" ");
+            }
+         }
       }
       else
       {
@@ -86,7 +131,25 @@ public class L2LMathDeclaration extends MathDeclaration
 
       if (endDec != null)
       {
-         listener.write(endDec.toString(parser)); 
+         Writeable writeable = parser.getListener().getWriteable();
+
+         writeable.write(String.format("%c%s",
+           parser.getEscChar(), endDec.getName()));
+   
+         if (parser.isLetter(endDec.getName().charAt(0)))
+         {
+            if (parser.size() == 0)
+            {
+               parser.fetchNext();
+            }
+      
+            TeXObject nextObj = parser.firstElement();
+
+            if (nextObj instanceof Letter)
+            {
+               writeable.write(" ");
+            }
+         }
       }
       else
       {

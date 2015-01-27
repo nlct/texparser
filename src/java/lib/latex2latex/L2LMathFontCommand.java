@@ -39,7 +39,20 @@ public class L2LMathFontCommand extends MathFontCommand
    public void process(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
-      process(parser);
+      Writeable writeable = parser.getListener().getWriteable();
+
+      writeable.write(String.format("%c%s",
+        parser.getEscChar(), getName()));
+
+      if (parser.isLetter(getName().charAt(0)))
+      {
+         TeXObject nextObj = stack.peek();
+
+         if (nextObj instanceof Letter)
+         {
+            writeable.write(" ");
+         }
+      }
    }
 
    public void process(TeXParser parser)
@@ -47,6 +60,22 @@ public class L2LMathFontCommand extends MathFontCommand
    {
       Writeable writeable = parser.getListener().getWriteable();
 
-      writeable.write(toString(parser));
+      writeable.write(String.format("%c%s",
+        parser.getEscChar(), getName()));
+
+      if (parser.isLetter(getName().charAt(0)))
+      {
+         if (parser.size() == 0)
+         {
+            parser.fetchNext();
+         }
+
+         TeXObject nextObj = parser.firstElement();
+
+         if (nextObj instanceof Letter)
+         {
+            writeable.write(" ");
+         }
+      }
    }
 }

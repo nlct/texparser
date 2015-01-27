@@ -240,7 +240,7 @@ public class TeXParser extends TeXObjectList
 
    public int getLineNumber()
    {
-      return reader == null ? -1 : reader.getLineNumber();
+      return reader == null ? -1 : reader.getLineNumber()+1;
    }
 
    public boolean isLetter(char c)
@@ -1117,6 +1117,7 @@ public class TeXParser extends TeXObjectList
 
                cs = new TeXCsRef(macro.toString());
                list.add(cs);
+               reset();
 
                if (!skipNextSpaces(list))
                {

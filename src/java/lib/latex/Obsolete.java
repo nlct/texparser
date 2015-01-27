@@ -62,6 +62,13 @@ public class Obsolete extends ControlSequence
             StringBuilder builder = new StringBuilder();
             builder.append(orgCommand.toString(parser));
 
+            TeXObject firstObj = stack.peek();
+
+            if (firstObj instanceof SkippedSpaces)
+            {
+               stack.pop();
+            }
+
             while (stack.size() > 0)
             {
                TeXObject obj = stack.peek();
@@ -117,6 +124,18 @@ public class Obsolete extends ControlSequence
 
             StringBuilder builder = new StringBuilder();
             builder.append(orgCommand.toString(parser));
+
+            if (parser.size() == 0)
+            {
+               parser.fetchNext();
+            }
+
+            TeXObject firstObj = parser.firstElement();
+
+            if (firstObj instanceof SkippedSpaces)
+            {
+               parser.pop();
+            }
 
             while (true)
             {

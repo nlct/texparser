@@ -46,6 +46,6 @@ public class L2LIgnoreable extends ControlSequence
      throws IOException
    {
       ((LaTeX2LaTeX)parser.getListener()).substituting( 
-        ""+parser.getEscChar()+name, "");
+        String.format("%c%s", parser.getEscChar(), name), "");
    }
 }

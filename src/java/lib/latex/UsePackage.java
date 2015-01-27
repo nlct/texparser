@@ -79,7 +79,7 @@ public class UsePackage extends ControlSequence
 
       LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
 
-      preProcess(parser, list, keyvalList, styNameList);
+      preProcess(parser, list, keyValList, styNameList);
 
       String[] split = styNameList.split(",");
 
@@ -123,7 +123,7 @@ public class UsePackage extends ControlSequence
 
       LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
 
-      preProcess(parser, parser, keyvalList, styNameList);
+      preProcess(parser, parser, keyValList, styNameList);
 
       String[] split = styNameList.split(",");
 

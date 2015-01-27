@@ -63,16 +63,7 @@ public abstract class ControlSequence extends Macro
 
    public String toString(TeXParser parser)
    {
-      String name = getName();
-
-      char lastCh = name.charAt(name.length()-1);
-
-      if (parser.isCatCode(TeXParser.TYPE_LETTER, lastCh))
-      {
-         return ""+parser.getEscChar()+name+" ";
-      }
-
-      return ""+parser.getEscChar()+name;
+      return String.format("%c%s", parser.getEscChar(), getName());
    }
 
    public TeXObjectList string(TeXParser parser)

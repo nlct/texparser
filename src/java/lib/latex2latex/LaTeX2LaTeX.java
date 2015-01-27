@@ -841,7 +841,7 @@ public class LaTeX2LaTeX extends LaTeXParserListener
          write("*");
       }
 
-      write(""+bg+esc+csName+eg);
+      write(String.format("%c%c%s%c", bg, esc, csName, eg));
 
       if (numParams > 0)
       {
@@ -853,7 +853,7 @@ public class LaTeX2LaTeX extends LaTeXParserListener
          }
       }
 
-      write(""+bg+definition.toString(parser)+eg);
+      write(String.format("%c%s%c", bg, definition.toString(parser), eg));
    }
 
    private File inFile;
