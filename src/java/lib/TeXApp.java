@@ -49,4 +49,5 @@ public interface TeXApp
    public static int MESSAGE_READING = 0;
    public static int MESSAGE_WRITING = 1;
    public static int MESSAGE_SHOW = 2;
+   public static int MESSAGE_INFORMATION = 3;
 }

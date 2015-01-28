@@ -272,6 +272,18 @@ public class TeXParser extends TeXObjectList
 
          reader = parentReader;
 
+         TeXObjectList pending = reader.getPending();
+
+         if (pending != null)
+         {
+            while (pending.size() > 0)
+            {
+               add(pending.remove(0));
+            }
+
+            reader.setPending(null);
+         }
+
          return read();
       }
 
@@ -830,7 +842,7 @@ public class TeXParser extends TeXObjectList
       if (c == -1)
       {
          throw new TeXSyntaxException(
-            getListenerFile(), getLineNumber(),
+            getCurrentFile(), getLineNumber(),
             TeXSyntaxException.ERROR_BAD_PARAM, "EOF");
       }
 
@@ -853,7 +865,7 @@ public class TeXParser extends TeXObjectList
          else
          {
             throw new TeXSyntaxException(
-               getListenerFile(),
+               getCurrentFile(),
                getLineNumber(),
                TeXSyntaxException.ERROR_BAD_PARAM, ""+((int)c));
          }
@@ -872,7 +884,7 @@ public class TeXParser extends TeXObjectList
          else
          {
             throw new TeXSyntaxException(
-               getListenerFile(),
+               getCurrentFile(),
                getLineNumber(),
                TeXSyntaxException.ERROR_BAD_PARAM, ""+((int)c));
          }
@@ -902,7 +914,7 @@ public class TeXParser extends TeXObjectList
          if (isShort && isPar(group.lastElement()))
          {
             throw new TeXSyntaxException(
-               getListenerFile(),
+               getCurrentFile(),
                getLineNumber(),
                TeXSyntaxException.ERROR_PAR_BEFORE_EG);
          }
@@ -913,7 +925,7 @@ public class TeXParser extends TeXObjectList
       if (c == -1)
       {
          throw new TeXSyntaxException(
-            getListenerFile(),
+            getCurrentFile(),
             getLineNumber(),
             TeXSyntaxException.ERROR_NO_EG);
       }
@@ -930,7 +942,7 @@ public class TeXParser extends TeXObjectList
       if (c == -1)
       {
          throw new TeXSyntaxException(
-            getListenerFile(),
+            getCurrentFile(),
             getLineNumber(),
             TeXSyntaxException.ERROR_MISSING_ENDMATH);
       }
@@ -986,7 +998,7 @@ public class TeXParser extends TeXObjectList
             if (c == -1)
             {
                throw new TeXSyntaxException(
-                  getListenerFile(),
+                  getCurrentFile(),
                   getLineNumber(),
                   TeXSyntaxException.ERROR_MISSING_ENDMATH);
             }
@@ -995,7 +1007,7 @@ public class TeXParser extends TeXObjectList
             {
                reset();
                throw new TeXSyntaxException(
-                  getListenerFile(),
+                  getCurrentFile(),
                   getLineNumber(),
                   TeXSyntaxException.ERROR_DOLLAR2_ENDED_WITH_DOLLAR);
             }
@@ -1031,7 +1043,7 @@ public class TeXParser extends TeXObjectList
       if (c == -1)
       {
          throw new TeXSyntaxException(
-            getListenerFile(),
+            getCurrentFile(),
             getLineNumber(),
             TeXSyntaxException.ERROR_NOT_FOUND, terminator);
       }
@@ -1055,7 +1067,7 @@ public class TeXParser extends TeXObjectList
          if (!fetchNext(list))
          {
             throw new TeXSyntaxException(
-               getListenerFile(),
+               getCurrentFile(),
                getLineNumber(),
                TeXSyntaxException.ERROR_NOT_FOUND, terminator);
          }
@@ -1282,7 +1294,7 @@ public class TeXParser extends TeXObjectList
       else if (isCatCode(TYPE_EG, (char)c))
       {
          throw new TeXSyntaxException(
-            getListenerFile(),
+            getCurrentFile(),
             getLineNumber(),
             TeXSyntaxException.ERROR_UNEXPECTED_EG);
       }
@@ -1327,6 +1339,24 @@ public class TeXParser extends TeXObjectList
    {
       if (reader != this.reader)
       {
+         // Is the current stack non-empty?
+         // If it is, save remaining content for later
+
+         TeXObjectList pending = null;
+
+         if (size() > 0)
+         {
+            pending = new TeXObjectList(size());
+
+            while (size() > 0)
+            {
+               pending.add(remove(0));
+            }
+
+            this.reader.setPending(pending);
+            pending = null;
+         }
+
          reader.setParent(this.reader);
          this.reader = reader;
       }
@@ -1372,6 +1402,7 @@ public class TeXParser extends TeXObjectList
             this.reader = reader.getParent();
          }
       }
+
    }
 
    public void parse(File file)
@@ -1627,9 +1658,16 @@ public class TeXParser extends TeXObjectList
       return listener;
    }
 
-   public File getListenerFile()
+   public File getCurrentFile()
    {
-      return listener == null ? null : listener.getFile();
+      if (reader == null)
+      {
+         return null;
+      }
+
+      Object source = reader.getSource();
+
+      return source instanceof File ? (File)source : null;
    }
 
    public boolean isMathMode()

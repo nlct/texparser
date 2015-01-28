@@ -53,7 +53,7 @@ public class SbChar extends Macro
       if (object == null)
       {
          throw new TeXSyntaxException(
-            parser.getListenerFile(),
+            parser.getCurrentFile(),
             parser.getLineNumber(),
             TeXSyntaxException.ERROR_MISSING_PARAM, ""+parser.getSbChar());
       }

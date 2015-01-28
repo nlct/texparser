@@ -34,7 +34,7 @@ public abstract class MidControlSequence extends ControlSequence
    public void process(TeXParser parser) throws IOException
    {
       throw new TeXSyntaxException(
-         parser.getListenerFile(),
+         parser.getCurrentFile(),
          parser.getLineNumber(),
          TeXSyntaxException.ERROR_AMBIGUOUS_MIDCS, getName());
    }
@@ -42,7 +42,7 @@ public abstract class MidControlSequence extends ControlSequence
    public void process(TeXParser parser, TeXObjectList stack) throws IOException
    {
       throw new TeXSyntaxException(
-         parser.getListenerFile(),
+         parser.getCurrentFile(),
          parser.getLineNumber(),
          TeXSyntaxException.ERROR_AMBIGUOUS_MIDCS, getName());
    }

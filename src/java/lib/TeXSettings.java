@@ -719,7 +719,7 @@ public class TeXSettings
          if (reg == null)
          {
             throw new TeXSyntaxException(
-               parser.getListenerFile(),
+               parser.getCurrentFile(),
                parser.getLineNumber(),
                TeXSyntaxException.ERROR_REGISTER_UNDEF, name);
          }
@@ -742,7 +742,7 @@ public class TeXSettings
       if (reg == null)
       {
          throw new TeXSyntaxException(
-            parser.getListenerFile(),
+            parser.getCurrentFile(),
             parser.getLineNumber(),
             TeXSyntaxException.ERROR_REGISTER_UNDEF, name);
       }
@@ -781,7 +781,7 @@ public class TeXSettings
          if (reg == null)
          {
             throw new TeXSyntaxException(
-               parser.getListenerFile(),
+               parser.getCurrentFile(),
                parser.getLineNumber(),
                TeXSyntaxException.ERROR_REGISTER_UNDEF, name);
          }
@@ -804,7 +804,7 @@ public class TeXSettings
       if (reg == null)
       {
          throw new TeXSyntaxException(
-            parser.getListenerFile(),
+            parser.getCurrentFile(),
             parser.getLineNumber(),
             TeXSyntaxException.ERROR_REGISTER_UNDEF, name);
       }
@@ -843,7 +843,7 @@ public class TeXSettings
          if (reg == null)
          {
             throw new TeXSyntaxException(
-               parser.getListenerFile(),
+               parser.getCurrentFile(),
                parser.getLineNumber(),
                TeXSyntaxException.ERROR_REGISTER_UNDEF, name);
          }
@@ -866,7 +866,7 @@ public class TeXSettings
       if (reg == null)
       {
          throw new TeXSyntaxException(
-            parser.getListenerFile(),
+            parser.getCurrentFile(),
             parser.getLineNumber(),
             TeXSyntaxException.ERROR_REGISTER_UNDEF, name);
       }
@@ -905,7 +905,7 @@ public class TeXSettings
          if (reg == null)
          {
             throw new TeXSyntaxException(
-               parser.getListenerFile(),
+               parser.getCurrentFile(),
                parser.getLineNumber(),
                TeXSyntaxException.ERROR_REGISTER_UNDEF, name);
          }
@@ -928,7 +928,7 @@ public class TeXSettings
       if (reg == null)
       {
          throw new TeXSyntaxException(
-            parser.getListenerFile(),
+            parser.getCurrentFile(),
             parser.getLineNumber(),
             TeXSyntaxException.ERROR_REGISTER_UNDEF, name);
       }

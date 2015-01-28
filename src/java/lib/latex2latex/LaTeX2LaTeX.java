@@ -521,6 +521,10 @@ public class LaTeX2LaTeX extends LaTeXParserListener
       {
          writer.print((char)charCode);
       }
+      else
+      {
+         getTeXApp().warning(getParser(), "null writer");
+      }
    }
 
    public void write(char c) throws IOException
@@ -528,6 +532,10 @@ public class LaTeX2LaTeX extends LaTeXParserListener
       if (writer != null)
       {
          writer.print(c);
+      }
+      else
+      {
+         getTeXApp().warning(getParser(), "null writer");
       }
    }
 
@@ -537,6 +545,10 @@ public class LaTeX2LaTeX extends LaTeXParserListener
       {
          writer.print(string);
       }
+      else
+      {
+         getTeXApp().warning(getParser(), "null writer");
+      }
    }
 
    public void writeln(String string) throws IOException
@@ -544,6 +556,10 @@ public class LaTeX2LaTeX extends LaTeXParserListener
       if (writer != null)
       {
          writer.println(string);
+      }
+      else
+      {
+         getTeXApp().warning(getParser(), "null writer");
       }
    }
 
@@ -553,6 +569,10 @@ public class LaTeX2LaTeX extends LaTeXParserListener
       {
          writer.println(c);
       }
+      else
+      {
+         getTeXApp().warning(getParser(), "null writer");
+      }
    }
 
    public void writeln() throws IOException
@@ -560,6 +580,10 @@ public class LaTeX2LaTeX extends LaTeXParserListener
       if (writer != null)
       {
          writer.println();
+      }
+      else
+      {
+         getTeXApp().warning(getParser(), "null writer");
       }
    }
 
@@ -755,16 +779,9 @@ public class LaTeX2LaTeX extends LaTeXParserListener
       return false;
    }
 
-   public File getFile()
-   {
-      return inFile;
-   }
-
    public void beginParse(File file)
      throws IOException
    {
-      inFile = file;
-
       getTeXApp().message(TeXApp.MESSAGE_READING, file.getAbsolutePath());
 
       basePath = file.getParentFile().toPath();
@@ -783,16 +800,6 @@ public class LaTeX2LaTeX extends LaTeXParserListener
    public void endParse(File file)
     throws IOException
    {
-      if (getParser().getCurrentParentFile() == null)
-      {
-         inFile = null;
-
-         if (writer != null)
-         {
-            writer.close();
-            writer = null;
-         }
-      }
    }
 
    public void href(String url, TeXObject text)
@@ -855,8 +862,6 @@ public class LaTeX2LaTeX extends LaTeXParserListener
 
       write(String.format("%c%s%c", bg, definition.toString(parser), eg));
    }
-
-   private File inFile;
 
    private Path outPath, basePath;
    private PrintWriter writer;

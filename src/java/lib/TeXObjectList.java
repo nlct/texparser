@@ -125,7 +125,7 @@ public class TeXObjectList extends Vector<TeXObject> implements TeXObject,Expand
       {
          parser.push(new TeXUnit());
          throw new TeXSyntaxException(
-            parser.getListenerFile(),
+            parser.getCurrentFile(),
             parser.getLineNumber(),
             TeXSyntaxException.ERROR_MISSING_UNIT);
       }
@@ -150,7 +150,7 @@ public class TeXObjectList extends Vector<TeXObject> implements TeXObject,Expand
             push(object);
             push(new TeXUnit());
             throw new TeXSyntaxException(
-               parser.getListenerFile(),
+               parser.getCurrentFile(),
                parser.getLineNumber(),
                TeXSyntaxException.ERROR_MISSING_UNIT);
          }
@@ -162,7 +162,7 @@ public class TeXObjectList extends Vector<TeXObject> implements TeXObject,Expand
             push(object);
             push(new TeXUnit());
             throw new TeXSyntaxException(
-               parser.getListenerFile(),
+               parser.getCurrentFile(),
                parser.getLineNumber(),
                TeXSyntaxException.ERROR_MISSING_UNIT);
          }
@@ -182,7 +182,7 @@ public class TeXObjectList extends Vector<TeXObject> implements TeXObject,Expand
          push(nextObj);
          push(new TeXUnit());
          throw new TeXSyntaxException(
-               parser.getListenerFile(),
+               parser.getCurrentFile(),
                parser.getLineNumber(),
                TeXSyntaxException.ERROR_MISSING_UNIT);
       }
@@ -196,7 +196,7 @@ public class TeXObjectList extends Vector<TeXObject> implements TeXObject,Expand
             push(object);
             push(new TeXUnit());
             throw new TeXSyntaxException(
-               parser.getListenerFile(),
+               parser.getCurrentFile(),
                parser.getLineNumber(),
                TeXSyntaxException.ERROR_MISSING_UNIT);
          }
@@ -214,7 +214,7 @@ public class TeXObjectList extends Vector<TeXObject> implements TeXObject,Expand
       push(object);
       push(new TeXUnit());
       throw new TeXSyntaxException(
-               parser.getListenerFile(),
+               parser.getCurrentFile(),
                parser.getLineNumber(),
                TeXSyntaxException.ERROR_MISSING_UNIT);
    }
@@ -278,7 +278,7 @@ public class TeXObjectList extends Vector<TeXObject> implements TeXObject,Expand
       catch (NumberFormatException e)
       {
          throw new TeXSyntaxException(
-                  parser.getListenerFile(),
+                  parser.getCurrentFile(),
                   parser.getLineNumber(),
                   TeXSyntaxException.ERROR_NUMBER_EXPECTED);
       }
@@ -369,7 +369,7 @@ public class TeXObjectList extends Vector<TeXObject> implements TeXObject,Expand
       catch (NumberFormatException e)
       {
          throw new TeXSyntaxException(
-                  parser.getListenerFile(),
+                  parser.getCurrentFile(),
                   parser.getLineNumber(),
                   TeXSyntaxException.ERROR_NUMBER_EXPECTED);
       }
@@ -533,7 +533,7 @@ public class TeXObjectList extends Vector<TeXObject> implements TeXObject,Expand
       }
 
       throw new TeXSyntaxException(
-               parser.getListenerFile(),
+               parser.getCurrentFile(),
                parser.getLineNumber(),
                TeXSyntaxException.ERROR_MISSING_CLOSING,
         ""+closeDelim);

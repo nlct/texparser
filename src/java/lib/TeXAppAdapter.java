@@ -47,6 +47,7 @@ public class TeXAppAdapter implements TeXApp
 
    public void message(int messageType, String arg)
    {
+      System.out.println(arg);
    }
 
    public void warning(TeXParser parser, String message)

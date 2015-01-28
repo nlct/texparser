@@ -169,18 +169,12 @@ public class AuxParser extends DefaultTeXParserListener
    public void endParse(File file)
       throws IOException
    {
-      this.file = null;
    }
 
    public void beginParse(File file)
       throws IOException
    {
-      this.file = file;
-   }
-
-   public File getFile()
-   {
-      return file;
+      getTeXApp().message(TeXApp.MESSAGE_READING, file.getAbsolutePath());
    }
 
    public void addAuxData(AuxData data)
@@ -215,8 +209,6 @@ public class AuxParser extends DefaultTeXParserListener
 
    private Vector<AuxData> auxData;
    private TeXApp texApp;
-
-   private File file;
 
    private Charset charset=null;
 }

@@ -60,7 +60,7 @@ public class TeXSyntaxException extends IOException
 
    public TeXSyntaxException(TeXParser parser, int errorCode, String param)
    {
-      this(parser.getListenerFile(),
+      this(parser.getCurrentFile(),
            parser.getLineNumber(), 
            errorCode,
            param);
@@ -68,7 +68,7 @@ public class TeXSyntaxException extends IOException
 
    public TeXSyntaxException(TeXParser parser, int errorCode, String param, Throwable cause)
    {
-      this(parser.getListenerFile(),
+      this(parser.getCurrentFile(),
            parser.getLineNumber(), 
            errorCode,
            param,
@@ -77,7 +77,7 @@ public class TeXSyntaxException extends IOException
 
    public TeXSyntaxException(TeXParser parser, int errorCode)
    {
-      this(parser.getListenerFile(),
+      this(parser.getCurrentFile(),
            parser.getLineNumber(), 
            errorCode,
            null);
@@ -86,7 +86,7 @@ public class TeXSyntaxException extends IOException
    public TeXSyntaxException(TeXParser parser, int errorCode,
      Throwable cause)
    {
-      this(parser.getListenerFile(),
+      this(parser.getCurrentFile(),
            parser.getLineNumber(), 
            errorCode,
            null,

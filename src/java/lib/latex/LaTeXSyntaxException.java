@@ -62,7 +62,7 @@ public class LaTeXSyntaxException extends IOException
 
    public LaTeXSyntaxException(TeXParser parser, int errorCode, String param)
    {
-      this(parser.getListenerFile(), 
+      this(parser.getCurrentFile(), 
            parser.getLineNumber(),
            errorCode,
            param);
@@ -70,7 +70,7 @@ public class LaTeXSyntaxException extends IOException
 
    public LaTeXSyntaxException(TeXParser parser, int errorCode)
    {
-      this(parser.getListenerFile(), 
+      this(parser.getCurrentFile(), 
            parser.getLineNumber(),
            errorCode,
            null);

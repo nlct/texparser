@@ -635,22 +635,11 @@ public class L2HConverter extends LaTeXParserListener
    public void endParse(File file)
     throws IOException
    {
-      if (getParser().getCurrentParentFile() == null)
-      {
-         this.file = null;
-
-         if (writer != null)
-         {
-            writer.close();
-            writer = null;
-         }
-      }
    }
 
    public void beginParse(File file)
     throws IOException
    {
-      this.file = file;
       getTeXApp().message(TeXApp.MESSAGE_READING, file.getAbsolutePath());
 
       basePath = file.getParentFile().toPath();
@@ -673,11 +662,6 @@ public class L2HConverter extends LaTeXParserListener
          getTeXApp().message(TeXApp.MESSAGE_WRITING, outFile.getAbsolutePath());
          writer = new PrintWriter(outFile);
       }
-   }
-
-   public File getFile()
-   {
-      return file;
    }
 
    public void setSuffix(String suffix)
@@ -703,8 +687,6 @@ public class L2HConverter extends LaTeXParserListener
    private Writer writer;
 
    private TeXApp texApp;
-
-   private File file;
 
    private Path outPath, basePath;
 

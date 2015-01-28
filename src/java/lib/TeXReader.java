@@ -149,7 +149,18 @@ public class TeXReader implements Readable,Closeable
       return "TeXReader[reader:"+reader+",source:"+source+"]";
    }
 
+   public void setPending(TeXObjectList pending)
+   {
+      this.pending = pending;
+   }
+
+   public TeXObjectList getPending()
+   {
+      return pending;
+   }
+
    private Reader reader;
    private TeXReader parent;
    private Object source;
+   private TeXObjectList pending;
 }
