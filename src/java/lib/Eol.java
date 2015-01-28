@@ -24,7 +24,7 @@ public class Eol extends WhiteSpace
 {
    public Eol()
    {
-      this(System.getProperty("line.separator", "\n"));
+      this(String.format("%n"));
    }
 
    public Eol(String eol)
