@@ -1062,6 +1062,18 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       footnotes.add(footnote);
    }
 
+   public TeXObjectList getAuthor()
+   {
+      ControlSequence cs = getControlSequence("@author");
+
+      if (cs instanceof GenericCommand)
+      {
+         return ((GenericCommand)cs).getDefinition();
+      }
+
+      return null;
+   }
+
    private Vector<String> verbEnv;
 
    private Vector<LaTeXFile> loadedPackages;

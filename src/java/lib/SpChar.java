@@ -53,9 +53,19 @@ public class SpChar extends Macro
       if (object == null)
       {
          throw new TeXSyntaxException(
-            parser.getCurrentFile(),
-            parser.getLineNumber(),
+            parser,
             TeXSyntaxException.ERROR_MISSING_PARAM, ""+parser.getSpChar());
+      }
+
+      TeXObject nextObject = stack.peekStack();
+
+      if (nextObject instanceof SpChar)
+      {
+         stack.push(parser.getListener().createGroup());
+
+         parser.getListener().getTeXApp().error(new TeXSyntaxException(
+           parser, TeXSyntaxException.ERROR_DOUBLE_SUPERSCRIPT, 
+               object.toString()));
       }
 
       parser.getListener().superscript(object);
@@ -65,6 +75,17 @@ public class SpChar extends Macro
      throws IOException
    {
       TeXObject object = parser.popNextArg();
+
+      TeXObject nextObject = parser.peekStack();
+
+      if (nextObject instanceof SpChar)
+      {
+         parser.push(parser.getListener().createGroup());
+
+         parser.getListener().getTeXApp().error(new TeXSyntaxException(
+           parser, TeXSyntaxException.ERROR_DOUBLE_SUPERSCRIPT, 
+               object.toString()));
+      }
 
       parser.getListener().superscript(object);
    }

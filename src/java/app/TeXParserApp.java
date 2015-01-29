@@ -193,8 +193,10 @@ public class TeXParserApp implements TeXApp
       return string;
    }
 
-   public void substituting(int lineNum, String original, String replacement)
+   public void substituting(TeXParser parser, String original, String replacement)
    {
+      int lineNum = parser.getLineNumber();
+
       if (replacement.isEmpty())
       {
          errorListener.warning(getLabelWithValues("error.line", ""+lineNum, 
@@ -675,6 +677,12 @@ public class TeXParserApp implements TeXApp
          break;
          case TeXSyntaxException.ERROR_EXTRA:
            message = getLabelWithValue("error.extra", e.getParam());
+         break;
+         case TeXSyntaxException.ERROR_DOUBLE_SUBSCRIPT:
+           message = getLabelWithValue("error.double_subscript", e.getParam());
+         break;
+         case TeXSyntaxException.ERROR_DOUBLE_SUPERSCRIPT:
+           message = getLabelWithValue("error.double_superscript", e.getParam());
          break;
          default:
            message = e.getMessage();

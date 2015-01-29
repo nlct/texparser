@@ -282,7 +282,7 @@ public class LaTeX2LaTeX extends LaTeXParserListener
    {
       if (styName.equals("graphics") || styName.equals("epsfig"))
       {
-         getTeXApp().substituting(parser.getLineNumber(),
+         getTeXApp().substituting(parser,
            styName, "graphicx");
 
          styName = "graphicx";
@@ -308,7 +308,7 @@ public class LaTeX2LaTeX extends LaTeXParserListener
    public void substituting(String original, String replacement)
      throws IOException
    {
-      getTeXApp().substituting(parser.getLineNumber(),
+      getTeXApp().substituting(parser,
         original, replacement);
    }
 

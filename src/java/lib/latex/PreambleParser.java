@@ -142,7 +142,7 @@ public class PreambleParser extends LaTeXParserListener
 
    public void substituting(String original, String replacement)
    {
-      texApp.substituting(parser.getLineNumber(), original, replacement);
+      texApp.substituting(parser, original, replacement);
    }
 
    public void href(String url, TeXObject text)

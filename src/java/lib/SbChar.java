@@ -58,6 +58,17 @@ public class SbChar extends Macro
             TeXSyntaxException.ERROR_MISSING_PARAM, ""+parser.getSbChar());
       }
 
+      TeXObject nextObject = stack.peekStack();
+
+      if (nextObject instanceof SbChar)
+      {
+         stack.push(parser.getListener().createGroup());
+
+         parser.getListener().getTeXApp().error(new TeXSyntaxException(
+           parser, TeXSyntaxException.ERROR_DOUBLE_SUBSCRIPT,
+               object.toString()));
+      }
+
       parser.getListener().subscript(object);
    }
 
@@ -65,6 +76,17 @@ public class SbChar extends Macro
      throws IOException
    {
       TeXObject object = parser.popNextArg();
+
+      TeXObject nextObject = parser.peekStack();
+
+      if (nextObject instanceof SbChar)
+      {
+         parser.push(parser.getListener().createGroup());
+
+         parser.getListener().getTeXApp().error(new TeXSyntaxException(
+           parser, TeXSyntaxException.ERROR_DOUBLE_SUBSCRIPT,
+               object.toString()));
+      }
 
       parser.getListener().subscript(object);
    }

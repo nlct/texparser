@@ -77,10 +77,12 @@ public class NewCommand extends Command
          object = (stack == parser ? parser.popNextArg() : stack.popArg());
       }
 
-      if (object instanceof TeXObjectList
-       &&((TeXObjectList)object).size() == 1)
+      if (object instanceof TeXObjectList)
       {
-         object = ((TeXObjectList)object).pop();
+         // Use popArg in case there are spaces before or after the
+         // controls sequence.
+
+         object = ((TeXObjectList)object).popArg();
       }
 
       String csName;

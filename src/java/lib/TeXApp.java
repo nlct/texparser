@@ -35,7 +35,7 @@ public interface TeXApp
    public void wmftoeps(File wmfFile, File epsFile)
      throws IOException,InterruptedException;
 
-   public void substituting(int lineNum, String original, String replacement);
+   public void substituting(TeXParser parser, String original, String replacement);
 
    public void message(int messageType, String arg);
 

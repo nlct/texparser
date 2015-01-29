@@ -41,8 +41,9 @@ public class TeXAppAdapter implements TeXApp
    {
    }
 
-   public void substituting(int lineNum, String original, String replacement)
+   public void substituting(TeXParser parser, String original, String replacement)
    {
+      System.out.println(original+" -> "+replacement);
    }
 
    public void message(int messageType, String arg)
@@ -52,7 +53,7 @@ public class TeXAppAdapter implements TeXApp
 
    public void warning(TeXParser parser, String message)
    {
-      System.out.println(message);
+      System.err.println(message);
    }
 
    public void error(Exception e)
@@ -173,6 +174,14 @@ public class TeXAppAdapter implements TeXApp
          break;
          case TeXSyntaxException.ERROR_EXTRA:
            message = "Extra "+ e.getParam();
+         break;
+         case TeXSyntaxException.ERROR_DOUBLE_SUBSCRIPT:
+           message = "Double subscript _"+ e.getParam()
+              +"_ (replaced with _"+e.getParam()+"{}_)";
+         break;
+         case TeXSyntaxException.ERROR_DOUBLE_SUPERSCRIPT:
+           message = "Double superscript ^"+ e.getParam()
+              +"^ (replaced with ^"+e.getParam()+"{}^)";
          break;
          default:
            message = e.getMessage();
