@@ -794,6 +794,7 @@ public class LaTeX2LaTeX extends LaTeXParserListener
 
          getTeXApp().message(TeXApp.MESSAGE_WRITING, outFile.getAbsolutePath());
          writer = new PrintWriter(outFile);
+
       }
    }
 
@@ -805,6 +806,19 @@ public class LaTeX2LaTeX extends LaTeXParserListener
    public void endParse(File file)
     throws IOException
    {
+      TeXReader reader = getParser().getReader();
+
+      if (reader != null)
+      {
+         reader = reader.getParent();
+      }
+
+      if (writer != null && reader == null)
+      {
+         writer.flush();
+         writer.close();
+         writer = null;
+      }
    }
 
    public void href(String url, TeXObject text)
