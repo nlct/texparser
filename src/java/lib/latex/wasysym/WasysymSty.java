@@ -45,8 +45,8 @@ public class WasysymSty extends LaTeXSty
       registerControlSequence(listener.createMathSymbol("lhd", 0x25C3));
       registerControlSequence(listener.createMathSymbol("RHD", 0x25B8));
       registerControlSequence(listener.createMathSymbol("rhd", 0x25B9));
-      registerControlSequence(listener.createMathSymbol("apprele", 0x2272));
-      registerControlSequence(listener.createMathSymbol("apprege", 0x2273));
+      registerControlSequence(listener.createMathSymbol("apprle", 0x2272));
+      registerControlSequence(listener.createMathSymbol("apprge", 0x2273));
       registerControlSequence(listener.createMathSymbol("wasypropto", 0x221D));
       registerControlSequence(listener.createMathSymbol("ocircle", 0x25CB));
    }
