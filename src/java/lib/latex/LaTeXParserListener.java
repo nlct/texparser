@@ -694,6 +694,11 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
          return new NatbibSty(this);
       }
 
+      if (styName.equals("wasysym"))
+      {
+         return new WasysymSty(styName, this);
+      }
+
       return null;
    }
 
