@@ -790,11 +790,16 @@ public class LaTeX2LaTeX extends LaTeXParserListener
       {
          Files.createDirectories(outPath);
 
-         File outFile = new File(outPath.toFile(), file.getName());
+         File outFile = new File(outPath.toFile(), getOutFileName(file));
 
          getTeXApp().message(TeXApp.MESSAGE_WRITING, outFile.getAbsolutePath());
          writer = new PrintWriter(outFile);
       }
+   }
+
+   public String getOutFileName(File inFile)
+   {
+      return inFile.getName();
    }
 
    public void endParse(File file)
