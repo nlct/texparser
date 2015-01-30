@@ -39,6 +39,7 @@ import com.dickimawbooks.texparserlib.latex.etoolbox.*;
 import com.dickimawbooks.texparserlib.latex.hyperref.*;
 import com.dickimawbooks.texparserlib.latex.natbib.*;
 import com.dickimawbooks.texparserlib.latex.inputenc.*;
+import com.dickimawbooks.texparserlib.latex.wasysym.*;
 
 public abstract class LaTeXParserListener extends DefaultTeXParserListener
 {
