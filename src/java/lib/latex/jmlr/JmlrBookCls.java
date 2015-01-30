@@ -37,4 +37,12 @@ public class JmlrBookCls extends JmlrCls
       getListener().usepackage(null, "setspace");
       super.preOptions();
    }
+
+   public void addDefinitions()
+   {
+      super.addDefinitions();
+
+      registerControlSequence(
+         new StoreDataCs("logo", "@logourl", "@logo"));
+   }
 }
