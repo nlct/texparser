@@ -532,9 +532,7 @@ public class TeXObjectList extends Vector<TeXObject> implements TeXObject,Expand
          list.add(object);
       }
 
-      throw new TeXSyntaxException(
-               parser.getCurrentFile(),
-               parser.getLineNumber(),
+      throw new TeXSyntaxException(parser,
                TeXSyntaxException.ERROR_MISSING_CLOSING,
         ""+closeDelim);
    }
