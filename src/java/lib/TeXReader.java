@@ -146,7 +146,8 @@ public class TeXReader implements Readable,Closeable
 
    public String toString()
    {
-      return "TeXReader[reader:"+reader+",source:"+source+"]";
+      return "TeXReader[reader:"+reader+",source:"+source
+       +",parent="+parent+"]";
    }
 
    public void setPending(TeXObjectList pending)

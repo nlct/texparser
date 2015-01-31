@@ -40,6 +40,7 @@ import com.dickimawbooks.texparserlib.latex.hyperref.*;
 import com.dickimawbooks.texparserlib.latex.natbib.*;
 import com.dickimawbooks.texparserlib.latex.inputenc.*;
 import com.dickimawbooks.texparserlib.latex.wasysym.*;
+import com.dickimawbooks.texparserlib.latex.pifont.*;
 
 public abstract class LaTeXParserListener extends DefaultTeXParserListener
 {
@@ -698,6 +699,11 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       if (styName.equals("wasysym"))
       {
          return new WasysymSty(styName, this);
+      }
+
+      if (styName.equals("pifont"))
+      {
+         return new PifontSty(styName, this);
       }
 
       return null;
