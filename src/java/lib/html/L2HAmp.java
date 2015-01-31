@@ -70,7 +70,7 @@ public class L2HAmp extends Command
    {
       if (((L2HConverter)parser.getListener()).isInDocEnv())
       {
-         parser.getListener().getWriteable().writeln("&amp;");
+         parser.getListener().getWriteable().write("&amp;");
       }
    }
 
