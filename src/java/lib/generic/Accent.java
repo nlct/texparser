@@ -44,7 +44,7 @@ public class Accent extends ControlSequence
 
    public void process(TeXParser parser) throws IOException
    {
-      TeXObject object = parser.popStack();
+      TeXObject object = parser.popNextArg();
       TeXObjectList remaining = null;
 
       String accent = name;
@@ -138,19 +138,19 @@ public class Accent extends ControlSequence
       
       if (remaining != null && remaining.size() > 0)
       {
-         remaining.process(parser);
+         parser.push(remaining);
       }
    }
 
    public void process(TeXParser parser, TeXObjectList stack) throws IOException
    {
-      if (stack == null || stack.size() == 0)
+      if (stack == null || stack.size() == 0 || stack == parser)
       {
          process(parser);
          return;
       }
 
-      TeXObject object = stack.pop();
+      TeXObject object = stack.popArg();
 
       TeXObjectList remaining = null;
 
@@ -167,7 +167,7 @@ public class Accent extends ControlSequence
          {
             remaining = ((Expandable)object).expandfully(parser, stack);
 
-            if (remaining.size() == 0)
+            if (remaining == null || remaining.size() == 0)
             {
                if (stack.size() == 0)
                {
@@ -236,7 +236,7 @@ public class Accent extends ControlSequence
       {
          TeXObjectList expanded = null;
 
-         if (remaining.size() == 0)
+         if (remaining == null || remaining.size() == 0)
          {
             expanded = ((Expandable)object).expandfully(parser, stack);
          }
@@ -275,7 +275,13 @@ public class Accent extends ControlSequence
       }
       else
       {
-         object.process(parser, remaining);
+         if (remaining != null && remaining.size() > 0)
+         {
+            stack.push(remaining);
+         }
+
+         object.process(parser, stack);
+
          throw new TeXSyntaxException(
              parser,
              TeXSyntaxException.ERROR_INVALID_ACCENT,
@@ -284,7 +290,7 @@ public class Accent extends ControlSequence
       
       if (remaining != null && remaining.size() > 0)
       {
-         remaining.process(parser);
+         stack.push(remaining);
       }
    }
 
