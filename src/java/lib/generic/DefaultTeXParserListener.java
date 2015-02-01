@@ -67,6 +67,7 @@ public abstract class DefaultTeXParserListener extends TeXParserListener
       parser.putControlSequence(new Special());
       parser.putControlSequence(new GenericCommand("empty"));
       parser.putControlSequence(new Def());
+      parser.putControlSequence(new Def("gdef", true, false));
       parser.putControlSequence(new Let());
       parser.putControlSequence(new Special());
       parser.putControlSequence(new Jobname());
