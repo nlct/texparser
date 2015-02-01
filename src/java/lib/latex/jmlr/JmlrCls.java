@@ -120,6 +120,7 @@ public class JmlrCls extends LaTeXCls
       registerControlSequence(new GenericCommand("@jmlrabbrvproceedings",
        null, listener.createString("JMLR")));
       registerControlSequence(new JmlrProceedings());
+      registerControlSequence(new ObsoleteFontCs());
 
       TeXObjectList def = new TeXObjectList();
       def.add(new TeXCsRef("jmlrproceedings"));
@@ -136,6 +137,7 @@ public class JmlrCls extends LaTeXCls
       def.add(grp);
       def.add(listener.createGroup("JMLR: Workshop and Conference Proceedings"));
       registerControlSequence(new GenericCommand("jmlrwcp", null, def));
+      registerControlSequence(new AtSecondOfTwo("ifprint"));
    }
 
    public void processOption(String option)
@@ -150,6 +152,14 @@ public class JmlrCls extends LaTeXCls
       else if (option.equals("wcp"))
       {
          listener.getControlSequence("jmlrwcp").process(listener.getParser());
+      }
+      else if (option.equals("color"))
+      {
+         registerControlSequence(new AtSecondOfTwo("ifprint"));
+      }
+      else if (option.equals("gray"))
+      {
+         registerControlSequence(new AtFirstOfTwo("ifprint"));
       }
    }
 }

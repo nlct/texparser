@@ -135,6 +135,8 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
 
    protected void addPredefined()
    {
+      super.addPredefined();
+
       loadedPackages = new Vector<LaTeXFile>();
       verbEnv = new Vector<String>();
 
@@ -296,8 +298,6 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       addFontSizeDeclaration("footnotesize", TeXSettings.SIZE_FOOTNOTE);
       addFontSizeDeclaration("scriptsize", TeXSettings.SIZE_SCRIPT);
       addFontSizeDeclaration("tiny", TeXSettings.SIZE_TINY);
-
-      super.addPredefined();
 
       parser.putControlSequence(new DocumentStyle());
    }
