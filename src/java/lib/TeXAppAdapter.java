@@ -99,6 +99,12 @@ public class TeXAppAdapter implements TeXApp
          case LaTeXSyntaxException.ERROR_DEFINED:
             message = "" + e.getParam()+" already defined";
          break;
+         case LaTeXSyntaxException.ERROR_ILLEGAL_ARRAY_ARG_CHAR:
+            message = "Illegal character '" + e.getParam()+"' in array arg";
+         break;
+         case LaTeXSyntaxException.ERROR_NO_ALIGNMENT:
+            message = "No alignment found";
+         break;
          default:
             message = e.getMessage();
       }
@@ -182,6 +188,12 @@ public class TeXAppAdapter implements TeXApp
          case TeXSyntaxException.ERROR_DOUBLE_SUPERSCRIPT:
            message = "Double superscript ^"+ e.getParam()
               +"^ (replaced with ^"+e.getParam()+"{}^)";
+         break;
+         case TeXSyntaxException.ERROR_MISPLACED_OMIT:
+           message = "Misplaced \\omit";
+         break;
+         case TeXSyntaxException.ERROR_ILLEGAL_ALIGN:
+           message = "Illegal alignment "+e.getParam();
          break;
          default:
            message = e.getMessage();

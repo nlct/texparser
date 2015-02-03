@@ -169,7 +169,9 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       parser.putControlSequence(new Verb());
       parser.putControlSequence(new Cr("\\"));
       parser.putControlSequence(new Cr("cr"));
-      parser.putControlSequence(new Cr("tabularnewline"));
+      parser.putControlSequence(new TabularNewline());
+      parser.putControlSequence(new Hline());
+      parser.putControlSequence(new Cline());
       parser.putControlSequence(new Frac());
       parser.putControlSequence(new GenericCommand("@empty"));
       parser.putControlSequence(new AtIfNextChar());
@@ -505,6 +507,12 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
    public UnknownReference createUnknownReference(TeXObject label)
    {
       return new UnknownReference(this, label);
+   }
+
+   public TeXCellAlignList createTeXCellAlignList(TeXObject colSpecs)
+     throws IOException
+   {
+      return new TeXCellAlignList(getParser(), colSpecs);
    }
 
    public boolean isInDocEnv()
@@ -940,8 +948,14 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
 
       if (settings.getAlignMode() == TeXSettings.ALIGN_MODE_TRUE)
       {
-         settings.setStartRowMode(TeXSettings.START_ROW_MODE_TRUE);
+         settings.startRow();
       }
+   }
+
+   public AlignRow createAlignRow(TeXObjectList stack)
+     throws IOException
+   {
+      return new AlignRow(getParser(), stack);
    }
 
    public void setAuxData(Vector<AuxData> auxData)

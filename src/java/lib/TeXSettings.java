@@ -292,6 +292,7 @@ public class TeXSettings
    {
       setStartRowMode(START_ROW_MODE_TRUE);
       startColumn();
+      resetAlignmentColumn();
    }
 
    public void startColumn()
@@ -400,6 +401,31 @@ public class TeXSettings
       return currentAlignmentColumn;
    }
 
+   public TeXCellAlignList getCurrentAlignmentList()
+   {
+      return currentAlignmentList;
+   }
+
+   public TeXCellAlignList getAlignmentList()
+   {
+      if (currentAlignmentList == null)
+      {
+         if (parent == null)
+         {
+            return null;
+         }
+
+         return parent.getAlignmentList();
+      }
+
+      return currentAlignmentList;
+   }
+
+   public void setAlignmentList(TeXCellAlignList list)
+   {
+      currentAlignmentList = list;
+   }
+
    private void resetAlignmentColumn()
    {
       currentAlignmentColumn = 0;
@@ -412,12 +438,13 @@ public class TeXSettings
 
    public int getCurrentAlignmentColumnCount()
    {
-      return currentAlignmentColumnCount;
+      return currentAlignmentList == null ? 0 :
+             currentAlignmentList.size();
    }
 
    public int getAlignmentColumnCount()
    {
-      if (currentAlignmentColumnCount == INHERIT)
+      if (currentAlignmentList == null)
       {
          if (parent == null)
          {
@@ -427,12 +454,7 @@ public class TeXSettings
          return parent.getAlignmentColumnCount();
       }
 
-      return currentAlignmentColumnCount;
-   }
-
-   public void setAlignmentColumnCount(int count)
-   {
-      currentAlignmentColumnCount = count;
+      return getCurrentAlignmentColumnCount();
    }
 
    public Color getFgColor()
@@ -2425,8 +2447,9 @@ public class TeXSettings
    private int currentStartRowMode = INHERIT;
    private int currentStartColumnMode = INHERIT;
 
-   private int currentAlignmentColumnCount = INHERIT;
    private int currentAlignmentColumn = INHERIT;
+
+   private TeXCellAlignList currentAlignmentList = null;
 
    private Color currentFgColor = null;
    private Color currentBgColor = null;

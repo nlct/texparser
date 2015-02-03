@@ -43,11 +43,12 @@ Some \textbf{bold text}, some \textit{italic text} and some
 \begin{table}[htbp]
 \caption{A Sample Table}\label{tab:sample}
 \centering
-\begin{tabular}{lcr}
+\begin{tabular}{@{+}l||cr}
+\hline\hline
 Lorum & Ipsum & Dolor sit amet\\
 \multicolumn{3}{c}{consectetuer adipiscing elit}\\
 Ut & purus & elit\\
-vestibulum ut & placerat ac & adipiscing vitae, felis
+vestibulum ut & placerat ac & adipiscing vitae, felis\\\hline
 \end{tabular}
 \end{table}
 

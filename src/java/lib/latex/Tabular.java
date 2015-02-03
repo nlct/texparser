@@ -65,45 +65,114 @@ public class Tabular extends Declaration
    }
 
    protected void startTabular(TeXParser parser, 
-     TeXObject verticalAlignment, TeXObject columnSpecs)
+     int verticalAlignment, TeXObject columnSpecs)
      throws IOException
    {
       TeXSettings settings = parser.getSettings();
 
-      int columnCount = 1;// TODO fix this
+      LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
 
-      orgMode = settings.getStartColumnMode();
-      settings.setStartRowMode(TeXSettings.START_ROW_MODE_TRUE);
-
-      settings.setAlignmentColumnCount(columnCount);
+      settings.setAlignmentList(listener.createTeXCellAlignList(columnSpecs));
+      settings.startAlignment();
    }
 
    public void process(TeXParser parser) throws IOException
    {
-      TeXObject vertAlign = parser.popNextArg('[', ']');
+      TeXObject vertAlignArg = parser.popNextArg('[', ']');
+
+      int vertAlign = -1;
+
+      if (vertAlignArg != null)
+      {
+         if (vertAlignArg instanceof Expandable)
+         {
+            TeXObjectList list = ((Expandable)vertAlignArg).expandfully(parser);
+
+            if (list != null)
+            {
+               vertAlignArg = list;
+            }
+         }
+
+         String arg = vertAlignArg.toString(parser).trim();
+
+         if (!arg.isEmpty())
+         {
+            vertAlign = arg.charAt(0);
+         }
+      }
+
       TeXObject columnSpecs = parser.popNextArg();
 
+      if (columnSpecs instanceof Expandable)
+      {
+         TeXObjectList expanded = ((Expandable)columnSpecs).expandfully(parser);
+
+         if (expanded != null)
+         {
+            columnSpecs = expanded;
+         }
+      }
+
       startTabular(parser, vertAlign, columnSpecs);
+
+      AlignRow row = ((LaTeXParserListener)parser.getListener()).createAlignRow(parser);
+
+      row.process(parser);
    }
 
-   public void process(TeXParser parser, TeXObjectList list) throws IOException
+   public void process(TeXParser parser, TeXObjectList stack) throws IOException
    {
-      TeXObject vertAlign = list.popArg(parser, '[', ']');
-      TeXObject columnSpecs = list.popArg();
+      TeXObject vertAlignArg = stack.popArg(parser, '[', ']');
+      int vertAlign = -1;
+
+      if (vertAlignArg != null)
+      {
+         if (vertAlignArg instanceof Expandable)
+         {
+            TeXObjectList list = ((Expandable)vertAlignArg).expandfully(parser, stack);
+
+            if (list != null)
+            {
+               vertAlignArg = list;
+            }
+         }
+
+         String arg = vertAlignArg.toString(parser).trim();
+
+         if (!arg.isEmpty())
+         {
+            vertAlign = arg.charAt(0);
+         }
+      }
+
+      TeXObject columnSpecs = stack.popArg();
+
+      if (columnSpecs instanceof Expandable)
+      {
+         TeXObjectList expanded =
+            ((Expandable)columnSpecs).expandfully(parser, stack);
+
+         if (expanded != null)
+         {
+            columnSpecs = expanded;
+         }
+      }
 
       startTabular(parser, vertAlign, columnSpecs);
+
+      AlignRow row = ((LaTeXParserListener)parser.getListener()).createAlignRow(stack);
+
+      row.process(parser, stack);
    }
 
    public void end(TeXParser parser) throws IOException
    {
-      TeXSettings settings = parser.getSettings();
-      settings.setStartColumnMode(orgMode);
+      parser.getSettings().endAlignment();
    }
 
    public boolean isModeSwitcher()
    {
       return false;
    }
-
-   private int orgMode = TeXSettings.INHERIT;
 }

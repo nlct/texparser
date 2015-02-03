@@ -97,7 +97,6 @@ public class L2HConverter extends LaTeXParserListener
       putControlSequence(new L2HHypertarget());
       putControlSequence(new L2HHyperlink());
 
-      putControlSequence(new L2HCr("\\"));
       putControlSequence(new L2HAmp());
       putControlSequence(new L2HNoBreakSpace());
       putControlSequence(new SpaceCs("newblock"));
@@ -140,6 +139,11 @@ public class L2HConverter extends LaTeXParserListener
       parser.putControlSequence(
          new L2HMathDeclaration("equation", TeXSettings.MODE_DISPLAY_MATH, true));
 
+      parser.putControlSequence(new L2HTabular());
+      parser.putControlSequence(new L2HTabular("array"));
+
+      parser.putControlSequence(new L2HMultiColumn());
+
       try
       {
          LaTeXSty sty = getLaTeXSty("hyperref");
@@ -172,6 +176,12 @@ public class L2HConverter extends LaTeXParserListener
    public MathGroup createMathGroup()
    {
       return new L2HMathGroup();
+   }
+
+   public AlignRow createAlignRow(TeXObjectList stack)
+     throws IOException
+   {
+      return new L2HAlignRow(getParser(), stack);
    }
 
    public void setWriter(Writer writer)
@@ -414,13 +424,67 @@ public class L2HConverter extends LaTeXParserListener
       writeable.writeln("</script>");
    }
 
+   protected void writeTabularCss(String halign, String valign)
+     throws IOException
+   {
+      String suffix = "";
+
+      if (halign != null)
+      {
+         suffix = suffix + halign.charAt(0);
+      }
+
+      if (valign != null)
+      {
+         suffix = suffix + valign.charAt(0);
+      }
+
+      writeln("table.tabular-"+suffix);
+      writeln("{");
+      writeln("  display: inline-table;");
+      writeln("  border-collapse: collapse;");
+
+      if (halign != null)
+      {
+         writeln("  align: "+halign+";");
+      }
+
+      if (valign != null)
+      {
+         writeln("  vertical-align: "+valign+";");
+      }
+
+      writeln("}");
+   }
+
    public void writeCssStyles()
      throws IOException
    {
       writeln("div.displaymath { display: block; text-align: center; }");
       writeln("div.eqno { float: right; }");
-      writeln("div.table { display: block; }");
-      writeln("div.figure { display: block; }");
+      writeln("div.table { display: block; text-align: center; }");
+
+      writeTabularCss("center", "middle");
+      writeTabularCss("center", "bottom");
+      writeTabularCss("center", "top");
+
+      writeTabularCss("left", "middle");
+      writeTabularCss("left", "bottom");
+      writeTabularCss("left", "top");
+
+      writeTabularCss("right", "middle");
+      writeTabularCss("right", "bottom");
+      writeTabularCss("right", "top");
+
+      writeTabularCss(null, "middle");
+      writeTabularCss(null, "bottom");
+      writeTabularCss(null, "top");
+
+      writeTabularCss("left", null);
+      writeTabularCss("center", null);
+      writeTabularCss("right", null);
+
+      writeln("div.figure { display: block; text-align: center; }");
       writeln("div.caption { display: block; text-align: center; }");
       writeln("div.marginpar { float: right; }");
       writeln("div.abstract { display: block; margin-right: 4em; margin-left: 4em;}");

@@ -40,7 +40,7 @@ public class Cr extends ControlSequence
       return new Cr(getName());
    }
 
-   public void process(TeXParser parser, boolean isStar,
+   public void process(TeXParser parser, TeXObjectList stack, boolean isStar,
      TeXObject optArg)
       throws IOException
    {
@@ -65,11 +65,11 @@ public class Cr extends ControlSequence
             parser.push(obj);
          }
 
-         process(parser, isStar, parser.popNextArg('[', ']'));
+         process(parser, parser, isStar, parser.popNextArg('[', ']'));
       }
       else
       {
-         process(parser, false, null);
+         process(parser, parser, false, null);
       }
    }
 
@@ -91,11 +91,11 @@ public class Cr extends ControlSequence
             list.push(obj);
          }
 
-         process(parser, isStar, list.popArg(parser, '[', ']'));
+         process(parser, list, isStar, list.popArg(parser, '[', ']'));
       }
       else
       {
-         process(parser, false, null);
+         process(parser, list, false, null);
       }
    }
 

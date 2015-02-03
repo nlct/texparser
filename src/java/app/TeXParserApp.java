@@ -599,6 +599,12 @@ public class TeXParserApp implements TeXApp
          case LaTeXSyntaxException.ERROR_DEFINED:
             message = getLabelWithValue("error.defined", e.getParam());
          break;
+         case LaTeXSyntaxException.ERROR_ILLEGAL_ARRAY_ARG_CHAR:
+            message = getLabel("error.misplaced_omit");
+         break;
+         case LaTeXSyntaxException.ERROR_NO_ALIGNMENT:
+            message = getLabel("error.no_alignment");
+         break;
          default:
             message = e.getMessage();
       }
@@ -683,6 +689,9 @@ public class TeXParserApp implements TeXApp
          break;
          case TeXSyntaxException.ERROR_DOUBLE_SUPERSCRIPT:
            message = getLabelWithValue("error.double_superscript", e.getParam());
+         break;
+         case TeXSyntaxException.ERROR_ILLEGAL_ALIGN:
+           message = getLabelWithValue("error.illegal_align", e.getParam());
          break;
          default:
            message = e.getMessage();
