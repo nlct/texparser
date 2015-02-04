@@ -34,9 +34,9 @@ public class DimenRegister extends Register implements TeXDimension
       setValue(value);
    }
 
-   public void setValue(int value)
+   public void setValue(int spValue)
    {
-      this.value = value;
+      this.value = spValue;
    }
 
    public float getValue()
@@ -96,5 +96,6 @@ public class DimenRegister extends Register implements TeXDimension
 
    private int value = 0;
 
+   // TODO find some way to implement em and ex
    private static TeXUnit unit = new TeXUnit(TeXUnit.UNIT_SP);
 }

@@ -18,6 +18,8 @@
 */
 package com.dickimawbooks.texparserlib;
 
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
 import java.io.IOException;
 
 public class UserDimension implements TeXDimension
@@ -42,6 +44,51 @@ public class UserDimension implements TeXDimension
    {
       value = num.getValue();
       unit = texUnit;
+   }
+
+   public UserDimension(TeXParser parser, String string)
+    throws TeXSyntaxException
+   {
+      Matcher m = DIMENSION_PATTERN.matcher(string);
+
+      if (!m.matches())
+      {
+         throw new TeXSyntaxException(parser,
+           TeXSyntaxException.ERROR_DIMEN_EXPECTED, string);
+      }
+
+      String valueString = m.group(1);
+      String unitString = m.group(2);
+
+      try
+      {
+         value = Float.parseFloat(valueString);
+      }
+      catch (NumberFormatException e)
+      {
+         // this shouldn't happen
+         throw new TeXSyntaxException(parser,
+           TeXSyntaxException.ERROR_DIMEN_EXPECTED, string);
+      }
+
+      int id = -1;
+
+      for (int i = 0; i < TeXUnit.UNIT_NAMES.length; i++)
+      {
+         if (TeXUnit.UNIT_NAMES[i].equals(unitString))
+         {
+            id = i;
+            break;
+         }
+      }
+
+      if (id == -1)
+      {
+         throw new TeXSyntaxException(parser,
+           TeXSyntaxException.ERROR_DIMEN_EXPECTED, string);
+      }
+
+      unit = new TeXUnit(id);
    }
 
    public Object clone()
@@ -93,4 +140,7 @@ public class UserDimension implements TeXDimension
    private float value;
 
    private TeXUnit unit;
+
+   public static final Pattern DIMENSION_PATTERN 
+     = Pattern.compile("\\s*(\\d*(?:\\.\\d+)?\\d)\\s*([a-z]{2})\\s*");
 }

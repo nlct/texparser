@@ -39,6 +39,11 @@ public abstract class LaTeXSty
       listener.registerControlSequence(this, cs);
    }
 
+   public DimenRegister registerNewLength(String name)
+   {
+      return listener.getParser().getSettings().newdimen(name);
+   }
+
    public abstract void processOption(String option)
     throws IOException;
 

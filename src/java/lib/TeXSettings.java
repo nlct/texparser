@@ -663,44 +663,52 @@ public class TeXSettings
         activeChar);
    }
 
-   public void countdef(String name, int alloc)
+   public CountRegister countdef(String name, int alloc)
    {
       CountRegister reg = new CountRegister(name);
       parser.allocCount(alloc, reg);
       putRegister(reg);
+
+      return reg;
    }
 
-   public void newcount(boolean isLocal, String name)
+   public CountRegister newcount(boolean isLocal, String name)
    {
       if (isLocal || parent == null)
       {
-         newcount(name);
+         return newcount(name);
       }
       else
       {
-         parent.newcount(isLocal, name);
+         return parent.newcount(isLocal, name);
       }
    }
 
-   public void newcount(String name)
+   public CountRegister newcount(String name)
    {
       CountRegister reg = new CountRegister(name);
       parser.allocCount(reg);
       putRegister(reg);
+
+      return reg;
    }
 
-   public void dimendef(String name, int alloc)
+   public DimenRegister dimendef(String name, int alloc)
    {
       DimenRegister reg = new DimenRegister(name);
       parser.allocDimen(alloc, reg);
       putRegister(reg);
+
+      return reg;
    }
 
-   public void newdimen(String name)
+   public DimenRegister newdimen(String name)
    {
       DimenRegister reg = new DimenRegister(name);
       parser.allocDimen(reg);
       putRegister(reg);
+
+      return reg;
    }
 
    protected Register putRegister(Register register)
