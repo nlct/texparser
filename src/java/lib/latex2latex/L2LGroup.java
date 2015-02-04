@@ -42,13 +42,9 @@ public class L2LGroup extends Group
       super(listener, text);
    }
 
-   public Object clone()
+   public TeXObjectList createList()
    {
-      L2LGroup group = new L2LGroup();
-
-      group.addAll(this);
-
-      return group;
+      return new L2LGroup(capacity());
    }
 
    private void preprocess(TeXParser parser)

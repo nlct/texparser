@@ -537,11 +537,24 @@ public class TeXObjectList extends Vector<TeXObject> implements TeXObject,Expand
         ""+closeDelim);
    }
 
+   public TeXObjectList createList()
+   {
+      return new TeXObjectList(capacity());
+   }
+
    public Object clone()
    {
-      TeXObjectList list = new TeXObjectList(Math.min(10, size()));
+      TeXObjectList list = createList();
 
-      list.addAll(this);
+      for (TeXObject object : this)
+      {
+         list.add((TeXObject)object.clone());
+      }
+
+      for (Declaration dec : declarations)
+      {
+         list.declarations.add((Declaration)dec.clone());
+      }
 
       return list;
    }

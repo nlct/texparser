@@ -37,18 +37,11 @@ public class CsvList extends TeXObjectList
       super(capacity);
    }
 
-   public Object clone()
+   public TeXObjectList createList()
    {
-      CsvList list = new CsvList(capacity());
-
-      for (TeXObject object : this)
-      {
-         list.add((TeXObject)object.clone());
-      }
-
-      return list;
+      return new CsvList(capacity());
    }
-   
+
    public static CsvList getList(TeXParser parser, TeXObject object)
      throws IOException
    {

@@ -94,7 +94,6 @@ public class MultiColumn extends MultiCell
             colAlignArg = expanded;
          }
       }
-
       TeXObject contents = stack.pop();
 
       TeXObjectList expanded = new TeXObjectList();

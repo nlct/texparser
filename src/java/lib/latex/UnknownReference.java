@@ -49,13 +49,9 @@ public class UnknownReference extends TeXObjectList
       this.label = label;
    }
 
-   public Object clone()
+   public TeXObjectList createList()
    {
-      UnknownReference cs = new UnknownReference(getLabelObject(), getLabel());
-
-      cs.addAll(this);
-
-      return cs;
+      return new UnknownReference(getLabelObject(), getLabel());
    }
 
    public TeXObject getLabelObject()

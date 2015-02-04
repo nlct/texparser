@@ -57,6 +57,11 @@ public class TeXParser extends TeXObjectList
    {
    }
 
+   public TeXObjectList createList()
+   {
+      return new TeXParser(listener);
+   }
+
    private void initRegisters()
    {
       CountRegister countReg = new CountRegister("count@");
@@ -1477,7 +1482,7 @@ public class TeXParser extends TeXObjectList
          fetchNext(isShort);
       }
 
-      return super.popArg();
+      return popArg();
    }
 
    public TeXObject popNextArg(char openDelim, char closeDelim)

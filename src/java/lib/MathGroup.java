@@ -23,6 +23,16 @@ import java.util.Vector;
 
 public class MathGroup extends Group
 {
+   public MathGroup()
+   {
+      super();
+   }
+
+   public MathGroup(int capacity)
+   {
+      super(capacity);
+   }
+
    public boolean isInLine()
    {
       return isinline;
@@ -33,16 +43,10 @@ public class MathGroup extends Group
       isinline = isInLine;
    }
 
-   public Object clone()
+   public TeXObjectList createList()
    {
-      MathGroup math = new MathGroup();
+      MathGroup math = new MathGroup(capacity());
       math.setInLine(isinline);
-
-      for (TeXObject object : this)
-      {
-         math.add((TeXObject)object.clone());
-      }
-
       return math;
    }
 

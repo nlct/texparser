@@ -30,16 +30,15 @@ public class L2HMathGroup extends MathGroup
       super();
    }
 
-   public Object clone()
+   public L2HMathGroup(int capacity)
    {
-      MathGroup math = new L2HMathGroup();
+      super(capacity);
+   }
+
+   public TeXObjectList createList()
+   {
+      L2HMathGroup math = new L2HMathGroup(capacity());
       math.setInLine(isInLine());
-
-      for (TeXObject object : this)
-      {
-         math.add((TeXObject)object.clone());
-      }
-
       return math;
    }
 

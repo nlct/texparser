@@ -309,20 +309,7 @@ public class GenericCommand extends Command
    private TeXObject replaceList(TeXParser parser,
      TeXObjectList list, TeXObject[] args)
    {
-      TeXObjectList stack;
-
-      if (list instanceof MathGroup)
-      {
-         stack = parser.getListener().createMathGroup();
-      }
-      else if (list instanceof Group)
-      {
-         stack = parser.getListener().createGroup();
-      }
-      else
-      {
-         stack = new TeXObjectList();
-      }
+      TeXObjectList stack = list.createList();
 
       for (TeXObject obj : list)
       {

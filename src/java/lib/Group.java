@@ -40,19 +40,16 @@ public class Group extends TeXObjectList
 
    public TeXObjectList toList()
    {
-      return (TeXObjectList)super.clone();
+      TeXObjectList list = new TeXObjectList(size());
+
+      list.addAll(this);
+
+      return list;
    }
 
-   public Object clone()
+   public TeXObjectList createList()
    {
-      Group group = new Group(capacity());
-
-      for (TeXObject object : this)
-      {
-         group.add((TeXObject)object.clone());
-      }
-
-      return group;
+      return new Group(capacity());
    }
 
    // stack is outside this group
@@ -168,7 +165,7 @@ public class Group extends TeXObjectList
         TeXObjectList stack)
      throws IOException
    {
-      Group list = parser.getListener().createGroup();
+      TeXObjectList list = createList();
 
       TeXObjectList remaining = (TeXObjectList)clone();
 
@@ -213,7 +210,7 @@ public class Group extends TeXObjectList
 
    public TeXObjectList expandfully(TeXParser parser) throws IOException
    {
-      Group list = parser.getListener().createGroup();
+      TeXObjectList list = createList();
 
       TeXObjectList remaining = (TeXObjectList)clone();
 

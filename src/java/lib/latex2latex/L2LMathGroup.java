@@ -44,17 +44,9 @@ public class L2LMathGroup extends MathGroup
       this.closeDelim = closeDelim;
    }
 
-   public Object clone()
+   public TeXObjectList createList()
    {
-      L2LMathGroup math = new L2LMathGroup();
-      math.setInLine(isInLine());
-
-      for (TeXObject object : this)
-      {
-         math.add((TeXObject)object.clone());
-      }
-
-      return math;
+      return new L2LMathGroup(isInLine(), openDelim, closeDelim);
    }
 
    public void process(TeXParser parser)
