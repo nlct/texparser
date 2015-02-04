@@ -142,8 +142,6 @@ public class L2HConverter extends LaTeXParserListener
       parser.putControlSequence(new L2HTabular());
       parser.putControlSequence(new L2HTabular("array"));
 
-      parser.putControlSequence(new L2HMultiColumn());
-
       try
       {
          LaTeXSty sty = getLaTeXSty("hyperref");

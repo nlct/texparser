@@ -157,6 +157,13 @@ public class L2HAlignRow extends AlignRow
          style += "width: "+width.toString(parser)+"; ";
       }
 
+      switch (alignCell.getAlign())
+      {
+         case 'c': style += "text-align: center; "; break;
+         case 'l': style += "text-align: left; "; break;
+         case 'r': style += "text-align: right; "; break;
+      }
+
       return style;
    }
 
@@ -171,7 +178,7 @@ public class L2HAlignRow extends AlignRow
       TeXCellAlign alignment;
 
       TeXObject firstObj =
-         cellContents.isEmpty() ? cellContents : cellContents.firstElement();
+         cellContents.isEmpty() ? cellContents : cellContents.peekStack();
 
       if (firstObj instanceof MultiCell)
       {

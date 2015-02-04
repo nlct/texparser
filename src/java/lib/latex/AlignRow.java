@@ -42,6 +42,11 @@ public class AlignRow extends TeXObjectList
       parse(parser, stack);
    }
 
+   public TeXObjectList createList()
+   {
+      return new AlignRow(capacity());
+   }
+
    protected void parse(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
@@ -290,8 +295,7 @@ public class AlignRow extends TeXObjectList
 
             processCell(parser, alignCell, cell);
 
-            TeXObject firstObj = cell.isEmpty() ? cell : 
-               cell.firstElement();
+            TeXObject firstObj = cell.isEmpty() ? cell : cell.peekStack();
 
             if (firstObj instanceof MultiCell)
             {
