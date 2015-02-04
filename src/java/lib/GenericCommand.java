@@ -214,6 +214,10 @@ public class GenericCommand extends Command
          {
             stack.add(((DoubleParam)obj).getParam());
          }
+         else if (obj instanceof TeXObjectList)
+         {
+            stack.add(replaceList(parser, ((TeXObjectList)obj), args));
+         }
          else
          {
             stack.add(obj);
@@ -283,11 +287,56 @@ public class GenericCommand extends Command
       {
          if (obj instanceof Param)
          {
-            stack.add(args[((Param)obj).getDigit()]);
+            stack.add(args[((Param)obj).getDigit()-1]);
          }
          else if (obj instanceof DoubleParam)
          {
             stack.add(((DoubleParam)obj).getParam());
+         }
+         else if (obj instanceof TeXObjectList)
+         {
+            stack.add(replaceList(parser, ((TeXObjectList)obj), args));
+         }
+         else
+         {
+            stack.add(obj);
+         }
+      }
+
+      return stack;
+   }
+
+   private TeXObject replaceList(TeXParser parser,
+     TeXObjectList list, TeXObject[] args)
+   {
+      TeXObjectList stack;
+
+      if (list instanceof MathGroup)
+      {
+         stack = parser.getListener().createMathGroup();
+      }
+      else if (list instanceof Group)
+      {
+         stack = parser.getListener().createGroup();
+      }
+      else
+      {
+         stack = new TeXObjectList();
+      }
+
+      for (TeXObject obj : list)
+      {
+         if (obj instanceof Param)
+         {
+            stack.add(args[((Param)obj).getDigit()-1]);
+         }
+         else if (obj instanceof DoubleParam)
+         {
+            stack.add(((DoubleParam)obj).getParam());
+         }
+         else if (obj instanceof TeXObjectList)
+         {
+            stack.add(replaceList(parser, ((TeXObjectList)obj), args));
          }
          else
          {

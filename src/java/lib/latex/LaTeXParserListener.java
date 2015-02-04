@@ -28,6 +28,7 @@ import java.nio.charset.IllegalCharsetNameException;
 import java.nio.file.Path;
 
 import com.dickimawbooks.texparserlib.*;
+import com.dickimawbooks.texparserlib.primitives.*;
 import com.dickimawbooks.texparserlib.generic.*;
 import com.dickimawbooks.texparserlib.aux.*;
 import com.dickimawbooks.texparserlib.latex.graphics.*;
@@ -319,9 +320,9 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
      int numParams, TeXObject defValue, TeXObject definition)
    throws IOException
    {
-      ControlSequence cs = parser.getControlSequence(csName);
+      ControlSequence cs = getControlSequence(csName);
 
-      if (cs == null)
+      if (cs instanceof Undefined)
       {
          if (overwrite == NewCommand.OVERWRITE_FORCE)
          {
