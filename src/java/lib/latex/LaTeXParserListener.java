@@ -1041,10 +1041,17 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
    }
 
    public int getcountervalue(String name)
+    throws TeXSyntaxException,LaTeXSyntaxException
    {
       Register reg = parser.getSettings().getRegister("c@"+name);
 
-      return reg == null ? 0 : reg.number();
+      if (reg == null)
+      {
+         throw new LaTeXSyntaxException(parser, 
+            LaTeXSyntaxException.ERROR_UNDEFINED_COUNTER, name);
+      }
+
+      return reg.number(parser);
    }
 
    public void addtocounter(String name, Numerical value)

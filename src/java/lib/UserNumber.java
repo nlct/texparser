@@ -32,12 +32,26 @@ public class UserNumber implements TeXNumber
       value = num;
    }
 
+   public UserNumber(TeXParser parser, String string)
+     throws TeXSyntaxException
+   {
+      try
+      {
+         value = Integer.parseInt(string);
+      }
+      catch (NumberFormatException e)
+      {
+         throw new TeXSyntaxException(parser, 
+          TeXSyntaxException.ERROR_NUMBER_EXPECTED, string);
+      }
+   }
+
    public Object clone()
    {
       return new UserNumber(value);
    }
 
-   public int number()
+   public int number(TeXParser parser) throws TeXSyntaxException
    {
       return value;
    }
@@ -45,6 +59,16 @@ public class UserNumber implements TeXNumber
    public int getValue()
    {
       return value;
+   }
+
+   public void setValue(int newValue)
+   {
+      value = newValue;
+   }
+
+   public void setValue(float newValue)
+   {
+      value = (int)newValue;
    }
 
    public String toString()

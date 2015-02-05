@@ -18,7 +18,6 @@
 */
 package com.dickimawbooks.texparserlib;
 
-
 public abstract class Register extends ControlSequence implements Numerical
 {
    public Register(String name)
@@ -36,15 +35,18 @@ public abstract class Register extends ControlSequence implements Numerical
       return allocation;
    }
 
-   public abstract TeXObject the(TeXParser parser);
+   public abstract TeXObject the(TeXParser parser)
+    throws TeXSyntaxException;
 
-   public abstract void advance(int increment);
+   public abstract void advance(TeXParser parser, Numerical increment)
+    throws TeXSyntaxException;
 
    public abstract void divide(int divisor);
 
    public abstract void multiply(int factor);
 
-   public abstract void setValue(int value);
+   public abstract void setValue(TeXParser parser, Numerical value)
+    throws TeXSyntaxException;
 
    protected int allocation = -1;
 }

@@ -28,40 +28,101 @@ public class DimenRegister extends Register implements TeXDimension
       this(name, 0);
    }
 
-   public DimenRegister(String name, int value)
+   public DimenRegister(String name, int spValue)
    {
-      super(name);
-      setValue(value);
+      this(name, spValue, FixedUnit.SP);
    }
 
-   public void setValue(int spValue)
+   public DimenRegister(String name, float value, TeXUnit unit)
    {
-      this.value = spValue;
+      super(name);
+      setValue(value, unit);
+   }
+
+   public void setValue(float value, TeXUnit unit)
+   {
+      this.value = value;
+      this.unit = unit;
+   }
+
+   public void setValue(TeXParser parser, Numerical numerical)
+    throws TeXSyntaxException
+   {
+      if (!(numerical instanceof TeXDimension))
+      {
+         setValue(numerical.number(parser), FixedUnit.SP);
+
+         throw new TeXSyntaxException(parser, 
+           TeXSyntaxException.ERROR_DIMEN_EXPECTED, 
+           numerical.toString(parser));
+      }
+
+      TeXDimension dimen = (TeXDimension)numerical;
+      setValue(dimen.getValue(), dimen.getUnit());
    }
 
    public float getValue()
    {
-      return (float)value;
-   }
-
-   public int number()
-   {
       return value;
    }
 
+   public TeXUnit getUnit()
+   {
+      return unit;
+   }
+
+   public int number(TeXParser parser) throws TeXSyntaxException
+   {
+      return unit.toSp(parser, value);
+   }
+
    public TeXObject the(TeXParser parser)
+    throws TeXSyntaxException
    {
-      return parser.string(""+((float)value/65536.0f)+"pt");
+      return parser.string(String.format("%fpt", unit.toPt(parser, value)));
    }
 
-   public void advance()
+   public void advance(TeXParser parser, Numerical increment)
+    throws TeXSyntaxException
    {
-      advance(1);
-   }
+      if (!(increment instanceof TeXDimension))
+      {
+         throw new TeXSyntaxException(parser, 
+           TeXSyntaxException.ERROR_DIMEN_EXPECTED,
+           increment.toString(parser));
+      }
 
-   public void advance(int increment)
-   {
-      value += increment;
+      TeXDimension dimen = (TeXDimension)increment;
+
+      TeXUnit otherUnit = dimen.getUnit();
+
+      if (unit.equals(otherUnit))
+      {
+         value += dimen.getValue();
+         return;
+      }
+
+      if (!(unit instanceof FixedUnit))
+      {
+         if (otherUnit instanceof FixedUnit)
+         {
+            // if this unit isn't fixed but the other is,
+            // convert to other unit
+
+            value = otherUnit.fromUnit(parser, value, unit)
+                  + dimen.getValue();
+            unit = dimen.getUnit();
+            return;
+         }
+
+         // neither unit are fixed, but they're not the same unit,
+         // so convert to pt
+
+         value = unit.toPt(parser, value);
+         unit = FixedUnit.PT;
+      }
+
+      value += unit.toUnit(parser, dimen.getValue(), otherUnit);
    }
 
    public void divide(int divisor)
@@ -86,16 +147,10 @@ public class DimenRegister extends Register implements TeXDimension
 
    public Object clone()
    {
-      return new DimenRegister(getName(), value);
+      return new DimenRegister(getName(), value, unit);
    }
 
-   public TeXUnit getUnit()
-   {
-      return unit;
-   }
+   private float value = 0f;
 
-   private int value = 0;
-
-   // TODO find some way to implement em and ex
-   private static TeXUnit unit = new TeXUnit(TeXUnit.UNIT_SP);
+   private TeXUnit unit;
 }

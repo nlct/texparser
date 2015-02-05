@@ -20,5 +20,7 @@ package com.dickimawbooks.texparserlib;
 
 public interface Numerical
 {
-   public int number();
+   public int number(TeXParser parser) throws TeXSyntaxException;
+
+   public String toString(TeXParser parser);
 }

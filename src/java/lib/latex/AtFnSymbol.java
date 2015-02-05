@@ -77,7 +77,7 @@ public class AtFnSymbol extends Command
    {
       TeXParserListener listener = parser.getListener();
 
-      switch (arg.number())
+      switch (arg.number(parser))
       {
          case 0: return new TeXObjectList();
          case 1: return listener.getOther('*');

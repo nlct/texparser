@@ -39,12 +39,18 @@ public class CountRegister extends Register implements TeXNumber
       this.value = value;
    }
 
+   public void setValue(TeXParser parser, Numerical numerical)
+    throws TeXSyntaxException
+   {
+      setValue(numerical.number(parser));
+   }
+
    public int getValue()
    {
       return value;
    }
 
-   public int number()
+   public int number(TeXParser parser) throws TeXSyntaxException
    {
       return value;
    }
@@ -56,12 +62,13 @@ public class CountRegister extends Register implements TeXNumber
 
    public void advance()
    {
-      advance(1);
+      value++;
    }
 
-   public void advance(int increment)
+   public void advance(TeXParser parser, Numerical increment)
+    throws TeXSyntaxException
    {
-      value += increment;
+      value += increment.number(parser);
    }
 
    public void divide(int divisor)

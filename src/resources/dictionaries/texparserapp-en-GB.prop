@@ -74,6 +74,7 @@ error.double_superscript=Double superscript ^$1^ (replaced with ^$1{}^)
 error.illegal_align=Illegal alignment $1
 error.misplaced_omit=Misplaced \\omit
 error.no_alignment=No alignment specifiers found
+error.undefined_counter=No counter '$1' defined
 error.unknown=Unknown error
 error.multi_begin_doc=Only one \\\\begin{document} permitted
 error.no_begin_doc=No \\begin{document} found

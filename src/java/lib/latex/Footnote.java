@@ -62,7 +62,7 @@ public class Footnote extends ControlSequence
 
       String counter = mpfn.toString(parser);
 
-      int orgValue = 0;
+      UserNumber orgValue = new UserNumber();
       Register reg = null;
 
       if (opt != null)
@@ -75,7 +75,7 @@ public class Footnote extends ControlSequence
                TeXSyntaxException.ERROR_REGISTER_UNDEF, "c@"+counter);
          }
 
-         orgValue = reg.number();
+         orgValue.setValue(reg.number(parser));
 
          if (opt instanceof Expandable)
          {
@@ -87,15 +87,7 @@ public class Footnote extends ControlSequence
             }
          }
 
-         try
-         {
-            reg.setValue(Integer.parseInt(opt.toString(parser)));
-         }
-         catch (NumberFormatException e)
-         {
-            throw new TeXSyntaxException(parser, 
-               TeXSyntaxException.ERROR_NUMBER_EXPECTED, e);
-         }
+         reg.setValue(parser, new UserNumber(parser, opt.toString(parser)));
       }
       else
       {
@@ -118,7 +110,7 @@ public class Footnote extends ControlSequence
    
       if (opt != null)
       {
-         reg.setValue(orgValue);
+         reg.setValue(parser, orgValue);
       }
 
       footnote(parser, parser, targetName, thempfn, arg);
@@ -146,7 +138,7 @@ public class Footnote extends ControlSequence
 
       String counter = mpfn.toString(parser);
 
-      int orgValue = 0;
+      UserNumber orgValue = new UserNumber();
       Register reg = null;
 
       if (opt != null)
@@ -159,7 +151,7 @@ public class Footnote extends ControlSequence
                TeXSyntaxException.ERROR_REGISTER_UNDEF, "c@"+counter);
          }
 
-         orgValue = reg.number();
+         orgValue.setValue(reg.number(parser));
 
          if (opt instanceof Expandable)
          {
@@ -171,15 +163,7 @@ public class Footnote extends ControlSequence
             }
          }
 
-         try
-         {
-            reg.setValue(Integer.parseInt(opt.toString(parser)));
-         }
-         catch (NumberFormatException e)
-         {
-            throw new TeXSyntaxException(parser, 
-               TeXSyntaxException.ERROR_NUMBER_EXPECTED, e);
-         }
+         reg.setValue(parser, new UserNumber(parser, opt.toString(parser)));
       }
       else
       {
@@ -202,7 +186,7 @@ public class Footnote extends ControlSequence
    
       if (opt != null)
       {
-         reg.setValue(orgValue);
+         reg.setValue(parser, orgValue);
       }
 
       footnote(parser, stack, targetName, thempfn, arg);

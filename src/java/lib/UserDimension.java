@@ -26,7 +26,7 @@ public class UserDimension implements TeXDimension
 {
    public UserDimension()
    {
-      this(0, new TeXUnit());
+      this(0, FixedUnit.PT);
    }
 
    public UserDimension(float num, TeXUnit texUnit)
@@ -71,34 +71,26 @@ public class UserDimension implements TeXDimension
            TeXSyntaxException.ERROR_DIMEN_EXPECTED, string);
       }
 
-      int id = -1;
-
-      for (int i = 0; i < TeXUnit.UNIT_NAMES.length; i++)
+      try
       {
-         if (TeXUnit.UNIT_NAMES[i].equals(unitString))
-         {
-            id = i;
-            break;
-         }
+         unit = TeXUnit.createUnit(unitString);
       }
-
-      if (id == -1)
+      catch (IllegalArgumentException e)
       {
          throw new TeXSyntaxException(parser,
            TeXSyntaxException.ERROR_DIMEN_EXPECTED, string);
       }
-
-      unit = new TeXUnit(id);
    }
 
    public Object clone()
    {
-      return new UserDimension(value, (TeXUnit)unit.clone());
+      return new UserDimension(value, unit);
    }
 
-   public int number()
+   public int number(TeXParser parser)
+     throws TeXSyntaxException
    {
-      return (int)(value*unit.getSpScaleFactor());
+      return (int)unit.toSp(parser, value);
    }
 
    public float getValue()
@@ -111,9 +103,31 @@ public class UserDimension implements TeXDimension
       return unit;
    }
 
+   public void setValue(float value, TeXUnit unit)
+   {
+      this.value = value;
+      this.unit = unit;
+   }
+
+   public void setValue(TeXParser parser, Numerical numerical)
+     throws TeXSyntaxException
+   {
+      if (!(numerical instanceof TeXDimension))
+      {
+         setValue(numerical.number(parser), FixedUnit.SP);
+
+         throw new TeXSyntaxException(parser,
+           TeXSyntaxException.ERROR_DIMEN_EXPECTED,
+           numerical.toString(parser));
+      }
+
+      TeXDimension dimen = (TeXDimension)numerical;
+      setValue(dimen.getValue(), dimen.getUnit());
+   }
+
    public String toString(TeXParser parser)
    {
-      return ""+value+unit.toString(parser);
+      return String.format("%f%s", value, unit.toString(parser));
    }
 
    public TeXObjectList string(TeXParser parser) throws IOException
@@ -123,7 +137,7 @@ public class UserDimension implements TeXDimension
 
    public void process(TeXParser parser) throws IOException
    {
-      parser.getListener().getWriteable().write(""+value);
+      parser.getListener().getWriteable().write(toString(parser));
    }
 
    public void process(TeXParser parser, TeXObjectList stack)

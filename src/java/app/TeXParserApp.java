@@ -605,6 +605,9 @@ public class TeXParserApp implements TeXApp
          case LaTeXSyntaxException.ERROR_NO_ALIGNMENT:
             message = getLabel("error.no_alignment");
          break;
+         case LaTeXSyntaxException.ERROR_UNDEFINED_COUNTER:
+            message = getLabelWithValue("error.undefined_counter", e.getParam());
+         break;
          default:
             message = e.getMessage();
       }

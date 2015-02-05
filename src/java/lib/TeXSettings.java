@@ -761,7 +761,7 @@ public class TeXSettings
          }
       }
 
-      reg.setValue(value.number());
+      reg.setValue(parser, value);
    }
 
    public void globalSetRegister(String name, Numerical value)
@@ -777,7 +777,7 @@ public class TeXSettings
             TeXSyntaxException.ERROR_REGISTER_UNDEF, name);
       }
 
-      reg.setValue(value.number());
+      reg.setValue(parser, value);
 
       if (parent != null)
       {
@@ -791,7 +791,7 @@ public class TeXSettings
          }
          else if (reg != rootReg)
          {
-            rootReg.setValue(reg.number());
+            rootReg.setValue(parser, reg);
          }
       }
    }
@@ -823,7 +823,7 @@ public class TeXSettings
          }
       }
 
-      reg.advance(value.number());
+      reg.advance(parser, value);
    }
 
    public void globalAdvanceRegister(String name, Numerical value)
@@ -839,7 +839,7 @@ public class TeXSettings
             TeXSyntaxException.ERROR_REGISTER_UNDEF, name);
       }
 
-      reg.advance(value.number());
+      reg.advance(parser, value);
 
       if (parent != null)
       {
@@ -853,7 +853,7 @@ public class TeXSettings
          }
          else if (reg != rootReg)
          {
-            rootReg.setValue(reg.number());
+            rootReg.setValue(parser, reg);
          }
       }
    }
@@ -885,7 +885,7 @@ public class TeXSettings
          }
       }
 
-      reg.multiply(value.number());
+      reg.multiply(value.number(parser));
    }
 
    public void globalMultiplyRegister(String name, Numerical value)
@@ -901,7 +901,7 @@ public class TeXSettings
             TeXSyntaxException.ERROR_REGISTER_UNDEF, name);
       }
 
-      reg.multiply(value.number());
+      reg.multiply(value.number(parser));
 
       if (parent != null)
       {
@@ -915,7 +915,7 @@ public class TeXSettings
          }
          else if (reg != rootReg)
          {
-            rootReg.setValue(reg.number());
+            rootReg.setValue(parser, reg);
          }
       }
    }
@@ -947,7 +947,7 @@ public class TeXSettings
          }
       }
 
-      reg.divide(value.number());
+      reg.divide(value.number(parser));
    }
 
    public void globalDivideRegister(String name, Numerical value)
@@ -963,7 +963,7 @@ public class TeXSettings
             TeXSyntaxException.ERROR_REGISTER_UNDEF, name);
       }
 
-      reg.divide(value.number());
+      reg.divide(value.number(parser));
 
       if (parent != null)
       {
@@ -977,7 +977,7 @@ public class TeXSettings
          }
          else if (reg != rootReg)
          {
-            rootReg.setValue(reg.number());
+            rootReg.setValue(parser, reg);
          }
       }
    }

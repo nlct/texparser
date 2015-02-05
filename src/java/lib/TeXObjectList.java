@@ -123,7 +123,8 @@ public class TeXObjectList extends Vector<TeXObject> implements TeXObject,Expand
 
       if (object == null)
       {
-         parser.push(new TeXUnit());
+         parser.push(FixedUnit.PT);
+
          throw new TeXSyntaxException(
             parser.getCurrentFile(),
             parser.getLineNumber(),
@@ -134,53 +135,32 @@ public class TeXObjectList extends Vector<TeXObject> implements TeXObject,Expand
       {
          char c1 = (char)((CharObject)object).getCharCode();
 
-         boolean found = false;
-
-         for (int i = 0; i < TeXUnit.UNIT_NAMES.length; i++)
-         {
-            if (TeXUnit.UNIT_NAMES[i].charAt(0) == c1)
-            {
-               found = true;
-               break;
-            }
-         }
-
-         if (!found)
-         {
-            push(object);
-            push(new TeXUnit());
-            throw new TeXSyntaxException(
-               parser.getCurrentFile(),
-               parser.getLineNumber(),
-               TeXSyntaxException.ERROR_MISSING_UNIT);
-         }
-
          TeXObject nextObj = popStack();
 
          if (nextObj == null || !(nextObj instanceof CharObject))
          {
             push(object);
-            push(new TeXUnit());
+            push(new FixedUnit());
             throw new TeXSyntaxException(
                parser.getCurrentFile(),
                parser.getLineNumber(),
                TeXSyntaxException.ERROR_MISSING_UNIT);
          }
 
-         char c2 = (char)((CharObject)object).getCharCode();
+         char c2 = (char)((CharObject)nextObj).getCharCode();
 
-         for (int i = 0; i < TeXUnit.UNIT_NAMES.length; i++)
+         try
          {
-            if (TeXUnit.UNIT_NAMES[i].charAt(0) == c1
-             && TeXUnit.UNIT_NAMES[i].charAt(1) == c2)
-            {
-               return new TeXUnit(i);
-            }
+            return TeXUnit.createUnit(String.format("%c%c", c1, c2));
+         }
+         catch (IllegalArgumentException e)
+         {
          }
 
-         push(object);
          push(nextObj);
-         push(new TeXUnit());
+         push(object);
+         push(FixedUnit.PT);
+
          throw new TeXSyntaxException(
                parser.getCurrentFile(),
                parser.getLineNumber(),
@@ -191,10 +171,11 @@ public class TeXObjectList extends Vector<TeXObject> implements TeXObject,Expand
       {
          TeXObjectList expanded = ((Expandable)object).expandfully(parser, this);
 
-         if (expanded == null || expanded.size() == 0)
+         if (expanded == null || expanded.isEmpty())
          {
             push(object);
-            push(new TeXUnit());
+            push(FixedUnit.PT);
+
             throw new TeXSyntaxException(
                parser.getCurrentFile(),
                parser.getLineNumber(),
@@ -212,7 +193,8 @@ public class TeXObjectList extends Vector<TeXObject> implements TeXObject,Expand
       }
 
       push(object);
-      push(new TeXUnit());
+      push(FixedUnit.PT);
+
       throw new TeXSyntaxException(
                parser.getCurrentFile(),
                parser.getLineNumber(),

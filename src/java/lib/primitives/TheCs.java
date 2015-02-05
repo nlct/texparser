@@ -57,7 +57,7 @@ public class TheCs extends Primitive implements Expandable
       }
       else
       {
-         list.add(new UserNumber(arg.number()));
+         list.add(new UserNumber(arg.number(parser)));
       }
 
       return list;
@@ -80,7 +80,7 @@ public class TheCs extends Primitive implements Expandable
       }
       else
       {
-         list.add(new UserNumber(arg.number()));
+         list.add(new UserNumber(arg.number(parser)));
       }
 
       return list;

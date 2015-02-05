@@ -105,6 +105,9 @@ public class TeXAppAdapter implements TeXApp
          case LaTeXSyntaxException.ERROR_NO_ALIGNMENT:
             message = "No alignment found";
          break;
+         case LaTeXSyntaxException.ERROR_UNDEFINED_COUNTER:
+            message = "No counter '"+e.getParam()+"' defined";
+         break;
          default:
             message = e.getMessage();
       }

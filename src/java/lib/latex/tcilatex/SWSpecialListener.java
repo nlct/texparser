@@ -56,7 +56,7 @@ public class SWSpecialListener implements SpecialListener
             try
             {
                float num = Float.parseFloat(m.group(1));
-               TeXUnit unit = new TeXUnit(m.group(2));
+               TeXUnit unit = TeXUnit.createUnit(m.group(2));
 
                keyValList.put("height", new UserDimension(num, unit));
             }
@@ -75,7 +75,7 @@ public class SWSpecialListener implements SpecialListener
             try
             {
                float num = Float.parseFloat(m.group(1));
-               TeXUnit unit = new TeXUnit(m.group(2));
+               TeXUnit unit = TeXUnit.createUnit(m.group(2));
 
                keyValList.put("width", new UserDimension(num, unit));
             }

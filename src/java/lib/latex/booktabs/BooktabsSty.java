@@ -42,13 +42,13 @@ public class BooktabsSty extends LaTeXSty
       //TODO implement em values
 
       reg = registerNewLength("heavyrulewidth");
-      reg.setValue((int)(0.80002/65536.0)); // should be 0.08em
+      reg.setValue(0.80002f, FixedUnit.PT); // should be 0.08em
 
       reg = registerNewLength("lightrulewidth");
-      reg.setValue((int)(0.50003/65536.0)); // should be 0.05em
+      reg.setValue(0.50003f, FixedUnit.PT); // should be 0.05em
 
       reg = registerNewLength("cmidrulewidth");
-      reg.setValue((int)(0.29999/65536.0)); // should be 0.03em
+      reg.setValue(0.29999f, FixedUnit.PT); // should be 0.03em
    }
 
    public void processOption(String option)

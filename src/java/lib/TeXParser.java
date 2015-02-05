@@ -1875,7 +1875,7 @@ public class TeXParser extends TeXObjectList
 
       CountRegister allocReg = countAlloc.get(ALLOC_COUNT);
 
-      int alloc = allocReg.number()+1;
+      int alloc = allocReg.getValue()+1;
 
       while (countAlloc.containsKey(new Integer(alloc)))
       {
@@ -1904,7 +1904,7 @@ public class TeXParser extends TeXObjectList
 
       CountRegister allocReg = countAlloc.get(ALLOC_DIMEN);
 
-      int alloc = allocReg.number()+1;
+      int alloc = allocReg.getValue()+1;
 
       while (countAlloc.containsKey(new Integer(alloc)))
       {
