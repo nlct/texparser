@@ -35,14 +35,13 @@ public class DimenRegister extends Register implements TeXDimension
 
    public DimenRegister(String name, float value, TeXUnit unit)
    {
-      super(name);
-      setValue(value, unit);
+      this(name, new TeXGlue(new UserDimension(value, unit)));
    }
 
-   public void setValue(float value, TeXUnit unit)
+   public DimenRegister(String name, TeXGlue dimension)
    {
-      this.value = value;
-      this.unit = unit;
+      super(name);
+      this.dimension = dimension;
    }
 
    public void setValue(TeXParser parser, Numerical numerical)
@@ -50,89 +49,52 @@ public class DimenRegister extends Register implements TeXDimension
    {
       if (!(numerical instanceof TeXDimension))
       {
-         setValue(numerical.number(parser), FixedUnit.SP);
+         dimension.setValue(
+            new UserDimension(numerical.number(parser), FixedUnit.SP));
 
          throw new TeXSyntaxException(parser, 
            TeXSyntaxException.ERROR_DIMEN_EXPECTED, 
            numerical.toString(parser));
       }
 
-      TeXDimension dimen = (TeXDimension)numerical;
-      setValue(dimen.getValue(), dimen.getUnit());
+      dimension.setValue((TeXDimension)numerical);
    }
 
    public float getValue()
    {
-      return value;
+      return dimension.getValue();
    }
 
    public TeXUnit getUnit()
    {
-      return unit;
+      return dimension.getUnit();
    }
 
    public int number(TeXParser parser) throws TeXSyntaxException
    {
-      return unit.toSp(parser, value);
+      return dimension.number(parser);
    }
 
    public TeXObject the(TeXParser parser)
     throws TeXSyntaxException
    {
-      return parser.string(String.format("%fpt", unit.toPt(parser, value)));
+      return parser.string(dimension.toString(parser));
    }
 
    public void advance(TeXParser parser, Numerical increment)
     throws TeXSyntaxException
    {
-      if (!(increment instanceof TeXDimension))
-      {
-         throw new TeXSyntaxException(parser, 
-           TeXSyntaxException.ERROR_DIMEN_EXPECTED,
-           increment.toString(parser));
-      }
-
-      TeXDimension dimen = (TeXDimension)increment;
-
-      TeXUnit otherUnit = dimen.getUnit();
-
-      if (unit.equals(otherUnit))
-      {
-         value += dimen.getValue();
-         return;
-      }
-
-      if (!(unit instanceof FixedUnit))
-      {
-         if (otherUnit instanceof FixedUnit)
-         {
-            // if this unit isn't fixed but the other is,
-            // convert to other unit
-
-            value = otherUnit.fromUnit(parser, value, unit)
-                  + dimen.getValue();
-            unit = dimen.getUnit();
-            return;
-         }
-
-         // neither unit are fixed, but they're not the same unit,
-         // so convert to pt
-
-         value = unit.toPt(parser, value);
-         unit = FixedUnit.PT;
-      }
-
-      value += unit.toUnit(parser, dimen.getValue(), otherUnit);
-   }
-
-   public void divide(int divisor)
-   {
-      value /= divisor;
+      dimension.advance(parser, increment);
    }
 
    public void multiply(int factor)
    {
-      value *= factor;
+      dimension.multiply(factor);
+   }
+
+   public void divide(int divisor)
+   {
+      dimension.divide(divisor);
    }
 
    public void process(TeXParser parser)
@@ -147,10 +109,8 @@ public class DimenRegister extends Register implements TeXDimension
 
    public Object clone()
    {
-      return new DimenRegister(getName(), value, unit);
+      return new DimenRegister(getName(), (TeXGlue)dimension.clone());
    }
 
-   private float value = 0f;
-
-   private TeXUnit unit;
+   private TeXGlue dimension;
 }

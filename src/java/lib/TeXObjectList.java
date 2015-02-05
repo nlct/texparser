@@ -241,7 +241,231 @@ public class TeXObjectList extends Vector<TeXObject> implements TeXObject,Expand
 
       TeXUnit unit = popUnit(parser);
 
-      return new UserDimension(value, unit);
+      TeXDimension dimen = new UserDimension(value, unit);
+
+      TeXGlue glue = popGlue(parser);
+
+      if (glue == null)
+      {
+         return dimen;
+      }
+
+      glue.setFixed(dimen);
+
+      return glue;
+   }
+
+   private TeXGlue popGlue(TeXParser parser)
+     throws IOException
+   {
+      TeXObject object = popStack();
+
+      if (object instanceof Expandable)
+      {
+         TeXObjectList expanded = ((Expandable)object).expandfully(parser, this);
+
+         if (expanded != null)
+         {
+            addAll(0, expanded);
+            object = popStack();
+         }
+      }
+
+      if (!(object instanceof CharObject))
+      {
+         push(object);
+         return null;
+      }
+
+      char c1 = (char)((CharObject)object).getCharCode();
+
+      if (c1 != 'p' && c1 != 'm')
+      {
+         push(object);
+         return null;
+      }
+
+      TeXObject object2 = pop();
+
+      if (object2 instanceof Expandable)
+      {
+         TeXObjectList expanded = ((Expandable)object2).expandfully(parser, this);
+
+         if (expanded != null)
+         {
+            addAll(0, expanded);
+            object2 = pop();
+         }
+      }
+
+      if (!(object2 instanceof CharObject))
+      {
+         push(object2);
+         push(object);
+         return null;
+      }
+
+      char c2 = (char)((CharObject)object2).getCharCode();
+
+      if ((c1 == 'p' && c2 != 'l')
+       || (c1 == 'm' && c2 != 'i'))
+      {
+         push(object2);
+         push(object);
+         return null;
+      }
+
+      TeXObject object3 = pop();
+
+      if (object3 instanceof Expandable)
+      {
+         TeXObjectList expanded = ((Expandable)object3).expandfully(parser, this);
+
+         if (expanded != null)
+         {
+            addAll(0, expanded);
+            object3 = pop();
+         }
+      }
+
+      if (!(object3 instanceof CharObject))
+      {
+         push(object3);
+         push(object2);
+         push(object);
+         return null;
+      }
+
+      char c3 = (char)((CharObject)object3).getCharCode();
+
+      if ((c1 == 'p' && c3 != 'u')
+       || (c1 == 'm' && c3 != 'n'))
+      {
+         push(object3);
+         push(object2);
+         push(object);
+         return null;
+      }
+
+      TeXObject object4 = pop();
+
+      if (object4 instanceof Expandable)
+      {
+         TeXObjectList expanded = ((Expandable)object4).expandfully(parser, this);
+
+         if (expanded != null)
+         {
+            addAll(0, expanded);
+            object4 = pop();
+         }
+      }
+
+      if (!(object4 instanceof CharObject))
+      {
+         push(object4);
+         push(object3);
+         push(object2);
+         push(object);
+         return null;
+      }
+
+      char c4 = (char)((CharObject)object4).getCharCode();
+
+      if ((c1 == 'p' && c4 != 's')
+       || (c1 == 'm' && c4 != 'u'))
+      {
+         push(object4);
+         push(object3);
+         push(object2);
+         push(object);
+         return null;
+      }
+
+      TeXObject object5 = null;
+
+      if (c1 == 'm')
+      {
+         object5 = pop();
+
+         if (object5 instanceof Expandable)
+         {
+            TeXObjectList expanded = ((Expandable)object5).expandfully(parser, this);
+
+            if (expanded != null)
+            {
+               addAll(0, expanded);
+               object5 = pop();
+            }
+         }
+
+         if (!(object5 instanceof CharObject))
+         {
+            push(object5);
+            push(object4);
+            push(object3);
+            push(object2);
+            push(object);
+            return null;
+         }
+
+         char c5 = (char)((CharObject)object5).getCharCode();
+
+         if (c5 != 's')
+         {
+            push(object5);
+            push(object4);
+            push(object3);
+            push(object2);
+            push(object);
+            return null;
+         }
+      }
+
+      TeXDimension dimen = popDimension(parser);
+
+      if (c1 == 'm')
+      {
+         if (dimen instanceof TeXGlue)
+         {
+            TeXGlue glue = (TeXGlue)dimen;
+
+            if (glue.getShrink() != null)
+            {
+               push(glue);
+               push(object5);
+               push(object4);
+               push(object3);
+               push(object2);
+               push(object);
+               return null;
+            }
+
+            glue.setShrink(glue.getFixed());
+            return glue;
+         }
+
+         return new TeXGlue(new UserDimension(), null, dimen);
+      }
+
+      if (dimen instanceof TeXGlue)
+      {
+         TeXGlue glue = (TeXGlue)dimen;
+
+         if (glue.getStretch() != null)
+         {
+            push(glue);
+            push(object4);
+            push(object3);
+            push(object2);
+            push(object);
+            return null;
+         }
+
+         glue.setStretch(glue.getFixed());
+         return glue;
+      }
+
+      return new TeXGlue(new UserDimension(), dimen, null);
    }
 
    public Float popFloat(TeXParser parser)

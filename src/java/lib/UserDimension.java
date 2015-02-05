@@ -127,6 +127,59 @@ public class UserDimension implements TeXDimension
       return parser.string(toString(parser));
    }
 
+   public void advance(TeXParser parser, Numerical increment)
+    throws TeXSyntaxException
+   {
+      if (!(increment instanceof TeXDimension))
+      {
+         throw new TeXSyntaxException(parser, 
+           TeXSyntaxException.ERROR_DIMEN_EXPECTED,
+           increment.toString(parser));
+      }
+
+      TeXDimension dimen = (TeXDimension)increment;
+
+      TeXUnit otherUnit = dimen.getUnit();
+
+      if (unit.equals(otherUnit))
+      {
+         value += dimen.getValue();
+         return;
+      }
+
+      if (!(unit instanceof FixedUnit))
+      {
+         if (otherUnit instanceof FixedUnit)
+         {
+            // if this unit isn't fixed but the other is,
+            // convert to other unit
+
+            value = otherUnit.fromUnit(parser, value, unit)
+                  + dimen.getValue();
+            unit = dimen.getUnit();
+            return;
+         }
+
+         // neither unit are fixed, but they're not the same unit,
+         // so convert to pt
+
+         value = unit.toPt(parser, value);
+         unit = FixedUnit.PT;
+      }
+
+      value += unit.toUnit(parser, dimen.getValue(), otherUnit);
+   }
+
+   public void divide(int divisor)
+   {
+      value /= divisor;
+   }
+
+   public void multiply(int factor)
+   {
+      value *= factor;
+   }
+
    public void process(TeXParser parser) throws IOException
    {
       parser.getListener().getWriteable().write(toString(parser));

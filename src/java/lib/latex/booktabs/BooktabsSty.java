@@ -37,16 +37,9 @@ public class BooktabsSty extends LaTeXSty
       registerControlSequence(new BKTrule("midrule", BKTrule.MIDDLE));
       registerControlSequence(new BKTrule("bottomrule", BKTrule.BOTTOM));
 
-      DimenRegister reg;
-
-      reg = registerNewLength("heavyrulewidth");
-      reg.setValue(0.08f, TeXUnit.EM);
-
-      reg = registerNewLength("lightrulewidth");
-      reg.setValue(0.05f, TeXUnit.EM);
-
-      reg = registerNewLength("cmidrulewidth");
-      reg.setValue(0.03f, TeXUnit.EM);
+      registerNewLength("heavyrulewidth", 0.08f, TeXUnit.EM);
+      registerNewLength("lightrulewidth", 0.05f, TeXUnit.EM);
+      registerNewLength("cmidrulewidth", 0.03f, TeXUnit.EM);
    }
 
    public void processOption(String option)

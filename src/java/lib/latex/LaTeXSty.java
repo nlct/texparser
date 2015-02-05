@@ -44,6 +44,23 @@ public abstract class LaTeXSty
       return listener.getParser().getSettings().newdimen(name);
    }
 
+   public DimenRegister registerNewLength(String name, 
+     float value, TeXUnit unit)
+   {
+      DimenRegister reg = registerNewLength(name);
+
+      try
+      {
+         reg.setValue(listener.getParser(), 
+           new UserDimension(value, unit));
+      }
+      catch (TeXSyntaxException e)
+      {// shouldn't happen
+      }
+
+      return reg;
+   }
+
    public abstract void processOption(String option)
     throws IOException;
 

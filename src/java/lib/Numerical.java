@@ -20,6 +20,13 @@ package com.dickimawbooks.texparserlib;
 
 public interface Numerical
 {
+   public void advance(TeXParser parser, Numerical increment)
+    throws TeXSyntaxException;
+
+   public void divide(int divisor);
+
+   public void multiply(int factor);
+
    public int number(TeXParser parser) throws TeXSyntaxException;
 
    public String toString(TeXParser parser);

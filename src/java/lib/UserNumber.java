@@ -71,6 +71,22 @@ public class UserNumber implements TeXNumber
       value = (int)newValue;
    }
 
+   public void multiply(int factor)
+   {
+      value *= factor;
+   }
+
+   public void divide(int divisor)
+   {
+      value /= divisor;
+   }
+
+   public void advance(TeXParser parser, Numerical increment)
+    throws TeXSyntaxException
+   {
+      value += increment.number(parser);
+   }
+
    public String toString()
    {
       return ""+value;
