@@ -39,16 +39,14 @@ public class BooktabsSty extends LaTeXSty
 
       DimenRegister reg;
 
-      //TODO implement em values
-
       reg = registerNewLength("heavyrulewidth");
-      reg.setValue(0.80002f, FixedUnit.PT); // should be 0.08em
+      reg.setValue(0.08f, TeXUnit.EM);
 
       reg = registerNewLength("lightrulewidth");
-      reg.setValue(0.50003f, FixedUnit.PT); // should be 0.05em
+      reg.setValue(0.05f, TeXUnit.EM);
 
       reg = registerNewLength("cmidrulewidth");
-      reg.setValue(0.29999f, FixedUnit.PT); // should be 0.03em
+      reg.setValue(0.03f, TeXUnit.EM);
    }
 
    public void processOption(String option)

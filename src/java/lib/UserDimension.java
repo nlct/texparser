@@ -71,15 +71,7 @@ public class UserDimension implements TeXDimension
            TeXSyntaxException.ERROR_DIMEN_EXPECTED, string);
       }
 
-      try
-      {
-         unit = TeXUnit.createUnit(unitString);
-      }
-      catch (IllegalArgumentException e)
-      {
-         throw new TeXSyntaxException(parser,
-           TeXSyntaxException.ERROR_DIMEN_EXPECTED, string);
-      }
+      unit = parser.getListener().createUnit(unitString);
    }
 
    public Object clone()

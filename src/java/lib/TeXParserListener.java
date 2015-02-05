@@ -93,6 +93,39 @@ public abstract class TeXParserListener
 
    public abstract SkippedEols createSkippedEols();
 
+   public TeXUnit createUnit(String unitName)
+    throws TeXSyntaxException
+   {
+      if (unitName.equals("em"))
+      {
+         return TeXUnit.EM;
+      }
+
+      if (unitName.equals("ex"))
+      {
+         return TeXUnit.EX;
+      }
+
+      if (unitName.equals("mu"))
+      {
+         return TeXUnit.MU;
+      }
+
+      try
+      {
+         return new FixedUnit(unitName);
+      }
+      catch (IllegalArgumentException e)
+      {
+         throw new TeXSyntaxException(getParser(),
+           TeXSyntaxException.ERROR_MISSING_UNIT, unitName);
+      }
+   }
+
+   public abstract float emToPt(float emValue);
+
+   public abstract float exToPt(float exValue);
+
    public abstract void skipping(Ignoreable ignoreable)
       throws IOException;
 

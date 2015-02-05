@@ -20,11 +20,6 @@ package com.dickimawbooks.texparserlib;
 
 public abstract class TeXUnit implements TeXObject
 {
-   public static TeXUnit createUnit(String unitName)
-   {
-      return new FixedUnit(unitName); // TODO: add variable units
-   }
-
    // convert value in other unit to this unit
    public abstract float toUnit(TeXParser parser, float value, 
      TeXUnit otherUnit)
@@ -65,4 +60,20 @@ public abstract class TeXUnit implements TeXObject
    {
       return false;
    }
+
+   public static float muToEm(float muValue)
+   {
+      return muValue/18f;
+   }
+
+   public static float emToMu(float emValue)
+   {
+     return 18f*emValue;
+   }
+
+   public static final FixedUnit PT = new FixedUnit(FixedUnit.UNIT_PT);
+   public static final FixedUnit SP = new FixedUnit(FixedUnit.UNIT_SP);
+   public static final EmUnit EM = new EmUnit();
+   public static final ExUnit EX = new ExUnit();
+   public static final MuUnit MU = new MuUnit();
 }

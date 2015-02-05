@@ -151,10 +151,10 @@ public class TeXObjectList extends Vector<TeXObject> implements TeXObject,Expand
 
          try
          {
-            return TeXUnit.createUnit(String.format("%c%c", c1, c2));
+            return parser.getListener().createUnit(String.format("%c%c", c1, c2));
          }
-         catch (IllegalArgumentException e)
-         {
+         catch (TeXSyntaxException e)
+         { // throw below
          }
 
          push(nextObj);

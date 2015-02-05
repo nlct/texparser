@@ -23,6 +23,9 @@ import java.io.EOFException;
 import java.io.File;
 import java.util.Hashtable;
 import java.util.Vector;
+import java.util.Iterator;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
 import java.nio.charset.Charset;
 import java.nio.charset.IllegalCharsetNameException;
 import java.nio.file.Path;
@@ -1115,6 +1118,84 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       return null;
    }
 
+   public float emToPt(float emValue)
+   {
+      getTeXApp().warning(getParser(),
+        "Can't convert from em to pt, no font information loaded");
+
+      // approximate
+
+      float base = 10f;
+
+      if (docCls == null)
+      {
+         KeyValList opts = docCls.getOptions();
+
+         if (opts != null)
+         {
+            for (Iterator<String> it = opts.keySet().iterator(); it.hasNext();)
+            {
+               Matcher m = PTSIZE_PATTERN.matcher(it.next());
+
+               if (m.matches())
+               {
+                  try
+                  {
+                     base = (float)Integer.parseInt(m.group(1));
+                     break;
+                  }
+                  catch (NumberFormatException e)
+                  {// this won't happen
+                  }
+               }
+            }
+         }
+      }
+
+      // TODO take into account font size change
+
+      return base*0.95f*emValue;
+   }
+
+   public float exToPt(float exValue)
+   {
+      getTeXApp().warning(getParser(),
+        "Can't convert from ex to pt, no font information loaded");
+
+      // approximate!!!
+
+      float base = 10f;
+
+      if (docCls == null)
+      {
+         KeyValList opts = docCls.getOptions();
+
+         if (opts != null)
+         {
+            for (Iterator<String> it = opts.keySet().iterator(); it.hasNext();)
+            {
+               Matcher m = PTSIZE_PATTERN.matcher(it.next());
+
+               if (m.matches())
+               {
+                  try
+                  {
+                     base = (float)Integer.parseInt(m.group(1));
+                     break;
+                  }
+                  catch (NumberFormatException e)
+                  {// this won't happen
+                  }
+               }
+            }
+         }
+      }
+
+      // TODO take into account font size change
+
+      return base*0.44f*exValue;
+   }
+
    private Vector<String> verbEnv;
 
    private Vector<LaTeXFile> loadedPackages;
@@ -1145,4 +1226,6 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       "pdf", "PDF", "png", "PNG", "jpg", "JPG", "jpeg", "JPEG",
       "eps", "EPS", "ps", "PS", "gif", "GIF"
    };
+
+   public static final Pattern PTSIZE_PATTERN = Pattern.compile("(\\d+)pt");
 }

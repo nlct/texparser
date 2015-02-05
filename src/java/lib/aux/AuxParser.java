@@ -207,6 +207,24 @@ public class AuxParser extends DefaultTeXParserListener
       return charset;
    }
 
+   // shouldn't be needed in auxFile
+   public float emToPt(float emValue)
+   {
+      getTeXApp().warning(getParser(),
+         "Can't convert from em to pt, no font information loaded");
+
+      return 9.5f*emValue;
+   }
+
+   // shouldn't be needed in auxFile
+   public float exToPt(float exValue)
+   {
+      getTeXApp().warning(getParser(),
+         "Can't convert from ex to pt, no font information loaded");
+
+      return 4.4f*exValue;
+   }
+
    private Vector<AuxData> auxData;
    private TeXApp texApp;
 

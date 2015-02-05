@@ -158,7 +158,4 @@ public class FixedUnit extends TeXUnit
        (float)(12.0*1238.0/1157.0), 
        (float)(1.0/65536)
     };
-
-   public static final FixedUnit PT = new FixedUnit(UNIT_PT);
-   public static final FixedUnit SP = new FixedUnit(UNIT_SP);
 }
