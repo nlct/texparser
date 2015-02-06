@@ -31,6 +31,11 @@ public class SpChar extends Macro
       return new SpChar();
    }
 
+   public String toString()
+   {
+      return "^";
+   }
+
    public String toString(TeXParser parser)
    {
       return ""+parser.getSpChar();

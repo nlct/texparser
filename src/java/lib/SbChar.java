@@ -31,6 +31,11 @@ public class SbChar extends Macro
       return new SbChar();
    }
 
+   public String toString()
+   {
+      return "_";
+   }
+
    public String toString(TeXParser parser)
    {
       return ""+parser.getSbChar();
