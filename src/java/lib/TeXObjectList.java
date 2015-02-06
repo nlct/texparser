@@ -886,9 +886,40 @@ public class TeXObjectList extends Vector<TeXObject> implements TeXObject,Expand
    {
       StringBuilder builder = new StringBuilder();
 
-      for (TeXObject object : this)
+      for (int i = 0, n = size(); i < n; i++)
       {
+         TeXObject object = get(i);
+
          builder.append(object.toString(parser));
+
+         if (object instanceof ControlSequence
+         && ((ControlSequence)object).isControlWord(parser)
+         && i < n-1)
+         {
+            object = get(i+1);
+           
+            if (object instanceof Letter)
+            {
+               builder.append(" ");
+            }
+            else if (object instanceof TeXObjectList
+                && !(object instanceof Group))
+            {
+               i++;
+               String str = ((TeXObjectList)object).toString(parser);
+               if (str.isEmpty())
+               {
+                  continue;
+               }
+
+               if (parser.isLetter(str.charAt(0)))
+               {
+                  builder.append(" ");
+               }
+
+               builder.append(str);
+            }
+         }
       }
 
       return builder.toString();
