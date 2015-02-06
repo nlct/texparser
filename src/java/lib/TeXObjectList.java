@@ -44,6 +44,26 @@ public class TeXObjectList extends Vector<TeXObject> implements TeXObject,Expand
       }
    }
 
+   public TeXObject expandedPopStack(TeXParser parser)
+     throws IOException
+   {
+      TeXObject object = popStack();
+
+      if (object instanceof Expandable)
+      {
+         TeXObjectList expanded =
+            ((Expandable)object).expandfully(parser, this);
+
+         if (expanded != null)
+         {
+            addAll(0, expanded);
+            object = popStack();
+         }
+      }
+
+      return object;
+   }
+
    public TeXObject popStack() throws IOException
    {
       return popStack(false);
@@ -119,12 +139,10 @@ public class TeXObjectList extends Vector<TeXObject> implements TeXObject,Expand
    public TeXUnit popUnit(TeXParser parser)
     throws IOException
    {
-      TeXObject object = popStack();
+      TeXObject object = expandedPopStack(parser);
 
       if (object == null)
       {
-         parser.push(FixedUnit.PT);
-
          throw new TeXSyntaxException(
             parser.getCurrentFile(),
             parser.getLineNumber(),
@@ -135,12 +153,12 @@ public class TeXObjectList extends Vector<TeXObject> implements TeXObject,Expand
       {
          char c1 = (char)((CharObject)object).getCharCode();
 
-         TeXObject nextObj = popStack();
+         TeXObject nextObj = expandedPopStack(parser);
 
          if (nextObj == null || !(nextObj instanceof CharObject))
          {
             push(object);
-            push(new FixedUnit());
+
             throw new TeXSyntaxException(
                parser.getCurrentFile(),
                parser.getLineNumber(),
@@ -154,12 +172,46 @@ public class TeXObjectList extends Vector<TeXObject> implements TeXObject,Expand
             return parser.getListener().createUnit(String.format("%c%c", c1, c2));
          }
          catch (TeXSyntaxException e)
-         { // throw below
+         {
+            if (c1 == 'f' && c2 == 'i')
+            {
+               TeXObject object3 = expandedPopStack(parser);
+
+               if (object3 == null
+               || !(object3 instanceof CharObject)
+               || (((CharObject)object3).getCharCode() != 'l'))
+               {
+                  push(object3);
+               }
+               else
+               {
+                  TeXObject object4 = expandedPopStack(parser);
+
+                  if (object4 == null
+                  || !(object4 instanceof CharObject)
+                  || ((CharObject)object4).getCharCode() != 'l')
+                  {
+                     push(object4);
+                     return TeXUnit.FIL;
+                  }
+
+                  TeXObject object5 = expandedPopStack(parser);
+
+                  if (object5 == null
+                  || (object5 instanceof CharObject)
+                  || ((CharObject)object5).getCharCode() != 'l')
+                  {
+                     push(object5);
+                     return TeXUnit.FILL;
+                  }
+
+                  return TeXUnit.FILLL;
+               }
+            }
          }
 
          push(nextObj);
          push(object);
-         push(FixedUnit.PT);
 
          throw new TeXSyntaxException(
                parser.getCurrentFile(),
@@ -167,33 +219,7 @@ public class TeXObjectList extends Vector<TeXObject> implements TeXObject,Expand
                TeXSyntaxException.ERROR_MISSING_UNIT);
       }
 
-      if (object instanceof Expandable)
-      {
-         TeXObjectList expanded = ((Expandable)object).expandfully(parser, this);
-
-         if (expanded == null || expanded.isEmpty())
-         {
-            push(object);
-            push(FixedUnit.PT);
-
-            throw new TeXSyntaxException(
-               parser.getCurrentFile(),
-               parser.getLineNumber(),
-               TeXSyntaxException.ERROR_MISSING_UNIT);
-         }
-
-         TeXUnit unit = expanded.popUnit(parser);
-
-         if (expanded.size() > 0)
-         {
-            addAll(0, expanded);
-         }
-
-         return unit;
-      }
-
       push(object);
-      push(FixedUnit.PT);
 
       throw new TeXSyntaxException(
                parser.getCurrentFile(),
@@ -204,24 +230,19 @@ public class TeXObjectList extends Vector<TeXObject> implements TeXObject,Expand
    public Numerical popNumerical(TeXParser parser)
    throws IOException
    {
-      TeXObject object = peekStack();
-
-      if (object instanceof TeXCsRef)
-      {
-         object = parser.getListener().getControlSequence(((TeXCsRef)object).getName());
-      }
+      TeXObject object = expandedPopStack(parser);
 
       if (object instanceof Register)
       {
-         popStack();
          return (Register)object;
       }
 
       if (object instanceof TeXDimension)
       {
-         popStack();
          return (TeXDimension)object;
       }
+
+      push(object);
 
       return popNumber(parser);
    }
@@ -229,19 +250,7 @@ public class TeXObjectList extends Vector<TeXObject> implements TeXObject,Expand
    public TeXDimension popDimension(TeXParser parser)
     throws IOException
    {
-      TeXObject object = popStack();
-
-      if (object instanceof Expandable)
-      {
-         TeXObjectList expanded = 
-           ((Expandable)object).expandfully(parser, this);
-
-         if (expanded != null)
-         {
-            addAll(expanded);
-            object = popStack();
-         }
-      }
+      TeXObject object = expandedPopStack(parser);
 
       if (object instanceof TeXDimension)
       {
@@ -252,19 +261,7 @@ public class TeXObjectList extends Vector<TeXObject> implements TeXObject,Expand
 
       Float value = popFloat(parser);
 
-      object = popStack();
-
-      if (object instanceof Expandable)
-      {
-         TeXObjectList expanded = 
-           ((Expandable)object).expandfully(parser, this);
-
-         if (expanded != null)
-         {
-            addAll(expanded);
-            object = popStack();
-         }
-      }
+      object = expandedPopStack(parser);
 
       if (object instanceof DimenRegister)
       {
@@ -294,18 +291,7 @@ public class TeXObjectList extends Vector<TeXObject> implements TeXObject,Expand
    private TeXGlue popGlue(TeXParser parser)
      throws IOException
    {
-      TeXObject object = popStack();
-
-      if (object instanceof Expandable)
-      {
-         TeXObjectList expanded = ((Expandable)object).expandfully(parser, this);
-
-         if (expanded != null)
-         {
-            addAll(0, expanded);
-            object = popStack();
-         }
-      }
+      TeXObject object = expandedPopStack(parser);
 
       if (!(object instanceof CharObject))
       {
@@ -321,18 +307,7 @@ public class TeXObjectList extends Vector<TeXObject> implements TeXObject,Expand
          return null;
       }
 
-      TeXObject object2 = pop();
-
-      if (object2 instanceof Expandable)
-      {
-         TeXObjectList expanded = ((Expandable)object2).expandfully(parser, this);
-
-         if (expanded != null)
-         {
-            addAll(0, expanded);
-            object2 = pop();
-         }
-      }
+      TeXObject object2 = expandedPopStack(parser);
 
       if (!(object2 instanceof CharObject))
       {
@@ -351,18 +326,7 @@ public class TeXObjectList extends Vector<TeXObject> implements TeXObject,Expand
          return null;
       }
 
-      TeXObject object3 = pop();
-
-      if (object3 instanceof Expandable)
-      {
-         TeXObjectList expanded = ((Expandable)object3).expandfully(parser, this);
-
-         if (expanded != null)
-         {
-            addAll(0, expanded);
-            object3 = pop();
-         }
-      }
+      TeXObject object3 = expandedPopStack(parser);
 
       if (!(object3 instanceof CharObject))
       {
@@ -383,18 +347,7 @@ public class TeXObjectList extends Vector<TeXObject> implements TeXObject,Expand
          return null;
       }
 
-      TeXObject object4 = pop();
-
-      if (object4 instanceof Expandable)
-      {
-         TeXObjectList expanded = ((Expandable)object4).expandfully(parser, this);
-
-         if (expanded != null)
-         {
-            addAll(0, expanded);
-            object4 = pop();
-         }
-      }
+      TeXObject object4 = expandedPopStack(parser);
 
       if (!(object4 instanceof CharObject))
       {
@@ -421,18 +374,7 @@ public class TeXObjectList extends Vector<TeXObject> implements TeXObject,Expand
 
       if (c1 == 'm')
       {
-         object5 = pop();
-
-         if (object5 instanceof Expandable)
-         {
-            TeXObjectList expanded = ((Expandable)object5).expandfully(parser, this);
-
-            if (expanded != null)
-            {
-               addAll(0, expanded);
-               object5 = pop();
-            }
-         }
+         object5 = expandedPopStack(parser);
 
          if (!(object5 instanceof CharObject))
          {
@@ -507,7 +449,7 @@ public class TeXObjectList extends Vector<TeXObject> implements TeXObject,Expand
    public Float popFloat(TeXParser parser)
     throws IOException
    {
-      TeXObject object = popStack();
+      TeXObject object = expandedPopStack(parser);
 
       StringBuilder builder = new StringBuilder();
       
@@ -526,42 +468,12 @@ public class TeXObjectList extends Vector<TeXObject> implements TeXObject,Expand
       }
    }
 
-   protected void popFloat(TeXParser parser, TeXObject object, StringBuilder builder)
+   // object should be fully expanded
+   protected void popFloat(TeXParser parser, TeXObject object, 
+      StringBuilder builder)
    throws IOException
    {
       if (object == null) return;
-
-      if (object instanceof Expandable)
-      {
-         TeXObjectList expanded = ((Expandable)object).expandfully(parser, this);
-
-         if (expanded != null)
-         {
-            for (int i = 0, n = expanded.size(); i < n; i++)
-            {
-               TeXObject obj = expanded.get(i);
-
-               String str = obj.toString(parser);
-
-               try
-               {
-                  Float.parseFloat(builder.toString()+str+"0");
-               }
-               catch (NumberFormatException e)
-               {
-                  addAll(0, expanded.subList(i, n-1));
-
-                  return;
-               }
-
-               builder.append(str);
-            }
-
-            object = popStack();
-            popFloat(parser, object, builder);
-            return;
-         }
-      }
 
       String str = object.toString(parser);
 
@@ -577,18 +489,13 @@ public class TeXObjectList extends Vector<TeXObject> implements TeXObject,Expand
 
       builder.append(str);
 
-      popFloat(parser, popStack(), builder);
+      popFloat(parser, expandedPopStack(parser), builder);
    }
 
    public TeXNumber popNumber(TeXParser parser)
     throws IOException
    {
-      TeXObject object = popStack();
-
-      if (object instanceof TeXCsRef)
-      {
-         object = parser.getListener().getControlSequence(((TeXCsRef)object).getName());
-      }
+      TeXObject object = expandedPopStack(parser);
 
       if (object instanceof TeXNumber)
       {
@@ -617,42 +524,12 @@ public class TeXObjectList extends Vector<TeXObject> implements TeXObject,Expand
       }
    }
 
-   protected void popNumber(TeXParser parser, TeXObject object, StringBuilder builder)
+   // object should be fully expanded
+   protected void popNumber(TeXParser parser, TeXObject object,
+     StringBuilder builder)
    throws IOException
    {
       if (object == null) return;
-
-      if (object instanceof Expandable)
-      {
-         TeXObjectList expanded = ((Expandable)object).expandfully(parser, this);
-
-         if (expanded != null)
-         {
-            for (int i = 0, n = expanded.size(); i < n; i++)
-            {
-               TeXObject obj = expanded.get(i);
-
-               String str = obj.toString(parser);
-
-               try
-               {
-                  Integer.parseInt(builder.toString()+str);
-               }
-               catch (NumberFormatException e)
-               {
-                  addAll(0, expanded.subList(i, n-1));
-
-                  return;
-               }
-
-               builder.append(str);
-            }
-
-            object = popStack();
-            popNumber(parser, object, builder);
-            return;
-         }
-      }
 
       String str = object.toString(parser);
 
@@ -668,12 +545,15 @@ public class TeXObjectList extends Vector<TeXObject> implements TeXObject,Expand
 
       builder.append(str);
 
-      popNumber(parser, popStack(), builder);
+      popNumber(parser, expandedPopStack(parser), builder);
    }
 
    public void push(TeXObject object)
    {
-      add(0, object);
+      if (object != null)
+      {
+         add(0, object);
+      }
    }
 
    public void add(int index, TeXObject object)
