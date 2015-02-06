@@ -37,7 +37,7 @@ public class JmlrEmail extends ControlSequence
 
    public Object clone()
    {
-      return new JmlrEmail(getEmail());
+      return new JmlrEmail(getName());
    }
 
    public void process(TeXParser parser, TeXObjectList stack)

@@ -37,7 +37,7 @@ public class JmlrAddr extends ControlSequence
 
    public Object clone()
    {
-      return new JmlrAddr(getAddr());
+      return new JmlrAddr(getName());
    }
 
    public void process(TeXParser parser, TeXObjectList stack)
