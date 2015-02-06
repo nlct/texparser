@@ -113,7 +113,11 @@ public class UserDimension implements TeXDimension
            numerical.toString(parser));
       }
 
-      TeXDimension dimen = (TeXDimension)numerical;
+      setValue((TeXDimension)numerical);
+   }
+
+   public void setValue(TeXDimension dimen)
+   {
       setValue(dimen.getValue(), dimen.getUnit());
    }
 
@@ -176,6 +180,11 @@ public class UserDimension implements TeXDimension
    }
 
    public void multiply(int factor)
+   {
+      value *= factor;
+   }
+
+   public void multiply(float factor)
    {
       value *= factor;
    }

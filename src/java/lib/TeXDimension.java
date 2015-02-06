@@ -24,4 +24,7 @@ public interface TeXDimension extends Numerical,TeXObject
 
    public TeXUnit getUnit();
 
+   public void multiply(float factor);
+
+   public void setValue(TeXDimension dimen);
 }

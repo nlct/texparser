@@ -24,16 +24,20 @@ public class TeXGlue implements TeXDimension
 {
    public TeXGlue()
    {
-      this(new UserDimension());
+      fixed = new UserDimension();
+      shrink = null;
+      stretch = null;
    }
 
    public TeXGlue(TeXDimension dimen)
    {
-      setFixed(dimen);
+      fixed = new UserDimension();
+      setValue(dimen);
    }
 
    public TeXGlue(TeXDimension dimen, TeXDimension plus, TeXDimension minus)
    {
+      fixed = new UserDimension();
       setFixed(dimen);
       setStretch(plus);
       setShrink(minus);
@@ -41,37 +45,68 @@ public class TeXGlue implements TeXDimension
 
    public Object clone()
    {
-      TeXGlue glue = new TeXGlue((TeXDimension)dimen.clone());
+      TeXGlue glue = new TeXGlue();
 
-      glue.stretch = (stretch == null ? null : (TeXDimension)stretch.clone());
-      glue.shrink = (shrink == null ? null : (TeXDimension)shrink.clone());
+      glue.setFixed(fixed);
+      glue.setShrink(shrink);
+      glue.setStretch(stretch);
 
       return glue;
    }
 
    public float getValue()
    {
-      return dimen.getValue();
+      return fixed.getValue();
    }
 
    public TeXUnit getUnit()
    {
-      return dimen.getUnit();
+      return fixed.getUnit();
    }
 
    public void setValue(TeXDimension dimen)
    {
-      this.dimen = dimen;
-
-      if (dimen instanceof TeXGlue)
+      if (dimen instanceof DimenRegister)
+      {
+         setValue(((DimenRegister)dimen).getDimension());
+      }
+      else if (dimen instanceof TeXGlue)
       {
          TeXGlue glue = (TeXGlue)dimen;
 
-         this.shrink = glue.shrink;
-         this.stretch = glue.stretch;
+         this.fixed.setValue(glue.fixed);
+
+         if (this.shrink == null)
+         {
+            this.shrink = (glue.shrink == null ? null : 
+              (TeXDimension)glue.shrink.clone());
+         }
+         else if (glue.shrink == null)
+         {
+            this.shrink = null;
+         }
+         else
+         {
+            this.shrink.setValue(glue.shrink);
+         }
+
+         if (this.stretch == null)
+         {
+            this.stretch = (glue.stretch == null ? null : 
+              (TeXDimension)glue.stretch.clone());
+         }
+         else if (glue.stretch == null)
+         {
+            this.stretch = null;
+         }
+         else
+         {
+            this.stretch.setValue(glue.stretch);
+         }
       }
       else
       {
+         this.fixed.setValue(dimen);
          this.shrink = null;
          this.stretch = null;
       }
@@ -80,7 +115,7 @@ public class TeXGlue implements TeXDimension
    public void advance(TeXParser parser, Numerical increment)
     throws TeXSyntaxException
    {
-      dimen.advance(parser, increment);
+      fixed.advance(parser, increment);
 
       if (increment instanceof TeXGlue)
       {
@@ -114,7 +149,7 @@ public class TeXGlue implements TeXDimension
 
    public void divide(int divisor)
    {
-      dimen.divide(divisor);
+      fixed.divide(divisor);
 
       if (shrink != null)
       {
@@ -129,7 +164,22 @@ public class TeXGlue implements TeXDimension
 
    public void multiply(int factor)
    {
-      dimen.multiply(factor);
+      fixed.multiply(factor);
+
+      if (shrink != null)
+      {
+         shrink.multiply(factor);
+      }
+
+      if (stretch != null)
+      {
+         stretch.multiply(factor);
+      }
+   }
+
+   public void multiply(float factor)
+   {
+      fixed.multiply(factor);
 
       if (shrink != null)
       {
@@ -144,37 +194,29 @@ public class TeXGlue implements TeXDimension
 
    public void setFixed(TeXDimension dimen)
    {
-      if (dimen instanceof TeXGlue)
+      if (dimen instanceof DimenRegister)
       {
-         TeXGlue glue = (TeXGlue)dimen;
-
-         this.dimen = glue.dimen;
-
-         if (glue.stretch != null)
-         {
-            stretch = glue.stretch;
-         }
-
-         if (glue.shrink != null)
-         {
-            shrink = glue.shrink;
-         }
-
-         return;
+         setFixed(((DimenRegister)dimen).getDimension());
       }
-
-      this.dimen = dimen;
+      else if (dimen instanceof TeXGlue)
+      {
+         setFixed(((TeXGlue)dimen).getFixed());
+      }
+      else
+      {
+         fixed.setValue(dimen);
+      }
    }
 
    public int number(TeXParser parser)
     throws TeXSyntaxException
    {
-      return dimen.number(parser);
+      return fixed.number(parser);
    }
 
    public String toString(TeXParser parser)
    {
-      String str = dimen.toString(parser);
+      String str = fixed.toString(parser);
 
       if (stretch != null)
       {
@@ -223,32 +265,64 @@ public class TeXGlue implements TeXDimension
 
    public void setShrink(TeXDimension shrink)
    {
-      if (shrink instanceof TeXGlue)
+      if (shrink instanceof DimenRegister)
+      {
+         setShrink(((DimenRegister)shrink).getDimension());
+      }
+      else if (shrink instanceof TeXGlue)
       {
          TeXGlue glue = (TeXGlue)shrink;
-         this.shrink = glue.dimen;
-         return;
-      }
 
-      this.shrink = shrink;
+         setShrink(glue.fixed);
+      }
+      else
+      {
+         if (this.shrink == null)
+         {
+            if (shrink != null)
+            {
+               this.shrink = (TeXDimension)shrink.clone();
+            }
+         }
+         else
+         {
+            this.shrink.setValue(shrink);
+         }
+      }
    }
 
    public void setStretch(TeXDimension stretch)
    {
-      if (stretch instanceof TeXGlue)
+      if (stretch instanceof DimenRegister)
+      {
+         setStretch(((DimenRegister)stretch).getDimension());
+      }
+      else if (stretch instanceof TeXGlue)
       {
          TeXGlue glue = (TeXGlue)stretch;
-         this.stretch = glue.dimen;
-         return;
-      }
 
-      this.stretch = stretch;
+         setShrink(glue.fixed);
+      }
+      else
+      {
+         if (this.stretch == null)
+         {
+            if (stretch != null)
+            {
+               this.stretch = (TeXDimension)stretch.clone();
+            }
+         }
+         else
+         {
+            this.stretch.setValue(stretch);
+         }
+      }
    }
 
    public TeXDimension getFixed()
    {
-      return dimen;
+      return fixed;
    }
 
-   private TeXDimension dimen, stretch, shrink;
+   private TeXDimension fixed, stretch, shrink;
 }

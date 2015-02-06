@@ -229,15 +229,51 @@ public class TeXObjectList extends Vector<TeXObject> implements TeXObject,Expand
    public TeXDimension popDimension(TeXParser parser)
     throws IOException
    {
-      TeXObject object = peekStack();
+      TeXObject object = popStack();
+
+      if (object instanceof Expandable)
+      {
+         TeXObjectList expanded = 
+           ((Expandable)object).expandfully(parser, this);
+
+         if (expanded != null)
+         {
+            addAll(expanded);
+            object = popStack();
+         }
+      }
 
       if (object instanceof TeXDimension)
       {
-         popStack();
          return (TeXDimension)object;
       }
 
+      push(object);
+
       Float value = popFloat(parser);
+
+      object = popStack();
+
+      if (object instanceof Expandable)
+      {
+         TeXObjectList expanded = 
+           ((Expandable)object).expandfully(parser, this);
+
+         if (expanded != null)
+         {
+            addAll(expanded);
+            object = popStack();
+         }
+      }
+
+      if (object instanceof DimenRegister)
+      {
+         TeXDimension dimen = new TeXGlue((DimenRegister)object);
+         dimen.multiply(value.floatValue());
+         return dimen;
+      }
+
+      push(object);
 
       TeXUnit unit = popUnit(parser);
 

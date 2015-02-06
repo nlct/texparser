@@ -57,7 +57,17 @@ public class DimenRegister extends Register implements TeXDimension
            numerical.toString(parser));
       }
 
-      dimension.setValue((TeXDimension)numerical);
+      setValue((TeXDimension)numerical);
+   }
+
+   public void setValue(TeXDimension dimen)
+   {
+      dimension.setValue(dimen);
+   }
+
+   public TeXDimension getDimension()
+   {
+      return dimension;
    }
 
    public float getValue()
@@ -88,6 +98,11 @@ public class DimenRegister extends Register implements TeXDimension
    }
 
    public void multiply(int factor)
+   {
+      dimension.multiply(factor);
+   }
+
+   public void multiply(float factor)
    {
       dimension.multiply(factor);
    }
