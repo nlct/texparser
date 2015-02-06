@@ -85,6 +85,11 @@ public abstract class ControlSequence extends Macro
           && hasSyntax(other);
    }
 
+   public boolean isControlWord(TeXParser parser)
+   {
+      return parser.isLetter(name.charAt(0));
+   }
+
    // control sequence name without initial backslash
 
    protected String name;
