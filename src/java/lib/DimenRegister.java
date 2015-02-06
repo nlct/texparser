@@ -100,11 +100,91 @@ public class DimenRegister extends Register implements TeXDimension
    public void process(TeXParser parser)
       throws IOException
    {
+      TeXObject object = parser.popStack();
+
+      if (object instanceof Expandable)
+      {
+         TeXObjectList expanded = ((Expandable)object).expandfully(parser);
+
+         if (expanded != null)
+         {
+            parser.addAll(expanded);
+            object = parser.popStack();
+         }
+      }
+
+      if (object instanceof CharObject
+       && ((CharObject)object).getCharCode() == '=')
+      {
+         object = parser.popStack();
+
+         if (object instanceof Expandable)
+         {
+            TeXObjectList expanded = ((Expandable)object).expandfully(parser);
+
+            if (expanded != null)
+            {
+               parser.addAll(expanded);
+               object = parser.popStack();
+            }
+         }
+      }
+
+      if (object instanceof Register)
+      {
+         setValue(parser, ((Register)object));
+         return;
+      }
+
+      parser.push(object);
+
+      setValue(parser, parser.popDimension());
    }
 
    public void process(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
+      TeXObject object = stack.popStack();
+
+      if (object instanceof Expandable)
+      {
+         TeXObjectList expanded =
+            ((Expandable)object).expandfully(parser, stack);
+
+         if (expanded != null)
+         {
+            stack.addAll(expanded);
+            object = stack.popStack();
+         }
+      }
+
+      if (object instanceof CharObject
+       && ((CharObject)object).getCharCode() == '=')
+      {
+         object = stack.popStack();
+
+         if (object instanceof Expandable)
+         {
+            TeXObjectList expanded =
+               ((Expandable)object).expandfully(parser, stack);
+
+            if (expanded != null)
+            {
+               stack.addAll(expanded);
+               object = stack.popStack();
+            }
+         }
+      }
+
+      if (object instanceof Register)
+      {
+         setValue(parser, ((Register)object));
+         return;
+      }
+
+      stack.push(object);
+
+      setValue(parser, stack.popDimension(parser));
    }
 
    public Object clone()
