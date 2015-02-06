@@ -159,6 +159,16 @@ public class L2HConverter extends LaTeXParserListener
       }
    }
 
+   public BigOperator createBigOperator(String name, int code1, int code2)
+   {
+      return new L2HBigOperator(name, code1, code2);
+   }
+
+   public BigOperator createBigOperator(String name, int code)
+   {
+      return new L2HBigOperator(name, code);
+   }
+
    public Letter getLetter(int charCode)
    {
       return new L2HLetter(charCode);
@@ -432,7 +442,7 @@ public class L2HConverter extends LaTeXParserListener
 
       writeable.writeln("<!-- MathJax -->");
       writeable.writeln("<script type=\"text/x-mathjax-config\">");
-      writeable.writeln("MathJax.Hub.Config({tex2jax: { inlineMath: [['$','$'],['\\\\(','\\\\)']] }});");
+      writeable.writeln("MathJax.Hub.Config({tex2jax: { inlineMath: [['$','$'],['\\\\(','\\\\)']], displayMath: [ ['$$','$$'], ['\\[','\\]'] ]}});");
       writeable.writeln("</script>");
 
       writeable.write("<script type=\"text/javascript\" src=");
@@ -478,7 +488,7 @@ public class L2HConverter extends LaTeXParserListener
      throws IOException
    {
       writeln("div.displaymath { display: block; text-align: center; }");
-      writeln("div.eqno { float: right; }");
+      writeln("span.eqno { float: right; }");
       writeln("div.table { display: block; text-align: center; }");
 
       writeTabularCss("center", "middle");
@@ -596,9 +606,9 @@ public class L2HConverter extends LaTeXParserListener
          }
 
          write("\\frac{");
-         write(before.toString(getParser()));
+         before.process(getParser());
          write("}{");
-         write(after.toString(getParser()));
+         after.process(getParser());
          write("}");
 
          if (firstDelim != null || secondDelim != null)

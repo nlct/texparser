@@ -1502,6 +1502,11 @@ public class TeXParser extends TeXObjectList
       return popArg(this, openDelim, closeDelim);
    }
 
+   public TeXObject expandedPopStack() throws IOException
+   {
+      return expandedPopStack(this);
+   }
+
    public TeXObject popStack() throws IOException
    {
       return popStack(false);

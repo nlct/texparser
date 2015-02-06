@@ -248,9 +248,18 @@ public class L2HMathDeclaration extends MathDeclaration
             }
 
             parser.addAll(0, list);
+
+            listener.write("<span class=\"eqno\">(");
+            listener.getControlSequence("theequation").process(parser);
+            listener.write(")</span>");
          }
 
          listener.write("$");
+
+         if (getMode() == TeXSettings.MODE_DISPLAY_MATH)
+         {
+            listener.write("$");
+         }
       }
    }
 
@@ -263,13 +272,11 @@ public class L2HMathDeclaration extends MathDeclaration
       if (listener.useMathJax())
       {
          listener.write("$");
-      }
 
-      if (isNumbered())
-      {
-         listener.write("<div class=\"eqno\">(");
-         listener.getControlSequence("theequation").process(parser);
-         listener.write(")</div>");
+         if (getMode() == TeXSettings.MODE_DISPLAY_MATH)
+         {
+            listener.write("$");
+         }
       }
 
       if (getMode() == TeXSettings.MODE_DISPLAY_MATH)

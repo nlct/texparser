@@ -19,47 +19,75 @@
 package com.dickimawbooks.texparserlib.html;
 
 import java.io.IOException;
-import java.io.Writer;
+import java.io.EOFException;
 
 import com.dickimawbooks.texparserlib.*;
-import com.dickimawbooks.texparserlib.primitives.*;
+import com.dickimawbooks.texparserlib.generic.*;
+import com.dickimawbooks.texparserlib.latex.*;
 
-public class L2HUndefined extends Undefined
+public class L2HBigOperator extends BigOperator
 {
-   public L2HUndefined()
+   public L2HBigOperator(String name, int codePoint)
    {
-      this("undefined");
+      super(name, codePoint);
    }
 
-   public L2HUndefined(String name)
+   public L2HBigOperator(String name, int codePoint, int dispCharCode)
    {
-      super(name);
+      super(name, codePoint, dispCharCode);
    }
 
    public Object clone()
    {
-      return new L2HUndefined(getName());
+      return new L2HBigOperator(getName(), getCharCode(), getDispCharCode());
    }
 
    public void process(TeXParser parser, TeXObjectList stack)
-      throws IOException
-   {
-      process(parser);
-   }
-
-   public void process(TeXParser parser)
-      throws IOException
+   throws IOException
    {
       L2HConverter listener = (L2HConverter)parser.getListener();
 
-      if (parser.isMathMode() && listener.useMathJax())
+      if (listener.useMathJax())
       {
          listener.write(toString(parser));
+
+         if (isControlWord(parser))
+         {
+            listener.write(' ');
+         }
       }
       else
       {
-         listener.getTeXApp().error(new TeXSyntaxException(
-            parser, TeXSyntaxException.ERROR_UNDEFINED, getName()));
+         write(parser);
       }
    }
+
+   public TeXObjectList expandonce(TeXParser parser)
+     throws IOException
+   {
+      L2HConverter listener = (L2HConverter)parser.getListener();
+
+      return listener.useMathJax() ? null : super.expandonce(parser);
+   }
+
+   public void process(TeXParser parser)
+   throws IOException
+   {
+      L2HConverter listener = (L2HConverter)parser.getListener();
+
+      if (listener.useMathJax())
+      {
+         listener.write(toString(parser));
+
+         if (isControlWord(parser))
+         {
+            listener.write(' ');
+         }
+      }
+      else
+      {
+         write(parser);
+      }
+   }
+
 }

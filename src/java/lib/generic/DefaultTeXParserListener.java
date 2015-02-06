@@ -220,11 +220,6 @@ public abstract class DefaultTeXParserListener extends TeXParserListener
       return new BinarySymbol(name, code);
    }
 
-   public BigOperator createBigOperator(String name, int code)
-   {
-      return new BigOperator(name, code);
-   }
-
    public Symbol createSymbol(String name, int code)
    {
       return new Symbol(name, code);
@@ -238,6 +233,11 @@ public abstract class DefaultTeXParserListener extends TeXParserListener
    public MathSymbol createMathSymbol(String name, int code)
    {
       return new MathSymbol(name, code);
+   }
+
+   public BigOperator createBigOperator(String name, int code)
+   {
+      return new BigOperator(name, code);
    }
 
    public BigOperator createBigOperator(String name, int code1, int code2)

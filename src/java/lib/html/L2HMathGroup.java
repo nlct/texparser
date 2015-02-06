@@ -86,9 +86,18 @@ public class L2HMathGroup extends MathGroup
 
       if (listener.useMathJax())
       {
-         listener.write("$");
-         processList(parser, list);
-         listener.write("$");
+         if (isInLine())
+         {
+            listener.write("$");
+            processList(parser, list);
+            listener.write("$");
+         }
+         else
+         {
+            listener.write("$$");
+            processList(parser, list);
+            listener.write("$$");
+         }
       }
       else
       {
