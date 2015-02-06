@@ -59,10 +59,55 @@ public class Maketitle extends ControlSequence
       ((LaTeXParserListener)parser.getListener()).resetcounter("footnote");
    }
 
+   protected TeXObjectList createTitle(TeXParser parser)
+    throws IOException
+   {
+      TeXParserListener listener = parser.getListener();
+
+      TeXObjectList list = new TeXObjectList();
+
+      list.add(listener.getControlSequence("begin"));
+      list.add(listener.createGroup("center"));
+
+      Group grp = listener.createGroup();
+      grp.add(listener.getControlSequence("LARGE"));
+      grp.add(listener.getControlSequence("@title"));
+      grp.add(listener.getControlSequence("par"));
+
+      list.add(grp);
+
+      grp = listener.createGroup();
+      grp.add(listener.getControlSequence("large"));
+      grp.add(listener.getControlSequence("begin"));
+      grp.add(listener.createGroup("tabular"));
+      grp.add(listener.createString("[t]"));
+      grp.add(listener.createGroup("c"));
+      grp.add(listener.getControlSequence("@author"));
+      grp.add(listener.getControlSequence("end"));
+      grp.add(listener.createGroup("tabular"));
+      grp.add(listener.getControlSequence("par"));
+
+      list.add(grp);
+
+      grp = listener.createGroup();
+      grp.add(listener.getControlSequence("large"));
+      grp.add(listener.getControlSequence("@date"));
+
+      list.add(grp);
+
+      list.add(listener.getControlSequence("end"));
+      list.add(listener.createGroup("center"));
+
+      return list;
+   }
+
    public void process(TeXParser parser)
    throws IOException
    {
       preProcess(parser);
+
+      createTitle(parser).process(parser);
+
       postProcess(parser);
    }
 
@@ -70,6 +115,9 @@ public class Maketitle extends ControlSequence
    throws IOException
    {
       preProcess(parser);
+
+      createTitle(parser).process(parser, stack);
+
       postProcess(parser);
    }
 }
