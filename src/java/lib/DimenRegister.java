@@ -25,17 +25,20 @@ public class DimenRegister extends Register implements TeXDimension
 {
    public DimenRegister(String name)
    {
-      this(name, 0);
-   }
-
-   public DimenRegister(String name, int spValue)
-   {
-      this(name, spValue, FixedUnit.SP);
+      this(name, 0, FixedUnit.SP);
    }
 
    public DimenRegister(String name, float value, TeXUnit unit)
    {
-      this(name, new TeXGlue(new UserDimension(value, unit)));
+      this(name, new TeXGlue());
+
+      try
+      {
+         dimension.setDimension(null, new UserDimension(value, unit));
+      }
+      catch (TeXSyntaxException e)
+      {// shouldn't happen
+      }
    }
 
    public DimenRegister(String name, TeXGlue dimension)
@@ -49,7 +52,7 @@ public class DimenRegister extends Register implements TeXDimension
    {
       if (!(numerical instanceof TeXDimension))
       {
-         dimension.setValue(
+         dimension.setDimension(parser,
             new UserDimension(numerical.number(parser), FixedUnit.SP));
 
          throw new TeXSyntaxException(parser, 
@@ -57,12 +60,13 @@ public class DimenRegister extends Register implements TeXDimension
            numerical.toString(parser));
       }
 
-      setValue((TeXDimension)numerical);
+      setDimension(parser, (TeXDimension)numerical);
    }
 
-   public void setValue(TeXDimension dimen)
+   public void setDimension(TeXParser parser, TeXDimension dimen)
+    throws TeXSyntaxException
    {
-      dimension.setValue(dimen);
+      dimension.setDimension(parser, dimen);
    }
 
    public TeXDimension getDimension()

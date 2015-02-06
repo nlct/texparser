@@ -20,7 +20,7 @@ package com.dickimawbooks.texparserlib;
 
 import java.io.IOException;
 
-public class TeXGlue implements TeXDimension
+public class TeXGlue implements TeXDimension, Expandable
 {
    public TeXGlue()
    {
@@ -29,27 +29,36 @@ public class TeXGlue implements TeXDimension
       stretch = null;
    }
 
-   public TeXGlue(TeXDimension dimen)
+   public TeXGlue(TeXParser parser, TeXDimension dimen)
+    throws TeXSyntaxException
    {
       fixed = new UserDimension();
-      setValue(dimen);
+      setDimension(parser, dimen);
    }
 
-   public TeXGlue(TeXDimension dimen, TeXDimension plus, TeXDimension minus)
+   public TeXGlue(TeXParser parser, TeXDimension dimen, 
+     TeXDimension plus, TeXDimension minus)
+   throws TeXSyntaxException
    {
       fixed = new UserDimension();
-      setFixed(dimen);
-      setStretch(plus);
-      setShrink(minus);
+      setFixed(parser, dimen);
+      setStretch(parser, plus);
+      setShrink(parser, minus);
    }
 
    public Object clone()
    {
       TeXGlue glue = new TeXGlue();
 
-      glue.setFixed(fixed);
-      glue.setShrink(shrink);
-      glue.setStretch(stretch);
+      try
+      {
+         glue.setFixed(null, fixed);
+         glue.setShrink(null, shrink);
+         glue.setStretch(null, stretch);
+      }
+      catch (TeXSyntaxException e)
+      {// shouldn't happen
+      }
 
       return glue;
    }
@@ -64,17 +73,18 @@ public class TeXGlue implements TeXDimension
       return fixed.getUnit();
    }
 
-   public void setValue(TeXDimension dimen)
+   public void setDimension(TeXParser parser, TeXDimension dimen)
+     throws TeXSyntaxException
    {
       if (dimen instanceof DimenRegister)
       {
-         setValue(((DimenRegister)dimen).getDimension());
+         setDimension(parser, ((DimenRegister)dimen).getDimension());
       }
       else if (dimen instanceof TeXGlue)
       {
          TeXGlue glue = (TeXGlue)dimen;
 
-         this.fixed.setValue(glue.fixed);
+         this.fixed.setDimension(parser, glue.fixed);
 
          if (this.shrink == null)
          {
@@ -87,7 +97,7 @@ public class TeXGlue implements TeXDimension
          }
          else
          {
-            this.shrink.setValue(glue.shrink);
+            this.shrink.setDimension(parser, glue.shrink);
          }
 
          if (this.stretch == null)
@@ -101,12 +111,12 @@ public class TeXGlue implements TeXDimension
          }
          else
          {
-            this.stretch.setValue(glue.stretch);
+            this.stretch.setDimension(parser, glue.stretch);
          }
       }
       else
       {
-         this.fixed.setValue(dimen);
+         setFixed(parser, dimen);
          this.shrink = null;
          this.stretch = null;
       }
@@ -192,19 +202,27 @@ public class TeXGlue implements TeXDimension
       }
    }
 
-   public void setFixed(TeXDimension dimen)
+   public void setFixed(TeXParser parser, TeXDimension dimen)
+     throws TeXSyntaxException
    {
       if (dimen instanceof DimenRegister)
       {
-         setFixed(((DimenRegister)dimen).getDimension());
+         setFixed(parser, ((DimenRegister)dimen).getDimension());
       }
       else if (dimen instanceof TeXGlue)
       {
-         setFixed(((TeXGlue)dimen).getFixed());
+         setFixed(parser, ((TeXGlue)dimen).getFixed());
       }
       else
       {
-         fixed.setValue(dimen);
+         if (dimen.getUnit() instanceof FillUnit)
+         {
+            throw new TeXSyntaxException(parser,
+              TeXSyntaxException.ERROR_MISSING_UNIT, 
+              dimen.getUnit().toString());
+         }
+
+         fixed.setDimension(parser, dimen);
       }
    }
 
@@ -236,16 +254,40 @@ public class TeXGlue implements TeXDimension
       return parser.string(toString(parser));
    }
 
+   public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
+      throws IOException
+   {
+      return string(parser);
+   }
+
+   public TeXObjectList expandonce(TeXParser parser)
+      throws IOException
+   {
+      return string(parser);
+   }
+
+   public TeXObjectList expandfully(TeXParser parser, TeXObjectList stack)
+      throws IOException
+   {
+      return expandonce(parser, stack);
+   }
+
+   public TeXObjectList expandfully(TeXParser parser)
+      throws IOException
+   {
+      return expandonce(parser);
+   }
+
    public void process(TeXParser parser)
       throws IOException
    {
-      parser.getListener().getWriteable().write(toString(parser));
+      parser.addAll(0, string(parser));
    }
 
    public void process(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
-      process(parser);
+      stack.addAll(0, string(parser));
    }
 
    public boolean isPar()
@@ -263,17 +305,18 @@ public class TeXGlue implements TeXDimension
       return shrink;
    }
 
-   public void setShrink(TeXDimension shrink)
+   public void setShrink(TeXParser parser, TeXDimension shrink)
+    throws TeXSyntaxException
    {
       if (shrink instanceof DimenRegister)
       {
-         setShrink(((DimenRegister)shrink).getDimension());
+         setShrink(parser, ((DimenRegister)shrink).getDimension());
       }
       else if (shrink instanceof TeXGlue)
       {
          TeXGlue glue = (TeXGlue)shrink;
 
-         setShrink(glue.fixed);
+         setShrink(parser, glue.fixed);
       }
       else
       {
@@ -286,22 +329,23 @@ public class TeXGlue implements TeXDimension
          }
          else
          {
-            this.shrink.setValue(shrink);
+            this.shrink.setDimension(parser, shrink);
          }
       }
    }
 
-   public void setStretch(TeXDimension stretch)
+   public void setStretch(TeXParser parser, TeXDimension stretch)
+    throws TeXSyntaxException
    {
       if (stretch instanceof DimenRegister)
       {
-         setStretch(((DimenRegister)stretch).getDimension());
+         setStretch(parser, ((DimenRegister)stretch).getDimension());
       }
       else if (stretch instanceof TeXGlue)
       {
          TeXGlue glue = (TeXGlue)stretch;
 
-         setShrink(glue.fixed);
+         setStretch(parser, glue.fixed);
       }
       else
       {
@@ -314,7 +358,7 @@ public class TeXGlue implements TeXDimension
          }
          else
          {
-            this.stretch.setValue(stretch);
+            this.stretch.setDimension(parser, stretch);
          }
       }
    }

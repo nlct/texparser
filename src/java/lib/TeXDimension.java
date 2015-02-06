@@ -26,5 +26,6 @@ public interface TeXDimension extends Numerical,TeXObject
 
    public void multiply(float factor);
 
-   public void setValue(TeXDimension dimen);
+   public void setDimension(TeXParser parser, TeXDimension dimen)
+     throws TeXSyntaxException;
 }

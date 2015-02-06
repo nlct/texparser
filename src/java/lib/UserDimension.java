@@ -22,7 +22,7 @@ import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 import java.io.IOException;
 
-public class UserDimension implements TeXDimension
+public class UserDimension implements TeXDimension, Expandable
 {
    public UserDimension()
    {
@@ -113,10 +113,10 @@ public class UserDimension implements TeXDimension
            numerical.toString(parser));
       }
 
-      setValue((TeXDimension)numerical);
+      setDimension(parser, (TeXDimension)numerical);
    }
 
-   public void setValue(TeXDimension dimen)
+   public void setDimension(TeXParser parser, TeXDimension dimen)
    {
       setValue(dimen.getValue(), dimen.getUnit());
    }
@@ -189,15 +189,39 @@ public class UserDimension implements TeXDimension
       value *= factor;
    }
 
+   public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
+     throws IOException
+   {
+      return string(parser);
+   }
+
+   public TeXObjectList expandonce(TeXParser parser)
+     throws IOException
+   {
+      return string(parser);
+   }
+
+   public TeXObjectList expandfully(TeXParser parser)
+     throws IOException
+   {
+      return expandonce(parser);
+   }
+
+   public TeXObjectList expandfully(TeXParser parser, TeXObjectList stack)
+     throws IOException
+   {
+      return expandonce(parser, stack);
+   }
+
    public void process(TeXParser parser) throws IOException
    {
-      parser.getListener().getWriteable().write(toString(parser));
+      parser.addAll(0, string(parser));
    }
 
    public void process(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
-      process(parser);
+      stack.addAll(0, string(parser));
    }
 
    public boolean isPar()
