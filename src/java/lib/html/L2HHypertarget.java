@@ -60,7 +60,7 @@ public class L2HHypertarget extends Command
 
       if (text instanceof Expandable)
       {
-         TeXObjectList expanded = ((Expandable)text).expandonce(parser);
+         TeXObjectList expanded = ((Expandable)text).expandfully(parser);
 
          if (expanded != null)
          {
@@ -70,10 +70,9 @@ public class L2HHypertarget extends Command
 
 
       TeXObjectList list = new TeXObjectList();
-      list.add(new HtmlTag("<a name=\""+
-        HtmlTag.getUriFragment(target.toString(parser))+"\">"));
-      list.add(text);
-      list.add(new HtmlTag("</a>"));
+      list.add(new HtmlTag(String.format("<a name=\"%s\">%s</a>",
+        HtmlTag.getUriFragment(target.toString(parser)), 
+        text.toString(parser))));
 
       return list;
    }
@@ -97,7 +96,7 @@ public class L2HHypertarget extends Command
 
       if (text instanceof Expandable)
       {
-         TeXObjectList expanded = ((Expandable)text).expandonce(parser, stack);
+         TeXObjectList expanded = ((Expandable)text).expandfully(parser, stack);
 
          if (expanded != null)
          {
@@ -106,10 +105,10 @@ public class L2HHypertarget extends Command
       }
 
       TeXObjectList list = new TeXObjectList();
-      list.add(new HtmlTag("<a name=\""+
-        HtmlTag.getUriFragment(target.toString(parser))+"\">"));
-      list.add(text);
-      list.add(new HtmlTag("</a>"));
+
+      list.add(new HtmlTag(String.format("<a name=\"%s\">%s</a>",
+        HtmlTag.getUriFragment(target.toString(parser)), 
+        text.toString(parser))));
 
       return list;
    }

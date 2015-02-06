@@ -56,12 +56,7 @@ public class AlignRow extends TeXObjectList
 
       while (true)
       {
-         TeXObject span = stack.popStack();
-
-         if (span instanceof TeXCsRef)
-         {
-            span = listener.getControlSequence(((TeXCsRef)span).getName());
-         }
+         TeXObject span = stack.expandedPopStack(parser);
 
          if (span instanceof WhiteSpace)
          {
@@ -72,25 +67,6 @@ public class AlignRow extends TeXObjectList
          {
             stack.push(span);
             break;
-         }
-
-         if (span instanceof Expandable)
-         {
-            TeXObjectList expanded;
-
-            if (stack == parser)
-            {
-               expanded = ((Expandable)span).expandfully(parser);
-            }
-            else
-            {
-               expanded = ((Expandable)span).expandfully(parser, stack);
-            }
-
-            if (expanded != null)
-            {
-               span = expanded;
-            }
          }
 
          if (span instanceof TeXObjectList)
@@ -109,12 +85,7 @@ public class AlignRow extends TeXObjectList
 
       while (true)
       {
-         TeXObject obj = stack.popStack();
-
-         if (obj instanceof TeXCsRef)
-         {
-            obj = listener.getControlSequence(((TeXCsRef)obj).getName());
-         }
+         TeXObject obj = stack.expandedPopStack(parser);
 
          if (obj instanceof Tab)
          {
@@ -226,6 +197,11 @@ public class AlignRow extends TeXObjectList
 
             group.add(obj);
          }
+      }
+
+      if (group != null)
+      {
+         add(group);
       }
    }
 

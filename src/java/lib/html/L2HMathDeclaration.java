@@ -149,6 +149,11 @@ public class L2HMathDeclaration extends MathDeclaration
          }
 
          listener.write("$");
+
+         if (getMode() == TeXSettings.MODE_DISPLAY_MATH)
+         {
+            listener.write("$");
+         }
       }
    }
 

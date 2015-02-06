@@ -203,11 +203,7 @@ public class L2HAlignRow extends AlignRow
          alignment = alignCell;
       }
 
-      writeable.write("<td"+span+" style=\"");
-
-      writeable.write(getAlignStyle(parser, alignment));
-
-      writeable.write("\">");
+      startCell(parser, span, getAlignStyle(parser, alignment));
 
       TeXObjectList contentsList = new TeXObjectList();
 
@@ -245,7 +241,19 @@ public class L2HAlignRow extends AlignRow
          contentsList.pop().process(parser, contentsList);
       }
 
-      writeable.writeln("</td>");
+      endCell(parser);
+   }
+
+   protected void startCell(TeXParser parser, String span, String style)
+    throws IOException
+   {
+      Writeable writeable = parser.getListener().getWriteable();
+      writeable.write(String.format("<td%s style=\"%s\">", span, style));
+   }
+
+   protected void endCell(TeXParser parser) throws IOException
+   {
+      parser.getListener().getWriteable().writeln("</td>");
    }
 
    private int[] hlines;

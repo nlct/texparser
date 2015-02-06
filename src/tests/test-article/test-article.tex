@@ -54,6 +54,17 @@ Another numbered equation:
  + (\hat{y}_i - y_i)\pfrac{\phi_k(\vec{x}_i)}{\eta_j}
 \end{equation}
 
+Oh, no! It's an \texttt{eqnarray}:
+\begin{eqnarray}
+f(x) &=& ax^2 +b\label{eq:f}\\
+f'(x) &=& 2ax\label{eq:df}
+\end{eqnarray}
+and an \texttt{eqnarray*}:
+\begin{eqnarray*}
+\mathcal{I} & = & \int_0^\infty f(x)\,dx\\
+g(x) & = & \prod_i h_i(x)
+\end{eqnarray*}
+
 Some \textbf{bold text}, \textit{italic text}, 
 \textsf{sans-serif text}, \textsc{small caps}.
 Here's a footnote.\footnote{Here's the footnote text.}
@@ -64,6 +75,8 @@ Some cross-references: section~\ref{sec:intro},
 equation~\ref{eq:mx+c} and some
 citations~\cite{article-full,incollection-full}
 and~\cite[some text]{inproceedings-full}.
+
+Some more references: equations~\ref{eq:f} and~\ref{eq:df}.
 
 \lipsum[2-3]
 

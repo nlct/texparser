@@ -66,7 +66,7 @@ public class L2HTabular extends Tabular
 
       switch (verticalAlignment)
       {
-         case 'c': cls += "c"; break;
+         case 'c': cls += "m"; break;
          case 'b': cls += "b"; break;
          case 't': cls += "t"; break;
       }

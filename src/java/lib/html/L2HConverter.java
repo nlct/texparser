@@ -142,6 +142,9 @@ public class L2HConverter extends LaTeXParserListener
       parser.putControlSequence(new L2HTabular());
       parser.putControlSequence(new L2HTabular("array"));
 
+      parser.putControlSequence(new L2HEqnarray());
+      parser.putControlSequence(new L2HEqnarray("eqnarray*", false));
+
       putControlSequence(new L2Hhfill("hfill"));
       putControlSequence(new L2Hhfill("hfil"));
 
@@ -193,6 +196,12 @@ public class L2HConverter extends LaTeXParserListener
      throws IOException
    {
       return new L2HAlignRow(getParser(), stack);
+   }
+
+   public AlignRow createMathAlignRow(TeXObjectList stack, boolean isNumbered)
+     throws IOException
+   {
+      return new L2HMathAlignRow(getParser(), stack, isNumbered);
    }
 
    public void cr(boolean isStar, TeXObject optArg)
@@ -442,7 +451,7 @@ public class L2HConverter extends LaTeXParserListener
 
       writeable.writeln("<!-- MathJax -->");
       writeable.writeln("<script type=\"text/x-mathjax-config\">");
-      writeable.writeln("MathJax.Hub.Config({tex2jax: { inlineMath: [['$','$'],['\\\\(','\\\\)']], displayMath: [ ['$$','$$'], ['\\[','\\]'] ]}});");
+      writeable.writeln("MathJax.Hub.Config({tex2jax: { inlineMath: [['$','$'],['\\\\(','\\\\)']], displayMath: [ ['$$','$$'], ['\\\\[','\\\\]'] ]}});");
       writeable.writeln("</script>");
 
       writeable.write("<script type=\"text/javascript\" src=");
