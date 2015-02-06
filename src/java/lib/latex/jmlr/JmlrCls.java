@@ -65,6 +65,9 @@ public class JmlrCls extends LaTeXCls
        null, listener.createString("Editors")));
 
       registerControlSequence(new JmlrKeywords());
+      registerControlSequence(new JmlrName());
+      registerControlSequence(new JmlrEmail());
+      registerControlSequence(new JmlrAddr());
    }
 
    protected void loadPreHyperrefPackages()
