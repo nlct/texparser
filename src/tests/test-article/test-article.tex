@@ -11,6 +11,9 @@
 \title{Sample Article}
 \author{Nicola Talbot\thanks{Some attribution}}
 
+\newcommand*{\pfrac}[2]{\frac{\partial#1}{\partial#2}}
+\newcommand*{\dpfrac}[3]{\frac{\partial^2#1}{\partial#2\partial#3}}
+
 \begin{document}
 \maketitle
 
@@ -38,6 +41,14 @@ A numbered equation:
 y = m x + c
 \label{eq:mx+c}
 \end{equation}
+
+\[
+ \dpfrac{L}{\eta_j}{w_k}
+ = \dpfrac{L}{w_k}{\eta_j}
+ = \sum_{i=1}^n \pfrac{g(z_i)}{z_i}
+   \phi_k(x_i)\pfrac{z_i}{\eta_j}
+ + (\hat{y}_i - y_i)\pfrac{\phi_k(x_i)}{\eta_j}
+\]
 
 Some \textbf{bold text}, \textit{italic text}, 
 \textsf{sans-serif text}, \textsc{small caps}.
