@@ -142,6 +142,9 @@ public class L2HConverter extends LaTeXParserListener
       parser.putControlSequence(new L2HTabular());
       parser.putControlSequence(new L2HTabular("array"));
 
+      putControlSequence(new L2Hhfill("hfill"));
+      putControlSequence(new L2Hhfill("hfil"));
+
       try
       {
          LaTeXSty sty = getLaTeXSty("hyperref");
@@ -181,6 +184,22 @@ public class L2HConverter extends LaTeXParserListener
    {
       return new L2HAlignRow(getParser(), stack);
    }
+
+   public void cr(boolean isStar, TeXObject optArg)
+     throws IOException
+   {
+      TeXSettings settings = getParser().getSettings();
+
+      if (settings.getAlignMode() == TeXSettings.ALIGN_MODE_TRUE)
+      {
+         settings.startRow();
+      }
+      else
+      {
+         writeln("<br>\n");
+      }
+   }
+
 
    public void setWriter(Writer writer)
    {
