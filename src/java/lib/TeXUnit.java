@@ -76,4 +76,7 @@ public abstract class TeXUnit implements TeXObject
    public static final EmUnit EM = new EmUnit();
    public static final ExUnit EX = new ExUnit();
    public static final MuUnit MU = new MuUnit();
+   public static final FillUnit FIL = new FillUnit(1);
+   public static final FillUnit FILL = new FillUnit(2);
+   public static final FillUnit FILLL = new FillUnit(3);
 }

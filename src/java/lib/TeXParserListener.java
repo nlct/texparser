@@ -111,6 +111,21 @@ public abstract class TeXParserListener
          return TeXUnit.MU;
       }
 
+      if (unitName.equals("fil"))
+      {
+         return TeXUnit.FIL;
+      }
+
+      if (unitName.equals("fill"))
+      {
+         return TeXUnit.FILL;
+      }
+
+      if (unitName.equals("filll"))
+      {
+         return TeXUnit.FILLL;
+      }
+
       try
       {
          return new FixedUnit(unitName);
