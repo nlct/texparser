@@ -94,6 +94,11 @@ public class L2HConverter extends LaTeXParserListener
    {
       super.addPredefined();
 
+      parser.putControlSequence(new GenericCommand("TeX", null,
+        createString("TeX")));
+      parser.putControlSequence(new GenericCommand("LaTeX", null,
+        createString("LaTeX")));
+
       putControlSequence(new L2HHypertarget());
       putControlSequence(new L2HHyperlink());
 
