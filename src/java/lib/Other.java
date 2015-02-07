@@ -18,17 +18,41 @@
 */
 package com.dickimawbooks.texparserlib;
 
-public class Other extends CharObject
+// 'other' may include Unicode characters, so it
+// implements CaseChangeable
+
+public class Other extends CharObject implements CaseChangeable
 {
    public Other(int charCode)
    {
       super(charCode);
    }
 
-
    public Object clone()
    {
       return new Other(getCharCode());
    }
+
+   public TeXObject toLowerCase(TeXParser parser)
+   {
+      if (!(Character.isUpperCase(charCode)
+         || Character.isTitleCase(charCode)))
+      {
+         return this;
+      }
+
+      return parser.getListener().getOther(Character.toLowerCase(charCode));
+   }
+
+   public TeXObject toUpperCase(TeXParser parser)
+   {
+      if (!Character.isLowerCase(charCode))
+      {
+         return this;
+      }
+
+      return parser.getListener().getOther(Character.toUpperCase(charCode));
+   }
+
 }
 

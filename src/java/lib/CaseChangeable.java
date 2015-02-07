@@ -18,31 +18,12 @@
 */
 package com.dickimawbooks.texparserlib;
 
-public class Letter extends CharObject implements CaseChangeable
+import java.io.IOException;
+
+public interface CaseChangeable
 {
-   public Letter(int charCode)
-   {
-      super(charCode);
-   }
+   public TeXObject toUpperCase(TeXParser parser);
 
-   public Letter(char c)
-   {
-      super((int)c);
-   }
-
-   public TeXObject toLowerCase(TeXParser parser)
-   {
-      return parser.getListener().getLetter(Character.toLowerCase(charCode));
-   }
-
-   public TeXObject toUpperCase(TeXParser parser)
-   {
-      return parser.getListener().getLetter(Character.toUpperCase(charCode));
-   }
-
-   public Object clone()
-   {
-      return new Letter(getCharCode());
-   }
+   public TeXObject toLowerCase(TeXParser parser);
 }
 

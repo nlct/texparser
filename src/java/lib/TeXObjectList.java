@@ -22,7 +22,8 @@ import java.io.IOException;
 import java.util.Vector;
 import java.util.ArrayDeque;
 
-public class TeXObjectList extends Vector<TeXObject> implements TeXObject,Expandable
+public class TeXObjectList extends Vector<TeXObject>
+  implements TeXObject,Expandable,CaseChangeable
 {
    public TeXObjectList()
    {
@@ -675,6 +676,44 @@ public class TeXObjectList extends Vector<TeXObject> implements TeXObject,Expand
       throw new TeXSyntaxException(parser,
                TeXSyntaxException.ERROR_MISSING_CLOSING,
         ""+closeDelim);
+   }
+
+   public TeXObjectList toLowerCase(TeXParser parser)
+   {
+      TeXObjectList list = createList();
+
+      for (TeXObject object : this)
+      {
+         if (object instanceof CaseChangeable)
+         {
+            list.add(((CaseChangeable)object).toLowerCase(parser));
+         }
+         else
+         {
+            list.add(object);
+         }
+      }
+
+      return list;
+   }
+
+   public TeXObjectList toUpperCase(TeXParser parser)
+   {
+      TeXObjectList list = createList();
+
+      for (TeXObject object : this)
+      {
+         if (object instanceof CaseChangeable)
+         {
+            list.add(((CaseChangeable)object).toUpperCase(parser));
+         }
+         else
+         {
+            list.add(object);
+         }
+      }
+
+      return list;
    }
 
    public TeXObjectList createList()
