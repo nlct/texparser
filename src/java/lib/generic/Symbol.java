@@ -218,6 +218,7 @@ public class Symbol extends ControlSequence implements CaseChangeable
       new Object[]{"yen", new Integer(0x00A5)},
       new Object[]{"ss", new Integer(0x00DF)},
       new Object[]{"ae", new Integer(0x00E6)},
+      new Object[]{"AE", new Integer(0x00C6)},
       new Object[]{"eth", new Integer(0x00F0)},
       new Object[]{"Thorn", new Integer(0x00DE)},
       new Object[]{"thorn", new Integer(0x00FE)},
