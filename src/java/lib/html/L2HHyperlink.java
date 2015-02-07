@@ -60,7 +60,7 @@ public class L2HHyperlink extends Command
 
       if (text instanceof Expandable)
       {
-         TeXObjectList expanded = ((Expandable)text).expandonce(parser);
+         TeXObjectList expanded = ((Expandable)text).expandfully(parser);
 
          if (expanded != null)
          {
@@ -70,10 +70,9 @@ public class L2HHyperlink extends Command
 
 
       TeXObjectList list = new TeXObjectList();
-      list.add(new HtmlTag("<a href=\"#"+
-        HtmlTag.getUriFragment(target.toString(parser))+"\">"));
-      list.add(text);
-      list.add(new HtmlTag("</a>"));
+      list.add(new HtmlTag(String.format("<a href=\"#%s\" href>%s</a>",
+        HtmlTag.getUriFragment(target.toString(parser)), 
+        text.toString(parser))));
 
       return list;
    }
@@ -95,14 +94,87 @@ public class L2HHyperlink extends Command
 
       TeXObject text = stack.popArg();
 
-      TeXObjectList list = new TeXObjectList();
-      list.add(new HtmlTag("<a href=\"#"+
-        HtmlTag.getUriFragment(target.toString(parser))+"\">"));
-      list.add(text);
-      list.add(new HtmlTag("</a>"));
+      if (text instanceof Expandable)
+      {
+         TeXObjectList expanded = ((Expandable)text).expandfully(parser);
 
+         if (expanded != null)
+         {
+            text = expanded;
+         }
+      }
+
+      TeXObjectList list = new TeXObjectList();
+      list.add(new HtmlTag(String.format("<a href=\"#%s\">%s</a>",
+        HtmlTag.getUriFragment(target.toString(parser)), 
+        text.toString(parser))));
       return list;
    }
 
+   public TeXObjectList expandfully(TeXParser parser, TeXObjectList stack)
+      throws IOException
+   {
+      return expandonce(parser, stack);
+   }
+
+   public TeXObjectList expandfully(TeXParser parser)
+      throws IOException
+   {
+      return expandonce(parser);
+   }
+
+   public void process(TeXParser parser, TeXObjectList stack)
+      throws IOException
+   {
+      TeXObject target = stack.popArg();
+
+      if (target instanceof Expandable)
+      {
+         TeXObjectList expanded = ((Expandable)target).expandfully(parser, stack);
+
+         if (expanded != null)
+         {
+            target = expanded;
+         }
+      }
+
+      TeXObject text = stack.popArg();
+
+      L2HConverter listener = (L2HConverter)parser.getListener();
+
+      listener.write(String.format("<a href=\"#%s\">",
+        HtmlTag.getUriFragment(target.toString(parser))));
+
+      text.process(parser, stack);
+
+      listener.write("</a>");
+   }
+
+   public void process(TeXParser parser)
+      throws IOException
+   {
+      TeXObject target = parser.popNextArg();
+
+      if (target instanceof Expandable)
+      {
+         TeXObjectList expanded = ((Expandable)target).expandfully(parser);
+
+         if (expanded != null)
+         {
+            target = expanded;
+         }
+      }
+
+      TeXObject text = parser.popNextArg();
+
+      L2HConverter listener = (L2HConverter)parser.getListener();
+
+      listener.write(String.format("<a href=\"#%s\">",
+        HtmlTag.getUriFragment(target.toString(parser))));
+
+      text.process(parser);
+
+      listener.write("</a>");
+   }
 
 }

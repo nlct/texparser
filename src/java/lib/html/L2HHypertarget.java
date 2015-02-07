@@ -113,5 +113,57 @@ public class L2HHypertarget extends Command
       return list;
    }
 
+   public void process(TeXParser parser, TeXObjectList stack)
+      throws IOException
+   {
+      TeXObject target = stack.popArg();
 
+      if (target instanceof Expandable)
+      {
+         TeXObjectList expanded = ((Expandable)target).expandfully(parser, stack);
+
+         if (expanded != null)
+         {
+            target = expanded;
+         }
+      }
+
+      TeXObject text = stack.popArg();
+
+      L2HConverter listener = (L2HConverter)parser.getListener();
+
+      listener.write(String.format("<a name=\"%s\">",
+        HtmlTag.getUriFragment(target.toString(parser))));
+
+      text.process(parser, stack);
+
+      listener.write("</a>");
+   }
+
+   public void process(TeXParser parser)
+      throws IOException
+   {
+      TeXObject target = parser.popNextArg();
+
+      if (target instanceof Expandable)
+      {
+         TeXObjectList expanded = ((Expandable)target).expandfully(parser);
+
+         if (expanded != null)
+         {
+            target = expanded;
+         }
+      }
+
+      TeXObject text = parser.popNextArg();
+
+      L2HConverter listener = (L2HConverter)parser.getListener();
+
+      listener.write(String.format("<a name=\"%s\">",
+        HtmlTag.getUriFragment(target.toString(parser))));
+
+      text.process(parser);
+
+      listener.write("</a>");
+   }
 }

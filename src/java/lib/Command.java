@@ -112,7 +112,7 @@ public abstract class Command extends ControlSequence implements Expandable
 
       if (expanded != null)
       {
-         expanded.process(parser, stack);
+         stack.addAll(0, expanded);
       }
    }
 
@@ -123,7 +123,7 @@ public abstract class Command extends ControlSequence implements Expandable
 
       if (expanded != null)
       {
-         expanded.process(parser);
+         parser.addAll(0, expanded);
       }
    }
 

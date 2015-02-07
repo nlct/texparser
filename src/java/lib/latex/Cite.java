@@ -163,7 +163,7 @@ public class Cite extends Command
 
       if (expanded != null)
       {
-         expanded.process(parser, stack);
+         stack.addAll(0, expanded);
       }
    }
 
@@ -174,7 +174,7 @@ public class Cite extends Command
 
       if (expanded != null)
       {
-         expanded.process(parser);
+         parser.addAll(0, expanded);
       }
    }
 
@@ -277,7 +277,6 @@ public class Cite extends Command
 
          list.add(grp);
       }
-
    }
 
 }
