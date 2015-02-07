@@ -87,3 +87,14 @@ This creates the directory output/test-sw and writes a copy of
 test-sw.tex with the relevant substitutions. The image file
 X0001.wmf is converted to eps and the eps file is then converted to
 pdf.
+
+Example 3:
+_________
+
+Conversion to HTML just creates a single HTML file.
+It's very limited as currently I only need to convert
+abstracts to HTML. Images aren't supported. MathJax is used to 
+render math mode.
+
+cd src/tests
+texparserapp --in test-article/test-article.tex --output output/test-article --html
