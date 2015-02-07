@@ -391,6 +391,8 @@ public class Symbol extends ControlSequence implements CaseChangeable
       new Object[]{"geq", new Integer(0x2265)},
       new Object[]{"ll", new Integer(0x226A)},
       new Object[]{"gg", new Integer(0x226B)},
+      new Object[]{"neq", new Integer(0x2260)},
+      new Object[]{"ne", new Integer(0x2260)},
       new Object[]{"amalg", new Integer(0x2A3F)},
       new Object[]{"approx", new Integer(0x2248)},
       new Object[]{"approxeq", new Integer(0x224A)},
