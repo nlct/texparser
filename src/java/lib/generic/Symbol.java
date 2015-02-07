@@ -231,6 +231,8 @@ public class Symbol extends ControlSequence implements CaseChangeable
       new Object[]{"oe", new Integer(0x0153)},
       new Object[]{"AA", new Integer(0x00C5)},
       new Object[]{"aa", new Integer(0x00E5)},
+      new Object[]{"i", new Integer(0x0131)},
+      new Object[]{"j", new Integer(0x0237)},
    };
 
    public static final Object[][] BIG_MATH_SYMBOLS = 
@@ -377,6 +379,8 @@ public class Symbol extends ControlSequence implements CaseChangeable
       new Object[]{"Bbbk", new Integer(0x1D55C)},
       new Object[]{"game", new Integer(0x2141)},
       new Object[]{"Finv", new Integer(0x2132)},
+      new Object[]{"imath", new Integer(0x1D6A4)},
+      new Object[]{"jmath", new Integer(0x1D6A5)},
    };
 
    public static final Object[][] BINARY_MATH_SYMBOLS = 
