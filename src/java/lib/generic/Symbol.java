@@ -63,7 +63,7 @@ public class Symbol extends ControlSequence implements CaseChangeable
 
       TeXObjectList list = new TeXObjectList();
 
-      list.add(parser.createOther(codePoint));
+      list.add(parser.getListener().getOther(codePoint));
 
       return list;
    }

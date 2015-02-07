@@ -377,7 +377,8 @@ public class TeXParser extends TeXObjectList
 
       for (char c = it.first(); c != CharacterIterator.DONE; c = it.next())
       {
-         list.add(isLetter(c) ? new Letter(c) : new Other(c));
+         list.add(isLetter(c) ?
+            listener.getLetter(c) : listener.getOther(c));
       }
 
       return list;
@@ -1158,7 +1159,7 @@ public class TeXParser extends TeXObjectList
 
                if (c == (int)'*')
                {
-                  list.add(new Other(c));
+                  list.add(listener.getOther(c));
                   c = read();
                }
 
@@ -1167,13 +1168,13 @@ public class TeXParser extends TeXObjectList
                TeXObjectList charList = new TeXObjectList();
                   list.add(charList);
 
-               charList.add(new Other(c));
+               charList.add(listener.getOther(c));
 
                while (c != -1)
                {
                   c = read();
 
-                  charList.add(new Other(c));
+                  charList.add(listener.getOther(c));
 
                   if (c == delim)
                   {
@@ -1198,11 +1199,11 @@ public class TeXParser extends TeXObjectList
                }
                else if (isCatCode(TYPE_LETTER, (char)c))
                {
-                  list.add(new Letter(c));
+                  list.add(listener.getLetter(c));
                }
                else
                {
-                  list.add(new Other(c));
+                  list.add(listener.getOther(c));
                }
             }
 

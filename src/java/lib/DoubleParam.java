@@ -56,7 +56,7 @@ public class DoubleParam implements TeXObject
      throws IOException
    {
       TeXObjectList list = new TeXObjectList();
-      list.add(new Other((int)parser.getParamChar()));
+      list.add(parser.getListener().getOther((int)parser.getParamChar()));
       list.add(getParam());
 
       return list;

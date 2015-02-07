@@ -60,7 +60,7 @@ public class Nbsp extends ActiveChar
      throws IOException
    {
       TeXObjectList list = new TeXObjectList();
-      list.add(new Other(0x00A0));
+      list.add(parser.getListener().getOther(0x00A0));
       return list;
    }
 

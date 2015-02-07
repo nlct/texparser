@@ -45,7 +45,7 @@ public class SpChar extends Macro
      throws IOException
    {
       TeXObjectList list = new TeXObjectList();
-      list.add(new Other((int)parser.getSpChar()));
+      list.add(parser.getListener().getOther((int)parser.getSpChar()));
 
       return list;
    }

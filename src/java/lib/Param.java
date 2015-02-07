@@ -67,11 +67,11 @@ public class Param implements TeXObject
      throws IOException
    {
       TeXObjectList list = new TeXObjectList();
-      list.add(new Other((int)parser.getParamChar()));
+      list.add(parser.getListener().getOther((int)parser.getParamChar()));
 
       if (digit != -1)
       {
-         list.add(new Other(0x30+digit));
+         list.add(parser.getListener().getOther(0x30+digit));
       }
 
       return list;

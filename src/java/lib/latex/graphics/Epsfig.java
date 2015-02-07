@@ -105,12 +105,13 @@ public class Epsfig extends ControlSequence
          grp.add(0, fileArg);
       }
 
-      replacement.add(new Other('['));
+      LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
+
+      replacement.add(listener.getOther('['));
       replacement.add(keyValList);
-      replacement.add(new Other(']'));
+      replacement.add(listener.getOther(']'));
       replacement.add(grp);
 
-      LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
       listener.substituting(originalStr, replacement.toString(parser));
 
       list.push(grp);

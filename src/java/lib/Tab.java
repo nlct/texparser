@@ -45,7 +45,7 @@ public class Tab implements TeXObject
      throws IOException
    {
       TeXObjectList list = new TeXObjectList();
-      list.add(new Other((int)parser.getTabChar()));
+      list.add(parser.getListener().getOther((int)parser.getTabChar()));
 
       return list;
    }

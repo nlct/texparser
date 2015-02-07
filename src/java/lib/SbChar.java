@@ -45,7 +45,7 @@ public class SbChar extends Macro
      throws IOException
    {
       TeXObjectList list = new TeXObjectList();
-      list.add(new Other((int)parser.getSbChar()));
+      list.add(parser.getListener().getOther((int)parser.getSbChar()));
 
       return list;
    }

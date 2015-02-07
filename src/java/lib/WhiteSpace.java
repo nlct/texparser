@@ -38,7 +38,7 @@ public abstract class WhiteSpace implements TeXObject
    {
       TeXObjectList list = new TeXObjectList();
 
-      list.add(new Other((int)' '));
+      list.add(parser.getListener().getOther((int)' '));
       return list;
    }
 

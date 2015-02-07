@@ -65,7 +65,7 @@ public class Comment extends Ignoreable
    {
       TeXObjectList list = new TeXObjectList();
 
-      list.add(new Other(parser.getCommentChar()));
+      list.add(parser.getListener().getOther(parser.getCommentChar()));
 
       parser.scan(builder.toString(), list);
 
