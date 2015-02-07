@@ -99,15 +99,15 @@ public class L2HMathGroup extends MathGroup
       {
          if (isInLine())
          {
-            listener.write("$");
+            listener.write(listener.mathJaxStartInline());
             processList(parser, list);
-            listener.write("$");
+            listener.write(listener.mathJaxEndInline());
          }
          else
          {
-            listener.write("$$");
+            listener.write(listener.mathJaxStartDisplay());
             processList(parser, list);
-            listener.write("$$");
+            listener.write(listener.mathJaxEndDisplay());
          }
       }
       else

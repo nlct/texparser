@@ -148,11 +148,13 @@ public class L2HMathDeclaration extends MathDeclaration
             stack.addAll(0, list);
          }
 
-         listener.write("$");
-
          if (getMode() == TeXSettings.MODE_DISPLAY_MATH)
          {
-            listener.write("$");
+            listener.write(listener.mathJaxStartDisplay());
+         }
+         else
+         {
+            listener.write(listener.mathJaxStartInline());
          }
       }
    }
@@ -259,11 +261,13 @@ public class L2HMathDeclaration extends MathDeclaration
             listener.write(")</span>");
          }
 
-         listener.write("$");
-
          if (getMode() == TeXSettings.MODE_DISPLAY_MATH)
          {
-            listener.write("$");
+            listener.write(listener.mathJaxStartDisplay());
+         }
+         else
+         {
+            listener.write(listener.mathJaxStartInline());
          }
       }
    }
@@ -276,11 +280,13 @@ public class L2HMathDeclaration extends MathDeclaration
 
       if (listener.useMathJax())
       {
-         listener.write("$");
-
          if (getMode() == TeXSettings.MODE_DISPLAY_MATH)
          {
-            listener.write("$");
+            listener.write(listener.mathJaxEndDisplay());
+         }
+         else
+         {
+            listener.write(listener.mathJaxEndInline());
          }
       }
 

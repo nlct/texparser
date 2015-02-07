@@ -351,15 +351,6 @@ public class L2HConverter extends LaTeXParserListener
    {
       if (writer == null) return;
 
-/*
-      String style = getStyle();
-
-      if (!style.isEmpty())
-      {
-         writer.write("<span style=\""+style+"\">");
-      }
-*/
-
       if (codePoint >= 32 && codePoint <= 126)
       {
          writer.write((char)codePoint);
@@ -369,12 +360,6 @@ public class L2HConverter extends LaTeXParserListener
          writer.write("&#x"+Integer.toHexString(codePoint)+";");
       }
 
-/*
-      if (!style.isEmpty())
-      {
-         writer.write("</span>");
-      }
-*/
    }
 
    public void write(String str)
@@ -450,6 +435,26 @@ public class L2HConverter extends LaTeXParserListener
       this.useMathJax = useMathJax;
    }
 
+   public String mathJaxStartInline()
+   {
+      return "\\(";
+   }
+
+   public String mathJaxEndInline()
+   {
+      return "\\)";
+   }
+
+   public String mathJaxStartDisplay()
+   {
+      return "\\[";
+   }
+
+   public String mathJaxEndDisplay()
+   {
+      return "\\]";
+   }
+
    public void writeMathJaxHeader()
      throws IOException
    {
@@ -457,7 +462,16 @@ public class L2HConverter extends LaTeXParserListener
 
       writeable.writeln("<!-- MathJax -->");
       writeable.writeln("<script type=\"text/x-mathjax-config\">");
-      writeable.writeln("MathJax.Hub.Config({tex2jax: { inlineMath: [['$','$']], displayMath: [ ['$$','$$'] ]}});");
+      writeable.writeln("MathJax.Hub.Config({tex2jax:");
+      writeable.writeln("{");
+      writeable.writeln(String.format("  inlineMath: [['%s','%s']],",
+        mathJaxStartInline().replace("\\", "\\\\"),
+        mathJaxEndInline().replace("\\", "\\\\")));
+      writeable.writeln(String.format("  displayMath: [ ['%s','%s'] ]",
+        mathJaxStartDisplay().replace("\\", "\\\\"),
+        mathJaxEndDisplay().replace("\\", "\\\\")));
+      writeable.writeln("}});");
+
       writeable.writeln("</script>");
 
       writeable.write("<script type=\"text/javascript\" src=");

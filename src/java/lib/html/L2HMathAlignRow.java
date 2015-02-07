@@ -99,7 +99,7 @@ public class L2HMathAlignRow extends L2HAlignRow
 
       if (listener.useMathJax())
       {
-         listener.write("$\\displaystyle ");
+         listener.write(listener.mathJaxStartInline()+"\\displaystyle ");
       }
    }
 
@@ -109,7 +109,7 @@ public class L2HMathAlignRow extends L2HAlignRow
 
       if (listener.useMathJax())
       {
-         listener.write("$");
+         listener.write(listener.mathJaxEndInline());
       }
 
       while (tags.size() > 0)
