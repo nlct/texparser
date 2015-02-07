@@ -5,14 +5,14 @@
   <properties>
     <property name="info.appName" value="texparserapp"/>
     <property name="info.url" value="http://www.dickimaw-books.com/apps/texparser/"/>
-    <property name="project.version" value="0.1a" />
+    <property name="project.version" value="0.2a" />
   </properties>
 
     <info>
         <appname>@{info.appName}</appname>
         <appversion>@{project.version}</appversion>
         <authors>
-            <author name="Nicola L. C. Talbot" email="n.talbot@uea.ac.uk"/>
+            <author name="Nicola L. C. Talbot" email="http://www.dickimaw-books.com/contact.html"/>
         </authors>
         <url>@{info.url}</url>
         <javaversion>1.7</javaversion>

@@ -1236,9 +1236,9 @@ public class TeXParserApp implements TeXApp
       }
    }
 
-   public static final String appVersion = "0.1b";
+   public static final String appVersion = "0.2b";
    public static final String appName = "texparserapp";
-   public static final String appDate = "2013-09-16";
+   public static final String appDate = "2015-02-07";
 
    private static Properties dictionary;
 
