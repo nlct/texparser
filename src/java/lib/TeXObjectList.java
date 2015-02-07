@@ -53,6 +53,11 @@ public class TeXObjectList extends Vector<TeXObject>
    {
       TeXObject object = popStack();
 
+      if (object instanceof TeXCsRef)
+      {
+         object = parser.getListener().getControlSequence(((TeXCsRef)object).getName());
+      }
+
       if (object instanceof Expandable)
       {
          TeXObjectList expanded =
@@ -60,8 +65,15 @@ public class TeXObjectList extends Vector<TeXObject>
 
          if (expanded != null)
          {
-            addAll(0, expanded);
-            object = popStack();
+            if (expanded instanceof Group)
+            {
+               object = expanded;
+            }
+            else
+            {
+               addAll(0, expanded);
+               object = popStack();
+            }
          }
       }
 
@@ -789,7 +801,7 @@ public class TeXObjectList extends Vector<TeXObject>
         TeXObjectList stack)
      throws IOException
    {
-      TeXObjectList list = new TeXObjectList();
+      TeXObjectList list = createList();
 
       TeXObjectList remaining = (TeXObjectList)clone();
 
@@ -829,12 +841,19 @@ public class TeXObjectList extends Vector<TeXObject>
          }
       }
 
+      if (list instanceof Group)
+      {
+         TeXObjectList expanded = new TeXObjectList();
+         expanded.add(list);
+         return expanded;
+      }
+
       return list;
    }
 
    public TeXObjectList expandfully(TeXParser parser) throws IOException
    {
-      TeXObjectList list = new TeXObjectList();
+      TeXObjectList list = createList();
 
       TeXObjectList remaining = (TeXObjectList)clone();
 
@@ -864,6 +883,13 @@ public class TeXObjectList extends Vector<TeXObject>
          {
             list.add(object);
          }
+      }
+
+      if (list instanceof Group)
+      {
+         TeXObjectList expanded = new TeXObjectList();
+         expanded.add(list);
+         return expanded;
       }
 
       return list;
