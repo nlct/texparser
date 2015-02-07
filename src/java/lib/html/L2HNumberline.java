@@ -16,52 +16,55 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
-package com.dickimawbooks.texparserlib.latex;
+package com.dickimawbooks.texparserlib.html;
 
 import java.io.IOException;
 import java.util.Vector;
 
 import com.dickimawbooks.texparserlib.*;
 
-public class AddContentsLine extends ControlSequence
+public class L2HNumberline extends ControlSequence
 {
-   public AddContentsLine()
+   public L2HNumberline()
    {
-      this("addcontentsline");
+      this("numberline");
    }
 
-   public AddContentsLine(String name)
+   public L2HNumberline(String name)
    {
       super(name);
    }
 
    public Object clone()
    {
-      return new AddContentsLine(getName());
+      return new L2HNumberline(getName());
    }
 
-   public void addcontentsline(TeXParser parser, 
-     TeXObject toc, TeXObject type, TeXObject title)
-   throws IOException
+   public void process(TeXParser parser)
+      throws IOException
    {
+      L2HConverter listener = (L2HConverter)parser.getListener();
+
+      TeXObject arg = parser.popNextArg();
+
+      listener.write("<span class=\"numberline\">");
+
+      arg.process(parser);
+
+      listener.write("</span>");
    }
 
-   public void process(TeXParser parser) throws IOException
+   public void process(TeXParser parser, TeXObjectList stack)
+      throws IOException
    {
-      TeXObject toc = parser.popNextArg();
-      TeXObject type = parser.popNextArg();
-      TeXObject title =parser.popNextArg();
+      L2HConverter listener = (L2HConverter)parser.getListener();
 
-      addcontentsline(parser, toc, type, title);
+      TeXObject arg = stack.popArg();
+
+      listener.write("<span class=\"numberline\">");
+
+      arg.process(parser);
+
+      listener.write("</span>");
    }
-
-   public void process(TeXParser parser, TeXObjectList stack) throws IOException
-   {
-      TeXObject toc = stack.popArg();
-      TeXObject type = stack.popArg();
-      TeXObject title = stack.popArg();
-
-      addcontentsline(parser, toc, type, title);
-   }
-
 }

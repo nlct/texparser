@@ -73,7 +73,6 @@ public abstract class Section extends ControlSequence
 
       if (isStar)
       {
-         ((LaTeXParserListener)parser.getListener()).stepcounter(getName()+"*");
          unnumbered(parser, stack, arg);
       }
       else
@@ -119,7 +118,8 @@ public abstract class Section extends ControlSequence
       }
    }
 
-   protected abstract void unnumbered(TeXParser parser, TeXObjectList stack, TeXObject arg)
+   protected abstract void unnumbered(TeXParser parser, TeXObjectList stack,
+     TeXObject title)
        throws IOException;
 
    protected abstract void numbered(TeXParser parser, TeXObjectList stack,

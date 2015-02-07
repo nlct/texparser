@@ -129,6 +129,28 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       return AuxData.getNameReference(auxData, getParser(), label);
    }
 
+   public TeXObject getHyperReference(TeXObject label)
+      throws IOException
+   {
+      if (auxData == null)
+      {
+         return createUnknownReference(label);
+      }
+
+      return AuxData.getHyperReference(auxData, getParser(), label);
+   }
+
+   public TeXObject getLabelForLink(TeXObject link)
+     throws IOException
+   {
+      if (auxData == null)
+      {
+         return null;
+      }
+
+      return AuxData.getLabelForLink(auxData, getParser(), link);
+   }
+
    public void addVerbEnv(String name)
    {
       verbEnv.add(name);

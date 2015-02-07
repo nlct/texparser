@@ -120,6 +120,7 @@ public class L2HConverter extends LaTeXParserListener
       putControlSequence(new L2HSection("paragraph"));
       putControlSequence(new L2HSection("subparagraph"));
       putControlSequence(new L2HSection("part"));
+      putControlSequence(new L2HNumberline());
 
       putControlSequence(new L2HCaption());
       putControlSequence(new L2HAtMakeCaption());
@@ -456,7 +457,7 @@ public class L2HConverter extends LaTeXParserListener
 
       writeable.writeln("<!-- MathJax -->");
       writeable.writeln("<script type=\"text/x-mathjax-config\">");
-      writeable.writeln("MathJax.Hub.Config({tex2jax: { inlineMath: [['$','$'],['\\\\(','\\\\)']], displayMath: [ ['$$','$$'], ['\\\\[','\\\\]'] ]}});");
+      writeable.writeln("MathJax.Hub.Config({tex2jax: { inlineMath: [['$','$']], displayMath: [ ['$$','$$'] ]}});");
       writeable.writeln("</script>");
 
       writeable.write("<script type=\"text/javascript\" src=");
@@ -535,6 +536,15 @@ public class L2HConverter extends LaTeXParserListener
       writeln("div.bibliography { display: block; margin-left: 4em; }");
       writeln("div.bibitem { display: inline; float: left; text-indent: -3em; }");
       writeln("div.mbox { display: inline; }");
+
+      writeln("span.numberline { display: inline-block; width: 3em; }");
+      writeln("div.toc-part { padding-left: .5em; padding-bottom: 2ex; font-weight: bold; font-size: large;}");
+      writeln("div.toc-chapter { padding-left: .5em; padding-bottom: 2ex; font-weight: bold; font-size: large;}");
+      writeln("div.toc-section { padding-left: 1em; font-weight: bold;}");
+      writeln("div.toc-subsection { padding-left: 1.5em; }");
+      writeln("div.toc-subsubsection { padding-left: 2em; }");
+      writeln("div.toc-paragraph { padding-left: 2.5em; }");
+      writeln("div.toc-subparagraph { padding-left: 3em; }");
 
       for (String style : extraCssStyles)
       {

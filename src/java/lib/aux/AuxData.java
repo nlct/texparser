@@ -294,6 +294,138 @@ public class AuxData
       return new UnknownReference(listener, label);
    }
 
+   public static TeXObject getLabelForLink(Vector<AuxData> auxData,
+     TeXParser parser, TeXObject link)
+   throws IOException
+   {
+      TeXObjectList expanded = null;
+
+      if (link instanceof Group)
+      {
+         link = ((Group)link).toList();
+      }
+
+      if (link instanceof Expandable)
+      {
+         expanded = ((Expandable)link).expandfully(parser);
+      }
+
+      String linkLabel = (expanded == null ?
+                      link.toString(parser) : 
+                      expanded.toString(parser));
+
+      return getLabelForLink(auxData, parser, linkLabel);
+   }
+
+   public static TeXObject getLabelForLink(Vector<AuxData> auxData,
+      TeXParser parser, String link)
+   throws IOException
+   {
+      for (AuxData data : auxData)
+      {
+         if (data.getName().equals("newlabel"))
+         {
+            TeXObject arg = data.getArg(0);
+            TeXObject params = data.getArg(1);
+
+            if (params instanceof TeXObjectList
+            && (((TeXObjectList)params).size() > 3))
+            {
+               TeXObject ref = ((TeXObjectList)params).get(3);
+
+               if (ref instanceof Group)
+               {
+                  ref = ((Group)ref).toList();
+               }
+
+               if (ref instanceof Expandable)
+               {
+                  TeXObjectList expanded=((Expandable)ref).expandfully(parser);
+
+                  if (expanded != null)
+                  {
+                     ref = expanded;
+                  }
+               }
+
+               String refString = ref.toString(parser);
+
+               if (refString.equals(link))
+               {
+                  return arg;
+               }
+            }
+         }
+      }
+
+      return null;
+   }
+
+   public static TeXObject getHyperReference(Vector<AuxData> auxData,
+    TeXParser parser, TeXObject object)
+    throws IOException
+   {
+      TeXObjectList expanded = null;
+
+      if (object instanceof Group)
+      {
+         object = ((Group)object).toList();
+      }
+
+      if (object instanceof Expandable)
+      {
+         expanded = ((Expandable)object).expandfully(parser);
+      }
+
+      String label = (expanded == null ?
+                      object.toString(parser) : 
+                      expanded.toString(parser));
+
+      return getHyperReference(auxData, parser, label);
+   }
+
+   public static TeXObject getHyperReference(Vector<AuxData> auxData,
+     TeXParser parser, String label)
+    throws IOException
+   {
+      for (AuxData data : auxData)
+      {
+         if (data.getName().equals("newlabel"))
+         {
+            TeXObject arg = data.getArg(0);
+
+            if (label.equals(arg.toString(parser)))
+            {
+               TeXObject params = data.getArg(1);
+
+               if (params instanceof TeXObjectList
+               && (((TeXObjectList)params).size() > 3))
+               {
+                  TeXObject ref = ((TeXObjectList)params).get(3);
+
+                  if (ref instanceof Group)
+                  {
+                     return ((Group)ref).toList();
+                  }
+
+                  return ref;
+               }
+
+               return params;
+            }
+         }
+      }
+
+      TeXParserListener listener = parser.getListener();
+
+      if (listener instanceof LaTeXParserListener)
+      {
+         return ((LaTeXParserListener)listener).createUnknownReference(label);
+      }
+
+      return new UnknownReference(listener, label);
+   }
+
    public static TeXObject getCitation(Vector<AuxData> auxData,
     TeXParser parser, TeXObject object)
     throws IOException

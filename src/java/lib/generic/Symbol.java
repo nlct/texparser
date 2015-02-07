@@ -272,6 +272,9 @@ public class Symbol extends ControlSequence implements CaseChangeable
       new Object[]{"bigtriangledown", new Integer(0x25BD), new Integer(0x25BD)},
    };
 
+   // Some of the upper case Greek symbols aren't
+   // actually defined in the LaTeX kernel, but
+   // they're added here for completeness.
    public static final Object[][] GREEK_SYMBOLS = 
    {
       new Object[]{"Alpha", new Integer(0x1D6E2)},

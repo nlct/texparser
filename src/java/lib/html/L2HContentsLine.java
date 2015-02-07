@@ -24,7 +24,7 @@ import java.io.EOFException;
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.*;
 
-public class L2HContentsLine extends ControlSequence
+public class L2HContentsLine extends ContentsLine
 {
    public L2HContentsLine()
    {
@@ -41,36 +41,34 @@ public class L2HContentsLine extends ControlSequence
       return new L2HContentsLine(getName());
    }
 
-   public void process(TeXParser parser, TeXObjectList stack)
-   throws IOException
+   public TeXObjectList contentsline(TeXParser parser, TeXObject type,
+    TeXObject title, TeXObject page, TeXObject link)
+      throws IOException
    {
-      L2HConverter listener = (L2HConverter)parser.getListener();
+      TeXObjectList list = new TeXObjectList();
 
-      TeXObject type = stack.popArg();
-      TeXObject title = stack.popArg();
-      TeXObject page = stack.popArg();
-      TeXObject link = null;
+      list.add(new HtmlTag(
+        String.format("<div class=\"toc-%s\"><a href=\"#%s\">",
+        type.toString(parser),
+         HtmlTag.getUriFragment(link.toString(parser)))));
+      list.add(title);
+      list.add(new HtmlTag("</a></div>"));
 
-      if (listener.isStyLoaded("hyperref"))
-      {
-         link = stack.popArg();
-      }
+      return list;
    }
 
-   public void process(TeXParser parser)
-   throws IOException
+   public TeXObjectList contentsline(TeXParser parser, TeXObject type,
+    TeXObject title, TeXObject page)
+      throws IOException
    {
-      L2HConverter listener = (L2HConverter)parser.getListener();
+      TeXObjectList list = new TeXObjectList();
 
-      TeXObject type = parser.popNextArg();
-      TeXObject title = parser.popNextArg();
-      TeXObject page = parser.popNextArg();
-      TeXObject link = null;
+      list.add(new HtmlTag(String.format("<div class=\"toc-%s\">",
+        type.toString(parser))));
+      list.add(title);
+      list.add(new HtmlTag("</div>"));
 
-      if (listener.isStyLoaded("hyperref"))
-      {
-         link = parser.popNextArg();
-      }
+      return list;
    }
 
 }

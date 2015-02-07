@@ -86,9 +86,12 @@ public class L2HSection extends Section
             }
          }
 
-         listener.write("<a name=\""
-           +HtmlTag.getUriFragment(getName()+"*."+cs.toString(parser))
-           +"\"></a>");
+         String counter = getName()+"*";
+
+         listener.write(String.format("<a name=\"%s\"></a>",
+           HtmlTag.getUriFragment(counter+"."+cs.toString(parser))));
+
+         listener.stepcounter(counter);
       }
 
       if (parser == stack || stack == null)
