@@ -194,6 +194,8 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       parser.putControlSequence(new BibItem());
       parser.putControlSequence(new Cite());
       parser.putControlSequence(new AddContentsLine());
+      parser.putControlSequence(new Uppercase("MakeUppercase"));
+      parser.putControlSequence(new Lowercase("MakeLowercase"));
 
       bibliographySection = new TeXObjectList();
       bibliographySection.add(new TeXCsRef("section"));
