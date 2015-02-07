@@ -22,6 +22,9 @@ import java.io.IOException;
 import java.util.Vector;
 import java.util.ArrayDeque;
 
+import com.dickimawbooks.texparserlib.primitives.*;
+import com.dickimawbooks.texparserlib.generic.*;
+
 public class TeXObjectList extends Vector<TeXObject>
   implements TeXObject,Expandable,CaseChangeable
 {
@@ -684,9 +687,28 @@ public class TeXObjectList extends Vector<TeXObject>
 
       for (TeXObject object : this)
       {
+         if (object instanceof TeXCsRef)
+         {
+            object = parser.getListener().getControlSequence(
+              ((TeXCsRef)object).getName());
+         }
+
          if (object instanceof CaseChangeable)
          {
             list.add(((CaseChangeable)object).toLowerCase(parser));
+         }
+         else if (object instanceof ControlSequence)
+         {
+            if (object instanceof Primitive
+             || object instanceof MathSymbol)
+            {
+               list.add(object);
+            }
+            else
+            {
+               list.add(new TeXCsRef(
+                 ((ControlSequence)object).getName().toLowerCase()));
+            }
          }
          else
          {
@@ -703,9 +725,28 @@ public class TeXObjectList extends Vector<TeXObject>
 
       for (TeXObject object : this)
       {
+         if (object instanceof TeXCsRef)
+         {
+            object = parser.getListener().getControlSequence(
+              ((TeXCsRef)object).getName());
+         }
+
          if (object instanceof CaseChangeable)
          {
             list.add(((CaseChangeable)object).toUpperCase(parser));
+         }
+         else if (object instanceof ControlSequence)
+         {
+            if (object instanceof Primitive
+             || object instanceof MathSymbol)
+            {
+               list.add(object);
+            }
+            else
+            {
+               list.add(new TeXCsRef(
+                ((ControlSequence)object).getName().toUpperCase()));
+            }
          }
          else
          {
