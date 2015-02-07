@@ -94,6 +94,8 @@ public abstract class DefaultTeXParserListener extends TeXParserListener
       parser.putControlSequence(new MathAccent("dot", 0x0307, 0x02D9));
       parser.putControlSequence(new MathAccent("ddot", 0x0308, 0x00A8));
       parser.putControlSequence(new DoubleLetterAccent("t", 0x035C, 0x203F));
+      parser.putControlSequence(new Uppercase());
+      parser.putControlSequence(new Lowercase());
 
       // TeX font changing declarations
 
