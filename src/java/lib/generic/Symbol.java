@@ -23,7 +23,7 @@ import java.util.Hashtable;
 
 import com.dickimawbooks.texparserlib.*;
 
-public class Symbol extends ControlSequence
+public class Symbol extends ControlSequence implements CaseChangeable
 {
    public Symbol(String name, int codePoint)
    {
@@ -36,13 +36,34 @@ public class Symbol extends ControlSequence
       return new Symbol(getName(), codePoint);
    }
 
+   public TeXObject toLowerCase(TeXParser parser)
+   {
+      if (!(Character.isUpperCase(codePoint)
+         || Character.isTitleCase(codePoint)))
+      {
+         return this;
+      }
+
+      return parser.getListener().getOther(Character.toLowerCase(codePoint));
+   }
+
+   public TeXObject toUpperCase(TeXParser parser)
+   {
+      if (!Character.isLowerCase(codePoint))
+      {
+         return this;
+      }
+
+      return parser.getListener().getOther(Character.toUpperCase(codePoint));
+   }
+
    public TeXObjectList expandonce(TeXParser parser)
      throws IOException
    {
 
       TeXObjectList list = new TeXObjectList();
 
-      list.add(new Other(codePoint));
+      list.add(parser.createOther(codePoint));
 
       return list;
    }
