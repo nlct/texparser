@@ -45,11 +45,22 @@ public class L2HMathGroup extends MathGroup
    public void processList(TeXParser parser, TeXObjectList stack)
     throws IOException
    {
+      L2HConverter listener = (L2HConverter)parser.getListener();
+
       while (size() > 0)
       {
-         TeXObject object = pop();
+         TeXObject object = expandedPopStack(parser);
 
-         if (stack != parser && size() == 0)
+         if (listener.useMathJax() && object instanceof ControlSequence)
+         {
+            listener.write(object.toString());
+
+            if (((ControlSequence)object).isControlWord(parser))
+            {
+               listener.write(' ');
+            }
+         }
+         else if (stack != parser && size() == 0)
          {
             object.process(parser, stack);
          }
