@@ -7,6 +7,7 @@
 \usepackage{lipsum}
 \usepackage{amsmath}
 \usepackage{pifont}
+\usepackage{textcase}
 \usepackage[colorlinks]{hyperref}
 
 \title{Sample Article}
@@ -19,6 +20,12 @@
 
 \begin{document}
 \maketitle
+
+\newcommand{\foo}{fooa}
+\newcommand{\FOO}{foob}
+Upper: \uppercase{\foo}. Lower: \lowercase{\FOO}.
+TC: Upper: \MakeTextUppercase{\foo}. Lower:
+\MakeTextLowercase{\FOO}.
 
 \tableofcontents
 
@@ -68,7 +75,11 @@ g(x) & = & \prod_i h_i(x)
 Some \textbf{bold text}, \textit{italic text}, 
 \textsf{sans-serif text}, \textsc{small caps}.
 Here's a footnote.\footnote{Here's the footnote text.}
-\uppercase{upper \lowercase{LOWER} MiXeD.}
+\TeX\ case-change: \uppercase{upper \lowercase{LOWER} MiXeD $\alpha \neq a$.}
+\LaTeX\ case-change: \MakeUppercase{abc\ae\ and 
+$\alpha \neq a$}.
+\texttt{textcase.sty} case-change: \MakeTextUppercase{abc\ae\ \( a = b \) and 
+$\alpha \neq a$}.
 
 \section{Another Section}
 

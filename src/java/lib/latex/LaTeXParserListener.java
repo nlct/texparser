@@ -46,6 +46,7 @@ import com.dickimawbooks.texparserlib.latex.inputenc.*;
 import com.dickimawbooks.texparserlib.latex.wasysym.*;
 import com.dickimawbooks.texparserlib.latex.pifont.*;
 import com.dickimawbooks.texparserlib.latex.booktabs.*;
+import com.dickimawbooks.texparserlib.latex.textcase.*;
 
 public abstract class LaTeXParserListener extends DefaultTeXParserListener
 {
@@ -725,6 +726,11 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       if (styName.equals("booktabs"))
       {
          return new BooktabsSty(styName, this);
+      }
+
+      if (styName.equals("textcase"))
+      {
+         return new TextCaseSty(this);
       }
 
       return null;
