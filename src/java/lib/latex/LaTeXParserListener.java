@@ -711,6 +711,11 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
          return new AmsmathSty(styName, this);
       }
 
+      if (styName.equals("amssymb"))
+      {
+         return new AmsSymbSty(styName, this);
+      }
+
       if (styName.equals("lipsum"))
       {
          return new LipsumSty(this);
