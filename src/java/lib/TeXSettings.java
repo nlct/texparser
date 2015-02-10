@@ -711,6 +711,18 @@ public class TeXSettings
       return reg;
    }
 
+   public DimenRegister newdimen(boolean isLocal, String name)
+   {
+      if (isLocal || parent == null)
+      {
+         return newdimen(name);
+      }
+      else
+      {
+         return parent.newdimen(isLocal, name);
+      }
+   }
+
    protected Register putRegister(Register register)
    {
       Register rootReg = register;

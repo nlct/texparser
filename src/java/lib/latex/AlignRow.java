@@ -269,18 +269,20 @@ public class AlignRow extends TeXObjectList
                cell.add(obj);
             }
 
-            processCell(parser, alignCell, cell);
+            int colSpan = 0;
 
             TeXObject firstObj = cell.isEmpty() ? cell : cell.peekStack();
 
             if (firstObj instanceof MultiCell)
             {
-               int colSpan = ((MultiCell)firstObj).getColumnSpan();
+               colSpan = ((MultiCell)firstObj).getColumnSpan();
+            }
 
-               for (int i = 1; i < colSpan; i++)
-               {
-                  parser.getSettings().startColumn();
-               }
+            processCell(parser, alignCell, cell);
+
+            for (int i = 1; i < colSpan; i++)
+            {
+               parser.getSettings().startColumn();
             }
          }
       }

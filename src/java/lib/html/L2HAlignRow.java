@@ -110,7 +110,23 @@ public class L2HAlignRow extends AlignRow
       parser.getListener().getWriteable().writeln("</tr>");
    }
 
-   protected String getAlignStyle(TeXParser parser, TeXCellAlign alignCell)
+   public TeXDimension getDefaultColSep(TeXParser parser)
+    throws TeXSyntaxException
+   {
+      Register reg = parser.getSettings().getRegister("tabcolsep");
+
+      if (reg == null || !(reg instanceof DimenRegister))
+      {
+         throw new TeXSyntaxException(parser,
+           TeXSyntaxException.ERROR_DIMEN_EXPECTED,
+           "\\tabcolsep");
+      }
+
+      return ((DimenRegister)reg).getDimension();
+   }
+
+   protected String getAlignStyle(TeXParser parser, TeXCellAlign alignCell,
+    TeXDimension defaultColSep)
    {
       String style = "";
 
@@ -140,12 +156,20 @@ public class L2HAlignRow extends AlignRow
          default: style += "border-top: double; ";
       }
 
-      if (alignCell.getBefore() != null)
+      if (alignCell.getBefore() == null)
+      {
+         style += "padding-left: "+defaultColSep.toString()+"; ";
+      }
+      else
       {
          style += "padding-left: 0px; ";
       }
 
-      if (alignCell.getAfter() != null)
+      if (alignCell.getAfter() == null)
+      {
+         style += "padding-right: "+defaultColSep.toString()+"; ";
+      }
+      else
       {
          style += "padding-right: 0px; ";
       }
@@ -172,6 +196,13 @@ public class L2HAlignRow extends AlignRow
      throws IOException
    {
       Writeable writeable = parser.getListener().getWriteable();
+
+      TeXDimension defaultColSep = getDefaultColSep(parser);
+
+      if (defaultColSep instanceof TeXGlue)
+      {
+         defaultColSep = ((TeXGlue)defaultColSep).getFixed();
+      }
 
       String span = "";
 
@@ -203,7 +234,7 @@ public class L2HAlignRow extends AlignRow
          alignment = alignCell;
       }
 
-      startCell(parser, span, getAlignStyle(parser, alignment));
+      startCell(parser, span, getAlignStyle(parser, alignment, defaultColSep));
 
       TeXObjectList contentsList = new TeXObjectList();
 

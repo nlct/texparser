@@ -109,6 +109,23 @@ confused with the math mode shift \verb|$|.
 
 \lipsum[8-9]
 
+\section{Floats}
+\label{sec:floats}
+
+Table~\ref{tab:sample} isn't very interesting.
+
+\begin{table}[htbp]
+\caption{A Sample Table}
+\label{tab:sample}
+\centering
+\begin{tabular}{clrl}
+Centred Column & Left Aligned & Right Aligned & Left Aligned\\
+One & Two & Three & Four\\
+A & B & C & D\\
+\multicolumn{2}{|c|}{Centre Span} & R & L
+\end{tabular}
+\end{table}
+
 \bibliographystyle{plain}
 \bibliography{xampl}
 

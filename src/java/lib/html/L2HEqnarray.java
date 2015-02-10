@@ -43,11 +43,13 @@ public class L2HEqnarray extends L2HMathDeclaration
    protected void startTabular(TeXParser parser)
      throws IOException
    {
-      parser.getListener().getWriteable().writeln("<table>");
+      L2HConverter listener = (L2HConverter)parser.getListener();
+
+      listener.putControlSequence(new L2HMathAlignNewline(isNumbered()));
+
+      listener.writeln("<table>");
 
       TeXSettings settings = parser.getSettings();
-
-      L2HConverter listener = (L2HConverter)parser.getListener();
 
       settings.setAlignmentList(listener.createTeXCellAlignList(
          listener.createString("rcl")));
@@ -61,8 +63,6 @@ public class L2HEqnarray extends L2HMathDeclaration
       L2HConverter listener = (L2HConverter)parser.getListener();
 
       parser.startGroup();
-
-      listener.putControlSequence(new L2HMathAlignNewline(isNumbered()));
 
       doModeSwitch(parser);
 

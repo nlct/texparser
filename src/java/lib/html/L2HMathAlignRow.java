@@ -90,6 +90,22 @@ public class L2HMathAlignRow extends L2HAlignRow
       super.endRow(parser);
    }
 
+   public TeXDimension getDefaultColSep(TeXParser parser)
+    throws TeXSyntaxException
+   {
+      Register reg = parser.getSettings().getRegister("arraycolsep");
+
+      if (reg == null || !(reg instanceof DimenRegister))
+      {
+         throw new TeXSyntaxException(parser,
+           TeXSyntaxException.ERROR_DIMEN_EXPECTED,
+           "\\arraycolsep");
+      }
+
+      return ((DimenRegister)reg).getDimension();
+   }
+
+
    protected void startCell(TeXParser parser, String span, String style)
     throws IOException
    {

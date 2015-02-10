@@ -249,6 +249,23 @@ public class TeXGlue implements TeXDimension, Expandable
       return str;
    }
 
+   public String toString()
+   {
+      String str = fixed.toString();
+
+      if (stretch != null)
+      {
+         str = str + " plus "+stretch.toString();
+      }
+
+      if (shrink != null)
+      {
+         str = str + " minus "+shrink.toString();
+      }
+
+      return str;
+   }
+
    public TeXObjectList string(TeXParser parser) throws IOException
    {
       return parser.string(toString(parser));
