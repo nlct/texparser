@@ -47,6 +47,7 @@ import com.dickimawbooks.texparserlib.latex.wasysym.*;
 import com.dickimawbooks.texparserlib.latex.pifont.*;
 import com.dickimawbooks.texparserlib.latex.booktabs.*;
 import com.dickimawbooks.texparserlib.latex.textcase.*;
+import com.dickimawbooks.texparserlib.latex.shortvrb.*;
 
 public abstract class LaTeXParserListener extends DefaultTeXParserListener
 {
@@ -762,6 +763,11 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       if (styName.equals("textcase"))
       {
          return new TextCaseSty(this);
+      }
+
+      if (styName.equals("shortvrb"))
+      {
+         return new ShortVrbSty(this);
       }
 
       return null;

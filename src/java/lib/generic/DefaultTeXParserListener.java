@@ -96,6 +96,7 @@ public abstract class DefaultTeXParserListener extends TeXParserListener
       parser.putControlSequence(new DoubleLetterAccent("t", 0x035C, 0x203F));
       parser.putControlSequence(new Uppercase());
       parser.putControlSequence(new Lowercase());
+      parser.putControlSequence(new Show());
 
       // TeX font changing declarations
 

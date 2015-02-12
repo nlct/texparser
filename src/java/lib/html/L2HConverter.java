@@ -742,11 +742,15 @@ public class L2HConverter extends LaTeXParserListener
       }
    }
 
-   public void verb(boolean isStar, char delim,
+   public void verb(String name, boolean isStar, char delim,
      String text)
     throws IOException
    {
-      write("<tt>"+text+"</tt>");
+      write("<code style=\"white-space: pre;\">");
+
+      super.verb(name, isStar, delim, text);
+
+      write("</code>");
    }
 
    public void includegraphics(KeyValList options, String file)

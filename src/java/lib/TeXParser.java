@@ -180,9 +180,23 @@ public class TeXParser extends TeXObjectList
 
    }
 
+   public boolean isActive(int c)
+   {
+      // check if in the active map
+
+      ActiveChar ac = getActiveChar(new Integer(c));
+
+      return ac != null;
+   }
+
    // checks if c has cat code of given type
    public boolean isCatCode(int type, char c)
    {
+      if (type == TYPE_ACTIVE)
+      {
+         if (isActive((char)c)) return true;
+      }
+
       Character character = new Character(c);
 
       if (catcodes[type] != null)
@@ -1146,6 +1160,57 @@ public class TeXParser extends TeXObjectList
       }
    }
 
+   public TeXObjectList popRemainingVerb(int delim)
+     throws IOException
+   {
+      TeXObjectList charList = new TeXObjectList();
+
+      while (size() > 0)
+      {
+         TeXObject obj = remove(0);
+
+         String str = obj.toString(this);
+
+         for (int i = 0, n = str.length(); i < n; i++)
+         {
+            char c = str.charAt(i);
+
+            if (c == delim)
+            {
+               addAll(0, listener.createString(str.substring(i)));
+               return charList;
+            }
+
+            charList.add(listener.getOther(c));
+         }
+      }
+
+      if (readVerb(delim, charList) == -1)
+      {
+         throw new EOFException();
+      }
+
+      return charList;
+   }
+
+   private int readVerb(int delim, TeXObjectList charList)
+    throws IOException
+   {
+      int c;
+
+      while ((c = read()) != -1)
+      {
+         if (c == delim)
+         {
+            return c;
+         }
+
+         charList.add(listener.getOther(c));
+      }
+
+      return -1;
+   }
+
    private boolean readControlSequence(TeXObjectList list)
      throws IOException
    {
@@ -1228,21 +1293,14 @@ public class TeXParser extends TeXObjectList
                int delim = c;
 
                TeXObjectList charList = new TeXObjectList();
-                  list.add(charList);
+
+               list.add(charList);
 
                charList.add(listener.getOther(c));
 
-               while (c != -1)
-               {
-                  c = read();
+               c = readVerb(delim, charList);
 
-                  charList.add(listener.getOther(c));
-
-                  if (c == delim)
-                  {
-                     break;
-                  }
-               }
+               charList.add(listener.getOther(c));
             }
             else if (cs.getName().equals("string"))
             {

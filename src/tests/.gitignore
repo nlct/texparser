@@ -6,3 +6,5 @@ output
 *.blg
 *.toc
 test*.pdf
+*.glo
+*.idx
