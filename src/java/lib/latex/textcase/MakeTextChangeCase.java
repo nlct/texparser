@@ -58,7 +58,7 @@ public abstract class MakeTextChangeCase extends ControlSequence
 
             if (list.size() > 0)
             {
-               newList.add(list.popStack());
+               newList.add(list.popStack(parser));
             }
          }
          else if (arg instanceof MathDeclaration)
@@ -94,7 +94,7 @@ public abstract class MakeTextChangeCase extends ControlSequence
    public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      TeXObject arg = stack.popArg();
+      TeXObject arg = stack.popArg(parser);
 
       if (arg instanceof Expandable)
       {

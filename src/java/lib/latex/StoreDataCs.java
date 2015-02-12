@@ -97,7 +97,7 @@ public class StoreDataCs extends ControlSequence
          optArg = stack.popArg(parser, '[', ']');
       }
 
-      TeXObject arg = stack.popArg();
+      TeXObject arg = stack.popArg(parser);
       setData(parser, optArg, arg);
    }
 

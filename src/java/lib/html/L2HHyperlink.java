@@ -80,7 +80,7 @@ public class L2HHyperlink extends Command
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
-      TeXObject target = stack.popArg();
+      TeXObject target = stack.popArg(parser);
 
       if (target instanceof Expandable)
       {
@@ -92,7 +92,7 @@ public class L2HHyperlink extends Command
          }
       }
 
-      TeXObject text = stack.popArg();
+      TeXObject text = stack.popArg(parser);
 
       if (text instanceof Expandable)
       {
@@ -126,7 +126,7 @@ public class L2HHyperlink extends Command
    public void process(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
-      TeXObject target = stack.popArg();
+      TeXObject target = stack.popArg(parser);
 
       if (target instanceof Expandable)
       {
@@ -138,7 +138,7 @@ public class L2HHyperlink extends Command
          }
       }
 
-      TeXObject text = stack.popArg();
+      TeXObject text = stack.popArg(parser);
 
       L2HConverter listener = (L2HConverter)parser.getListener();
 

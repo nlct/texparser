@@ -48,7 +48,7 @@ public class ObsoleteFontCs extends Declaration
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
-      TeXObject arg = stack.popArg();
+      TeXObject arg = stack.popArg(parser);
 
       if (arg instanceof Expandable)
       {
@@ -96,7 +96,7 @@ public class ObsoleteFontCs extends Declaration
    public TeXObjectList expandfully(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
-      TeXObject arg = stack.popArg();
+      TeXObject arg = stack.popArg(parser);
 
       if (arg instanceof Expandable)
       {
@@ -166,7 +166,7 @@ public class ObsoleteFontCs extends Declaration
    public void process(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
-      TeXObject arg = stack.popArg();
+      TeXObject arg = stack.popArg(parser);
 
       if (arg instanceof Expandable)
       {

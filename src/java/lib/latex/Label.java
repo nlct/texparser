@@ -71,7 +71,7 @@ public class Label extends Command
          return expandonce(parser);
       }
 
-      TeXObject arg = stack.popArg();
+      TeXObject arg = stack.popArg(parser);
 
       if (arg == null)
       {

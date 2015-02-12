@@ -82,7 +82,8 @@ public class Cline extends AlignSpan implements Expandable
    public TeXObjectList expandfully(TeXParser parser, TeXObjectList stack)
     throws IOException
    {
-      TeXObject arg = parser == stack ? parser.popNextArg() : stack.popArg();
+      TeXObject arg = parser == stack ? parser.popNextArg() 
+        : stack.popArg(parser);
 
       if (arg instanceof Expandable)
       {

@@ -45,7 +45,7 @@ public class BibItem extends ControlSequence
    {
       TeXObject opt = stack.popArg(parser, '[', ']');
 
-      TeXObject arg = stack.popArg();
+      TeXObject arg = stack.popArg(parser);
 
       LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
 

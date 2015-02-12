@@ -44,12 +44,12 @@ public class Csname extends Primitive
       throws IOException
    {
       TeXObjectList list = new TeXObjectList();
-      TeXObject obj = stack.popStack();
+      TeXObject obj = stack.popStack(parser);
 
       while (!(obj instanceof EndCsname))
       {
          list.add(obj);
-         obj = stack.popStack();
+         obj = stack.popStack(parser);
       }
 
       TeXObjectList expanded = list.expandfully(parser, stack);

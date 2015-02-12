@@ -82,7 +82,7 @@ public abstract class TheBibliography extends Declaration
 
    public void process(TeXParser parser, TeXObjectList list) throws IOException
    {
-      TeXObject arg = list.popArg();
+      TeXObject arg = list.popArg(parser);
 
       LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
 

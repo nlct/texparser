@@ -45,9 +45,10 @@ public class BibliographyStyle extends ControlSequence
       parser.popNextArg();
    }
 
-   public void process(TeXParser parser, TeXObjectList stack) throws IOException
+   public void process(TeXParser parser, TeXObjectList stack)
+      throws IOException
    {
-      stack.popArg();
+      stack.popArg(parser);
    }
 
 }

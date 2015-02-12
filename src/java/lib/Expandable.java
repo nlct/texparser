@@ -22,21 +22,18 @@ import java.io.IOException;
 
 public interface Expandable
 {
-   // Use parser.popStack() or parser.peekStack() if arguments required
-   // If either return null, use parser.fetchNext() to push the next
-   // object onto the stack. Make sure objects are popped off the
-   // stack when they are processed.
+   // Use parser.popNextArg() if arguments required
    public TeXObjectList expandonce(TeXParser parser) throws IOException;
 
    public TeXObjectList expandfully(TeXParser parser) throws IOException;
 
    // Local stack:
 
-   // If stack is null or empty, behaves like expandonce(parser)
-   public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack) throws IOException;
+   // Use stack.popArg(parser) if arguments required
+   public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
+     throws IOException;
 
-   // If stack is null or empty, behaves like expandfully(parser)
-   public TeXObjectList expandfully(TeXParser parser, TeXObjectList stack) throws IOException;
-
+   public TeXObjectList expandfully(TeXParser parser, TeXObjectList stack)
+     throws IOException;
 }
 

@@ -61,7 +61,7 @@ public class AuxCommand extends ControlSequence
 
       for (int i = 0; i < numArgs; i++)
       {
-         args[i] = stack.popArg();
+         args[i] = stack.popArg(parser);
       }
 
       auxParser.addAuxData(new AuxData(getName(), args));

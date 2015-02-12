@@ -44,13 +44,13 @@ public class L2HAtMakeCaption extends ControlSequence
    public void process(TeXParser parser, TeXObjectList stack)
    throws IOException
    {
-      TeXObject arg1 = stack.popArg();
+      TeXObject arg1 = stack.popArg(parser);
 
       arg1.process(parser, stack);
 
       parser.getListener().getWriteable().write(": ");
 
-      TeXObject arg2 = stack.popArg();
+      TeXObject arg2 = stack.popArg(parser);
 
       arg2.process(parser, stack);
    }

@@ -43,7 +43,7 @@ public class PreTo extends ControlSequence
    public void process(TeXParser parser, TeXObjectList list)
      throws IOException
    {
-      TeXObject arg = (list == parser ? parser.popNextArg():list.popArg());
+      TeXObject arg = (list == parser ? parser.popNextArg():list.popArg(parser));
 
       if (arg instanceof TeXCsRef)
       {
@@ -59,7 +59,7 @@ public class PreTo extends ControlSequence
 
       ControlSequence hook = (ControlSequence)arg;
 
-      TeXObject code = (list == parser ? parser.popNextArg():list.popArg());
+      TeXObject code = (list == parser ? parser.popNextArg():list.popArg(parser));
 
       TeXObjectList syntax = hook.getSyntax();
       TeXObjectList defn = new TeXObjectList();

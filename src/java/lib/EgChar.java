@@ -16,68 +16,77 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
-package com.dickimawbooks.texparserlib.latex.graphics;
+package com.dickimawbooks.texparserlib;
 
 import java.io.IOException;
 
-import com.dickimawbooks.texparserlib.*;
-import com.dickimawbooks.texparserlib.latex.*;
-
-public class GraphicsPath extends ControlSequence
+public class EgChar extends Macro
 {
-   public GraphicsPath()
+   public EgChar()
    {
-      this("graphicspath");
+      this('}');
    }
 
-   public GraphicsPath(String name)
+   public EgChar(char c)
    {
-      super(name);
+      this((int)c);
+   }
+
+   public EgChar(int code)
+   {
+      charCode = code;
    }
 
    public Object clone()
    {
-      return new GraphicsPath(getName());
+      return new EgChar(charCode);
    }
 
-   private void processPath(TeXParser parser, TeXObject arg)
+   public int getCharCode()
+   {
+      return charCode;
+   }
+
+   public String toString()
+   {
+      return String.format("%c", (char)charCode);
+   }
+
+   public String toString(TeXParser parser)
+   {
+      return ""+parser.getEgChar();
+   }
+
+   public TeXObjectList string(TeXParser parser)
      throws IOException
    {
-      TeXObjectList paths = new TeXObjectList();
+      TeXObjectList list = new TeXObjectList();
+      list.add(parser.getListener().getOther(charCode));
 
-      if (arg instanceof Group)
-      {
-         paths.add(((Group)arg).toList());
-      }
-      else if (arg instanceof TeXObjectList)
-      {
-         TeXObjectList list = (TeXObjectList)arg; 
-
-         while (list.size() > 0)
-         {
-            TeXObject thisPath = list.popArg(parser);
-
-            paths.add(thisPath);
-         }
-      }
-      else
-      {
-         paths.add(arg);
-      }
-
-      ((LaTeXParserListener)parser.getListener()).setGraphicsPath(paths);
+      return list;
    }
 
    public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      processPath(parser, stack.popArg(parser));
-
+      throw new TeXSyntaxException(parser,
+         TeXSyntaxException.ERROR_UNEXPECTED_EG);
    }
 
    public void process(TeXParser parser)
      throws IOException
    {
-      processPath(parser, parser.popNextArg());
+      throw new TeXSyntaxException(parser,
+         TeXSyntaxException.ERROR_UNEXPECTED_EG);
    }
+
+
+   public String show(TeXParser parser)
+    throws IOException
+   {
+      return String.format("end-group character %c", (char)charCode);
+   }
+
+   private int charCode;
 }
+

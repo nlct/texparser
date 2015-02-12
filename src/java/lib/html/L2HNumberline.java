@@ -59,7 +59,7 @@ public class L2HNumberline extends ControlSequence
    {
       L2HConverter listener = (L2HConverter)parser.getListener();
 
-      TeXObject arg = stack.popArg();
+      TeXObject arg = stack.popArg(parser);
 
       listener.write("<span class=\"numberline\">");
 

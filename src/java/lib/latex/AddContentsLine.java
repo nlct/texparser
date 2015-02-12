@@ -57,9 +57,9 @@ public class AddContentsLine extends ControlSequence
 
    public void process(TeXParser parser, TeXObjectList stack) throws IOException
    {
-      TeXObject toc = stack.popArg();
-      TeXObject type = stack.popArg();
-      TeXObject title = stack.popArg();
+      TeXObject toc = stack.popArg(parser);
+      TeXObject type = stack.popArg(parser);
+      TeXObject title = stack.popArg(parser);
 
       addcontentsline(parser, toc, type, title);
    }

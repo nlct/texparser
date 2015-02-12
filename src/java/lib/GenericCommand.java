@@ -175,7 +175,7 @@ public class GenericCommand extends Command
                   }
                   else
                   {
-                     args[n] = remainingStack.popStack(isShort);
+                     args[n] = remainingStack.popStack(parser, isShort);
                   }
 
                   n++;
@@ -183,7 +183,7 @@ public class GenericCommand extends Command
             }
             else
             {
-               TeXObject nextObj = remainingStack.popArg();
+               TeXObject nextObj = remainingStack.popArg(parser);
 
                if (nextObj == null || !obj.equals(nextObj))
                {

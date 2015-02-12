@@ -67,7 +67,7 @@ public class L2HOther extends Other
             if (obj instanceof CharObject
              && (((CharObject)obj).getCharCode() == c))
             {
-               stack.popStack();
+               stack.popStack(parser);
                listener.writeCodePoint(0x201D);
                return;
             }
@@ -79,7 +79,7 @@ public class L2HOther extends Other
             if (obj instanceof CharObject
              && (((CharObject)obj).getCharCode() == c))
             {
-               stack.popStack();
+               stack.popStack(parser);
                listener.writeCodePoint(0x201C);
                return;
             }
@@ -91,14 +91,14 @@ public class L2HOther extends Other
             if (obj instanceof CharObject
              && (((CharObject)obj).getCharCode() == c))
             {
-               stack.popStack();
+               stack.popStack(parser);
 
                obj = stack.peekStack();
 
                if (obj instanceof CharObject
                 && (((CharObject)obj).getCharCode() == c))
                {
-                  stack.popStack();
+                  stack.popStack(parser);
                   listener.writeCodePoint(0x2014);
                   return;
                }
@@ -114,7 +114,7 @@ public class L2HOther extends Other
             if (obj instanceof CharObject
              && (((CharObject)obj).getCharCode() == (int)'`'))
             {
-               stack.popStack();
+               stack.popStack(parser);
                listener.writeCodePoint(0x00BF);
                return;
             }
@@ -126,7 +126,7 @@ public class L2HOther extends Other
             if (obj instanceof CharObject
              && (((CharObject)obj).getCharCode() == (int)'`'))
             {
-               stack.popStack();
+               stack.popStack(parser);
                listener.writeCodePoint(0x00A1);
                return;
             }

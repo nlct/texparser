@@ -50,8 +50,8 @@ public class QDOVERD extends ControlSequence
    {
       ControlSequence cs = parser.getListener().getControlSequence("genfrac");
 
-      TeXObject delim1 = stack.popStack();
-      TeXObject delim2 = stack.popStack();
+      TeXObject delim1 = stack.popStack(parser);
+      TeXObject delim2 = stack.popStack(parser);
 
       stack.push(parser.getListener().getLetter((int)'0'));
       stack.push(parser.getListener().createGroup());

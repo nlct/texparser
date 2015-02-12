@@ -48,14 +48,14 @@ public class L2HMbox extends ControlSequence
 
       if (parser.isMathMode() && listener.useMathJax())
       {
-         TeXObject arg = stack.popStack();
+         TeXObject arg = stack.popStack(parser);
 
          listener.write(toString(parser));
          listener.write(arg.toString(parser));
       }
       else
       {
-         TeXObject arg = stack.popArg();
+         TeXObject arg = stack.popArg(parser);
 
          listener.write("<div class=\"mbox\">");
          arg.process(parser, stack);

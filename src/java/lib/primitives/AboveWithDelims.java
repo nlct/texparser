@@ -63,7 +63,7 @@ public class AboveWithDelims extends MidControlSequence
           getName());
       }
 
-      first = following.popStack();
+      first = following.popStack(parser);
 
       if (following.size() == 0)
       {
@@ -73,7 +73,7 @@ public class AboveWithDelims extends MidControlSequence
           toString(parser));
       }
 
-      second = following.popStack();
+      second = following.popStack(parser);
 
       if (following.size() == 0)
       {

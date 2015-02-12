@@ -151,14 +151,14 @@ public class SWFrame extends ControlSequence
       throws IOException
    {
       processArg(parser, 
-        stack.popArg(),
-        stack.popArg(),
-        stack.popArg(),
-        stack.popArg(),
-        stack.popArg(),
-        stack.popArg(),
-        stack.popArg(),
-        stack.popArg());
+        stack.popArg(parser),
+        stack.popArg(parser),
+        stack.popArg(parser),
+        stack.popArg(parser),
+        stack.popArg(parser),
+        stack.popArg(parser),
+        stack.popArg(parser),
+        stack.popArg(parser));
    }
 
    public void process(TeXParser parser)

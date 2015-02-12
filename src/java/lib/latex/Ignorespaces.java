@@ -42,11 +42,11 @@ public class Ignorespaces extends ControlSequence
    public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      TeXObject obj = stack.popStack();
+      TeXObject obj = stack.popStack(parser);
 
       while (obj instanceof WhiteSpace && stack.size() > 0)
       {
-         obj = stack.popStack();
+         obj = stack.popStack(parser);
       }
 
       stack.push(obj);

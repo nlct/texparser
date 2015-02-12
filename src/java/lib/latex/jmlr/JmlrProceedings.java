@@ -51,7 +51,7 @@ public class JmlrProceedings extends ControlSequence
    public void process(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
-      setData(parser, stack.popArg(), stack.popArg());
+      setData(parser, stack.popArg(parser), stack.popArg(parser));
    }
 
    public void process(TeXParser parser)

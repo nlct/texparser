@@ -65,7 +65,7 @@ public class TeXCellAlignList extends Vector<TeXCellAlign>
 
       while (list.size() > 0)
       {
-         TeXObject obj = list.popArg();
+         TeXObject obj = list.popArg(parser);
 
          if (!(obj instanceof CharObject))
          {
@@ -79,7 +79,7 @@ public class TeXCellAlignList extends Vector<TeXCellAlign>
          // Treating '!' the same as '@' for now
          if (code == '@'|| code == '!')
          {
-            TeXObject arg = list.popArg();
+            TeXObject arg = list.popArg(parser);
 
             if (cellAlign == null)
             {
@@ -100,7 +100,7 @@ public class TeXCellAlignList extends Vector<TeXCellAlign>
          }
          else if (code == '>')
          {
-            TeXObject arg = list.popArg();
+            TeXObject arg = list.popArg(parser);
 
             if (cellAlign == null)
             {
@@ -143,7 +143,7 @@ public class TeXCellAlignList extends Vector<TeXCellAlign>
 
             if (requiresDimension(code))
             {
-               TeXObject arg = list.popArg();
+               TeXObject arg = list.popArg(parser);
 
                if (arg instanceof TeXDimension)
                {

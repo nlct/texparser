@@ -46,7 +46,7 @@ public class L2HCaption extends ControlSequence
    {
       TeXObject optArg = stack.popArg(parser, '[', ']');
 
-      TeXObject arg = stack.popStack();
+      TeXObject arg = stack.popStack(parser);
 
       L2HConverter listener = (L2HConverter)parser.getListener();
 
@@ -78,11 +78,11 @@ public class L2HCaption extends ControlSequence
 
       // Is there a label following the caption?
 
-      TeXObject object = stack.popStack();
+      TeXObject object = stack.popStack(parser);
 
       while (object instanceof WhiteSpace)
       {
-         object = stack.popStack();
+         object = stack.popStack(parser);
       }
 
       if (object instanceof TeXCsRef)
@@ -91,7 +91,7 @@ public class L2HCaption extends ControlSequence
 
          if (object instanceof Label)
          {
-            TeXObject label = stack.popArg();
+            TeXObject label = stack.popArg(parser);
 
             if (label == null)
             {

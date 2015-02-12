@@ -51,7 +51,7 @@ public class Ifx extends If
       }
       else
       {
-         firstArg = stack.popStack();
+         firstArg = stack.popStack(parser);
 
          if (firstArg == null)
          {
@@ -67,7 +67,7 @@ public class Ifx extends If
       }
       else
       {
-         secondArg = stack.popStack();
+         secondArg = stack.popStack(parser);
 
          if (secondArg == null)
          {

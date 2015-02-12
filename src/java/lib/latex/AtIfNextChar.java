@@ -43,14 +43,14 @@ public class AtIfNextChar extends Command
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      TeXObject obj = stack.popArg();
+      TeXObject obj = stack.popArg(parser);
 
       String chr = obj.toString(parser);
 
-      TeXObject trueObj = stack.popArg();
-      TeXObject falseObj = stack.popArg();
+      TeXObject trueObj = stack.popArg(parser);
+      TeXObject falseObj = stack.popArg(parser);
 
-      TeXObject arg = stack.popArg();
+      TeXObject arg = stack.popArg(parser);
 
       TeXObject result = (arg.equals(obj) ? trueObj : falseObj);
 
@@ -87,14 +87,14 @@ public class AtIfNextChar extends Command
    public TeXObjectList expandfully(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      TeXObject obj = stack.popArg();
+      TeXObject obj = stack.popArg(parser);
 
       String chr = obj.toString(parser);
 
-      TeXObject trueObj = stack.popArg();
-      TeXObject falseObj = stack.popArg();
+      TeXObject trueObj = stack.popArg(parser);
+      TeXObject falseObj = stack.popArg(parser);
 
-      TeXObject arg = stack.popArg();
+      TeXObject arg = stack.popArg(parser);
 
       TeXObject result = (arg.equals(obj) ? trueObj : falseObj);
 
@@ -131,14 +131,14 @@ public class AtIfNextChar extends Command
    public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      TeXObject obj = stack.popArg();
+      TeXObject obj = stack.popArg(parser);
 
       String chr = obj.toString(parser);
 
-      TeXObject trueObj = stack.popArg();
-      TeXObject falseObj = stack.popArg();
+      TeXObject trueObj = stack.popArg(parser);
+      TeXObject falseObj = stack.popArg(parser);
 
-      TeXObject arg = stack.popArg();
+      TeXObject arg = stack.popArg(parser);
 
       if (arg.equals(obj))
       {

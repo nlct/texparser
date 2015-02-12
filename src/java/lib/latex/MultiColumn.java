@@ -56,7 +56,7 @@ public class MultiColumn extends MultiCell
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      TeXObject numColsArg = stack.popArg();
+      TeXObject numColsArg = stack.popArg(parser);
 
       if (numColsArg instanceof Expandable)
       {
@@ -82,7 +82,7 @@ public class MultiColumn extends MultiCell
            TeXSyntaxException.ERROR_NUMBER_EXPECTED, str);
       }
 
-      TeXObject colAlignArg = stack.popArg();
+      TeXObject colAlignArg = stack.popArg(parser);
 
       if (colAlignArg instanceof Expandable)
       {

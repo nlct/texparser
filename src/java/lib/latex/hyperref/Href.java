@@ -54,7 +54,7 @@ public class Href extends ControlSequence
 
    public void process(TeXParser parser, TeXObjectList list) throws IOException
    {
-      process(parser, list.popArg(), list.popArg());
+      process(parser, list.popArg(parser), list.popArg(parser));
    }
 
    private HyperrefSty sty;

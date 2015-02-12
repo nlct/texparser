@@ -119,7 +119,7 @@ public class AlignRow extends TeXObjectList
          else if (obj instanceof Begin)
          {
             TeXObject arg = (stack == parser ? 
-              parser.popNextArg() : stack.popArg());
+              parser.popNextArg() : stack.popArg(parser));
 
             if (arg instanceof Expandable)
             {
@@ -143,7 +143,7 @@ public class AlignRow extends TeXObjectList
          else if (obj instanceof End)
          {
             TeXObject arg = (stack == parser ? 
-              parser.popNextArg() : stack.popArg());
+              parser.popNextArg() : stack.popArg(parser));
 
             if (arg instanceof Expandable)
             {

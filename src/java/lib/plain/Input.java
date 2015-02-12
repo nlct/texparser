@@ -44,7 +44,8 @@ public class Input extends ControlSequence
      StringBuilder builder)
      throws IOException
    {
-      TeXObject next = (stack == parser ? parser.popStack() : stack.pop());
+      TeXObject next = (stack == parser ? parser.popStack() :
+         stack.popStack(parser));
 
       TeXObjectList expanded = null;
 

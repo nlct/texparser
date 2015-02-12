@@ -48,14 +48,14 @@ public abstract class ContentsLine extends ControlSequence
    {
       LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
 
-      TeXObject type = stack.popArg();
-      TeXObject title = stack.popArg();
-      TeXObject page = stack.popArg();
+      TeXObject type = stack.popArg(parser);
+      TeXObject title = stack.popArg(parser);
+      TeXObject page = stack.popArg(parser);
       TeXObject link = null;
 
       if (listener.isStyLoaded("hyperref"))
       {
-         link = stack.popArg();
+         link = stack.popArg(parser);
       }
 
       TeXObjectList list;

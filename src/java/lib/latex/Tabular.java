@@ -149,7 +149,7 @@ public class Tabular extends Declaration
          }
       }
 
-      TeXObject columnSpecs = stack.popArg();
+      TeXObject columnSpecs = stack.popArg(parser);
 
       if (columnSpecs instanceof Expandable)
       {

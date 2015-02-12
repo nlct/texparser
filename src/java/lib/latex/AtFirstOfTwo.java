@@ -57,8 +57,8 @@ public class AtFirstOfTwo extends Command
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      TeXObject arg = stack.popArg();
-      TeXObject ignore = stack.popArg();
+      TeXObject arg = stack.popArg(parser);
+      TeXObject ignore = stack.popArg(parser);
 
       if (arg instanceof TeXObjectList) return (TeXObjectList)arg;
 
@@ -100,8 +100,8 @@ public class AtFirstOfTwo extends Command
    public TeXObjectList expandfully(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      TeXObject arg = stack.popArg();
-      TeXObject ignore = stack.popArg();
+      TeXObject arg = stack.popArg(parser);
+      TeXObject ignore = stack.popArg(parser);
 
       TeXObjectList list;
 
@@ -136,8 +136,8 @@ public class AtFirstOfTwo extends Command
 
    public void process(TeXParser parser, TeXObjectList list) throws IOException
    {
-      TeXObject arg = list.popArg();
-      TeXObject ignore = list.popArg();
+      TeXObject arg = list.popArg(parser);
+      TeXObject ignore = list.popArg(parser);
 
       arg.process(parser, list);
    }

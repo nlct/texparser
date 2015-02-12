@@ -44,7 +44,7 @@ public class DocumentClass extends ControlSequence
    {
       TeXObject options = list.popArg(parser, '[', ']');
 
-      TeXObject cls = list.popArg();
+      TeXObject cls = list.popArg(parser);
 
       TeXObjectList expanded = null;
 

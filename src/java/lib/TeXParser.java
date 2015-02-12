@@ -889,14 +889,60 @@ public class TeXParser extends TeXObjectList
          }
          else
          {
-            throw new TeXSyntaxException(
-               getCurrentFile(),
-               getLineNumber(),
+            throw new TeXSyntaxException(this,
                TeXSyntaxException.ERROR_BAD_PARAM, ""+((int)c));
          }
       }
 
       return true;
+   }
+
+   public boolean popRemainingGroup(TeXParser parser, Group group, boolean isShort)
+      throws IOException
+   {
+      return popRemainingGroup(group, isShort);
+   }
+
+   public boolean popRemainingGroup(Group group, boolean isShort)
+      throws IOException
+   {
+      while (true)
+      {
+         if (isEmpty())
+         {
+            if (!fetchNext(isShort)) return false;
+         }
+
+         TeXObject obj = remove(0);
+
+         if (obj instanceof EgChar)
+         {
+            return true;
+         }
+
+         if (isShort && obj.isPar())
+         {
+            throw new TeXSyntaxException(this,
+               TeXSyntaxException.ERROR_PAR_BEFORE_EG);
+         }
+         else if (obj instanceof BgChar)
+         {
+            Group subGrp = listener.createGroup();
+
+            if (!popRemainingGroup(subGrp, isShort))
+            {
+               group.add(subGrp);
+
+               return false;
+            }
+
+            group.add(subGrp);
+         }
+         else
+         {
+            group.add(obj);
+         }
+      }
    }
 
    private boolean readGroup(Group group, boolean isShort)
@@ -913,15 +959,35 @@ public class TeXParser extends TeXObjectList
             return true;
          }
 
+         if (isCatCode(TYPE_BG, (char)c))
+         {
+            Group subGroup = listener.createGroup();
+
+            boolean result = readGroup(subGroup, isShort);
+            group.add(subGroup);
+
+            if (!result)
+            {
+               return false;
+            }
+
+            continue;
+         }
+
          reset();
 
          fetchNext(group, isShort);
 
-         if (isShort && isPar(group.lastElement()))
+         TeXObject obj = group.lastElement();
+
+         if (obj instanceof EgChar)
          {
-            throw new TeXSyntaxException(
-               getCurrentFile(),
-               getLineNumber(),
+            group.remove(group.size()-1);
+         }
+
+         if (isShort && isPar(obj))
+         {
+            throw new TeXSyntaxException(this,
                TeXSyntaxException.ERROR_PAR_BEFORE_EG);
          }
 
@@ -930,9 +996,7 @@ public class TeXParser extends TeXObjectList
 
       if (c == -1)
       {
-         throw new TeXSyntaxException(
-            getCurrentFile(),
-            getLineNumber(),
+         throw new TeXSyntaxException(this,
             TeXSyntaxException.ERROR_NO_EG);
       }
 
@@ -1072,9 +1136,7 @@ public class TeXParser extends TeXObjectList
 
          if (!fetchNext(list))
          {
-            throw new TeXSyntaxException(
-               getCurrentFile(),
-               getLineNumber(),
+            throw new TeXSyntaxException(this,
                TeXSyntaxException.ERROR_NOT_FOUND, terminator);
          }
 
@@ -1293,16 +1355,11 @@ public class TeXParser extends TeXObjectList
       }
       else if (isCatCode(TYPE_BG, (char)c))
       {
-         Group group = listener.createGroup();
-         list.add(group);
-         return readGroup(group, isShort);
+         list.add(listener.getBgChar(c));
       }
       else if (isCatCode(TYPE_EG, (char)c))
       {
-         throw new TeXSyntaxException(
-            getCurrentFile(),
-            getLineNumber(),
-            TeXSyntaxException.ERROR_UNEXPECTED_EG);
+         list.add(listener.getEgChar(c));
       }
       else if (isCatCode(TYPE_SPACE, (char)c))
       {
@@ -1482,8 +1539,7 @@ public class TeXParser extends TeXObjectList
       {
          fetchNext(isShort);
       }
-
-      return popArg();
+      return popArg(isShort);
    }
 
    public TeXObject popNextArg(char openDelim, char closeDelim)
@@ -1500,12 +1556,35 @@ public class TeXParser extends TeXObjectList
          fetchNext(isShort);
       }
 
-      return popArg(this, openDelim, closeDelim);
+      return popArg(isShort, openDelim, closeDelim);
+   }
+
+   public TeXObject popArg(boolean isShort)
+    throws IOException
+   {
+      return super.popArg(this, isShort);
+   }
+
+   public TeXObject popArg(boolean isShort, char openDelim, char closeDelim)
+   throws IOException
+   {
+      return super.popArg(this, isShort, openDelim, closeDelim);
    }
 
    public TeXObject expandedPopStack() throws IOException
    {
       return expandedPopStack(this);
+   }
+
+   public TeXObject popStack(TeXParser parser) throws IOException
+   {
+      return popStack();
+   }
+
+   public TeXObject popStack(TeXParser parser, boolean isShort)
+      throws IOException
+   {
+      return popStack(isShort);
    }
 
    public TeXObject popStack() throws IOException
@@ -1535,6 +1614,38 @@ public class TeXParser extends TeXObjectList
          return popStack(isShort);
       }
 
+      if (object instanceof BgChar)
+      {
+         Group group = listener.createGroup();
+         popRemainingGroup(group, isShort);
+         return group;
+      }
+
+      return object;
+   }
+
+   public TeXObject popToken()
+     throws IOException
+   {
+      if (size() == 0)
+      {
+         fetchNext(false);
+      }
+
+      if (size() == 0)
+      {
+         throw new EOFException();
+      }
+
+      TeXObject object = remove(0);
+
+      if (object instanceof Ignoreable)
+      {
+         listener.skipping((Ignoreable)object);
+
+         return popToken();
+      }
+
       return object;
    }
 
@@ -1557,7 +1668,7 @@ public class TeXParser extends TeXObjectList
 
          TeXObject obj = firstElement();
 
-         if (obj instanceof Group)
+         if (obj instanceof Group || obj instanceof BgChar)
          {
             break;
          }
@@ -1731,7 +1842,7 @@ public class TeXParser extends TeXObjectList
 
    public void putActiveChar(ActiveChar activeChar)
    {
-      activeTable.put(new Integer((int)activeChar.getChar().charValue()),
+      activeTable.put(new Integer(activeChar.getCharCode()),
         activeChar);
    }
 

@@ -50,8 +50,8 @@ public class QOVERD extends ControlSequence
    {
       ControlSequence cs = parser.getListener().getControlSequence("genfrac");
 
-      TeXObject delim1 = stack.popStack();
-      TeXObject delim2 = stack.popStack();
+      TeXObject delim1 = stack.popStack(parser);
+      TeXObject delim2 = stack.popStack(parser);
 
       stack.push(parser.getListener().createGroup());
       stack.push(parser.getListener().createGroup());

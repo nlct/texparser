@@ -53,7 +53,7 @@ public abstract class Section extends ControlSequence
          if (((CharObject)object).getCharCode() == (int)'*')
          {
             isStar = true;
-            stack.popStack();
+            stack.popStack(parser);
          }
       }
 
@@ -64,7 +64,7 @@ public abstract class Section extends ControlSequence
          optArg = stack.popArg(parser, '[', ']');
       }
 
-      TeXObject arg = stack.popStack();
+      TeXObject arg = stack.popStack(parser);
 
       if (arg == null)
       {

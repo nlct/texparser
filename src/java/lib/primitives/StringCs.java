@@ -43,18 +43,18 @@ public class StringCs extends Primitive implements Expandable
    public TeXObjectList string(TeXParser parser)
      throws IOException
    {
-      return parser.string();
+      return parser.popToken().string(parser);
    }
 
    private TeXObjectList string(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      return stack.string(parser);
+      return stack.popToken().string(parser);
    } 
 
    public TeXObjectList expandonce(TeXParser parser) throws IOException
    {
-      return string(parser);
+      return string(parser, parser);
    }
 
    public TeXObjectList expandfully(TeXParser parser) throws IOException
@@ -62,14 +62,16 @@ public class StringCs extends Primitive implements Expandable
       return expandonce(parser);
    }
 
-   public TeXObjectList expandonce(TeXParser parser, TeXObjectList list) throws IOException
+   public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
+      throws IOException
    {
-      return list.string(parser);
+      return string(parser, stack);
    }
 
-   public TeXObjectList expandfully(TeXParser parser, TeXObjectList list) throws IOException
+   public TeXObjectList expandfully(TeXParser parser, TeXObjectList stack)
+      throws IOException
    {
-      return expandonce(parser);
+      return expandonce(parser, stack);
    }
 
    public void process(TeXParser parser, TeXObjectList stack)

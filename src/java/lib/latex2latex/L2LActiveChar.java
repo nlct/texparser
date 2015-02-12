@@ -26,27 +26,27 @@ public class L2LActiveChar extends ActiveChar
 {
    public L2LActiveChar(int charCode)
    {
-      value = new Character((char)charCode);
+      this.charCode = charCode;
    }
 
    public L2LActiveChar(char c)
    {
-      value = new Character(c);
+      this((int)c);
    }
 
-   public Character getChar()
+   public int getCharCode()
    {
-      return value;
+      return charCode;
    }
 
    public String toString(TeXParser parser)
    {
-      return value.toString();
+      return String.format("%c", charCode);
    }
 
    public Object clone()
    {
-      return new L2LActiveChar(value.charValue());
+      return new L2LActiveChar(charCode);
    }
 
    public void process(TeXParser parser, TeXObjectList stack)
@@ -113,6 +113,6 @@ public class L2LActiveChar extends ActiveChar
       return null;
    }
 
-   private Character value;
+   private int charCode;
 }
 

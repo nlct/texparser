@@ -82,7 +82,7 @@ public class Centerline extends ControlSequence
    public void process(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
-      processArg(parser, stack.popStack(), stack);
+      processArg(parser, stack.popStack(parser), stack);
    }
 
    public void process(TeXParser parser)

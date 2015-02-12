@@ -53,7 +53,7 @@ public class SbChar extends Macro
    public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      TeXObject object = stack.popArg();
+      TeXObject object = stack.popArg(parser);
 
       if (object == null)
       {

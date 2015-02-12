@@ -58,7 +58,7 @@ public class Url extends ControlSequence
 
    public void process(TeXParser parser, TeXObjectList list) throws IOException
    {
-      process(parser, list.popArg(), list.popStack());
+      process(parser, list.popArg(parser), list.popStack(parser));
    }
 
    private HyperrefSty sty;

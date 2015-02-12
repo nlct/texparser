@@ -24,11 +24,11 @@ public abstract class ActiveChar extends Macro implements Expandable
 {
    // Character
 
-   public abstract Character getChar();
+   public abstract int getCharCode();
 
    public String toString()
    {
-      return getChar().toString();
+      return String.format("%c", (char)getCharCode());
    }
 
    public TeXObjectList string(TeXParser parser) throws IOException
@@ -37,5 +37,15 @@ public abstract class ActiveChar extends Macro implements Expandable
    }
 
    public abstract Object clone();
+
+   public boolean equals(Object object)
+   {
+      if (object instanceof ActiveChar)
+      {
+         return getCharCode() == ((ActiveChar)object).getCharCode();
+      }
+
+      return super.equals(object);
+   }
 }
 

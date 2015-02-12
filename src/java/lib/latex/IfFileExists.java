@@ -43,7 +43,7 @@ public class IfFileExists extends ControlSequence
    public void process(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
-      TeXObject arg = stack.popArg();
+      TeXObject arg = stack.popArg(parser);
 
       if (arg instanceof Expandable)
       {
@@ -55,8 +55,8 @@ public class IfFileExists extends ControlSequence
          }
       }
 
-      TeXObject truePart = stack.popArg();
-      TeXObject falsePart = stack.popArg();
+      TeXObject truePart = stack.popArg(parser);
+      TeXObject falsePart = stack.popArg(parser);
 
       TeXPath texPath = new TeXPath(parser, arg.toString(parser));
 

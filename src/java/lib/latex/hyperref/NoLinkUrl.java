@@ -81,7 +81,7 @@ public class NoLinkUrl extends ControlSequence
 
    public void process(TeXParser parser, TeXObjectList list) throws IOException
    {
-      process(parser, list, list.popArg());
+      process(parser, list, list.popArg(parser));
    }
 
 }

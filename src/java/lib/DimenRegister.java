@@ -119,7 +119,7 @@ public class DimenRegister extends Register implements TeXDimension
    public void process(TeXParser parser)
       throws IOException
    {
-      TeXObject object = parser.popStack();
+      TeXObject object = parser.popStack(parser, true);
 
       if (object instanceof Expandable)
       {
@@ -128,14 +128,14 @@ public class DimenRegister extends Register implements TeXDimension
          if (expanded != null)
          {
             parser.addAll(expanded);
-            object = parser.popStack();
+            object = parser.popStack(parser, true);
          }
       }
 
       if (object instanceof CharObject
        && ((CharObject)object).getCharCode() == '=')
       {
-         object = parser.popStack();
+         object = parser.popStack(parser, true);
 
          if (object instanceof Expandable)
          {
@@ -144,7 +144,7 @@ public class DimenRegister extends Register implements TeXDimension
             if (expanded != null)
             {
                parser.addAll(expanded);
-               object = parser.popStack();
+               object = parser.popStack(parser, true);
             }
          }
       }
@@ -163,7 +163,7 @@ public class DimenRegister extends Register implements TeXDimension
    public void process(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
-      TeXObject object = stack.popStack();
+      TeXObject object = stack.popStack(parser, true);
 
       if (object instanceof Expandable)
       {
@@ -173,14 +173,14 @@ public class DimenRegister extends Register implements TeXDimension
          if (expanded != null)
          {
             stack.addAll(expanded);
-            object = stack.popStack();
+            object = stack.popStack(parser, true);
          }
       }
 
       if (object instanceof CharObject
        && ((CharObject)object).getCharCode() == '=')
       {
-         object = stack.popStack();
+         object = stack.popStack(parser, true);
 
          if (object instanceof Expandable)
          {
@@ -190,7 +190,7 @@ public class DimenRegister extends Register implements TeXDimension
             if (expanded != null)
             {
                stack.addAll(expanded);
-               object = stack.popStack();
+               object = stack.popStack(parser, true);
             }
          }
       }

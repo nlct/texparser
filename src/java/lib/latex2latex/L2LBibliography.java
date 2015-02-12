@@ -67,7 +67,7 @@ public class L2LBibliography extends L2LControlSequence
    public void process(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
-      processBib(parser, stack.popArg());
+      processBib(parser, stack.popArg(parser));
    }
 
    public void process(TeXParser parser)

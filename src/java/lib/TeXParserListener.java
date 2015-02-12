@@ -49,6 +49,10 @@ public abstract class TeXParserListener
    // Gets active character identified by charCode.
    public abstract ActiveChar getActiveChar(int charCode);
 
+   public abstract BgChar getBgChar(int charCode);
+
+   public abstract EgChar getEgChar(int charCode);
+
    public abstract Eol getEol();
 
    public abstract Par getPar();

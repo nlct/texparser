@@ -50,7 +50,7 @@ public class UsePackage extends ControlSequence
    {
       TeXObject options = list.popArg(parser, '[', ']');
 
-      TeXObject sty = list.popArg();
+      TeXObject sty = list.popArg(parser);
 
       TeXObjectList expanded = null;
 

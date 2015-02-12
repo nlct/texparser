@@ -123,7 +123,7 @@ public class If extends Primitive implements Expandable
       }
       else
       {
-         firstArg = stack.popStack();
+         firstArg = stack.popStack(parser);
 
          if (firstArg == null)
          {
@@ -139,7 +139,7 @@ public class If extends Primitive implements Expandable
       }
       else
       {
-         secondArg = stack.popStack();
+         secondArg = stack.popStack(parser);
 
          if (secondArg == null)
          {
@@ -168,7 +168,7 @@ public class If extends Primitive implements Expandable
       }
       else
       {
-         obj = stack.popStack();
+         obj = stack.popStack(parser);
 
          if (obj == null)
          {
@@ -298,7 +298,7 @@ public class If extends Primitive implements Expandable
       }
       else
       {
-         obj = stack.popStack();
+         obj = stack.popStack(parser);
 
          if (obj == null)
          {
@@ -373,7 +373,7 @@ public class If extends Primitive implements Expandable
       }
       else
       {
-         obj = stack.popStack();
+         obj = stack.popStack(parser);
 
          if (obj == null)
          {
@@ -458,7 +458,7 @@ public class If extends Primitive implements Expandable
       }
       else
       {
-         obj = stack.popStack();
+         obj = stack.popStack(parser);
 
          if (obj == null)
          {

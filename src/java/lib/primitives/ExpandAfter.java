@@ -43,14 +43,14 @@ public class ExpandAfter extends Primitive implements Expandable
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
    throws IOException
    {
-      TeXObject firstArg = stack.popStack();
+      TeXObject firstArg = stack.popStack(parser);
 
       if (firstArg == null)
       {
          return expandonce(parser);
       }
 
-      TeXObject secondArg = stack.popStack();
+      TeXObject secondArg = stack.popStack(parser);
 
       if (secondArg == null)
       {
@@ -181,7 +181,7 @@ public class ExpandAfter extends Primitive implements Expandable
    public void process(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
-      TeXObject firstArg = stack.popStack();
+      TeXObject firstArg = stack.popStack(parser);
 
       if (firstArg == null)
       {
@@ -189,7 +189,7 @@ public class ExpandAfter extends Primitive implements Expandable
          return;
       }
 
-      TeXObject secondArg = stack.popStack();
+      TeXObject secondArg = stack.popStack(parser);
 
       if (secondArg == null)
       {

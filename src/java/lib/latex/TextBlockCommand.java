@@ -59,7 +59,7 @@ public class TextBlockCommand extends ControlSequence
 
    public void process(TeXParser parser, TeXObjectList stack) throws IOException
    {
-      TeXObject arg = stack.popStack();
+      TeXObject arg = stack.popStack(parser);
 
       if (arg instanceof Group)
       {

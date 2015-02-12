@@ -56,7 +56,7 @@ public class AtFirstOfOne extends Command
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      TeXObject arg1 = stack.popArg();
+      TeXObject arg1 = stack.popArg(parser);
 
       if (arg1 instanceof TeXObjectList) return (TeXObjectList)arg1;
 
@@ -97,7 +97,7 @@ public class AtFirstOfOne extends Command
    public TeXObjectList expandfully(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      TeXObject arg1 = stack.popArg();
+      TeXObject arg1 = stack.popArg(parser);
 
       TeXObjectList list;
 
@@ -131,7 +131,7 @@ public class AtFirstOfOne extends Command
 
    public void process(TeXParser parser, TeXObjectList list) throws IOException
    {
-      TeXObject arg1 = list.popArg();
+      TeXObject arg1 = list.popArg(parser);
 
       arg1.process(parser, list);
    }

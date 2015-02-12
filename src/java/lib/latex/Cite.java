@@ -110,7 +110,7 @@ public class Cite extends Command
          if (((CharObject)obj).getCharCode() == (int)'*')
          {
             isStar = true;
-            stack.popStack();
+            stack.popStack(parser);
          }
       }
 
@@ -123,7 +123,7 @@ public class Cite extends Command
          opt2 = stack.popArg(parser, '[', ']');
       }
 
-      TeXObject arg = stack.popArg();
+      TeXObject arg = stack.popArg(parser);
 
       if (arg instanceof Expandable)
       {

@@ -51,11 +51,18 @@ public class TeXObjectList extends Vector<TeXObject>
    public TeXObject expandedPopStack(TeXParser parser)
      throws IOException
    {
-      TeXObject object = popStack();
+      return expandedPopStack(parser, false);
+   }
+
+   public TeXObject expandedPopStack(TeXParser parser, boolean isShort)
+     throws IOException
+   {
+      TeXObject object = popStack(parser, isShort);
 
       if (object instanceof TeXCsRef)
       {
-         object = parser.getListener().getControlSequence(((TeXCsRef)object).getName());
+         object = parser.getListener().getControlSequence(
+           ((TeXCsRef)object).getName());
       }
 
       if (object instanceof Expandable)
@@ -72,7 +79,7 @@ public class TeXObjectList extends Vector<TeXObject>
             else
             {
                addAll(0, expanded);
-               object = popStack();
+               object = popStack(parser, isShort);
             }
          }
       }
@@ -80,12 +87,12 @@ public class TeXObjectList extends Vector<TeXObject>
       return object;
    }
 
-   public TeXObject popStack() throws IOException
+   public TeXObject popStack(TeXParser parser) throws IOException
    {
-      return popStack(false);
+      return popStack(parser, false);
    }
 
-   public TeXObject popStack(boolean isShort)
+   public TeXObject popStack(TeXParser parser, boolean isShort)
      throws IOException
    {
       while (size() > 0 && (get(0) instanceof Ignoreable))
@@ -102,11 +109,34 @@ public class TeXObjectList extends Vector<TeXObject>
 
       if (isShort && obj.isPar())
       {
-            throw new TeXSyntaxException(
-               TeXSyntaxException.ERROR_PAR_BEFORE_EG);
+         throw new TeXSyntaxException(parser,
+            TeXSyntaxException.ERROR_PAR_BEFORE_EG);
+      }
+
+      if (obj instanceof BgChar)
+      {
+         Group group = parser.getListener().createGroup();
+         popRemainingGroup(parser, group, isShort);
+         return group;
       }
 
       return obj;
+   }
+
+   public TeXObject popToken()
+     throws IOException
+   {
+      while (size() > 0 && (get(0) instanceof Ignoreable))
+      {
+         remove(0);
+      }
+
+      if (size() == 0)
+      {
+         return null;
+      }
+
+      return remove(0);
    }
 
    public TeXObject pop()
@@ -115,7 +145,6 @@ public class TeXObjectList extends Vector<TeXObject>
       return size() == 0 ? null : remove(0);
    }
 
-// TODO check for paragraph breaks if short
    public TeXObjectList popToGroup(TeXParser parser, boolean isShort)
      throws IOException
    {
@@ -132,7 +161,7 @@ public class TeXObjectList extends Vector<TeXObject>
 
          TeXObject obj = firstElement();
 
-         if (obj instanceof Group)
+         if (obj instanceof Group || obj instanceof BgChar)
          {
             break;
          }
@@ -155,7 +184,7 @@ public class TeXObjectList extends Vector<TeXObject>
    public TeXUnit popUnit(TeXParser parser)
     throws IOException
    {
-      TeXObject object = expandedPopStack(parser);
+      TeXObject object = expandedPopStack(parser, true);
 
       if (object == null)
       {
@@ -246,7 +275,7 @@ public class TeXObjectList extends Vector<TeXObject>
    public Numerical popNumerical(TeXParser parser)
    throws IOException
    {
-      TeXObject object = expandedPopStack(parser);
+      TeXObject object = expandedPopStack(parser, true);
 
       if (object instanceof Register)
       {
@@ -266,7 +295,7 @@ public class TeXObjectList extends Vector<TeXObject>
    public TeXDimension popDimension(TeXParser parser)
     throws IOException
    {
-      TeXObject object = expandedPopStack(parser);
+      TeXObject object = expandedPopStack(parser, true);
 
       if (object instanceof TeXDimension)
       {
@@ -342,7 +371,7 @@ public class TeXObjectList extends Vector<TeXObject>
    private TeXDimension popStretch(TeXParser parser)
      throws IOException
    {
-      TeXObject object = expandedPopStack(parser);
+      TeXObject object = expandedPopStack(parser, true);
 
       if (!(object instanceof CharObject)
        ||((CharObject)object).getCharCode() != 'p')
@@ -351,7 +380,7 @@ public class TeXObjectList extends Vector<TeXObject>
          return null;
       }
 
-      TeXObject object2 = expandedPopStack(parser);
+      TeXObject object2 = expandedPopStack(parser, true);
 
       if (!(object2 instanceof CharObject)
        ||((CharObject)object2).getCharCode() != 'l')
@@ -361,7 +390,7 @@ public class TeXObjectList extends Vector<TeXObject>
          return null;
       }
 
-      TeXObject object3 = expandedPopStack(parser);
+      TeXObject object3 = expandedPopStack(parser, true);
 
       if (!(object3 instanceof CharObject)
        ||((CharObject)object3).getCharCode() != 'u')
@@ -372,7 +401,7 @@ public class TeXObjectList extends Vector<TeXObject>
          return null;
       }
 
-      TeXObject object4 = expandedPopStack(parser);
+      TeXObject object4 = expandedPopStack(parser, true);
 
       if (!(object4 instanceof CharObject)
        ||((CharObject)object4).getCharCode() != 's')
@@ -386,7 +415,7 @@ public class TeXObjectList extends Vector<TeXObject>
 
       Float value = popFloat(parser);
 
-      object = expandedPopStack(parser);
+      object = expandedPopStack(parser, true);
 
       if (object instanceof DimenRegister)
       {
@@ -406,7 +435,7 @@ public class TeXObjectList extends Vector<TeXObject>
    private TeXDimension popShrink(TeXParser parser)
      throws IOException
    {
-      TeXObject object = expandedPopStack(parser);
+      TeXObject object = expandedPopStack(parser, true);
 
       if (!(object instanceof CharObject)
        ||((CharObject)object).getCharCode() != 'm')
@@ -415,7 +444,7 @@ public class TeXObjectList extends Vector<TeXObject>
          return null;
       }
 
-      TeXObject object2 = expandedPopStack(parser);
+      TeXObject object2 = expandedPopStack(parser, true);
 
       if (!(object2 instanceof CharObject)
        ||((CharObject)object2).getCharCode() != 'i')
@@ -425,7 +454,7 @@ public class TeXObjectList extends Vector<TeXObject>
          return null;
       }
 
-      TeXObject object3 = expandedPopStack(parser);
+      TeXObject object3 = expandedPopStack(parser, true);
 
       if (!(object3 instanceof CharObject)
        ||((CharObject)object3).getCharCode() != 'n')
@@ -436,7 +465,7 @@ public class TeXObjectList extends Vector<TeXObject>
          return null;
       }
 
-      TeXObject object4 = expandedPopStack(parser);
+      TeXObject object4 = expandedPopStack(parser, true);
 
       if (!(object4 instanceof CharObject)
        ||((CharObject)object4).getCharCode() != 'u')
@@ -448,7 +477,7 @@ public class TeXObjectList extends Vector<TeXObject>
          return null;
       }
 
-      TeXObject object5 = expandedPopStack(parser);
+      TeXObject object5 = expandedPopStack(parser, true);
 
       if (!(object5 instanceof CharObject)
        ||((CharObject)object5).getCharCode() != 's')
@@ -463,7 +492,7 @@ public class TeXObjectList extends Vector<TeXObject>
 
       Float value = popFloat(parser);
 
-      object = expandedPopStack(parser);
+      object = expandedPopStack(parser, true);
 
       if (object instanceof DimenRegister)
       {
@@ -495,9 +524,7 @@ public class TeXObjectList extends Vector<TeXObject>
       }
       catch (NumberFormatException e)
       {
-         throw new TeXSyntaxException(
-                  parser.getCurrentFile(),
-                  parser.getLineNumber(),
+         throw new TeXSyntaxException(parser,
                   TeXSyntaxException.ERROR_NUMBER_EXPECTED);
       }
    }
@@ -551,9 +578,7 @@ public class TeXObjectList extends Vector<TeXObject>
       }
       catch (NumberFormatException e)
       {
-         throw new TeXSyntaxException(
-                  parser.getCurrentFile(),
-                  parser.getLineNumber(),
+         throw new TeXSyntaxException(parser,
                   TeXSyntaxException.ERROR_NUMBER_EXPECTED);
       }
    }
@@ -584,6 +609,12 @@ public class TeXObjectList extends Vector<TeXObject>
 
    public void push(TeXObject object)
    {
+      if (object == this)
+      {
+         throw new IllegalArgumentException(
+           "Can't add list to itself");
+      }
+
       if (object != null)
       {
          add(0, object);
@@ -625,14 +656,20 @@ public class TeXObjectList extends Vector<TeXObject>
 
    // Pops an argument off the stack. Removes any top level
    // grouping.
-   public TeXObject popArg()
+   public TeXObject popArg(TeXParser parser)
     throws IOException
    {
-      TeXObject object = popStack();
+      return popArg(parser, false);
+   }
+
+   public TeXObject popArg(TeXParser parser, boolean isShort)
+    throws IOException
+   {
+      TeXObject object = popStack(parser, isShort);
 
       if (object == null)
       {
-         throw new TeXSyntaxException(
+         throw new TeXSyntaxException(parser,
             TeXSyntaxException.ERROR_MISSING_PARAM);
       }
 
@@ -651,7 +688,14 @@ public class TeXObjectList extends Vector<TeXObject>
    public TeXObject popArg(TeXParser parser, char openDelim, char closeDelim)
      throws IOException
    {
-      TeXObject object = popStack();
+      return popArg(parser, false, openDelim, closeDelim);
+   }
+
+   public TeXObject popArg(TeXParser parser, boolean isShort, 
+     char openDelim, char closeDelim)
+   throws IOException
+   {
+      TeXObject object = popStack(parser, isShort);
 
       if (!(object instanceof CharObject))
       {
@@ -683,6 +727,10 @@ public class TeXObjectList extends Vector<TeXObject>
             {
                return list;
             }
+         }
+         else if (isShort && object.isPar())
+         {
+            break;
          }
 
          list.add(object);
@@ -859,7 +907,7 @@ public class TeXObjectList extends Vector<TeXObject>
 
       while (remaining.size() > 0)
       {
-         TeXObject object = remaining.popStack();
+         TeXObject object = remaining.popStack(parser);
 
          if (object instanceof Expandable)
          {
@@ -1063,6 +1111,46 @@ public class TeXObjectList extends Vector<TeXObject>
    public boolean isPar()
    {
       return size() == 1 && firstElement().isPar();
+   }
+
+   public boolean popRemainingGroup(TeXParser parser, 
+      Group group, boolean isShort)
+     throws IOException
+   {
+      while (size() > 0)
+      {
+         TeXObject obj = remove(0);
+
+         if (obj instanceof EgChar)
+         {
+            return true;
+         }
+
+         if (isShort && obj.isPar())
+         {
+            throw new TeXSyntaxException(parser,
+               TeXSyntaxException.ERROR_PAR_BEFORE_EG);
+         }
+         else if (obj instanceof BgChar)
+         {
+            Group subGrp = parser.getListener().createGroup();
+
+            if (!popRemainingGroup(parser, subGrp, isShort))
+            {
+               group.add(subGrp);
+
+               return false;
+            }
+
+            group.add(subGrp);
+         }
+         else
+         {
+            group.add(obj);
+         }
+      }
+
+      return false;
    }
 
    private ArrayDeque<Declaration> declarations

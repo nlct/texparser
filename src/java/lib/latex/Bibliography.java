@@ -43,7 +43,7 @@ public class Bibliography extends ControlSequence
    public void process(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
-      TeXObject arg = stack.popArg();
+      TeXObject arg = stack.popArg(parser);
 
       if (arg instanceof Expandable)
       {

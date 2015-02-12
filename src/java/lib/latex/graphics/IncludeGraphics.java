@@ -195,7 +195,8 @@ public class IncludeGraphics extends ControlSequence
     KeyValList keyValList)
      throws IOException
    {
-      TeXObject imgFile = (list == parser ? parser.popNextArg():list.popArg());
+      TeXObject imgFile = (list == parser ? parser.popNextArg()
+        : list.popArg(parser));
 
       TeXObjectList expanded = null;
 

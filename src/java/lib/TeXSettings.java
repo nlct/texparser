@@ -659,7 +659,7 @@ public class TeXSettings
 
    public void putActiveChar(ActiveChar activeChar)
    {
-      activeTable.put(new Integer((int)activeChar.getChar().charValue()),
+      activeTable.put(new Integer(activeChar.getCharCode()),
         activeChar);
    }
 

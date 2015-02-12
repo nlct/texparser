@@ -162,6 +162,16 @@ public abstract class DefaultTeXParserListener extends TeXParserListener
       getParser().putActiveChar(activeChar);
    }
 
+   public BgChar getBgChar(int codePoint)
+   {
+      return new BgChar(codePoint);
+   }
+
+   public EgChar getEgChar(int codePoint)
+   {
+      return new EgChar(codePoint);
+   }
+
    public Eol getEol()
    {
       return new Eol();

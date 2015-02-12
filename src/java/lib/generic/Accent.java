@@ -150,7 +150,7 @@ public class Accent extends ControlSequence
          return;
       }
 
-      TeXObject object = stack.popArg();
+      TeXObject object = stack.popArg(parser);
 
       TeXObjectList remaining = null;
 
@@ -171,16 +171,16 @@ public class Accent extends ControlSequence
             {
                if (stack.size() == 0)
                {
-                  object = parser.popStack();
+                  object = parser.popNextArg();
                }
                else
                {
-                  object = stack.pop();
+                  object = stack.popArg(parser);
                }
             }
             else
             {
-               object = remaining.pop();
+               object = remaining.popArg(parser);
             }
          }
 
@@ -197,15 +197,15 @@ public class Accent extends ControlSequence
 
          if (remaining != null && remaining.size() > 0)
          {
-            object = remaining.pop();
+            object = remaining.popArg(parser);
          }
          else if (stack.size() > 0)
          {
-            object = stack.pop();
+            object = stack.popArg(parser);
          }
          else
          {
-            object = parser.popStack();
+            object = parser.popNextArg();
          }
       }
 
@@ -223,11 +223,11 @@ public class Accent extends ControlSequence
 
             if (remaining.size() == 0)
             {
-               object = stack.pop();
+               object = stack.popStack(parser);
             }
             else
             {
-               object = remaining.pop();
+               object = remaining.popStack(parser);
             }
          }
       }
@@ -259,11 +259,11 @@ public class Accent extends ControlSequence
 
          if (remaining.size() == 0)
          {
-            object = stack.pop();
+            object = stack.popStack(parser);
          }
          else
          {
-            object = remaining.pop();
+            object = remaining.popStack(parser);
          }
       }
 

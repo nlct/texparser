@@ -75,7 +75,7 @@ public class MultiCell extends Command
    public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      stack.popArg().process(parser, stack);
+      stack.popArg(parser).process(parser, stack);
    }
 
    public void process(TeXParser parser)

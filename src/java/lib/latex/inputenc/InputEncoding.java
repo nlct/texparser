@@ -62,7 +62,7 @@ public class InputEncoding extends ControlSequence
 
    public void process(TeXParser parser, TeXObjectList list) throws IOException
    {
-      TeXObject arg = list.popArg();
+      TeXObject arg = list.popArg(parser);
 
       TeXObjectList expanded = null;
 

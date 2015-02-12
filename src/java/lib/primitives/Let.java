@@ -43,7 +43,7 @@ public class Let extends Primitive
    public void process(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
-      TeXObject firstArg = stack.popStack();
+      TeXObject firstArg = stack.popStack(parser);
 
       if (firstArg == null)
       {
@@ -51,7 +51,7 @@ public class Let extends Primitive
          return;
       }
 
-      TeXObject secondArg = stack.popStack();
+      TeXObject secondArg = stack.popStack(parser);
 
       if (secondArg == null)
       {

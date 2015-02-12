@@ -26,16 +26,32 @@ public class Nbsp extends ActiveChar
 {
    public Nbsp()
    {
+      this('~');
+   }
+
+   public Nbsp(char c)
+   {
+      this((int)c);
+   }
+
+   public Nbsp(int code)
+   {
+      charCode = code;
    }
 
    public String toString(TeXParser parser)
    {
-      return character.toString();
+      return toString();
    }
 
-   public Character getChar()
+   public String toString()
    {
-      return character;
+      return String.format("%c", (int)charCode);
+   }
+
+   public int getCharCode()
+   {
+      return charCode;
    }
 
    public void process(TeXParser parser, TeXObjectList list)
@@ -78,8 +94,8 @@ public class Nbsp extends ActiveChar
 
    public Object clone()
    {
-      return new Nbsp();
+      return new Nbsp(charCode);
    }
 
-   public Character character = new Character('~');
+   public int charCode = (int)'~';
 }

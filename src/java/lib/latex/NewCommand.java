@@ -67,14 +67,14 @@ public class NewCommand extends Command
    public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      TeXObject object = (stack == parser ? parser.popNextArg() : stack.popArg());
+      TeXObject object = (stack == parser ? parser.popNextArg() : stack.popArg(parser));
 
       boolean isStar = false;
 
       if (object.toString().equals("*"))
       {
          isStar = true;
-         object = (stack == parser ? parser.popNextArg() : stack.popArg());
+         object = (stack == parser ? parser.popNextArg() : stack.popArg(parser));
       }
 
       if (object instanceof TeXObjectList)
@@ -82,7 +82,7 @@ public class NewCommand extends Command
          // Use popArg in case there are spaces before or after the
          // controls sequence.
 
-         object = ((TeXObjectList)object).popArg();
+         object = ((TeXObjectList)object).popArg(parser);
       }
 
       String csName;
@@ -147,7 +147,7 @@ public class NewCommand extends Command
       }
 
       TeXObject definition = (stack == parser ?
-             parser.popNextArg() : stack.popArg());
+             parser.popNextArg() : stack.popArg(parser));
 
       ((LaTeXParserListener)parser.getListener()).newcommand(
          overwrite, name, csName, isStar, numParams, defValue, definition);

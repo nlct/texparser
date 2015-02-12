@@ -43,7 +43,7 @@ public class Special extends Primitive implements Expandable
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
-      TeXObject arg = stack.popArg();
+      TeXObject arg = stack.popArg(parser);
 
       TeXObjectList expanded = null;
 

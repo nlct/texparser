@@ -68,7 +68,8 @@ public class Begin extends Command
    {
       LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
 
-      TeXObject object = (parser == stack ? parser.popNextArg() : stack.popArg());
+      TeXObject object = (parser == stack ? parser.popNextArg() 
+         : stack.popArg(parser));
 
       String name;
       TeXObjectList expanded = null;
@@ -110,13 +111,13 @@ public class Begin extends Command
 
          while (true)
          {
-            object = stack.popStack();
+            object = stack.popStack(parser);
 
             if (object instanceof End
              || (object instanceof TeXCsRef
                  && ((TeXCsRef)object).getName().equals("end")))
             {
-               TeXObject arg = stack.popStack();
+               TeXObject arg = stack.popStack(parser);
 
                if (endEnv.equals(arg.toString(parser)))
                {

@@ -20,32 +20,43 @@ package com.dickimawbooks.texparserlib;
 
 import java.io.IOException;
 
-public class SpChar extends Macro
+public class BgChar extends Macro
 {
-   public SpChar()
+   public BgChar()
    {
+      this('{');
+   }
+
+   public BgChar(char c)
+   {
+      this((int)c);
+   }
+
+   public BgChar(int code)
+   {
+      charCode = code;
    }
 
    public Object clone()
    {
-      return new SpChar();
+      return new BgChar(charCode);
    }
 
    public String toString()
    {
-      return "^";
+      return String.format("%c", (char)charCode);
    }
 
    public String toString(TeXParser parser)
    {
-      return ""+parser.getSpChar();
+      return ""+parser.getBgChar();
    }
 
    public TeXObjectList string(TeXParser parser)
      throws IOException
    {
       TeXObjectList list = new TeXObjectList();
-      list.add(parser.getListener().getOther((int)parser.getSpChar()));
+      list.add(parser.getListener().getOther(charCode));
 
       return list;
    }
@@ -53,52 +64,30 @@ public class SpChar extends Macro
    public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      TeXObject object = stack.popArg(parser);
+      Group group = parser.getListener().createGroup();
 
-      if (object == null)
-      {
-         throw new TeXSyntaxException(
-            parser,
-            TeXSyntaxException.ERROR_MISSING_PARAM, ""+parser.getSpChar());
-      }
+      stack.popRemainingGroup(parser, group, false);
 
-      TeXObject nextObject = stack.peekStack();
-
-      if (nextObject instanceof SpChar)
-      {
-         stack.push(parser.getListener().createGroup());
-
-         parser.getListener().getTeXApp().error(new TeXSyntaxException(
-           parser, TeXSyntaxException.ERROR_DOUBLE_SUPERSCRIPT, 
-               object.toString()));
-      }
-
-      parser.getListener().superscript(object);
+      stack.push(group);
    }
 
    public void process(TeXParser parser)
      throws IOException
    {
-      TeXObject object = parser.popNextArg();
+      Group group = parser.getListener().createGroup();
 
-      TeXObject nextObject = parser.peekStack();
+      parser.popRemainingGroup(group, false);
 
-      if (nextObject instanceof SpChar)
-      {
-         parser.push(parser.getListener().createGroup());
-
-         parser.getListener().getTeXApp().error(new TeXSyntaxException(
-           parser, TeXSyntaxException.ERROR_DOUBLE_SUPERSCRIPT, 
-               object.toString()));
-      }
-
-      parser.getListener().superscript(object);
+      parser.push(group);
    }
+
 
    public String show(TeXParser parser)
     throws IOException
    {
-      return "superscript character "+parser.getSpChar();
+      return String.format("begin-group character %c", (char)charCode);
    }
+
+   private int charCode;
 }
 

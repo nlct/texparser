@@ -51,21 +51,21 @@ public class Def extends Primitive
    public void process(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
-      TeXObject cs = stack.popStack();
+      TeXObject cs = stack.popStack(parser);
 
       if (cs == null)
       {
          stack = parser;
-         cs = stack.popStack();
+         cs = stack.popStack(parser);
       }
 
       TeXObjectList syntax = new TeXObjectList();
-      TeXObject nextObject = stack.popStack();
+      TeXObject nextObject = stack.popStack(parser);
 
       while (!(nextObject instanceof Group))
       {
          syntax.add(nextObject);
-         nextObject = stack.popStack();
+         nextObject = stack.popStack(parser);
       }
 
       TeXObjectList definition = ((Group)nextObject).toList();

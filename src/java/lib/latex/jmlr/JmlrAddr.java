@@ -43,7 +43,7 @@ public class JmlrAddr extends ControlSequence
    public void process(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
-      TeXObject obj = stack.popStack();
+      TeXObject obj = stack.popStack(parser);
 
       Group grp;
 

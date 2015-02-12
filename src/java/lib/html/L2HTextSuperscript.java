@@ -44,7 +44,7 @@ public class L2HTextSuperscript extends ControlSequence
    public void process(TeXParser parser, TeXObjectList stack)
    throws IOException
    {
-      TeXObject arg = stack.popArg();
+      TeXObject arg = stack.popArg(parser);
 
       stack.push(new HtmlTag("</sup>"));
       stack.push(arg);

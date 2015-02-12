@@ -72,7 +72,7 @@ public class L2HMathDeclaration extends MathDeclaration
 
             while (stack.size() > 0)
             {
-               TeXObject obj = stack.popStack();
+               TeXObject obj = stack.popStack(parser);
 
                if (obj instanceof TeXCsRef)
                {
@@ -102,7 +102,7 @@ public class L2HMathDeclaration extends MathDeclaration
                {
                   stack.addAll(0, (TeXObjectList)obj);
 
-                  obj = stack.popStack();
+                  obj = stack.popStack(parser);
                }
 
                if (obj instanceof TeXCsRef)

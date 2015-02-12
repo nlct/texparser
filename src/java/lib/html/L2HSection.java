@@ -146,7 +146,7 @@ public class L2HSection extends Section
       }
       else
       {
-         object = stack.popStack();
+         object = stack.popStack(parser);
       }
 
       while (object instanceof WhiteSpace || object.isPar())
@@ -157,7 +157,7 @@ public class L2HSection extends Section
          }
          else
          {
-            object = stack.popStack();
+            object = stack.popStack(parser);
          }
       }
 
@@ -176,7 +176,7 @@ public class L2HSection extends Section
          }
          else
          {
-            label = stack.popArg();
+            label = stack.popArg(parser);
          }
 
          if (label instanceof Expandable)

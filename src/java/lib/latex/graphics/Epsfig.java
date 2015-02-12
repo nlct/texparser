@@ -59,7 +59,7 @@ public class Epsfig extends ControlSequence
 
       replacement.add(gcs);
 
-      TeXObject arg = list.popStack();
+      TeXObject arg = list.popStack(parser);
 
       Group grp;
 

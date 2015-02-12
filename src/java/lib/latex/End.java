@@ -44,7 +44,7 @@ public class End extends ControlSequence
    {
       LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
 
-      TeXObject arg = list.popArg();
+      TeXObject arg = list.popArg(parser);
 
       TeXObjectList expanded = null;
 
