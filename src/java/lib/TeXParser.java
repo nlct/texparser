@@ -1597,6 +1597,7 @@ public class TeXParser extends TeXObjectList
       {
          fetchNext(isShort);
       }
+
       return popArg(isShort);
    }
 

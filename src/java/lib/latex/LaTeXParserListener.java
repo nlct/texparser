@@ -72,6 +72,7 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       setAuxData(auxData);
       setParseAuxEnabled(parseAux);
       counters = new Hashtable<String,Vector<String>>();
+      indexes = new Hashtable<String,IndexRoot>();
 
       footnotes = new TeXObjectList();
    }
@@ -221,6 +222,8 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       parser.putControlSequence(new Uppercase("MakeUppercase"));
       parser.putControlSequence(new Lowercase("MakeLowercase"));
       parser.putControlSequence(new Protect());
+      parser.putControlSequence(new Index());
+      parser.putControlSequence(new MakeIndex());
 
       bibliographySection = new TeXObjectList();
       bibliographySection.add(new TeXCsRef("section"));
@@ -1196,6 +1199,32 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       return null;
    }
 
+   // null argument indicates default index (mainIndex)
+   // returns null if indexing is disabled or if index doesn't exist
+   public IndexRoot getIndexRoot(String ref)
+   {
+      if (!isIndexingEnabled()) return null;
+
+      return indexes.get(ref == null ? mainIndex : ref);
+   }
+
+   public IndexLocation createIndexLocation(String indexLabel)
+    throws IOException
+   {
+      return new IndexLocation(new TeXCsRef("thepage"));
+   }
+
+   public void index(String ref, TeXObject arg) throws IOException
+   {
+      IndexRoot indexRoot = getIndexRoot(ref);
+
+      if (indexRoot != null)
+      {
+         indexRoot.addEntry(getParser(), arg,
+            createIndexLocation(ref == null ? mainIndex : ref));
+      }
+   }
+
    public float emToPt(float emValue)
    {
       getTeXApp().warning(getParser(),
@@ -1274,6 +1303,38 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       return base*0.44f*exValue;
    }
 
+   public boolean isIndexingEnabled()
+   {
+      return indexingEnabled;
+   }
+
+   public void enableIndexing(boolean enable)
+   {
+      enableIndexing(mainIndex, enable);
+   }
+
+   public void enableIndexing(String indexLabel, boolean enable)
+   {
+      indexingEnabled = enable;
+
+      if (indexingEnabled)
+      {
+         IndexRoot index = getIndexRoot(indexLabel);
+
+         if (index == null)
+         {
+            indexes.put(
+              indexLabel == null ? mainIndex : indexLabel,
+              index);
+         }
+      }
+   }
+
+   public void setMainIndexLabel(String label)
+   {
+      mainIndex = label;
+   }
+
    private Vector<String> verbEnv;
 
    private Vector<LaTeXFile> loadedPackages;
@@ -1295,6 +1356,12 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
    private TeXObjectList bibliographySection;
 
    private TeXObjectList footnotes;
+
+   private Hashtable<String,IndexRoot> indexes;
+
+   private String mainIndex = "main";
+
+   private boolean indexingEnabled = false;
 
    public static final UserNumber ZERO = new UserNumber(0);
    public static final UserNumber ONE = new UserNumber(1);

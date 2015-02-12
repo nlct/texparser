@@ -817,6 +817,21 @@ public class L2HConverter extends LaTeXParserListener
       writeln("<p><hr><p>");
    }
 
+   public IndexLocation createIndexLocation(String indexLabel)
+    throws IOException
+   {
+      indexLoc++;
+      String anchor = String.format("idx-%s-%d", 
+        HtmlTag.getUriFragment(indexLabel), indexLoc);
+
+      write(String.format("<a name=\"%s\"></a>", anchor));
+
+      return new IndexLocation(new HtmlTag(
+        String.format("<a ref=\"#%s\">%d</a>", anchor, indexLoc)));
+   }
+
+   private int indexLoc = 0;
+
    private Writer writer;
 
    private TeXApp texApp;
