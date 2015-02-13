@@ -319,7 +319,7 @@ public class TeXParser extends TeXObjectList
       reader.reset();
    }
 
-   public void scan(String text, TeXObjectList stack)
+   public void scan(String text, TeXObjectList list)
      throws IOException
    {
       TeXReader strReader = new TeXReader(reader, text);
@@ -329,7 +329,7 @@ public class TeXParser extends TeXObjectList
       {
          while (reader == strReader)
          {
-            if (!fetchNext(stack))
+            if (!fetchNext(list))
             {
                break;
             }
@@ -1358,7 +1358,7 @@ public class TeXParser extends TeXObjectList
    public boolean fetchNext(TeXObjectList list)
      throws IOException
    {
-      return fetchNext(this, false);
+      return fetchNext(list, false);
    }
 
    public boolean fetchNext(TeXObjectList list, boolean isShort)

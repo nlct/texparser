@@ -696,6 +696,9 @@ public class TeXParserApp implements TeXApp
          case TeXSyntaxException.ERROR_ILLEGAL_ALIGN:
            message = getLabelWithValue("error.illegal_align", e.getParam());
          break;
+         case TeXSyntaxException.ERROR_IMPROPER_ALPHABETIC_CONSTANT:
+           message = getLabelWithValue("error.improper_alphabetic_constant", e.getParam());
+         break;
          default:
            message = e.getMessage();
       }

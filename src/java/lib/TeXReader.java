@@ -134,6 +134,11 @@ public class TeXReader implements Readable,Closeable
       return parent;
    }
 
+   public Reader getReader()
+   {
+      return reader;
+   }
+
    public void setParent(TeXReader parentReader)
    {
       if (this == parentReader)

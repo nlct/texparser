@@ -84,6 +84,7 @@ error.extra_end=Extra \\\\end{$1} found
 error.unaccessible=Unaccessible '$1'
 error.defined='$1' already defined
 error.illegal_array_arg_char=Illegal character '$1' in array arg
+error.improper_alphabetic_constant=Improper alphabetic constant $1
 error.exec_failed=Failed to execute: $1
 error.app_failed=$1 failed with exit code $2
 error.interrupted=Process interrupted

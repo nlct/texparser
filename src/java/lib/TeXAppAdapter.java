@@ -198,6 +198,9 @@ public class TeXAppAdapter implements TeXApp
          case TeXSyntaxException.ERROR_ILLEGAL_ALIGN:
            message = "Illegal alignment "+e.getParam();
          break;
+         case TeXSyntaxException.ERROR_IMPROPER_ALPHABETIC_CONSTANT: 
+           message = "Improper alphabetic constant "+e.getParam();
+         break;
          default:
            message = e.getMessage();
       }

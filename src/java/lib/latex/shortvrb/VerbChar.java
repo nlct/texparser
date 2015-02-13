@@ -27,7 +27,13 @@ public class VerbChar extends ActiveChar
 {
    public VerbChar(int codePoint)
    {
+      this(codePoint, false);
+   }
+
+   public VerbChar(int codePoint, boolean showSpaces)
+   {
       this.codePoint = codePoint;
+      this.showSpaces = showSpaces;
    }
 
    public VerbChar(char c)
@@ -35,14 +41,24 @@ public class VerbChar extends ActiveChar
       this((int)c);
    }
 
+   public VerbChar(char c, boolean showSpaces)
+   {
+      this((int)c, showSpaces);
+   }
+
    public Object clone()
    {
-      return new VerbChar(codePoint);
+      return new VerbChar(codePoint, showSpaces);
    }
 
    public int getCharCode()
    {
       return codePoint;
+   }
+
+   public boolean visibleSpaces()
+   {
+      return showSpaces;
    }
 
    public String toString(TeXParser parser)
@@ -79,15 +95,56 @@ public class VerbChar extends ActiveChar
    {
       TeXObjectList list = parser.popRemainingVerb(codePoint);
 
-      parser.getListener().verb("verb", false, (char)codePoint, 
+      parser.getListener().verb("verb", showSpaces, (char)codePoint, 
         list.toString(parser));
    }
 
    public void process(TeXParser parser, TeXObjectList stack) throws IOException
    {
-      // This method shouldn't be called as verbatim can't be used
-      // in the argument of commands.
+      if (stack == null || stack == parser)
+      {
+         process(parser);
+         return;
+      }
+
+      StringBuilder builder = new StringBuilder();
+
+      while (stack.size() > 0)
+      {
+         TeXObject object = stack.pop();
+
+         if (object instanceof ActiveChar
+         && ((ActiveChar)object).getCharCode() == codePoint)
+         {
+            break;
+         }
+
+         if (object instanceof CharObject
+         && ((CharObject)object).getCharCode() == codePoint)
+         {
+            break;
+         }
+
+         if (object instanceof Comment)
+         {
+            builder.append(parser.getCommentChar());
+
+            TeXObjectList list = new TeXObjectList();
+            parser.scan(((Comment)object).getText(), list);
+
+            stack.addAll(0, list);
+         }
+         else
+         {
+            builder.append(object.toString(parser));
+         }
+      }
+
+      parser.getListener().verb("verb", showSpaces, (char)codePoint, 
+        builder.toString());
    }
 
    private int codePoint;
+
+   private boolean showSpaces;
 }
