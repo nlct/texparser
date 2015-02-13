@@ -36,6 +36,15 @@ public class Symbol extends ControlSequence implements CaseChangeable
       return new Symbol(getName(), codePoint);
    }
 
+   public boolean equals(Object other)
+   {
+      if (this == other) return true;
+
+      if (other == null || !(other instanceof Symbol)) return false;
+
+      return codePoint == ((Symbol)other).codePoint;
+   }
+
    public TeXObject toLowerCase(TeXParser parser)
    {
       if (!(Character.isUpperCase(codePoint)

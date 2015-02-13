@@ -116,5 +116,13 @@ public class TeXCsRef extends ControlSequence implements Expandable
       return new TeXCsRef(getName());
    }
 
+   public boolean equals(Object other)
+   {
+      if (this == other) return true;
+
+      if (other == null || !(other instanceof TeXCsRef)) return false;
+
+      return getName().equals(((TeXCsRef)other).getName());
+   }
 }
 

@@ -34,4 +34,13 @@ public abstract class Primitive extends ControlSequence
    {
       super(name, isShort);
    }
+
+   public boolean equals(Object other)
+   {
+      if (this == other) return true;
+
+      if (other == null || !(other instanceof Primitive)) return false;
+
+      return getName().equals(((Primitive)other).getName());
+   }
 }

@@ -167,6 +167,16 @@ public class If extends Primitive implements Expandable
          return false;
       }
 
+      if (firstArg instanceof AssignedMacro)
+      {
+         firstArg = ((AssignedMacro)firstArg).getUnderlying();
+      }
+
+      if (secondArg instanceof AssignedMacro)
+      {
+         secondArg = ((AssignedMacro)secondArg).getUnderlying();
+      }
+
       return firstArg.equals(secondArg);
    }
 

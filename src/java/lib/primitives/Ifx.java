@@ -59,6 +59,12 @@ public class Ifx extends If
          }
       }
 
+      if (firstArg instanceof TeXCsRef)
+      {
+         firstArg = parser.getListener().getControlSequence(
+            ((TeXCsRef)firstArg).getName());
+      }
+
       TeXObject secondArg;
 
       if (parser == stack || stack == null)
@@ -73,6 +79,12 @@ public class Ifx extends If
          {
             secondArg = parser.popStack();
          }
+      }
+
+      if (secondArg instanceof TeXCsRef)
+      {
+         secondArg = parser.getListener().getControlSequence(
+            ((TeXCsRef)secondArg).getName());
       }
 
       if (firstArg instanceof Expandable)
@@ -90,7 +102,14 @@ public class Ifx extends If
 
          if (expanded != null)
          {
-            firstArg = expanded;
+            if (!(expanded instanceof Group) && expanded.size() == 1)
+            {
+               firstArg = expanded.firstElement();
+            }
+            else
+            {
+               firstArg = expanded;
+            }
          }
       }
 
@@ -109,7 +128,14 @@ public class Ifx extends If
 
          if (expanded != null)
          {
-            secondArg = expanded;
+            if (!(expanded instanceof Group) && expanded.size() == 1)
+            {
+               secondArg = expanded.firstElement();
+            }
+            else
+            {
+               secondArg = expanded;
+            }
          }
       }
 

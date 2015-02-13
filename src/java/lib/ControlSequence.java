@@ -80,8 +80,8 @@ public abstract class ControlSequence extends Macro
 
       ControlSequence other = (ControlSequence)obj;
 
-      return getName().equals(other.getName())
-          && isShort() == other.isShort()
+      return isShort() == other.isShort()
+          && isPar() == other.isPar()
           && hasSyntax(other);
    }
 
