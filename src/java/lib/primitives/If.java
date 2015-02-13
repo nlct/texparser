@@ -119,15 +119,15 @@ public class If extends Primitive implements Expandable
 
       if (parser == stack || stack == null)
       {
-         firstArg = parser.popStack();
+         firstArg = parser.popToken();
       }
       else
       {
-         firstArg = stack.popStack(parser);
+         firstArg = stack.popToken();
 
          if (firstArg == null)
          {
-            firstArg = parser.popStack();
+            firstArg = parser.popToken();
          }
       }
 
@@ -135,16 +135,36 @@ public class If extends Primitive implements Expandable
 
       if (parser == stack || stack == null)
       {
-         secondArg = parser.popStack();
+         secondArg = parser.popToken();
       }
       else
       {
-         secondArg = stack.popStack(parser);
+         secondArg = stack.popToken();
 
          if (secondArg == null)
          {
-            secondArg = parser.popStack();
+            secondArg = parser.popToken();
          }
+      }
+
+      if (firstArg instanceof TeXCsRef)
+      {
+         firstArg = parser.getControlSequence(((TeXCsRef)firstArg).getName());
+      }
+
+      if (secondArg instanceof TeXCsRef)
+      {
+         secondArg = parser.getControlSequence(((TeXCsRef)secondArg).getName());
+      }
+
+      if (firstArg == secondArg)
+      {
+         return true;
+      }
+
+      if (firstArg == null || secondArg == null)
+      {
+         return false;
       }
 
       return firstArg.equals(secondArg);
@@ -396,13 +416,36 @@ public class If extends Primitive implements Expandable
 
          if (expanded != null)
          {
-            obj = expanded;
+            if (obj instanceof Group || expanded.isEmpty())
+            {
+               obj = expanded;
+            }
+            else
+            {
+               obj = expanded.remove(0);
+
+               if (!expanded.isEmpty())
+               {
+                  if (stack == null)
+                  {
+                     parser.addAll(0, expanded);
+                  }
+                  else
+                  {
+                     stack.addAll(0, expanded);
+                  }
+               }
+            }
          }
       }
 
-      if (obj instanceof Else || obj instanceof Fi)
+      if (obj.equals(ELSE))
       {
-         return (obj instanceof Else);
+         return true;
+      }
+      else if (obj.equals(FI))
+      {
+         return false;
       }
       else if (obj instanceof TeXObjectList
            && !(obj instanceof Group))
@@ -413,7 +456,9 @@ public class If extends Primitive implements Expandable
          {
             obj = list.get(i);
 
-            if (obj instanceof Else || obj instanceof Fi)
+            boolean isElse = obj.equals(ELSE);
+
+            if (isElse || obj.equals(FI))
             {
                if (i != n-1)
                {
@@ -427,7 +472,7 @@ public class If extends Primitive implements Expandable
                   }
                }
 
-               return (obj instanceof Else);
+               return isElse;
             }
          }
       }
@@ -450,6 +495,13 @@ public class If extends Primitive implements Expandable
          return; // no \else
       }
 
+      doRemainingFalsePart(parser, stack, expanded);
+   }
+
+   protected void doRemainingFalsePart(TeXParser parser, TeXObjectList stack,
+      TeXObjectList expanded)
+   throws IOException
+   {
       TeXObject obj;
 
       if (parser == stack || stack == null)
@@ -481,11 +533,30 @@ public class If extends Primitive implements Expandable
 
          if (expandedObj != null)
          {
-            obj = expandedObj;
+            if (obj instanceof Group || expandedObj.isEmpty())
+            {
+               obj = expandedObj;
+            }
+            else
+            {
+               obj = expandedObj.remove(0);
+
+               if (!expandedObj.isEmpty())
+               {
+                  if (stack == null)
+                  {
+                     parser.addAll(0, expandedObj);
+                  }
+                  else
+                  {
+                     stack.addAll(0, expandedObj);
+                  }
+               }
+            }
          }
       }
 
-      if (obj instanceof Fi)
+      if (obj.equals(FI))
       {
          return;
       }
@@ -498,7 +569,7 @@ public class If extends Primitive implements Expandable
          {
             obj = list.get(i);
 
-            if (obj instanceof Fi)
+            if (obj.equals(FI))
             {
                if (i != n-1)
                {
@@ -552,8 +623,10 @@ public class If extends Primitive implements Expandable
             expanded.add(obj);
          }
 
-         doFalsePart(parser, stack, expanded);
+         doRemainingFalsePart(parser, stack, expanded);
       }
    }
 
+   public static final Else ELSE = new Else();
+   public static final Fi FI = new Fi();
 }
