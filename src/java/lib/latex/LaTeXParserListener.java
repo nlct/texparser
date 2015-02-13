@@ -210,6 +210,7 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       parser.putControlSequence(new AtSecondOfTwo());
       parser.putControlSequence(new AtFirstOfOne());
       parser.putControlSequence(new AtGobble());
+      parser.putControlSequence(new AtGobbleTwo());
       parser.putControlSequence(new Verbatim());
       parser.putControlSequence(new Verbatim("verbatim*"));
       parser.putControlSequence(new Tabular());
@@ -771,6 +772,11 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       if (styName.equals("shortvrb"))
       {
          return new ShortVrbSty(this);
+      }
+
+      if (styName.equals("doc"))
+      {
+         return new DocSty(this);
       }
 
       return null;
