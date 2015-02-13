@@ -663,6 +663,23 @@ public class TeXSettings
         activeChar);
    }
 
+   public ActiveChar removeActiveChar(int code)
+   {
+      return removeActiveChar(new Integer(code));
+   }
+
+   public ActiveChar removeActiveChar(Integer code)
+   {
+      ActiveChar ac = activeTable.remove(code);
+
+      if (ac != null || parent == null)
+      {
+         return ac;
+      }
+
+      return parent.removeActiveChar(code);
+   }
+
    public CountRegister countdef(String name, int alloc)
    {
       CountRegister reg = new CountRegister(name);

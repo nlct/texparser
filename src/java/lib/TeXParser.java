@@ -1899,6 +1899,23 @@ public class TeXParser extends TeXObjectList
       return cs;
    }
 
+   public ActiveChar removeActiveChar(int code)
+   {
+      return activeTable.remove(new Integer(code));
+   }
+
+   public ActiveChar removeActiveChar(boolean isLocal, int code)
+   {
+      if (isLocal)
+      {
+         return settings.removeActiveChar(code);
+      }
+      else
+      {
+         return removeActiveChar(code);
+      }
+   }
+
    public void putActiveChar(ActiveChar activeChar)
    {
       activeTable.put(new Integer(activeChar.getCharCode()),

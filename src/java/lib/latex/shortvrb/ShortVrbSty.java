@@ -33,9 +33,7 @@ public class ShortVrbSty extends LaTeXSty
    public void addDefinitions()
    {
       registerControlSequence(new MakeShortVerb());
-/*
       registerControlSequence(new DeleteShortVerb());
-*/
 
       getListener().getParser().putActiveChar(new VerbChar('|'));
    }

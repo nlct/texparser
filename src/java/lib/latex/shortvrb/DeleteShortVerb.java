@@ -23,24 +23,24 @@ import java.io.IOException;
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.*;
 
-public class MakeShortVerb extends ControlSequence
+public class DeleteShortVerb extends ControlSequence
 {
-   public MakeShortVerb()
+   public DeleteShortVerb()
    {
-      this("MakeShortVerb");
+      this("DeleteShortVerb");
    }
 
-   public MakeShortVerb(String name)
+   public DeleteShortVerb(String name)
    {
       super(name);
    }
 
    public Object clone()
    {
-      return new MakeShortVerb(getName());
+      return new DeleteShortVerb(getName());
    }
 
-   // \MakeShortVerb has a global effect
+   // \DeleteShortVerb has a global effect
 
    public void process(TeXParser parser) throws IOException
    {
@@ -66,7 +66,6 @@ public class MakeShortVerb extends ControlSequence
       }
 
       int code;
-      boolean showSpaces = false;
 
       if (obj instanceof ActiveChar)
       {
@@ -77,42 +76,7 @@ public class MakeShortVerb extends ControlSequence
          code = ((CharObject)obj).getCharCode();
       }
 
-      if (code == '*')
-      {
-         showSpaces = true;
-
-         obj = parser.popNextArg();
-
-         if (obj instanceof TeXObjectList)
-         {
-            TeXObjectList list = (TeXObjectList)obj;
-            obj = list.pop();
-
-            if (list.size() > 0)
-            {
-               parser.addAll(0, list);
-            }
-         }
-
-         if (!(obj instanceof ActiveChar)
-          && !(obj instanceof CharObject))
-         {
-            throw new TeXSyntaxException(parser, 
-             TeXSyntaxException.ERROR_IMPROPER_ALPHABETIC_CONSTANT,
-             obj.toString(parser));
-         }
-
-         if (obj instanceof ActiveChar)
-         {
-            code = ((ActiveChar)obj).getCharCode();
-         }
-         else
-         {
-            code = ((CharObject)obj).getCharCode();
-         }
-      }
-
-      parser.putActiveChar(new VerbChar(code, showSpaces));
+      parser.removeActiveChar(code);
    }
 
    public void process(TeXParser parser, TeXObjectList stack) throws IOException
@@ -139,7 +103,6 @@ public class MakeShortVerb extends ControlSequence
       }
 
       int code;
-      boolean showSpaces = false;
 
       if (obj instanceof ActiveChar)
       {
@@ -150,41 +113,6 @@ public class MakeShortVerb extends ControlSequence
          code = ((CharObject)obj).getCharCode();
       }
 
-      if (code == '*')
-      {
-         showSpaces = true;
-
-         obj = stack.popArg(parser);
-
-         if (obj instanceof TeXObjectList)
-         {
-            TeXObjectList list = (TeXObjectList)obj;
-            obj = list.pop();
-
-            if (list.size() > 0)
-            {
-               stack.addAll(0, list);
-            }
-         }
-
-         if (!(obj instanceof ActiveChar)
-          && !(obj instanceof CharObject))
-         {
-            throw new TeXSyntaxException(parser, 
-             TeXSyntaxException.ERROR_IMPROPER_ALPHABETIC_CONSTANT,
-             obj.toString(parser));
-         }
-
-         if (obj instanceof ActiveChar)
-         {
-            code = ((ActiveChar)obj).getCharCode();
-         }
-         else
-         {
-            code = ((CharObject)obj).getCharCode();
-         }
-      }
-
-      parser.putActiveChar(new VerbChar(code, showSpaces));
+      parser.removeActiveChar(code);
    }
 }
