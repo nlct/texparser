@@ -43,7 +43,7 @@ public class Let extends Primitive
    public void process(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
-      TeXObject firstArg = stack.popStack(parser);
+      TeXObject firstArg = stack.popToken();
 
       if (firstArg == null)
       {
@@ -51,11 +51,11 @@ public class Let extends Primitive
          return;
       }
 
-      TeXObject secondArg = stack.popStack(parser);
+      TeXObject secondArg = stack.popToken();
 
       if (secondArg == null)
       {
-         secondArg = parser.popStack();
+         secondArg = parser.popToken();
       }
 
       doAssignment(parser, firstArg, secondArg);
@@ -64,9 +64,9 @@ public class Let extends Primitive
    public void process(TeXParser parser)
       throws IOException
    {
-      TeXObject firstArg = parser.popStack();
+      TeXObject firstArg = parser.popToken();
 
-      TeXObject secondArg = parser.popStack();
+      TeXObject secondArg = parser.popToken();
 
       doAssignment(parser, firstArg, secondArg);
    }
@@ -74,21 +74,43 @@ public class Let extends Primitive
    private void doAssignment(TeXParser parser,
      TeXObject firstArg, TeXObject secondArg)
    {
-      TeXObject obj = (TeXObject)secondArg.clone();
+      TeXObject underlying = (TeXObject)secondArg.clone();
 
-      if (obj instanceof ControlSequence
-       && firstArg instanceof ControlSequence)
+      if (firstArg instanceof ControlSequence)
       {
-         ControlSequence cs = (ControlSequence)obj;
+         ControlSequence cs = (ControlSequence)firstArg;
 
-         cs.setName(((ControlSequence)firstArg).getName());
+         AssignedControlSequence newObject = 
+            new AssignedControlSequence(cs.getName(), underlying);
 
-         parser.putControlSequence(getPrefix() != PREFIX_GLOBAL,
-          cs);
+         parser.putControlSequence(getPrefix() != PREFIX_GLOBAL, newObject);
+      }
+      else if (firstArg instanceof ActiveChar)
+      {
+         ActiveChar ac = (ActiveChar)firstArg;
+
+         AssignedActiveChar newObject = new AssignedActiveChar(ac.getCharCode(),
+            underlying);
+
+         parser.putActiveChar(getPrefix() != PREFIX_GLOBAL, newObject);
+      }
+      else if (firstArg instanceof CharObject)
+      {
+         CharObject chObj = (CharObject)firstArg;
+
+         AssignedActiveChar newObject = new AssignedActiveChar(
+            chObj.getCharCode(), underlying);
+
+         parser.putActiveChar(getPrefix() != PREFIX_GLOBAL, newObject);
       }
       else
       {
-         // TODO
+         String str = firstArg.toString(parser);
+
+         AssignedActiveChar newObject = new AssignedActiveChar(
+            str.codePointAt(0), underlying);
+
+         parser.putActiveChar(getPrefix() != PREFIX_GLOBAL, newObject);
       }
 
       clearPrefix();
