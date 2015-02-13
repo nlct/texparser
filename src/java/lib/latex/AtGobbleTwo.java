@@ -43,8 +43,8 @@ public class AtGobbleTwo extends Command
    public TeXObjectList expandonce(TeXParser parser)
      throws IOException
    {
-      TeXObject arg = parser.popNextArg();
-      TeXObject arg = parser.popNextArg();
+      parser.popNextArg();
+      parser.popNextArg();
 
       return new TeXObjectList();
    }
@@ -52,8 +52,8 @@ public class AtGobbleTwo extends Command
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      TeXObject arg = stack.popArg(parser);
-      TeXObject arg = stack.popArg(parser);
+      stack.popArg(parser);
+      stack.popArg(parser);
 
       return new TeXObjectList();
    }
