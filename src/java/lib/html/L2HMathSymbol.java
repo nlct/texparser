@@ -42,7 +42,7 @@ public class L2HMathSymbol extends MathSymbol
    {
       L2HConverter listener = (L2HConverter)parser.getListener();
 
-      if (listener.useMathJax())
+      if (listener.useMathJax() && !listener.isStyControlSequence(this))
       {
          listener.write(toString(parser));
 

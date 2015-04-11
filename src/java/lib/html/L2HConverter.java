@@ -86,6 +86,8 @@ public class L2HConverter extends LaTeXParserListener
       this.texApp = app;
       this.outPath = (outDir == null ? null : outDir.toPath());
 
+      this.styCs = new Vector<String>();
+
       setWriteable(this);
       setUseMathJax(useMathJax);
    }
@@ -717,7 +719,9 @@ public class L2HConverter extends LaTeXParserListener
    {
       if (useMathJax())
       {
-         write("_{"+arg.toString(getParser())+"}");
+         write("_{");
+         arg.process(parser);
+         write("}");
       }
       else
       {
@@ -732,7 +736,9 @@ public class L2HConverter extends LaTeXParserListener
    {
       if (useMathJax())
       {
-         write("^{"+arg.toString(getParser())+"}");
+         write("^{");
+         arg.process(parser);
+         write("}");
       }
       else
       {
@@ -829,6 +835,19 @@ public class L2HConverter extends LaTeXParserListener
       return new IndexLocation(new HtmlTag(
         String.format("<a ref=\"#%s\">%d</a>", anchor, indexLoc)));
    }
+
+   public void registerControlSequence(LaTeXSty sty, ControlSequence cs)
+   {
+      styCs.add(cs.getName());
+      putControlSequence(cs);
+   }
+
+   public boolean isStyControlSequence(ControlSequence cs)
+   {
+      return styCs.contains(cs.getName());
+   }
+
+   private Vector<String> styCs;
 
    private int indexLoc = 0;
 
