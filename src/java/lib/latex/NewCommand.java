@@ -167,6 +167,7 @@ public class NewCommand extends Command
    public static final byte OVERWRITE_FORBID=(byte)0;
    public static final byte OVERWRITE_FORCE=(byte)1;
    public static final byte OVERWRITE_SKIP=(byte)2;
+   public static final byte OVERWRITE_ALLOW=(byte)3;
 
    private byte overwrite=OVERWRITE_FORBID;
 }
