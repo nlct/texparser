@@ -180,6 +180,11 @@ public class L2HConverter extends LaTeXParserListener
       return new L2HBigOperator(name, code);
    }
 
+   public MathSymbol createMathSymbol(String name, int code)
+   {
+      return new L2HMathSymbol(name, code);
+   }
+
    public Letter getLetter(int charCode)
    {
       return new L2HLetter(charCode);

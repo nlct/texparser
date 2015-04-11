@@ -51,7 +51,8 @@ public class L2HMathGroup extends MathGroup
       {
          TeXObject object = expandedPopStack(parser);
 
-         if (listener.useMathJax() && object instanceof ControlSequence)
+         if (listener.useMathJax() && object instanceof ControlSequence
+         && !listener.isStyControlSequence((ControlSequence)object))
          {
             listener.write(object.toString());
 

@@ -49,6 +49,7 @@ public class WasysymSty extends LaTeXSty
       registerControlSequence(listener.createMathSymbol("apprge", 0x2273));
       registerControlSequence(listener.createMathSymbol("wasypropto", 0x221D));
       registerControlSequence(listener.createMathSymbol("ocircle", 0x25CB));
+      registerControlSequence(listener.createMathSymbol("oiint", 0x222F));
    }
 
    public void processOption(String option)
