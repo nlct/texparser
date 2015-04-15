@@ -48,6 +48,7 @@ import com.dickimawbooks.texparserlib.latex.pifont.*;
 import com.dickimawbooks.texparserlib.latex.booktabs.*;
 import com.dickimawbooks.texparserlib.latex.textcase.*;
 import com.dickimawbooks.texparserlib.latex.shortvrb.*;
+import com.dickimawbooks.texparserlib.latex.probsoln.*;
 
 public abstract class LaTeXParserListener extends DefaultTeXParserListener
 {
@@ -777,6 +778,11 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       if (styName.equals("doc"))
       {
          return new DocSty(this);
+      }
+
+      if (styName.equals("probsoln"))
+      {
+         return new ProbSolnSty(this);
       }
 
       return null;
