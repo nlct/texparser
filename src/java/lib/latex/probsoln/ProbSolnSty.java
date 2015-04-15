@@ -50,6 +50,33 @@ public class ProbSolnSty extends LaTeXSty
       registerControlSequence(new OnlyProblem());
       registerControlSequence(new OnlySolution());
       registerControlSequence(new UseProblem(this));
+
+      if (getParser().getControlSequence("solution") == null)
+      {
+         registerControlSequence(new Solution());
+      }
+
+      registerControlSequence(new GenericCommand("solutionname",
+         null, getListener().createString("Solution")));
+
+       TeXObjectList list = new TeXObjectList();
+
+       list.add(new TeXCsRef("let"));
+       list.add(new TeXCsRef("ifshowanswers"));
+       list.add(new TeXCsRef("iftrue"));
+
+       registerControlSequence(new GenericCommand(true, "showanswers",
+         null, list));
+
+       list = new TeXObjectList();
+
+       list.add(new TeXCsRef("let"));
+       list.add(new TeXCsRef("ifshowanswers"));
+       list.add(new TeXCsRef("iffalse"));
+
+       registerControlSequence(new GenericCommand(true, "hideanswers",
+         null, list));
+
    }
 
    public void processOption(String option)

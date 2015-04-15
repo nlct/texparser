@@ -95,9 +95,16 @@ public class ProbSolnData
    private TeXObjectList getData(TeXParser parser, TeXObject[] params)
      throws IOException
    {
-      TeXObjectList list = new TeXObjectList(contents.size());
+       return getData(parser, params, contents);
+   }
 
-      for (TeXObject object : contents)
+   private TeXObjectList getData(TeXParser parser, TeXObject[] params,
+     TeXObjectList contentsList)
+     throws IOException
+   {
+      TeXObjectList list = contentsList.createList();
+
+      for (TeXObject object : contentsList)
       {
          if (object instanceof Param)
          {
@@ -115,6 +122,10 @@ public class ProbSolnData
          else if (object instanceof DoubleParam)
          {
             list.add((TeXObject)((DoubleParam)object).getParam().clone());
+         }
+         else if (object instanceof TeXObjectList)
+         {
+            list.add(getData(parser, params, (TeXObjectList)object));
          }
          else
          {
