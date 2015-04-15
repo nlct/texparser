@@ -122,6 +122,11 @@ public abstract class LaTeXSty
       return listener;
    }
 
+   public TeXParser getParser()
+   {
+      return listener.getParser();
+   }
+
    private String name;
 
    private LaTeXParserListener listener;
