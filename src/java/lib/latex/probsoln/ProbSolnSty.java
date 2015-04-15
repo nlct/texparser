@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.Set;
 
 import com.dickimawbooks.texparserlib.*;
+import com.dickimawbooks.texparserlib.primitives.NewIf;
 import com.dickimawbooks.texparserlib.latex.*;
 
 public class ProbSolnSty extends LaTeXSty
@@ -46,6 +47,9 @@ public class ProbSolnSty extends LaTeXSty
    public void addDefinitions()
    {
       registerControlSequence(new DefProblem(this));
+      registerControlSequence(new OnlyProblem());
+      registerControlSequence(new OnlySolution());
+      registerControlSequence(new UseProblem(this));
    }
 
    public void processOption(String option)
@@ -56,6 +60,8 @@ public class ProbSolnSty extends LaTeXSty
    protected void preOptions()
      throws IOException
    {
+      NewIf.createConditional(getListener().getParser(),
+        "ifshowanswers");
    }
 
    public ProbSolnDatabase getDatabase(String name) throws ProbSolnException

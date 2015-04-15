@@ -51,6 +51,80 @@ public class ProbSolnData
       return name;
    }
 
+   public int getNumArgs()
+   {
+      return numArgs;
+   }
+
+   public void process(TeXParser parser)
+     throws IOException
+   {
+      TeXObject[] params = null;
+
+      if (numArgs > 0)
+      {
+         params = new TeXObject[numArgs];
+
+         for (int i = 0; i < numArgs; i++)
+         {
+            params[i] = parser.popNextArg();
+         }
+      }
+
+      getData(parser, params).process(parser);
+   }
+
+   public void process(TeXParser parser, TeXObjectList stack)
+     throws IOException
+   {
+      TeXObject[] params = null;
+
+      if (numArgs > 0)
+      {
+         params = new TeXObject[numArgs];
+
+         for (int i = 0; i < numArgs; i++)
+         {
+            params[i] = stack.popArg(parser);
+         }
+      }
+
+      getData(parser, params).process(parser, stack);
+   }
+
+   private TeXObjectList getData(TeXParser parser, TeXObject[] params)
+     throws IOException
+   {
+      TeXObjectList list = new TeXObjectList(contents.size());
+
+      for (TeXObject object : contents)
+      {
+         if (object instanceof Param)
+         {
+            int idx = ((Param)object).getDigit()-1;
+
+            if (params == null || idx >= params.length)
+            {
+               throw new TeXSyntaxException(parser,
+                 TeXSyntaxException.ERROR_SYNTAX,
+                 object.toString(parser));
+            }
+
+            list.add((TeXObject)params[idx].clone());
+         }
+         else if (object instanceof DoubleParam)
+         {
+            list.add((TeXObject)((DoubleParam)object).getParam().clone());
+         }
+         else
+         {
+            list.add((TeXObject)object.clone());
+         }
+      }
+
+      return list;
+   }
+
    private String name;
 
    private int numArgs = 0;

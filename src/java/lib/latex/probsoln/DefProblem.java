@@ -24,7 +24,7 @@ import java.io.EOFException;
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.*;
 
-public class DefProblem extends Declaration
+public class DefProblem extends GatherEnvContents
 {
    public DefProblem(ProbSolnSty sty)
    {
@@ -40,30 +40,6 @@ public class DefProblem extends Declaration
    public Object clone()
    {
       return new DefProblem(getName(), sty);
-   }
-
-   public TeXObjectList expandonce(TeXParser parser, TeXObjectList list)
-      throws IOException
-   {
-      return null;
-   }
-
-   public TeXObjectList expandonce(TeXParser parser)
-      throws IOException
-   {
-      return null;
-   }
-
-   public TeXObjectList expandfully(TeXParser parser, TeXObjectList list)
-      throws IOException
-   {
-      return null;
-   }
-
-   public TeXObjectList expandfully(TeXParser parser)
-      throws IOException
-   {
-      return null;
    }
 
    public void process(TeXParser parser) throws IOException
@@ -161,42 +137,7 @@ public class DefProblem extends Declaration
 
       TeXObject object = stack.pop();
 
-      TeXObjectList contents = new TeXObjectList();
-
-      while (object != null)
-      {
-         if (object instanceof TeXCsRef)
-         {
-            object = parser.getListener().getControlSequence(
-              ((TeXCsRef)object).getName());
-         }
-
-         if (object instanceof End)
-         {
-            TeXObject nextObj = 
-               stack == parser ? parser.popNextArg() : stack.popArg(parser);
-
-            String envName = envName = nextObj.toString(parser);
-
-            Group grp = parser.getListener().createGroup(envName);
-
-            if (envName.equals(getName()))
-            {
-               stack.push(grp);
-               stack.push(object);
-               break;
-            }
-
-            contents.add(object);
-            contents.add(grp);
-         }
-         else
-         {
-            contents.add(object);
-         }
-
-         object = stack.pop();
-      }
+      TeXObjectList contents = popContents(parser, stack);
 
       ProbSolnData data = new ProbSolnData(label, numArgs.number(parser),
         defArgs, contents);
@@ -207,11 +148,6 @@ public class DefProblem extends Declaration
    public void end(TeXParser parser)
     throws IOException
    {
-   }
-
-   public boolean isModeSwitcher()
-   {
-      return false;
    }
 
    private ProbSolnSty sty;
