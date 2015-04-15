@@ -83,6 +83,7 @@ public abstract class DefaultTeXParserListener extends TeXParserListener
       parser.putControlSequence(new IfFalse());
       parser.putControlSequence(new Else());
       parser.putControlSequence(new Fi());
+      parser.putControlSequence(new NewIf());
       parser.putControlSequence(new MathAccent("vec", 8407));
       parser.putControlSequence(new MathAccent("hat", 0x0302, 0x02C6));
       parser.putControlSequence(new MathAccent("check", 0x030C, 0x02C7));
