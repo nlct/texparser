@@ -381,6 +381,27 @@ public abstract class DefaultTeXParserListener extends TeXParserListener
       return referencedFiles;
    }
 
+   public TeXObjectList requestUserInput(String message)
+     throws IOException
+   {
+      TeXObjectList list = new TeXObjectList();
+
+      requestUserInput(message, list);
+
+      return list;
+   }
+
+   public void requestUserInput(String message, TeXObjectList list)
+     throws IOException
+   {
+      String response = getTeXApp().requestUserInput(message);
+
+      if (response != null && !response.isEmpty())
+      {
+         getParser().scan(response, list);
+      }
+   }
+
    protected Writeable writeable;
 
    protected Vector<TeXPath> referencedFiles;
