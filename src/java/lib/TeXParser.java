@@ -1618,6 +1618,12 @@ public class TeXParser extends TeXObjectList
       return popArg(isShort, openDelim, closeDelim);
    }
 
+   public Numerical popNumericalArg(char openDelim, char closeDelim)
+     throws IOException
+   {
+      return popNumericalArg(this, openDelim, closeDelim);
+   }
+
    public TeXObject popArg(boolean isShort)
     throws IOException
    {

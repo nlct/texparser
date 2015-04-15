@@ -518,14 +518,16 @@ public class TeXObjectList extends Vector<TeXObject>
       
       popFloat(parser, object, builder);
 
+      String str = builder.toString();
+
       try
       {
-         return Float.valueOf(builder.toString());
+         return Float.valueOf(str);
       }
       catch (NumberFormatException e)
       {
          throw new TeXSyntaxException(parser,
-                  TeXSyntaxException.ERROR_NUMBER_EXPECTED);
+                  TeXSyntaxException.ERROR_NUMBER_EXPECTED, str);
       }
    }
 
@@ -572,15 +574,7 @@ public class TeXObjectList extends Vector<TeXObject>
       
       popNumber(parser, object, builder);
 
-      try
-      {
-         return new UserNumber(Integer.parseInt(builder.toString()));
-      }
-      catch (NumberFormatException e)
-      {
-         throw new TeXSyntaxException(parser,
-                  TeXSyntaxException.ERROR_NUMBER_EXPECTED);
-      }
+      return new UserNumber(parser, builder.toString());
    }
 
    // object should be fully expanded
@@ -739,6 +733,38 @@ public class TeXObjectList extends Vector<TeXObject>
       throw new TeXSyntaxException(parser,
                TeXSyntaxException.ERROR_MISSING_CLOSING,
         ""+closeDelim);
+   }
+
+   public Numerical popNumericalArg(TeXParser parser, char openDelim, char closeDelim)
+     throws IOException
+   {
+      TeXObject obj = popArg(parser, true, openDelim, closeDelim);
+
+      if (obj == null) return null;
+
+      if (obj instanceof Numerical)
+      {
+         return (Numerical)obj;
+      }
+
+      TeXObjectList expanded = null;
+
+      if (obj instanceof Expandable)
+      {
+         expanded = ((Expandable)obj).expandfully(parser, this);
+      }
+
+      if (expanded != null)
+      {
+         obj = expanded;
+      }
+
+      if (obj instanceof TeXObjectList)
+      {
+         return ((TeXObjectList)obj).popNumerical(parser);
+      }
+
+      return new UserNumber(parser, obj.toString(parser));
    }
 
    public TeXObjectList toLowerCase(TeXParser parser)
