@@ -183,6 +183,12 @@ public class TeXParserApp implements TeXApp
       System.out.println(arg);
    }
 
+   public String requestUserInput(String message)
+     throws IOException
+   {
+      return javax.swing.JOptionPane.showInputDialog(null, message);
+   }
+
    public void warning(TeXParser parser, String message)
    {
       System.err.println(appName+": "+message);

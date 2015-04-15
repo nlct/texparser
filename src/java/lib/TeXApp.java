@@ -46,6 +46,9 @@ public interface TeXApp
    public void copyFile(File orgFile, File newFile)
      throws IOException,InterruptedException;
 
+   public String requestUserInput(String message)
+     throws IOException;
+
    public static int MESSAGE_READING = 0;
    public static int MESSAGE_WRITING = 1;
    public static int MESSAGE_SHOW = 2;

@@ -214,4 +214,11 @@ public class TeXAppAdapter implements TeXApp
      throws IOException,InterruptedException
    {
    }
+
+   public String requestUserInput(String message)
+     throws IOException
+   {
+      return javax.swing.JOptionPane.showInputDialog(null, message);
+   }
+
 }
