@@ -339,7 +339,7 @@ public class LaTeX2LaTeX extends LaTeXParserListener
       }
    }
 
-   protected Path copyImageFile(String[] grpaths, TeXPath path)
+   public Path copyImageFile(String[] grpaths, TeXPath path)
     throws IOException,InterruptedException
    {
       if (grpaths == null)
