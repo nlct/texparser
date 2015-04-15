@@ -45,11 +45,16 @@ public class NewIf extends Primitive
    {
        if (!(obj instanceof ControlSequence))
        {
-          throw new TeXSyntaxException(parser, ERROR_CS_EXPECTED, obj);
+          throw new TeXSyntaxException(parser,
+            TeXSyntaxException.ERROR_CS_EXPECTED, obj.toString(parser));
        }
 
-       String name = ((ControlSequence)obj).getName();
+       createConditional(parser, ((ControlSequence)obj).getName());
+   }
 
+   public static void createConditional(TeXParser parser, String name)
+      throws IOException
+   {
        parser.putControlSequence(new IfFalse(name));
 
        TeXObjectList list = new TeXObjectList();
