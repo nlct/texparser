@@ -37,7 +37,16 @@ public interface TeXApp
 
    public void substituting(TeXParser parser, String original, String replacement);
 
-   public void message(int messageType, String arg);
+   public String getMessage(String label);
+
+   public String getMessage(String label, String param);
+
+   public String getMessage(String label, String[] params);
+
+   public String requestUserInput(String message)
+     throws IOException;
+
+   public void message(String text);
 
    public void warning(TeXParser parser, String message);
 
@@ -46,11 +55,6 @@ public interface TeXApp
    public void copyFile(File orgFile, File newFile)
      throws IOException,InterruptedException;
 
-   public String requestUserInput(String message)
-     throws IOException;
-
-   public static int MESSAGE_READING = 0;
-   public static int MESSAGE_WRITING = 1;
-   public static int MESSAGE_SHOW = 2;
-   public static int MESSAGE_INFORMATION = 3;
+   public static String MESSAGE_READING = "message.reading";
+   public static String MESSAGE_WRITING = "message.writing";
 }

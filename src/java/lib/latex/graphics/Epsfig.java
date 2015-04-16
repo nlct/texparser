@@ -90,8 +90,8 @@ public class Epsfig extends ControlSequence
 
       if (fileArg == null)
       {
-         throw new LaTeXSyntaxException(LaTeXSyntaxException.ERROR_MISSING_KEY,
-           "file");
+         throw new LaTeXSyntaxException(parser,
+            LaTeXSyntaxException.ERROR_MISSING_KEY, "file");
       }
 
       grp = parser.getListener().createGroup();

@@ -791,7 +791,8 @@ public class L2HConverter extends LaTeXParserListener
    public void beginParse(File file)
     throws IOException
    {
-      getTeXApp().message(TeXApp.MESSAGE_READING, file.getAbsolutePath());
+      getTeXApp().message(getTeXApp().getMessage(
+         TeXApp.MESSAGE_READING, file.getAbsolutePath()));
 
       basePath = file.getParentFile().toPath();
 
@@ -810,7 +811,8 @@ public class L2HConverter extends LaTeXParserListener
 
          File outFile = new File(outPath.toFile(), baseName+"."+getSuffix());
 
-         getTeXApp().message(TeXApp.MESSAGE_WRITING, outFile.getAbsolutePath());
+         getTeXApp().message(getTeXApp().getMessage(
+            TeXApp.MESSAGE_WRITING, outFile.getAbsolutePath()));
          writer = new PrintWriter(outFile);
       }
    }

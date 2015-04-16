@@ -18,112 +18,62 @@
 */
 package com.dickimawbooks.texparserlib.latex;
 
-import java.io.IOException;
-import java.io.File;
-
+import com.dickimawbooks.texparserlib.TeXSyntaxException;
 import com.dickimawbooks.texparserlib.TeXParser;
 
-public class LaTeXSyntaxException extends IOException
+public class LaTeXSyntaxException extends TeXSyntaxException
 {
-   public LaTeXSyntaxException(int errorCode)
+   public LaTeXSyntaxException(TeXParser parser, String errorTag, String param)
    {
-      this(null, -1, errorCode, null);
+      super(parser, errorTag, param);
    }
 
-   public LaTeXSyntaxException(File file, int errorCode)
+   public LaTeXSyntaxException(TeXParser parser, String errorTag, String[] params)
    {
-      this(file, -1, errorCode, null);
+      super(parser, errorTag, params);
    }
 
-   public LaTeXSyntaxException(int lineNumber, int errorCode)
+   public LaTeXSyntaxException(TeXParser parser, String errorTag,
+      String param, Throwable cause)
    {
-      this(null, lineNumber, errorCode, null);
+      super(parser, errorTag, param, cause);
    }
 
-   public LaTeXSyntaxException(File file, int lineNumber, int errorCode)
+   public LaTeXSyntaxException(TeXParser parser, String errorTag,
+      String[] params, Throwable cause)
    {
-      this(file, lineNumber, errorCode, null);
+      super(parser, errorTag, params, cause);
    }
 
-   public LaTeXSyntaxException(int errorCode, String param)
+   public LaTeXSyntaxException(TeXParser parser, String errorTag)
    {
-      this(null, -1, errorCode, param);
+      super(parser, errorTag);
    }
 
-   public LaTeXSyntaxException(File file, int errorCode, String param)
+   public LaTeXSyntaxException(TeXParser parser, String errorTag,
+     Throwable cause)
    {
-      this(file, -1, errorCode, param);
+      super(parser, errorTag, cause);
    }
 
-   public LaTeXSyntaxException(int lineNumber, int errorCode, String param)
-   {
-      this(null, lineNumber, errorCode, param);
-   }
-
-   public LaTeXSyntaxException(TeXParser parser, int errorCode, String param)
-   {
-      this(parser.getCurrentFile(), 
-           parser.getLineNumber(),
-           errorCode,
-           param);
-   }
-
-   public LaTeXSyntaxException(TeXParser parser, int errorCode)
-   {
-      this(parser.getCurrentFile(), 
-           parser.getLineNumber(),
-           errorCode,
-           null);
-   }
-
-   public LaTeXSyntaxException(File file, int lineNumber, int errorCode, String param)
-   {
-      super("LaTeX syntax error code "+errorCode);
-      this.file = file;
-      this.errorCode = errorCode;
-      this.param = param;
-      this.lineNum = lineNumber;
-   }
-
-   public int getErrorCode()
-   {
-      return errorCode;
-   }
-
-   public String getParam()
-   {
-      return param;
-   }
-
-   public void setLineNumber(int number)
-   {
-      lineNum = number;
-   }
-
-   public int getLineNumber()
-   {
-      return lineNum;
-   }
-
-   public File getFile()
-   {
-      return file;
-   }
-
-   public void setFile(File file)
-   {
-      this.file = file;
-   }
-
-   private int errorCode;
-   private String param;
-   private int lineNum;
-   private File file;
-
-   public static final int ERROR_MULTI_BEGIN_DOC=1,
-      ERROR_NO_BEGIN_DOC=2, ERROR_MULTI_CLS=3,
-      ERROR_MISSING_KEY=4, ERROR_EXTRA_END=5,
-      ERROR_UNACCESSIBLE=6,
-      ERROR_DEFINED=7, ERROR_ILLEGAL_ARRAY_ARG_CHAR=8,
-      ERROR_NO_ALIGNMENT=9, ERROR_UNDEFINED_COUNTER=10;
+   public static final String ERROR_MULTI_BEGIN_DOC = 
+      "latex.error.multi_begin_doc";
+   public static final String ERROR_NO_BEGIN_DOC = 
+      "latex.error.no_begin_doc";
+   public static final String ERROR_MULTI_CLS = 
+      "latex.error.multi_cls";
+   public static final String ERROR_MISSING_KEY = 
+      "latex.error.missing_key";
+   public static final String ERROR_EXTRA_END = 
+      "latex.error.extra_end";
+   public static final String ERROR_UNACCESSIBLE = 
+      "latex.error.unaccessible";
+   public static final String ERROR_DEFINED = 
+      "latex.error.defined";
+   public static final String ERROR_ILLEGAL_ARRAY_ARG_CHAR = 
+      "latex.error.illegal_array_arg_char";
+   public static final String ERROR_NO_ALIGNMENT =
+      "latex.error.no_alignment";
+   public static final String ERROR_UNDEFINED_COUNTER = 
+      "latex.error.undefined_counter";
 }

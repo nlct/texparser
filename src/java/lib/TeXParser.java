@@ -1509,10 +1509,6 @@ public class TeXParser extends TeXObjectList
                {
                   listener.getTeXApp().error(e);
                }
-               catch (LaTeXSyntaxException e)
-               {
-                  listener.getTeXApp().error(e);
-               }
             }
          }
       }

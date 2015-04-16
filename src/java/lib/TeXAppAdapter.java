@@ -46,9 +46,36 @@ public class TeXAppAdapter implements TeXApp
       System.out.println(original+" -> "+replacement);
    }
 
-   public void message(int messageType, String arg)
+   public String getMessage(String label)
    {
-      System.out.println(arg);
+      return label;
+   }
+
+   public String getMessage(String label, String param)
+   {
+      return String.format("%s[%s]", label, param);
+   }
+
+   public String getMessage(String label, String[] params)
+   {
+      String msg = label;
+
+      String pre = "[";
+
+      for (int i = 0; i < params.length; i++)
+      {
+         msg += pre + params[i];
+         pre = ",";
+      }
+
+      msg += "]";
+
+      return msg;
+   }
+
+   public void message(String text)
+   {
+      System.out.println(text);
    }
 
    public void warning(TeXParser parser, String message)
@@ -58,156 +85,14 @@ public class TeXAppAdapter implements TeXApp
 
    public void error(Exception e)
    {
-      if (e instanceof LaTeXSyntaxException)
+      if (e instanceof TeXSyntaxException)
       {
-         System.err.println(getErrorMessage((LaTeXSyntaxException)e));
-      }
-      else if (e instanceof TeXSyntaxException)
-      {
-         System.err.println(getErrorMessage((TeXSyntaxException)e));
+         System.err.println(((TeXSyntaxException)e).getMessage(this));
       }
       else
       {
          e.printStackTrace();
       }
-   }
-
-   public static String getErrorMessage(LaTeXSyntaxException e)
-   {
-      String message;
-
-      switch (e.getErrorCode())
-      {
-         case LaTeXSyntaxException.ERROR_MULTI_BEGIN_DOC:
-            message = "Only one \\begin{document} permitted";
-         break;
-         case LaTeXSyntaxException.ERROR_NO_BEGIN_DOC:
-            message = "No \\begin{document} found";
-         break;
-         case LaTeXSyntaxException.ERROR_MULTI_CLS:
-            message = "Only one \\documentclass permitted";
-         break;
-         case LaTeXSyntaxException.ERROR_MISSING_KEY:
-            message = "Missing '"+ e.getParam()+"' key";
-         break;
-         case LaTeXSyntaxException.ERROR_EXTRA_END:
-            message = "Extra \\end{" + e.getParam()+"} found";
-         break;
-         case LaTeXSyntaxException.ERROR_UNACCESSIBLE:
-            message = "Unaccessible '" + e.getParam()+"'";
-         break;
-         case LaTeXSyntaxException.ERROR_DEFINED:
-            message = "" + e.getParam()+" already defined";
-         break;
-         case LaTeXSyntaxException.ERROR_ILLEGAL_ARRAY_ARG_CHAR:
-            message = "Illegal character '" + e.getParam()+"' in array arg";
-         break;
-         case LaTeXSyntaxException.ERROR_NO_ALIGNMENT:
-            message = "No alignment found";
-         break;
-         case LaTeXSyntaxException.ERROR_UNDEFINED_COUNTER:
-            message = "No counter '"+e.getParam()+"' defined";
-         break;
-         default:
-            message = e.getMessage();
-      }
-
-      int lineNum = e.getLineNumber();
-
-      return lineNum == -1 ? message : "Line "+lineNum+" : "+message;
-   }
-
-   public static String getErrorMessage(TeXSyntaxException e)
-   {
-      String message;
-
-      switch (e.getErrorCode())
-      {
-         case TeXSyntaxException.ERROR_BAD_PARAM:
-           message = "Parameter digit 1 to 9 expected. Found '"
-            + e.getParam()+"'";
-         break;
-         case TeXSyntaxException.ERROR_NO_EG:
-           message = "Missing end group";
-         break;
-         case TeXSyntaxException.ERROR_PAR_BEFORE_EG:
-           message = "Paragraph break found before end group";
-         break;
-         case TeXSyntaxException.ERROR_UNEXPECTED_EG:
-           message = "Unexpected end group found";
-         break;
-         case TeXSyntaxException.ERROR_MISSING_ENDMATH:
-           message = "Missing end math";
-         break;
-         case TeXSyntaxException.ERROR_DOLLAR2_ENDED_WITH_DOLLAR:
-           message = "$$ ended with $";
-         break;
-         case TeXSyntaxException.ERROR_NOT_FOUND:
-           message = "Expected '"+ e.getParam()+"' but not found";
-         break;
-         case TeXSyntaxException.ERROR_MISSING_PARAM:
-           message = "Argument expected but not found";
-         break;
-         case TeXSyntaxException.ERROR_NOT_MATH_MODE:
-           message = e.getParam()+" only permitted in math mode";
-         break;
-         case TeXSyntaxException.ERROR_INVALID_ACCENT:
-           message = e.getParam()+" is not a recognised accent";
-         break;
-         case TeXSyntaxException.ERROR_AMBIGUOUS_MIDCS:
-           message = "Ambiguous use of "+ e.getParam();
-         break;
-         case TeXSyntaxException.ERROR_MISSING_CLOSING:
-           message = "Missing closing "+ e.getParam();
-         break;
-         case TeXSyntaxException.ERROR_DIMEN_EXPECTED:
-           message = "Dimension expected";
-         break;
-         case TeXSyntaxException.ERROR_MISSING_UNIT:
-           message = "Missing unit";
-         break;
-         case TeXSyntaxException.ERROR_EXPECTED:
-           message = "Expected "+ e.getParam();
-         break;
-         case TeXSyntaxException.ERROR_UNDEFINED:
-           message = "Undefined command "+ e.getParam();
-         break;
-         case TeXSyntaxException.ERROR_CS_EXPECTED:
-           message = "Control sequence expected (found " +e.getParam()+")";
-         break;
-         case TeXSyntaxException.ERROR_NUMBER_EXPECTED:
-           message = "Number expected (found "+ e.getParam()+")";
-         break;
-         case TeXSyntaxException.ERROR_SYNTAX:
-           message = "Invalid syntax for "+ e.getParam();
-         break;
-         case TeXSyntaxException.ERROR_EXTRA:
-           message = "Extra "+ e.getParam();
-         break;
-         case TeXSyntaxException.ERROR_DOUBLE_SUBSCRIPT:
-           message = "Double subscript _"+ e.getParam()
-              +"_ (replaced with _"+e.getParam()+"{}_)";
-         break;
-         case TeXSyntaxException.ERROR_DOUBLE_SUPERSCRIPT:
-           message = "Double superscript ^"+ e.getParam()
-              +"^ (replaced with ^"+e.getParam()+"{}^)";
-         break;
-         case TeXSyntaxException.ERROR_MISPLACED_OMIT:
-           message = "Misplaced \\omit";
-         break;
-         case TeXSyntaxException.ERROR_ILLEGAL_ALIGN:
-           message = "Illegal alignment "+e.getParam();
-         break;
-         case TeXSyntaxException.ERROR_IMPROPER_ALPHABETIC_CONSTANT: 
-           message = "Improper alphabetic constant "+e.getParam();
-         break;
-         default:
-           message = e.getMessage();
-      }
-
-      int lineNum = e.getLineNumber();
-
-      return lineNum == -1 ? message : "Line "+lineNum+" : "+message;
    }
 
    public void copyFile(File orgFile, File newFile)

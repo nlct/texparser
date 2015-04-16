@@ -174,7 +174,8 @@ public class AuxParser extends DefaultTeXParserListener
    public void beginParse(File file)
       throws IOException
    {
-      getTeXApp().message(TeXApp.MESSAGE_READING, file.getAbsolutePath());
+      getTeXApp().message(getTeXApp().getMessage(
+         TeXApp.MESSAGE_READING, file.getAbsolutePath()));
    }
 
    public void addAuxData(AuxData data)

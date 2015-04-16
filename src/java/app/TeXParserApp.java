@@ -168,19 +168,9 @@ public class TeXParserApp implements TeXApp
       parser.parse(new File(inFileName));
    }
 
-   public void message(int type, String arg)
+   public void message(String text)
    {
-      switch (type)
-      {
-         case MESSAGE_READING:
-            System.out.println(getLabelWithValue("message.reading", arg));
-         return;
-         case MESSAGE_WRITING:
-            System.out.println(getLabelWithValue("message.writing", arg));
-         return;
-      }
-
-      System.out.println(arg);
+      System.out.println(text);
    }
 
    public String requestUserInput(String message)
@@ -578,143 +568,6 @@ public class TeXParserApp implements TeXApp
            && currentProcessListeners.size() > 0);
    }
 
-   public static String getErrorMessage(LaTeXSyntaxException e)
-   {
-      String message;
-
-      switch (e.getErrorCode())
-      {
-         case LaTeXSyntaxException.ERROR_MULTI_BEGIN_DOC:
-            message = getLabel("error.multi_begin_doc");
-         break;
-         case LaTeXSyntaxException.ERROR_NO_BEGIN_DOC:
-            message = getLabel("error.no_begin_doc");
-         break;
-         case LaTeXSyntaxException.ERROR_MULTI_CLS:
-            message = getLabel("error.multi_cls");
-         break;
-         case LaTeXSyntaxException.ERROR_MISSING_KEY:
-            message = getLabelWithValue("error.missing_key", e.getParam());
-         break;
-         case LaTeXSyntaxException.ERROR_EXTRA_END:
-            message = getLabelWithValue("error.extra_end", e.getParam());
-         break;
-         case LaTeXSyntaxException.ERROR_UNACCESSIBLE:
-            message = getLabelWithValue("error.unaccessible", e.getParam());
-         break;
-         case LaTeXSyntaxException.ERROR_DEFINED:
-            message = getLabelWithValue("error.defined", e.getParam());
-         break;
-         case LaTeXSyntaxException.ERROR_ILLEGAL_ARRAY_ARG_CHAR:
-            message = getLabel("error.misplaced_omit");
-         break;
-         case LaTeXSyntaxException.ERROR_NO_ALIGNMENT:
-            message = getLabel("error.no_alignment");
-         break;
-         case LaTeXSyntaxException.ERROR_UNDEFINED_COUNTER:
-            message = getLabelWithValue("error.undefined_counter", e.getParam());
-         break;
-         default:
-            message = e.getMessage();
-      }
-
-      int lineNum = e.getLineNumber();
-
-      return (lineNum == -1 ? message : 
-         getLabelWithValues("error.line", ""+lineNum, message));
-   }
-
-   public static String getErrorMessage(TeXSyntaxException e)
-   {
-      String message;
-
-      switch (e.getErrorCode())
-      {
-         case TeXSyntaxException.ERROR_BAD_PARAM:
-           message = getLabelWithValue("error.bad_param", e.getParam());
-         break;
-         case TeXSyntaxException.ERROR_NO_EG:
-           message = getLabel("error.no_eg");
-         break;
-         case TeXSyntaxException.ERROR_PAR_BEFORE_EG:
-           message = getLabel("error.par_before_eg");
-         break;
-         case TeXSyntaxException.ERROR_UNEXPECTED_EG:
-           message = getLabel("error.unexpected_eg");
-         break;
-         case TeXSyntaxException.ERROR_MISSING_ENDMATH:
-           message = getLabel("error.missing_endmath");
-         break;
-         case TeXSyntaxException.ERROR_DOLLAR2_ENDED_WITH_DOLLAR:
-           message = getLabel("error.dollar2_ended_with_dollar");
-         break;
-         case TeXSyntaxException.ERROR_NOT_FOUND:
-           message = getLabelWithValue("error.not_found", e.getParam());
-         break;
-         case TeXSyntaxException.ERROR_MISSING_PARAM:
-           message = getLabel("error.missing_param");
-         break;
-         case TeXSyntaxException.ERROR_NOT_MATH_MODE:
-           message = getLabelWithValue("error.not_math_mode", e.getParam());
-         break;
-         case TeXSyntaxException.ERROR_INVALID_ACCENT:
-           message = getLabelWithValue("error.invalid_accent", e.getParam());
-         break;
-         case TeXSyntaxException.ERROR_AMBIGUOUS_MIDCS:
-           message = getLabelWithValue("error.ambiguous_midcs", e.getParam());
-         break;
-         case TeXSyntaxException.ERROR_MISSING_CLOSING:
-           message = getLabelWithValue("error.missing_closing", e.getParam());
-         break;
-         case TeXSyntaxException.ERROR_DIMEN_EXPECTED:
-           message = getLabel("error.dimen_expected");
-         break;
-         case TeXSyntaxException.ERROR_MISSING_UNIT:
-           message = getLabel("error.missing_unit");
-         break;
-         case TeXSyntaxException.ERROR_EXPECTED:
-           message = getLabelWithValue("error.expected", e.getParam());
-         break;
-         case TeXSyntaxException.ERROR_UNDEFINED:
-           message = getLabelWithValue("error.undefined", e.getParam());
-         break;
-         case TeXSyntaxException.ERROR_CS_EXPECTED:
-           message = getLabelWithValue("error.cs_expected", e.getParam());
-         break;
-         case TeXSyntaxException.ERROR_NUMBER_EXPECTED:
-           message = getLabelWithValue("error.number_expected", e.getParam());
-         break;
-         case TeXSyntaxException.ERROR_REGISTER_UNDEF:
-           message = getLabelWithValue("error.register_undef", e.getParam());
-         break;
-         case TeXSyntaxException.ERROR_SYNTAX:
-           message = getLabelWithValue("error.syntax", e.getParam());
-         break;
-         case TeXSyntaxException.ERROR_EXTRA:
-           message = getLabelWithValue("error.extra", e.getParam());
-         break;
-         case TeXSyntaxException.ERROR_DOUBLE_SUBSCRIPT:
-           message = getLabelWithValue("error.double_subscript", e.getParam());
-         break;
-         case TeXSyntaxException.ERROR_DOUBLE_SUPERSCRIPT:
-           message = getLabelWithValue("error.double_superscript", e.getParam());
-         break;
-         case TeXSyntaxException.ERROR_ILLEGAL_ALIGN:
-           message = getLabelWithValue("error.illegal_align", e.getParam());
-         break;
-         case TeXSyntaxException.ERROR_IMPROPER_ALPHABETIC_CONSTANT:
-           message = getLabelWithValue("error.improper_alphabetic_constant", e.getParam());
-         break;
-         default:
-           message = e.getMessage();
-      }
-
-      int lineNum = e.getLineNumber();
-
-      return (lineNum == -1 ? message : 
-         getLabelWithValues("error.line", ""+lineNum, message));
-   }
-
    public static void help()
    {
       version();
@@ -792,13 +645,9 @@ public class TeXParserApp implements TeXApp
 
    public void error(Exception e)
    {
-      if (e instanceof LaTeXSyntaxException)
+      if (e instanceof TeXSyntaxException)
       {
-         errorListener.error(getErrorMessage((LaTeXSyntaxException)e));
-      }
-      else if (e instanceof TeXSyntaxException)
-      {
-         errorListener.error(getErrorMessage((TeXSyntaxException)e));
+         errorListener.error(((TeXSyntaxException)e).getMessage(this));
       }
       else
       {
@@ -873,6 +722,21 @@ public class TeXParserApp implements TeXApp
             in.close();
          }
       }
+   }
+
+   public String getMessage(String label)
+   {
+      return getLabel(label);
+   }
+
+   public String getMessage(String label, String param)
+   {
+      return getLabelWithValue(label, param);
+   }
+
+   public String getMessage(String label, String[] params)
+   {
+      return getLabelWithValues(label, params);
    }
 
    public static String getLabelWithAlt(String label, String alt)
