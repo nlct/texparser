@@ -52,6 +52,7 @@ public class ProbSolnSty extends LaTeXSty
       registerControlSequence(new UseProblem(this));
       registerControlSequence(new NewProblem(this));
       registerControlSequence(new Question());
+      registerControlSequence(new ForEachProblem(this));
 
       if (getParser().getControlSequence("solution") == null)
       {
@@ -84,6 +85,22 @@ public class ProbSolnSty extends LaTeXSty
    public void processOption(String option)
     throws IOException
    {
+      if (option.equals("answers"))
+      {
+         getListener().getControlSequence("showanswerstrue").process(getParser());
+      }
+      else if (option.equals("noanswers"))
+      {
+	 getListener().getControlSequence("showanswersfalse").process(getParser());
+      }
+      else if (option.equals("usedefaultargs"))
+      {
+         getListener().getControlSequence("usedefaultprobargstrue").process(getParser());
+      }
+      else if (option.equals("usenodefaultargs"))
+      {
+         getListener().getControlSequence("usedefaultprobargsfalse").process(getParser());
+      }
    }
 
    protected void preOptions()
@@ -91,6 +108,8 @@ public class ProbSolnSty extends LaTeXSty
    {
       NewIf.createConditional(getListener().getParser(),
         "ifshowanswers");
+      NewIf.createConditional(getListener().getParser(),
+        "ifusedefaultprobargs");
    }
 
    public ProbSolnDatabase getDatabase(String name) throws ProbSolnException
