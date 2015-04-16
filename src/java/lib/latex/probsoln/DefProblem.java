@@ -135,11 +135,10 @@ public class DefProblem extends GatherEnvContents
          stack.popArg(parser, '[', ']');
       }
 
-      TeXObject object = stack.pop();
-
       TeXObjectList contents = popContents(parser, stack);
 
-      ProbSolnData data = new ProbSolnData(label, numArgs.number(parser),
+      ProbSolnData data = new ProbSolnData(label,
+        numArgs == null ? 0 : numArgs.number(parser),
         defArgs, contents);
 
       sty.addProblem(data);

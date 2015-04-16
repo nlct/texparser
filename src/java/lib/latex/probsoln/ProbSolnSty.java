@@ -50,6 +50,8 @@ public class ProbSolnSty extends LaTeXSty
       registerControlSequence(new OnlyProblem());
       registerControlSequence(new OnlySolution());
       registerControlSequence(new UseProblem(this));
+      registerControlSequence(new NewProblem(this));
+      registerControlSequence(new Question());
 
       if (getParser().getControlSequence("solution") == null)
       {

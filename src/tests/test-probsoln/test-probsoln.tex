@@ -4,7 +4,7 @@
 
 \showanswers
 
-\begin{defproblem}[1]{diffsin}
+\begin{defproblem}[1][{2}]{diffsin}
 Differentiate $f(x)=\sin(#1x)$.
 \begin{onlysolution}
  \begin{solution}
@@ -13,8 +13,22 @@ Differentiate $f(x)=\sin(#1x)$.
 \end{onlysolution}
 \end{defproblem}
 
+\newproblem[1][{4}]{diffcos}{%
+  \(f(x) = \cos(#1x)\)
+}%
+{%
+  \(f'(x) = -#1\sin(#1x)\)
+}
+
+\newproblem*{essay}{An essay style question without an answer.}
+
 \begin{document}
 
-\useproblem{diffsin}{3}
+\begin{enumerate}
+\item \useproblem{diffsin}{3}
 
+\item \useproblem{diffcos}{8}
+
+\item \useproblem{essay}
+\end{enumerate}
 \end{document}
