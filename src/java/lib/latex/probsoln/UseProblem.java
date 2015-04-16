@@ -81,7 +81,7 @@ public class UseProblem extends ControlSequence
          }
       }
 
-      sty.getProblem(object.toString(parser), db).process(parser, stack);
+      sty.getProblem(parser, object.toString(parser), db).process(parser, stack);
    }
 
    public void process(TeXParser parser)
@@ -122,7 +122,7 @@ public class UseProblem extends ControlSequence
          }
       }
 
-      sty.getProblem(object.toString(parser), db).process(parser);
+      sty.getProblem(parser, object.toString(parser), db).process(parser);
    }
 
    private ProbSolnSty sty;

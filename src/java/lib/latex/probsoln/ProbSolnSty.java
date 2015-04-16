@@ -34,14 +34,8 @@ public class ProbSolnSty extends LaTeXSty
 
       databases = new HashMap<String,ProbSolnDatabase>();
 
-      try
-      {
-         addDatabase("default");
-      }
-      catch (ProbSolnException e)
-      {
-         // won't happen
-      }
+      ProbSolnDatabase db = new ProbSolnDatabase("default");
+      databases.put("default", db);
    }
 
    public void addDefinitions()
@@ -112,72 +106,75 @@ public class ProbSolnSty extends LaTeXSty
         "ifusedefaultprobargs");
    }
 
-   public ProbSolnDatabase getDatabase(String name) throws ProbSolnException
+   public ProbSolnDatabase getDatabase(TeXParser parser, String name)
+     throws ProbSolnException
    {
       ProbSolnDatabase db = databases.get(name);
 
       if (db == null)
       {
-         throw new ProbSolnException(
-           "ProbSoln Database '"+name+"' doesn't exist");
+         throw new ProbSolnException(parser,
+           ProbSolnException.ERROR_NO_SUCH_DB, name);
       }
 
       return db;
    }
 
-   public ProbSolnData getProblem(String label, String dbName)
+   public ProbSolnData getProblem(TeXParser parser, String label, String dbName)
     throws ProbSolnException
    {
-      ProbSolnData prob = getDatabase(dbName).get(label);
+      ProbSolnData prob = getDatabase(parser, dbName).get(label);
 
       if (prob == null)
       {
-         throw new ProbSolnException(String.format(
-           "Entry '%s' doesn't exist in ProbSoln database '%s'",
-           label, dbName));
+         throw new ProbSolnException(parser,
+           ProbSolnException.ERROR_NO_SUCH_ENTRY_IN_DB,
+           new String[] {label, dbName});
       }
 
       return prob;
    }
 
-   public void addDatabase(String name) throws ProbSolnException
+   public void addDatabase(TeXParser parser, String name)
+     throws ProbSolnException
    {
       if (databases.containsKey(name))
       {
-         throw new ProbSolnException(
-           "ProbSoln Database '"+name+"' already exists");
+         throw new ProbSolnException(parser, 
+           ProbSolnException.ERROR_DB_EXISTS, name);
       }
 
       ProbSolnDatabase db = new ProbSolnDatabase(name);
       databases.put(name, db);
    }
 
-   public void moveProblem(String label, String source, String target)
-    throws ProbSolnException
+   public void moveProblem(TeXParser parser,
+     String label, String source, String target)
+   throws ProbSolnException
    {
       ProbSolnDatabase db = databases.get(source);
 
       if (db == null)
       {
-         throw new ProbSolnException(
-           "ProbSoln Database '"+source+"' doesn't exist");
+         throw new ProbSolnException(parser,
+           ProbSolnException.ERROR_NO_SUCH_DB, source);
       }
 
       ProbSolnData data = db.remove(label);
 
       if (data == null)
       {
-         throw new ProbSolnException(String.format(
-           "Entry '%s' doesn't exist in ProbSoln database '%s'",
-           label, source));
+         throw new ProbSolnException(parser,
+           ProbSolnException.ERROR_NO_SUCH_ENTRY_IN_DB,
+           new String[] {label, source});
       }
 
       db = databases.get(target);
 
       if (db == null)
       {
-         throw new ProbSolnException(
-           "ProbSoln Database '"+target+"' doesn't exist");
+         throw new ProbSolnException(parser,
+           ProbSolnException.ERROR_NO_SUCH_DB, target);
       }
 
       db.put(label, data);
@@ -193,9 +190,10 @@ public class ProbSolnSty extends LaTeXSty
       return databases.size();
    }
 
-   public void addProblem(ProbSolnData data) throws ProbSolnException
+   public void addProblem(TeXParser parser, ProbSolnData data)
+   throws ProbSolnException
    {
-      ProbSolnDatabase db = getDatabase(currentDb);
+      ProbSolnDatabase db = getDatabase(parser, currentDb);
 
       db.put(data.getName(), data);
    }

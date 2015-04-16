@@ -208,7 +208,7 @@ public class NewProblem extends ControlSequence
         numArgs == null ? 0 : numArgs.number(parser),
         defArgs, contents);
 
-      sty.addProblem(data);
+      sty.addProblem(parser, data);
    }
 
    private void processStar(TeXParser parser, TeXObjectList stack)
@@ -329,7 +329,7 @@ public class NewProblem extends ControlSequence
         numArgs == null ? 0 : numArgs.number(parser),
         defArgs, contents);
 
-      sty.addProblem(data);
+      sty.addProblem(parser, data);
    }
 
    private ProbSolnSty sty;

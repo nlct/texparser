@@ -141,7 +141,7 @@ public class DefProblem extends GatherEnvContents
         numArgs == null ? 0 : numArgs.number(parser),
         defArgs, contents);
 
-      sty.addProblem(data);
+      sty.addProblem(parser, data);
    }
 
    public void end(TeXParser parser)

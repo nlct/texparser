@@ -68,7 +68,7 @@ public class ForEachProblem extends ControlSequence
 
       TeXObject body = stack.popArg(parser);
       
-      ProbSolnDatabase database = sty.getDatabase(db);
+      ProbSolnDatabase database = sty.getDatabase(parser, db);
 
       Iterator<String> it = database.keySet().iterator();
 
@@ -112,7 +112,7 @@ public class ForEachProblem extends ControlSequence
 
       TeXObject body = parser.popNextArg();
 
-      ProbSolnDatabase database = sty.getDatabase(db);
+      ProbSolnDatabase database = sty.getDatabase(parser, db);
 
       Iterator<String> it = database.keySet().iterator();
 
