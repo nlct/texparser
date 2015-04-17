@@ -298,7 +298,19 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       parser.putControlSequence(new ListDec());
       parser.putControlSequence(new EnumerateDec());
       parser.putControlSequence(new ItemizeDec());
+      parser.putControlSequence(new DescriptionDec());
+      parser.putControlSequence(new GenericCommand(false, "descriptionlabel",
+        new TeXObject[] {getParam(1)},
+        new TeXObject[]
+        {
+           new TeXCsRef("hspace"),
+           new TeXCsRef("labelsep"),
+           new TeXCsRef("normalfont"),
+           new TeXCsRef("bfseries"),
+           getParam(1)
+        }));
       parser.putControlSequence(new ListItem());
+      parser.putControlSequence(new DescriptionItem());
       parser.putControlSequence(new UseCounter());
 
       parser.putControlSequence(

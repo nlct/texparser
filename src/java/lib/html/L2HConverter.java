@@ -133,12 +133,10 @@ public class L2HConverter extends LaTeXParserListener
 
       putControlSequence(new L2HAbstract());
 
-/*
-      putControlSequence(new L2HList());
-      putControlSequence(new L2HEnumerate());
-      putControlSequence(new L2HItemize());
-*/
       putControlSequence(new L2HItem());
+
+      putControlSequence(new L2HDescriptionLabel());
+      putControlSequence(new L2HDescriptionItem());
 
       putControlSequence(new L2HMathDeclaration("math"));
 
@@ -589,6 +587,7 @@ public class L2HConverter extends LaTeXParserListener
       writeln("span.inlineitem { margin-right: .5em; margin-left: .5em; }");
       writeln("span.numitem { float: left; margin-left: -3em; text-align: right; min-width: 2.5em; }");
       writeln("span.bulletitem { float: left; margin-left: -1em; }");
+      writeln("span.descitem { font: normal; font-weight: bold; }");
 
       for (String style : extraCssStyles)
       {
@@ -881,7 +880,11 @@ public class L2HConverter extends LaTeXParserListener
    {
       super.startList(trivlist);
 
-      if (trivlist.isInLine())
+      if (trivlist instanceof DescriptionDec)
+      {
+         write(String.format("%n<dl>%n"));
+      }
+      else if (trivlist.isInLine())
       {
          write("<div class=\"inlinelist\">");
       }
@@ -900,7 +903,11 @@ public class L2HConverter extends LaTeXParserListener
 
    public void endList(TrivListDec trivlist) throws IOException
    {
-      if (trivlist.isInLine())
+      if (trivlist instanceof DescriptionDec)
+      {
+         write(String.format("%n</dl>%n"));
+      }
+      else if (trivlist.isInLine())
       {
          write("</div>");
       }
