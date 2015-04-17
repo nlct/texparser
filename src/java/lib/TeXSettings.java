@@ -855,7 +855,7 @@ public class TeXSettings
       reg.advance(parser, value);
    }
 
-   public void globalAdvanceRegister(String name, Numerical value)
+   public Register globalAdvanceRegister(String name, Numerical value)
      throws TeXSyntaxException
    {
       Register reg = getRegister(name);
@@ -885,6 +885,8 @@ public class TeXSettings
             rootReg.setValue(parser, reg);
          }
       }
+
+      return reg;
    }
 
    public void localMultiplyRegister(String name, Numerical value)

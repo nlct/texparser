@@ -53,7 +53,6 @@ public class NewIf extends Primitive
    }
 
    public static void createConditional(TeXParser parser, String name)
-      throws IOException
    {
        parser.putControlSequence(new IfFalse(name));
 

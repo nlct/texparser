@@ -132,12 +132,9 @@ public class L2HConverter extends LaTeXParserListener
 
       putControlSequence(new L2HAbstract());
 
-      putControlSequence(new L2HList("enumerate", "ol",
-        new L2HItem()));
-      putControlSequence(new L2HList("itemize", "ul",
-        new L2HItem()));
-      putControlSequence(new L2HList("description", "dl",
-        new L2HDescItem()));
+      putControlSequence(new L2HList());
+      putControlSequence(new L2HEnumerate());
+      putControlSequence(new L2HItem());
 
       putControlSequence(new L2HMathDeclaration("math"));
 
@@ -162,6 +159,10 @@ public class L2HConverter extends LaTeXParserListener
 
       putControlSequence(new L2Hhfill("hfill"));
       putControlSequence(new L2Hhfill("hfil"));
+
+      /* indent/noindent not implemented */
+      putControlSequence(new Relax("indent"));
+      putControlSequence(new Relax("noindent"));
 
       try
       {
@@ -573,6 +574,10 @@ public class L2HConverter extends LaTeXParserListener
       writeln("div.toc-subsubsection { padding-left: 2em; }");
       writeln("div.toc-paragraph { padding-left: 2.5em; }");
       writeln("div.toc-subparagraph { padding-left: 3em; }");
+
+      writeln(".displaylist { display: block; list-style-type: none; }");
+      writeln(".inlinelist { display: inline; list-style-type: none; }");
+      writeln("span.listitem { float: left; padding-right: 1em;}");
 
       for (String style : extraCssStyles)
       {

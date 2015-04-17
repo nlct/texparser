@@ -16,7 +16,7 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
-package com.dickimawbooks.texparserlib.html;
+package com.dickimawbooks.texparserlib.latex.probsoln;
 
 import java.io.IOException;
 import java.io.EOFException;
@@ -24,29 +24,25 @@ import java.io.EOFException;
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.*;
 
-public class L2HItem extends ListItem
+public class TextEnum extends EnumerateDec
 {
-   public L2HItem()
+   public TextEnum()
    {
-      this("item");
+      this("textenum");
    }
 
-   public L2HItem(String name)
+   public TextEnum(String name)
    {
       super(name);
    }
 
    public Object clone()
    {
-      return new L2HItem(getName());
+      return new TextEnum(getName());
    }
 
-   public void makelabel(TeXParser parser, TeXObject label)
-    throws IOException
+   public boolean isInLine()
    {
-      parser.getListener().getWriteable().write("<li><span class=\"listitem\">");
-      label.process(parser);
-      parser.getListener().getWriteable().write("</span>");
+      return true;
    }
-
 }

@@ -281,6 +281,35 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       newcounter("footnote");
       newcounter("mpfootnote");
 
+
+      parser.getSettings().newcount("@listdepth");
+      parser.getSettings().newcount("@enumdepth");
+
+      NewIf.createConditional(parser, "if@nmbrlist");
+
+      parser.putControlSequence(new TrivListDec());
+      parser.putControlSequence(new ListDec());
+      parser.putControlSequence(new EnumerateDec());
+      parser.putControlSequence(new ListItem());
+      parser.putControlSequence(new UseCounter());
+
+      parser.putControlSequence(
+        new GenericCommand(true, "labelenumi", null, 
+        new TeXObject[] {new TeXCsRef("theenumi"), getOther('.')}));
+
+      parser.putControlSequence(
+        new GenericCommand(true, "labelenumii", null, 
+        new TeXObject[]
+        {getOther('('), new TeXCsRef("theenumii"), getOther(')')}));
+
+      parser.putControlSequence(
+        new GenericCommand(true, "labelenumiii", null, 
+        new TeXObject[] {new TeXCsRef("theenumiii"), getOther('.')}));
+
+      parser.putControlSequence(
+        new GenericCommand(true, "labelenumiv", null, 
+        new TeXObject[] {new TeXCsRef("theenumiv"), getOther('.')}));
+
       parser.putControlSequence(
         new GenericCommand("@mpfn", null, createString("footnote")));
       parser.putControlSequence(
@@ -1377,6 +1406,7 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
 
    public static final UserNumber ZERO = new UserNumber(0);
    public static final UserNumber ONE = new UserNumber(1);
+   public static final UserNumber MINUS_ONE = new UserNumber(-1);
 
    public static final String[] IMAGE_EXT = new String[]
    {

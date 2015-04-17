@@ -24,74 +24,39 @@ import java.util.Vector;
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.*;
 
-public class L2HList extends Declaration
+public class L2HList extends ListDec
 {
-   public L2HList(String name, String htmlTag, ControlSequence itemCs)
+   public L2HList()
+   {
+      this("list");
+   }
+
+   public L2HList(String name)
    {
       super(name);
-      this.htmlTag = htmlTag;
-      this.itemCs = itemCs;
    }
 
    public Object clone()
    {
-      return new L2HList(getName(), htmlTag, (ControlSequence)itemCs.clone());
+      return new L2HList(getName());
    }
 
-   public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
-     throws IOException
+   public void setup(TeXParser parser, TeXObject labelCs,
+     TeXObject listsettings)
+   throws IOException
    {
-      return null;
-   }
+      super.setup(parser, labelCs, listsettings);
 
-   public TeXObjectList expandonce(TeXParser parser)
-     throws IOException
-   {
-      return null;
-   }
-
-   public TeXObjectList expandfully(TeXParser parser, TeXObjectList stack)
-     throws IOException
-   {
-      return null;
-   }
-
-   public TeXObjectList expandfully(TeXParser parser)
-     throws IOException
-   {
-      return null;
-   }
-
-   public void process(TeXParser parser) throws IOException
-   {
-      parser.putControlSequence(true, itemCs);
-
-      parser.getListener().getWriteable().write(String.format("<%s>", htmlTag));
-
-      super.process(parser);
-   }
-
-   public void process(TeXParser parser, TeXObjectList stack) throws IOException
-   {
-      parser.putControlSequence(true, itemCs);
-
-      parser.getListener().getWriteable().write(String.format("<%s>", htmlTag));
-
-      super.process(parser, stack);
+      parser.getListener().getWriteable().write(
+        String.format("<ul class=\"%s\">",
+           isInLine() ? "inlinelist" : "displaylist"));
    }
 
    public void end(TeXParser parser)
     throws IOException
    {
-      parser.getListener().getWriteable().write(String.format("</%s>", htmlTag));
+      parser.getListener().getWriteable().write("</ul>");
+
+      super.end(parser);
    }
-
-   public boolean isModeSwitcher()
-   {
-      return false;
-   }
-
-   private String htmlTag;
-
-   private ControlSequence itemCs;
 }

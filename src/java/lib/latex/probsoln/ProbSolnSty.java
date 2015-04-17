@@ -47,6 +47,7 @@ public class ProbSolnSty extends LaTeXSty
       registerControlSequence(new UseProblem(this));
       registerControlSequence(new NewProblem(this));
       registerControlSequence(new Question());
+      registerControlSequence(new TextEnum());
       registerControlSequence(new ForEachProblem(this));
 
       if (getParser().getControlSequence("solution") == null)

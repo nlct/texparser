@@ -19,34 +19,43 @@
 package com.dickimawbooks.texparserlib.html;
 
 import java.io.IOException;
-import java.io.EOFException;
+import java.util.Vector;
 
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.*;
 
-public class L2HItem extends ListItem
+public class L2HEnumerate extends EnumerateDec
 {
-   public L2HItem()
+   public L2HEnumerate()
    {
-      this("item");
+      this("enumerate");
    }
 
-   public L2HItem(String name)
+   public L2HEnumerate(String name)
    {
       super(name);
    }
 
    public Object clone()
    {
-      return new L2HItem(getName());
+      return new L2HEnumerate(getName());
    }
 
-   public void makelabel(TeXParser parser, TeXObject label)
+   public void setup(TeXParser parser)
+   throws IOException
+   {
+      super.setup(parser);
+
+      parser.getListener().getWriteable().write(
+        String.format("<ol class=\"%s\">",
+           isInLine() ? "inlinelist" : "displaylist"));
+   }
+
+   public void end(TeXParser parser)
     throws IOException
    {
-      parser.getListener().getWriteable().write("<li><span class=\"listitem\">");
-      label.process(parser);
-      parser.getListener().getWriteable().write("</span>");
-   }
+      parser.getListener().getWriteable().write("</ol>");
 
+      super.end(parser);
+   }
 }
