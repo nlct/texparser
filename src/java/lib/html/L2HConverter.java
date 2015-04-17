@@ -134,6 +134,7 @@ public class L2HConverter extends LaTeXParserListener
 
       putControlSequence(new L2HList());
       putControlSequence(new L2HEnumerate());
+      putControlSequence(new L2HItemize());
       putControlSequence(new L2HItem());
 
       putControlSequence(new L2HMathDeclaration("math"));
@@ -159,6 +160,11 @@ public class L2HConverter extends LaTeXParserListener
 
       putControlSequence(new L2Hhfill("hfill"));
       putControlSequence(new L2Hhfill("hfil"));
+
+      putControlSequence(new L2HNormalFont());
+
+      putControlSequence(new GenericCommand(true, "labelitemii", null,
+       new HtmlTag("&#x2013;")));
 
       /* indent/noindent not implemented */
       putControlSequence(new Relax("indent"));
@@ -577,7 +583,8 @@ public class L2HConverter extends LaTeXParserListener
 
       writeln(".displaylist { display: block; list-style-type: none; }");
       writeln(".inlinelist { display: inline; list-style-type: none; }");
-      writeln("span.listitem { float: left; padding-right: 1em;}");
+      writeln("span.numitem { float: left; margin-left: -3em; text-align: right; min-width: 2.5em; }");
+      writeln("span.bulletitem { float: left; margin-left: -1em; }");
 
       for (String style : extraCssStyles)
       {
@@ -865,6 +872,25 @@ public class L2HConverter extends LaTeXParserListener
    {
       return styCs.contains(cs.getName());
    }
+
+   public void startList(TrivList trivlist) throws IOException
+   {
+      if (trivlist instanceof EnumerateDec)
+      {
+         write(String.format("<ol class=\"%s\">",
+           trivlist.isInLine() ? "inlinelist" : "displaylist"));
+      }
+      else
+      {
+         write(String.format("<ul class=\"%s\">",
+           trivlist.isInLine() ? "inlinelist" : "displaylist"));
+      }
+   }
+
+   public void endList(TrivList trivlist) throws IOException
+   {
+   }
+
 
    private Vector<String> styCs;
 

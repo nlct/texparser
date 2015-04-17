@@ -1,5 +1,6 @@
 \documentclass{article}
 
+\usepackage{lipsum}
 \usepackage[answers,usedefaultargs]{probsoln}
 
 \begin{defproblem}[1][{2}]{diffsin}
@@ -18,7 +19,26 @@ Differentiate $f(x)=\sin(#1x)$.
   \(f'(x) = -#1\sin(#1x)\)
 }
 
-\newproblem*{essay}{An essay style question without an answer.}
+\newproblem*{essay}{An essay style question without an answer.
+\lipsum[1]}
+
+\begin{defproblem}{subparts}
+Find $x$ in:
+\begin{textenum}
+\item $4+x=2$;
+\item $3x=9$;
+\item $x-1=4$.
+\end{textenum}
+\begin{onlysolution}
+ \begin{solution}
+  \begin{textenum}
+  \item $x=-2$;
+  \item $x=3$;
+  \item $x=5$.
+  \end{textenum}
+ \end{solution}
+\end{onlysolution}
+\end{defproblem}
 
 \begin{document}
 
@@ -28,10 +48,29 @@ Differentiate $f(x)=\sin(#1x)$.
 \item \useproblem{diffcos}{8}
 
 \item \useproblem{essay}
+
+\item \useproblem{subparts}
 \end{enumerate}
 
 Iterate:
 \begin{enumerate}
 \foreachproblem{\item \thisproblem}
 \end{enumerate}
+
+Test itemize:
+\begin{itemize}
+\item First.
+ \begin{itemize}
+  \item Second.
+  \item Third.
+  \begin{itemize}
+   \item Fourth.
+   \item Fifth.
+    \begin{itemize}
+     \item Sixth.
+     \item Seventh.
+    \end{itemize}
+  \end{itemize}
+ \end{itemize}
+\end{itemize}
 \end{document}

@@ -19,44 +19,58 @@
 package com.dickimawbooks.texparserlib.html;
 
 import java.io.IOException;
-import java.io.EOFException;
+import java.util.Vector;
 
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.*;
 
-public class L2HItem extends ListItem
+public class L2HItemize extends ItemizeDec
 {
-   public L2HItem()
+   public L2HItemize()
    {
-      this("item");
+      this("itemize");
    }
 
-   public L2HItem(String name)
+   public L2HItemize(String name)
    {
       super(name);
    }
 
    public Object clone()
    {
-      return new L2HItem(getName());
+      return new L2HItemize(getName());
    }
 
-   public void makelabel(TeXParser parser, TeXObject label)
-    throws IOException
+   public void setup(TeXParser parser)
+   throws IOException
    {
-      L2HConverter listener = (L2HConverter)parser.getListener();
+      super.setup(parser);
 
-      if (listener.isIfTrue(listener.getControlSequence("if@nmbrlist")))
+      if (isInLine())
       {
-         listener.write("<li><span class=\"numitem\">");
+         parser.getListener().getWriteable().write(
+           String.format("<ul class=\"inlinelist\">"));
       }
       else
       {
-         listener.write("<li><span class=\"bulletitem\">");
+         parser.getListener().getWriteable().write(
+           String.format("%n<ul class=\"displaylist\">%n"));
       }
 
-      label.process(parser);
-      listener.write("</span>");
    }
 
+   public void end(TeXParser parser)
+    throws IOException
+   {
+      if (isInLine())
+      {
+         parser.getListener().getWriteable().write(String.format("</ul>"));
+      }
+      else
+      {
+         parser.getListener().getWriteable().write(String.format("%n</ul>%n"));
+      }
+
+      super.end(parser);
+   }
 }

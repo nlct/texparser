@@ -284,12 +284,14 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
 
       parser.getSettings().newcount("@listdepth");
       parser.getSettings().newcount("@enumdepth");
+      parser.getSettings().newcount("@itemdepth");
 
       NewIf.createConditional(parser, "if@nmbrlist");
 
       parser.putControlSequence(new TrivListDec());
       parser.putControlSequence(new ListDec());
       parser.putControlSequence(new EnumerateDec());
+      parser.putControlSequence(new ItemizeDec());
       parser.putControlSequence(new ListItem());
       parser.putControlSequence(new UseCounter());
 
@@ -309,6 +311,27 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       parser.putControlSequence(
         new GenericCommand(true, "labelenumiv", null, 
         new TeXObject[] {new TeXCsRef("theenumiv"), getOther('.')}));
+
+      parser.putControlSequence(
+        new GenericCommand(true, "labelitemi", null, 
+        new TeXObject[] {new TeXCsRef("textbullet")}));
+
+      parser.putControlSequence(
+        new GenericCommand(true, "labelitemii", null, 
+        new TeXObject[]
+        {
+           new TeXCsRef("normalfont"),
+           new TeXCsRef("bfseries"),
+           new TeXCsRef("textendash")
+        }));
+
+      parser.putControlSequence(
+        new GenericCommand(true, "labelitemiii", null, 
+        new TeXObject[] {new TeXCsRef("textasteriskcentered")}));
+
+      parser.putControlSequence(
+        new GenericCommand(true, "labelitemiv", null, 
+        new TeXObject[] {new TeXCsRef("textperiodcentered")}));
 
       parser.putControlSequence(
         new GenericCommand("@mpfn", null, createString("footnote")));
@@ -1374,6 +1397,14 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
    public void setMainIndexLabel(String label)
    {
       mainIndex = label;
+   }
+
+   public void startList(TrivList trivlist) throws IOException
+   {
+   }
+
+   public void endList(TrivList trivlist) throws IOException
+   {
    }
 
    private Vector<String> verbEnv;

@@ -215,6 +215,7 @@ public class Symbol extends ControlSequence implements CaseChangeable
       new Object[]{"textgreater", new Integer((int)'>')},
       new Object[]{"textless", new Integer((int)'<')},
       new Object[]{"textperiodcentered", new Integer(0x00B7)},
+      new Object[]{"textasteriskcentered", new Integer(0xFF0A)},
       new Object[]{"textquestiondown", new Integer(0x00BF)},
       new Object[]{"textquotedblleft", new Integer(0x201C)},
       new Object[]{"textquotedblright", new Integer(0x201D)},

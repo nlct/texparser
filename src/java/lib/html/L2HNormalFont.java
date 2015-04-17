@@ -19,60 +19,66 @@
 package com.dickimawbooks.texparserlib.html;
 
 import java.io.IOException;
-import java.io.EOFException;
+import java.util.Vector;
 
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.*;
 
-public class L2HDescItem extends L2HItem
+public class L2HNormalFont extends Declaration 
 {
-   public L2HDescItem()
+   public L2HNormalFont()
    {
-      this("item");
+      this("normalfont");
    }
 
-   public L2HDescItem(String name)
+   public L2HNormalFont(String name)
    {
       super(name);
    }
 
    public Object clone()
    {
-      return new L2HDescItem(getName());
+      return new L2HNormalFont(getName());
    }
 
-   public void process(TeXParser parser, TeXObjectList stack)
-   throws IOException
+   public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
+     throws IOException
    {
-      TeXObject label = stack.popArg(parser, '[', ']');
-
-      parser.getListener().getWriteable().write("<dt>");
-
-      if (label != null)
-      {
-         label.process(parser, stack);
-      }
-
-      parser.getListener().getWriteable().write("</dt>");
-
-      parser.getListener().getWriteable().write("<dd>");
+      return null;
    }
 
-   public void process(TeXParser parser)
-   throws IOException
+   public TeXObjectList expandonce(TeXParser parser)
+     throws IOException
    {
-      TeXObject label = parser.popNextArg('[', ']');
-
-      parser.getListener().getWriteable().write("<dt>");
-
-      if (label != null)
-      {
-         label.process(parser);
-      }
-
-      parser.getListener().getWriteable().write("</dt>");
-
-      parser.getListener().getWriteable().write("<dd>");
+      return null;
    }
 
+   public TeXObjectList expandfully(TeXParser parser, TeXObjectList stack)
+     throws IOException
+   {
+      return null;
+   }
+
+   public TeXObjectList expandfully(TeXParser parser)
+     throws IOException
+   {
+      return null;
+   }
+
+   public void process(TeXParser parser) throws IOException
+   {
+      super.process(parser);
+
+      parser.getListener().getWriteable().write("<span style=\"font: normal;\">");
+   }
+
+   public void end(TeXParser parser) throws IOException
+   {
+      parser.getListener().getWriteable().write("</span>");
+   }
+
+   public boolean isModeSwitcher()
+   {
+      return false;
+   }
 }

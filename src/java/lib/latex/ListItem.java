@@ -45,7 +45,11 @@ public class ListItem extends ControlSequence
    {
       TeXObject label = stack.popArg(parser, '[', ']');
 
-      makelabel(parser, setuplabel(parser, label));
+      Group grp = parser.getListener().createGroup();
+
+      grp.add(setuplabel(parser, label));
+
+      makelabel(parser, grp);
    }
 
    public void process(TeXParser parser)
@@ -53,7 +57,11 @@ public class ListItem extends ControlSequence
    {
       TeXObject label = parser.popNextArg('[', ']');
 
-      makelabel(parser, setuplabel(parser, label));
+      Group grp = parser.getListener().createGroup();
+
+      grp.add(setuplabel(parser, label));
+
+      makelabel(parser, setuplabel(parser, grp));
    }
 
    public TeXObject setuplabel(TeXParser parser, TeXObject label)
