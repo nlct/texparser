@@ -104,5 +104,5 @@ public class AtRoman extends Command
    private byte state;
 
    public static final byte UPPER = 0;
-   public static final byte LOWER = 0;
+   public static final byte LOWER = 1;
 }
