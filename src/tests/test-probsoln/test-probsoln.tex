@@ -1,5 +1,6 @@
 \documentclass{article}
 
+%\usepackage[usedefaultargs]{probsoln}
 \usepackage{probsoln}
 
 \showanswers
@@ -33,5 +34,7 @@ Differentiate $f(x)=\sin(#1x)$.
 \end{enumerate}
 
 Iterate:
-\foreachproblem{Label: \thisproblemlabel. }
+\begin{enumerate}
+\foreachproblem{\item \thisproblem}
+\end{enumerate}
 \end{document}

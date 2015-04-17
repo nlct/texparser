@@ -24,6 +24,7 @@ import java.util.Set;
 
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.primitives.NewIf;
+import com.dickimawbooks.texparserlib.primitives.IfTrue;
 import com.dickimawbooks.texparserlib.latex.*;
 
 public class ProbSolnSty extends LaTeXSty
@@ -81,20 +82,32 @@ public class ProbSolnSty extends LaTeXSty
    {
       if (option.equals("answers"))
       {
-         getListener().getControlSequence("showanswerstrue").process(getParser());
+         getListener().getControlSequence("showanswerstrue")
+           .process(getParser());
       }
       else if (option.equals("noanswers"))
       {
-	 getListener().getControlSequence("showanswersfalse").process(getParser());
+	 getListener().getControlSequence("showanswersfalse")
+           .process(getParser());
       }
       else if (option.equals("usedefaultargs"))
       {
-         getListener().getControlSequence("usedefaultprobargstrue").process(getParser());
+         getListener().getControlSequence("usedefaultprobargstrue")
+           .process(getParser());
       }
       else if (option.equals("usenodefaultargs"))
       {
-         getListener().getControlSequence("usedefaultprobargsfalse").process(getParser());
+         getListener().getControlSequence("usedefaultprobargsfalse")
+           .process(getParser());
       }
+   }
+
+   public boolean useDefaultArgs()
+   {
+      ControlSequence cs = getListener().getControlSequence(
+         "ifusedefaultprobargs");
+
+      return getListener().isIfTrue(cs);
    }
 
    protected void preOptions()
@@ -106,28 +119,28 @@ public class ProbSolnSty extends LaTeXSty
         "ifusedefaultprobargs");
    }
 
-   public ProbSolnDatabase getDatabase(TeXParser parser, String name)
+   public ProbSolnDatabase getDatabase(String name)
      throws ProbSolnException
    {
       ProbSolnDatabase db = databases.get(name);
 
       if (db == null)
       {
-         throw new ProbSolnException(parser,
+         throw new ProbSolnException(getParser(),
            ProbSolnException.ERROR_NO_SUCH_DB, name);
       }
 
       return db;
    }
 
-   public ProbSolnData getProblem(TeXParser parser, String label, String dbName)
+   public ProbSolnData getProblem(String label, String dbName)
     throws ProbSolnException
    {
-      ProbSolnData prob = getDatabase(parser, dbName).get(label);
+      ProbSolnData prob = getDatabase(dbName).get(label);
 
       if (prob == null)
       {
-         throw new ProbSolnException(parser,
+         throw new ProbSolnException(getParser(),
            ProbSolnException.ERROR_NO_SUCH_ENTRY_IN_DB,
            new String[] {label, dbName});
       }
@@ -135,12 +148,12 @@ public class ProbSolnSty extends LaTeXSty
       return prob;
    }
 
-   public void addDatabase(TeXParser parser, String name)
+   public void addDatabase(String name)
      throws ProbSolnException
    {
       if (databases.containsKey(name))
       {
-         throw new ProbSolnException(parser, 
+         throw new ProbSolnException(getParser(), 
            ProbSolnException.ERROR_DB_EXISTS, name);
       }
 
@@ -148,15 +161,14 @@ public class ProbSolnSty extends LaTeXSty
       databases.put(name, db);
    }
 
-   public void moveProblem(TeXParser parser,
-     String label, String source, String target)
+   public void moveProblem(String label, String source, String target)
    throws ProbSolnException
    {
       ProbSolnDatabase db = databases.get(source);
 
       if (db == null)
       {
-         throw new ProbSolnException(parser,
+         throw new ProbSolnException(getParser(),
            ProbSolnException.ERROR_NO_SUCH_DB, source);
       }
 
@@ -164,7 +176,7 @@ public class ProbSolnSty extends LaTeXSty
 
       if (data == null)
       {
-         throw new ProbSolnException(parser,
+         throw new ProbSolnException(getParser(),
            ProbSolnException.ERROR_NO_SUCH_ENTRY_IN_DB,
            new String[] {label, source});
       }
@@ -173,7 +185,7 @@ public class ProbSolnSty extends LaTeXSty
 
       if (db == null)
       {
-         throw new ProbSolnException(parser,
+         throw new ProbSolnException(getParser(),
            ProbSolnException.ERROR_NO_SUCH_DB, target);
       }
 
@@ -190,10 +202,10 @@ public class ProbSolnSty extends LaTeXSty
       return databases.size();
    }
 
-   public void addProblem(TeXParser parser, ProbSolnData data)
+   public void addProblem(ProbSolnData data)
    throws ProbSolnException
    {
-      ProbSolnDatabase db = getDatabase(parser, currentDb);
+      ProbSolnDatabase db = getDatabase(currentDb);
 
       db.put(data.getName(), data);
    }

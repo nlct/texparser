@@ -56,6 +56,11 @@ public class ProbSolnData
       return numArgs;
    }
 
+   public TeXObjectList getDefaultArgs()
+   {
+      return defArgs;
+   }
+
    public void process(TeXParser parser)
      throws IOException
    {

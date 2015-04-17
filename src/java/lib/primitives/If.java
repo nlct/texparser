@@ -637,6 +637,23 @@ public class If extends Primitive implements Expandable
       }
    }
 
+   public boolean equals(Object obj)
+   {
+      if (obj == this) return true;
+
+      if (obj == null || !(obj instanceof TeXObject))
+      {
+         return false;
+      }
+
+      if (obj instanceof AssignedMacro)
+      {
+         return ((AssignedMacro)obj).getUnderlying().equals(this);
+      }
+
+      return obj.getClass().getName().equals(getClass().getName());
+   }
+
    public static final Else ELSE = new Else();
    public static final Fi FI = new Fi();
 }

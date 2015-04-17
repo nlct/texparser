@@ -56,7 +56,7 @@ public class UseProblem extends ControlSequence
 
          if (dataset instanceof Expandable)
          {
-            expanded = ((TeXObjectList)dataset).expandfully(parser, stack);
+            expanded = ((Expandable)dataset).expandfully(parser, stack);
 
             if (expanded != null)
             {
@@ -73,7 +73,7 @@ public class UseProblem extends ControlSequence
 
       if (object instanceof Expandable)
       {
-         expanded = ((TeXObjectList)object).expandfully(parser, stack);
+         expanded = ((Expandable)object).expandfully(parser, stack);
 
          if (expanded != null)
          {
@@ -81,7 +81,7 @@ public class UseProblem extends ControlSequence
          }
       }
 
-      sty.getProblem(parser, object.toString(parser), db).process(parser, stack);
+      sty.getProblem(object.toString(parser), db).process(parser, stack);
    }
 
    public void process(TeXParser parser)
@@ -97,7 +97,7 @@ public class UseProblem extends ControlSequence
 
          if (dataset instanceof Expandable)
          {
-            expanded = ((TeXObjectList)dataset).expandfully(parser);
+            expanded = ((Expandable)dataset).expandfully(parser);
 
             if (expanded != null)
             {
@@ -114,7 +114,7 @@ public class UseProblem extends ControlSequence
 
       if (object instanceof Expandable)
       {
-         expanded = ((TeXObjectList)object).expandfully(parser);
+         expanded = ((Expandable)object).expandfully(parser);
 
          if (expanded != null)
          {
@@ -122,7 +122,7 @@ public class UseProblem extends ControlSequence
          }
       }
 
-      sty.getProblem(parser, object.toString(parser), db).process(parser);
+      sty.getProblem(object.toString(parser), db).process(parser);
    }
 
    private ProbSolnSty sty;

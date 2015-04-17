@@ -55,14 +55,6 @@ public class SbChar extends Macro
    {
       TeXObject object = stack.popArg(parser);
 
-      if (object == null)
-      {
-         throw new TeXSyntaxException(
-            parser.getCurrentFile(),
-            parser.getLineNumber(),
-            TeXSyntaxException.ERROR_MISSING_PARAM, ""+parser.getSbChar());
-      }
-
       TeXObject nextObject = stack.peekStack();
 
       if (nextObject instanceof SbChar)

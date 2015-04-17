@@ -325,18 +325,12 @@ public class TeXParser extends TeXObjectList
       TeXReader strReader = new TeXReader(reader, text);
       reader = strReader;
 
-      try
+      while (reader == strReader)
       {
-         while (reader == strReader)
+         if (!fetchNext(list))
          {
-            if (!fetchNext(list))
-            {
-               break;
-            }
+            break;
          }
-      }
-      catch (EOFException e)
-      {
       }
    }
 

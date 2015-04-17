@@ -664,7 +664,7 @@ public class TeXObjectList extends Vector<TeXObject>
       if (object == null)
       {
          throw new TeXSyntaxException(parser,
-            TeXSyntaxException.ERROR_MISSING_PARAM);
+            TeXSyntaxException.ERROR_EMPTY_STACK);
       }
 
       if (object instanceof Group

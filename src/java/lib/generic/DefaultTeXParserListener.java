@@ -79,8 +79,8 @@ public abstract class DefaultTeXParserListener extends TeXParserListener
       parser.putControlSequence(new EndCsname());
       parser.putControlSequence(new If());
       parser.putControlSequence(new Ifx());
-      parser.putControlSequence(new IfTrue());
-      parser.putControlSequence(new IfFalse());
+      parser.putControlSequence(IFTRUE);
+      parser.putControlSequence(IFFALSE);
       parser.putControlSequence(new Else());
       parser.putControlSequence(new Fi());
       parser.putControlSequence(new NewIf());
@@ -402,9 +402,22 @@ public abstract class DefaultTeXParserListener extends TeXParserListener
       }
    }
 
+   public boolean isIfTrue(ControlSequence cs)
+   {
+      return IFTRUE.equals(cs);
+   }
+
+   public boolean isIfFalse(ControlSequence cs)
+   {
+      return IFFALSE.equals(cs);
+   }
+
    protected Writeable writeable;
 
    protected Vector<TeXPath> referencedFiles;
 
    protected Vector<SpecialListener> specialListeners;
+
+   public static final IfTrue IFTRUE = new IfTrue();
+   public static final IfFalse IFFALSE = new IfFalse();
 }

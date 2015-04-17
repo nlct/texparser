@@ -47,7 +47,9 @@ public class ForEachProblem extends ControlSequence
    {
       String db = "default";
 
-      TeXObject dataset = stack.popArg(parser, '[', ']');
+      TeXObject dataset =
+        parser == stack ? parser.popNextArg('[', ']')
+                        : stack.popArg(parser, '[', ']');
 
       if (dataset != null)
       {
@@ -55,7 +57,14 @@ public class ForEachProblem extends ControlSequence
 
          if (dataset instanceof Expandable)
          {
-            expanded = ((TeXObjectList)dataset).expandfully(parser, stack);
+            if (parser == stack)
+            {
+               expanded = ((TeXObjectList)dataset).expandfully(parser);
+            }
+            else
+            {
+               expanded = ((TeXObjectList)dataset).expandfully(parser, stack);
+            }
 
             if (expanded != null)
             {
@@ -66,9 +75,10 @@ public class ForEachProblem extends ControlSequence
          db = dataset.toString(parser);
       }
 
-      TeXObject body = stack.popArg(parser);
-      
-      ProbSolnDatabase database = sty.getDatabase(parser, db);
+      TeXObject body = 
+        (parser == stack ? parser.popNextArg() : stack.popArg(parser));
+
+      ProbSolnDatabase database = sty.getDatabase(db);
 
       Iterator<String> it = database.keySet().iterator();
 
@@ -82,54 +92,78 @@ public class ForEachProblem extends ControlSequence
            new GenericCommand("thisproblemlabel", null, 
              parser.getListener().createString(key)));
 
-         contents.process(parser, stack);
+         ProbSolnData data = database.get(key);
+
+         TeXObjectList useproblem = new TeXObjectList();
+
+         useproblem.add(new TeXCsRef("useproblem"));
+         useproblem.add(new TeXCsRef("thisproblemlabel"));
+
+         int numArgs = data.getNumArgs();
+
+         if (numArgs > 0)
+         {
+            TeXObjectList args = data.getDefaultArgs();
+
+            if (args == null || !sty.useDefaultArgs())
+            {
+               TeXApp app = parser.getListener().getTeXApp();
+               String response;
+
+               if (numArgs == 1)
+               {
+                  response = app.requestUserInput(app.getMessage(
+                    PROBSOLN_REQUEST_ARG, 
+                    new String[] {key, db}));
+               }
+               else
+               {
+                  response = app.requestUserInput(app.getMessage(
+                    PROBSOLN_REQUEST_ARGS,
+                    new String[] {key, db, ""+numArgs}));
+               }
+
+               TeXObjectList list = new TeXObjectList();
+
+               if (response != null)
+               {
+                  parser.scan(response+"\\relax", list);
+
+                  for (int i = 0; i < numArgs; i++)
+                  {
+                     useproblem.add(list.popStack(parser, true));
+                  }
+               }
+            }
+            else
+            {
+               useproblem.addAll(args);
+            }
+         }
+
+         parser.putControlSequence(true, 
+           new GenericCommand("thisproblem", null, useproblem));
+
+         if (parser == stack)
+         {
+            contents.process(parser);
+         }
+         else
+         {
+            contents.process(parser, stack);
+         }
       }
+
    }
 
    public void process(TeXParser parser)
      throws IOException
    {
-      String db = "default";
-
-      TeXObject dataset = parser.popNextArg('[', ']');
-
-      if (dataset != null)
-      {
-         TeXObjectList expanded = null;
-
-         if (dataset instanceof Expandable)
-         {
-            expanded = ((TeXObjectList)dataset).expandfully(parser);
-
-            if (expanded != null)
-            {
-               dataset = expanded;
-            }
-         }
-
-         db = dataset.toString(parser);
-      }
-
-      TeXObject body = parser.popNextArg();
-
-      ProbSolnDatabase database = sty.getDatabase(parser, db);
-
-      Iterator<String> it = database.keySet().iterator();
-
-      while (it.hasNext())
-      {
-         String key = it.next();
-
-         TeXObject contents = (TeXObject)body.clone();
-
-         parser.putControlSequence(true, 
-           new GenericCommand("thisproblemlabel", null, 
-             parser.getListener().createString(key)));
-
-         contents.process(parser);
-      }
+      process(parser, parser);
    }
 
    private ProbSolnSty sty;
 
+   public final static String PROBSOLN_REQUEST_ARGS = "probsoln.request_args";
+   public final static String PROBSOLN_REQUEST_ARG = "probsoln.request_arg";
 }

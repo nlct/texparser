@@ -242,6 +242,7 @@ public class TeXSyntaxException extends IOException
       "tex.error.dollar2_ended_with_dollar";
    public static final String ERROR_NOT_FOUND = "tex.error.not_found";
    public static final String ERROR_MISSING_PARAM = "tex.error.missing_param";
+   public static final String ERROR_EMPTY_STACK = "tex.error.empty_stack";
    public static final String ERROR_NOT_MATH_MODE = "tex.error.not_math_mode";
    public static final String ERROR_INVALID_ACCENT = "tex.error.invalid_accent";
    public static final String ERROR_AMBIGUOUS_MIDCS = 

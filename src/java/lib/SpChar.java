@@ -55,13 +55,6 @@ public class SpChar extends Macro
    {
       TeXObject object = stack.popArg(parser);
 
-      if (object == null)
-      {
-         throw new TeXSyntaxException(
-            parser,
-            TeXSyntaxException.ERROR_MISSING_PARAM, ""+parser.getSpChar());
-      }
-
       TeXObject nextObject = stack.peekStack();
 
       if (nextObject instanceof SpChar)
