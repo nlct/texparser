@@ -42,14 +42,14 @@ public class ListDec extends TrivListDec
 
    public void process(TeXParser parser) throws IOException
    {
-      setup(parser, parser.popNextArg(), parser.popNextArg());
       parser.getListener().getControlSequence("@nmbrlistfalse").process(parser);
+      setup(parser, parser.popNextArg(), parser.popNextArg());
    }
 
    public void process(TeXParser parser, TeXObjectList stack) throws IOException
    {
-      setup(parser, stack.popArg(parser), stack.popArg(parser));
       parser.getListener().getControlSequence("@nmbrlistfalse").process(parser);
+      setup(parser, stack.popArg(parser), stack.popArg(parser));
    }
 
    public void setup(TeXParser parser, TeXObject labelCs, 
@@ -73,6 +73,8 @@ public class ListDec extends TrivListDec
       }
 
       listsettings.process(parser);
+
+      ((LaTeXParserListener)parser.getListener()).startList(this);
    }
 
    public void end(TeXParser parser)

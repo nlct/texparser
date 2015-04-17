@@ -1,0 +1,43 @@
+\documentclass{article}
+
+\usepackage{lipsum}
+
+\begin{document}
+
+Test itemize:
+\begin{itemize}
+\item First.
+ \begin{itemize}
+  \item Second.
+  \item Third.
+  \begin{itemize}
+   \item Fourth.
+   \item Fifth.
+    \begin{itemize}
+     \item Sixth.
+     \item Seventh.
+    \end{itemize}
+  \end{itemize}
+ \end{itemize}
+\item[*] Different label.
+\item \lipsum[1]
+\end{itemize}
+
+Test enumerate:
+\begin{enumerate}
+\item First.
+ \begin{enumerate}
+  \item Second.
+  \item Third.
+  \begin{enumerate}
+   \item Fourth.
+   \item Fifth.
+    \begin{enumerate}
+     \item Sixth.
+     \item Seventh.
+    \end{enumerate}
+  \end{enumerate}
+ \end{enumerate}
+\item \lipsum[1]
+\end{enumerate}
+

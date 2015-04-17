@@ -49,9 +49,6 @@ public class UseCounter extends ControlSequence
 
       listener.getControlSequence("@nmbrlisttrue").process(parser);
 
-      parser.putControlSequence(true, new GenericCommand(true, "@listctr",
-        null, arg));
-
       if (arg instanceof Expandable)
       {
          TeXObjectList expanded = ((Expandable)arg).expandfully(parser, stack);
@@ -61,6 +58,9 @@ public class UseCounter extends ControlSequence
             arg = expanded;
          }
       }
+
+      parser.putControlSequence(true, new GenericCommand(true, "@listctr",
+        null, arg));
 
       listener.setcounter(arg.toString(parser), listener.ZERO);
    }

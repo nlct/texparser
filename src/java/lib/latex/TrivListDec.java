@@ -66,11 +66,13 @@ public class TrivListDec extends Declaration
    public void process(TeXParser parser) throws IOException
    {
       setup(parser);
+      ((LaTeXParserListener)parser.getListener()).startList(this);
    }
 
    public void process(TeXParser parser, TeXObjectList stack) throws IOException
    {
       setup(parser);
+      ((LaTeXParserListener)parser.getListener()).startList(this);
    }
 
    public void setup(TeXParser parser) throws IOException
@@ -82,6 +84,7 @@ public class TrivListDec extends Declaration
    public void end(TeXParser parser)
     throws IOException
    {
+      ((LaTeXParserListener)parser.getListener()).endList(this);
    }
 
    public boolean isModeSwitcher()

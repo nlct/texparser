@@ -22,6 +22,7 @@ import java.io.*;
 import java.nio.file.Path;
 import java.nio.file.Files;
 import java.util.Vector;
+import java.util.Stack;
 
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.primitives.*;
@@ -132,9 +133,11 @@ public class L2HConverter extends LaTeXParserListener
 
       putControlSequence(new L2HAbstract());
 
+/*
       putControlSequence(new L2HList());
       putControlSequence(new L2HEnumerate());
       putControlSequence(new L2HItemize());
+*/
       putControlSequence(new L2HItem());
 
       putControlSequence(new L2HMathDeclaration("math"));
@@ -582,7 +585,8 @@ public class L2HConverter extends LaTeXParserListener
       writeln("div.toc-subparagraph { padding-left: 3em; }");
 
       writeln(".displaylist { display: block; list-style-type: none; }");
-      writeln(".inlinelist { display: inline; list-style-type: none; }");
+      writeln(".inlinelist { display: inline; }");
+      writeln("span.inlineitem { margin-right: .5em; margin-left: .5em; }");
       writeln("span.numitem { float: left; margin-left: -3em; text-align: right; min-width: 2.5em; }");
       writeln("span.bulletitem { float: left; margin-left: -1em; }");
 
@@ -873,24 +877,47 @@ public class L2HConverter extends LaTeXParserListener
       return styCs.contains(cs.getName());
    }
 
-   public void startList(TrivList trivlist) throws IOException
+   public void startList(TrivListDec trivlist) throws IOException
    {
-      if (trivlist instanceof EnumerateDec)
+      super.startList(trivlist);
+
+      if (trivlist.isInLine())
       {
-         write(String.format("<ol class=\"%s\">",
-           trivlist.isInLine() ? "inlinelist" : "displaylist"));
+         write("<div class=\"inlinelist\">");
       }
       else
       {
-         write(String.format("<ul class=\"%s\">",
-           trivlist.isInLine() ? "inlinelist" : "displaylist"));
+         if (isIfTrue(getControlSequence("if@nmbrlist")))
+         {
+            write(String.format("%n<ol class=\"displaylist\">%n"));
+         }
+         else
+         {
+            write(String.format("%n<ul class=\"displaylist\">%n"));
+         }
       }
    }
 
-   public void endList(TrivList trivlist) throws IOException
+   public void endList(TrivListDec trivlist) throws IOException
    {
-   }
+      if (trivlist.isInLine())
+      {
+         write("</div>");
+      }
+      else
+      {
+         if (isIfTrue(getControlSequence("if@nmbrlist")))
+         {
+            write(String.format("%n</ol>%n"));
+         }
+         else
+         {
+            write(String.format("%n</ul>%n"));
+         }
+      }
 
+      super.endList(trivlist);
+   }
 
    private Vector<String> styCs;
 
@@ -907,4 +934,6 @@ public class L2HConverter extends LaTeXParserListener
    private String suffix = "html";
 
    private Vector<String> extraCssStyles = new Vector<String>();
+
+   private Stack<TrivListDec> trivListStack = new Stack<TrivListDec>();
 }

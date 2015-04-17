@@ -23,6 +23,7 @@ import java.io.EOFException;
 import java.io.File;
 import java.util.Hashtable;
 import java.util.Vector;
+import java.util.Stack;
 import java.util.Iterator;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
@@ -212,6 +213,11 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       parser.putControlSequence(new AtFirstOfOne());
       parser.putControlSequence(new AtGobble());
       parser.putControlSequence(new AtGobbleTwo());
+      parser.putControlSequence(new AtAlph("@Alph", AtAlph.UPPER));
+      parser.putControlSequence(new AtAlph("@alph", AtAlph.LOWER));
+      parser.putControlSequence(new AtRoman("@Roman", AtRoman.UPPER));
+      parser.putControlSequence(new AtRoman("@roman", AtRoman.LOWER));
+
       parser.putControlSequence(new Verbatim());
       parser.putControlSequence(new Verbatim("verbatim*"));
       parser.putControlSequence(new Tabular());
@@ -274,9 +280,9 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       newcounter("table");
       newcounter("equation");
       newcounter("enumi");
-      newcounter("enumii");
-      newcounter("enumiii");
-      newcounter("enumiv");
+      newcounter("enumii", null, "@alph");
+      newcounter("enumiii", null, "@roman");
+      newcounter("enumiv", null, "@Alph");
 
       newcounter("footnote");
       newcounter("mpfootnote");
@@ -1154,13 +1160,18 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
 
    public void newcounter(String name, String parent)
    {
+      newcounter(name, parent, "number");
+   }
+
+   public void newcounter(String name, String parent, String format)
+   {
       // counters are global
       parser.getSettings().newcount(false, "c@"+name);
 
       if (parent == null)
       {
          parser.putControlSequence(new GenericCommand(true, "the"+name, null,
-             new TeXObject[] {new TeXCsRef("number"), new TeXCsRef("c@"+name)}));
+             new TeXObject[] {new TeXCsRef(format), new TeXCsRef("c@"+name)}));
 
       }
       else
@@ -1399,12 +1410,19 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       mainIndex = label;
    }
 
-   public void startList(TrivList trivlist) throws IOException
+   public void startList(TrivListDec trivlist) throws IOException
    {
+      trivListStack.push(trivlist);
    }
 
-   public void endList(TrivList trivlist) throws IOException
+   public void endList(TrivListDec trivlist) throws IOException
    {
+      trivListStack.pop();
+   }
+
+   public TrivListDec peekTrivListStack()
+   {
+      return trivListStack.peek();
    }
 
    private Vector<String> verbEnv;
@@ -1434,6 +1452,8 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
    private String mainIndex = "main";
 
    private boolean indexingEnabled = false;
+
+   private Stack<TrivListDec> trivListStack = new Stack<TrivListDec>();
 
    public static final UserNumber ZERO = new UserNumber(0);
    public static final UserNumber ONE = new UserNumber(1);

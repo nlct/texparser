@@ -1,6 +1,5 @@
 \documentclass{article}
 
-\usepackage{lipsum}
 \usepackage[answers,usedefaultargs]{probsoln}
 
 \begin{defproblem}[1][{2}]{diffsin}
@@ -19,8 +18,7 @@ Differentiate $f(x)=\sin(#1x)$.
   \(f'(x) = -#1\sin(#1x)\)
 }
 
-\newproblem*{essay}{An essay style question without an answer.
-\lipsum[1]}
+\newproblem*{essay}{An essay style question without an answer.}
 
 \begin{defproblem}{subparts}
 Find $x$ in:
@@ -56,21 +54,4 @@ Iterate:
 \begin{enumerate}
 \foreachproblem{\item \thisproblem}
 \end{enumerate}
-
-Test itemize:
-\begin{itemize}
-\item First.
- \begin{itemize}
-  \item Second.
-  \item Third.
-  \begin{itemize}
-   \item Fourth.
-   \item Fifth.
-    \begin{itemize}
-     \item Sixth.
-     \item Seventh.
-    \end{itemize}
-  \end{itemize}
- \end{itemize}
-\end{itemize}
 \end{document}

@@ -84,7 +84,7 @@ public class ItemizeDec extends ListDec
    {
       TeXSettings settings = parser.getSettings();
 
-      Register enumdepth = settings.globalAdvanceRegister("@enumdepth",
+      Register enumdepth = settings.globalAdvanceRegister("@itemdepth",
          LaTeXParserListener.MINUS_ONE);
 
       super.end(parser);

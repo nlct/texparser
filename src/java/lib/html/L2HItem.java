@@ -41,18 +41,26 @@ public class L2HItem extends ListItem
       return new L2HItem(getName());
    }
 
-   public void makelabel(TeXParser parser, TeXObject label)
+   public void makelabel(TeXParser parser, TrivListDec trivList, 
+     TeXObject label)
     throws IOException
    {
       L2HConverter listener = (L2HConverter)parser.getListener();
 
-      if (listener.isIfTrue(listener.getControlSequence("if@nmbrlist")))
+      if (trivList.isInLine())
       {
-         listener.write("<li><span class=\"numitem\">");
+         listener.write("<span class=\"inlineitem\">");
       }
       else
       {
-         listener.write("<li><span class=\"bulletitem\">");
+         if (listener.isIfTrue(listener.getControlSequence("if@nmbrlist")))
+         {
+            listener.write("<li><span class=\"numitem\">");
+         }
+         else
+         {
+            listener.write("<li><span class=\"bulletitem\">");
+         }
       }
 
       label.process(parser);

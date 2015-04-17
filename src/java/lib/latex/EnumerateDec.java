@@ -82,6 +82,7 @@ public class EnumerateDec extends ListDec
       listsettings.add(enumctr);
 
       setup(parser, labelCs, listsettings);
+
    }
 
    public void end(TeXParser parser)

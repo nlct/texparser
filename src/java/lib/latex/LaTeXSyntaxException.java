@@ -76,4 +76,6 @@ public class LaTeXSyntaxException extends TeXSyntaxException
       "latex.error.no_alignment";
    public static final String ERROR_UNDEFINED_COUNTER = 
       "latex.error.undefined_counter";
+   public static final String ERROR_LONELY_ITEM = 
+      "latex.error.lonely_item";
 }

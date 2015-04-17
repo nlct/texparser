@@ -45,11 +45,25 @@ public class ListItem extends ControlSequence
    {
       TeXObject label = stack.popArg(parser, '[', ']');
 
-      Group grp = parser.getListener().createGroup();
+      LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
+
+      TrivListDec trivList; 
+
+      try
+      {
+         trivList = listener.peekTrivListStack();
+      }
+      catch (java.util.EmptyStackException e)
+      {
+         throw new LaTeXSyntaxException(parser, 
+           LaTeXSyntaxException.ERROR_LONELY_ITEM, e);
+      }
+
+      Group grp = listener.createGroup();
 
       grp.add(setuplabel(parser, label));
 
-      makelabel(parser, grp);
+      makelabel(parser, trivList, grp);
    }
 
    public void process(TeXParser parser)
@@ -57,11 +71,25 @@ public class ListItem extends ControlSequence
    {
       TeXObject label = parser.popNextArg('[', ']');
 
-      Group grp = parser.getListener().createGroup();
+      LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
+
+      TrivListDec trivList; 
+
+      try
+      {
+         trivList = listener.peekTrivListStack();
+      }
+      catch (java.util.EmptyStackException e)
+      {
+         throw new LaTeXSyntaxException(parser, 
+           LaTeXSyntaxException.ERROR_LONELY_ITEM, e);
+      }
+
+      Group grp = listener.createGroup();
 
       grp.add(setuplabel(parser, label));
 
-      makelabel(parser, setuplabel(parser, grp));
+      makelabel(parser, trivList, grp);
    }
 
    public TeXObject setuplabel(TeXParser parser, TeXObject label)
@@ -94,7 +122,7 @@ public class ListItem extends ControlSequence
       return listener.getControlSequence("@itemlabel");
    }
 
-   public void makelabel(TeXParser parser, TeXObject label)
+   public void makelabel(TeXParser parser, TrivListDec trivList, TeXObject label)
     throws IOException
    {
       label.process(parser);
