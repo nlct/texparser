@@ -16,36 +16,57 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
-package com.dickimawbooks.texparserlib.latex.pifont;
+package com.dickimawbooks.texparserlib.latex;
 
-import java.util.Hashtable;
 import java.io.IOException;
 
 import com.dickimawbooks.texparserlib.*;
-import com.dickimawbooks.texparserlib.latex.*;
 
-public class PifontSty extends LaTeXSty
+public class DingList extends ListDec
 {
-   public PifontSty(String name, LaTeXParserListener listener)
+   public DingList()
    {
-      super(name, listener);
+      this("dinglist");
    }
 
-   public void addDefinitions()
+   public DingList(String name)
    {
-      LaTeXParserListener listener = getListener();
-
-      registerControlSequence(new Ding());
-      registerControlSequence(new DingList());
+      super(name);
    }
 
-   public void processOption(String option)
+   public Object clone()
+   {
+      return new DingList(getName());
+   }
+
+   public void process(TeXParser parser) throws IOException
+   {
+      setup(parser, parser.popStack());
+   }
+
+   public void process(TeXParser parser, TeXObjectList stack) throws IOException
+   {
+      setup(parser, stack.popStack(parser));
+   }
+
+   public void setup(TeXParser parser, TeXObject arg) throws IOException
+   {
+      setup(parser);
+
+      TeXObjectList label = new TeXObjectList();
+
+      label.add(parser.getListener().getControlSequence("ding"));
+      label.add(arg);
+
+      TeXObjectList listsettings = new TeXObjectList();
+
+      setup(parser, label, listsettings);
+   }
+
+   public void end(TeXParser parser)
     throws IOException
    {
+      super.end(parser);
    }
 
-   protected void preOptions()
-     throws IOException
-   {
-   }
 }
