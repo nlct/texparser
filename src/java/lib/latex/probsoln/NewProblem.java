@@ -167,8 +167,6 @@ public class NewProblem extends ControlSequence
       TeXObjectList contents = new TeXObjectList();
 
       contents.add(new TeXCsRef("begin"));
-      contents.add(parser.getListener().createGroup("onlyproblem"));
-      contents.add(new TeXCsRef("begin"));
       contents.add(parser.getListener().createGroup("probsolnquestion"));
 
       if (problem instanceof TeXObjectList)
@@ -182,8 +180,6 @@ public class NewProblem extends ControlSequence
 
       contents.add(new TeXCsRef("end"));
       contents.add(parser.getListener().createGroup("probsolnquestion"));
-      contents.add(new TeXCsRef("end"));
-      contents.add(parser.getListener().createGroup("onlyproblem"));
 
       contents.add(new TeXCsRef("begin"));
       contents.add(parser.getListener().createGroup("onlysolution"));

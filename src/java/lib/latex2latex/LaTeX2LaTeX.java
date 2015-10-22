@@ -278,7 +278,7 @@ public class LaTeX2LaTeX extends LaTeXParserListener
       write(parser.getBgChar()+clsName+parser.getEgChar());
    }
 
-   public void usepackage(KeyValList options, String styName) throws IOException
+   public LaTeXSty usepackage(KeyValList options, String styName) throws IOException
    {
       if (styName.equals("graphics") || styName.equals("epsfig"))
       {
@@ -288,7 +288,7 @@ public class LaTeX2LaTeX extends LaTeXParserListener
          styName = "graphicx";
       }
 
-      super.usepackage(options, styName);
+      LaTeXSty sty = super.usepackage(options, styName);
 
       write(parser.getEscChar());
       write("usepackage");
@@ -303,6 +303,8 @@ public class LaTeX2LaTeX extends LaTeXParserListener
       write(parser.getBgChar());
       write(styName);
       write(parser.getEgChar());
+
+      return sty;
    }
 
    public void substituting(String original, String replacement)

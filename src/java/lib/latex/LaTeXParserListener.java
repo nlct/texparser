@@ -747,7 +747,7 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       return null;
    }
 
-   public void usepackage(KeyValList options, String styName)
+   public LaTeXSty usepackage(KeyValList options, String styName)
    throws IOException
    {
       if (!isStyLoaded(styName))
@@ -763,7 +763,11 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
          {
             sty.load(options);
          }
+
+         return sty;
       }
+
+      return null;
    }
 
    public LaTeXSty getLaTeXSty(String styName)

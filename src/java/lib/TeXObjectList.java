@@ -625,6 +625,22 @@ public class TeXObjectList extends Vector<TeXObject>
       super.add(index, object);
    }
 
+   public boolean add(TeXObject object)
+   {
+      if (object == null)
+      {
+         throw new NullPointerException();
+      }
+
+      if (object == this)
+      {
+         throw new IllegalArgumentException(
+           "Can't add a list to itself");
+      }
+
+      return super.add(object);
+   }
+
    public TeXObject peek()
    {
       return size() == 0 ? null : firstElement();

@@ -114,3 +114,6 @@ probsoln.no_such_entry_in_db=Entry '$1' doesn't exist in ProbSoln database '$2'.
 probsoln.db_exists=ProbSoln database '$1' already exists.
 probsoln.request_args=Problem '$1' (in database '$2') requires $3 arguments. Please specify
 probsoln.request_arg=Problem '$1' (in database '$2') requires 1 argument. Please specify
+
+# Image drawing messages
+teximage.error.no_path=No path defined on which to operate

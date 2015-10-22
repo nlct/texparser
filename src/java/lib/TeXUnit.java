@@ -73,6 +73,7 @@ public abstract class TeXUnit implements TeXObject
 
    public static final FixedUnit PT = new FixedUnit(FixedUnit.UNIT_PT);
    public static final FixedUnit SP = new FixedUnit(FixedUnit.UNIT_SP);
+   public static final FixedUnit BP = new FixedUnit(FixedUnit.UNIT_BP);
    public static final EmUnit EM = new EmUnit();
    public static final ExUnit EX = new ExUnit();
    public static final MuUnit MU = new MuUnit();
