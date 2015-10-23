@@ -68,10 +68,118 @@ public class JmlrCls extends LaTeXCls
       registerControlSequence(new GenericCommand("editorsname",
        null, listener.createString("Editors")));
 
+      registerControlSequence(new GenericCommand("sectionrefname",
+       null, listener.createString("Section")));
+
+      registerControlSequence(new GenericCommand("sectionsrefname",
+       null, listener.createString("Sections")));
+
+      registerControlSequence(new GenericCommand("equationrefname",
+       null, listener.createString("Equation")));
+
+      registerControlSequence(new GenericCommand("equationsrefname",
+       null, listener.createString("Equations")));
+
+      registerControlSequence(new GenericCommand("tablerefname",
+       null, listener.createString("Table")));
+
+      registerControlSequence(new GenericCommand("tablesrefname",
+       null, listener.createString("Tables")));
+
+      registerControlSequence(new GenericCommand("figurerefname",
+       null, listener.createString("Figure")));
+
+      registerControlSequence(new GenericCommand("figuresrefname",
+       null, listener.createString("Figures")));
+
+      registerControlSequence(new GenericCommand("algorithmrefname",
+       null, listener.createString("Algorithm")));
+
+      registerControlSequence(new GenericCommand("algorithmsrefname",
+       null, listener.createString("Algorithms")));
+
+      registerControlSequence(new GenericCommand("theoremrefname",
+       null, listener.createString("Theorem")));
+
+      registerControlSequence(new GenericCommand("theoremsrefname",
+       null, listener.createString("Theorems")));
+
+      registerControlSequence(new GenericCommand("lemmarefname",
+       null, listener.createString("Lemma")));
+
+      registerControlSequence(new GenericCommand("lemmasrefname",
+       null, listener.createString("Lemmas")));
+
+      registerControlSequence(new GenericCommand("remarkrefname",
+       null, listener.createString("Remark")));
+
+      registerControlSequence(new GenericCommand("remarksrefname",
+       null, listener.createString("Remarks")));
+
+      registerControlSequence(new GenericCommand("corollaryrefname",
+       null, listener.createString("Corollary")));
+
+      registerControlSequence(new GenericCommand("corollarysrefname",
+       null, listener.createString("Corollaries")));
+
+      registerControlSequence(new GenericCommand("definitionrefname",
+       null, listener.createString("Definition")));
+
+      registerControlSequence(new GenericCommand("definitionsrefname",
+       null, listener.createString("Definitions")));
+
+      registerControlSequence(new GenericCommand("axiomrefname",
+       null, listener.createString("Axiom")));
+
+      registerControlSequence(new GenericCommand("axiomsrefname",
+       null, listener.createString("Axioms")));
+
+      registerControlSequence(new GenericCommand("examplerefname",
+       null, listener.createString("Example")));
+
+      registerControlSequence(new GenericCommand("examplesrefname",
+       null, listener.createString("Examples")));
+
+      registerControlSequence(new GenericCommand("appendixrefname",
+       null, listener.createString("Appendix")));
+
+      registerControlSequence(new GenericCommand("appendixsrefname",
+       null, listener.createString("Appendices")));
+
+      registerControlSequence(new GenericCommand("partrefname",
+       null, listener.createString("Part")));
+
+      registerControlSequence(new GenericCommand("partsrefname",
+       null, listener.createString("Parts")));
+
+      registerControlSequence(new GenericCommand("@jmlr@reflistsep",
+       null, listener.createString(", ")));
+
+      registerControlSequence(new GenericCommand("@jmlr@reflistlastsep",
+       null, listener.createString(" and ")));
+
       registerControlSequence(new JmlrKeywords());
       registerControlSequence(new JmlrName(this));
       registerControlSequence(new JmlrEmail());
       registerControlSequence(new JmlrAddr());
+
+      registerControlSequence(new JmlrObjectRef());
+      registerControlSequence(new JmlrObjectTypeRef("section"));
+      registerControlSequence(new JmlrObjectTypeRef("equation",
+        listener.createString("("), listener.createString(")")));
+      registerControlSequence(new JmlrObjectTypeRef("table"));
+      registerControlSequence(new JmlrObjectTypeRef("figure"));
+      registerControlSequence(new JmlrObjectTypeRef("algorithm"));
+      registerControlSequence(new JmlrObjectTypeRef("theorem"));
+      registerControlSequence(new JmlrObjectTypeRef("lemma"));
+      registerControlSequence(new JmlrObjectTypeRef("remark"));
+      registerControlSequence(new JmlrObjectTypeRef("corollary"));
+      registerControlSequence(new JmlrObjectTypeRef("definition"));
+      registerControlSequence(new JmlrObjectTypeRef("conjecture"));
+      registerControlSequence(new JmlrObjectTypeRef("axiom"));
+      registerControlSequence(new JmlrObjectTypeRef("exampleref"));
+      registerControlSequence(new JmlrObjectTypeRef("appendix"));
+      registerControlSequence(new JmlrObjectTypeRef("part"));
    }
 
    protected void loadPreHyperrefPackages()
