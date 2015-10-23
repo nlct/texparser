@@ -29,15 +29,13 @@ public abstract class LaTeXSty extends LaTeXFile
    public LaTeXSty(String name, LaTeXParserListener listener)
    throws IOException
    {
-      this(name, "sty", listener);
+      this(null, name, "sty", listener);
    }
 
    public LaTeXSty(String name, String ext, LaTeXParserListener listener)
    throws IOException
    {
-      super(listener.getParser(), null, name, ext);
-      this.name = name;
-      this.listener = listener;
+      this(null, name, ext, listener);
    }
 
    public LaTeXSty(KeyValList options, String name, 
@@ -58,6 +56,11 @@ public abstract class LaTeXSty extends LaTeXFile
       if (options != null)
       {
          load(options);
+      }
+      else
+      {
+         preOptions();
+         postOptions();
       }
    }
 
