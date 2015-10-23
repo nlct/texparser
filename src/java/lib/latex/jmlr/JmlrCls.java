@@ -175,6 +175,11 @@ public class JmlrCls extends LaTeXCls
 
    public void addAuthor(TeXObject author)
    {
+      if (authors == null)
+      {
+         authors = new TeXObjectList();
+      }
+
       authors.add(author);
    }
 
@@ -183,5 +188,5 @@ public class JmlrCls extends LaTeXCls
       return authors;
    }
 
-   private TeXObjectList authors = new TeXObjectList();
+   private TeXObjectList authors = null;
 }
