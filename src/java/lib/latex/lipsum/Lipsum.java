@@ -25,7 +25,7 @@ import java.text.StringCharacterIterator;
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.*;
 
-public class Lipsum extends ControlSequence
+public class Lipsum extends Command
 {
    public Lipsum(LipsumSty sty)
    {
@@ -43,6 +43,105 @@ public class Lipsum extends ControlSequence
       return new Lipsum(getName(), sty);
    }
 
+   public TeXObjectList expandonce(TeXParser parser)
+     throws IOException
+   {
+      return expandonce(parser, parser);
+   }
+
+   public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
+     throws IOException
+   {
+      TeXObject next = (parser == stack ? parser.popStack() : stack.pop());
+
+      boolean isStar = false;
+
+      if (next != null && next instanceof CharObject
+       && ((CharObject)next).getCharCode() == (int)'*')
+      {
+         isStar = true;
+      }
+      else
+      {
+         stack.push(next);
+      }
+
+      TeXObject optArg = (parser == stack ?
+       parser.popNextArg('[', ']') :
+       stack.popArg(parser, '[', ']'));
+
+      TeXObjectList expanded = null;
+      String refs;
+
+      if (optArg != null)
+      {
+         if (optArg instanceof Expandable)
+         {
+            if (parser == stack)
+            {
+               expanded = ((Expandable)optArg).expandfully(parser);
+            }
+            else
+            {
+               expanded = ((Expandable)optArg).expandfully(parser, stack);
+            }
+         }
+
+         if (expanded == null)
+         {
+            refs = optArg.toString(parser);
+         }
+         else
+         {
+            refs = expanded.toString(parser);
+         }
+      }
+      else
+      {
+         refs = sty.getDefaultRange();
+      }
+
+      expanded = new TeXObjectList();
+
+      String[] split = refs.split(",");
+
+      for (int j = 0; j < split.length; j++)
+      {
+         String[] range = split[j].split("-");
+
+         if (range == null || range.length == 0)
+         {
+            continue;
+         }
+
+         try
+         {
+            int firstIdx = Integer.parseInt(range[0]);
+
+            int lastIdx = (range.length == 1 ? firstIdx : 
+              Integer.parseInt(range[1]));
+
+            for (int i = firstIdx-1; i < lastIdx; i++)
+            {
+               expanded.addAll(
+                  parser.getListener().createString(LIPSUM_TEXT[i]));
+
+               if (!isStar)
+               {
+                  expanded.add(new TeXCsRef("par"));
+               }
+            }
+         }
+         catch (NumberFormatException e)
+         {
+            throw new TeXSyntaxException(parser.getLineNumber(),
+              TeXSyntaxException.ERROR_NUMBER_EXPECTED);
+         }
+      }
+
+      return expanded;
+   }
+
    private void lipsum(TeXParser parser, TeXObjectList stack,
      TeXObject optArg, boolean isStar)
      throws IOException
@@ -55,7 +154,14 @@ public class Lipsum extends ControlSequence
 
          if (optArg instanceof Expandable)
          {
-            expanded = ((Expandable)optArg).expandfully(parser, stack);
+            if (parser == stack)
+            {
+               expanded = ((Expandable)optArg).expandfully(parser);
+            }
+            else
+            {
+               expanded = ((Expandable)optArg).expandfully(parser, stack);
+            }
          }
 
          if (expanded == null)
