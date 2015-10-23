@@ -173,12 +173,7 @@ public class L2HConverter extends LaTeXParserListener
 
       try
       {
-         LaTeXSty sty = getLaTeXSty("hyperref");
-
-         if (sty != null)
-         {
-            sty.load(null);
-         }
+         LaTeXSty sty = getLaTeXSty(null, "hyperref");
       }
       catch (IOException e)
       {

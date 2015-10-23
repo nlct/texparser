@@ -26,9 +26,10 @@ import com.dickimawbooks.texparserlib.latex.*;
 
 public class EtoolboxSty extends LaTeXSty
 {
-   public EtoolboxSty(LaTeXParserListener listener)
+   public EtoolboxSty(KeyValList options, LaTeXParserListener listener)
+   throws IOException
    {
-      super("etoolbox", listener);
+      super(options, "etoolbox", listener);
    }
 
    public void addDefinitions()

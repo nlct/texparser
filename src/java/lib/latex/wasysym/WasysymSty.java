@@ -26,9 +26,11 @@ import com.dickimawbooks.texparserlib.latex.*;
 
 public class WasysymSty extends LaTeXSty
 {
-   public WasysymSty(String name, LaTeXParserListener listener)
+   public WasysymSty(KeyValList options, String name, 
+     LaTeXParserListener listener)
+   throws IOException
    {
-      super(name, listener);
+      super(options, name, listener);
    }
 
    public void addDefinitions()

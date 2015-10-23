@@ -26,14 +26,17 @@ import com.dickimawbooks.texparserlib.latex.*;
 
 public class AmsSymbSty extends LaTeXSty
 {
-   public AmsSymbSty(LaTeXParserListener listener)
+   public AmsSymbSty(KeyValList options, LaTeXParserListener listener)
+    throws IOException
    {
-      this("amssymb", listener);
+      this(options, "amssymb", listener);
    }
 
-   public AmsSymbSty(String name, LaTeXParserListener listener)
+   public AmsSymbSty(KeyValList options, String name, 
+      LaTeXParserListener listener)
+   throws IOException
    {
-      super(name, listener);
+      super(options, name, listener);
    }
 
    public void addDefinitions()

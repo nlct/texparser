@@ -28,9 +28,10 @@ import com.dickimawbooks.texparserlib.latex.*;
 
 public class InputEncSty extends LaTeXSty
 {
-   public InputEncSty(LaTeXParserListener listener)
+   public InputEncSty(KeyValList options, LaTeXParserListener listener)
+    throws IOException
    {
-      super("inputenc", listener);
+      super(options, "inputenc", listener);
    }
 
    public void addDefinitions()

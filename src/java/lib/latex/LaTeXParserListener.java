@@ -719,32 +719,25 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
             LaTeXSyntaxException.ERROR_MULTI_CLS);
       }
 
-      docCls = new LaTeXFile(parser, options, clsName, "cls");
+      docCls = getLaTeXCls(options, clsName);
 
       addFileReference(docCls);
-
-      LaTeXCls cls = getLaTeXCls(clsName);
-
-      if (cls != null)
-      {
-         cls.load(options);
-      }
    }
 
-   public LaTeXCls getLaTeXCls(String clsName)
+   public LaTeXCls getLaTeXCls(KeyValList options, String clsName)
     throws IOException
    {
       if (clsName.equals("jmlr"))
       {
-         return new JmlrCls(this);
+         return new JmlrCls(options, this);
       }
 
       if (clsName.equals("jmlrbook"))
       {
-         return new JmlrBookCls(this);
+         return new JmlrBookCls(options, this);
       }
 
-      return null;
+      return new UnknownCls(options, clsName, this);
    }
 
    public LaTeXSty usepackage(KeyValList options, String styName)
@@ -752,17 +745,10 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
    {
       if (!isStyLoaded(styName))
       {
-         LaTeXFile lfile = new LaTeXFile(parser, options, styName, "sty");
+         LaTeXSty sty = getLaTeXSty(options, styName);
 
-         addFileReference(lfile);
-         loadedPackages.add(lfile);
-
-         LaTeXSty sty = getLaTeXSty(styName);
-
-         if (sty != null)
-         {
-            sty.load(options);
-         }
+         addFileReference(sty);
+         loadedPackages.add(sty);
 
          return sty;
       }
@@ -770,7 +756,7 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       return null;
    }
 
-   public LaTeXSty getLaTeXSty(String styName)
+   public LaTeXSty getLaTeXSty(KeyValList options, String styName)
    throws IOException
    {
       if (styName.equals("graphics")
@@ -786,80 +772,80 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
             loadedPackages.add(lfile);
          }
 
-         return new GraphicsSty(styName, this);
+         return new GraphicsSty(options, styName, this);
       }
 
       if (styName.equals("amsmath"))
       {
-         return new AmsmathSty(styName, this);
+         return new AmsmathSty(options, styName, this);
       }
 
       if (styName.equals("amssymb"))
       {
-         return new AmsSymbSty(styName, this);
+         return new AmsSymbSty(options, styName, this);
       }
 
       if (styName.equals("lipsum"))
       {
-         return new LipsumSty(this);
+         return new LipsumSty(options, this);
       }
 
       if (styName.equals("etoolbox"))
       {
-         return new EtoolboxSty(this);
+         return new EtoolboxSty(options, this);
       }
 
       if (styName.equals("hyperref"))
       {
-         return new HyperrefSty(this);
+         return new HyperrefSty(options, this);
       }
 
       if (styName.equals("inputenc"))
       {
-         return new InputEncSty(this);
+         return new InputEncSty(options, this);
       }
 
       if (styName.equals("natbib"))
       {
-         return new NatbibSty(this);
+         return new NatbibSty(options, this);
       }
 
       if (styName.equals("wasysym"))
       {
-         return new WasysymSty(styName, this);
+         return new WasysymSty(options, styName, this);
       }
 
       if (styName.equals("pifont"))
       {
-         return new PifontSty(styName, this);
+         return new PifontSty(options, styName, this);
       }
 
       if (styName.equals("booktabs"))
       {
-         return new BooktabsSty(styName, this);
+         return new BooktabsSty(options, styName, this);
       }
 
       if (styName.equals("textcase"))
       {
-         return new TextCaseSty(this);
+         return new TextCaseSty(options, this);
       }
 
       if (styName.equals("shortvrb"))
       {
-         return new ShortVrbSty(this);
+         return new ShortVrbSty(options, this);
       }
 
       if (styName.equals("doc"))
       {
-         return new DocSty(this);
+         return new DocSty(options, this);
       }
 
       if (styName.equals("probsoln"))
       {
-         return new ProbSolnSty(this);
+         return new ProbSolnSty(options, this);
       }
 
-      return null;
+      return new UnknownSty(options, styName, this);
    }
 
    public abstract void substituting( 

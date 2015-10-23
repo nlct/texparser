@@ -29,9 +29,10 @@ import com.dickimawbooks.texparserlib.latex.*;
 
 public class ProbSolnSty extends LaTeXSty
 {
-   public ProbSolnSty(LaTeXParserListener listener)
+   public ProbSolnSty(KeyValList options, LaTeXParserListener listener)
+   throws IOException
    {
-      super("probsoln", listener);
+      super(options, "probsoln", listener);
 
       databases = new HashMap<String,ProbSolnDatabase>();
 

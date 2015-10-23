@@ -26,9 +26,11 @@ import com.dickimawbooks.texparserlib.latex.*;
 
 public class JmlrBookCls extends JmlrCls
 {
-   public JmlrBookCls(LaTeXParserListener listener)
+   public JmlrBookCls(KeyValList options, 
+      LaTeXParserListener listener)
+   throws IOException
    {
-      super("jmlrbook", listener);
+      super(options, "jmlrbook", listener);
    }
 
    protected void preOptions()

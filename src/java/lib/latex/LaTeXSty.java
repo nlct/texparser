@@ -24,12 +24,41 @@ import java.util.Iterator;
 
 import com.dickimawbooks.texparserlib.*;
 
-public abstract class LaTeXSty
+public abstract class LaTeXSty extends LaTeXFile
 {
    public LaTeXSty(String name, LaTeXParserListener listener)
+   throws IOException
    {
+      this(name, "sty", listener);
+   }
+
+   public LaTeXSty(String name, String ext, LaTeXParserListener listener)
+   throws IOException
+   {
+      super(listener.getParser(), null, name, ext);
       this.name = name;
       this.listener = listener;
+   }
+
+   public LaTeXSty(KeyValList options, String name, 
+      LaTeXParserListener listener)
+   throws IOException
+   {
+      this(options, name, "sty", listener);
+   }
+
+   public LaTeXSty(KeyValList options, String name, String ext,
+      LaTeXParserListener listener)
+   throws IOException
+   {
+      super(listener.getParser(), options, name, ext);
+      this.name = name;
+      this.listener = listener;
+
+      if (options != null)
+      {
+         load(options);
+      }
    }
 
    public abstract void addDefinitions();

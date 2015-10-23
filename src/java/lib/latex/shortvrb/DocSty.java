@@ -25,9 +25,10 @@ import com.dickimawbooks.texparserlib.latex.*;
 
 public class DocSty extends LaTeXSty
 {
-   public DocSty(LaTeXParserListener listener)
+   public DocSty(KeyValList options, LaTeXParserListener listener)
+   throws IOException
    {
-      super("doc", listener);
+      super(options, "doc", listener);
    }
 
    public void addDefinitions()

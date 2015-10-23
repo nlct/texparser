@@ -25,19 +25,20 @@ import com.dickimawbooks.texparserlib.latex.*;
 
 public class JmlrName extends ControlSequence
 {
-   public JmlrName()
+   public JmlrName(JmlrCls cls)
    {
-      this("Name");
+      this(cls, "Name");
    }
 
-   public JmlrName(String name)
+   public JmlrName(JmlrCls cls, String name)
    {
       super(name);
+      this.cls = cls;
    }
 
    public Object clone()
    {
-      return new JmlrName(getName());
+      return new JmlrName(cls, getName());
    }
 
    public void process(TeXParser parser, TeXObjectList stack)
@@ -55,6 +56,8 @@ public class JmlrName extends ControlSequence
       {
          grp = parser.getListener().createGroup();
       }
+
+      cls.addAuthor((TeXObject)grp.clone());
 
       grp.push(new TeXCsRef("bfseries"));
       grp.push(new TeXCsRef("upshape"));
@@ -79,10 +82,14 @@ public class JmlrName extends ControlSequence
          grp = parser.getListener().createGroup();
       }
 
+      cls.addAuthor((TeXObject)grp.clone());
+
       grp.push(new TeXCsRef("bfseries"));
       grp.push(new TeXCsRef("upshape"));
       grp.push(new TeXCsRef("normalsize"));
 
       parser.push(grp);
    }
+
+   private JmlrCls cls;
 }

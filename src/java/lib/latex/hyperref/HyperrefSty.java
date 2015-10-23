@@ -24,9 +24,10 @@ import com.dickimawbooks.texparserlib.latex.*;
 
 public class HyperrefSty extends LaTeXSty
 {
-   public HyperrefSty(LaTeXParserListener listener)
+   public HyperrefSty(KeyValList options, LaTeXParserListener listener)
+    throws IOException
    {
-      super("hyperref", listener);
+      super(options, "hyperref", listener);
    }
 
    public void addDefinitions()

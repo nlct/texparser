@@ -16,24 +16,31 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
-package com.dickimawbooks.texparserlib.latex.lipsum;
+package com.dickimawbooks.texparserlib.latex;
 
+import java.util.Hashtable;
 import java.io.IOException;
+import java.util.Iterator;
 
-import com.dickimawbooks.texparserlib.latex.*;
+import com.dickimawbooks.texparserlib.*;
 
-public class LipsumSty extends LaTeXSty
+public class UnknownCls extends LaTeXCls
 {
-   public LipsumSty(KeyValList options, LaTeXParserListener listener)
-    throws IOException
+   public UnknownCls(String name, LaTeXParserListener listener)
+   throws IOException
    {
-      super(options, "lipsum", listener);
+      super(name, listener);
+   }
+
+   public UnknownCls(KeyValList options, String name, 
+     LaTeXParserListener listener)
+   throws IOException
+   {
+      super(options, name, listener);
    }
 
    public void addDefinitions()
    {
-      registerControlSequence(new Lipsum(this));
-      registerControlSequence(new SetLipsumDefault(this));
    }
 
    public void processOption(String option)
@@ -45,16 +52,4 @@ public class LipsumSty extends LaTeXSty
      throws IOException
    {
    }
-
-   public String getDefaultRange()
-   {
-      return defaultRange;
-   }
-
-   public void setDefaultRange(String range)
-   {
-      defaultRange = range;
-   }
-
-   private String defaultRange = "1-7";
 }

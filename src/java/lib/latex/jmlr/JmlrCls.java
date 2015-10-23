@@ -27,14 +27,18 @@ import com.dickimawbooks.texparserlib.generic.*;
 
 public class JmlrCls extends LaTeXCls
 {
-   public JmlrCls(LaTeXParserListener listener)
+   public JmlrCls(KeyValList options, 
+      LaTeXParserListener listener)
+   throws IOException
    {
-      this("jmlr", listener);
+      this(options, "jmlr", listener);
    }
 
-   public JmlrCls(String name, LaTeXParserListener listener)
+   public JmlrCls(KeyValList options, String name, 
+      LaTeXParserListener listener)
+   throws IOException
    {
-      super(name, listener);
+      super(options, name, listener);
    }
 
    public void addDefinitions()
@@ -65,7 +69,7 @@ public class JmlrCls extends LaTeXCls
        null, listener.createString("Editors")));
 
       registerControlSequence(new JmlrKeywords());
-      registerControlSequence(new JmlrName());
+      registerControlSequence(new JmlrName(this));
       registerControlSequence(new JmlrEmail());
       registerControlSequence(new JmlrAddr());
    }
@@ -168,4 +172,16 @@ public class JmlrCls extends LaTeXCls
          registerControlSequence(new AtFirstOfTwo("ifprint"));
       }
    }
+
+   public void addAuthor(TeXObject author)
+   {
+      authors.add(author);
+   }
+
+   public TeXObjectList getAuthors()
+   {
+      return authors;
+   }
+
+   private TeXObjectList authors = new TeXObjectList();
 }

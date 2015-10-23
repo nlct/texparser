@@ -26,9 +26,11 @@ import com.dickimawbooks.texparserlib.latex.*;
 
 public class PifontSty extends LaTeXSty
 {
-   public PifontSty(String name, LaTeXParserListener listener)
+   public PifontSty(KeyValList options, String name, 
+      LaTeXParserListener listener)
+   throws IOException
    {
-      super(name, listener);
+      super(options, name, listener);
    }
 
    public void addDefinitions()
