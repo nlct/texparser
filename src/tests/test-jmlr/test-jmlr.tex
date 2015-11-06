@@ -1,0 +1,55 @@
+\documentclass[wcp]{jmlr}
+
+\usepackage{lipsum}% Provides dummy text for this example
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+
+\jmlrvolume{42}
+\jmlryear{2011}
+\jmlrworkshop{Workshop on Something}
+
+\title[D'Arçé Article]{An  Article by Mary-Jane d'Arçé}
+
+\author{\Name{Mary-Jane {d'Arçé}}\Email{mjdb@sample.com}\\
+\addr{University of No Where}}
+
+\editor{Anne Editor}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+\lipsum[1]
+\end{abstract}
+\begin{keywords}
+Sample
+\end{keywords}
+
+\section{Introduction}
+
+This is a sample article. \sectionref{sec:method} discusses
+the method used. \equationref{eq:emc2} is an interesting 
+equation. Some other stuff is in \appendixref{apd:first}.
+
+\lipsum
+
+\section{Method}\label{sec:method}
+
+\lipsum
+
+\begin{equation}\label{eq:emc2}
+E = mc^2
+\end{equation}
+
+\lipsum
+
+Here are some citations: \citet{article-full,incollection-minimal}.
+
+\bibliography{xampl}
+
+\appendix
+\section{First Appendix}\label{apd:first}
+
+\lipsum
+\end{document}

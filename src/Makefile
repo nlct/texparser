@@ -39,6 +39,10 @@ test-lists : app tests/output
 	rm -f -r tests/output/test-lists
 	bin/texparserapp --in tests/test-lists/test-lists.tex --output tests/output/test-lists --html
 
+test-jmlr	: app tests/output
+	rm -f -r tests/output/test-jmlr
+	bin/texparserapp --in tests/test-jmlr/test-jmlr.tex --output tests/output/test-jmlr
+
 app     : lib lib/texparserlib.jar lib/texparserapp.jar \
 	  lib/resources lib/texparser-splash.png \
 	  bin/texparserapp lib/icons \
