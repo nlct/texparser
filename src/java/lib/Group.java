@@ -107,15 +107,12 @@ public class Group extends TeXObjectList
 
       MidControlSequence midcs = null;
 
-      boolean markerFound = false;
-
       for (int i = 0; i < size(); i++)
       {
          TeXObject object = get(i);
 
          if (object.equals(marker))
          {
-            markerFound = true;
             break;
          }
 
@@ -151,17 +148,11 @@ public class Group extends TeXObjectList
          before = null;
          after = null;
 
-         while (!markerFound && size() != 0)
+         while (size() != 0)
          {
             TeXObject object = remove(0);
 
-            if (object.equals(marker))
-            {
-               markerFound = true;
-               break;
-            }
-
-            if (object == null)
+            if (object.equals(marker) || object == null)
             {
                break;
             }
