@@ -65,7 +65,7 @@ public class Space extends WhiteSpace
 
    public String toString()
    {
-      return String.format("%s%s", getClass().getName(), format());
+      return String.format("%s%s", getClass().getSimpleName(), format());
    }
 
    public Object clone()

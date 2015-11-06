@@ -90,7 +90,7 @@ public class SkippedSpaces extends Ignoreable
    {
       StringBuilder builder = new StringBuilder();
 
-      builder.append(String.format("%s[", getClass().getName()));
+      builder.append(String.format("%s[", getClass().getSimpleName()));
 
       for (Space sp : contents)
       {
