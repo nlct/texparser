@@ -55,6 +55,7 @@ public class JmlrName extends ControlSequence
       else
       {
          grp = parser.getListener().createGroup();
+         grp.add(obj);
       }
 
       cls.addAuthor((TeXObject)grp.clone());
@@ -80,6 +81,7 @@ public class JmlrName extends ControlSequence
       else
       {
          grp = parser.getListener().createGroup();
+         grp.add(obj);
       }
 
       cls.addAuthor((TeXObject)grp.clone());

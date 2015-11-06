@@ -54,6 +54,7 @@ public class JmlrAddr extends ControlSequence
       else
       {
          grp = parser.getListener().createGroup();
+         grp.add(obj);
       }
 
       grp.push(new TeXCsRef("itshape"));
@@ -77,6 +78,7 @@ public class JmlrAddr extends ControlSequence
       else
       {
          grp = parser.getListener().createGroup();
+         grp.add(obj);
       }
 
       grp.push(new TeXCsRef("itshape"));
