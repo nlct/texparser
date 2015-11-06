@@ -63,7 +63,7 @@ public class SbChar extends Macro
 
          parser.getListener().getTeXApp().error(new TeXSyntaxException(
            parser, TeXSyntaxException.ERROR_DOUBLE_SUBSCRIPT,
-               object.toString()));
+               object.toString(parser)));
       }
 
       parser.getListener().subscript(object);
@@ -82,7 +82,7 @@ public class SbChar extends Macro
 
          parser.getListener().getTeXApp().error(new TeXSyntaxException(
            parser, TeXSyntaxException.ERROR_DOUBLE_SUBSCRIPT,
-               object.toString()));
+               object.toString(parser)));
       }
 
       parser.getListener().subscript(object);
