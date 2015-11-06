@@ -185,6 +185,8 @@ public class Group extends TeXObjectList
          clear();
          midcs.process(parser, before, after);
       }
+
+      processEndDeclarations(parser);
    }
 
    public TeXObjectList expandonce(TeXParser parser) throws IOException
