@@ -54,6 +54,7 @@ public class JmlrEmail extends ControlSequence
       else
       {
          grp = parser.getListener().createGroup();
+         grp.add(obj);
       }
 
       grp.push(new TeXCsRef("scshape"));
@@ -78,6 +79,7 @@ public class JmlrEmail extends ControlSequence
       else
       {
          grp = parser.getListener().createGroup();
+         grp.add(obj);
       }
 
       grp.push(new TeXCsRef("scshape"));
