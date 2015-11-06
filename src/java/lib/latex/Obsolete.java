@@ -35,8 +35,8 @@ public class Obsolete extends ControlSequence
 
    public Object clone()
    {
-      return new Obsolete((Command)orgCommand.clone(),
-        (Command)replacementCommand.clone());
+      return new Obsolete((ControlSequence)orgCommand.clone(),
+        (ControlSequence)replacementCommand.clone());
    }
 
    public void process(TeXParser parser, TeXObjectList stack)

@@ -224,6 +224,54 @@ public class KeyValList extends HashMap<String,TeXObject>
       return builder.toString();
    }
 
+   public String format()
+   {
+      StringBuilder builder = new StringBuilder();
+
+      Set<String> keySet = keySet();
+
+      Iterator<String> it = keySet.iterator();
+
+      while (it.hasNext())
+      {
+         String key = it.next();
+
+         builder.append(key);
+         TeXObject value = get(key);
+
+         if (value instanceof TeXObjectList
+          && ((TeXObjectList)value).isEmpty())
+         {
+            value = null;
+         }
+
+         if (value != null)
+         {
+            builder.append('=');
+
+            String strVal = value.toString();
+
+            if (strVal.matches(".*[^\\w].*"))
+            {
+               builder.append("{");
+               builder.append(strVal);
+               builder.append("}");
+            }
+            else
+            {
+               builder.append(strVal);
+            }
+         }
+
+         if (it.hasNext())
+         {
+            builder.append(',');
+         }
+      }
+
+      return builder.toString();
+   }
+
    public boolean isPar()
    {
       return false;

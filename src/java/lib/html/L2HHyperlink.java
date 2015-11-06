@@ -145,7 +145,10 @@ public class L2HHyperlink extends Command
       listener.write(String.format("<a href=\"#%s\">",
         HtmlTag.getUriFragment(target.toString(parser))));
 
-      text.process(parser, stack);
+      if (text != null)
+      {
+         text.process(parser, stack);
+      }
 
       listener.write("</a>");
    }

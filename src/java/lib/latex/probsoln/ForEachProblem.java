@@ -57,7 +57,7 @@ public class ForEachProblem extends ControlSequence
 
          if (dataset instanceof Expandable)
          {
-            if (parser == stack)
+            if (parser == stack || stack == null)
             {
                expanded = ((TeXObjectList)dataset).expandfully(parser);
             }
@@ -144,7 +144,7 @@ public class ForEachProblem extends ControlSequence
          parser.putControlSequence(true, 
            new GenericCommand("thisproblem", null, useproblem));
 
-         if (parser == stack)
+         if (parser == stack || stack == null)
          {
             contents.process(parser);
          }

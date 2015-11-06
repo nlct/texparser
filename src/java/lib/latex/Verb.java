@@ -70,7 +70,8 @@ public class Verb extends Command
 
       boolean isStar = false;
 
-      if (object.toString().equals("*"))
+      if (object instanceof CharObject
+        && ((CharObject)object).getCharCode() == (int)'*')
       {
          isStar = true;
          object = stack.pop();
@@ -92,7 +93,8 @@ public class Verb extends Command
 
       boolean isStar = false;
 
-      if (object.toString().equals("*"))
+      if (object instanceof CharObject
+        && ((CharObject)object).getCharCode() == (int)'*')
       {
          isStar = true;
          object = parser.pop();

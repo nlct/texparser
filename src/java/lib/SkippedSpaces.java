@@ -74,7 +74,7 @@ public class SkippedSpaces extends Ignoreable
       return builder.toString();
    }
 
-   public String toString()
+   public String format()
    {
       StringBuilder builder = new StringBuilder();
 
@@ -82,6 +82,22 @@ public class SkippedSpaces extends Ignoreable
       {
          builder.appendCodePoint(sp.getSpace());
       }
+
+      return builder.toString();
+   }
+
+   public String toString()
+   {
+      StringBuilder builder = new StringBuilder();
+
+      builder.append(String.format("%s[", getClass().getName()));
+
+      for (Space sp : contents)
+      {
+         builder.appendCodePoint(sp.getSpace());
+      }
+
+      builder.append("]");
 
       return builder.toString();
    }

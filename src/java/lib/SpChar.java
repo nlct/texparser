@@ -31,7 +31,7 @@ public class SpChar extends Macro
       return new SpChar();
    }
 
-   public String toString()
+   public String format()
    {
       return "^";
    }

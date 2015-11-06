@@ -55,7 +55,8 @@ public class Cr extends ControlSequence
 
          boolean isStar;
 
-         if (obj instanceof CharObject && obj.toString().equals("*"))
+         if (obj instanceof CharObject &&
+            ((CharObject)obj).getCharCode() == (int)'*')
          {
             isStar = true;
          }

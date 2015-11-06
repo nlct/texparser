@@ -67,18 +67,11 @@ public class UseProblem extends ControlSequence
          db = dataset.toString(parser);
       }
 
-      TeXObject object = stack.popArg(parser);
+      TeXObject object = stack.expandedPopStack(parser);
 
-      TeXObjectList expanded = null;
-
-      if (object instanceof Expandable)
+      if (object instanceof Group)
       {
-         expanded = ((Expandable)object).expandfully(parser, stack);
-
-         if (expanded != null)
-         {
-            object = expanded;
-         }
+         object = ((Group)object).toList();
       }
 
       sty.getProblem(object.toString(parser), db).process(parser, stack);
@@ -108,18 +101,11 @@ public class UseProblem extends ControlSequence
          db = dataset.toString(parser);
       }
 
-      TeXObject object = parser.popNextArg();
+      TeXObject object = parser.expandedPopStack(true);
 
-      TeXObjectList expanded = null;
-
-      if (object instanceof Expandable)
+      if (object instanceof Group)
       {
-         expanded = ((Expandable)object).expandfully(parser);
-
-         if (expanded != null)
-         {
-            object = expanded;
-         }
+         object = ((Group)object).toList();
       }
 
       sty.getProblem(object.toString(parser), db).process(parser);

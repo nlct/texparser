@@ -158,7 +158,7 @@ public class L2HAlignRow extends AlignRow
 
       if (alignCell.getBefore() == null)
       {
-         style += "padding-left: "+defaultColSep.toString()+"; ";
+         style += "padding-left: "+defaultColSep.format()+"; ";
       }
       else
       {
@@ -167,7 +167,7 @@ public class L2HAlignRow extends AlignRow
 
       if (alignCell.getAfter() == null)
       {
-         style += "padding-right: "+defaultColSep.toString()+"; ";
+         style += "padding-right: "+defaultColSep.format()+"; ";
       }
       else
       {

@@ -28,6 +28,12 @@ public abstract class ActiveChar extends Macro implements Expandable
 
    public String toString()
    {
+      return String.format("%s[char=%c]",
+        getClass().getName(), (char)getCharCode());
+   }
+
+   public String format()
+   {
       return String.format("%c", (char)getCharCode());
    }
 

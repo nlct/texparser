@@ -402,5 +402,12 @@ public class GenericCommand extends Command
       return definition;
    }
 
+   public String toString()
+   {
+      return String.format("%s[name=%s,prefix=%d,syntax=%s,definition=%s]",
+       getClass().getSimpleName(), getName(), getPrefix(), getSyntax(),
+       getDefinition());
+   }
+
    private TeXObjectList definition;
 }

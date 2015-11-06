@@ -52,26 +52,54 @@ public class Group extends TeXObjectList
       return new Group(capacity());
    }
 
-   // stack is outside this group
-   // TODO: Check for \\expandafter at the end of this
-
    public void process(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
-      parser.startGroup();
+      StackMarker marker = null;
 
-      processList(parser, stack);
+      if (stack != parser && stack != null)
+      {
+         marker = new StackMarker();
+         add(marker);
 
-      parser.endGroup();
+         addAll(stack);
+         stack.clear();
+      }
+
+      startGroup(parser);
+      processList(parser, marker);
+      endGroup(parser);
+
+      if (!isEmpty())
+      {
+         stack.addAll(this);
+         clear();
+      }
    }
 
    public void process(TeXParser parser)
     throws IOException
    {
-      process(parser, parser);
+      startGroup(parser);
+
+      processList(parser, null);
+
+      endGroup(parser);
    }
 
-   protected void processList(TeXParser parser, TeXObjectList stack)
+   public void startGroup(TeXParser parser)
+    throws IOException
+   {
+      parser.startGroup();
+   }
+
+   public void endGroup(TeXParser parser)
+    throws IOException
+   {
+      parser.endGroup();
+   }
+
+   protected void processList(TeXParser parser, StackMarker marker)
     throws IOException
    {
       TeXObjectList before = new TeXObjectList();
@@ -79,9 +107,17 @@ public class Group extends TeXObjectList
 
       MidControlSequence midcs = null;
 
+      boolean markerFound = false;
+
       for (int i = 0; i < size(); i++)
       {
          TeXObject object = get(i);
+
+         if (object.equals(marker))
+         {
+            markerFound = true;
+            break;
+         }
 
          if (object instanceof TeXCsRef)
          {
@@ -115,9 +151,15 @@ public class Group extends TeXObjectList
          before = null;
          after = null;
 
-         while (size() != 0)
+         while (!markerFound && size() != 0)
          {
             TeXObject object = remove(0);
+
+            if (object.equals(marker))
+            {
+               markerFound = true;
+               break;
+            }
 
             if (object == null)
             {
@@ -135,14 +177,7 @@ public class Group extends TeXObjectList
                pushDeclaration((Declaration)object);
             }
 
-            if (size() == 0 && stack != parser)
-            {
-               object.process(parser, stack);
-            }
-            else
-            {
-               object.process(parser, this);
-            }
+            object.process(parser, this);
          }
       }
       else
@@ -150,20 +185,95 @@ public class Group extends TeXObjectList
          clear();
          midcs.process(parser, before, after);
       }
+   }
 
-      processEndDeclarations(parser);
+   public TeXObjectList expandonce(TeXParser parser) throws IOException
+   {
+      TeXObjectList expanded = new TeXObjectList();
 
+      expanded.add(getBegin(parser));
+      expanded.addAll(this);
+      expanded.add(getEnd(parser));
+
+      return expanded.expandonce(parser);
+   }
+
+   public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
+     throws IOException
+   {
+      TeXObjectList expanded = new TeXObjectList();
+
+      expanded.add(getBegin(parser));
+      expanded.addAll(this);
+      expanded.add(getEnd(parser));
+
+      if (stack != null && stack != parser)
+      {
+         while (stack.size() > 0)
+         {
+            expanded.add(stack.remove(0));
+         }
+      }
+
+      return expanded.expandonce(parser);
+   }
+
+   public TeXObjectList expandfully(TeXParser parser) throws IOException
+   {
+      TeXObjectList expanded = new TeXObjectList();
+
+      expanded.add(getBegin(parser));
+      expanded.addAll(this);
+      expanded.add(getEnd(parser));
+
+      return expanded.expandfully(parser);
+   }
+
+   public TeXObjectList expandfully(TeXParser parser, TeXObjectList stack)
+     throws IOException
+   {
+      TeXObjectList expanded = new TeXObjectList();
+
+      expanded.add(getBegin(parser));
+      expanded.addAll(this);
+      expanded.add(getEnd(parser));
+
+      if (stack != null && stack != parser)
+      {
+         while (stack.size() > 0)
+         {
+            expanded.add(stack.remove(0));
+         }
+      }
+
+      return expanded.expandfully(parser);
    }
 
    public String toString(TeXParser parser)
    {
-      return ""+parser.getBgChar()+super.toString(parser)+parser.getEgChar();
+      return String.format("%s%s%s", getBegin(parser).toString(parser),
+         super.toString(parser),
+          getEnd(parser).toString(parser));
    }
 
    public String toString()
    {
-      return "{"+super.toString()+"}";
+      return "Group{"+super.toString()+"}";
    }
 
+   public String format()
+   {
+      return "{"+super.format()+"}";
+   }
+
+   public TeXObject getBegin(TeXParser parser)
+   {
+      return parser.getListener().getBgChar(parser.getBgChar());
+   }
+
+   public TeXObject getEnd(TeXParser parser)
+   {
+      return parser.getListener().getEgChar(parser.getEgChar());
+   }
 }
 

@@ -33,13 +33,17 @@ public class Par implements TeXObject
 
    public String toString(TeXParser parser)
    {
-      String eol = System.getProperty("line.separator", "\n");
-      return eol+eol;
+      return String.format("%n%n");
+   }
+
+   public String format()
+   {
+      return "\\par ";
    }
 
    public String toString()
    {
-      return "\\par ";
+      return String.format("%s%n", getClass().getName());
    }
 
    public TeXObjectList string(TeXParser parser)

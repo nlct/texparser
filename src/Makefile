@@ -9,7 +9,7 @@ tests/output	:
 
 test-nested	: app tests/output
 	rm -f -r tests/output/test-nested-env-group
-	bin/texparserapp --in tests/test-nested-env-group/test-nested-env-group.tex --output tests/output/test-nested-env-group
+	bin/texparserapp --debug --in tests/test-nested-env-group/test-nested-env-group.tex --output tests/output/test-nested-env-group
 
 test-obs	: app tests/output
 	rm -f -r tests/output/test-obsolete
@@ -21,11 +21,11 @@ test-sw	: app tests/output
 
 test-abs : app tests/output
 	rm -f -r tests/output/test-abs
-	bin/texparserapp --in tests/test-abs/test-abs.tex --output tests/output/test-abs --html
+	bin/texparserapp --debug --in tests/test-abs/test-abs.tex --output tests/output/test-abs --html
 
 test-article : app tests/output
 	rm -f -r tests/output/test-article
-	bin/texparserapp --in tests/test-article/test-article.tex --output tests/output/test-article --html
+	bin/texparserapp --debug --in tests/test-article/test-article.tex --output tests/output/test-article --html
 
 test-doc : app tests/output
 	rm -f -r tests/output/test-doc
@@ -33,7 +33,7 @@ test-doc : app tests/output
 
 test-probsoln : app tests/output
 	rm -f -r tests/output/test-probsoln
-	bin/texparserapp --in tests/test-probsoln/test-probsoln.tex --output tests/output/test-probsoln --html
+	bin/texparserapp --debug --in tests/test-probsoln/test-probsoln.tex --output tests/output/test-probsoln --html
 
 test-lists : app tests/output
 	rm -f -r tests/output/test-lists

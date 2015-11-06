@@ -57,34 +57,69 @@ public class TeXObjectList extends Vector<TeXObject>
    public TeXObject expandedPopStack(TeXParser parser, boolean isShort)
      throws IOException
    {
+      if (size() == 0)
+      {
+         return null;
+      }
+
+      flatten();
+
       TeXObject object = popStack(parser, isShort);
 
       if (object instanceof TeXCsRef)
       {
          object = parser.getListener().getControlSequence(
-           ((TeXCsRef)object).getName());
-      }
+            ((TeXCsRef)object).getName());
 
-      if (object instanceof Expandable)
-      {
-         TeXObjectList expanded =
-            ((Expandable)object).expandfully(parser, this);
-
-         if (expanded != null)
+         if (object instanceof EndCs)
          {
-            if (expanded instanceof Group)
-            {
-               object = expanded;
-            }
-            else
-            {
-               addAll(0, expanded);
-               object = popStack(parser, isShort);
-            }
+            return object;
          }
       }
 
-      return object;
+      if (object instanceof Group)
+      {
+         Group group = (Group)object;
+
+         TeXObjectList expanded = group.expandfully(parser, this);
+         if (expanded.get(0) instanceof BgChar)
+         {
+            BgChar bgChar = (BgChar)expanded.remove(0);
+            group = bgChar.createGroup(parser);
+            expanded.popRemainingGroup(parser, group, isShort, bgChar);
+            if (!expanded.isEmpty())
+            {
+               addAll(0, expanded);
+            }
+
+            return group;
+         }
+
+         addAll(0, expanded);
+         object = popStack(parser, isShort);
+      }
+
+      if (object instanceof BgChar)
+      {
+         Group group = ((BgChar)object).createGroup(parser);
+         popRemainingGroup(parser, group, isShort, (BgChar)object);
+
+         return group;
+      }
+
+      if (!(object instanceof Expandable))
+      {
+         return object;
+      }
+
+      TeXObjectList expanded = ((Expandable)object).expandfully(parser, this);
+
+      if (expanded == null)
+      {
+         return object;
+      }
+
+      return expanded;
    }
 
    public TeXObject popStack(TeXParser parser) throws IOException
@@ -115,8 +150,8 @@ public class TeXObjectList extends Vector<TeXObject>
 
       if (obj instanceof BgChar)
       {
-         Group group = parser.getListener().createGroup();
-         popRemainingGroup(parser, group, isShort);
+         Group group = ((BgChar)obj).createGroup(parser);
+         popRemainingGroup(parser, group, isShort, (BgChar)obj);
          return group;
       }
 
@@ -142,7 +177,12 @@ public class TeXObjectList extends Vector<TeXObject>
    public TeXObject pop()
      throws IOException
    {
-      return size() == 0 ? null : remove(0);
+      if (isEmpty())
+      {
+         return null;
+      }
+
+      return remove(0);
    }
 
    public TeXObjectList popToGroup(TeXParser parser, boolean isShort)
@@ -649,7 +689,10 @@ public class TeXObjectList extends Vector<TeXObject>
    public TeXObject peekStack()
     throws IOException
    {
-      if (size() == 0) return null;
+      if (size() == 0)
+      {
+         return null;
+      }
 
       for (int i = 0, n = size(); i < n; i++)
       {
@@ -676,12 +719,6 @@ public class TeXObjectList extends Vector<TeXObject>
     throws IOException
    {
       TeXObject object = popStack(parser, isShort);
-
-      if (object == null)
-      {
-         throw new TeXSyntaxException(parser,
-            TeXSyntaxException.ERROR_EMPTY_STACK);
-      }
 
       if (object instanceof Group
        && !(object instanceof MathGroup))
@@ -881,61 +918,105 @@ public class TeXObjectList extends Vector<TeXObject>
       return list;
    }
 
+   protected void flatten()
+   {
+      for (int i = size()-1; i >= 0; i--)
+      {
+         TeXObject obj = get(i);
+
+         if (obj instanceof TeXObjectList)
+         {
+            ((TeXObjectList)obj).flatten();
+
+            if (!(obj instanceof Group))
+            {
+               remove(i);
+               addAll(i, (TeXObjectList)obj);
+            }
+         }
+      }
+   }
+
    public TeXObjectList expandonce(TeXParser parser)
      throws IOException
    {
-      return expandonce(parser, null);
+      flatten();
+
+      TeXObjectList list = new TeXObjectList(size());
+      TeXObjectList remaining = (TeXObjectList)clone();
+
+      while (!remaining.isEmpty())
+      {
+         TeXObject object = remaining.remove(0);
+
+         TeXObjectList expanded = null;
+
+         if (object instanceof Expandable)
+         {
+            expanded = ((Expandable)object).expandonce(parser, remaining);
+         }
+
+         if (expanded == null)
+         {
+            list.add(object);
+         }
+         else
+         {
+            list.addAll(expanded);
+         }
+      }
+
+      return list;
    }
 
    public TeXObjectList expandonce(TeXParser parser, 
         TeXObjectList stack)
      throws IOException
    {
-      TeXObjectList list = createList();
+      flatten();
 
+      TeXObjectList list = new TeXObjectList(size());
       TeXObjectList remaining = (TeXObjectList)clone();
 
-      if (stack != null)
+      StackMarker marker = null;
+
+      if (stack != null && stack != parser)
       {
-         while (stack.size() > 0)
-         {
-            remaining.add(stack.remove(0));
-         }
+         marker = new StackMarker();
+         remaining.add(marker);
+         remaining.addAll(stack);
+         stack.clear();
       }
 
-      while (remaining.size() > 0)
+      while (!remaining.isEmpty())
       {
          TeXObject object = remaining.remove(0);
 
+         if (object.equals(marker))
+         {
+            break;
+         }
+
+         TeXObjectList expanded = null;
+
          if (object instanceof Expandable)
          {
-            TeXObjectList expanded = ((Expandable)object).expandonce(parser,
-                remaining);
-
-            if (expanded == null)
-            {
-               list.add(object);
-            }
-            else if (expanded instanceof Group)
-            {
-               list.add(expanded);
-            }
-            else
-            {
-               list.addAll(expanded);
-            }
+            expanded = ((Expandable)object).expandonce(parser, remaining);
          }
-         else
+
+         if (expanded == null)
          {
             list.add(object);
          }
+         else
+         {
+            list.addAll(expanded);
+         }
       }
 
-      if (list instanceof Group)
+      if (!remaining.isEmpty())
       {
-         TeXObjectList expanded = new TeXObjectList();
-         expanded.add(list);
-         return expanded;
+         stack.addAll(remaining);
       }
 
       return list;
@@ -943,43 +1024,30 @@ public class TeXObjectList extends Vector<TeXObject>
 
    public TeXObjectList expandfully(TeXParser parser) throws IOException
    {
-      TeXObjectList list = createList();
+      flatten();
 
+      TeXObjectList list = new TeXObjectList(size());
       TeXObjectList remaining = (TeXObjectList)clone();
 
-      while (remaining.size() > 0)
+      while (!remaining.isEmpty())
       {
-         TeXObject object = remaining.popStack(parser);
+         TeXObject object = remaining.remove(0);
+
+         TeXObjectList expanded = null;
 
          if (object instanceof Expandable)
          {
-            TeXObjectList expanded = ((Expandable)object).expandfully(parser,
-                remaining);
-
-            if (expanded == null)
-            {
-               list.add(object);
-            }
-            else if (expanded instanceof Group)
-            {
-               list.add(expanded);
-            }
-            else
-            {
-               list.addAll(expanded);
-            }
+            expanded = ((Expandable)object).expandfully(parser, remaining);
          }
-         else
+
+         if (expanded == null)
          {
             list.add(object);
          }
-      }
-
-      if (list instanceof Group)
-      {
-         TeXObjectList expanded = new TeXObjectList();
-         expanded.add(list);
-         return expanded;
+         else
+         {
+            list.addAll(expanded);
+         }
       }
 
       return list;
@@ -988,7 +1056,53 @@ public class TeXObjectList extends Vector<TeXObject>
    public TeXObjectList expandfully(TeXParser parser,
         TeXObjectList stack) throws IOException
    {
-      return expandfully(parser);
+      flatten();
+
+      TeXObjectList list = new TeXObjectList(size());
+      TeXObjectList remaining = (TeXObjectList)clone();
+
+      StackMarker marker = null;
+
+      if (stack != null && stack != parser)
+      {
+         marker = new StackMarker();
+         remaining.add(marker);
+         remaining.addAll(stack);
+         stack.clear();
+      }
+
+      while (!remaining.isEmpty())
+      {
+         TeXObject object = remaining.remove(0);
+
+         if (object.equals(marker))
+         {
+            break;
+         }
+
+         TeXObjectList expanded = null;
+
+         if (object instanceof Expandable)
+         {
+            expanded = ((Expandable)object).expandfully(parser, remaining);
+         }
+
+         if (expanded == null)
+         {
+            list.add(object);
+         }
+         else
+         {
+            list.addAll(expanded);
+         }
+      }
+
+      if (!remaining.isEmpty())
+      {
+         stack.addAll(remaining);
+      }
+
+      return list;
    }
 
    public void process(TeXParser parser)
@@ -1016,35 +1130,51 @@ public class TeXObjectList extends Vector<TeXObject>
       }
    }
 
-   // Process with local stack.
    public void process(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
-      if (stack != null)
+      StackMarker marker = null;
+
+      if (stack != parser && stack != null)
       {
-         while (stack.size() > 0)
+         marker = new StackMarker();
+         add(marker);
+
+         addAll(stack);
+         stack.clear();
+      }
+
+      while (size() > 0)
+      {
+         TeXObject object = remove(0);
+
+         if (object.equals(marker))
          {
-            TeXObject object = stack.remove(0);
+            break;
+         }
 
-            if (object instanceof TeXCsRef)
-            {
-               object = parser.getListener().getControlSequence(
-                  ((TeXCsRef)object).getName());
-            }
+         if (object instanceof TeXCsRef)
+         {
+            object = parser.getListener().getControlSequence(
+               ((TeXCsRef)object).getName());
+         }
 
-            if (object instanceof Declaration)
-            {
-               pushDeclaration((Declaration)object);
-            }
+         if (object instanceof Declaration)
+         {
+            pushDeclaration((Declaration)object);
+         }
 
-            if (!(object instanceof Ignoreable))
-            {
-               add(object);
-            }
+         if (!(object instanceof Ignoreable))
+         {
+            object.process(parser, this);
          }
       }
 
-      process(parser);
+      if (!isEmpty())
+      {
+         stack.addAll(this);
+         clear();
+      }
    }
 
    public String toString()
@@ -1074,6 +1204,20 @@ public class TeXObjectList extends Vector<TeXObject>
       }
 
       builder.append(']');
+
+      return builder.toString();
+   }
+
+   public String format()
+   {
+      StringBuilder builder = new StringBuilder();
+
+      for (int i = 0, n = size(); i < n; i++)
+      {
+         TeXObject object = get(i);
+
+         builder.append(object.format());
+      }
 
       return builder.toString();
    }
@@ -1156,7 +1300,7 @@ public class TeXObjectList extends Vector<TeXObject>
    }
 
    public boolean popRemainingGroup(TeXParser parser, 
-      Group group, boolean isShort)
+      Group group, boolean isShort, BgChar bgChar)
      throws IOException
    {
       while (size() > 0)
@@ -1165,6 +1309,14 @@ public class TeXObjectList extends Vector<TeXObject>
 
          if (obj instanceof EgChar)
          {
+            if (!((EgChar)obj).matches(bgChar))
+            {
+               throw new TeXSyntaxException(parser,
+                 TeXSyntaxException.ERROR_EXTRA_OR_FORGOTTEN,
+                 new String[] {obj.toString(parser), 
+                               bgChar.toString(parser)});
+            }
+
             return true;
          }
 
@@ -1175,9 +1327,9 @@ public class TeXObjectList extends Vector<TeXObject>
          }
          else if (obj instanceof BgChar)
          {
-            Group subGrp = parser.getListener().createGroup();
+            Group subGrp = ((BgChar)obj).createGroup(parser);
 
-            if (!popRemainingGroup(parser, subGrp, isShort))
+            if (!popRemainingGroup(parser, subGrp, isShort, ((BgChar)obj)))
             {
                group.add(subGrp);
 

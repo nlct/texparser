@@ -49,7 +49,7 @@ public class Space extends WhiteSpace
 
    public String toString(TeXParser parser)
    {
-      return toString();
+      return ""+(char)charCode;
    }
 
    public TeXObjectList string(TeXParser parser)
@@ -58,9 +58,14 @@ public class Space extends WhiteSpace
       return parser.string(" ");
    }
 
-   public String toString()
+   public String format()
    {
       return ""+(char)charCode;
+   }
+
+   public String toString()
+   {
+      return String.format("%s%s", getClass().getName(), format());
    }
 
    public Object clone()

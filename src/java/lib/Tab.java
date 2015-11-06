@@ -38,6 +38,11 @@ public class Tab implements TeXObject
 
    public String toString()
    {
+      return getClass().getName();
+   }
+
+   public String format()
+   {
       return "&";
    }
 

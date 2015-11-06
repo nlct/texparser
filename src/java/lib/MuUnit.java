@@ -101,7 +101,7 @@ public class MuUnit extends TeXUnit
       return toString();
    }
 
-   public String toString()
+   public String format()
    {
       return "mu";
    }

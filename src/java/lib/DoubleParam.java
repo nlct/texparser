@@ -47,9 +47,15 @@ public class DoubleParam implements TeXObject
       return ""+parser.getParamChar()+param.toString(parser);
    }
 
+   public String format()
+   {
+      return "#"+getParam().format();
+   }
+
    public String toString()
    {
-      return "#"+getParam().toString();
+      return String.format("%s[param=%s]", getClass().getName(),
+        getParam().toString());
    }
 
    public TeXObjectList string(TeXParser parser)

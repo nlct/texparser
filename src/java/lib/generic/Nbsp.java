@@ -41,10 +41,10 @@ public class Nbsp extends ActiveChar
 
    public String toString(TeXParser parser)
    {
-      return toString();
+      return format();
    }
 
-   public String toString()
+   public String format()
    {
       return String.format("%c", (int)charCode);
    }

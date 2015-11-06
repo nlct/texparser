@@ -71,7 +71,8 @@ public class NewCommand extends Command
 
       boolean isStar = false;
 
-      if (object.toString().equals("*"))
+      if (object instanceof CharObject
+       && ((CharObject)object).getCharCode() == (int)'*')
       {
          isStar = true;
          object = (stack == parser ? parser.popNextArg() : stack.popArg(parser));
@@ -96,7 +97,7 @@ public class NewCommand extends Command
          throw new TeXSyntaxException(
             parser,
             TeXSyntaxException.ERROR_CS_EXPECTED,
-            object.toString());
+            object.format());
       }
 
       object = (stack == parser ?

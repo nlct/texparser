@@ -94,7 +94,7 @@ public class AuxData
 
       for (int i = 0; i < args.length; i++)
       {
-         builder.append(bg+args[i].toString()+eg);
+         builder.append(bg+args[i].format()+eg);
       }
 
       return builder.toString();

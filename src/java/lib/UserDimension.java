@@ -126,9 +126,15 @@ public class UserDimension implements TeXDimension, Expandable
       return String.format("%f%s", value, unit.toString(parser));
    }
 
+   public String format()
+   {
+      return String.format("%f%s", value, unit.format());
+   }
+
    public String toString()
    {
-      return String.format("%f%s", value, unit.toString());
+      return String.format("%s[value=%f,unit=%s]",
+         getClass().getName(), value, unit.toString());
    }
 
    public TeXObjectList string(TeXParser parser) throws IOException

@@ -47,7 +47,7 @@ public class EgChar extends Macro
       return charCode;
    }
 
-   public String toString()
+   public String format()
    {
       return String.format("%c", (char)charCode);
    }
@@ -85,6 +85,11 @@ public class EgChar extends Macro
     throws IOException
    {
       return String.format("end-group character %c", (char)charCode);
+   }
+
+   public boolean matches(BgChar bgChar)
+   {
+      return !(bgChar instanceof MathBg);
    }
 
    private int charCode;

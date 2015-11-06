@@ -117,7 +117,7 @@ public class FillUnit extends TeXUnit
       return toString();
    }
 
-   public String toString()
+   public String format()
    {
       String str = "fi";
 

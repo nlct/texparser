@@ -47,6 +47,16 @@ public abstract class WhiteSpace implements TeXObject
       return false;
    }
 
+   public String toString()
+   {
+      return getClass().getName();
+   }
+
+   public String format()
+   {
+      return " ";
+   }
+
    public abstract Object clone();
 }
 

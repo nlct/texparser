@@ -173,6 +173,12 @@ public abstract class Macro implements TeXObject
 
    protected boolean allowsPrefix = false;
 
+   public String toString()
+   {
+      return String.format("%s[prefix=%d,syntax=%s]",
+       getClass().getSimpleName(), getPrefix(), syntax);
+   }
+
    public static final byte PREFIX_NONE = (byte)0;
    public static final byte PREFIX_LONG = (byte)1;
    public static final byte PREFIX_GLOBAL = (byte)2;

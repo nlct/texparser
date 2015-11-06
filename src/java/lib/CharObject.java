@@ -62,6 +62,12 @@ public abstract class CharObject implements TeXObject
 
    public String toString()
    {
+      return String.format("%s[%s]", getClass().getSimpleName(), 
+        format());
+   }
+
+   public String format()
+   {
       StringBuilder builder = new StringBuilder(2);
       builder.appendCodePoint(getCharCode());
       return builder.toString();

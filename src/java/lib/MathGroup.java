@@ -50,17 +50,17 @@ public class MathGroup extends Group
       return math;
    }
 
-   public String toString(TeXParser parser)
+   public String format()
    {
-      String delim = parser.getMathDelim(isinline);
-
       StringBuilder builder = new StringBuilder();
+
+      String delim = (isInLine() ? "$" : "$$");
 
       builder.append(delim);
 
       for (TeXObject object : this)
       {
-         builder.append(object.toString(parser));
+         builder.append(object.format());
       }
 
       builder.append(delim);
@@ -70,9 +70,11 @@ public class MathGroup extends Group
 
    public String toString()
    {
-      String delim = (isinline ? "$" : "$$");
-
       StringBuilder builder = new StringBuilder();
+
+      builder.append("MathGroup");
+
+      String delim = (isInLine() ? "$" : "$$");
 
       builder.append(delim);
 
@@ -86,18 +88,25 @@ public class MathGroup extends Group
       return builder.toString();
    }
 
-   public void process(TeXParser parser, TeXObjectList stack)
+   public void startGroup(TeXParser parser)
     throws IOException
    {
-      parser.startGroup();
+      super.startGroup(parser);
+
       TeXSettings settings = parser.getSettings();
 
       settings.setMode(isinline ? TeXSettings.MODE_INLINE_MATH :
          TeXSettings.MODE_DISPLAY_MATH);
+   }
 
-      processList(parser, stack);
+   public TeXObject getBegin(TeXParser parser)
+   {
+      return new MathBg(parser.getMathChar(), isInLine());
+   }
 
-      parser.endGroup();
+   public TeXObject getEnd(TeXParser parser)
+   {
+      return new MathEg(parser.getMathChar(), isInLine());
    }
 
    private boolean isinline;

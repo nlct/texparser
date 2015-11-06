@@ -68,32 +68,15 @@ public class Begin extends Command
    {
       LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
 
-      TeXObject object = (parser == stack ? parser.popNextArg() 
-         : stack.popArg(parser));
+      TeXObject object = (parser == stack ? parser.expandedPopStack() 
+         : stack.expandedPopStack(parser));
 
-      String name;
-      TeXObjectList expanded = null;
-
-      if (object instanceof Expandable)
+      if (object instanceof Group)
       {
-         if (parser == stack)
-         {
-            expanded = ((Expandable)object).expandfully(parser);
-         }
-         else
-         {
-            expanded = ((Expandable)object).expandfully(parser, stack);
-         }
+         object = ((Group)object).toList();
       }
 
-      if (expanded == null)
-      {
-         name = object.toString(parser);
-      }
-      else
-      {
-         name = expanded.toString(parser);
-      }
+      String name = object.toString(parser);
 
       if (name.equals("document"))
       {
@@ -146,7 +129,7 @@ public class Begin extends Command
         new GenericCommand(true, "@currenvir", null,
            parser.getListener().createString(name)));
 
-      if (parser == stack)
+      if (stack == null)
       {
          doBegin(parser, parser, name);
       }

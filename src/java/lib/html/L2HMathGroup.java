@@ -42,28 +42,30 @@ public class L2HMathGroup extends MathGroup
       return math;
    }
 
-   public void processList(TeXParser parser, TeXObjectList stack)
+   public void processList(TeXParser parser, StackMarker marker)
     throws IOException
    {
       L2HConverter listener = (L2HConverter)parser.getListener();
 
       while (size() > 0)
       {
+         if (get(0).equals(marker))
+         {
+            remove(0);
+            break;
+         }
+
          TeXObject object = expandedPopStack(parser);
+
+         if (object == null)
+         {
+            break;
+         }
 
          if (listener.useMathJax() && object instanceof ControlSequence
          && !listener.isStyControlSequence((ControlSequence)object))
          {
-            listener.write(object.toString());
-
-            if (((ControlSequence)object).isControlWord(parser))
-            {
-               listener.write(' ');
-            }
-         }
-         else if (stack != parser && size() == 0)
-         {
-            object.process(parser, stack);
+            listener.write(object.format());
          }
          else
          {
@@ -72,18 +74,12 @@ public class L2HMathGroup extends MathGroup
       }
    }
 
-   public void process(TeXParser parser) throws IOException
-   {
-      process(parser, parser);
-   }
-
-   public void process(TeXParser parser, TeXObjectList list) throws IOException
+   public void startGroup(TeXParser parser)
+    throws IOException
    {
       L2HConverter listener = (L2HConverter)parser.getListener();
 
       parser.startGroup();
-
-      int orgMode = parser.getSettings().getCurrentMode();
 
       if (!isInLine())
       {
@@ -101,19 +97,29 @@ public class L2HMathGroup extends MathGroup
          if (isInLine())
          {
             listener.write(listener.mathJaxStartInline());
-            processList(parser, list);
-            listener.write(listener.mathJaxEndInline());
          }
          else
          {
             listener.write(listener.mathJaxStartDisplay());
-            processList(parser, list);
-            listener.write(listener.mathJaxEndDisplay());
          }
       }
-      else
+   }
+
+   public void endGroup(TeXParser parser)
+    throws IOException
+   {
+      L2HConverter listener = (L2HConverter)parser.getListener();
+
+      if (listener.useMathJax())
       {
-         processList(parser, list);
+         if (isInLine())
+         {
+            listener.write(listener.mathJaxEndInline());
+         }
+         else
+         {
+            listener.write(listener.mathJaxEndDisplay());
+         }
       }
 
       if (!isInLine())
@@ -121,9 +127,6 @@ public class L2HMathGroup extends MathGroup
          listener.write("</div>");
       }
 
-      parser.getSettings().setMode(orgMode);
-
       parser.endGroup();
    }
-
 }

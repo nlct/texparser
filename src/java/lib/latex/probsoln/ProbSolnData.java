@@ -141,6 +141,12 @@ public class ProbSolnData
       return list;
    }
 
+   public String toString()
+   {
+      return String.format("ProbSolnData[name=%s,args=(n=%d,default=%s),contents=%s]",
+        name, numArgs, defArgs, contents);
+   }
+
    private String name;
 
    private int numArgs = 0;

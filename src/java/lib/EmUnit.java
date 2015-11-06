@@ -99,7 +99,7 @@ public class EmUnit extends TeXUnit
       return toString();
    }
 
-   public String toString()
+   public String format()
    {
       return "em";
    }

@@ -44,6 +44,12 @@ public class HtmlTag implements TeXObject
 
    public String toString()
    {
+      return String.format("%s[tag=%s]", 
+        getClass().getName(), getTag());
+   }
+
+   public String format()
+   {
       return getTag();
    }
 

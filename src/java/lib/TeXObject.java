@@ -42,6 +42,8 @@ public interface TeXObject extends Cloneable
    public TeXObjectList string(TeXParser parser)
     throws IOException;
 
+   public String format();
+
    public boolean isPar();
 }
 

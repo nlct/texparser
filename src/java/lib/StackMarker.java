@@ -20,8 +20,19 @@ package com.dickimawbooks.texparserlib;
 
 import java.io.IOException;
 
-public abstract class Ignoreable implements TeXObject
+public class StackMarker extends Ignoreable
 {
+   public StackMarker()
+   {
+      index = ++lastIndex;
+   }
+
+   private StackMarker(long index)
+   {
+      this.index = index;
+      this.lastIndex = index;
+   }
+
    // Does nothing
    public void process(TeXParser parser)
       throws IOException
@@ -43,11 +54,38 @@ public abstract class Ignoreable implements TeXObject
       return false;
    }
 
-   public String toString()
+   public String toString(TeXParser parser)
    {
-      return getClass().getName();
+      return "";
    }
 
-   public abstract Object clone();
+   public String format()
+   {
+      return "";
+   }
+
+   public String toString()
+   {
+      return String.format("%s[index=%d]",
+        getClass().getSimpleName(), index);
+   }
+
+   public Object clone()
+   {
+      return new StackMarker(index);
+   }
+
+   public boolean equals(Object object)
+   {
+      if (object == null || !(object instanceof StackMarker))
+      {
+        return false;
+      }
+
+      return index == ((StackMarker)object).index;
+   }
+
+   private long index=-1;
+   private static long lastIndex=-1;
 }
 

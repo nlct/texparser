@@ -648,6 +648,11 @@ public class TeXParserApp implements TeXApp
       if (e instanceof TeXSyntaxException)
       {
          errorListener.error(((TeXSyntaxException)e).getMessage(this));
+
+         if (debugMode)
+         {
+            e.printStackTrace();
+         }
       }
       else
       {

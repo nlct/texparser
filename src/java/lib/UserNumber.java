@@ -87,9 +87,15 @@ public class UserNumber implements TeXNumber
       value += increment.number(parser);
    }
 
-   public String toString()
+   public String format()
    {
       return ""+value;
+   }
+
+   public String toString()
+   {
+      return String.format("%s[value=%d]",
+         getClass().getSimpleName(), value);
    }
 
    public String toString(TeXParser parser)

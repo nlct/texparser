@@ -44,25 +44,14 @@ public class End extends ControlSequence
    {
       LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
 
-      TeXObject arg = list.popArg(parser);
+      TeXObject arg = list.expandedPopStack(parser, true);
 
-      TeXObjectList expanded = null;
-
-      if (arg instanceof Expandable)
+      if (arg instanceof Group)
       {
-         expanded = ((Expandable)arg).expandfully(parser, list);
+         arg = ((Group)arg).toList();
       }
 
-      String name;
-
-      if (expanded == null)
-      {
-         name = arg.toString(parser);
-      }
-      else
-      {
-         name = expanded.toString(parser);
-      }
+      String name = arg.toString(parser);
 
       if (name.equals("document"))
       {
@@ -80,7 +69,7 @@ public class End extends ControlSequence
 
       if (currenv instanceof Expandable)
       {
-         expanded = ((Expandable)currenv).expandfully(parser);
+         TeXObjectList expanded = ((Expandable)currenv).expandfully(parser);
 
          if (expanded != null)
          {
@@ -104,25 +93,14 @@ public class End extends ControlSequence
    {
       LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
 
-      TeXObject arg = parser.popNextArg();
+      TeXObject arg = parser.expandedPopStack();
 
-      TeXObjectList expanded = null;
-
-      if (arg instanceof Expandable)
+      if (arg instanceof Group)
       {
-         expanded = ((Expandable)arg).expandfully(parser);
+         arg = ((Group)arg).toList();
       }
 
-      String name;
-
-      if (expanded == null)
-      {
-         name = arg.toString(parser);
-      }
-      else
-      {
-         name = expanded.toString(parser);
-      }
+      String name = arg.toString(parser);
 
       if (name.equals("document"))
       {
@@ -140,7 +118,7 @@ public class End extends ControlSequence
 
       if (currenv instanceof Expandable)
       {
-         expanded = ((Expandable)currenv).expandfully(parser);
+         TeXObjectList expanded = ((Expandable)currenv).expandfully(parser);
 
          if (expanded != null)
          {

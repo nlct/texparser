@@ -74,5 +74,32 @@ public class SkippedEols extends Ignoreable
       return builder.toString();
    }
 
+   public String toString()
+   {
+      StringBuilder builder = new StringBuilder();
+      builder.append(String.format("%s[", getClass().getName()));
+
+      for (Eol eol : contents)
+      {
+         builder.append(eol.toString());
+      }
+
+      builder.append("]");
+
+      return builder.toString();
+   }
+
+   public String format()
+   {
+      StringBuilder builder = new StringBuilder();
+
+      for (Eol eol : contents)
+      {
+         builder.append(eol.format());
+      }
+
+      return builder.toString();
+   }
+
    private Vector<Eol> contents;
 }

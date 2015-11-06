@@ -181,6 +181,12 @@ public class TeXCellAlign
 
    public String toString()
    {
+      return String.format("%s[format=%s]", getClass().getSimpleName(),
+        format());
+   }
+
+   public String format()
+   {
       String preR = "";
 
       for (int i = 0; i < preRules; i++)
@@ -197,11 +203,11 @@ public class TeXCellAlign
 
       return String.format("%s%s%s%s%s%s%s", 
         preR,
-        before==null?"":"@{"+before.toString()+"}",
-        preShift==null?"":preShift.toString(),
+        before==null?"":"@{"+before.format()+"}",
+        preShift==null?"":preShift.format(),
         align==-1?"":(char)align,
-        postShift==null?"":postShift.toString(),
-        after==null?"":"@{"+after.toString()+"}",
+        postShift==null?"":postShift.format(),
+        after==null?"":"@{"+after.format()+"}",
         postR);
    }
 

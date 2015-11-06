@@ -85,13 +85,17 @@ public class L2LOther extends Other
    {
       if (getCharCode() == (int)'.')
       {
-         TeXObject nextObj = stack.pop();
+         TeXObject nextObj = null;
+
+         nextObj = stack.pop();
 
          if (nextObj != null
           && nextObj instanceof Other
           && ((Other)nextObj).getCharCode() == (int)'.')
          {
-            TeXObject nextObj2 = stack.pop();
+            TeXObject nextObj2 = null;
+
+            nextObj2 = stack.pop();
 
             if (nextObj2 != null
               && nextObj2 instanceof Other

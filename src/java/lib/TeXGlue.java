@@ -249,21 +249,27 @@ public class TeXGlue implements TeXDimension, Expandable
       return str;
    }
 
-   public String toString()
+   public String format()
    {
-      String str = fixed.toString();
+      String str = fixed.format();
 
       if (stretch != null)
       {
-         str = str + " plus "+stretch.toString();
+         str = str + " plus "+stretch.format();
       }
 
       if (shrink != null)
       {
-         str = str + " minus "+shrink.toString();
+         str = str + " minus "+shrink.format();
       }
 
       return str;
+   }
+
+   public String toString()
+   {
+      return String.format("%s[fixed:%s,stretch=%s,shrink=%s]",
+        getClass().getName(), fixed, stretch, shrink);
    }
 
    public TeXObjectList string(TeXParser parser) throws IOException

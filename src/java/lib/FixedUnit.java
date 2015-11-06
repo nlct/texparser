@@ -79,7 +79,7 @@ public class FixedUnit extends TeXUnit
       return toString();
    }
 
-   public String toString()
+   public String format()
    {
       return UNIT_NAMES[id];
    }

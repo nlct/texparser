@@ -756,6 +756,24 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       return null;
    }
 
+   public LaTeXSty getLoadedPackage(String styName)
+   {
+      for (LaTeXFile lfile : loadedPackages)
+      {
+         if (lfile instanceof LaTeXSty)
+         {
+            LaTeXSty sty = (LaTeXSty)lfile;
+
+            if (sty.getName().equals(styName))
+            {
+               return sty;
+            }
+         }
+      }
+
+      return null;
+   }
+
    public LaTeXSty getLaTeXSty(KeyValList options, String styName)
    throws IOException
    {

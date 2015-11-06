@@ -53,7 +53,7 @@ public class L2HLetter extends Letter
 
       if (code >= 32 && code <= 126)
       {
-         return toString();
+         return format();
       }
 
       return "&#x"+Integer.toHexString(code)+";";

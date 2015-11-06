@@ -30,4 +30,6 @@ public interface Numerical
    public int number(TeXParser parser) throws TeXSyntaxException;
 
    public String toString(TeXParser parser);
+
+   public String format();
 }

@@ -184,5 +184,11 @@ public class CountRegister extends Register implements TeXNumber
       return reg;
    }
 
+   public String toString()
+   {
+      return String.format("%s[name=%s,value=%d]",
+       getClass().getSimpleName(), getName(), value);
+   }
+
    private int value = 0;
 }

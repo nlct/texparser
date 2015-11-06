@@ -16,38 +16,41 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
-package com.dickimawbooks.texparserlib;
+package com.dickimawbooks.texparserlib.primitives;
 
 import java.io.IOException;
+import java.io.EOFException;
 
-public abstract class Ignoreable implements TeXObject
+import com.dickimawbooks.texparserlib.*;
+
+// This just behaves in a similar way to EndInput and doesn't
+// attempt to actually emulate \end
+public class EndCs extends Primitive
 {
-   // Does nothing
+   public EndCs()
+   {
+      this("end");
+   }
+
+   public EndCs(String name)
+   {
+      super(name);
+   }
+
+   public Object clone()
+   {
+      return new EndCs(getName());
+   }
+
+   public void process(TeXParser parser, TeXObjectList stack)
+      throws IOException
+   {
+      process(parser);
+   }
+
    public void process(TeXParser parser)
       throws IOException
    {
+      throw new EOFException();
    }
-
-   public void process(TeXParser parser, TeXObjectList stack) 
-      throws IOException
-   {
-   }
-
-   public TeXObjectList string(TeXParser parser) throws IOException
-   {
-      return new TeXObjectList();
-   } 
-
-   public boolean isPar()
-   {
-      return false;
-   }
-
-   public String toString()
-   {
-      return getClass().getName();
-   }
-
-   public abstract Object clone();
 }
-

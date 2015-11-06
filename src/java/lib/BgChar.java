@@ -42,7 +42,7 @@ public class BgChar extends Macro
       return new BgChar(charCode);
    }
 
-   public String toString()
+   public String format()
    {
       return String.format("%c", (char)charCode);
    }
@@ -64,9 +64,9 @@ public class BgChar extends Macro
    public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      Group group = parser.getListener().createGroup();
+      Group group = createGroup(parser);
 
-      stack.popRemainingGroup(parser, group, false);
+      stack.popRemainingGroup(parser, group, false, this);
 
       stack.push(group);
    }
@@ -74,9 +74,9 @@ public class BgChar extends Macro
    public void process(TeXParser parser)
      throws IOException
    {
-      Group group = parser.getListener().createGroup();
+      Group group = createGroup(parser);
 
-      parser.popRemainingGroup(group, false);
+      parser.popRemainingGroup(group, false, this);
 
       parser.push(group);
    }
@@ -86,6 +86,16 @@ public class BgChar extends Macro
     throws IOException
    {
       return String.format("begin-group character %c", (char)charCode);
+   }
+
+   public int getCharCode()
+   {
+      return charCode;
+   }
+
+   public Group createGroup(TeXParser parser)
+   {
+      return parser.getListener().createGroup();
    }
 
    private int charCode;

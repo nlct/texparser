@@ -108,7 +108,7 @@ public class L2HHypertarget extends Command
 
       list.add(new HtmlTag(String.format("<a name=\"%s\">%s</a>",
         HtmlTag.getUriFragment(target.toString(parser)), 
-        text.toString(parser))));
+        text == null ? "" :text.toString(parser))));
 
       return list;
    }
@@ -135,7 +135,10 @@ public class L2HHypertarget extends Command
       listener.write(String.format("<a name=\"%s\">",
         HtmlTag.getUriFragment(target.toString(parser))));
 
-      text.process(parser, stack);
+      if (text != null)
+      {
+         text.process(parser, stack);
+      }
 
       listener.write("</a>");
    }

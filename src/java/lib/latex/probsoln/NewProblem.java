@@ -54,7 +54,8 @@ public class NewProblem extends ControlSequence
    {
       TeXObject object = stack.peekStack();
 
-      if (object.toString().equals("*"))
+      if (object instanceof CharObject
+      && ((CharObject)object).getCharCode() == (int)'*')
       {
          if (stack == parser)
          {

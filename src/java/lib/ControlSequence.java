@@ -48,6 +48,12 @@ public abstract class ControlSequence extends Macro
 
    public String toString()
    {
+      return String.format("%s[name=%s,prefix=%d,syntax=%s]",
+       getClass().getSimpleName(), getName(), getPrefix(), getSyntax());
+   }
+
+   public String format()
+   {
       String name = getName();
 
       int lastCh = name.charAt(name.length()-1);

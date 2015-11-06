@@ -71,6 +71,12 @@ public abstract class TeXUnit implements TeXObject
      return 18f*emValue;
    }
 
+   public String toString()
+   {
+      return String.format("%s[unit=%s]", getClass().getSimpleName(),
+        format());
+   }
+
    public static final FixedUnit PT = new FixedUnit(FixedUnit.UNIT_PT);
    public static final FixedUnit SP = new FixedUnit(FixedUnit.UNIT_SP);
    public static final FixedUnit BP = new FixedUnit(FixedUnit.UNIT_BP);

@@ -57,6 +57,12 @@ public class Comment extends Ignoreable
 
    public String toString()
    {
+      return String.format("%s[comment=%s]%n", getClass().getName(),
+         builder.toString());
+   }
+
+   public String format()
+   {
       return String.format("%c%s%n", '%', builder.toString());
    }
 

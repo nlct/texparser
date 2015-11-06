@@ -195,7 +195,15 @@ public class JmlrCls extends LaTeXCls
       listener.usepackage(null, "amssymb");
       LaTeXSty sty = listener.usepackage(null, "natbib");
 
-      sty.processOption("round");
+      if (sty == null)
+      {
+         sty = listener.getLoadedPackage("natbib");
+      }
+
+      if (sty != null)
+      {
+         sty.processOption("round");
+      }
 
       listener.usepackage(null, "graphicx");
       listener.usepackage(null, "url");

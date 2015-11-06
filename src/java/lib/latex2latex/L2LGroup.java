@@ -102,8 +102,8 @@ public class L2LGroup extends Group
       push(object);
    }
 
-   public void process(TeXParser parser, TeXObjectList stack)
-      throws IOException
+   public void startGroup(TeXParser parser)
+    throws IOException
    {
       preprocess(parser);
 
@@ -113,11 +113,16 @@ public class L2LGroup extends Group
       writeable.write(parser.getBgChar());
 
       parser.startGroup();
+   }
 
-      processList(parser, stack);
+   public void endGroup(TeXParser parser)
+    throws IOException
+   {
+      LaTeX2LaTeX listener = (LaTeX2LaTeX)parser.getListener();
 
+      Writeable writeable = listener.getWriteable();
       parser.endGroup();
-
       writeable.write(parser.getEgChar());
    }
+
 }

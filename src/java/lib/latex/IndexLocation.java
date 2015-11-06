@@ -200,6 +200,18 @@ public class IndexLocation implements TeXObject
         type, format.toString(), location.toString());
    }
 
+   public String format()
+   {
+      if (format == null)
+      {
+         return location.format();
+      }
+
+      return String.format("%s{%s}",
+        format.format(),
+        location.format());
+   }
+
    private byte type = NORMAL;
    private TeXObject format;
    private TeXObject location;

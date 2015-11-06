@@ -269,5 +269,6 @@ public class TeXSyntaxException extends IOException
       "tex.error.illegal_align";
    public static final String ERROR_IMPROPER_ALPHABETIC_CONSTANT =
       "tex.error.improper_alphabetic_constant";
-
+   public static final String ERROR_EXTRA_OR_FORGOTTEN =
+      "tex.error.extra_or_forgotten";
 }

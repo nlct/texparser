@@ -211,5 +211,11 @@ public class DimenRegister extends Register implements TeXDimension
       return new DimenRegister(getName(), (TeXGlue)dimension.clone());
    }
 
+   public String toString()
+   {
+      return String.format("%s[name=%s,value=%s]",
+       getClass().getSimpleName(), getName(), dimension);
+   }
+
    private TeXGlue dimension;
 }

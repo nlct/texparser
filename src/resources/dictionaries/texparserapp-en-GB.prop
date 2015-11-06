@@ -87,6 +87,7 @@ tex.error.number_expected=Number expected (found '$1')
 tex.error.register_undef=Unknown register '$1'
 tex.error.syntax=Invalid syntax for $1
 tex.error.extra=Extra $1
+tex.error.extra_or_forgotten=Extra $1, or forgotten $2
 tex.error.double_subscript=Double subscript _$1_ (replaced with _$1{}_)
 tex.error.double_superscript=Double superscript ^$1^ (replaced with ^$1{}^)
 tex.error.illegal_align=Illegal alignment $1

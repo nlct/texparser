@@ -905,13 +905,13 @@ public class TeXParser extends TeXObjectList
       return true;
    }
 
-   public boolean popRemainingGroup(TeXParser parser, Group group, boolean isShort)
+   public boolean popRemainingGroup(TeXParser parser, Group group, boolean isShort, BgChar bgChar)
       throws IOException
    {
-      return popRemainingGroup(group, isShort);
+      return popRemainingGroup(group, isShort, bgChar);
    }
 
-   public boolean popRemainingGroup(Group group, boolean isShort)
+   public boolean popRemainingGroup(Group group, boolean isShort, BgChar bgChar)
       throws IOException
    {
       while (true)
@@ -925,6 +925,14 @@ public class TeXParser extends TeXObjectList
 
          if (obj instanceof EgChar)
          {
+            if (!((EgChar)obj).matches(bgChar))
+            {
+               throw new TeXSyntaxException(this,
+                 TeXSyntaxException.ERROR_EXTRA_OR_FORGOTTEN,
+                 new String[] {obj.toString(this),
+                               bgChar.toString(this)});
+            }
+
             return true;
          }
 
@@ -935,9 +943,9 @@ public class TeXParser extends TeXObjectList
          }
          else if (obj instanceof BgChar)
          {
-            Group subGrp = listener.createGroup();
+            Group subGrp = ((BgChar)obj).createGroup(this);
 
-            if (!popRemainingGroup(subGrp, isShort))
+            if (!popRemainingGroup(subGrp, isShort, (BgChar)obj))
             {
                group.add(subGrp);
 
@@ -1626,9 +1634,70 @@ public class TeXParser extends TeXObjectList
       return super.popArg(this, isShort, openDelim, closeDelim);
    }
 
+   public TeXObject expandedPopStack(TeXParser parser) throws IOException
+   {
+      return parser.expandedPopStack();
+   }
+
+   public TeXObject expandedPopStack(TeXParser parser, boolean isShort)
+      throws IOException
+   {
+      return parser.expandedPopStack(isShort);
+   }
+
    public TeXObject expandedPopStack() throws IOException
    {
-      return expandedPopStack(this);
+      return expandedPopStack(false);
+   }
+
+   public TeXObject expandedPopStack(boolean isShort) throws IOException
+   {
+      TeXObject object = popStack(isShort);
+
+      if (object instanceof TeXCsRef)
+      {
+         object = getListener().getControlSequence(
+            ((TeXCsRef)object).getName());
+      }
+
+      if (object instanceof BgChar)
+      {
+         Group group = ((BgChar)object).createGroup(this);
+         popRemainingGroup(group, isShort, (BgChar)object);
+
+         return group;
+      }
+
+      if (!(object instanceof Expandable))
+      {
+         return object;
+      }
+
+      TeXObjectList expanded = ((Expandable)object).expandfully(this);
+
+      if (expanded != null)
+      {
+         if (expanded.size() == 0)
+         {
+            return expanded;
+         }
+
+         object = expanded.remove(0);
+
+         if (object instanceof BgChar)
+         {
+            Group grp = ((BgChar)object).createGroup(this);
+            expanded.popRemainingGroup(this, grp, isShort, (BgChar)object);
+            addAll(0, expanded);
+
+            return grp;
+         }
+
+         addAll(0, expanded);
+         return object;
+      }
+
+      return object;
    }
 
    public TeXObject popStack(TeXParser parser) throws IOException
@@ -1671,8 +1740,8 @@ public class TeXParser extends TeXObjectList
 
       if (object instanceof BgChar)
       {
-         Group group = listener.createGroup();
-         popRemainingGroup(group, isShort);
+         Group group = ((BgChar)object).createGroup(this);
+         popRemainingGroup(group, isShort, (BgChar)object);
          return group;
       }
 
