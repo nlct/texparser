@@ -16,42 +16,50 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
-package com.dickimawbooks.texparserlib;
+package com.dickimawbooks.texparserlib.bib;
 
-import java.io.IOException;
+import java.util.Vector;
+import java.util.HashMap;
 
-public abstract class ActiveChar extends Macro implements Expandable
+import com.dickimawbooks.texparserlib.*;
+
+/**
+ * Bib value list
+ */
+
+public class BibValueList extends Vector<BibValue> implements BibValue
 {
-   // Character
-
-   public abstract int getCharCode();
-
-   public String toString()
+   public BibValueList()
    {
-      return String.format("%s[char=%c]",
-        getClass().getSimpleName(), (char)getCharCode());
+      super();
    }
 
-   public String format()
+   public TeXObject getContents()
    {
-      return String.format("%c", (char)getCharCode());
-   }
+      TeXObjectList list = new TeXObjectList(size());
 
-   public TeXObjectList string(TeXParser parser) throws IOException
-   {
-      return parser.string(toString());
-   }
-
-   public abstract Object clone();
-
-   public boolean equals(Object object)
-   {
-      if (object instanceof ActiveChar)
+      for (BibValue value : this)
       {
-         return getCharCode() == ((ActiveChar)object).getCharCode();
+         list.add(value.getContents());
       }
 
-      return super.equals(object);
+      return list;
+   }
+
+   public String applyDelim(byte fieldDelimChange)
+   {
+      StringBuilder builder = new StringBuilder();
+
+      for (int i = 0; i < size(); i++)
+      {
+         if (i > 0)
+         {
+            builder.append(" ");
+         }
+
+         builder.append(get(i).applyDelim(fieldDelimChange));
+      }
+
+      return builder.toString();
    }
 }
-

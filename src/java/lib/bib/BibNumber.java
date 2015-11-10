@@ -16,42 +16,39 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
-package com.dickimawbooks.texparserlib;
+package com.dickimawbooks.texparserlib.bib;
 
-import java.io.IOException;
+import java.util.Vector;
+import java.util.HashMap;
 
-public abstract class ActiveChar extends Macro implements Expandable
+import com.dickimawbooks.texparserlib.*;
+
+/**
+ * Bib number
+ */
+
+public class BibNumber implements BibValue
 {
-   // Character
+   public BibNumber(TeXNumber value)
+   {
+      this.value = value;
+   }
 
-   public abstract int getCharCode();
+   public TeXObject getContents()
+   {
+      return value;
+   }
+
+   public String applyDelim(byte fieldDelimChange)
+   {
+      return value.format();
+   }
 
    public String toString()
    {
-      return String.format("%s[char=%c]",
-        getClass().getSimpleName(), (char)getCharCode());
+      return String.format("%s[value=%s]", getClass().getSimpleName(),
+       value.format());
    }
 
-   public String format()
-   {
-      return String.format("%c", (char)getCharCode());
-   }
-
-   public TeXObjectList string(TeXParser parser) throws IOException
-   {
-      return parser.string(toString());
-   }
-
-   public abstract Object clone();
-
-   public boolean equals(Object object)
-   {
-      if (object instanceof ActiveChar)
-      {
-         return getCharCode() == ((ActiveChar)object).getCharCode();
-      }
-
-      return super.equals(object);
-   }
+   private TeXNumber value;
 }
-

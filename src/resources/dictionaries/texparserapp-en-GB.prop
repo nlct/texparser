@@ -108,6 +108,18 @@ latex.error.defined='$1' already defined
 latex.error.illegal_array_arg_char=Illegal character '$1' in array arg
 latex.error.lonely_item=Lonely \\\\item
 
+# bibtex errors
+bibtex.error.missing_value=Missing value
+bibtex.error.expecting=Expecting '$1'
+bibtex.error.expecting_or=Expecting '$1' or '$2'
+bibtex.error.missing_field_part=Missing field part
+bibtex.error.missing_field_name=Missing field name
+bibtex.error.unbalanced_braces=Unbalanced braces
+bibtex.error.immediately_follows_entry_type='$1' immediately follows entry type
+bibtex.error.immediately_follows_field_name='$1' immediately follows field name
+bibtex.error.illegal_end=Illegal end
+bibtex.error.missing=Missing
+
 # Package messages
 
 probsoln.no_such_db=ProbSoln database '$1' doesn't exist.
