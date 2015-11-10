@@ -183,7 +183,7 @@ public class BibEntry extends BibData
    {
       StringBuilder builder = new StringBuilder();
 
-      builder.append(String.format("@%s%c%s,%n", 
+      builder.append(String.format("@%s%c%s", 
         applyCase(entryType, caseChange), openDelim, id));
 
       Set<String> keys = fields.keySet();
@@ -194,12 +194,12 @@ public class BibEntry extends BibData
       {
          String key = it.next();
 
-         builder.append(String.format("%s = %s,%n", 
+         builder.append(String.format(",%n  %s = %s", 
            applyCase(key, caseChange), 
            fields.get(key).applyDelim(fieldDelimChange)));
       }
 
-      builder.append(String.format("%c%n", closeDelim));
+      builder.append(String.format("%n%c%n", closeDelim));
 
       return builder.toString();
    }
