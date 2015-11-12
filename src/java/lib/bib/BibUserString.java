@@ -20,6 +20,7 @@ package com.dickimawbooks.texparserlib.bib;
 
 import java.util.Vector;
 import java.util.HashMap;
+import java.io.IOException;
 
 import com.dickimawbooks.texparserlib.*;
 
@@ -86,6 +87,52 @@ public class BibUserString implements BibValue
    {
       return String.format("%s[%s]", getClass().getSimpleName(), 
          string.format());
+   }
+
+   public TeXObjectList expand(TeXParser parser)
+    throws IOException
+   {
+      if (string instanceof Group)
+      {
+         return ((Group)string).toList();
+      }
+
+      TeXObjectList list = new TeXObjectList();
+
+      if (!(string instanceof TeXObjectList))
+      {
+         list.add(string);
+         return list;
+      }
+
+      TeXObjectList stringList = (TeXObjectList)string;
+
+      if (stringList.isEmpty())
+      {
+         return list;
+      }
+
+      TeXObject first = stringList.firstElement();
+      TeXObject last = stringList.lastElement();
+
+      int firstIdx = 0;
+      int lastIdx = stringList.size()-1;
+
+      if (first instanceof CharObject
+       && ((CharObject)first).getCharCode() == (int)'"'
+       && last instanceof CharObject
+       && ((CharObject)last).getCharCode() == (int)'"')
+      {
+         firstIdx++;
+         lastIdx--;
+      }
+
+      for (int i = firstIdx; i <= lastIdx; i++)
+      {
+         list.add(stringList.get(i));
+      }
+
+      return list;
    }
 
    private TeXObject string;

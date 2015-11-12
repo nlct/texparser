@@ -43,6 +43,13 @@ public class BibEntry extends BibData
       return entryType;
    }
 
+   public boolean isEntryType(String type)
+   {
+      if (entryType == null || type == null) return false;
+
+      return entryType.toLowerCase().equals(type.toLowerCase());
+   }
+
    public void setId(String id)
    {
       this.id = id;
@@ -210,7 +217,368 @@ public class BibEntry extends BibData
          getClass().getSimpleName(), entryType, id);
    }
 
+   public Vector<Contributor> getEditors(TeXParser parser)
+     throws IOException
+   {
+      BibValueList field = getField("editor");
+
+      if (field == null) return null;
+
+      return parse(parser, field);
+   }
+
+   public Vector<Contributor> getAuthors(TeXParser parser)
+     throws IOException
+   {
+      BibValueList field = getField("author");
+
+      if (field == null) return null;
+
+      return parse(parser, field);
+   }
+
+   public static Vector<Contributor> parse(TeXParser parser, BibValueList field)
+      throws IOException
+   {
+      Vector<Contributor> contributors = new Vector<Contributor>();
+
+      TeXObjectList list = field.expand(parser);
+
+      TeXObjectList word = null;
+
+      Vector<TeXObjectList> current = new Vector<TeXObjectList>();
+
+      while (!list.isEmpty())
+      {
+         TeXObject object = list.pop();
+
+         if (word == null)
+         {
+            if (object instanceof CharObject)
+            {
+               if (((CharObject)object).getCharCode() == (int)'a')
+               {
+                  if (list.size() > 3)
+                  {
+                     TeXObject nextObj = list.pop();
+                     TeXObject nextObj2 = list.pop();
+                     TeXObject nextObj3 = list.pop();
+
+                     if (nextObj instanceof CharObject
+                      && ((CharObject)nextObj).getCharCode() == (int)'n'
+                      && nextObj2 instanceof CharObject
+                      && ((CharObject)nextObj2).getCharCode() == (int)'d'
+                      && nextObj3 instanceof WhiteSpace)
+                     {
+                        contributors.add(parseContributor(parser, current));
+                        current = new Vector<TeXObjectList>();
+                        continue;
+                     }
+
+                     word = new TeXObjectList();
+                     word.add(object);
+                     word.add(nextObj);
+                     word.add(nextObj2);
+                     word.add(nextObj3);
+                  }
+                  else
+                  {
+                     word = new TeXObjectList();
+                     word.add(object);
+                  }
+               }
+               else
+               {
+                  word = new TeXObjectList();
+                  word.add(object);
+
+                  if (((CharObject)object).getCharCode() == (int)',')
+                  {
+                     current.add(word);
+                     word = null;
+                  }
+               }
+            }
+            else if (!(object instanceof WhiteSpace))
+            {
+               word = new TeXObjectList();
+               word.add(object);
+            }
+         }
+         else if (object instanceof CharObject
+              && ((CharObject)object).getCharCode() == (int)',')
+         {
+            current.add(word);
+            word = new TeXObjectList();
+            word.add(object);
+            current.add(word);
+            word = null;
+         }
+         else if (object instanceof WhiteSpace)
+         {
+            current.add(word);
+            word = null;
+         }
+         else
+         {
+            word.add(object);
+         }
+      }
+
+      if (word != null)
+      {
+         current.add(word);
+      }
+
+      contributors.add(parseContributor(parser, current));
+
+      return contributors;
+   }
+
+   private static Contributor parseContributor(TeXParser parser,
+     Vector<TeXObjectList> list)
+    throws IOException
+   {
+
+      int commaCount = 0;
+
+      StringBuffer buffer = new StringBuffer();
+
+      for (int i = 0; i < list.size(); i++)
+      {
+         TeXObjectList word = list.get(i);
+
+         if (word.size() == 1)
+         {
+            TeXObject object = word.firstElement();
+
+            if (object instanceof CharObject 
+             && ((CharObject)object).getCharCode() == (int)',')
+            {
+               commaCount++;
+               buffer.append(",");
+            }
+            else if (i > 0)
+            {
+               buffer.append(String.format(" %s", object.format()));
+            }
+            else
+            {
+               buffer.append(object.format());
+            }
+         }
+         else if (i > 0)
+         {
+            buffer.append(String.format(" %s", word.format()));
+         }
+         else
+         {
+            buffer.append(word.format());
+         }
+      }
+
+      if (buffer.toString().equals("others"))
+      {
+         return new EtAl();
+      }
+
+      TeXObject forenames = null;
+      TeXObject von = null;
+      TeXObject suffix = null;
+      TeXObject surname = null;
+
+      switch (commaCount)
+      {
+         case 0: // forenames [von] surname
+
+            if (list.isEmpty())
+            {
+               return new Contributor();
+            }
+
+            if (list.size() == 1)
+            {
+               surname = list.firstElement();
+               break;
+            }
+
+            surname = new TeXObjectList();
+
+            for (int i = 0, lastIdx = list.size()-1; i <= lastIdx; i++)
+            {
+               TeXObjectList word = list.get(i);
+
+               if (surname == null && startsWithLower(word))
+               {
+                  von = appendName(parser, von, word);
+               }
+               else if (von != null || i == lastIdx)
+               {
+                  surname = appendName(parser, surname, word);
+               }
+               else
+               {
+                  forenames = appendName(parser, forenames, word);
+               }
+            }
+
+         break;
+         case 1: // [von] surname, forenames
+
+            for (int i = 0, n = list.size(); i < n; i++)
+            {
+               TeXObjectList word = list.get(i);
+
+               if (isComma(word))
+               {
+                  i++;
+
+                  if (i < n)
+                  {
+                     forenames = list.get(i);
+                  }
+               }
+               else if (surname == null && startsWithLower(word))
+               {
+                  von = appendName(parser, von, word);
+               }
+               else if (forenames == null)
+               {
+                  surname = appendName(parser, surname, word);
+               }
+               else
+               {
+                  forenames = appendName(parser, forenames, word);
+               }
+            }
+
+         break;
+         case 2: // [von] surname, suffix, forenames
+
+            for (int i = 0, n = list.size(); i < n; i++)
+            {
+               TeXObjectList word = list.get(i);
+
+               if (isComma(word))
+               {
+                  i++;
+
+                  if (i < n)
+                  {
+                     if (suffix == null)
+                     {
+                        suffix = list.get(i);
+                     }
+                     else
+                     {
+                        forenames = list.get(i);
+                     }
+                  }
+               }
+               else if (surname == null && startsWithLower(word))
+               {
+                  von = appendName(parser, von, word);
+               }
+               else if (suffix == null)
+               {
+                  surname = appendName(parser, surname, word);
+               }
+               else if (forenames == null)
+               {
+                  suffix = appendName(parser, suffix, word);
+               }
+               else
+               {
+                  forenames = appendName(parser, forenames, word);
+               }
+            }
+
+         break;
+         default:
+           throw new BibTeXSyntaxException(parser, 
+             BibTeXSyntaxException.ERROR_TOO_MANY_COMMAS, buffer.toString());
+      }
+
+      return new Contributor(forenames, von, surname, suffix);
+   }
+
+   private static TeXObject appendName(TeXParser parser, 
+     TeXObject name, TeXObjectList word)
+   {
+      if (name == null)
+      {
+         name = word;
+      }
+      else
+      {
+         TeXObjectList nameList;
+
+         if (name instanceof TeXObjectList 
+            && !(name instanceof Group))
+         {
+            nameList = (TeXObjectList)name;
+         }
+         else
+         {
+            nameList = new TeXObjectList();
+            nameList.add(name);
+            name = nameList;
+         }
+
+         nameList.add(parser.getListener().getSpace());
+         nameList.add(word);
+      }
+
+      return name;
+   }
+
+   private static boolean isComma(TeXObjectList word)
+   {
+      if (word.size() == 1)
+      {
+         TeXObject object = word.firstElement();
+
+         return (object instanceof CharObject
+                 && ((CharObject)object).getCharCode() == (int)',');
+      }
+
+      return false;
+   }
+
+   protected static boolean startsWithLower(TeXObjectList word)
+   {
+      return getInitialCase(word) == CASE_LOWER;
+   }
+
+   private static byte getInitialCase(TeXObjectList word)
+   {
+      for (TeXObject object : word)
+      {
+         if (object instanceof CharObject)
+         {
+            int code = ((CharObject)object).getCharCode();
+
+            if (Character.isLowerCase(code)) return CASE_LOWER;
+
+            if (Character.isUpperCase(code)) return CASE_UPPER;
+         }
+         else if (object instanceof TeXObjectList)
+         {
+            byte result = getInitialCase((TeXObjectList)object);
+
+            if (result != CASE_NA)
+            {
+               return result;
+            }
+         }
+      }
+
+      return CASE_NA;
+   }
+
    private HashMap<String,BibValueList> fields;
    private String entryType;
    private String id;
+
+   private static final byte CASE_LOWER=0, CASE_UPPER=1, CASE_NA=2;
 }

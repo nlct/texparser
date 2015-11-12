@@ -119,6 +119,8 @@ bibtex.error.immediately_follows_entry_type='$1' immediately follows entry type
 bibtex.error.immediately_follows_field_name='$1' immediately follows field name
 bibtex.error.illegal_end=Illegal end
 bibtex.error.missing=Missing
+bibtex.error.too_many_commas=Too many commas in name '$1'
+bibtex.error.string_name_undefined=String name '$1' undefined
 
 # Package messages
 

@@ -53,4 +53,9 @@ public class StringConcat extends Other implements BibValue
    {
       return "#";
    }
+
+   public TeXObjectList expand(TeXParser parser)
+   {
+      return new TeXObjectList();
+   }
 }

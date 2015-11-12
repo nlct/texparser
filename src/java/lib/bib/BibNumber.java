@@ -20,6 +20,7 @@ package com.dickimawbooks.texparserlib.bib;
 
 import java.util.Vector;
 import java.util.HashMap;
+import java.io.IOException;
 
 import com.dickimawbooks.texparserlib.*;
 
@@ -48,6 +49,23 @@ public class BibNumber implements BibValue
    {
       return String.format("%s[value=%s]", getClass().getSimpleName(),
        value.format());
+   }
+
+   public TeXObjectList expand(TeXParser parser) throws IOException
+   {
+      TeXObjectList expanded;
+
+      if (value instanceof Expandable)
+      {
+         expanded = ((Expandable)value).expandfully(parser);
+
+         if (expanded != null) return expanded;
+      }
+
+      expanded = new TeXObjectList();
+      expanded.add(value);
+
+      return expanded;
    }
 
    private TeXNumber value;

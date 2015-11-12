@@ -78,4 +78,8 @@ public class BibTeXSyntaxException extends TeXSyntaxException
       "bibtex.error.illegal_end";
    public static final String ERROR_MISSING = 
       "bibtex.error.missing";
+   public static final String ERROR_TOO_MANY_COMMAS = 
+      "bibtex.error.too_many_commas";
+   public static final String ERROR_STRING_NAME_UNDEFINED = 
+      "bibtex.error.string_name_undefined";
 }

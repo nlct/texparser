@@ -20,54 +20,28 @@ package com.dickimawbooks.texparserlib.bib;
 
 import java.util.Vector;
 import java.util.HashMap;
-import java.io.IOException;
 
 import com.dickimawbooks.texparserlib.*;
 
 /**
- * Bib variable
+ * And others
  */
 
-public class BibVariable implements BibValue
+public class EtAl extends Contributor
 {
-   public BibVariable(TeXObject string, String variableName)
+   public EtAl()
    {
-      this.string = string;
-      this.variableName = variableName;
+      super(null, null, "others", null);
    }
 
-   public TeXObject getContents()
+   public String format()
    {
-      return string;
+      return getSurname();
    }
 
-   public String getVariableName()
+   public String toString()
    {
-      return variableName;
+      return String.format("%s[%s]",
+        getClass().getSimpleName(), getSurname());
    }
-
-   public String applyDelim(byte fieldDelimChange)
-   {
-      return string.format();
-   }
-
-   public TeXObjectList expand(TeXParser parser)
-    throws IOException
-   {
-      BibParser bibParser = (BibParser)parser.getListener();
-
-      BibString var = bibParser.getBibString(variableName);
-
-      if (var == null)
-      {
-         throw new BibTeXSyntaxException(parser, 
-           BibTeXSyntaxException.ERROR_STRING_NAME_UNDEFINED,
-           variableName);
-      }
-
-      return var.getValue().expand(parser);
-   }
-
-   private TeXObject string;
-   private String variableName;
 }

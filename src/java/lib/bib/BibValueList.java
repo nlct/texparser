@@ -20,6 +20,7 @@ package com.dickimawbooks.texparserlib.bib;
 
 import java.util.Vector;
 import java.util.HashMap;
+import java.io.IOException;
 
 import com.dickimawbooks.texparserlib.*;
 
@@ -41,6 +42,19 @@ public class BibValueList extends Vector<BibValue> implements BibValue
       for (BibValue value : this)
       {
          list.add(value.getContents());
+      }
+
+      return list;
+   }
+
+   public TeXObjectList expand(TeXParser parser)
+     throws IOException
+   {
+      TeXObjectList list = new TeXObjectList(size());
+
+      for (BibValue value : this)
+      {
+         list.addAll(value.expand(parser));
       }
 
       return list;

@@ -183,6 +183,20 @@ public class BibParser extends DefaultTeXParserListener
       return null;
    }
 
+   public BibString getBibString(String key)
+   {
+      for (BibData data : bibData)
+      {
+         if (data instanceof BibString 
+          && ((BibString)data).getKey().equals(key))
+         {
+            return (BibString)data;
+         }
+      }
+
+      return null;
+   }
+
    public Vector<BibData> getBibData()
    {
       return bibData;

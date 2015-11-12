@@ -20,6 +20,7 @@ package com.dickimawbooks.texparserlib.bib;
 
 import java.util.Vector;
 import java.util.HashMap;
+import java.io.IOException;
 
 import com.dickimawbooks.texparserlib.*;
 
@@ -30,6 +31,9 @@ import com.dickimawbooks.texparserlib.*;
 public interface BibValue
 {
    public TeXObject getContents();
+
+   public TeXObjectList expand(TeXParser parser)
+     throws IOException;
 
    public String applyDelim(byte fieldDelimChange);
 
