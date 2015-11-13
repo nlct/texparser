@@ -133,6 +133,26 @@ public class Contributor
         getClass().getSimpleName(), forenames, von, surname, suffix);
    }
 
+   public void setForenames(String name)
+   {
+      forenames = name;
+   }
+
+   public void setSurname(String name)
+   {
+      surname = name;
+   }
+
+   public void setVonPart(String name)
+   {
+      von = name;
+   }
+
+   public void setSuffix(String name)
+   {
+      suffix = name;
+   }
+
    private String forenames;
    private String surname;
    private String von;
