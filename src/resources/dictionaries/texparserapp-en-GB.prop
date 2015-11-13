@@ -82,6 +82,7 @@ tex.error.dimen_expected=Dimension expected
 tex.error.missing_unit=Missing unit
 tex.error.expected=Expected $1
 tex.error.undefined=Undefined command $1
+tex.error.undefined_char=Undefined active character '$1'
 tex.error.cs_expected=Control sequence expected (found '$1')
 tex.error.number_expected=Number expected (found '$1')
 tex.error.register_undef=Unknown register '$1'
