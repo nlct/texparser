@@ -253,6 +253,7 @@ public class TeXSyntaxException extends IOException
    public static final String ERROR_MISSING_UNIT = "tex.error.missing_unit";
    public static final String ERROR_EXPECTED = "tex.error.expected";
    public static final String ERROR_UNDEFINED = "tex.error.undefined";
+   public static final String ERROR_UNDEFINED_CHAR = "tex.error.undefined_char";
    public static final String ERROR_CS_EXPECTED = "tex.error.cs_expected";
    public static final String ERROR_NUMBER_EXPECTED = 
       "tex.error.number_expected";
