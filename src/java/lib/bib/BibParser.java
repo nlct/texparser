@@ -79,11 +79,14 @@ public class BibParser extends DefaultTeXParserListener
 
       int atcode = parser.getCatCode('@');
       int hashcode = parser.getCatCode('#');
+      int tildecode = parser.getCatCode('~');
       parser.setCatCode('@', TeXParser.TYPE_ACTIVE);
       parser.setCatCode('#', TeXParser.TYPE_OTHER);
+      parser.setCatCode('~', TeXParser.TYPE_OTHER);
       parser.parse(bibFile);
       parser.setCatCode('@', atcode);
       parser.setCatCode('#', hashcode);
+      parser.setCatCode('~', tildecode);
 
       return parser;
    }
@@ -92,7 +95,6 @@ public class BibParser extends DefaultTeXParserListener
    {
       parser.putActiveChar(new At());
    }
-
 
    public Writeable getWriteable()
    {
