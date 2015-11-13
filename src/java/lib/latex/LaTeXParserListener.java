@@ -863,6 +863,11 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
          return new ProbSolnSty(options, this);
       }
 
+      if (styName.equals("jmlr2e"))
+      {
+         return new Jmlr2eSty(options, this);
+      }
+
       return new UnknownSty(options, styName, this);
    }
 
