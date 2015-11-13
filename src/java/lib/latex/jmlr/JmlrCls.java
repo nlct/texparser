@@ -19,6 +19,7 @@
 package com.dickimawbooks.texparserlib.latex.jmlr;
 
 import java.util.Hashtable;
+import java.util.Vector;
 import java.io.IOException;
 
 import com.dickimawbooks.texparserlib.*;
@@ -289,20 +290,20 @@ public class JmlrCls extends LaTeXCls
       }
    }
 
-   public void addAuthor(TeXObject author)
+   public void addAuthor(Group author)
    {
       if (authors == null)
       {
-         authors = new TeXObjectList();
+         authors = new Vector<Group>();
       }
 
       authors.add(author);
    }
 
-   public TeXObjectList getAuthors()
+   public Vector<Group> getAuthors()
    {
       return authors;
    }
 
-   private TeXObjectList authors = null;
+   private Vector<Group> authors = null;
 }

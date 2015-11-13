@@ -58,7 +58,7 @@ public class JmlrName extends ControlSequence
          grp.add(obj);
       }
 
-      cls.addAuthor((TeXObject)grp.clone());
+      cls.addAuthor((Group)grp.clone());
 
       grp.push(new TeXCsRef("bfseries"));
       grp.push(new TeXCsRef("upshape"));
@@ -84,7 +84,7 @@ public class JmlrName extends ControlSequence
          grp.add(obj);
       }
 
-      cls.addAuthor((TeXObject)grp.clone());
+      cls.addAuthor((Group)grp.clone());
 
       grp.push(new TeXCsRef("bfseries"));
       grp.push(new TeXCsRef("upshape"));
