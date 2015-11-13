@@ -1393,7 +1393,16 @@ public class TeXParser extends TeXObjectList
       }
       else if (isCatCode(TYPE_ACTIVE, (char)c))
       {
-         list.add(listener.getActiveChar(c));
+         TeXObject obj = listener.getActiveChar(c);
+
+         if (obj == null)
+         {
+            throw new TeXSyntaxException(this, 
+              TeXSyntaxException.ERROR_UNDEFINED_CHAR, 
+              String.format("%c", (char)c));
+         }
+
+         list.add(obj);
       }
       else if (isCatCode(TYPE_SP, (char)c))
       {
