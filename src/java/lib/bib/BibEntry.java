@@ -224,7 +224,7 @@ public class BibEntry extends BibData
 
       if (field == null) return null;
 
-      return parse(parser, field);
+      return parseContributors(parser, field);
    }
 
    public Vector<Contributor> getAuthors(TeXParser parser)
@@ -234,10 +234,10 @@ public class BibEntry extends BibData
 
       if (field == null) return null;
 
-      return parse(parser, field);
+      return parseContributors(parser, field);
    }
 
-   public static Vector<Contributor> parse(TeXParser parser, BibValueList field)
+   public static Vector<Contributor> parseContributors(TeXParser parser, BibValueList field)
       throws IOException
    {
       Vector<Contributor> contributors = new Vector<Contributor>();
