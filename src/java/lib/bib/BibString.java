@@ -75,11 +75,7 @@ public class BibString extends BibData
 
       value = new BibValueList();
 
-      if (!readValue(parser, (TeXObjectList)contents, value, endGroupChar))
-      {
-         throw new BibTeXSyntaxException(parser, 
-           BibTeXSyntaxException.ERROR_MISSING, endGroupChar.format());
-      }
+      readValue(parser, (TeXObjectList)contents, value, endGroupChar);
 
       if (value.isEmpty())
       {
