@@ -72,6 +72,11 @@ public class BibEntry extends BibData
       fields.put(fieldName, contents);
    }
 
+   public Set<String> getKeySet()
+   {
+      return fields.keySet();
+   }
+
    public String getKey(String fieldName)
    {
       BibValue value = fields.get(fieldName);
