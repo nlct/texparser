@@ -56,11 +56,7 @@ public class BibPreamble extends BibData
    {
       preamble = new BibValueList();
 
-      if (!readValue(parser, (TeXObjectList)contents, preamble, endGroupChar))
-      {
-         throw new BibTeXSyntaxException(parser, 
-           BibTeXSyntaxException.ERROR_MISSING, endGroupChar.format());
-      }
+      readValue(parser, (TeXObjectList)contents, preamble, endGroupChar);
 
       if (preamble.isEmpty())
       {
