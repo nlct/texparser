@@ -29,13 +29,26 @@ public class TeXPath
    public TeXPath(TeXParser parser, String texPath)
      throws IOException
    {
-      this(parser, texPath, "tex");
+      this(parser, texPath, "tex", true);
+   }
+
+   public TeXPath(TeXParser parser, String texPath, boolean useKpsewhich)
+     throws IOException
+   {
+      this(parser, texPath, "tex", useKpsewhich);
    }
 
    public TeXPath(TeXParser parser, String texPath, String defExt)
      throws IOException
    {
-      init(parser, texPath, defExt);
+      this(parser, texPath, defExt, true);
+   }
+
+   public TeXPath(TeXParser parser, String texPath, String defExt,
+     boolean useKpsewhich)
+     throws IOException
+   {
+      init(parser, texPath, defExt, useKpsewhich);
    }
 
    public TeXPath(TeXParser parser, File file)
@@ -47,7 +60,7 @@ public class TeXPath
    private void init(TeXParser parser, File file)
      throws IOException
    {
-      File parent = parser.getCurrentParentFile();
+      File parent = (parser == null ? null : parser.getCurrentParentFile());
 
       Path path = file.toPath();
 
@@ -67,7 +80,14 @@ public class TeXPath
    private void init(TeXParser parser, String texPath, String defExt)
      throws IOException
    {
-      File parent = parser.getCurrentParentFile();
+      init(parser, texPath, defExt, true);
+   }
+
+   private void init(TeXParser parser, String texPath, String defExt,
+     boolean useKpsewhich)
+     throws IOException
+   {
+      File parent = (parser == null ? null : parser.getCurrentParentFile());
 
       base = (parent == null ? null : parent.toPath());
 
@@ -87,7 +107,7 @@ public class TeXPath
          }
       }
 
-      if (!split[n].contains("."))
+      if (!defExt.isEmpty() && !split[n].contains("."))
       {
          split[n] += "."+defExt;
       }
@@ -106,7 +126,7 @@ public class TeXPath
 
       // Does file exist?
 
-      if (!file.exists())
+      if (!file.exists() && useKpsewhich && parser != null)
       {
          // Can kpsewhich find the file?
 
@@ -116,17 +136,14 @@ public class TeXPath
 
             if (loc != null && !loc.isEmpty())
             {
-               File f = new File(loc);
+               foundByKpsewhich = true;
 
-               if (f.exists())
-               {
-                  init(parser, f);
-               }
+               init(parser, loc, "", false);
             }
          }
-         catch (Exception e)
+         catch (IOException|InterruptedException e)
          {
-            // Not on TeX path
+            // kpsewhich couldn't find the file
          }
       }
    }
@@ -139,6 +156,34 @@ public class TeXPath
    public Path getBaseDir()
    {
       return base;
+   }
+
+   public boolean isHidden()
+   {
+      if (base != null)
+      {
+         for (int i = base.getNameCount()-1; i >= 0; i--)
+         {
+            String name = base.getName(i).toString();
+
+            if (name.startsWith(".") && !name.equals(".") && !name.equals(".."))
+            {
+               return true;
+            }
+         }
+      }
+
+      for (int i = relative.getNameCount()-1; i >= 0; i--)
+      {
+         String name = relative.getName(i).toString();
+
+         if (name.startsWith(".") && !name.equals(".") && !name.equals(".."))
+         {
+            return true;
+         }
+      }
+
+      return false;
    }
 
    public String getTeXPath(boolean stripExtension)
@@ -184,6 +229,11 @@ public class TeXPath
          base.resolve(relative).toFile());
    }
 
+   public Path getPath()
+   {
+      return (base == null ? relative : base.resolve(relative));
+   }
+
    public Path getRelative()
    {
       return relative;
@@ -221,5 +271,12 @@ public class TeXPath
          base.resolve(relative).toString());
    }
 
+   public boolean wasFoundByKpsewhich()
+   {
+      return foundByKpsewhich;
+   }
+
    private Path base, relative;
+
+   private boolean foundByKpsewhich = false;
 }

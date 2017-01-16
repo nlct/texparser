@@ -306,6 +306,38 @@ public class TeXParserApp implements TeXApp
       }
    }
 
+   public boolean isReadAccessAllowed(TeXPath path)
+   {
+      return isReadAccessAllowed(path.getFile());
+   }
+
+   public boolean isReadAccessAllowed(File file)
+   {
+      return file.canRead();
+   }
+
+   public boolean isWriteAccessAllowed(TeXPath path)
+   {
+      return isWriteAccessAllowed(path.getFile());
+   }
+
+   public boolean isWriteAccessAllowed(File file)
+   {
+      if (file.exists())
+      {
+         return file.canWrite();
+      }
+
+      File dir = file.getParentFile();
+
+      if (dir != null)
+      {
+         return dir.canWrite();
+      }
+
+      return (new File(System.getProperty("user.dir"))).canWrite();
+   }
+
    public void copyFile(File src, File dest)
    throws IOException
    {
@@ -744,6 +776,11 @@ public class TeXParserApp implements TeXApp
       return getLabelWithValues(label, params);
    }
 
+   public String getMessage(String label, Object... params)
+   {
+      return getLabelWithValues(label, params);
+   }
+
    public static String getLabelWithAlt(String label, String alt)
    {
       if (dictionary == null) return alt;
@@ -910,6 +947,58 @@ public class TeXParserApp implements TeXApp
    // Only works for up to nine values.
 
    public static String getLabelWithValues(String label, String[] values)
+   {
+      String prop = getLabel(label);
+
+      if (prop == null)
+      {
+         return prop;
+      }
+
+      int n = prop.length();
+
+      StringBuffer buffer = new StringBuffer(n);
+
+      for (int i = 0; i < n; i++)
+      {
+         int c = prop.codePointAt(i);
+
+         if (c == (int)'\\' && i != n-1)
+         {
+            buffer.appendCodePoint(prop.codePointAt(++i));
+         }
+         else if (c == (int)'$' && i != n-1)
+         {
+            c = prop.codePointAt(i+1);
+
+            if (c >= 48 && c <= 57)
+            {
+               // Digit
+
+               int index = c - 48 - 1;
+
+               if (index >= 0 && index < values.length)
+               {
+                  buffer.append(values[index]);
+               }
+
+               i++;
+            }
+            else
+            {
+               buffer.append('$');
+            }
+         }
+         else
+         {
+            buffer.appendCodePoint(c);
+         }
+      }
+
+      return new String(buffer);
+   }
+
+   public static String getLabelWithValues(String label, Object... values)
    {
       String prop = getLabel(label);
 

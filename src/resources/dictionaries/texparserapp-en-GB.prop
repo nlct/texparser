@@ -16,6 +16,8 @@ message.running=Running $1
 message.processing=Processing $1
 message.copying=Copying $1 -> $2
 message.moving=Moving $1 -> $2
+message.no.read=No read access for $1...
+message.no.write=No write access for $1...
 
 # Warnings
 warning.substituting=Substituting $1 with $2

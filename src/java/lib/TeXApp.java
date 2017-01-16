@@ -28,10 +28,12 @@ public interface TeXApp
      throws IOException,InterruptedException;
 
    // Runs epstopdf --output=pdfFile epsFile
+   // This method should check read and write permissions
    public void epstopdf(File epsFile, File pdfFile)
      throws IOException,InterruptedException;
 
    // Runs wmftoeps -o epsFile wmfFile
+   // This method should check read and write permissions
    public void wmftoeps(File wmfFile, File epsFile)
      throws IOException,InterruptedException;
 
@@ -43,6 +45,8 @@ public interface TeXApp
 
    public String getMessage(String label, String[] params);
 
+   public String getMessage(String label, Object... params);
+
    public String requestUserInput(String message)
      throws IOException;
 
@@ -52,9 +56,18 @@ public interface TeXApp
 
    public void error(Exception e);
 
+   // This method should check read and write permissions
    public void copyFile(File orgFile, File newFile)
      throws IOException,InterruptedException;
 
+   public boolean isReadAccessAllowed(TeXPath path);
+   public boolean isReadAccessAllowed(File file);
+
+   public boolean isWriteAccessAllowed(TeXPath path);
+   public boolean isWriteAccessAllowed(File file);
+
    public static String MESSAGE_READING = "message.reading";
    public static String MESSAGE_WRITING = "message.writing";
+   public static String MESSAGE_NO_READ = "message.no.read";
+   public static String MESSAGE_NO_WRITE = "message.no.write";
 }

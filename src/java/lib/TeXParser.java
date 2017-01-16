@@ -1542,6 +1542,66 @@ public class TeXParser extends TeXObjectList
    public void parse(File file, Charset charset)
      throws IOException
    {
+      if (!getListener().getTeXApp().isReadAccessAllowed(file))
+      {
+         getListener().getTeXApp().warning(this, 
+            getListener().getTeXApp().getMessage(TeXApp.MESSAGE_NO_READ, file));
+
+         return;
+      }
+
+      if (jobname == null)
+      {
+         jobname = file.getName();
+
+         int idx = jobname.lastIndexOf(".");
+
+         if (idx > 0)
+         {
+            jobname = jobname.substring(0, idx);
+         }
+      }
+
+      try
+      {
+         listener.beginParse(file);
+
+         parse(new TeXReader(this.reader, file, charset));
+      }
+      catch (EOFException e)
+      {
+      }
+      finally
+      {
+         listener.endParse(file);
+
+         if (reader != null)
+         {
+            reader.close();
+            reader = reader.getParent();
+         }
+      }
+   }
+
+   public void parse(TeXPath path)
+     throws IOException
+   {
+      parse(path, null);
+   }
+
+   public void parse(TeXPath path, Charset charset)
+     throws IOException
+   {
+      if (!getListener().getTeXApp().isReadAccessAllowed(path))
+      {
+         getListener().getTeXApp().warning(this, 
+            getListener().getTeXApp().getMessage(TeXApp.MESSAGE_NO_READ, path));
+
+         return;
+      }
+
+      File file = path.getFile();
+
       if (jobname == null)
       {
          jobname = file.getName();

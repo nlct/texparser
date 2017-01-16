@@ -26,6 +26,7 @@ import java.util.Vector;
 import java.text.CharacterIterator;
 import java.text.StringCharacterIterator;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
 
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.primitives.*;
@@ -292,13 +293,11 @@ public abstract class DefaultTeXParserListener extends TeXParserListener
    public boolean input(TeXPath path)
     throws IOException
    {
-      File file = path.getFile();
-
-      if (file != null && file.exists())
+      if (path != null && Files.exists(path.getPath()))
       {
          Charset charset = getCharSet();
 
-         getParser().parse(file, charset);
+         getParser().parse(path, charset);
 
          return true;
       }

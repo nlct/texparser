@@ -228,7 +228,7 @@ public class TeXSyntaxException extends IOException
    }
 
    private String errorTag;
-   private String[] params;
+   private String[] params;// TODO change to Object?
    private int lineNum = -1;
    private File file = null;
 

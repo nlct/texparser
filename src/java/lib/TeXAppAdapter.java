@@ -73,6 +73,23 @@ public class TeXAppAdapter implements TeXApp
       return msg;
    }
 
+   public String getMessage(String label, Object... params)
+   {
+      String msg = label;
+
+      String pre = "[";
+
+      for (int i = 0; i < params.length; i++)
+      {
+         msg += pre + (String)params[i];
+         pre = ",";
+      }
+
+      msg += "]";
+
+      return msg;
+   }
+
    public void message(String text)
    {
       System.out.println(text);
@@ -104,6 +121,41 @@ public class TeXAppAdapter implements TeXApp
      throws IOException
    {
       return javax.swing.JOptionPane.showInputDialog(null, message);
+   }
+
+   // These methods should be overridden to check for openin_any and
+   // openout_any
+
+   public boolean isReadAccessAllowed(TeXPath path)
+   {
+      return isReadAccessAllowed(path.getFile());
+   }
+
+   public boolean isReadAccessAllowed(File file)
+   {
+      return file.canRead();
+   }
+
+   public boolean isWriteAccessAllowed(TeXPath path)
+   {
+      return isWriteAccessAllowed(path.getFile());
+   }
+
+   public boolean isWriteAccessAllowed(File file)
+   {
+      if (file.exists())
+      {
+         return file.canWrite();
+      }
+
+      File dir = file.getParentFile();
+
+      if (dir != null)
+      {
+         return dir.canWrite();
+      }
+
+      return (new File(System.getProperty("user.dir"))).canWrite();
    }
 
 }
