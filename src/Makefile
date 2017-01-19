@@ -85,7 +85,7 @@ classes/com/dickimawbooks/texparserapp/TeXParserApp.class   : classes/com/dickim
 classes/com/dickimawbooks/texparserlib/TeXParser.class   : classes/com/dickimawbooks/texparserlib \
 	java/lib/*.java java/lib/*/*.java java/lib/*/*/*.java
 	cd java/lib; \
-	javac -d ../../classes -Xlint:unchecked -Xlint:deprecation *.java */*.java */*/*.java
+	javac -target 1.7 -source 1.7 -d ../../classes -Xlint:unchecked -Xlint:deprecation *.java */*.java */*/*.java
 
 classes/com/dickimawbooks/texparserapp    :
 	mkdir -p classes/com/dickimawbooks/texparserapp
