@@ -100,4 +100,84 @@ public class CsvList extends TeXObjectList
 
       return false;
    }
+
+   public TeXObject getValue(int index)
+   {
+      TeXObject value = get(index);
+
+      if (!(value instanceof TeXObjectList))
+      {
+         return value;
+      }
+
+      TeXObjectList list = (TeXObjectList)value;
+
+      int n = list.size();
+
+      if (n == 0) return value;
+
+      if (n == 1)
+      {
+         value = list.get(0);
+
+         if (value instanceof Group
+           &&!(value instanceof MathGroup))
+         {
+            return ((Group)value).toList();
+         }
+         else
+         {
+            return value;
+         }
+      }
+
+      int start = 0;
+      int end = n-1;
+
+      for (int i = 0; i < n; i++)
+      {
+         TeXObject obj = list.get(i);
+
+         if (!(obj instanceof Ignoreable))
+         {
+            start = i;
+            break;
+         }
+      }
+
+      for (int i = end; i >= 0; i--)
+      {
+         TeXObject obj = list.get(i);
+
+         if (!(obj instanceof Ignoreable))
+         {
+            end = i;
+            break;
+         }
+      }
+
+      if (start == end)
+      {
+         value = list.get(start);
+
+         if (value instanceof Group
+          &&!(value instanceof MathGroup))
+         {
+            return ((Group)value).toList();
+         }
+         else
+         {
+            return value;
+         }
+      }
+
+      TeXObjectList valList = new TeXObjectList();
+
+      for (int i = start; i <= end; i++)
+      {
+         valList.add(list.get(i));
+      }
+
+      return valList;
+   }
 }
