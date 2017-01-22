@@ -128,7 +128,7 @@ public class BibEntry extends BibData
     TeXObjectList contents, TeXObject endGroupChar)
      throws IOException
    {
-      id = readKey(parser, contents);
+      setId(readKey(parser, contents));
 
       TeXObject object = contents.popStack(parser);
 
