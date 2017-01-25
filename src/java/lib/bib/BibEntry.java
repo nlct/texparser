@@ -60,6 +60,11 @@ public class BibEntry extends BibData
       return id;
    }
 
+   public BibValueList removeField(String fieldName)
+   {
+      return fields.remove(fieldName);
+   }
+
    public void putField(String fieldName, BibValueList contents)
    {
       String key = getKey(fieldName);
