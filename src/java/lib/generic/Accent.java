@@ -310,6 +310,7 @@ public class Accent extends ControlSequence
       parser.putControlSequence(new Accent("."));
       parser.putControlSequence(new Accent("v"));
       parser.putControlSequence(new Accent("H"));
+      parser.putControlSequence(new Accent("k"));
    }
 
    public static boolean isAccentCommand(String csName)
@@ -325,7 +326,7 @@ public class Accent extends ControlSequence
           || c == 'u' || c == 'c' || c == '~'
           || c == '^' || c == 'r' || c == 'b'
           || c == 'd' || c == '=' || c == '.'
-          || c == 'v' || c == 'H';
+          || c == 'v' || c == 'H' || c == 'k';
    }
 
    private String getText(String accent, int codePoint)
@@ -399,6 +400,11 @@ public class Accent extends ControlSequence
       if (accent.equals("H"))
       {
          return getAccent(codePoint, DOUBLE_ACUTE_ACCENTS, 0x030B);
+      }
+
+      if (accent.equals("k"))
+      {
+         return getAccent(codePoint, OGONEK_ACCENTS, 0x02DB);
       }
 
       return ""+(char)codePoint;
@@ -691,6 +697,20 @@ public class Accent extends ControlSequence
       new int[] {(int)'o', 0x0151},
       new int[] {(int)'U', 0x0170},
       new int[] {(int)'u', 0x0171},
+   };
+
+   public static final int[][] OGONEK_ACCENTS =
+   {
+      new int[] {(int)'O', 0x01EA},
+      new int[] {(int)'o', 0x01EB},
+      new int[] {(int)'U', 0x0172},
+      new int[] {(int)'u', 0x0173},
+      new int[] {(int)'i', 0x012F},
+      new int[] {(int)'I', 0x012E},
+      new int[] {(int)'e', 0x0119},
+      new int[] {(int)'E', 0x0118},
+      new int[] {(int)'a', 0x0105},
+      new int[] {(int)'A', 0x0104},
    };
 
 }
