@@ -44,10 +44,42 @@ public class L2HStringConverter extends L2HConverter
       return (new L2HStringConverter(app)).convert(str, atIsLetter);
    }
 
+   public static String convert(TeXApp app, String str, boolean atIsLetter,
+    boolean useMathJax)
+    throws IOException
+   {
+      return (new L2HStringConverter(app)).convert(str, atIsLetter, useMathJax);
+   }
+
    public String convert(String str, boolean atIsLetter)
     throws IOException
    {
       setIsInDocEnv(true);
+
+      StringWriter writer = new StringWriter();
+      setWriter(writer);
+
+      TeXParser parser = new TeXParser(this);
+
+      if (atIsLetter)
+      {
+         parser.setCatCode('@', TeXParser.TYPE_LETTER);
+      }
+
+      parser.parse(new TeXReader(str));
+
+      String html = writer.toString();
+      setWriter(null);
+
+      return html;
+   }
+
+   public String convert(String str, boolean atIsLetter, boolean useMathJax)
+    throws IOException
+   {
+      setIsInDocEnv(true);
+      setUseMathJax(useMathJax);
+
       StringWriter writer = new StringWriter();
       setWriter(writer);
 
