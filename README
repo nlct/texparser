@@ -8,16 +8,30 @@ My Java application MakeJmlrBookGUI needs to parse LaTeX files so
 that it can fix common problems. This mainly involves replacing
 obsolete/problematic code and removing ".eps" from included graphics, 
 so that the book correctly compiles with pdflatex and my jmlrbook class.
-Since TeX4HT no longer works with my jmlrbook class, I started to
-extend the TeX parsing code so that it could convert the article
-abstracts to HTML without requiring TeX4HT.
+Unfortunately TeX syntax can be too complex for a regular
+expression. The `texparserlib.jar` library is not intended as a TeX
+engine, but as a way of parsing TeX code that's somewhat better than
+a simple pattern match.
 
-Since I have another Java application that also needs to parse LaTeX
-files (datatooltk), I decided to split away the TeX parsing code
-into a separate library, namely texparserlib.jar. At the moment,
-texparserapp.jar is just provided to test the texparserlib.jar code,
-but I may develop it into an application for replacing obsolete
-LaTeX code. texparserapp currently only works in batch mode.
+Since TeX4HT no longer works with the jmlrbook class, I started to
+extend the TeX parsing code so that it could convert the article
+abstracts to HTML without requiring TeX4HT. This aspect is no
+longer required as JMLR W&CP now generate the HTML files from the
+.bib file associated with the proceedings, but html part of the
+TeX parser library allows the translation of code fragments, such as 
+author name or article title, allowing it to be rendered in Java's
+HTMLDocument, which makes the GUI look a bit tidier.
+
+Since I other Java applications (datatooltk and bib2gls) that also
+need to parse LaTeX files or their associated .aux or .bib files, I
+decided to split away the TeX parsing code from MakeJmlBookGui into
+a separate library, namely texparserlib.jar. This also makes it
+easier to test the library without the additional overhead of the
+main program.
+
+The accompanying texparserapp.jar is a command line application
+provided to test the texparserlib.jar library. It's not intended for
+general use.
 
 Syntax:
 

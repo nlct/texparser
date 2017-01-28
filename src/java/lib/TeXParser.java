@@ -2097,56 +2097,66 @@ public class TeXParser extends TeXObjectList
       return settings;
    }
 
+   public char getSpecialChar(int type, char def)
+   {
+      if (catcodes[type].size() == 0)
+      {
+         return def;
+      }
+
+      return catcodes[type].firstElement().charValue();
+   }
+
    public char getEscChar()
    {
-      return catcodes[TYPE_ESC].firstElement().charValue();
+      return getSpecialChar(TYPE_ESC, '\\');
    }
 
    public char getMathChar()
    {
-      return catcodes[TYPE_MATH].firstElement().charValue();
+      return getSpecialChar(TYPE_MATH, '$');
    }
 
    public String getMathDelim(boolean isinline)
    {
-      char c = catcodes[TYPE_MATH].firstElement().charValue();
+      char c = getSpecialChar(TYPE_MATH, '$');
 
       return isinline ? ""+c : ""+c+c;
    }
 
    public char getCommentChar()
    {
-      return catcodes[TYPE_COMMENT].firstElement().charValue();
+      return getSpecialChar(TYPE_COMMENT, '%');
    }
 
    public char getBgChar()
    {
-      return catcodes[TYPE_BG].firstElement().charValue();
+      return getSpecialChar(TYPE_BG, '{');
    }
 
    public char getEgChar()
    {
-      return catcodes[TYPE_EG].firstElement().charValue();
+      return getSpecialChar(TYPE_EG, '}');
    }
 
    public char getParamChar()
    {
-      return catcodes[TYPE_PARAM].firstElement().charValue();
+      return getSpecialChar(TYPE_PARAM, '#');
    }
 
    public char getSpChar()
    {
-      return catcodes[TYPE_SP].firstElement().charValue();
+      return getSpecialChar(TYPE_SP, '^');
    }
 
    public char getSbChar()
    {
-      return catcodes[TYPE_SB].firstElement().charValue();
+      return getSpecialChar(TYPE_SB, '_');
    }
 
    public char getTabChar()
    {
-      return catcodes[TYPE_TAB].firstElement().charValue();
+      return getSpecialChar(TYPE_TAB, '\t');
    }
 
    public String getJobname()

@@ -63,6 +63,11 @@ public class BibPreamble extends BibData
          throw new BibTeXSyntaxException(parser, 
            BibTeXSyntaxException.ERROR_MISSING_FIELD_PART);
       }
+
+      for (int i = 0; i < preamble.size(); i++)
+      {
+         BibValue value = preamble.get(i);
+      }
    }
 
    public String format(byte caseChange, char openDelim, char closeDelim,

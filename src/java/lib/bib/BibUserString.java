@@ -129,10 +129,88 @@ public class BibUserString implements BibValue
 
       for (int i = firstIdx; i <= lastIdx; i++)
       {
-         list.add(stringList.get(i));
+         i = expand(parser, stringList, i, list);
       }
 
       return list;
+   }
+
+   protected int expand(TeXParser parser, 
+      TeXObjectList stringList, int i, TeXObjectList list)
+   throws IOException
+   {
+      TeXObject obj = stringList.get(i);
+
+      if (obj instanceof TeXObjectList)
+      {
+         TeXObjectList subList = ((TeXObjectList)obj).createList();
+
+         for (int j = 0; j < ((TeXObjectList)obj).size(); j++)
+         {
+            j = expand(parser, (TeXObjectList)obj, j, subList);
+         }
+
+         list.add(subList);
+      }
+      else if (obj instanceof CharObject)
+      {
+         // # inside a string should be considered a parameter
+         // marker, not string concatenation.
+
+         if (((CharObject)obj).getCharCode() == '#'
+             && i < stringList.size()-1)
+         {
+            // is the next object another '#' or a digit?
+
+            TeXObject nextObj = stringList.get(i+1);
+
+            if (nextObj instanceof CharObject)
+            {
+               int c = ((CharObject)nextObj).getCharCode();
+
+               if (c == '#' && i < stringList.size()-2)
+               {
+                  nextObj = stringList.get(i+2);
+
+                  if (nextObj instanceof CharObject
+                  && ((CharObject)nextObj).getCharCode() > '0'
+                  && ((CharObject)nextObj).getCharCode() <= '9')
+                  {
+                     list.add(parser.getListener().getParam(
+                       ((CharObject)nextObj).getCharCode()-(int)'0'));
+                     i += 2;
+                  }
+                  else
+                  {
+                     list.add(obj);
+                  }
+               }
+               else if (c > '0' && c <= '9')
+               {
+                  list.add(parser.getListener().getParam(c-(int)'0'));
+                  i++;
+               }
+               else
+               {
+                  list.add(obj);
+               }
+            }
+            else
+            {// leave it as a CharObject
+               list.add(obj);
+            }
+         }
+         else
+         {
+            list.add(obj);
+         }
+      }
+      else
+      {
+         list.add(obj);
+      }
+
+      return i;
    }
 
    private TeXObject string;

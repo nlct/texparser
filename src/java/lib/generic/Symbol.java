@@ -23,7 +23,7 @@ import java.util.Hashtable;
 
 import com.dickimawbooks.texparserlib.*;
 
-public class Symbol extends ControlSequence implements CaseChangeable
+public class Symbol extends ControlSequence implements Expandable,CaseChangeable
 {
    public Symbol(String name, int codePoint)
    {
