@@ -19,16 +19,25 @@
 package com.dickimawbooks.texparserlib.html;
 
 import java.io.*;
+import java.util.Vector;
 
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.generic.*;
 import com.dickimawbooks.texparserlib.latex.*;
+import com.dickimawbooks.texparserlib.aux.AuxData;
 
 public class L2HStringConverter extends L2HConverter
 {
    public L2HStringConverter(TeXApp app)
    {
       super(app);
+
+      setWriteable(this);
+   }
+
+   public L2HStringConverter(TeXApp app, Vector<AuxData> data)
+   {
+      super(app, data);
 
       setWriteable(this);
    }
