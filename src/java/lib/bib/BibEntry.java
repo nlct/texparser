@@ -67,6 +67,11 @@ public class BibEntry extends BibData
 
    public void putField(String fieldName, BibValueList contents)
    {
+      if (fieldName == null)
+      {
+         throw new NullPointerException();
+      }
+
       String key = getKey(fieldName);
 
       if (key != null && !fieldName.equals(key))
