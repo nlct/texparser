@@ -37,11 +37,85 @@ public class BibValueList extends Vector<BibValue> implements BibValue
 
    public TeXObject getContents()
    {
-      TeXObjectList list = new TeXObjectList(size());
+      return getContents(false);
+   }
 
-      for (BibValue value : this)
+   public static TeXObjectList stripDelim(TeXObjectList list)
+   {
+      int n = list.size()-1;
+
+      if (n == -1 || n == 1) return list;
+
+      if (n == 0)
       {
-         list.add(value.getContents());
+         if (list.get(0) instanceof TeXObjectList)
+         {
+            return stripDelim((TeXObjectList)list.get(0));
+         }
+         else
+         {
+            return list;
+         }
+      }
+
+      TeXObject firstObj = list.get(0);
+      TeXObject lastObj = list.get(n);
+
+      if (firstObj instanceof CharObject
+        && lastObj instanceof CharObject
+        && ((CharObject)firstObj).getCharCode() == '"'
+        && ((CharObject)lastObj).getCharCode() == '"')
+      {
+         list.remove(n);
+         list.remove(0);
+      }
+
+      return list;
+   }
+
+   public TeXObject getContents(boolean stripDelim)
+   {
+      TeXObjectList list = new TeXObjectList();
+
+      int n = size()-1;
+
+      if (n == -1) return list;
+
+      BibValue value = get(0);
+      TeXObject obj = value.getContents();
+
+      if (n >= 2 && obj instanceof CharObject 
+          && ((CharObject)obj).getCharCode() == '"')
+      {
+         BibValue lastValue = get(n);
+
+         if (lastValue instanceof CharObject
+           && ((CharObject)obj).getCharCode() == '"')
+         {
+            n--;
+         }
+         else
+         {
+            list.add(obj);
+         }
+      }
+      else
+      {
+         list.add(obj);
+      }
+
+      for (int i = 1; i <= n; i++)
+      {
+         value = get(i);
+         obj = value.getContents();
+
+         list.add(obj);
+      }
+
+      if (n == 0 && stripDelim && obj instanceof TeXObjectList
+          && !(obj instanceof Group))
+      {
+         return stripDelim((TeXObjectList)list);
       }
 
       return list;
