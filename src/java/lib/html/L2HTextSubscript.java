@@ -24,21 +24,21 @@ import java.io.EOFException;
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.*;
 
-public class L2HTextSuperscript extends ControlSequence
+public class L2HTextSubscript extends ControlSequence
 {
-   public L2HTextSuperscript()
+   public L2HTextSubscript()
    {
-      this("textsuperscript");
+      this("textsubscript");
    }
 
-   public L2HTextSuperscript(String name)
+   public L2HTextSubscript(String name)
    {
       super(name);
    }
 
    public Object clone()
    {
-      return new L2HTextSuperscript(getName());
+      return new L2HTextSubscript(getName());
    }
 
    /*
@@ -59,9 +59,9 @@ public class L2HTextSuperscript extends ControlSequence
       {
          // Don't use listener as this should be in text mode
 
-         stack.push(new HtmlTag("</sup>"));
+         stack.push(new HtmlTag("</sub>"));
          stack.push(arg);
-         stack.push(new HtmlTag("<sup>"));
+         stack.push(new HtmlTag("<sub>"));
       }
    }
 
@@ -78,9 +78,9 @@ public class L2HTextSuperscript extends ControlSequence
       {
          // Don't use listener as this should be in text mode
 
-         parser.push(new HtmlTag("</sup>"));
+         parser.push(new HtmlTag("</sub>"));
          parser.push(arg);
-         parser.push(new HtmlTag("<sup>"));
+         parser.push(new HtmlTag("<sub>"));
       }
    }
 
@@ -107,11 +107,11 @@ public class L2HTextSuperscript extends ControlSequence
    {
       int code = obj.getCharCode();
 
-      for (int i = 0; i < UNICODE_SUPERSCRIPTS.length; i++)
+      for (int i = 0; i < UNICODE_SUBSCRIPTS.length; i++)
       {
-         if (UNICODE_SUPERSCRIPTS[i][0] == code)
+         if (UNICODE_SUBSCRIPTS[i][0] == code)
          {
-            return parser.getListener().getOther(UNICODE_SUPERSCRIPTS[i][1]);
+            return parser.getListener().getOther(UNICODE_SUBSCRIPTS[i][1]);
          }
       }
 
@@ -135,9 +135,9 @@ public class L2HTextSuperscript extends ControlSequence
       {
          int code = ((CharObject)arg).getCharCode();
 
-         for (int i = 0; i < UNICODE_SUPERSCRIPTS.length; i++)
+         for (int i = 0; i < UNICODE_SUBSCRIPTS.length; i++)
          {
-            if (UNICODE_SUPERSCRIPTS[i][0] == code)
+            if (UNICODE_SUBSCRIPTS[i][0] == code)
             {
                return true;
             }
@@ -147,25 +147,37 @@ public class L2HTextSuperscript extends ControlSequence
       return false;
    }
 
-   public static final int[][] UNICODE_SUPERSCRIPTS = new int[][]
+   public static final int[][] UNICODE_SUBSCRIPTS = new int[][]
    {
-      new int[] {'0', 0x2070},
-      new int[] {'i', 0x2071},
-      new int[] {'1', 0x00B9},
-      new int[] {'2', 0x00B2},
-      new int[] {'3', 0x00B3},
-      new int[] {'4', 0x2074},
-      new int[] {'5', 0x2075},
-      new int[] {'6', 0x2076},
-      new int[] {'7', 0x2077},
-      new int[] {'8', 0x2078},
-      new int[] {'9', 0x2079},
-      new int[] {'+', 0x207A},
-      new int[] {'-', 0x207B},
-      new int[] {'=', 0x207C},
-      new int[] {'(', 0x207D},
-      new int[] {')', 0x207D},
-      new int[] {'n', 0x207F},
+      new int[] {'0', 0x2080},
+      new int[] {'1', 0x2081},
+      new int[] {'2', 0x2082},
+      new int[] {'3', 0x2083},
+      new int[] {'4', 0x2084},
+      new int[] {'5', 0x2085},
+      new int[] {'6', 0x2086},
+      new int[] {'7', 0x2087},
+      new int[] {'8', 0x2088},
+      new int[] {'9', 0x2089},
+      new int[] {'+', 0x208A},
+      new int[] {'-', 0x208B},
+      new int[] {'=', 0x208C},
+      new int[] {'(', 0x208D},
+      new int[] {')', 0x208D},
+      new int[] {'a', 0x2090},
+      new int[] {'e', 0x2091},
+      new int[] {'o', 0x2092},
+      new int[] {'x', 0x2093},
+      new int[] {0x0259, 0x2094},// schwa
+      new int[] {'h', 0x2095},
+      new int[] {'k', 0x2096},
+      new int[] {'l', 0x2097},
+      new int[] {'m', 0x2098},
+      new int[] {'n', 0x2099},
+      new int[] {'p', 0x209A},
+      new int[] {'s', 0x209B},
+      new int[] {'t', 0x209C},
+      new int[] {'j', 0x2C7C}
    };
 
 }

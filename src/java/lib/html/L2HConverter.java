@@ -116,6 +116,7 @@ public class L2HConverter extends LaTeXParserListener
       putControlSequence(new L2HMbox());
 
       putControlSequence(new L2HTextSuperscript());
+      putControlSequence(new L2HTextSubscript());
 
       putControlSequence(new L2HSection());
       putControlSequence(new L2HSection("subsection"));
@@ -747,9 +748,9 @@ public class L2HConverter extends LaTeXParserListener
       }
       else
       {
-         write("<sb>");
+         write("<sub>");
          arg.process(parser);
-         write("</sb>");
+         write("</sub>");
       }
    }
 
@@ -764,9 +765,9 @@ public class L2HConverter extends LaTeXParserListener
       }
       else
       {
-         write("<sp>");
+         write("<sup>");
          arg.process(parser);
-         write("</sp>");
+         write("</sup>");
       }
    }
 

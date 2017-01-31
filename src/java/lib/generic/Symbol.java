@@ -190,6 +190,10 @@ public class Symbol extends ControlSequence implements Expandable,CaseChangeable
       new Object[]{"&", new Integer((int)'&')},
       new Object[]{"$", new Integer((int)'$')},
       new Object[]{"#", new Integer((int)'#')},
+      new Object[]{"lbrack", new Integer((int)'[')},
+      new Object[]{"rbrack", new Integer((int)']')},
+      new Object[]{"lq", new Integer((int)'`')},
+      new Object[]{"rq", new Integer((int)'\'')},
    };
 
    public static final Object[][] TEXT_SYMBOLS =
