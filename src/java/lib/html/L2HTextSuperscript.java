@@ -166,6 +166,8 @@ public class L2HTextSuperscript extends ControlSequence
       new int[] {'(', 0x207D},
       new int[] {')', 0x207D},
       new int[] {'n', 0x207F},
+      new int[] {'a', 0x00AA},
+      new int[] {'o', 0x00BA},
    };
 
 }
