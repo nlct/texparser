@@ -16,7 +16,7 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
-package com.dickimawbooks.texparserlib.latex.xspace;
+package com.dickimawbooks.texparserlib.latex.siunitx;
 
 import java.io.IOException;
 import java.util.Vector;
@@ -24,52 +24,26 @@ import java.util.Vector;
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.*;
 
-// Fairly primitive approximation
-public class Xspace extends ControlSequence
+public class SiPer extends SiPower
 {
-   public Xspace()
+   public SiPer(SIunitxSty sty)
    {
-      this("xspace");
+      this(sty, "per", 1);
    }
 
-   public Xspace(String name)
+   public SiPer(SIunitxSty sty, String name, int power)
    {
-      super(name);
+      super(sty, name, power);
    }
 
    public Object clone()
    {
-      return new Xspace(getName());
+      return new SiPer(sty, getName(), getPower());
    }
 
-   public void process(TeXParser parser) throws IOException
+   protected TeXObject getPowerObject(int pow)
    {
-      if (parser.size() == 0)
-      {
-         parser.fetchNext();
-      }
-
-      TeXObject obj = parser.firstElement();
-
-      if (obj instanceof SkippedSpaces)
-      {
-         parser.push(parser.getListener().getSpace());
-      }
-   }
-
-   public void process(TeXParser parser, TeXObjectList list) throws IOException
-   {
-      if (list.size() == 0)
-      {
-         return;
-      }
-
-      TeXObject obj = list.firstElement();
-
-      if (obj instanceof SkippedSpaces)
-      {
-         list.push(parser.getListener().getSpace());
-      }
+      return new UserNumber(-pow);
    }
 
 }

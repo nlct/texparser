@@ -52,6 +52,7 @@ import com.dickimawbooks.texparserlib.latex.shortvrb.*;
 import com.dickimawbooks.texparserlib.latex.probsoln.*;
 import com.dickimawbooks.texparserlib.latex.bpchem.*;
 import com.dickimawbooks.texparserlib.latex.xspace.*;
+import com.dickimawbooks.texparserlib.latex.siunitx.*;
 
 public abstract class LaTeXParserListener extends DefaultTeXParserListener
 {
@@ -868,6 +869,11 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       if (styName.equals("bpchem"))
       {
          return new BpChemSty(options, this);
+      }
+
+      if (styName.equals("siunitx"))
+      {
+         return new SIunitxSty(options, this);
       }
 
       if (styName.equals("xspace"))

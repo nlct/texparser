@@ -16,7 +16,7 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
-package com.dickimawbooks.texparserlib.latex.xspace;
+package com.dickimawbooks.texparserlib.latex.siunitx;
 
 import java.io.IOException;
 import java.util.Vector;
@@ -25,51 +25,39 @@ import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.*;
 
 // Fairly primitive approximation
-public class Xspace extends ControlSequence
+public class Si extends ControlSequence
 {
-   public Xspace()
+   public Si(SIunitxSty sty)
    {
-      this("xspace");
+      this("si", sty);
    }
 
-   public Xspace(String name)
+   public Si(String name, SIunitxSty sty)
    {
       super(name);
+      this.sty = sty;
    }
 
    public Object clone()
    {
-      return new Xspace(getName());
+      return new Si(getName(), sty);
    }
 
    public void process(TeXParser parser) throws IOException
    {
-      if (parser.size() == 0)
-      {
-         parser.fetchNext();
-      }
+      TeXObject optArg = parser.popNextArg('[', ']');
 
-      TeXObject obj = parser.firstElement();
-
-      if (obj instanceof SkippedSpaces)
-      {
-         parser.push(parser.getListener().getSpace());
-      }
+      sty.parseUnit(parser, parser.popNextArg()).process(parser);
    }
 
-   public void process(TeXParser parser, TeXObjectList list) throws IOException
+   public void process(TeXParser parser, TeXObjectList stack)
+      throws IOException
    {
-      if (list.size() == 0)
-      {
-         return;
-      }
+      TeXObject optArg = stack.popArg(parser, '[', ']');
 
-      TeXObject obj = list.firstElement();
-
-      if (obj instanceof SkippedSpaces)
-      {
-         list.push(parser.getListener().getSpace());
-      }
+      sty.parseUnit(parser, stack.popArg(parser)).process(parser, stack);
    }
 
+
+   private SIunitxSty sty;
 }

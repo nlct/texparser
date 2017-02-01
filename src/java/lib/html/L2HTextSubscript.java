@@ -90,6 +90,11 @@ public class L2HTextSubscript extends ControlSequence
       {
          return getUnicode(parser, (CharObject)arg);
       }
+      else if (arg instanceof TeXNumber)
+      {
+         return convert(parser, parser.getListener().createString(
+            arg.toString(parser)));
+      }
       else
       {
          TeXObjectList argList = (TeXObjectList)arg;
@@ -131,6 +136,10 @@ public class L2HTextSubscript extends ControlSequence
 
          return true;
       }
+      else if (arg instanceof TeXNumber)
+      {
+         return true;
+      }
       else if (arg instanceof CharObject)
       {
          int code = ((CharObject)arg).getCharCode();
@@ -161,6 +170,7 @@ public class L2HTextSubscript extends ControlSequence
       new int[] {'9', 0x2089},
       new int[] {'+', 0x208A},
       new int[] {'-', 0x208B},
+      new int[] {0x2212, 0x208B},
       new int[] {'=', 0x208C},
       new int[] {'(', 0x208D},
       new int[] {')', 0x208D},

@@ -90,6 +90,11 @@ public class L2HTextSuperscript extends ControlSequence
       {
          return getUnicode(parser, (CharObject)arg);
       }
+      else if (arg instanceof TeXNumber)
+      {
+         return convert(parser, parser.getListener().createString(
+            arg.toString(parser)));
+      }
       else
       {
          TeXObjectList argList = (TeXObjectList)arg;
@@ -131,6 +136,10 @@ public class L2HTextSuperscript extends ControlSequence
 
          return true;
       }
+      else if (arg instanceof TeXNumber)
+      {
+         return true;
+      }
       else if (arg instanceof CharObject)
       {
          int code = ((CharObject)arg).getCharCode();
@@ -162,6 +171,7 @@ public class L2HTextSuperscript extends ControlSequence
       new int[] {'9', 0x2079},
       new int[] {'+', 0x207A},
       new int[] {'-', 0x207B},
+      new int[] {0x2212, 0x207B},// minus symbol
       new int[] {'=', 0x207C},
       new int[] {'(', 0x207D},
       new int[] {')', 0x207D},

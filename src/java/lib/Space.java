@@ -79,5 +79,26 @@ public class Space extends WhiteSpace
    }
 
    private int charCode;
+
+   public static final int SPACE=0x0020;
+   public static final int NO_BREAK_SPACE=0x00A0;
+   public static final int OGHAM_SPACE_MARK=0x1680;
+   public static final int MONGOLIAN_VOWEL_SEPARATOR=0x180E;// no width
+   public static final int EN_QUAD=0x2000;// 1en = 1/2em
+   public static final int EM_QUAD=0x2001;// 1em
+   public static final int EN_SPACE=0x2002;// 1en = 1/2em
+   public static final int EM_SPACE=0x2003;// 1em
+   public static final int THREE_PER_EM_SPACE=0x2004;// 1/3 em
+   public static final int FOUR_PER_EM_SPACE=0x2005;// 1/4 em
+   public static final int SIX_PER_EM_SPACE=0x2006;// 1/6 em
+   public static final int FIGURE_SPACE=0x2007;// width of digits
+   public static final int PUNCTUATION_SPACE=0x2008;// width of a period .
+   public static final int THIN_SPACE=0x2009;// 1/5 em
+   public static final int HAIR_SPACE=0x200A;// narrower than thin space
+   public static final int ZERO_WIDTH_SPACE=0x200B;// nominally no width
+   public static final int NARROW_NO_BREAK_SPACE=0x202F;
+   public static final int MEDIUM_MATHEMATICAL_SPACE=0x205F;// 4/18em
+   public static final int IDEOGRAPHIC_SPACE=0x3000; 
+   public static final int ZERO_WIDTH_NO_BREAK_SPACE=0xFEFF; 
 }
 
