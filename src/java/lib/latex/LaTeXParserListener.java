@@ -209,6 +209,7 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       parser.putControlSequence(new MultiColumn());
       parser.putControlSequence(new Hline());
       parser.putControlSequence(new Cline());
+      parser.putControlSequence(new EnsureMath());
       parser.putControlSequence(new Frac());
       parser.putControlSequence(new GenericCommand("@empty"));
       parser.putControlSequence(new AtIfNextChar());
