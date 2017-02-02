@@ -54,6 +54,7 @@ import com.dickimawbooks.texparserlib.latex.bpchem.*;
 import com.dickimawbooks.texparserlib.latex.xspace.*;
 import com.dickimawbooks.texparserlib.latex.siunitx.*;
 import com.dickimawbooks.texparserlib.latex.mhchem.*;
+import com.dickimawbooks.texparserlib.latex.stix.*;
 
 public abstract class LaTeXParserListener extends DefaultTeXParserListener
 {
@@ -881,6 +882,11 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       if (styName.equals("mhchem"))
       {
          return new MhchemSty(options, this);
+      }
+
+      if (styName.equals("stix"))
+      {
+         return new StixSty(options, this);
       }
 
       if (styName.equals("xspace"))
