@@ -56,6 +56,7 @@ import com.dickimawbooks.texparserlib.latex.siunitx.*;
 import com.dickimawbooks.texparserlib.latex.mhchem.*;
 import com.dickimawbooks.texparserlib.latex.stix.*;
 import com.dickimawbooks.texparserlib.latex.textcomp.*;
+import com.dickimawbooks.texparserlib.latex.mnsymbol.*;
 
 public abstract class LaTeXParserListener extends DefaultTeXParserListener
 {
@@ -888,6 +889,11 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       if (styName.equals("stix"))
       {
          return new StixSty(options, this);
+      }
+
+      if (styName.toLowerCase().equals("mnsymbol"))
+      {
+         return new MnSymbolSty(options, this);
       }
 
       if (styName.equals("textcomp"))
