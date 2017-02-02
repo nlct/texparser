@@ -100,6 +100,10 @@ public abstract class DefaultTeXParserListener extends TeXParserListener
       parser.putControlSequence(new Uppercase());
       parser.putControlSequence(new Lowercase());
       parser.putControlSequence(new Show());
+      parser.putControlSequence(new GenericCommand(true, "lq", 
+        null, new TeXObject[]{getOther('`')}));
+      parser.putControlSequence(new GenericCommand(true, "rq", 
+        null, new TeXObject[]{getOther('\'')}));
 
       // TeX font changing declarations
 

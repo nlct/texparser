@@ -52,15 +52,49 @@ public class L2HOther extends Other
 
       if (listener.isInDocEnv())
       {
-         if (parser.isMathMode())
-         {
-            super.process(parser);
-            return;
-         }
-
          int c = getCharCode();
 
-         if (c == (int)'\'')
+         if (parser.isMathMode())
+         {
+            if (!listener.useMathJax())
+            {
+               if (c == (int)'\'')
+               {
+                  TeXObject obj = stack.peekStack();
+
+                  if (obj instanceof CharObject
+                   && (((CharObject)obj).getCharCode() == c))
+                  {
+                     stack.popStack(parser);
+                     listener.writeCodePoint(0x2033);
+                  }
+                  else
+                  {
+                     listener.writeCodePoint(0x2032);
+                  }
+
+                  return;
+               }
+               else if (c == (int)'`')
+               {
+                  TeXObject obj = stack.peekStack();
+
+                  if (obj instanceof CharObject
+                   && (((CharObject)obj).getCharCode() == c))
+                  {
+                     stack.popStack(parser);
+                     listener.writeCodePoint(0x2036);
+                  }
+                  else
+                  {
+                     listener.writeCodePoint(0x2035);
+                  }
+
+                  return;
+               }
+            }
+         }
+         else if (c == (int)'\'')
          {
             TeXObject obj = stack.peekStack();
 
@@ -69,8 +103,13 @@ public class L2HOther extends Other
             {
                stack.popStack(parser);
                listener.writeCodePoint(0x201D);
-               return;
             }
+            else
+            {
+               listener.writeCodePoint(0x2019);
+            }
+
+            return;
          }
          else if (c == (int)'`')
          {
@@ -81,8 +120,13 @@ public class L2HOther extends Other
             {
                stack.popStack(parser);
                listener.writeCodePoint(0x201C);
-               return;
             }
+            else
+            {
+               listener.writeCodePoint(0x2018);
+            }
+
+            return;
          }
          else if (c == (int)'-')
          {
