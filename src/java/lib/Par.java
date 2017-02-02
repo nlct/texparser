@@ -24,11 +24,22 @@ public class Par implements TeXObject
 {
    public Par()
    {
+      this("par");
+   }
+
+   public Par(String name)
+   {
+      this.name = name;
+   }
+
+   public String getName()
+   {
+      return name;
    }
 
    public Object clone()
    {
-      return new Par();
+      return new Par(getName());
    }
 
    public String toString(TeXParser parser)
@@ -38,7 +49,7 @@ public class Par implements TeXObject
 
    public String format()
    {
-      return "\\par ";
+      return String.format("\\%s ", name);
    }
 
    public String toString()
@@ -49,7 +60,7 @@ public class Par implements TeXObject
    public TeXObjectList string(TeXParser parser)
      throws IOException
    {
-      return parser.string(""+parser.getEscChar()+"par");
+      return parser.string(String.format("%c%s", parser.getEscChar(), name));
    }
 
    public void process(TeXParser parser, TeXObjectList list)
@@ -66,5 +77,7 @@ public class Par implements TeXObject
    {
       return true;
    }
+
+   private String name;
 }
 
