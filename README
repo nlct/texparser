@@ -29,6 +29,21 @@ a separate library, namely texparserlib.jar. This also makes it
 easier to test the library without the additional overhead of the
 main program.
 
+There are only a few LaTeX packages implemented and some of them
+aren't a full implementation. These are provided as some aspects of
+them are required for the applications using the texparserlib
+library. For example, MakeJmlrBookGUI needs to convert articles that
+use the old jmlr2e package so that they instead use the new jmlr
+class, the `datatooltk` application can import probsoln data sets, and
+`bib2gls` needs to know symbols that commonly occur in glossary
+entries. So, for example, `texparserlib` recognises `siunitx`'s
+`\si{}` command as it's feasible that a user might want to define units used
+in the document, but it's less likely that a specific measurement
+might occur in the `name` field (although measurements may well
+occur in the `description` when defining constants, but that's less
+important to `bib2gls` since entries aren't usually sorted by their
+description).
+
 The accompanying texparserapp.jar is a command line application
 provided to test the texparserlib.jar library. It's not intended for
 general use.
