@@ -25,8 +25,10 @@ TeX parser library allows the translation of code fragments, such as
 author name or article title, so it can be rendered in Java's
 `HTMLDocument`, which makes the GUI look a bit tidier.
 
-Since I have other Java applications (`datatooltk` and `bib2gls`) that also
-need to parse LaTeX files or their associated `.aux` or `.bib` files, I
+Since I have other Java applications (for example,
+[`datatooltk`](https://github.com/nlct/datatooltk) and
+[`bib2gls`](https://github.com/nlct/bib2gls)) that also need to
+parse LaTeX files or their associated `.aux` or `.bib` files, I
 decided to split away the TeX parsing code from MakeJmlBookGui into
 a separate library, namely `texparserlib.jar`. This also makes it
 easier to test the library without the additional overhead of the
