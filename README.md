@@ -74,9 +74,7 @@ original files.
 
 Test files are in `src/tests/`
 
-###EXAMPLES
-
-####Example 1:
+###Example 1:
 
 The test file `src/tests/test-obsolete/test-obs.tex` contains obsolete
 commands such as `\bf`, `\centerline` and `\epsfig`.
@@ -84,7 +82,7 @@ commands such as `\bf`, `\centerline` and `\epsfig`.
 cd src/tests
 texparserapp --in test-obsolete/test-obs.tex --output output/test-obsolete
 ```
-This will create the directory output/test-obsolete and create a
+This will create the directory `output/test-obsolete` and create a
 file in it called `test-obs.tex` which is the original file with the
 obsolete commands replaced. The eps file is also copied over to the
 new directory and `epstopdf` is used to create a corresponding pdf
@@ -97,7 +95,7 @@ and the corresponding LaTeX2e math font commands (such as `\mathbf`)
 in math mode. The commands are unchanged if they occur in the
 argument of `\verb` or in a command definition.
 
-####Example 2:
+###Example 2:
 
 The test file `src/tests/test-sw/test-sw.tex` simulates output from
 Scientific Word. (I don't have SW so I can't test this. The code is
@@ -108,8 +106,8 @@ book style. Also, I don't have `tcilatex.tex` used by SW, so
 `texparserapp` removes `\input{tcilatex}` and substitutes `\FRAME` and
 `\Qcb`. I don't know what other commands `tcilatex` defines. Those two
 are the only ones I've encountered so far. `texparserapp` also
-replaces `\special{language "Scientific Word";...;tempfilename
-'imgname.wmf'}` with `\includegraphics{imgname}` and runs `wmf2eps` on
+replaces
+`\special{language "Scientific Word";...;tempfilename '`*imgname*`.wmf'}` with `\includegraphics{`*imgname*`}` and runs `wmf2eps` on
 the wmf image.
 ```bash
 cd src/tests
@@ -120,10 +118,10 @@ This creates the directory `output/test-sw` and writes a copy of
 `X0001.wmf` is converted to eps and the eps file is then converted to
 pdf.
 
-####Example 3:
+###Example 3:
 
 Conversion to HTML just creates a single HTML file.
-It's very limited as I initially only need to convert
+It's very limited as I initially only needed to convert
 abstracts to HTML. Images aren't supported. MathJax is used to 
 render math mode.
 ```bash
