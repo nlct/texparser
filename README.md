@@ -19,7 +19,7 @@ a simple pattern match.
 Since TeX4HT no longer works with the `jmlrbook` class, I started to
 extend the TeX parsing code so that it could convert the article
 abstracts to HTML without requiring TeX4HT. This aspect is no
-longer required as JMLR W&CP now generate the HTML files from the
+longer required as JMLR W&amp;CP now generate the HTML files from the
 `.bib` file associated with the proceedings, but the `html` part of the
 TeX parser library allows the translation of code fragments, such as 
 author name or article title, allowing it to be rendered in Java's
@@ -53,7 +53,7 @@ general use.
 
 Syntax:
 
-texparserapp --in $lt;tex file$gt; --output &lt;out dir&gt;
+texparserapp --in &lt;tex file&gt; --output &lt;out dir&gt;
 
 This parses &lt;tex file&gt; and saves the new file in &lt;out dir&gt; and
 copies over any included images. It will run `epstopdf` on any eps
