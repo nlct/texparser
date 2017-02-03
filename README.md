@@ -22,10 +22,10 @@ abstracts to HTML without requiring TeX4HT. This aspect is no
 longer required as JMLR W&amp;CP now generate the HTML files from the
 `.bib` file associated with the proceedings, but the `html` part of the
 TeX parser library allows the translation of code fragments, such as 
-author name or article title, allowing it to be rendered in Java's
+author name or article title, so it can be rendered in Java's
 `HTMLDocument`, which makes the GUI look a bit tidier.
 
-Since I other Java applications (`datatooltk` and `bib2gls`) that also
+Since I have other Java applications (`datatooltk` and `bib2gls`) that also
 need to parse LaTeX files or their associated `.aux` or `.bib` files, I
 decided to split away the TeX parsing code from MakeJmlBookGui into
 a separate library, namely `texparserlib.jar`. This also makes it
@@ -53,14 +53,14 @@ general use.
 
 Syntax:
 
-texparserapp --in &lt;tex file&gt; --output &lt;out dir&gt;
+`texparserapp --in` &lt;*tex file*&gt; `--output` &lt;*out dir*&gt;
 
-This parses &lt;tex file&gt; and saves the new file in &lt;out dir&gt; and
+This parses &lt;*tex file*&gt; and saves the new file in &lt;*out dir*&gt; and
 copies over any included images. It will run `epstopdf` on any eps
 files and `wmf2eps` on any wps files. Both `epstopdf` and `wmf2eps` must
 be on your system path.
 
-The output directory &gt;out dir&gt; must not exist. This is a
+The output directory &lt;*out dir*&gt; must not exist. This is a
 precautionary measure to ensure you don't accidentally overwrite the
 original files.
 
