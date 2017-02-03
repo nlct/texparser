@@ -55,12 +55,14 @@ general use.
 
 Syntax:
 
-`texparserapp --in` &lt;*tex file*&gt; `--output` &lt;*out dir*&gt;
+`texparserapp` [`--html`] `--in` &lt;*tex file*&gt; `--output` &lt;*out dir*&gt;
 
 This parses &lt;*tex file*&gt; and saves the new file in &lt;*out dir*&gt; and
 copies over any included images. It will run `epstopdf` on any eps
 files and `wmf2eps` on any wps files. Both `epstopdf` and `wmf2eps` must
-be on your system path.
+be on your system path. The `--html` switch indicates conversion to
+HTML. If this switch is omitted, LaTeX to LaTeX conversion is
+assumed.
 
 The output directory &lt;*out dir*&gt; must not exist. This is a
 precautionary measure to ensure you don't accidentally overwrite the
