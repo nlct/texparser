@@ -50,6 +50,11 @@ public abstract class BibData
          return new BibString(entryType);
       }
 
+      if (lc.equals("comment"))
+      {
+         return new BibComment(entryType);
+      }
+
       return new BibEntry(entryType);
    }
 

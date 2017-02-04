@@ -81,7 +81,7 @@ public class NewCommand extends Command
       if (object instanceof TeXObjectList)
       {
          // Use popArg in case there are spaces before or after the
-         // controls sequence.
+         // control sequence.
 
          object = ((TeXObjectList)object).popArg(parser);
       }
