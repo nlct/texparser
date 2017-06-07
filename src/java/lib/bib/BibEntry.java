@@ -138,7 +138,21 @@ public class BibEntry extends BibData
     TeXObjectList contents, TeXObject endGroupChar)
      throws IOException
    {
-      setId(readKey(parser, contents));
+      TeXObjectList idList = readKeyObject(parser, contents);
+
+      String id = idList.format();
+
+      if (id.isEmpty())
+      {
+         throw new BibTeXSyntaxException(parser,
+           BibTeXSyntaxException.ERROR_MISSING_FIELD_NAME);
+      }
+
+      setId(id);
+
+      BibValueList value = new BibValueList();
+      value.add(new BibUserString(idList));
+      putField("id", value);
 
       TeXObject object = contents.popStack(parser);
 
@@ -186,7 +200,7 @@ public class BibEntry extends BibData
               object.format());
          }
 
-         BibValueList value = new BibValueList();
+         value = new BibValueList();
 
          readValue(parser, (TeXObjectList)contents, value, endGroupChar);
 
