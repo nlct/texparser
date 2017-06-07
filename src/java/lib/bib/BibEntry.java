@@ -60,6 +60,11 @@ public class BibEntry extends BibData
       return id;
    }
 
+   public BibValueList getIdField()
+   {
+      return idValue;
+   }
+
    public BibValueList removeField(String fieldName)
    {
       return fields.remove(fieldName);
@@ -152,7 +157,7 @@ public class BibEntry extends BibData
 
       BibValueList value = new BibValueList();
       value.add(new BibUserString(idList));
-      putField("id", value);
+      idValue = value;
 
       TeXObject object = contents.popStack(parser);
 
@@ -608,6 +613,7 @@ public class BibEntry extends BibData
    private HashMap<String,BibValueList> fields;
    private String entryType;
    private String id;
+   private BibValueList idValue;
 
    private static final byte CASE_LOWER=0, CASE_UPPER=1, CASE_NA=2;
 }
