@@ -58,7 +58,7 @@ public abstract class BibData
       return new BibEntry(entryType);
    }
 
-   public String readKey(TeXParser parser, TeXObjectList stack)
+   public TeXObjectList readKeyObject(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
       TeXObjectList list = new TeXObjectList();
@@ -110,6 +110,14 @@ public abstract class BibData
          list.add(object);
          object = stack.popStack(parser);
       }
+
+      return list;
+   }
+
+   public String readKey(TeXParser parser, TeXObjectList stack)
+     throws IOException
+   {
+      TeXObjectList list = readKeyObject(parser, stack);
 
       String key = list.format();
 
