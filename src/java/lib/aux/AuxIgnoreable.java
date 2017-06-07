@@ -31,18 +31,62 @@ public class AuxIgnoreable extends ControlSequence
       super(name);
    }
 
+   public AuxIgnoreable(String name, boolean hasStarredForm, boolean[] margs)
+   {
+      super(name);
+      this.star = hasStarredForm;
+      this.margs = margs;
+   }
+
    public Object clone()
    {
-      return new AuxIgnoreable(getName());
+      return new AuxIgnoreable(getName(), star, margs);
    }
 
    public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
+      TeXObject object = null;
+
+      if (star)
+      {
+         object = stack.peekStack();
+
+         if (object instanceof CharObject
+             && ((CharObject)object).getCharCode() == (int)'*')
+         {
+            object = (stack == parser ? parser.popNextArg() 
+              : stack.popArg(parser));
+         }
+      }
+
+      if (margs == null)
+      {
+         return;
+      }
+
+      for (boolean isMandatoryArg : margs)
+      {
+         if (isMandatoryArg)
+         {
+            object = (stack == parser ?
+              parser.popNextArg() : stack.popArg(parser));
+         }
+         else
+         {
+            object = (stack == parser ?
+                       parser.popNextArg(true, '[', ']')
+                       : stack.popArg(parser, '[', ']'));
+         }
+      }
    }
 
    public void process(TeXParser parser)
      throws IOException
    {
+      process(parser, parser);
    }
+
+   private boolean star=false;
+   private boolean[] margs = null;
 }
