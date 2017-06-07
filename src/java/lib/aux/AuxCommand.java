@@ -62,6 +62,11 @@ public class AuxCommand extends ControlSequence
       for (int i = 0; i < numArgs; i++)
       {
          args[i] = stack.popArg(parser);
+
+         if (args[i] == null)
+         {
+            throw new NullPointerException("null arg " +i+" for "+getName());
+         }
       }
 
       auxParser.addAuxData(new AuxData(getName(), args));
@@ -77,6 +82,11 @@ public class AuxCommand extends ControlSequence
       for (int i = 0; i < numArgs; i++)
       {
          args[i] = parser.popNextArg();
+
+         if (args[i] == null)
+         {
+            throw new NullPointerException("null arg " +i+" for "+getName());
+         }
       }
 
       auxParser.addAuxData(new AuxData(getName(), args));
