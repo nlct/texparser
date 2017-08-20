@@ -57,6 +57,12 @@ public class KeyValList extends HashMap<String,TeXObject>
                continue;
             }
 
+            if (obj instanceof BgChar)
+            {
+               obj.process(parser, list);
+               obj = list.remove(0);
+            }
+
             if (obj instanceof CharObject)
             {
                int charCode = ((CharObject)obj).getCharCode();
