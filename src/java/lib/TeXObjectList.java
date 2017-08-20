@@ -718,7 +718,22 @@ public class TeXObjectList extends Vector<TeXObject>
    public TeXObject popArg(TeXParser parser, boolean isShort)
     throws IOException
    {
+      return popArg(parser, isShort, true);
+   }
+
+   public TeXObject popArg(TeXParser parser, boolean isShort,
+    boolean ignoreLeadingWhiteSpace)
+    throws IOException
+   {
       TeXObject object = popStack(parser, isShort);
+
+      if (ignoreLeadingWhiteSpace)
+      {
+         while (object instanceof WhiteSpace)
+         {
+            object = popStack(parser, isShort);
+         }
+      }
 
       if (object instanceof Group
        && !(object instanceof MathGroup))
