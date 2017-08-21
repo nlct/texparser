@@ -483,47 +483,40 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
          defList.add(definition);
       }
 
-      if (defValue == null)
+      if (numParams == 0)
       {
          putControlSequence(true,// local
-           new GenericCommand(this, isShort, name, numParams, defList));
-
+           new LaTeXGenericCommand(isShort, name, defList));
          return;
       }
 
-      String innerName = ""+parser.getEscChar()+name;
+      char[] syntax = new char[numParams];
 
-      Group noOpt = createGroup();
-      noOpt.add(new TeXCsRef(innerName));
-      noOpt.add(getOther((int)'['));
-      noOpt.add(defValue);
-      noOpt.add(getOther((int)']'));
-
-      putControlSequence(true,
-       new GenericCommand(isShort, name, null, 
-         new TeXObject[]
-         {
-            new TeXCsRef("@ifnextchar"),
-            getOther('['),
-            new TeXCsRef(innerName),
-            noOpt
-         })
-      );
-
-      TeXObjectList syntax = new TeXObjectList();
-
-      syntax.add(getOther((int)'['));
-      syntax.add(getParam(1));
-      syntax.add(getOther((int)']'));
-
-      for (int i = 2; i <= numParams; i++)
+      if (defValue == null)
       {
-         syntax.add(getParam(i));
+         syntax[0] = LaTeXGenericCommand.SYNTAX_MANDATORY;
+      }
+      else
+      {
+         syntax[0] = LaTeXGenericCommand.SYNTAX_OPTIONAL;
       }
 
-      putControlSequence(true,
-         new GenericCommand(isShort, innerName, syntax, defList)
-      );
+      for (int i = 1; i < numParams; i++)
+      {
+         syntax[i] = LaTeXGenericCommand.SYNTAX_MANDATORY;
+      }
+
+      if (defValue == null)
+      {
+         putControlSequence(true,// local
+           new LaTeXGenericCommand(isShort, name, syntax, defList));
+      }
+      else
+      {
+         putControlSequence(true,// local
+           new LaTeXGenericCommand(isShort, name, syntax, defList,
+             new TeXObject[]{defValue}));
+      }
    }
 
    private void addFontWeightDeclaration(

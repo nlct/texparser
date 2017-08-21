@@ -20,6 +20,8 @@ package com.dickimawbooks.texparserlib;
 
 import java.io.IOException;
 
+// TODO: add support for deeper levels
+
 public class DoubleParam implements TeXObject
 {
    public DoubleParam(Param param)
