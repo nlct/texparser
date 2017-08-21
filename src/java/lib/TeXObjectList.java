@@ -790,6 +790,12 @@ public class TeXObjectList extends Vector<TeXObject>
                return list;
             }
          }
+         else if (object instanceof BgChar)
+         {
+            Group group = parser.getListener().createGroup();
+            popRemainingGroup(parser, group, isShort, (BgChar)object);
+            object = group;
+         }
          else if (isShort && object.isPar())
          {
             break;
