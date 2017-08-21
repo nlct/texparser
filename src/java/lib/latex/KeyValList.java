@@ -50,7 +50,8 @@ public class KeyValList extends HashMap<String,TeXObject>
          {
             TeXObject obj = list.remove(0);
 
-            if ((obj instanceof Space || obj instanceof Eol)
+            if ((obj instanceof Space || obj instanceof Eol 
+                || obj instanceof Ignoreable)
              && (keyBuilder.length() == 0 
                   || (valBuilder != null && valBuilder.size() == 0)))
             {
@@ -78,16 +79,29 @@ public class KeyValList extends HashMap<String,TeXObject>
                   }
                   else if (charCode == (int)',')
                   {
-                     keyValList.put(keyBuilder.toString().trim(), 
-                       new TeXObjectList());
+                     String key = keyBuilder.toString().trim();
+
+                     // Don't allow empty keys
+
+                     if (!key.isEmpty())
+                     {
+                        keyValList.put(key, new TeXObjectList());
+                     }
+
                      keyBuilder.setLength(0);
                      continue;
                   }
                }
                else if (charCode == ',') // building the value
                {
-                  keyValList.put(keyBuilder.toString().trim(), 
-                    valBuilder);
+                  String key = keyBuilder.toString().trim();
+
+                  // Don't allow empty keys
+
+                  if (!key.isEmpty())
+                  {
+                     keyValList.put(key, valBuilder);
+                  }
 
                   keyBuilder.setLength(0);
                   valBuilder = null;
