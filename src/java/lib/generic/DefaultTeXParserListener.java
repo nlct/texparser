@@ -385,7 +385,7 @@ public abstract class DefaultTeXParserListener extends TeXParserListener
       return referencedFiles;
    }
 
-   public TeXObjectList requestUserInput(String message)
+   public TeXObjectList requestUserInputAsList(String message)
      throws IOException
    {
       TeXObjectList list = new TeXObjectList();
