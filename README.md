@@ -3,7 +3,7 @@
 This code is *highly experimental* and still under construction. It
 comes with no guarantees, no warranties and is not future-proof.
 
-##PURPOSE
+## PURPOSE
 
 My Java application
 [MakeJmlrBookGUI](http://www.dickimaw-books.com/software/makejmlrbookgui/)
@@ -69,12 +69,12 @@ precautionary measure to ensure you don't accidentally overwrite the
 original files.
 
 
-##TEST FILES
+## TEST FILES
 
 
 Test files are in `src/tests/`
 
-###Example 1:
+### Example 1:
 
 The test file `src/tests/test-obsolete/test-obs.tex` contains obsolete
 commands such as `\bf`, `\centerline` and `\epsfig`.
@@ -95,7 +95,7 @@ and the corresponding LaTeX2e math font commands (such as `\mathbf`)
 in math mode. The commands are unchanged if they occur in the
 argument of `\verb` or in a command definition.
 
-###Example 2:
+### Example 2:
 
 The test file `src/tests/test-sw/test-sw.tex` simulates output from
 Scientific Word. (I don't have SW so I can't test this. The code is
@@ -118,7 +118,7 @@ This creates the directory `output/test-sw` and writes a copy of
 `X0001.wmf` is converted to eps and the eps file is then converted to
 pdf.
 
-###Example 3:
+### Example 3:
 
 Conversion to HTML just creates a single HTML file.
 It's very limited as I initially only needed to convert
