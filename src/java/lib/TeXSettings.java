@@ -457,6 +457,11 @@ public class TeXSettings
       return getCurrentAlignmentColumnCount();
    }
 
+   public Color getCurrentFgColor()
+   {
+      return currentFgColor;
+   }
+
    public Color getFgColor()
    {
       if (currentFgColor == null)
@@ -472,6 +477,16 @@ public class TeXSettings
       return currentFgColor;
    }
 
+   public void setFgColor(Color col)
+   {
+      currentFgColor = col;
+   }
+
+   public Color getCurrentBgColor()
+   {
+      return currentBgColor;
+   }
+
    public Color getBgColor()
    {
       if (currentBgColor == null)
@@ -485,6 +500,11 @@ public class TeXSettings
       }
 
       return currentBgColor;
+   }
+
+   public void setBgColor(Color col)
+   {
+      currentBgColor = col;
    }
 
    public void setFontFamily(int setting)
