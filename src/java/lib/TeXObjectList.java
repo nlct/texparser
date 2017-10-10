@@ -315,7 +315,19 @@ public class TeXObjectList extends Vector<TeXObject>
    public Numerical popNumerical(TeXParser parser)
    throws IOException
    {
-      TeXObject object = expandedPopStack(parser, true);
+      TeXObject object = peekStack();
+
+      if (object instanceof CharObject)
+      {
+         int codePoint = ((CharObject)object).getCharCode();
+
+         if (codePoint == '"' || codePoint == '\'' || codePoint == '`')
+         {
+            return popNumber(parser);
+         }
+      }
+
+      object = expandedPopStack(parser, true);
 
       if (object instanceof Register)
       {
@@ -598,7 +610,94 @@ public class TeXObjectList extends Vector<TeXObject>
    public TeXNumber popNumber(TeXParser parser)
     throws IOException
    {
-      TeXObject object = expandedPopStack(parser);
+      TeXObject object = peekStack();
+
+      int base = 10;
+
+      if (object instanceof CharObject)
+      {
+         int codePoint = ((CharObject)object).getCharCode();
+
+         if (codePoint == '"')
+         {
+            popStack(parser);
+            base = 16;
+         }
+         if (codePoint == '\'')
+         {
+            popStack(parser);
+            base = 8;
+         }
+         else if (codePoint == '`')
+         {
+            popStack(parser);
+
+            TeXObject nextObj = peek();
+
+            if (nextObj instanceof ControlSequence)
+            {
+               popStack(parser);
+
+               String name = ((ControlSequence)nextObj).getName();
+
+               codePoint = name.codePointAt(0);
+
+               if (Character.charCount(codePoint) != name.length())
+               {
+                  throw new TeXSyntaxException(parser,
+                    TeXSyntaxException.ERROR_IMPROPER_ALPHABETIC_CONSTANT,
+                    nextObj.toString(parser));
+               }
+
+               // skip trailing spaces
+
+               object = peek();
+
+               while (object instanceof Space)
+               {
+                  pop();
+                  object = peek();
+               }
+
+               return new UserNumber(codePoint);
+            }
+            else if (nextObj instanceof CharObject)
+            {
+               codePoint = ((CharObject)nextObj).getCharCode();
+
+               popStack(parser);
+
+               // skip trailing spaces
+
+               object = peek();
+
+               while (object instanceof Space)
+               {
+                  pop();
+                  object = peek();
+               }
+
+               return new UserNumber(codePoint);
+            }
+            else
+            {
+               String str = nextObj.toString(parser);
+
+               codePoint = str.codePointAt(0);
+
+               if (Character.charCount(codePoint) != str.length())
+               {
+                  throw new TeXSyntaxException(parser,
+                    TeXSyntaxException.ERROR_IMPROPER_ALPHABETIC_CONSTANT,
+                    str);
+               }
+
+               return new UserNumber(codePoint);
+            }
+         }
+      }
+
+      object = expandedPopStack(parser);
 
       if (object instanceof TeXNumber)
       {
@@ -612,14 +711,24 @@ public class TeXObjectList extends Vector<TeXObject>
 
       StringBuilder builder = new StringBuilder();
       
-      popNumber(parser, object, builder);
+      popNumber(parser, object, builder, base);
 
-      return new UserNumber(parser, builder.toString());
+      // skip trailing spaces
+
+      object = peek();
+
+      while (object instanceof Space)
+      {
+         pop();
+         object = peek();
+      }
+
+      return new UserNumber(parser, builder.toString(), base);
    }
 
    // object should be fully expanded
    protected void popNumber(TeXParser parser, TeXObject object,
-     StringBuilder builder)
+     StringBuilder builder, int base)
    throws IOException
    {
       if (object == null) return;
@@ -628,7 +737,7 @@ public class TeXObjectList extends Vector<TeXObject>
 
       try
       {
-         Integer.parseInt(builder.toString()+str);
+         Integer.parseInt(builder.toString()+str, base);
       }
       catch (NumberFormatException e)
       {
@@ -638,7 +747,7 @@ public class TeXObjectList extends Vector<TeXObject>
 
       builder.append(str);
 
-      popNumber(parser, expandedPopStack(parser), builder);
+      popNumber(parser, expandedPopStack(parser), builder, base);
    }
 
    public void push(TeXObject object)

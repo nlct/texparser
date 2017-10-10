@@ -46,6 +46,20 @@ public class UserNumber implements TeXNumber
       }
    }
 
+   public UserNumber(TeXParser parser, String string, int base)
+     throws TeXSyntaxException
+   {
+      try
+      {
+         value = Integer.parseInt(string, base);
+      }
+      catch (NumberFormatException e)
+      {
+         throw new TeXSyntaxException(parser, 
+          TeXSyntaxException.ERROR_NUMBER_EXPECTED, string);
+      }
+   }
+
    public Object clone()
    {
       return new UserNumber(value);
