@@ -76,6 +76,7 @@ public abstract class DefaultTeXParserListener extends TeXParserListener
       parser.putControlSequence(new NumberCs());
       parser.putControlSequence(new RomanNumeral());
       parser.putControlSequence(new TheCs());
+      parser.putControlSequence(new CharCs());
       parser.putControlSequence(new ExpandAfter());
       parser.putControlSequence(new Csname());
       parser.putControlSequence(new EndCsname());
