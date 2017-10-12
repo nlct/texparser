@@ -58,6 +58,7 @@ public class L2HTextSuperscript extends ControlSequence
       else
       {
          // Don't use listener as this should be in text mode
+         // (push in reverse order)
 
          stack.push(new HtmlTag("</sup>"));
          stack.push(arg);
@@ -77,6 +78,7 @@ public class L2HTextSuperscript extends ControlSequence
       else
       {
          // Don't use listener as this should be in text mode
+         // (push in reverse order)
 
          parser.push(new HtmlTag("</sup>"));
          parser.push(arg);

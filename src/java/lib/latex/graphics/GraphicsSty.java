@@ -36,6 +36,10 @@ public class GraphicsSty extends LaTeXSty
    public void addDefinitions()
    {
       registerControlSequence(new IncludeGraphics(this));
+      registerControlSequence(new RotateBox());
+      registerControlSequence(new ScaleBox());
+      registerControlSequence(new ReflectBox());
+      registerControlSequence(new ResizeBox());
       registerControlSequence(new GraphicsPath());
       registerControlSequence(new Epsfig("epsfig"));
       registerControlSequence(new Epsfig("psfig"));
@@ -50,4 +54,48 @@ public class GraphicsSty extends LaTeXSty
      throws IOException
    {
    }
+   public static double getDouble(TeXObject object, TeXParser parser)
+      throws TeXSyntaxException
+   {
+      String string = object.toString(parser);
+
+      try
+      {
+         return Double.valueOf(string);
+      }
+      catch (NumberFormatException e)
+      {
+         throw new TeXSyntaxException(parser,
+          TeXSyntaxException.ERROR_NUMBER_EXPECTED, string);
+      }
+   }
+
+   public static TeXDimension getDimension(TeXObject object, TeXParser parser)
+      throws IOException
+   {
+      if (object instanceof Expandable)
+      {
+         TeXObjectList expanded = ((Expandable)object).expandfully(parser);
+
+         if (expanded != null)
+         {
+            object = expanded;
+         }
+      }
+
+      if (object instanceof TeXDimension)
+      {
+         return (TeXDimension)object;
+      }
+      else if (object instanceof TeXObjectList)
+      {
+         return ((TeXObjectList)object).popDimension(parser);
+      }
+      else
+      {
+         throw new TeXSyntaxException(parser,
+           TeXSyntaxException.ERROR_DIMEN_EXPECTED, object.toString(parser));
+      }
+   }
+
 }

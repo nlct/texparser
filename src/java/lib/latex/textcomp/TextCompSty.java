@@ -92,8 +92,6 @@ public class TextCompSty extends LaTeXSty
       new Object[]{"textreferencemark", new Integer(0x00203B)},
       new Object[]{"textinterrobang", new Integer(0x00203D)},
       new Object[]{"textdiscount", new Integer(0x002052)},
-      new Object[]{"textsuperscript", new Integer(0x00207B)},
-      new Object[]{"textsubscript", new Integer(0x00208B)},
       new Object[]{"textlira", new Integer(0x0020A4)},
       new Object[]{"textnaira", new Integer(0x0020A6)},
       new Object[]{"textwon", new Integer(0x0020A9)},

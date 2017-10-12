@@ -789,6 +789,157 @@ public class L2HConverter extends LaTeXParserListener
       write(String.format("<img src=\"%s\"/>", file));
    }
 
+   protected void writeTransform(String tag, String property)
+   throws IOException
+   {
+      writeTransform(tag, property, null);
+   }
+
+   protected void writeTransform(String tag, String property, String originProp)
+   throws IOException
+   {
+      write(String.format(
+        "<%s style=\"display: inline-block; transform: %s; -ms-transform: %s; -webkit-transform: %s;",
+        tag, property, property, property));
+
+      if (originProp != null)
+      {
+         write(String.format(
+          " transform-origin: %s; -ms-transform-origin: %s; -webkit-transform-origin: %s;",
+          originProp, originProp, originProp));
+      }
+
+      write("\">");
+   }
+
+   public void transform(String function, TeXParser parser, 
+      TeXObjectList stack, TeXObject object)
+   throws IOException
+   {
+      writeTransform("div", function);
+
+      if (stack == parser || stack == null)
+      {
+         object.process(parser);
+      }
+      else
+      {
+         object.process(parser, stack);
+      }
+
+      write("</div>");
+   }
+
+   public void rotate(double angle, TeXParser parser, 
+      TeXObjectList stack, TeXObject object)
+   throws IOException
+   {
+      transform(String.format("rotate(%fdeg)", -angle), parser, stack, object);
+   }
+
+   public void rotate(double angle, double originPercentX, 
+      double originPercentY, TeXParser parser, 
+      TeXObjectList stack, TeXObject object)
+   throws IOException
+   {
+      if (originPercentX == 0 && originPercentY == 0)
+      {
+         transform(String.format("rotate(%fdeg)", -angle),
+            parser, stack, object);
+      }
+      else
+      {
+         transform(String.format("rotate(%fdeg)", -angle, 
+           String.format("%d%% %d%%", originPercentX, originPercentY)),
+           parser, stack, object);
+      }
+   }
+
+   public void rotate(double angle, TeXDimension orgX, TeXDimension orgY,
+      TeXParser parser, TeXObjectList stack, TeXObject object)
+   throws IOException
+   {
+      if (orgX == null && orgX == null)
+      {
+         transform(String.format("rotate(%fdeg)", -angle),
+            parser, stack, object);
+      }
+      else
+      {
+         String x = "0%";
+         String y = "0%";
+
+         if (orgX != null)
+         {
+            x = String.format("%f%s", orgX.format());
+         }
+
+         if (orgY != null)
+         {
+            y = String.format("%f%s", orgY.format());
+         }
+
+         transform(String.format("rotate(%fdeg)", -angle, 
+           String.format("%s %s", x, y)),
+           parser, stack, object);
+      }
+   }
+
+   public void scale(double factorX, double factorY, TeXParser parser, 
+      TeXObjectList stack, TeXObject object)
+   throws IOException
+   {
+      transform(String.format("scale(%f,%f)", factorX, factorY),
+        parser, stack, object);
+   }
+
+   public void scaleX(double factor, TeXParser parser, 
+      TeXObjectList stack, TeXObject object)
+   throws IOException
+   {
+      transform(String.format("scaleX(%f)", factor),
+        parser, stack, object);
+   }
+
+   public void scaleY(double factor, TeXParser parser, 
+      TeXObjectList stack, TeXObject object)
+   throws IOException
+   {
+      transform(String.format("scaleY(%f)", factor),
+        parser, stack, object);
+   }
+
+   public void resize(TeXDimension width, TeXDimension height,
+      TeXParser parser, TeXObjectList stack, TeXObject object)
+   throws IOException
+   {// not implemented
+
+      write("<div style=\"display: inline-block;");
+
+      if (width != null)
+      {
+         write(String.format(" width: %s;", width.format()));
+      }
+
+      if (height != null)
+      {
+         write(String.format(" height: %s;", height.format()));
+      }
+
+      write("\">");
+
+      if (stack == parser || stack == null)
+      {
+         object.process(parser);
+      }
+      else
+      {
+         object.process(parser, stack);
+      }
+
+      write("</div>");
+   }
+
    public TeXApp getTeXApp()
    {
       return texApp;

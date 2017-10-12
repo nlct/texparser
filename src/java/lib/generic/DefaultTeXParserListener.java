@@ -381,6 +381,143 @@ public abstract class DefaultTeXParserListener extends TeXParserListener
       }
    }
 
+   // By default this just processes the object.
+   // Needs to be overridden if the rotation can actually be
+   // performed.
+   public void rotate(double angle, TeXParser parser, 
+      TeXObjectList stack, TeXObject object)
+   throws IOException
+   {
+      if (stack == parser || stack == null)
+      {
+         object.process(parser);
+      }
+      else
+      {
+         object.process(parser, stack);
+      }
+   }
+
+   public void rotate(double angle, double originPercentX, 
+      double originPercentY, TeXParser parser, 
+      TeXObjectList stack, TeXObject object)
+   throws IOException
+   {
+      rotate(angle, parser, stack, object);
+   }
+
+   public void rotate(double angle, TeXDimension orgX, TeXDimension orgY, 
+      TeXParser parser, TeXObjectList stack, TeXObject object)
+   throws IOException
+   {
+      rotate(angle, parser, stack, object);
+   }
+
+   public void scale(double factor, TeXParser parser, 
+      TeXObjectList stack, TeXObject object)
+   throws IOException
+   {
+      scale(factor, factor, parser, stack, object);
+   }
+
+   public void scale(double factorX, double factorY, TeXParser parser, 
+      TeXObjectList stack, TeXObject object)
+   throws IOException
+   {
+      if (stack == parser || stack == null)
+      {
+         object.process(parser);
+      }
+      else
+      {
+         object.process(parser, stack);
+      }
+   }
+
+   public void scaleX(double factor, TeXParser parser, 
+      TeXObjectList stack, TeXObject object)
+   throws IOException
+   {
+      if (stack == parser || stack == null)
+      {
+         object.process(parser);
+      }
+      else
+      {
+         object.process(parser, stack);
+      }
+   }
+
+   public void scaleY(double factor, TeXParser parser, 
+      TeXObjectList stack, TeXObject object)
+   throws IOException
+   {
+      if (stack == parser || stack == null)
+      {
+         object.process(parser);
+      }
+      else
+      {
+         object.process(parser, stack);
+      }
+   }
+
+   public void resize(TeXDimension width, TeXDimension height, 
+      TeXParser parser, TeXObjectList stack, TeXObject object)
+   throws IOException
+   {
+      if (stack == parser || stack == null)
+      {
+         object.process(parser);
+      }
+      else
+      {
+         object.process(parser, stack);
+      }
+   }
+
+   public void resizeX(TeXDimension width, 
+      TeXParser parser, TeXObjectList stack, TeXObject object)
+   throws IOException
+   {
+      if (stack == parser || stack == null)
+      {
+         object.process(parser);
+      }
+      else
+      {
+         object.process(parser, stack);
+      }
+   }
+
+   public void resizeY(TeXDimension height, 
+      TeXParser parser, TeXObjectList stack, TeXObject object)
+   throws IOException
+   {
+      if (stack == parser || stack == null)
+      {
+         object.process(parser);
+      }
+      else
+      {
+         object.process(parser, stack);
+      }
+   }
+
+   public void translate(TeXDimension width, TeXDimension height, 
+      TeXParser parser, TeXObjectList stack, TeXObject object)
+   throws IOException
+   {
+      if (stack == parser || stack == null)
+      {
+         object.process(parser);
+      }
+      else
+      {
+         object.process(parser, stack);
+      }
+   }
+
    public Vector<TeXPath> getFileList()
    {
       return referencedFiles;

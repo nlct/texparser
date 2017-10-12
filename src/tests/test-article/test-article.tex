@@ -12,6 +12,7 @@
 \usepackage{mhchem}
 \usepackage{siunitx}
 \usepackage{textcomp}
+\usepackage{graphicx}
 \usepackage[colorlinks]{hyperref}
 
 \title{Sample Article}
@@ -37,7 +38,14 @@
 Chars: \texttt{\char98}, \texttt{\char`b}, \texttt{\char'142},
 \texttt{\char"62}, \texttt{\char`\b}, \texttt{\char`\\ foo}.
 
+Normal Text.
+\rotatebox{45}{Rotated Text}
+\scalebox{2}{Scaled Text}
+
 \lipsum[4-5]
+
+Subscript\textsubscript{subscript} and
+Superscript\textsuperscript{superscript}.
 
 From the bpchem manual:
 \BPChem{C\_2H\_5OH} or \BPChem{SO\_4\^{2-}}.
