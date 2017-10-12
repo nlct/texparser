@@ -58,6 +58,7 @@ import com.dickimawbooks.texparserlib.latex.stix.*;
 import com.dickimawbooks.texparserlib.latex.textcomp.*;
 import com.dickimawbooks.texparserlib.latex.mnsymbol.*;
 import com.dickimawbooks.texparserlib.latex.fourier.*;
+import com.dickimawbooks.texparserlib.latex.tipa.*;
 
 public abstract class LaTeXParserListener extends DefaultTeXParserListener
 {
@@ -898,6 +899,11 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       if (styName.equals("fourier"))
       {
          return new FourierSty(options, this);
+      }
+
+      if (styName.equals("tipa"))
+      {
+         return new TipaSty(options, this);
       }
 
       if (styName.equals("xspace"))
