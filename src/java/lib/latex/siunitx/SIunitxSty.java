@@ -161,6 +161,10 @@ public class SIunitxSty extends LaTeXSty
       {
          return new SiPower(this, "squared", 2);
       }
+      else if (name.equals("cubed"))
+      {
+         return new SiPower(this, "cubed", 3);
+      }
       else
       {
          TeXObject unit = getUnit(cs);
