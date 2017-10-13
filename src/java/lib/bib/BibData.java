@@ -83,6 +83,11 @@ public abstract class BibData
             break;
          }
 
+         if (object instanceof At)
+         {// allow @ in label
+            object = parser.getListener().getOther('@');
+         }
+
          if (object instanceof CharObject)
          {
             int code = ((CharObject)object).getCharCode();
