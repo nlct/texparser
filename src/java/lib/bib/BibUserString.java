@@ -89,19 +89,49 @@ public class BibUserString implements BibValue
          string.format());
    }
 
+   private void convertAt(TeXObjectList list, TeXParser parser)
+      throws IOException
+   {
+      for (int i = 0; i < list.size(); i++)
+      {
+         TeXObject object = list.get(i);
+
+         if (object instanceof At)
+         {
+            list.set(i, parser.getListener().getOther('@'));
+         }
+         else if (object instanceof TeXObjectList)
+         {
+            convertAt((TeXObjectList)object, parser);
+         }
+      }
+   }
+
    public TeXObjectList expand(TeXParser parser)
     throws IOException
    {
+      TeXObjectList list;
+
       if (string instanceof Group)
       {
-         return ((Group)string).toList();
+         list = ((Group)string).toList();
+         convertAt(list, parser);
+         return list;
       }
 
-      TeXObjectList list = new TeXObjectList();
+      list = new TeXObjectList();
 
       if (!(string instanceof TeXObjectList))
       {
-         list.add(string);
+         if (string instanceof At)
+         {
+            list.add(parser.getListener().getOther('@'));
+         }
+         else
+         {
+            list.add(string);
+         }
+
          return list;
       }
 
@@ -151,6 +181,10 @@ public class BibUserString implements BibValue
          }
 
          list.add(subList);
+      }
+      else if (obj instanceof At)
+      {
+         list.add(parser.getListener().getOther('@'));
       }
       else if (obj instanceof CharObject)
       {

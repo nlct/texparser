@@ -254,6 +254,7 @@ public abstract class BibData
 
             list.add(object);
             object = stack.popStack(parser);
+
          }
 
          stack.push(object);
