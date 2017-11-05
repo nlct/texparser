@@ -247,5 +247,10 @@ public class BibUserString implements BibValue
       return i;
    }
 
+   public Object clone()
+   {
+      return new BibUserString((TeXObject)string.clone());
+   }
+
    private TeXObject string;
 }

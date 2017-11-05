@@ -35,6 +35,34 @@ public class BibValueList extends Vector<BibValue> implements BibValue
       super();
    }
 
+   public BibValueList(int capacity)
+   {
+      super(capacity);
+   }
+
+   public Object clone()
+   {
+      BibValueList obj;
+
+      int n = size();
+
+      if (n > 10)
+      {
+         obj = new BibValueList(n);
+      }
+      else
+      {
+         obj = new BibValueList();
+      }
+
+      for (BibValue value : this)
+      {
+         obj.add((BibValue)value.clone());
+      }
+
+      return obj;
+   }
+
    public TeXObject getContents()
    {
       return getContents(false);

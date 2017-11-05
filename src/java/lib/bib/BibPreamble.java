@@ -85,6 +85,18 @@ public class BibPreamble extends BibData
          getClass().getSimpleName(), entryType, preamble);
    }
 
+   public Object clone()
+   {
+      BibPreamble obj = new BibPreamble(getEntryType());
+
+      if (preamble != null)
+      {
+         obj.preamble = (BibValueList)preamble.clone();
+      }
+
+      return obj;
+   }
+
    private String entryType;
    private BibValueList preamble;
 }

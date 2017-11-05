@@ -41,15 +41,29 @@ public class BibParser extends DefaultTeXParserListener
    public BibParser(TeXApp texApp)
      throws IOException
    {
-      this(texApp, null);
+      this(texApp, null, true);
+   }
+
+   public BibParser(TeXApp texApp, boolean maketildeother)
+     throws IOException
+   {
+      this(texApp, null, maketildeother);
    }
 
    public BibParser(TeXApp texApp, Charset charset)
      throws IOException
    {
+      this(texApp, charset, true);
+   }
+
+   public BibParser(TeXApp texApp, Charset charset, 
+     boolean maketildeother)
+     throws IOException
+   {
       super(null);
       this.texApp = texApp;
       this.charset = charset;
+      this.maketildeother = maketildeother;
 
       setWriteable(this);
 
@@ -79,14 +93,29 @@ public class BibParser extends DefaultTeXParserListener
 
       int atcode = parser.getCatCode('@');
       int hashcode = parser.getCatCode('#');
-      int tildecode = parser.getCatCode('~');
+      int tildecode = TeXParser.TYPE_ACTIVE;
+
+      if (maketildeother)
+      {
+         tildecode = parser.getCatCode('~');
+      }
+
       parser.setCatCode('@', TeXParser.TYPE_ACTIVE);
       parser.setCatCode('#', TeXParser.TYPE_OTHER);
-      parser.setCatCode('~', TeXParser.TYPE_OTHER);
+
+      if (maketildeother)
+      {
+         parser.setCatCode('~', TeXParser.TYPE_OTHER);
+      }
+
       parser.parse(bibFile);
       parser.setCatCode('@', atcode);
       parser.setCatCode('#', hashcode);
-      parser.setCatCode('~', tildecode);
+
+      if (maketildeother)
+      {
+         parser.setCatCode('~', tildecode);
+      }
 
       return parser;
    }
@@ -94,6 +123,11 @@ public class BibParser extends DefaultTeXParserListener
    protected void addPredefined()
    {
       parser.putActiveChar(new At());
+
+      if (!maketildeother)
+      {
+         parser.putActiveChar(new Nbsp());
+      }
    }
 
    public Writeable getWriteable()
@@ -231,4 +265,6 @@ public class BibParser extends DefaultTeXParserListener
    private TeXApp texApp;
 
    private Charset charset=null;
+
+   private boolean maketildeother=true;
 }

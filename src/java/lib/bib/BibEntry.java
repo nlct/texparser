@@ -610,6 +610,28 @@ public class BibEntry extends BibData
       return CASE_NA;
    }
 
+   public Object clone()
+   {
+      BibEntry obj = new BibEntry(getEntryType());
+
+      obj.id = id;
+
+      if (idValue != null)
+      {
+         obj.idValue = (BibValueList)idValue.clone();
+      }
+
+      for (Iterator<String> it=fields.keySet().iterator();
+           it.hasNext();)
+      {
+         String key = it.next();
+
+         obj.fields.put(key, (BibValueList)fields.get(key).clone());
+      }
+
+      return obj;
+   }
+
    private HashMap<String,BibValueList> fields;
    private String entryType;
    private String id;

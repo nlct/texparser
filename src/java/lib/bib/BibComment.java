@@ -45,6 +45,18 @@ public class BibComment extends BibData
       return entryType;
    }
 
+   public Object clone()
+   {
+      BibComment obj = new BibComment(getEntryType());
+
+      if (contents != null)
+      {
+         obj.contents = (TeXObjectList)contents.clone();
+      }
+
+      return obj;
+   }
+
    public TeXObjectList getContents()
    {
       return contents;

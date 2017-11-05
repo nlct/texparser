@@ -36,6 +36,12 @@ public class BibVariable implements BibValue
       this.variableName = variableName;
    }
 
+   public Object clone()
+   {
+      return new BibVariable((TeXObject)string.clone(),
+        variableName);
+   }
+
    public TeXObject getContents()
    {
       return string;

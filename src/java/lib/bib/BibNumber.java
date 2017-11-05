@@ -68,5 +68,10 @@ public class BibNumber implements BibValue
       return expanded;
    }
 
+   public Object clone()
+   {
+      return new BibNumber((TeXNumber)value.clone());
+   }
+
    private TeXNumber value;
 }

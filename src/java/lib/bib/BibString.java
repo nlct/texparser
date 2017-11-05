@@ -109,6 +109,19 @@ public class BibString extends BibData
          getClass().getSimpleName(), entryType, key);
    }
 
+   public Object clone()
+   {
+      BibString obj = new BibString(getEntryType());
+      obj.key = key;
+
+      if (value != null)
+      {
+         obj.value = (BibValueList)value.clone();
+      }
+
+      return obj;
+   }
+
    private String entryType;
 
    private String key;

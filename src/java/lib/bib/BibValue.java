@@ -32,6 +32,8 @@ public interface BibValue
 {
    public TeXObject getContents();
 
+   public Object clone();
+
    public TeXObjectList expand(TeXParser parser)
      throws IOException;
 
