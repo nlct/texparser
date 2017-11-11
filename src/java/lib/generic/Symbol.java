@@ -282,7 +282,7 @@ public class Symbol extends ControlSequence implements Expandable,CaseChangeable
       new Object[]{"bigodot", new Integer(0x2299), new Integer(0x2A00)},
       new Object[]{"bigoplus", new Integer(0x2295), new Integer(0x2A01)},
       new Object[]{"bigotimes", new Integer(0x2297), new Integer(0x2A02)},
-      new Object[]{"biguplus", new Integer(0x228E), new Integer(0x2A02)},
+      new Object[]{"biguplus", new Integer(0x228E), new Integer(0x2A04)},
       new Object[]{"bigvee", new Integer(0x2228), new Integer(0x22C1)},
       new Object[]{"bigwedge", new Integer(0x2227), new Integer(0x22C0)},
       new Object[]{"int", new Integer(0x222B), new Integer(0x222B)},
