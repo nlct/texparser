@@ -274,8 +274,8 @@ public class Symbol extends ControlSequence implements Expandable,CaseChangeable
 
    public static final Object[][] BIG_MATH_SYMBOLS = 
    {
-      new Object[]{"bigsqcap", new Integer(0x2293), new Integer(0x220F)},
-      new Object[]{"bigsqcup", new Integer(0x2294), new Integer(0x2210)},
+      new Object[]{"bigsqcap", new Integer(0x2293), new Integer(0x2A05)},
+      new Object[]{"bigsqcup", new Integer(0x2294), new Integer(0x2A06)},
       new Object[]{"sum", new Integer(0x2211), new Integer(0x2211)},
       new Object[]{"bigcap", new Integer(0x2229), new Integer(0x22C2)},
       new Object[]{"bigcup", new Integer(0x222A), new Integer(0x22C3)},
