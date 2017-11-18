@@ -82,4 +82,6 @@ public class BibTeXSyntaxException extends TeXSyntaxException
       "bibtex.error.too_many_commas";
    public static final String ERROR_STRING_NAME_UNDEFINED = 
       "bibtex.error.string_name_undefined";
+   public static final String ERROR_REPEATED_ENTRY = 
+      "bibtex.error.repeated_entry";
 }

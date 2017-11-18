@@ -63,6 +63,17 @@ public class At extends ActiveChar
 
       data.parseContents(parser, (TeXObjectList)contents, eg);
 
+      if (data instanceof BibEntry)
+      {
+         String id = ((BibEntry)data).getId();
+
+         if (bibParser.getBibEntry(id) != null)
+         {
+            throw new BibTeXSyntaxException(parser,
+              BibTeXSyntaxException.ERROR_REPEATED_ENTRY, id);
+         }
+      }
+
       bibParser.addBibData(data);
    }
 

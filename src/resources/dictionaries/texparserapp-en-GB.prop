@@ -124,6 +124,7 @@ bibtex.error.illegal_end=Illegal end
 bibtex.error.missing=Missing
 bibtex.error.too_many_commas=Too many commas in name '$1'
 bibtex.error.string_name_undefined=String name '$1' undefined
+bibtex.error.repeated_entry=Repeated entry '$1'
 
 # Package messages
 
