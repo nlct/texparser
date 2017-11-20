@@ -243,6 +243,11 @@ public class BibParser extends DefaultTeXParserListener
       return charset;
    }
 
+   public void setCharSet(Charset charset)
+   {
+      this.charset = charset;
+   }
+
    // shouldn't be needed in bibFile
    public float emToPt(float emValue)
    {
@@ -266,5 +271,5 @@ public class BibParser extends DefaultTeXParserListener
 
    private Charset charset=null;
 
-   private boolean maketildeother=true;
+   protected boolean maketildeother=true;
 }
