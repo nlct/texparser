@@ -333,7 +333,22 @@ public class BibEntry extends BibData
                   }
                }
             }
-            else if (!(object instanceof WhiteSpace))
+            else if (object instanceof WhiteSpace)
+            {
+               while (!list.isEmpty())
+               {
+                  TeXObject nextObj = list.peek();
+
+                  if (!(nextObj instanceof WhiteSpace
+                         || nextObj instanceof Ignoreable))
+                  {
+                     break;
+                  }
+
+                  object = list.pop();
+               }
+            }
+            else
             {
                word = new TeXObjectList();
                word.add(object);
