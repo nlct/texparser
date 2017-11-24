@@ -38,8 +38,6 @@ public class FontEncSty extends LaTeXSty
    throws IOException
    {
       super(options, name, listener);
-
-      encodings = new HashMap<String,FontEncoding>();
    }
 
    public void addDefinitions()
@@ -70,16 +68,26 @@ public class FontEncSty extends LaTeXSty
 
    public FontEncoding getEncoding(String name)
    {
+      if (encodings == null)
+      {
+         return null;
+      }
+
       return encodings.get(name);
    }
 
    public void registerEncoding(FontEncoding encoding)
    {
-      encodings.put(encoding.getName(), encoding);
+      registerEncoding(encoding.getName(), encoding);
    }
 
    public void registerEncoding(String name, FontEncoding encoding)
    {
+      if (encodings == null)
+      {
+         encodings = new HashMap<String,FontEncoding>();
+      }
+
       encodings.put(name, encoding);
    }
 
