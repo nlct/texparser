@@ -41,6 +41,11 @@ public class TeXSettings
       this.parser = parser;
    }
 
+   public TeXParser getParser()
+   {
+      return parser;
+   }
+
    public TeXSettings getRoot()
    {
       if (parent == null)
@@ -1258,8 +1263,45 @@ public class TeXSettings
       return false;
    }
 
+   public FontEncoding getCurrentFontEncoding()
+   {
+      return currentFontEncoding;
+   }
+
+   public FontEncoding getFontEncoding()
+   {
+      if (currentFontEncoding == null)
+      {
+         if (parent == null)
+         {
+            return null;
+         }
+
+         return parent.getFontEncoding();
+      }
+
+      return currentFontEncoding;
+   }
+
+   public void setFontEncoding(FontEncoding fontEncoding)
+   {
+      currentFontEncoding = fontEncoding;
+
+      if (fontEncoding != null)
+      {
+         fontEncoding.addDefinitions(this);
+      }
+   }
+
    public int getCharCode(int charCode)
    {
+      FontEncoding fontEncoding = getFontEncoding();
+
+      if (fontEncoding != null)
+      {
+         charCode = fontEncoding.getCharCode(charCode);
+      }
+
       if (getCharMapMode() == CHAR_MAP_OFF)
       {
          return -1;
@@ -2512,6 +2554,8 @@ public class TeXSettings
 
    private Color currentFgColor = null;
    private Color currentBgColor = null;
+
+   private FontEncoding currentFontEncoding = null;
 
    private TeXParser parser;
 

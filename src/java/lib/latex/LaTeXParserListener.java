@@ -58,6 +58,7 @@ import com.dickimawbooks.texparserlib.latex.stix.*;
 import com.dickimawbooks.texparserlib.latex.textcomp.*;
 import com.dickimawbooks.texparserlib.latex.mnsymbol.*;
 import com.dickimawbooks.texparserlib.latex.fourier.*;
+import com.dickimawbooks.texparserlib.latex.fontenc.*;
 import com.dickimawbooks.texparserlib.latex.tipa.*;
 
 public abstract class LaTeXParserListener extends DefaultTeXParserListener
@@ -777,6 +778,11 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       return null;
    }
 
+   public FontEncSty getFontEncSty()
+   {
+      return fontEncSty;
+   }
+
    public LaTeXSty getLaTeXSty(KeyValList options, String styName)
    throws IOException
    {
@@ -824,6 +830,12 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       if (styName.equals("inputenc"))
       {
          return new InputEncSty(options, this);
+      }
+
+      if (styName.equals("fontenc"))
+      {
+         fontEncSty = new FontEncSty(options, this);
+         return fontEncSty;
       }
 
       if (styName.equals("natbib"))
@@ -1513,6 +1525,8 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
    private boolean docEnvFound = false;
 
    private String inputEncoding = null;
+
+   private FontEncSty fontEncSty = null;
 
    private boolean parseAux = false;
 
