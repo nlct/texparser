@@ -60,6 +60,7 @@ import com.dickimawbooks.texparserlib.latex.mnsymbol.*;
 import com.dickimawbooks.texparserlib.latex.fourier.*;
 import com.dickimawbooks.texparserlib.latex.fontenc.*;
 import com.dickimawbooks.texparserlib.latex.tipa.*;
+import com.dickimawbooks.texparserlib.latex.upgreek.*;
 
 public abstract class LaTeXParserListener extends DefaultTeXParserListener
 {
@@ -911,6 +912,11 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       if (styName.equals("fourier"))
       {
          return new FourierSty(options, this);
+      }
+
+      if (styName.equals("upgreek"))
+      {
+         return new UpGreekSty(options, this);
       }
 
       if (styName.equals("tipa"))
