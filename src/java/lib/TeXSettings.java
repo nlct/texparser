@@ -87,8 +87,8 @@ public class TeXSettings
          return;
       }
 
-      throw new IllegalArgumentException(
-          "Invalid argument '"+setting+"' for setMode(int)");
+      throw new IllegalArgumentException(String.format(
+          "Invalid argument '%d' for setMode(int)", setting));
    }
 
    public int getCurrentCharMapMode()
@@ -121,8 +121,8 @@ public class TeXSettings
          return;
       }
 
-      throw new IllegalArgumentException(
-          "Invalid argument '"+setting+"' for setCharMapMode(int)");
+      throw new IllegalArgumentException(String.format(
+          "Invalid argument '%d' for setCharMapMode(int)", setting));
    }
 
    public int getCurrentFontFamily()
@@ -276,8 +276,8 @@ public class TeXSettings
          return;
       }
 
-      throw new IllegalArgumentException(
-          "Invalid argument '"+setting+"' for setAlignMode(int)");
+      throw new IllegalArgumentException(String.format(
+          "Invalid argument '%d' for setAlignMode(int)", setting));
    }
 
    public void endAlignment()
@@ -342,8 +342,8 @@ public class TeXSettings
          return;
       }
 
-      throw new IllegalArgumentException(
-          "Invalid argument '"+setting+"' for setStartRowMode(int)");
+      throw new IllegalArgumentException(String.format(
+          "Invalid argument '%d' for setStartRowMode(int)", setting));
    }
 
    public int getCurrentStartColumnMode()
@@ -382,8 +382,8 @@ public class TeXSettings
          return;
       }
 
-      throw new IllegalArgumentException(
-          "Invalid argument '"+setting+"' for setStartColumnMode(int)");
+      throw new IllegalArgumentException(String.format(
+          "Invalid argument '%d' for setStartColumnMode(int)", setting));
    }
 
    public int getCurrentAlignmentColumn()
@@ -524,8 +524,9 @@ public class TeXSettings
            currentFontFamily = setting;
          break;
          default:
-           throw new IllegalArgumentException("Invalid setting '"
-            + setting+"' for TeXSettings.setFontFamily(int)");
+           throw new IllegalArgumentException(String.format(
+            "Invalid setting '%d' for TeXSettings.setFontFamily(int)",
+             setting));
       }
    }
 
@@ -542,8 +543,9 @@ public class TeXSettings
            currentFontShape = setting;
          break;
          default:
-           throw new IllegalArgumentException("Invalid setting '"
-            + setting+"' for TeXSettings.setFontShape(int)");
+           throw new IllegalArgumentException(String.format(
+            "Invalid setting '%d' for TeXSettings.setFontShape(int)",
+             setting));
       }
    }
 
@@ -557,8 +559,9 @@ public class TeXSettings
            currentFontWeight = setting;
          break;
          default:
-           throw new IllegalArgumentException("Invalid setting '"
-            + setting+"' for TeXSettings.setFontWeight(int)");
+           throw new IllegalArgumentException(String.format(
+            "Invalid setting '%d' for TeXSettings.setFontWeight(int)",
+             setting));
       }
    }
 
@@ -581,8 +584,9 @@ public class TeXSettings
            currentFontSize = setting;
          break;
          default:
-           throw new IllegalArgumentException("Invalid setting '"
-            + setting+"' for TeXSettings.setFontSize(int)");
+           throw new IllegalArgumentException(String.format(
+            "Invalid setting '%d' for TeXSettings.setFontSize(int)",
+             setting));
       }
    }
 
@@ -604,8 +608,9 @@ public class TeXSettings
            currentMathFont = setting;
          break;
          default:
-           throw new IllegalArgumentException("Invalid setting '"
-            + setting+"' for TeXSettings.setMathFont(int)");
+           throw new IllegalArgumentException(String.format(
+            "Invalid setting '%d' for TeXSettings.setMathFont(int)",
+             setting));
       }
    }
 
@@ -621,8 +626,9 @@ public class TeXSettings
            currentParAlign = setting;
          break;
          default:
-           throw new IllegalArgumentException("Invalid setting '"
-            + setting+"' for TeXSettings.setParAlign(int)");
+           throw new IllegalArgumentException(String.format(
+            "Invalid setting '%d' for TeXSettings.setParAlign(int)",
+             setting));
       }
    }
 

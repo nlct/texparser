@@ -176,7 +176,7 @@ public class BibEntry extends BibData
       {
          throw new BibTeXSyntaxException(parser, 
            BibTeXSyntaxException.ERROR_EXPECTING_OR,
-           new String[] {",", endGroupChar.format()});
+           ",", endGroupChar.format());
       }
 
       while (!contents.isEmpty())

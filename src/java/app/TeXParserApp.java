@@ -21,6 +21,7 @@ package com.dickimawbooks.texparserapp;
 
 import java.util.Properties;
 import java.util.Vector;
+import java.text.MessageFormat;
 import java.io.*;
 import java.net.URL;
 import java.nio.file.Files;
@@ -39,69 +40,101 @@ import com.dickimawbooks.texparserapp.io.*;
 
 public class TeXParserApp implements TeXApp
 {
-   public TeXParserApp()
+   public TeXParserApp() 
    {
-      settings = new TeXParserAppSettings();
-
       guiMode = false;
 
+      settings = new TeXParserAppSettings(this);
+
+      initDefaultErrorListener(this);
+
+      initProperties();
+
+      currentProcessListeners = new Vector<ProcessListener>();
+   }
+
+   private void initDefaultErrorListener(final TeXParserApp app)
+   {
+      errorListener = new ErrorListener()
+      {
+         // check for GUI mode in case error occurs before GUI
+         // system initialised.
+
+         public void warning(String message)
+         {
+            if (guiMode)
+            {
+               TeXParserAppGuiResources.warning(app, message);
+            }
+            else
+            {
+               System.err.println(String.format("%s: %s", APP_NAME, message));
+            }
+         }
+
+         public void error(String message)
+         {
+            if (guiMode)
+            {
+               TeXParserAppGuiResources.error(app, message);
+            }
+            else
+            {
+               System.err.println(String.format("%s: %s", APP_NAME, message));
+            }
+         }
+
+         public void error(Exception e)
+         {
+            error(e.getMessage());
+            e.printStackTrace();
+         }
+      };
+   }
+
+   private void initProperties()
+   {
       try
       {
          settings.loadProperties();
       }
       catch (IOException e)
       {
-         System.err.println(appName+": unable to load properties:\n" +
-           e.getMessage());
+         System.err.println(String.format("%s: unable to load properties:%s%n",
+           APP_NAME, e.getMessage()));
       }
 
       try
       {
          loadDictionary();
       }
-      catch (IOException e)
+      catch (Exception e)
       {
-         System.err.println(appName+": unable to load dictionary file:\n"
-           + e.getMessage());
+         System.err.println(String.format(
+           "%s: unable to load dictionary file:%s%n",
+           APP_NAME, e.getMessage()));
       }
-
-      currentProcessListeners = new Vector<ProcessListener>();
    }
 
-   private void doBatchProcess(String outputFormat)
+   public TeXParserAppGUI getGui()
    {
-      errorListener = new ErrorListener()
-      {
-         public void warning(String message)
-         {
-            System.err.println(appName+": "+message);
-         }
+      return guiApp;
+   }
 
-         public void error(String message)
-         {
-            System.err.println(appName+": "+message);
-         }
-
-         public void error(Exception e)
-         {
-            System.err.println(appName+": "+e.getMessage());
-            e.printStackTrace();
-         }
-      };
-
-
+   private void doBatchProcess()
+   {
       try
       {
          if (inFileName == null)
          {
             throw new InvalidSyntaxException(
-               getLabel("error.syntax.batch.missing_in"));
+               getMessage("error.syntax.batch.missing_in"));
          }
 
          if (outDir == null)
          {
             throw new InvalidSyntaxException(
-               getLabel("error.syntax.batch.missing_out"));
+               getMessage("error.syntax.batch.missing_out"));
          }
 
          if (outputFormat.equals("latex"))
@@ -115,7 +148,7 @@ public class TeXParserApp implements TeXApp
          else
          {
             throw new InvalidSyntaxException(
-               getLabelWithValue("error.syntax.batch.unknown_format", outputFormat));
+               getMessage("error.syntax.batch.unknown_format", outputFormat));
          }
       }
       catch (IOException e)
@@ -138,7 +171,7 @@ public class TeXParserApp implements TeXApp
 
       if (outDir.exists())
       {
-         throw new IOException(getLabelWithValue(
+         throw new IOException(getMessage(
             "error.exists", outDir.getAbsolutePath()));
       }
 
@@ -157,7 +190,7 @@ public class TeXParserApp implements TeXApp
 
       if (outDir.exists())
       {
-         throw new IOException(getLabelWithValue(
+         throw new IOException(getMessage(
             "error.exists", outDir.getAbsolutePath()));
       }
 
@@ -181,7 +214,7 @@ public class TeXParserApp implements TeXApp
 
    public void warning(TeXParser parser, String message)
    {
-      System.err.println(appName+": "+message);
+      System.err.println(APP_NAME+": "+message);
    }
 
    public String tag(String string)
@@ -191,18 +224,33 @@ public class TeXParserApp implements TeXApp
 
    public void substituting(TeXParser parser, String original, String replacement)
    {
+      File file = parser.getCurrentFile();
       int lineNum = parser.getLineNumber();
+      String message;
 
       if (replacement.isEmpty())
       {
-         errorListener.warning(getLabelWithValues("error.line", ""+lineNum, 
-           getLabelWithValue("warning.removing", tag(original))));
+         message = getMessage("warning.removing", tag(original));
       }
       else
       {
-         errorListener.warning(getLabelWithValues("error.line", ""+lineNum, 
-           getLabelWithValues("warning.substituting",
-              tag(original), tag(replacement))));
+         message = getMessage("warning.substituting",
+              tag(original), tag(replacement));
+      }
+
+      if (file == null)
+      {
+         errorListener.warning(message);
+      }
+      else if (lineNum > 0)
+      {
+         errorListener.warning(String.format("%s:%d: %s", file.getName(), 
+           lineNum, message));
+      }
+      else
+      {
+         errorListener.warning(String.format("%s: %s", file.getName(), 
+           message));
       }
    }
 
@@ -277,8 +325,8 @@ public class TeXParserApp implements TeXApp
 
       if (exitCode != 0)
       {
-         throw new IOException(getLabelWithValues("error.app_failed",
-           app+" \""+fileName+"\"", ""+exitCode));
+         throw new IOException(getMessage("error.app_failed",
+           String.format("%s \"%s\"", app, fileName), exitCode));
       }
    }
 
@@ -301,8 +349,8 @@ public class TeXParserApp implements TeXApp
 
       if (exitCode != 0)
       {
-         throw new IOException(getLabelWithValues("error.app_failed",
-           app+" \""+fileName+"\"", ""+exitCode));
+         throw new IOException(getMessage("error.app_failed",
+           String.format("%s \"%s\"", app, fileName), exitCode));
       }
    }
 
@@ -437,7 +485,7 @@ public class TeXParserApp implements TeXApp
       try
       {
          timer = new java.util.Timer(true);
-         interruptor = new InterruptTimerTask(Thread.currentThread());
+         interruptor = new InterruptTimerTask(this, Thread.currentThread());
          timer.schedule(interruptor, getMaxProcessTime());
          listener.setInterruptor(interruptor);
 
@@ -542,7 +590,7 @@ public class TeXParserApp implements TeXApp
 
       if (writeInfo)
       {
-         String message = getLabelWithValue("message.running", execName+params);
+         String message = getMessage("message.running", execName+params);
 
          if (guiApp != null)
          {
@@ -558,7 +606,8 @@ public class TeXParserApp implements TeXApp
 
       listener.setProcess(p);
 
-      ProcessInputReaderThread inReaderThread = new ProcessInputReaderThread(p, listener);
+      ProcessInputReaderThread inReaderThread 
+         = new ProcessInputReaderThread(this, p, listener);
       listener.setThread(inReaderThread);
       inReaderThread.start();
       inReaderThread = null;
@@ -567,14 +616,14 @@ public class TeXParserApp implements TeXApp
    }
 
 //http://www.forward.com.au/javaProgramming/HowToStopAThread.html
-   public static synchronized void checkForInterrupt()
+   public synchronized void checkForInterrupt()
      throws InterruptedException
    {
       Thread.yield();
 
       if (Thread.currentThread().isInterrupted())
       {
-         throw new CancelledException();
+         throw new CancelledException(this);
       }
    }
 
@@ -600,67 +649,62 @@ public class TeXParserApp implements TeXApp
            && currentProcessListeners.size() > 0);
    }
 
-   public static void help()
+   public void help()
    {
       version();
       System.out.println();
-      System.out.println(getLabel("syntax.title"));
+      System.out.println(getMessage("syntax.title"));
       System.out.println();
-      System.out.println(appName+" --gui");
-      System.out.println(getLabel("syntax.or"));
-      System.out.println(getLabelWithValue("syntax.opt_in", appName));
+      System.out.println(APP_NAME+" --gui");
+      System.out.println(getMessage("syntax.or"));
+      System.out.println(getMessage("syntax.opt_in", APP_NAME));
       System.out.println();
-      System.out.println(getLabel("syntax.general"));
-      System.out.println(getLabelWithValues("syntax.gui", "--gui", "-g"));
-      System.out.println(getLabelWithValues("syntax.batch", "--batch", "-b"));
-      System.out.println(getLabelWithValues("syntax.in", 
-        new String[]{"--in", "-i", appName}));
-      System.out.println(getLabelWithValues("syntax.out", "--output", "-o"));
-      System.out.println(getLabelWithValue("syntax.latex", "--latex"));
-      System.out.println(getLabelWithValue("syntax.html", "--html"));
-      System.out.println(getLabelWithValues("syntax.version", "--version", "-v"));
-      System.out.println(getLabelWithValues("syntax.help", "--help", "-h"));
-      System.out.println(getLabelWithValue("syntax.debug", "--debug"));
-      System.out.println(getLabelWithValue("syntax.nodebug", "--nodebug"));
+      System.out.println(getMessage("syntax.general"));
+      System.out.println(getMessage("syntax.gui", "--gui", "-g"));
+      System.out.println(getMessage("syntax.batch", "--batch", "-b"));
+      System.out.println(getMessage("syntax.in", "--in", "-i", APP_NAME));
+      System.out.println(getMessage("syntax.out", "--output", "-o"));
+      System.out.println(getMessage("syntax.latex", "--latex"));
+      System.out.println(getMessage("syntax.html", "--html"));
+      System.out.println(getMessage("syntax.version", "--version", "-v"));
+      System.out.println(getMessage("syntax.help", "--help", "-h"));
+      System.out.println(getMessage("syntax.debug", "--debug"));
+      System.out.println(getMessage("syntax.nodebug", "--nodebug"));
       System.out.println();
-      System.out.println(getLabelWithValue("syntax.bugreport", 
-        "http://www.dickimaw-books.com/bug-report.html"));
-      System.out.println(getLabelWithValues("syntax.homepage", 
-        appName,
-        "http://www.dickimaw-books.com/apps/texparser/"));
+      System.out.println(getMessage("syntax.bugreport", 
+        "https://github.com/nlct/texparser"));
+      System.out.println(getMessage("syntax.homepage", 
+        APP_NAME,
+        "http://www.dickimaw-books.com/software/texparser/"));
    }
 
-   public static String getAppInfo()
+   public String getAppInfo()
    {
-      String eol = System.getProperty("line.separator", "\n");
-
-      String info = getLabelWithValues("about.version",
-        new String[]{ appName, appVersion, appDate})
-        + eol
+      String info = String.format("%s%n%s%n%s",
+         getMessage("about.version", APP_NAME, APP_VERSION, APP_DATE),
 // Copyright line shouldn't get translated (according to
 // http://www.gnu.org/prep/standards/standards.html)
-        + "Copyright (C) 2013 Nicola L. C. Talbot (www.dickimaw-books.com)"
-        + eol
-        + getLabel("about.legal");
+        "Copyright (C) 2013 Nicola L. C. Talbot (www.dickimaw-books.com)",
+         getMessage("about.legal"));
 
-      String translator = dictionary.getProperty("about.translator_info");
+      String translator = getLabelWithAlt("about.translator_info", null);
 
       if (translator != null && !translator.isEmpty())
       {
-         info += eol + translator;
+         info = String.format("%s%n%s", info, translator);
       }
 
-      String ack = dictionary.getProperty("about.acknowledgements");
+      String ack = getLabelWithAlt("about.acknowledgements", null);
 
       if (ack != null && !ack.isEmpty())
       {
-         ack += eol + eol + ack;
+         info = String.format("%s%n%n%s", info, ack);
       }
 
       return info;
    }
 
-   public static void version()
+   public void version()
    {
       System.out.println(getAppInfo());
    }
@@ -692,31 +736,21 @@ public class TeXParserApp implements TeXApp
       }
    }
 
-   public static void debug(String message)
+   public void debug(String message)
    {
       if (debugMode)
       {
-         System.err.println(appName+": "+message);
+         System.err.println(String.format("%s: %s", APP_NAME, message));
       }
    }
 
-   public static void debug(Exception e)
+   public void debug(Exception e)
    {
       if (debugMode)
       {
-         System.err.println(appName+":");
+         System.err.println(String.format("%s:", APP_NAME));
          e.printStackTrace();
       }
-   }
-
-   public static String getDictionary()
-   {
-      return dict;
-   }
-
-   public static URL getDictionaryUrl()
-   {
-      return TeXParserApp.class.getResource(dict);
    }
 
    public void loadDictionary()
@@ -725,16 +759,16 @@ public class TeXParserApp implements TeXApp
       String dictLanguage = settings.getDictionary();
 
       InputStream in = null;
-      BufferedReader reader = null;
 
       try
       {
-         dict = settings.getDictionaryLocation()+"-"
-             + settings.getDictionary()+".prop";
+         String dict = String.format("%s-%s.xml",
+            settings.getDictionaryLocation(),
+            dictLanguage);
 
-         in = TeXParserApp.class.getResourceAsStream(dict);
+         URL url = getClass().getResource(dict);
 
-         if (in == null)
+         if (url == null)
          {
             throw new FileNotFoundException
             (
@@ -742,18 +776,15 @@ public class TeXParserApp implements TeXApp
             );
          }
 
-         reader = new BufferedReader(new InputStreamReader(in));
+         in = url.openStream();
 
-         dictionary = new Properties();
-         dictionary.load(reader);
+         Properties dictionary = new Properties();
+         dictionary.loadFromXML(in);
+
+         messages = new TeXParserAppMessages(dictionary);
       }
       finally
       {
-         if (reader != null)
-         {
-            reader.close();
-         }
-
          if (in != null)
          {
             in.close();
@@ -761,459 +792,288 @@ public class TeXParserApp implements TeXApp
       }
    }
 
-   public String getMessage(String label)
-   {
-      return getLabel(label);
-   }
-
-   public String getMessage(String label, String param)
-   {
-      return getLabelWithValue(label, param);
-   }
-
-   public String getMessage(String label, String[] params)
-   {
-      return getLabelWithValues(label, params);
-   }
-
    public String getMessage(String label, Object... params)
    {
-      return getLabelWithValues(label, params);
+      if (messages == null)
+      {// message system hasn't been initialised
+
+         String param = (params.length == 0 ? "" : params[0].toString());
+
+         for (int i = 1; i < params.length; i++)
+         {
+            param += ","+params[0].toString();
+         }
+
+         return String.format("%s[%s]", label, param);
+      }
+
+      String msg = messages.getMessageIfExists(label, params);
+
+      if (msg == null)
+      {
+         warning("Can't find message for label: "+label);
+
+         return label;
+      }
+
+      return msg;
    }
 
-   public static String getLabelWithAlt(String label, String alt)
+   public String getLabelWithAlt(String label, String alt)
    {
-      if (dictionary == null) return alt;
+      if (messages == null) return alt;
 
-      String prop = dictionary.getProperty(label);
+      String msg = messages.getMessage(label);
 
-      if (prop == null)
+      if (msg == null)
       {
          return alt;
       }
 
-      return prop;
+      return msg;
    }
 
-   public static String getLabelRemoveArgs(String parent, String label)
+   public String getLabelRemoveArgs(String parent, String label)
    {
-      return getLabel(parent, label).replaceAll("\\$[0-9]", "");
+      return getLabel(parent, label).replaceAll("\\{[0-9]\\}", "");
    }
 
-   public static String getLabel(String label)
+   public String getLabel(String label)
    {
       return getLabel(null, label);
    }
 
-   public static String getLabel(String parent, String label)
+   public String getLabel(String parent, String label)
    {
       if (parent != null)
       {
          label = parent+"."+label;
       }
 
-      String prop = dictionary.getProperty(label);
+      String msg = messages.getMessageIfExists(label);
 
-      if (prop == null)
+      if (msg == null)
       {
-         System.err.println(appName+": no such dictionary property '"+label+"'");
+         System.err.println(APP_NAME+": no such dictionary property '"+label+"'");
          return "?"+label+"?";
       }
 
-      return prop;
+      return msg;
    }
 
-   public static String getToolTip(String label)
+   public String getToolTip(String label)
    {
       return getToolTip(null, label);
    }
 
-   public static String getToolTip(String parent, String label)
+   public String getToolTip(String parent, String label)
    {
       if (parent != null)
       {
          label = parent+"."+label;
       }
 
-      return dictionary.getProperty(label+".tooltip");
+      return getLabelWithAlt(label+".tooltip", null);
    }
 
-   public static char getMnemonic(String label)
+   public char getMnemonic(String label)
    {
       return getMnemonic(null, label);
    }
 
-   public static char getMnemonic(String parent, String label)
+   public char getMnemonic(String parent, String label)
    {
-      String prop = getLabel(parent, label+".mnemonic");
-
-      if (prop.equals(""))
-      {
-         debug("empty dictionary property '"+prop+"'");
-         return label.charAt(0);
-      }
-
-      return prop.charAt(0);
+      return (char)getMnemonicInt(parent, label);
    }
 
-   public static int getMnemonicInt(String label)
+   public int getMnemonicInt(String label)
    {
       return getMnemonicInt(null, label);
    }
 
-   public static int getMnemonicInt(String parent, String label)
+   public int getMnemonicInt(String parent, String label)
    {
-      String prop;
+      String propName;
 
       if (parent == null)
       {
-         prop = dictionary.getProperty(label+".mnemonic");
+         propName = String.format("%s.mnemonic", label);
       }
       else
       {
-         prop = dictionary.getProperty(parent+"."+label+".mnemonic");
+         propName = String.format("%s.%s.mnemonic", parent, label);
       }
 
-      if (prop == null || prop.isEmpty())
+      String prop = getLabelWithAlt(propName, null);
+
+      if (prop == null || prop.equals(""))
       {
+         debug(String.format("missing dictionary property '%s'", prop));
          return -1;
       }
 
       return prop.codePointAt(0);
    }
 
-   public static String getLabelWithValue(String label, String value)
+   private void parseArgs(String[] args) throws InvalidSyntaxException
    {
-      String prop = getLabel(label);
-
-      if (prop == null)
+      for (int i = 0; i < args.length; i++)
       {
-         return null;
-      }
-
-      if (value == null)
-      {
-         value = "";
-      }
-
-      int n = prop.length();
-
-      StringBuffer buffer = new StringBuffer(n);
-
-      for (int i = 0; i < n; i++)
-      {
-         int c = prop.codePointAt(i);
-
-         if (c == (int)'\\' && i != n-1)
+         if (args[i].equals("--version") || args[i].equals("-v"))
          {
-            buffer.appendCodePoint(prop.codePointAt(++i));
+            version();
+            System.exit(0);
          }
-         else if (c == (int)'$' && i != n-1)
+         else if (args[i].equals("--help") || args[i].equals("-h"))
          {
-            c = prop.codePointAt(i+1);
-
-            if (c == (int)'1')
-            {
-               buffer.append(value);
-               i++;
-            }
+            help();
+            System.exit(0);
          }
-         else
+         else if (args[i].equals("--output") || args[i].equals("-o"))
          {
-            buffer.appendCodePoint(c);
-         }
-      }
-
-      return new String(buffer);
-   }
-
-   public static String getLabelWithValue(String label, int value)
-   {
-      return getLabelWithValue(label, ""+value);
-   }
-
-   public static String getLabelWithValues(String label, int value1,
-      String value2)
-   {
-      return getLabelWithValues(label, new String[] {""+value1, value2});
-   }
-
-   public static String getLabelWithValues(String label, String value1,
-      String value2)
-   {
-      return getLabelWithValues(label, new String[] {value1, value2});
-   }
-
-   // Only works for up to nine values.
-
-   public static String getLabelWithValues(String label, String[] values)
-   {
-      String prop = getLabel(label);
-
-      if (prop == null)
-      {
-         return prop;
-      }
-
-      int n = prop.length();
-
-      StringBuffer buffer = new StringBuffer(n);
-
-      for (int i = 0; i < n; i++)
-      {
-         int c = prop.codePointAt(i);
-
-         if (c == (int)'\\' && i != n-1)
-         {
-            buffer.appendCodePoint(prop.codePointAt(++i));
-         }
-         else if (c == (int)'$' && i != n-1)
-         {
-            c = prop.codePointAt(i+1);
-
-            if (c >= 48 && c <= 57)
-            {
-               // Digit
-
-               int index = c - 48 - 1;
-
-               if (index >= 0 && index < values.length)
-               {
-                  buffer.append(values[index]);
-               }
-
-               i++;
-            }
-            else
-            {
-               buffer.append('$');
-            }
-         }
-         else
-         {
-            buffer.appendCodePoint(c);
-         }
-      }
-
-      return new String(buffer);
-   }
-
-   public static String getLabelWithValues(String label, Object... values)
-   {
-      String prop = getLabel(label);
-
-      if (prop == null)
-      {
-         return prop;
-      }
-
-      int n = prop.length();
-
-      StringBuffer buffer = new StringBuffer(n);
-
-      for (int i = 0; i < n; i++)
-      {
-         int c = prop.codePointAt(i);
-
-         if (c == (int)'\\' && i != n-1)
-         {
-            buffer.appendCodePoint(prop.codePointAt(++i));
-         }
-         else if (c == (int)'$' && i != n-1)
-         {
-            c = prop.codePointAt(i+1);
-
-            if (c >= 48 && c <= 57)
-            {
-               // Digit
-
-               int index = c - 48 - 1;
-
-               if (index >= 0 && index < values.length)
-               {
-                  buffer.append(values[index]);
-               }
-
-               i++;
-            }
-            else
-            {
-               buffer.append('$');
-            }
-         }
-         else
-         {
-            buffer.appendCodePoint(c);
-         }
-      }
-
-      return new String(buffer);
-   }
-
-   public static void main(String[] args)
-   {
-      final TeXParserApp app = new TeXParserApp();
-      String outputFormat = "latex";
-
-      try
-      {
-         for (int i = 0; i < args.length; i++)
-         {
-            if (args[i].equals("--version") || args[i].equals("-v"))
-            {
-               version();
-               System.exit(0);
-            }
-            else if (args[i].equals("--help") || args[i].equals("-h"))
-            {
-               help();
-               System.exit(0);
-            }
-            else if (args[i].equals("--output") || args[i].equals("-o"))
-            {
-               if (app.outDir != null)
-               {
-                  throw new InvalidSyntaxException(
-                    getLabelWithValue("error.syntax.only_one", args[i]));
-               }
-
-               i++;
-
-               if (i == args.length)
-               {
-                  throw new InvalidSyntaxException(
-                    getLabelWithValue("error.syntax.missing_filename",
-                      args[i-1]));
-               }
-
-               app.outDir = new File(args[i]);
-
-            }
-            else if (args[i].equals("--gui") || args[i].equals("-g"))
-            {
-               app.guiMode = true;
-            }
-            else if (args[i].equals("--batch") || args[i].equals("-b"))
-            {
-               app.guiMode = false;
-            }
-            else if (args[i].equals("--latex"))
-            {
-               outputFormat = "latex";
-            }
-            else if (args[i].equals("--html"))
-            {
-               outputFormat = "html";
-            }
-            else if (args[i].equals("--debug"))
-            {
-               app.debugMode = true;
-            }
-            else if (args[i].equals("--nodebug"))
-            {
-               app.debugMode = false;
-            }
-            else if (args[i].equals("-timeout"))
-            {
-               i++;
-
-               if (i == args.length)
-               {
-                  throw new IllegalArgumentException("-timeout requires numerical argument.");
-               }
-   
-               try
-               {
-                  MAX_PROCESS_TIME = Long.parseLong(args[i]);
-               }
-               catch (NumberFormatException e)
-               {
-                  throw new IllegalArgumentException(
-                     "-timeout requires numerical argument. Found: '"+args[i]+"'",
-                     e);
-               }
-            }
-            else if (args[i].equals("--in") || args[i].equals("-i"))
-            {
-               i++;
-
-               if (i == args.length)
-               {
-                  throw new InvalidSyntaxException(
-                    getLabelWithValue("error.syntax.missing_input",
-                      args[i-1]));
-               }
-
-               if (app.inFileName != null)
-               {
-                  throw new InvalidSyntaxException(
-                    getLabel("error.syntax.only_one_input"));
-               }
-
-               app.inFileName = args[i];
-            }
-            else if (args[i].charAt(0) == '-')
+            if (outDir != null)
             {
                throw new InvalidSyntaxException(
-                getLabelWithValue("error.syntax.unknown_option",
-                  args[i]));
+                 getMessage("error.syntax.only_one", args[i]));
             }
-            else
+
+            i++;
+
+            if (i == args.length)
             {
-               // if no option specified, assume --in
+               throw new InvalidSyntaxException(
+                 getMessage("error.syntax.missing_filename", args[i-1]));
+            }
 
-               if (app.inFileName != null)
-               {
-                  throw new InvalidSyntaxException(
-                    getLabel("error.syntax.only_one_input"));
-               }
+            outDir = new File(args[i]);
 
-               app.inFileName = args[i];
+         }
+         else if (args[i].equals("--gui") || args[i].equals("-g"))
+         {
+            guiMode = true;
+         }
+         else if (args[i].equals("--batch") || args[i].equals("-b"))
+         {
+            guiMode = false;
+         }
+         else if (args[i].equals("--latex"))
+         {
+            outputFormat = "latex";
+         }
+         else if (args[i].equals("--html"))
+         {
+            outputFormat = "html";
+         }
+         else if (args[i].equals("--debug"))
+         {
+            debugMode = true;
+         }
+         else if (args[i].equals("--nodebug"))
+         {
+            debugMode = false;
+         }
+         else if (args[i].equals("-timeout"))
+         {
+            i++;
+
+            if (i == args.length)
+            {
+               throw new IllegalArgumentException("-timeout requires numerical argument.");
+            }
+
+            try
+            {
+               MAX_PROCESS_TIME = Long.parseLong(args[i]);
+            }
+            catch (NumberFormatException e)
+            {
+               throw new IllegalArgumentException(
+                  "-timeout requires numerical argument. Found: '"+args[i]+"'",
+                  e);
             }
          }
-      }
-      catch (Exception e)
-      {
-         if (app.guiMode)
+         else if (args[i].equals("--in") || args[i].equals("-i"))
          {
-            TeXParserAppGuiResources.error(null, e);
+            i++;
+
+            if (i == args.length)
+            {
+               throw new InvalidSyntaxException(
+                 getMessage("error.syntax.missing_input",
+                   args[i-1]));
+            }
+
+            if (inFileName != null)
+            {
+               throw new InvalidSyntaxException(
+                 getMessage("error.syntax.only_one_input"));
+            }
+
+            inFileName = args[i];
+         }
+         else if (args[i].charAt(0) == '-')
+         {
+            throw new InvalidSyntaxException(
+             getMessage("error.syntax.unknown_option", args[i]));
          }
          else
          {
-            System.err.println(appName+": "+
-              getLabelWithValue("error.syntax", e.getMessage()));
+            // if no option specified, assume --in
+
+            if (inFileName != null)
+            {
+               throw new InvalidSyntaxException(
+                 getMessage("error.syntax.only_one_input"));
+            }
+
+            inFileName = args[i];
          }
-
-         System.exit(1);
       }
+   }
 
-      if (app.guiMode)
+   private void runApplication()
+   {
+      if (guiMode)
       {
          javax.swing.SwingUtilities.invokeLater(new Runnable()
           {
              public void run()
              {
-                app.createAndShowGUI();
+                createAndShowGUI();
              }
           });
       } 
       else
       {
-         app.doBatchProcess(outputFormat);
+         doBatchProcess();
       }
    }
 
-   public static final String appVersion = "0.2b";
-   public static final String appName = "texparserapp";
-   public static final String appDate = "2015-02-07";
+   public static void main(String[] args)
+   {
+      final TeXParserApp app = new TeXParserApp();
 
-   private static Properties dictionary;
+      try
+      {
+         app.parseArgs(args);
+      }
+      catch (Exception e)
+      {
+         app.error(e);
 
-   private static String dict = null;
+         System.exit(1);
+      }
+
+      app.runApplication();
+   }
+
+   public static final String APP_VERSION = "0.3b";
+   public static final String APP_NAME = "texparserapp";
+   public static final String APP_DATE = "2017-12-02";
 
    public static long MAX_PROCESS_TIME=0L;
 
-   private static boolean debugMode = false;
+   private boolean debugMode = false;
 
    private boolean guiMode = false;
 
@@ -1229,5 +1089,9 @@ public class TeXParserApp implements TeXApp
 
    private ErrorListener errorListener;
 
+   private TeXParserAppMessages messages;
+
    private File texmf;
+
+   private String outputFormat = "latex";
 }

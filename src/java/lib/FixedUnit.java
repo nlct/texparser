@@ -31,8 +31,8 @@ public class FixedUnit extends TeXUnit
    {
       if (unitId < 0 || unitId >= UNIT_NAMES.length)
       {
-         throw new IllegalArgumentException("Invalid ID '"
-           +unitId+"' in FixedUnit(int)");
+         throw new IllegalArgumentException(String.format(
+          "Invalid ID '%d' in FixedUnit(int)", unitId));
       }
 
       id = unitId;
@@ -53,8 +53,8 @@ public class FixedUnit extends TeXUnit
 
       if (id == -1)
       {
-         throw new IllegalArgumentException("Invalid unit name '"
-           +unitName+"' in FixedUnit(String)");
+         throw new IllegalArgumentException(String.format(
+           "Invalid unit name '%s' in FixedUnit(String)", unitName));
       }
    }
 

@@ -23,65 +23,27 @@ import java.io.File;
 
 public class TeXSyntaxException extends IOException
 {
-   public TeXSyntaxException(String errorTag)
-   {
-      this(null, -1, errorTag, (String)null);
-   }
-
-   public TeXSyntaxException(File file, String errorTag)
-   {
-      this(file, -1, errorTag, (String)null);
-   }
-
    public TeXSyntaxException(int lineNumber, String errorTag)
    {
-      this(null, lineNumber, errorTag, (String)null);
+      this((File)null, lineNumber, errorTag);
    }
 
-   public TeXSyntaxException(File file, int lineNumber, String errorTag)
+   public TeXSyntaxException(String errorTag, Object... params)
    {
-      this(file, lineNumber, errorTag, (String)null);
+      this((File)null, -1, errorTag, params);
    }
 
-   public TeXSyntaxException(String errorTag, String param)
-   {
-      this(null, -1, errorTag, param);
-   }
-
-   public TeXSyntaxException(String errorTag, String[] params)
-   {
-      this(null, -1, errorTag, params);
-   }
-
-   public TeXSyntaxException(File file, String errorTag, String param)
-   {
-      this(file, -1, errorTag, param);
-   }
-
-   public TeXSyntaxException(File file, String errorTag, String[] params)
+   public TeXSyntaxException(File file, String errorTag, Object... params)
    {
       this(file, -1, errorTag, params);
    }
 
-   public TeXSyntaxException(int lineNumber, String errorTag, String param)
+   public TeXSyntaxException(int lineNumber, String errorTag, Object... params)
    {
-      this(null, lineNumber, errorTag, param);
+      this((File)null, lineNumber, errorTag, params);
    }
 
-   public TeXSyntaxException(int lineNumber, String errorTag, String[] params)
-   {
-      this(null, lineNumber, errorTag, params);
-   }
-
-   public TeXSyntaxException(TeXParser parser, String errorTag, String param)
-   {
-      this(parser == null ? null : parser.getCurrentFile(),
-           parser == null ? -1 : parser.getLineNumber(), 
-           errorTag,
-           param);
-   }
-
-   public TeXSyntaxException(TeXParser parser, String errorTag, String[] params)
+   public TeXSyntaxException(TeXParser parser, String errorTag, Object... params)
    {
       this(parser == null ? null : parser.getCurrentFile(),
            parser == null ? -1 : parser.getLineNumber(), 
@@ -89,18 +51,8 @@ public class TeXSyntaxException extends IOException
            params);
    }
 
-   public TeXSyntaxException(TeXParser parser, String errorTag,
-      String param, Throwable cause)
-   {
-      this(parser == null ? null : parser.getCurrentFile(),
-           parser == null ? -1 : parser.getLineNumber(), 
-           errorTag,
-           param,
-           cause);
-   }
-
-   public TeXSyntaxException(TeXParser parser, String errorTag,
-      String[] params, Throwable cause)
+   public TeXSyntaxException(Throwable cause, TeXParser parser, String errorTag,
+      Object... params)
    {
       this(parser == null ? null : parser.getCurrentFile(),
            parser == null ? -1 : parser.getLineNumber(), 
@@ -109,26 +61,8 @@ public class TeXSyntaxException extends IOException
            cause);
    }
 
-   public TeXSyntaxException(TeXParser parser, String errorTag)
-   {
-      this(parser == null ? null : parser.getCurrentFile(),
-           parser == null ? -1 : parser.getLineNumber(), 
-           errorTag,
-           (String)null);
-   }
-
-   public TeXSyntaxException(TeXParser parser, String errorTag,
-     Throwable cause)
-   {
-      this(parser == null ? null : parser.getCurrentFile(),
-           parser == null ? -1 : parser.getLineNumber(), 
-           errorTag,
-           (String)null,
-           cause);
-   }
-
    public TeXSyntaxException(File file, int lineNumber, String errorTag,
-     String[] params)
+     Object... params)
    {
       super("TeX syntax error code "+errorTag);
       this.file = file;
@@ -137,42 +71,14 @@ public class TeXSyntaxException extends IOException
       this.lineNum = lineNumber;
    }
 
-   public TeXSyntaxException(File file, int lineNumber, String errorTag,
-       String param)
-   {
-      super("TeX syntax error code "+errorTag);
-      this.file = file;
-      this.errorTag = errorTag;
-      this.lineNum = lineNumber;
-
-      if (param != null)
-      {
-         this.params = new String[] {param};
-      }
-   }
-
-   public TeXSyntaxException(File file, int lineNumber, String errorTag,
-     String params[], Throwable cause)
+   public TeXSyntaxException(Throwable cause, File file, int lineNumber, 
+     String errorTag, Object... params)
    {
       super("TeX syntax error code "+errorTag, cause);
       this.file = file;
       this.errorTag = errorTag;
       this.params = params;
       this.lineNum = lineNumber;
-   }
-
-   public TeXSyntaxException(File file, int lineNumber, String errorTag,
-     String param, Throwable cause)
-   {
-      super("TeX syntax error code "+errorTag, cause);
-      this.file = file;
-      this.errorTag = errorTag;
-      this.lineNum = lineNumber;
-
-      if (param != null)
-      {
-         this.params = new String[] {param};
-      }
    }
 
    public String getErrorTag()
@@ -180,7 +86,7 @@ public class TeXSyntaxException extends IOException
       return errorTag;
    }
 
-   public String[] getParams()
+   public Object[] getParams()
    {
       return params;
    }
@@ -207,9 +113,7 @@ public class TeXSyntaxException extends IOException
 
    public String getMessage(TeXApp app)
    {
-      String msg = 
-        params == null ? app.getMessage(errorTag) 
-                       : app.getMessage(errorTag, params);
+      String msg = app.getMessage(errorTag, params);
 
       if (file == null && lineNum == -1)
       {
@@ -228,7 +132,7 @@ public class TeXSyntaxException extends IOException
    }
 
    private String errorTag;
-   private String[] params;// TODO change to Object?
+   private Object[] params;
    private int lineNum = -1;
    private File file = null;
 

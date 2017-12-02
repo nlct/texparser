@@ -357,23 +357,23 @@ public abstract class DefaultTeXParserListener extends TeXParserListener
       return null;
    }
 
-   public void verb(String name, boolean isStar, char delim, String text)
+   public void verb(String name, boolean isStar, int delim, String text)
      throws IOException
    {
       if (isStar)
       {
-         StringCharacterIterator iter = new StringCharacterIterator(text);
-
-         for (char c = iter.first(); c != CharacterIterator.DONE;
-              c = iter.next())
+         for (int i = 0; i < text.length(); )
          {
+            int c = text.codePointAt(i);
+            i += Character.charCount(c);
+
             if (c == ' ')
             {
                writeable.writeCodePoint(0x2423);
             }
             else
             {
-               writeable.write(c);
+               writeable.writeCodePoint(c);
             }
          }
       }

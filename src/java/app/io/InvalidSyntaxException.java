@@ -27,4 +27,9 @@ public class InvalidSyntaxException extends java.io.IOException
    {
       super(message);
    }
+
+   public InvalidSyntaxException(String message, Throwable cause)
+   {
+      super(message, cause);
+   }
 }

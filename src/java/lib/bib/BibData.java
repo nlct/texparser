@@ -236,7 +236,7 @@ public abstract class BibData
                   {
                      throw new BibTeXSyntaxException(parser,
                        BibTeXSyntaxException.ERROR_EXPECTING_OR,
-                       new String[] {",", eg.format()});
+                       ",", eg.format());
                   }
                }
 
@@ -303,7 +303,7 @@ public abstract class BibData
          {
             throw new BibTeXSyntaxException(parser,
               BibTeXSyntaxException.ERROR_EXPECTING_OR,
-              new String[] {",", eg.format()});
+              ",", eg.format());
          }
 
          if (code == '#')
@@ -323,7 +323,7 @@ public abstract class BibData
          {
             throw new BibTeXSyntaxException(parser,
               BibTeXSyntaxException.ERROR_EXPECTING_OR,
-              new String[] {",", eg.format()});
+              ",", eg.format());
          }
 
          return result;
@@ -331,7 +331,7 @@ public abstract class BibData
 
       throw new BibTeXSyntaxException(parser,
         BibTeXSyntaxException.ERROR_EXPECTING_OR,
-        new String[] {",", eg.format()});
+        ",", eg.format());
    }
 
    public String format()

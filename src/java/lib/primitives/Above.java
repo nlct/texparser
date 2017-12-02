@@ -63,7 +63,7 @@ public class Above extends MidControlSequence
       TeXParserListener listener = parser.getListener();
 
       listener.abovewithdelims( 
-        listener.getOther((int)'.'), listener.getOther((int)'.'), dimen,
+        listener.getOther('.'), listener.getOther('.'), dimen,
         before, following);
    }
 

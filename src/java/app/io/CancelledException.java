@@ -22,9 +22,9 @@ import com.dickimawbooks.texparserapp.TeXParserApp;
 
 public class CancelledException extends InterruptedException
 {
-   public CancelledException()
+   public CancelledException(TeXParserApp app)
    {
-      this(TeXParserApp.getLabel("error.interrupted"));
+      this(app.getMessage("error.interrupted"));
    }
 
    public CancelledException(String message)

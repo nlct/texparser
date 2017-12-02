@@ -43,38 +43,16 @@ public class TeXAppAdapter implements TeXApp
 
    public void substituting(TeXParser parser, String original, String replacement)
    {
-      System.out.println(original+" -> "+replacement);
-   }
-
-   public String getMessage(String label)
-   {
-      return label;
-   }
-
-   public String getMessage(String label, String param)
-   {
-      return String.format("%s[%s]", label, param);
-   }
-
-   public String getMessage(String label, String[] params)
-   {
-      String msg = label;
-
-      String pre = "[";
-
-      for (int i = 0; i < params.length; i++)
-      {
-         msg += pre + params[i];
-         pre = ",";
-      }
-
-      msg += "]";
-
-      return msg;
+      message(original+" -> "+replacement);
    }
 
    public String getMessage(String label, Object... params)
    {
+      if (params.length == 0)
+      {
+         return label;
+      }
+
       String msg = label;
 
       String pre = "[";

@@ -81,7 +81,7 @@ public class Def extends Primitive
 // TODO
          throw new LaTeXSyntaxException(parser,
            LaTeXSyntaxException.ERROR_UNACCESSIBLE,
-           cs.format());
+           cs.toString(parser));
       }
    }
 

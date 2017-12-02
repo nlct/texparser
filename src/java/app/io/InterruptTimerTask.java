@@ -6,17 +6,16 @@ import com.dickimawbooks.texparserapp.TeXParserApp;
 
 public class InterruptTimerTask extends java.util.TimerTask
 {
-   private Thread thread;
-
-   public InterruptTimerTask(Thread t)
+   public InterruptTimerTask(TeXParserApp app, Thread t)
    {
+      this.app = app;
       thread = t;
       status = 0;
    }
 
    public void run()
    {
-      TeXParserApp.debug("Process timed-out");
+      app.debug("Process timed-out");
       thread.interrupt();
 
       synchronized(this)
@@ -37,6 +36,10 @@ public class InterruptTimerTask extends java.util.TimerTask
    }
 
    private int status;
+
+   private Thread thread;
+
+   private TeXParserApp app;
 
    public static final int STATUS_NONE=0;
    public static final int STATUS_TIMEDOUT=1;

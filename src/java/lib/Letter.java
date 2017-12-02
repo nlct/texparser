@@ -25,11 +25,6 @@ public class Letter extends CharObject implements CaseChangeable
       super(charCode);
    }
 
-   public Letter(char c)
-   {
-      super((int)c);
-   }
-
    public TeXObject toLowerCase(TeXParser parser)
    {
       return parser.getListener().getLetter(Character.toLowerCase(charCode));

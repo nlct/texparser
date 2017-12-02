@@ -33,7 +33,7 @@ public class Tab implements TeXObject
 
    public String toString(TeXParser parser)
    {
-      return ""+parser.getTabChar();
+      return String.format("%c", parser.getTabChar());
    }
 
    public String toString()
@@ -50,7 +50,7 @@ public class Tab implements TeXObject
      throws IOException
    {
       TeXObjectList list = new TeXObjectList();
-      list.add(parser.getListener().getOther((int)parser.getTabChar()));
+      list.add(parser.getListener().getOther(parser.getTabChar()));
 
       return list;
    }

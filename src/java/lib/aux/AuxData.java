@@ -68,15 +68,18 @@ public class AuxData
    {
       StringBuilder builder = new StringBuilder();
 
-      String esc = ""+parser.getEscChar();
-      String bg = ""+parser.getBgChar();
-      String eg = ""+parser.getEgChar();
+      int esc = parser.getEscChar();
+      int bg = parser.getBgChar();
+      int eg = parser.getEgChar();
 
-      builder.append(esc+name);
+      builder.appendCodePoint(esc);
+      builder.append(name);
 
       for (int i = 0; i < args.length; i++)
       {
-         builder.append(bg+args[i].toString(parser)+eg);
+         builder.appendCodePoint(bg);
+         builder.append(args[i].toString(parser));
+         builder.appendCodePoint(eg);
       }
 
       return builder.toString();

@@ -32,18 +32,38 @@ import com.dickimawbooks.texparserapp.TeXParserApp;
  */
 public class TeXParserAppGuiResources
 {
-    public static synchronized void error(Component parent, String message)
+    public TeXParserAppGuiResources(TeXParserApp app)
     {
-       TeXParserApp.debug("Error: '"+message+"'");
+       this.app = app;
+       errorPanel = new ErrorPanel(this);
+    }
+
+    public static void error(TeXParserApp app, String message)
+    {
+       JOptionPane.showMessageDialog(null, message,
+          app.getLabelWithAlt("error.title", "Error"),
+          JOptionPane.ERROR_MESSAGE);
+    }
+
+    public static void warning(TeXParserApp app, String message)
+    {
+       JOptionPane.showMessageDialog(null, message,
+          app.getLabelWithAlt("warning.title", "Warning"),
+          JOptionPane.ERROR_MESSAGE);
+    }
+
+    public synchronized void error(Component parent, String message)
+    {
+       app.debug("Error: '"+message+"'");
 
        errorPanel.updateMessage(message);
 
        JOptionPane.showMessageDialog(parent, errorPanel,
-          TeXParserApp.getLabelWithAlt("error.title", "Error"),
+          app.getLabelWithAlt("error.title", "Error"),
           JOptionPane.ERROR_MESSAGE);
     }
 
-    public static synchronized void error(Component parent, Exception e)
+    public synchronized void error(Component parent, Exception e)
     {
        String message = e.getMessage();
 
@@ -62,54 +82,54 @@ public class TeXParserAppGuiResources
        error(parent, message, e);
     }
 
-    public static void error(Component parent, String message, Exception e)
+    public void error(Component parent, String message, Exception e)
     {
-       TeXParserApp.debug(e);
+       app.debug(e);
 
        errorPanel.updateMessage(message, e);
 
        JOptionPane.showMessageDialog(parent, errorPanel,
-          TeXParserApp.getLabelWithAlt("error.title", "Error"),
+          app.getLabelWithAlt("error.title", "Error"),
          JOptionPane.ERROR_MESSAGE);
     }
 
-    public static void warning(Component parent, String message)
+    public void warning(Component parent, String message)
     {
-       TeXParserApp.debug("Warning: '"+message+"'");
+       app.debug("Warning: '"+message+"'");
 
        errorPanel.updateMessage(message);
 
        JOptionPane.showMessageDialog(parent,
           errorPanel,
-          TeXParserApp.getLabelWithAlt("error.warning", "Warning"),
+          app.getLabelWithAlt("error.warning", "Warning"),
           JOptionPane.WARNING_MESSAGE);
     }
 
-    public static JButton createOkayButton(ActionListener listener)
+    public JButton createOkayButton(ActionListener listener)
     {
        return createActionButton("button", "okay", 
           listener, KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0));
     }
 
-    public static JButton createCancelButton(ActionListener listener)
+    public JButton createCancelButton(ActionListener listener)
     {
        return createActionButton("button", "cancel", listener,
           KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0));
     }
 
-    public static JButton createActionButton(String parent, String label, 
+    public JButton createActionButton(String parent, String label, 
       ActionListener listener, KeyStroke keyStroke)
     {
        return createActionButton(parent, label, listener, keyStroke,
-         TeXParserApp.getToolTip(parent, label));
+         app.getToolTip(parent, label));
     }
 
-    public static JButton createActionButton(String parent, String label, 
+    public JButton createActionButton(String parent, String label, 
       ActionListener listener, KeyStroke keyStroke,
       String tooltipText)
     {
-       String buttonLabel = TeXParserApp.getLabel(parent, label);
-       int mnemonic = TeXParserApp.getMnemonicInt(parent, label);
+       String buttonLabel = app.getLabel(parent, label);
+       int mnemonic = app.getMnemonicInt(parent, label);
        String actionCommand = label;
 
        // Is there an associated image?
@@ -202,23 +222,23 @@ public class TeXParserAppGuiResources
        return button;
     }
 
-    public static JLabel createJLabel(String label)
+    public JLabel createJLabel(String label)
     {
        return createJLabel(label, null);
     }
 
-    public static JLabel createJLabel(String label, JComponent comp)
+    public JLabel createJLabel(String label, JComponent comp)
     {
-       JLabel jLabel = new JLabel(TeXParserApp.getLabel(label));
+       JLabel jLabel = new JLabel(app.getLabel(label));
 
-       int mnemonic = TeXParserApp.getMnemonicInt(label);
+       int mnemonic = app.getMnemonicInt(label);
 
        if (mnemonic != -1)
        {
           jLabel.setDisplayedMnemonic(mnemonic);
        }
 
-       String tooltip = TeXParserApp.getToolTip(label);
+       String tooltip = app.getToolTip(label);
 
        if (tooltip != null)
        {
@@ -233,15 +253,15 @@ public class TeXParserAppGuiResources
        return jLabel;
    }
 
-   public static JRadioButton createJRadioButton(String parentLabel,
+   public JRadioButton createJRadioButton(String parentLabel,
       String label, ButtonGroup bg, ActionListener listener)
    {
       JRadioButton button = new JRadioButton(
-        TeXParserApp.getLabel(parentLabel, label));
+        app.getLabel(parentLabel, label));
 
-      button.setMnemonic(TeXParserApp.getMnemonic(parentLabel, label));
+      button.setMnemonic(app.getMnemonic(parentLabel, label));
 
-      String tooltip = TeXParserApp.getToolTip(parentLabel, label);
+      String tooltip = app.getToolTip(parentLabel, label);
 
       if (tooltip != null)
       {
@@ -260,12 +280,12 @@ public class TeXParserAppGuiResources
       return button;
    }
 
-    public static JCheckBox createJCheckBox(String parentLabel, String label,
+    public JCheckBox createJCheckBox(String parentLabel, String label,
        ActionListener listener)
     {
        JCheckBox checkBox = new JCheckBox(
-          TeXParserApp.getLabel(parentLabel, label));
-       checkBox.setMnemonic(TeXParserApp.getMnemonic(parentLabel, label));
+          app.getLabel(parentLabel, label));
+       checkBox.setMnemonic(app.getMnemonic(parentLabel, label));
        checkBox.setActionCommand(label);
 
        if (listener != null)
@@ -276,26 +296,26 @@ public class TeXParserAppGuiResources
        return checkBox;
     }
 
-   public static JTextArea createMessageArea()
+   public JTextArea createMessageArea()
    {
       return createMessageArea(8, 30);
    }
 
-   public static JTextArea createMessageArea(String label)
+   public JTextArea createMessageArea(String label)
    {
       return createMessageArea(8, 30, label);
    }
 
-   public static JTextArea createMessageArea(int rows, int cols, String label)
+   public JTextArea createMessageArea(int rows, int cols, String label)
    {
       JTextArea area = createMessageArea(rows, cols);
 
-      area.setText(TeXParserApp.getLabel(label));
+      area.setText(app.getLabel(label));
 
       return area;
    }
 
-   public static JTextArea createMessageArea(int rows, int cols)
+   public JTextArea createMessageArea(int rows, int cols)
    {
       JTextArea area = new JTextArea(rows, cols);
       area.setWrapStyleWord(true);
@@ -307,14 +327,14 @@ public class TeXParserAppGuiResources
       return area;
    }
 
-    public static JComponent createOkayCancelHelpPanel(
-       ActionListener listener, TeXParserAppGUI gui, String helpId)
+    public JComponent createOkayCancelHelpPanel(
+       ActionListener listener, String helpId)
     {
-      return createOkayCancelHelpPanel(null, listener, gui, helpId);
+       return createOkayCancelHelpPanel(null, listener, helpId);
     }
 
-    public static JComponent createOkayCancelHelpPanel(
-       JRootPane rootPane, ActionListener listener, TeXParserAppGUI gui, String helpId)
+    public JComponent createOkayCancelHelpPanel(
+       JRootPane rootPane, ActionListener listener, String helpId)
     {
        JPanel buttonPanel = new JPanel();
 
@@ -322,7 +342,7 @@ public class TeXParserAppGuiResources
 
        buttonPanel.add(okayButton);
        buttonPanel.add(createCancelButton(listener));
-       buttonPanel.add(gui.createHelpButton(helpId));
+       buttonPanel.add(app.getGui().createHelpButton(helpId));
 
        if (rootPane != null)
        {
@@ -332,13 +352,13 @@ public class TeXParserAppGuiResources
        return buttonPanel;
     }
 
-    public static JComponent createOkayCancelPanel(
+    public JComponent createOkayCancelPanel(
        ActionListener listener)
     {
        return createOkayCancelPanel(null, listener);
     }
 
-    public static JComponent createOkayCancelPanel(
+    public JComponent createOkayCancelPanel(
        JRootPane rootPane,
        ActionListener listener)
     {
@@ -357,17 +377,17 @@ public class TeXParserAppGuiResources
        return buttonPanel;
     }
 
-    public static JMenu createJMenu(String label)
+    public JMenu createJMenu(String label)
     {
        return createJMenu(null, label);
     }
 
-    public static JMenu createJMenu(String parent, String label)
+    public JMenu createJMenu(String parent, String label)
     {
-       JMenu menu = new JMenu(TeXParserApp.getLabel(parent, label));
-       menu.setMnemonic(TeXParserApp.getMnemonic(parent, label));
+       JMenu menu = new JMenu(app.getLabel(parent, label));
+       menu.setMnemonic(app.getMnemonic(parent, label));
 
-       String tooltip = TeXParserApp.getToolTip(parent, label);
+       String tooltip = app.getToolTip(parent, label);
 
        if (tooltip != null)
        {
@@ -377,38 +397,38 @@ public class TeXParserAppGuiResources
        return menu;
     }
 
-    public static JMenuItem createJMenuItem(String parent, String label)
+    public JMenuItem createJMenuItem(String parent, String label)
     {
        return createJMenuItem(parent, label, null, null, null);
     }
 
-    public static JMenuItem createJMenuItem(String parent, String label,
+    public JMenuItem createJMenuItem(String parent, String label,
        ActionListener listener)
     {
        return createJMenuItem(parent, label, listener, null, null);
     }
 
-    public static JMenuItem createJMenuItem(String parent, String label,
+    public JMenuItem createJMenuItem(String parent, String label,
        ActionListener listener, ScrollToolBar toolBar)
     {
        return createJMenuItem(parent, label, listener, null, toolBar);
     }
 
-    public static JMenuItem createJMenuItem(String parent, String label,
+    public JMenuItem createJMenuItem(String parent, String label,
      ActionListener listener, KeyStroke keyStroke)
     {
        return createJMenuItem(parent, label, listener, keyStroke, null);
     }
 
-    public static JMenuItem createJMenuItem(String parent, String label,
+    public JMenuItem createJMenuItem(String parent, String label,
      ActionListener listener, KeyStroke keyStroke, ScrollToolBar toolBar)
     {
-       return new ItemButton(parent, label, listener, keyStroke, toolBar);
+       return new ItemButton(this, parent, label, listener, keyStroke, toolBar);
     }
 
     // Get the image URL associated with action
 
-    public static URL getImageUrl(String action)
+    public URL getImageUrl(String action)
     {
        if (imageMap == null)
        {
@@ -452,7 +472,7 @@ public class TeXParserAppGuiResources
           }
           catch (IOException e)
           {
-             TeXParserApp.debug(e);
+             app.debug(e);
              return null;
           }
        }
@@ -465,14 +485,21 @@ public class TeXParserAppGuiResources
 
        if (imageURL == null)
        {
-          TeXParserApp.debug("Can't find resource '"+location+"'");
+          app.debug("Can't find resource '"+location+"'");
        }
 
        return imageURL;
     }
 
-    private static ErrorPanel errorPanel = new ErrorPanel();
+    public TeXParserApp getApplication()
+    {
+       return app;
+    }
 
-    private static Properties imageMap = null;
+    private ErrorPanel errorPanel;
+
+    private Properties imageMap = null;
+
+    private TeXParserApp app;
 }
 

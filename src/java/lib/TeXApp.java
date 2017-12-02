@@ -39,12 +39,6 @@ public interface TeXApp
 
    public void substituting(TeXParser parser, String original, String replacement);
 
-   public String getMessage(String label);
-
-   public String getMessage(String label, String param);
-
-   public String getMessage(String label, String[] params);
-
    public String getMessage(String label, Object... params);
 
    public String requestUserInput(String message)

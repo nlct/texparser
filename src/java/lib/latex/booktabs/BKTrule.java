@@ -45,7 +45,7 @@ public class BKTrule extends Hline implements Expandable
    {
       if (position != TOP && position != MIDDLE && position != BOTTOM)
       {
-         throw new IllegalArgumentException("Invalid position "+position);
+         throw new IllegalArgumentException("Invalid position: "+position);
       }
 
       this.position = position;

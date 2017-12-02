@@ -450,7 +450,7 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
          {
             throw new TeXSyntaxException(parser,
              TeXSyntaxException.ERROR_UNDEFINED,
-             ""+parser.getEscChar()+csName);
+             String.format("%c%s", parser.getEscChar(), csName));
          }
       }
       else

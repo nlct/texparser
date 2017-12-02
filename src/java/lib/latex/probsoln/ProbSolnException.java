@@ -25,37 +25,15 @@ import com.dickimawbooks.texparserlib.TeXParser;
 
 public class ProbSolnException extends LaTeXSyntaxException
 {
-   public ProbSolnException(TeXParser parser, String errorTag, String param)
-   {
-      super(parser, errorTag, param);
-   }
-
-   public ProbSolnException(TeXParser parser, String errorTag, String[] params)
+   public ProbSolnException(TeXParser parser, String errorTag, Object... params)
    {
       super(parser, errorTag, params);
    }
 
-   public ProbSolnException(TeXParser parser, String errorTag,
-      String param, Throwable cause)
+   public ProbSolnException(Throwable cause, TeXParser parser, String errorTag,
+      Object... params)
    {
-      super(parser, errorTag, param, cause);
-   }
-
-   public ProbSolnException(TeXParser parser, String errorTag,
-      String[] params, Throwable cause)
-   {
-      super(parser, errorTag, params, cause);
-   }
-
-   public ProbSolnException(TeXParser parser, String errorTag)
-   {
-      super(parser, errorTag);
-   }
-
-   public ProbSolnException(TeXParser parser, String errorTag,
-     Throwable cause)
-   {
-      super(parser, errorTag, cause);
+      super(cause, parser, errorTag, params);
    }
 
    public static final String ERROR_NO_SUCH_DB = "probsoln.no_such_db";

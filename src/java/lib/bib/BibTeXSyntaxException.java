@@ -23,37 +23,15 @@ import com.dickimawbooks.texparserlib.TeXParser;
 
 public class BibTeXSyntaxException extends TeXSyntaxException
 {
-   public BibTeXSyntaxException(TeXParser parser, String errorTag, String param)
-   {
-      super(parser, errorTag, param);
-   }
-
-   public BibTeXSyntaxException(TeXParser parser, String errorTag, String[] params)
+   public BibTeXSyntaxException(TeXParser parser, String errorTag, Object... params)
    {
       super(parser, errorTag, params);
    }
 
-   public BibTeXSyntaxException(TeXParser parser, String errorTag,
-      String param, Throwable cause)
+   public BibTeXSyntaxException(Throwable cause, TeXParser parser, 
+      String errorTag, Object... params)
    {
-      super(parser, errorTag, param, cause);
-   }
-
-   public BibTeXSyntaxException(TeXParser parser, String errorTag,
-      String[] params, Throwable cause)
-   {
-      super(parser, errorTag, params, cause);
-   }
-
-   public BibTeXSyntaxException(TeXParser parser, String errorTag)
-   {
-      super(parser, errorTag);
-   }
-
-   public BibTeXSyntaxException(TeXParser parser, String errorTag,
-     Throwable cause)
-   {
-      super(parser, errorTag, cause);
+      super(cause, parser, errorTag, params);
    }
 
    public static final String ERROR_MISSING_VALUE = 

@@ -144,7 +144,7 @@ public class ProbSolnSty extends LaTeXSty
       {
          throw new ProbSolnException(getParser(),
            ProbSolnException.ERROR_NO_SUCH_ENTRY_IN_DB,
-           new String[] {label, dbName});
+           label, dbName);
       }
 
       return prob;
@@ -180,7 +180,7 @@ public class ProbSolnSty extends LaTeXSty
       {
          throw new ProbSolnException(getParser(),
            ProbSolnException.ERROR_NO_SUCH_ENTRY_IN_DB,
-           new String[] {label, source});
+           label, source);
       }
 
       db = databases.get(target);

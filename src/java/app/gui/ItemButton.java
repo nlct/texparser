@@ -34,18 +34,21 @@ import com.dickimawbooks.texparserapp.TeXParserApp;
 
 public class ItemButton extends JMenuItem
 {
-   public ItemButton(String parentLabel, String actionLabel,
-     ActionListener listener, KeyStroke keyStroke, ScrollToolBar toolBar)
+   public ItemButton(TeXParserAppGuiResources resources, String parentLabel, 
+     String actionLabel, ActionListener listener, KeyStroke keyStroke, 
+     ScrollToolBar toolBar)
    {
-      super(TeXParserApp.getLabelRemoveArgs(parentLabel, actionLabel));
-      setMnemonic(TeXParserApp.getMnemonic(parentLabel, actionLabel));
+      super(resources.getApplication().getLabelRemoveArgs(parentLabel, actionLabel));
+      TeXParserApp app = resources.getApplication();
+
+      setMnemonic(app.getMnemonic(parentLabel, actionLabel));
       setActionCommand(actionLabel);
 
       button = null;
 
       if (toolBar != null)
       {
-         URL imageURL = TeXParserAppGuiResources.getImageUrl(actionLabel);
+         URL imageURL = resources.getImageUrl(actionLabel);
 
          if (imageURL != null)
          {
@@ -69,7 +72,7 @@ public class ItemButton extends JMenuItem
          } 
       }
 
-      String tooltip = TeXParserApp.getToolTip(parentLabel, actionLabel);
+      String tooltip = app.getToolTip(parentLabel, actionLabel);
 
       if (tooltip != null)
       {

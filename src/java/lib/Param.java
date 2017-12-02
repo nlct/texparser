@@ -54,8 +54,8 @@ public class Param implements TeXObject
 
    public String toString(TeXParser parser)
    {
-      return (digit == -1 ? ""+parser.getParamChar()
-                           : ""+parser.getParamChar()+digit);
+      return digit == -1 ? String.format("%c", parser.getParamChar())
+                         : String.format("%c%d", parser.getParamChar(), digit);
    }
 
    public String format()
@@ -74,7 +74,7 @@ public class Param implements TeXObject
      throws IOException
    {
       TeXObjectList list = new TeXObjectList();
-      list.add(parser.getListener().getOther((int)parser.getParamChar()));
+      list.add(parser.getListener().getOther(parser.getParamChar()));
 
       if (digit != -1)
       {

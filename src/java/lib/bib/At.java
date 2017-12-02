@@ -51,8 +51,7 @@ public class At extends ActiveChar
       if (!(contents instanceof TeXObjectList))
       {
          throw new BibTeXSyntaxException(parser,
-           BibTeXSyntaxException.ERROR_EXPECTING_OR,
-           new String[] {"{", "("});
+           BibTeXSyntaxException.ERROR_EXPECTING_OR, "{", "(");
       }
 
       BibParser bibParser = (BibParser)parser.getListener();

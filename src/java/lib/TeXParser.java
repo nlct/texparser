@@ -151,7 +151,7 @@ public class TeXParser extends TeXObjectList
           catcodes[i] = new CatCodeList();
       }
 
-      catcodes[TYPE_ESC].add(new Character('\\'));
+      catcodes[TYPE_ESC].add('\\');
       catcodes[TYPE_BG].add('{');
       catcodes[TYPE_EG].add('}');
       catcodes[TYPE_MATH].add('$');
@@ -165,14 +165,14 @@ public class TeXParser extends TeXObjectList
       catcodes[TYPE_SPACE].add(' ');
       catcodes[TYPE_SPACE].add('\t');
 
-      for (int i = (int)'A'; i <= (int)'Z'; i++)
+      for (int i = 'A'; i <= 'Z'; i++)
       {
-         catcodes[TYPE_LETTER].add(new Character((char)i));
+         catcodes[TYPE_LETTER].add(Integer.valueOf(i));
       }
 
-      for (int i = (int)'a'; i <= (int)'z'; i++)
+      for (int i = 'a'; i <= 'z'; i++)
       {
-         catcodes[TYPE_LETTER].add(new Character((char)i));
+         catcodes[TYPE_LETTER].add(Integer.valueOf(i));
       }
 
       catcodes[TYPE_ACTIVE].add('~');
@@ -184,20 +184,20 @@ public class TeXParser extends TeXObjectList
    {
       // check if in the active map
 
-      ActiveChar ac = getActiveChar(new Integer(c));
+      ActiveChar ac = getActiveChar(Integer.valueOf(c));
 
       return ac != null;
    }
 
    // checks if c has cat code of given type
-   public boolean isCatCode(int type, char c)
+   public boolean isCatCode(int type, int codePoint)
    {
       if (type == TYPE_ACTIVE)
       {
-         if (isActive((char)c)) return true;
+         if (isActive(codePoint)) return true;
       }
 
-      Character character = new Character(c);
+      Integer character = Integer.valueOf(codePoint);
 
       if (catcodes[type] != null)
       {
@@ -217,9 +217,9 @@ public class TeXParser extends TeXObjectList
       return true;
    }
 
-   public void setCatCode(char c, int catCode)
+   public void setCatCode(int c, int catCode)
    {
-      Character character = new Character(c);
+      Integer character = Integer.valueOf(c);
 
       // remove it from its current catcode list
 
@@ -242,9 +242,9 @@ public class TeXParser extends TeXObjectList
    }
 
    // gets the cat code of c
-   public int getCatCode(char c)
+   public int getCatCode(int c)
    {
-      Character character = new Character(c);
+      Integer character = Integer.valueOf(c);
 
       for (int i = 0; i < catcodes.length; i++)
       {
@@ -262,9 +262,15 @@ public class TeXParser extends TeXObjectList
       return reader == null ? -1 : reader.getLineNumber()+1;
    }
 
-   public boolean isLetter(char c)
+   public boolean isLetter(int c)
    {
-      return isCatCode(TYPE_LETTER, c);
+      if (isCatCode(TYPE_LETTER, c)
+           || (Character.isAlphabetic(c) && isCatCode(TYPE_OTHER, c)))
+      {
+         return true;
+      }
+
+      return false;
    }
 
    private int read() throws IOException
@@ -349,17 +355,17 @@ public class TeXParser extends TeXObjectList
       {
          int c = read();
 
-         while (isCatCode(TYPE_SPACE, (char)c))
+         while (isCatCode(TYPE_SPACE, c))
          {
             c = read();
          }
 
-         if (isCatCode(TYPE_EOL, (char)c))
+         if (isCatCode(TYPE_EOL, c))
          {
             parseEOL(c, this);
             text = pop().toString(this);
          }
-         else if (isCatCode(TYPE_ESC, (char)c))
+         else if (isCatCode(TYPE_ESC, c))
          {
             readControlSequence(this, true);
             text = pop().toString(this);
@@ -381,12 +387,13 @@ public class TeXParser extends TeXObjectList
    {
       TeXObjectList list = new TeXObjectList();
 
-      StringCharacterIterator it = new StringCharacterIterator(text);
-
-      for (char c = it.first(); c != CharacterIterator.DONE; c = it.next())
+      for (int i = 0; i < text.length(); )
       {
-         list.add(isLetter(c) ?
-            listener.getLetter(c) : listener.getOther(c));
+         int codePoint = text.codePointAt(i);
+         i += Character.charCount(codePoint);
+
+         list.add(isLetter(codePoint) ?
+            listener.getLetter(codePoint) : listener.getOther(codePoint));
       }
 
       return list;
@@ -416,7 +423,7 @@ public class TeXParser extends TeXObjectList
 
          c = read();
 
-         if (c == (int)'\n')
+         if (c == '\n')
          {
             // Paragraph break
             // skip any further new lines
@@ -435,7 +442,7 @@ public class TeXParser extends TeXObjectList
 
             c = read();
 
-            if (isCatCode(TYPE_EOL, (char)c))
+            if (isCatCode(TYPE_EOL, c))
             {
                // we have a paragraph break. Skip any
                // following eol
@@ -453,7 +460,7 @@ public class TeXParser extends TeXObjectList
                eolFound(list);
             }
          }
-         else if (isCatCode(TYPE_EOL, (char)c))
+         else if (isCatCode(TYPE_EOL, c))
          {
             // user assigned EOL cat code to c
             // so we have a paragraph break
@@ -489,7 +496,7 @@ public class TeXParser extends TeXObjectList
 
          c = read();
 
-         if (c == (int)'\r')
+         if (c == '\r')
          {
             // Paragraph break
             // skip any further new lines
@@ -508,7 +515,7 @@ public class TeXParser extends TeXObjectList
 
             c = read();
 
-            if (isCatCode(TYPE_EOL, (char)c))
+            if (isCatCode(TYPE_EOL, c))
             {
                // we have a paragraph break. Skip any
                // following eol
@@ -526,7 +533,7 @@ public class TeXParser extends TeXObjectList
                eolFound(list);
             }
          }
-         else if (isCatCode(TYPE_EOL, (char)c))
+         else if (isCatCode(TYPE_EOL, c))
          {
             // user assigned EOL cat code to c
             // so we have a paragraph break
@@ -556,7 +563,7 @@ public class TeXParser extends TeXObjectList
 
          // Do we have a paragraph break?
 
-         if (isCatCode(TYPE_EOL, (char)c))
+         if (isCatCode(TYPE_EOL, c))
          {
             // paragraph break
 
@@ -597,7 +604,7 @@ public class TeXParser extends TeXObjectList
 
       while ((c = read()) != -1)
       {
-         if (!isCatCode(TYPE_EOL, (char)c))
+         if (!isCatCode(TYPE_EOL, c))
          {
             reset();
             break;
@@ -609,7 +616,7 @@ public class TeXParser extends TeXObjectList
          }
 
          Eol eol = listener.getEol();
-         eol.setEol(""+(char)c);
+         eol.setEol(String.format("%c", c));
          skipped.add(eol);
 
          mark(1);
@@ -634,7 +641,7 @@ public class TeXParser extends TeXObjectList
 
       while ((c = read()) != -1)
       {
-         if (!isCatCode(TYPE_SPACE, (char)c))
+         if (!isCatCode(TYPE_SPACE, c))
          {
             reset();
             break;
@@ -691,20 +698,20 @@ public class TeXParser extends TeXObjectList
 
       while ((c = read()) != -1)
       {
-         if (isCatCode(TYPE_EOL, (char)c))
+         if (isCatCode(TYPE_EOL, c))
          {
-            if (c == (int)'\n')
+            if (c == '\n')
             {
                mark(1);
                c = read();
 
-               if (c == (int)'\r')
+               if (c == '\r')
                {
                   // LF+CR
                   mark(1);
                   c = read();
 
-                  if (isCatCode(TYPE_EOL, (char)c))
+                  if (isCatCode(TYPE_EOL, c))
                   {
                      list.add(comment);
                      list.add(listener.getPar());
@@ -716,7 +723,7 @@ public class TeXParser extends TeXObjectList
                      list.add(comment);
                   }
                }
-               else if (c == (int)'\n')
+               else if (c == '\n')
                {
                   // LF LF
 
@@ -725,7 +732,7 @@ public class TeXParser extends TeXObjectList
 
                   return skipNextEols(list);
                }
-               else if (isCatCode(TYPE_EOL, (char)c))
+               else if (isCatCode(TYPE_EOL, c))
                {
                   // LF EOL
 
@@ -748,18 +755,18 @@ public class TeXParser extends TeXObjectList
                   return skipNextSpaces(list);
                }
             }
-            else if (c == (int)'\r')
+            else if (c == '\r')
             {
                mark(1);
                c = read();
 
-               if (c == (int)'\n')
+               if (c == '\n')
                {
                   // CR+LF
                   mark(1);
                   c = read();
 
-                  if (isCatCode(TYPE_EOL, (char)c))
+                  if (isCatCode(TYPE_EOL, c))
                   {
                      list.add(comment);
                      list.add(listener.getPar());
@@ -771,7 +778,7 @@ public class TeXParser extends TeXObjectList
                      list.add(comment);
                   }
                }
-               else if (c == (int)'\r')
+               else if (c == '\r')
                {
                   // CR + CR
 
@@ -780,7 +787,7 @@ public class TeXParser extends TeXObjectList
 
                   return skipNextEols(list);
                }
-               else if (isCatCode(TYPE_EOL, (char)c))
+               else if (isCatCode(TYPE_EOL, c))
                {
                   // CR EOL
 
@@ -810,7 +817,7 @@ public class TeXParser extends TeXObjectList
                mark(1);
                c = read();
 
-               if (isCatCode(TYPE_EOL, (char)c))
+               if (isCatCode(TYPE_EOL, c))
                {
                   // EOL EOL
 
@@ -860,17 +867,17 @@ public class TeXParser extends TeXObjectList
             TeXSyntaxException.ERROR_BAD_PARAM, "EOF");
       }
 
-      if (isCatCode(TYPE_PARAM, (char)c))
+      if (isCatCode(TYPE_PARAM, c))
       {
          mark(1);
          c = read();
 
-         if (c > (int)'0' && c <= (int)'9')
+         if (c > '0' && c <= '9')
          {
             list.add(listener.getDoubleParam(
-              listener.getParam(c-(int)'0')));
+              listener.getParam(c-'0')));
          }
-         else if (isCatCode(TYPE_BG, (char)c))
+         else if (isCatCode(TYPE_BG, c))
          {
             list.add(listener.getDoubleParam(
               listener.getParam(-1)));
@@ -881,16 +888,16 @@ public class TeXParser extends TeXObjectList
             throw new TeXSyntaxException(
                getCurrentFile(),
                getLineNumber(),
-               TeXSyntaxException.ERROR_BAD_PARAM, ""+((int)c));
+               TeXSyntaxException.ERROR_BAD_PARAM, String.format("%c", c));
          }
       }
       else
       {
-         if (c >= (int)'0' && c <= (int)'9')
+         if (c >= '0' && c <= '9')
          {
-            list.add(listener.getParam(c-(int)'0'));
+            list.add(listener.getParam(c-'0'));
          }
-         else if (isCatCode(TYPE_BG, (char)c))
+         else if (isCatCode(TYPE_BG, c))
          {
             list.add(listener.getParam(-1));
             reset();
@@ -898,7 +905,7 @@ public class TeXParser extends TeXObjectList
          else
          {
             throw new TeXSyntaxException(this,
-               TeXSyntaxException.ERROR_BAD_PARAM, ""+((int)c));
+               TeXSyntaxException.ERROR_BAD_PARAM, String.format("%c", c));
          }
       }
 
@@ -929,8 +936,7 @@ public class TeXParser extends TeXObjectList
             {
                throw new TeXSyntaxException(this,
                  TeXSyntaxException.ERROR_EXTRA_OR_FORGOTTEN,
-                 new String[] {obj.toString(this),
-                               bgChar.toString(this)});
+                 obj.toString(this), bgChar.toString(this));
             }
 
             return true;
@@ -970,12 +976,12 @@ public class TeXParser extends TeXObjectList
 
       while ((c = read()) != -1)
       {
-         if (isCatCode(TYPE_EG, (char)c))
+         if (isCatCode(TYPE_EG, c))
          {
             return true;
          }
 
-         if (isCatCode(TYPE_BG, (char)c))
+         if (isCatCode(TYPE_BG, c))
          {
             Group subGroup = listener.createGroup();
 
@@ -1032,7 +1038,7 @@ public class TeXParser extends TeXObjectList
             getLineNumber(),
             TeXSyntaxException.ERROR_MISSING_ENDMATH);
       }
-      else if (isCatCode(TYPE_MATH, (char)c))
+      else if (isCatCode(TYPE_MATH, c))
       {
          math.setInLine(false);
          readDisplayMath(math);
@@ -1053,7 +1059,7 @@ public class TeXParser extends TeXObjectList
 
       while ((c = read()) != -1)
       {
-         if (isCatCode(TYPE_MATH, (char)c))
+         if (isCatCode(TYPE_MATH, c))
          {
             return;
          }
@@ -1076,7 +1082,7 @@ public class TeXParser extends TeXObjectList
 
       while ((c = read()) != -1)
       {
-         if (isCatCode(TYPE_MATH, (char)c))
+         if (isCatCode(TYPE_MATH, c))
          {
             mark(1);
             c = read();
@@ -1089,7 +1095,7 @@ public class TeXParser extends TeXObjectList
                   TeXSyntaxException.ERROR_MISSING_ENDMATH);
             }
 
-            if (!isCatCode(TYPE_MATH, (char)c))
+            if (!isCatCode(TYPE_MATH, c))
             {
                reset();
                throw new TeXSyntaxException(
@@ -1173,9 +1179,10 @@ public class TeXParser extends TeXObjectList
 
          String str = obj.toString(this);
 
-         for (int i = 0, n = str.length(); i < n; i++)
+         for (int i = 0, n = str.length(); i < n; )
          {
-            char c = str.charAt(i);
+            int c = str.codePointAt(i);
+            i += Character.charCount(c);
 
             if (c == delim)
             {
@@ -1229,11 +1236,11 @@ public class TeXParser extends TeXObjectList
 
       while ((c = read()) != -1)
       {
-         if (!isLetter((char)c))
+         if (!isLetter(c))
          {
             TeXCsRef cs;
 
-            if (isCatCode(TYPE_EOL, (char)c))
+            if (isCatCode(TYPE_EOL, c))
             {
                // Control sequence ended with EOL
 
@@ -1254,11 +1261,11 @@ public class TeXParser extends TeXObjectList
             {
                // Control Symbol
 
-               cs = new TeXCsRef(""+(char)c);
+               cs = new TeXCsRef(String.format("%c", c));
 
                list.add(cs);
             }
-            else if (isCatCode(TYPE_SPACE, (char)c))
+            else if (isCatCode(TYPE_SPACE, c))
             {
                // Control word ended by a space
 
@@ -1286,7 +1293,7 @@ public class TeXParser extends TeXObjectList
             {
                c = read();
 
-               if (c == (int)'*')
+               if (c == '*')
                {
                   list.add(listener.getOther(c));
                   c = read();
@@ -1309,17 +1316,17 @@ public class TeXParser extends TeXObjectList
                mark(1);
                c = read();
 
-               while (isCatCode(TYPE_SPACE, (char)c))
+               while (isCatCode(TYPE_SPACE, c))
                {
                   mark(1);
                   c = read();
                }
 
-               if (isCatCode(TYPE_ESC, (char)c))
+               if (isCatCode(TYPE_ESC, c))
                {
                   reset();
                }
-               else if (isCatCode(TYPE_LETTER, (char)c))
+               else if (isCatCode(TYPE_LETTER, c))
                {
                   list.add(listener.getLetter(c));
                }
@@ -1375,23 +1382,23 @@ public class TeXParser extends TeXObjectList
 
       if (c == -1) return false;
 
-      if (isCatCode(TYPE_EOL, (char)c))
+      if (isCatCode(TYPE_EOL, c))
       {
          parseEOL(c, list);
       }
-      else if (isCatCode(TYPE_ESC, (char)c))
+      else if (isCatCode(TYPE_ESC, c))
       {
         return readControlSequence(list);
       }
-      else if (isCatCode(TYPE_COMMENT, (char)c))
+      else if (isCatCode(TYPE_COMMENT, c))
       {
          return readComment(list);
       }
-      else if (isCatCode(TYPE_PARAM, (char)c))
+      else if (isCatCode(TYPE_PARAM, c))
       {
          return readParam(list);
       }
-      else if (isCatCode(TYPE_ACTIVE, (char)c))
+      else if (isCatCode(TYPE_ACTIVE, c))
       {
          TeXObject obj = listener.getActiveChar(c);
 
@@ -1399,45 +1406,45 @@ public class TeXParser extends TeXObjectList
          {
             throw new TeXSyntaxException(this, 
               TeXSyntaxException.ERROR_UNDEFINED_CHAR, 
-              String.format("%c", (char)c));
+              String.format("%c", c));
          }
 
          list.add(obj);
       }
-      else if (isCatCode(TYPE_SP, (char)c))
+      else if (isCatCode(TYPE_SP, c))
       {
          list.add(listener.createSpChar());
       }
-      else if (isCatCode(TYPE_SB, (char)c))
+      else if (isCatCode(TYPE_SB, c))
       {
          list.add(listener.createSbChar());
       }
-      else if (isCatCode(TYPE_TAB, (char)c))
+      else if (isCatCode(TYPE_TAB, c))
       {
          list.add(listener.getTab());
       }
-      else if (isCatCode(TYPE_MATH, (char)c))
+      else if (isCatCode(TYPE_MATH, c))
       {
          MathGroup math = listener.createMathGroup();
          list.add(math);
          readMath(math);
       }
-      else if (isCatCode(TYPE_BG, (char)c))
+      else if (isCatCode(TYPE_BG, c))
       {
          list.add(listener.getBgChar(c));
       }
-      else if (isCatCode(TYPE_EG, (char)c))
+      else if (isCatCode(TYPE_EG, c))
       {
          list.add(listener.getEgChar(c));
       }
-      else if (isCatCode(TYPE_SPACE, (char)c))
+      else if (isCatCode(TYPE_SPACE, c))
       {
          Space space = listener.getSpace();
          space.setSpace(c);
          list.add(space);
          return skipNextSpaces(list);
       }
-      else if (isLetter((char)c))
+      else if (isLetter(c))
       {
          list.add(listener.getLetter(c));
       }
@@ -1668,13 +1675,13 @@ public class TeXParser extends TeXObjectList
       return popArg(isShort);
    }
 
-   public TeXObject popNextArg(char openDelim, char closeDelim)
+   public TeXObject popNextArg(int openDelim, int closeDelim)
      throws IOException
    {
       return popNextArg(false, openDelim, closeDelim);
    }
 
-   public TeXObject popNextArg(boolean isShort, char openDelim, char closeDelim)
+   public TeXObject popNextArg(boolean isShort, int openDelim, int closeDelim)
      throws IOException
    {
       if (size() == 0)
@@ -1685,7 +1692,7 @@ public class TeXParser extends TeXObjectList
       return popArg(isShort, openDelim, closeDelim);
    }
 
-   public Numerical popNumericalArg(char openDelim, char closeDelim)
+   public Numerical popNumericalArg(int openDelim, int closeDelim)
      throws IOException
    {
       return popNumericalArg(this, openDelim, closeDelim);
@@ -1697,7 +1704,7 @@ public class TeXParser extends TeXObjectList
       return super.popArg(this, isShort);
    }
 
-   public TeXObject popArg(boolean isShort, char openDelim, char closeDelim)
+   public TeXObject popArg(boolean isShort, int openDelim, int closeDelim)
    throws IOException
    {
       return super.popArg(this, isShort, openDelim, closeDelim);
@@ -2097,64 +2104,64 @@ public class TeXParser extends TeXObjectList
       return settings;
    }
 
-   public char getSpecialChar(int type, char def)
+   public int getSpecialChar(int type, int def)
    {
       if (catcodes[type].size() == 0)
       {
          return def;
       }
 
-      return catcodes[type].firstElement().charValue();
+      return catcodes[type].firstElement().intValue();
    }
 
-   public char getEscChar()
+   public int getEscChar()
    {
       return getSpecialChar(TYPE_ESC, '\\');
    }
 
-   public char getMathChar()
+   public int getMathChar()
    {
       return getSpecialChar(TYPE_MATH, '$');
    }
 
    public String getMathDelim(boolean isinline)
    {
-      char c = getSpecialChar(TYPE_MATH, '$');
+      int c = getSpecialChar(TYPE_MATH, '$');
 
-      return isinline ? ""+c : ""+c+c;
+      return isinline ? String.format("%c", c) : String.format("%c%c", c, c);
    }
 
-   public char getCommentChar()
+   public int getCommentChar()
    {
       return getSpecialChar(TYPE_COMMENT, '%');
    }
 
-   public char getBgChar()
+   public int getBgChar()
    {
       return getSpecialChar(TYPE_BG, '{');
    }
 
-   public char getEgChar()
+   public int getEgChar()
    {
       return getSpecialChar(TYPE_EG, '}');
    }
 
-   public char getParamChar()
+   public int getParamChar()
    {
       return getSpecialChar(TYPE_PARAM, '#');
    }
 
-   public char getSpChar()
+   public int getSpChar()
    {
       return getSpecialChar(TYPE_SP, '^');
    }
 
-   public char getSbChar()
+   public int getSbChar()
    {
       return getSpecialChar(TYPE_SB, '_');
    }
 
-   public char getTabChar()
+   public int getTabChar()
    {
       return getSpecialChar(TYPE_TAB, '\t');
    }

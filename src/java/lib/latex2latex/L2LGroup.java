@@ -110,7 +110,7 @@ public class L2LGroup extends Group
       LaTeX2LaTeX listener = (LaTeX2LaTeX)parser.getListener();
 
       Writeable writeable = listener.getWriteable();
-      writeable.write(parser.getBgChar());
+      writeable.writeCodePoint(parser.getBgChar());
 
       parser.startGroup();
    }
@@ -122,7 +122,7 @@ public class L2LGroup extends Group
 
       Writeable writeable = listener.getWriteable();
       parser.endGroup();
-      writeable.write(parser.getEgChar());
+      writeable.writeCodePoint(parser.getEgChar());
    }
 
 }

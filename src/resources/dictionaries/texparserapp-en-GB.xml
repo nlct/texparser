@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+<comment>GB English language file for texparserapp</comment>
+
+<!--  About dialog -->
+<entry key="about.title">About {0}</entry>
+<entry key="about.version">{0} {0} ({1})</entry>
+<entry key="about.licence">License</entry>
+<entry key="about.legal">License GPLv3+: GNU GPL version 3 or later &lt;http://gnu.org/licenses/gpl.html&gt;
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.</entry>
+<entry key="about.translated_by">Translated by {0}</entry>
+<entry key="about.translator_info"></entry>
+<entry key="about.acknowledgements"></entry>
+
+<!--  Messages -->
+<entry key="message.reading">Reading {0}...</entry>
+<entry key="message.writing">Writing {0}...</entry>
+<entry key="message.running">Running {0}</entry>
+<entry key="message.processing">Processing {0}</entry>
+<entry key="message.copying">Copying {0} -> {0}</entry>
+<entry key="message.moving">Moving {0} -> {0}</entry>
+<entry key="message.no.read">No read access for {0}...</entry>
+<entry key="message.no.write">No write access for {0}...</entry>
+
+<!--  Warnings -->
+<entry key="warning.substituting">Substituting {0} with {1}</entry>
+<entry key="warning.removing">Removing {0}</entry>
+
+<!--  Syntax -->
+<entry key="syntax.title">Syntax:</entry>
+<entry key="syntax.or">or</entry>
+<entry key="syntax.opt_in">{0} [&lt;option&gt;]+ --in &lt;TeX file&gt;</entry>
+<entry key="syntax.general">General Options:</entry>
+<entry key="syntax.gui">{0} (or {1})			GUI interface.</entry>
+<entry key="syntax.batch">{0} (or {1})			No GUI interface. (Default.)</entry>
+<entry key="syntax.in">{0} (or {1}) &lt;TeX file&gt;	Parse &lt;TeX file&gt;.</entry>
+<entry key="syntax.out">{0} (or {1}) &lt;directory&gt;	Save output in &lt;directory&gt;, which must not already exist.</entry>
+<entry key="syntax.latex">{0}		Set the output format to LaTeX (default)</entry>
+<entry key="syntax.html">{0}		Set the output format to HTML</entry>
+<entry key="syntax.version">{0} (or {1})		Print version and exit.</entry>
+<entry key="syntax.help">{0} (or {1})			Print this help message and exit.</entry>
+<entry key="syntax.debug">{0}			Switch on debug mode.</entry>
+<entry key="syntax.nodebug">{0}		Switch off debug mode. (Default.)</entry>
+<entry key="syntax.bugreport">Report bugs to: {0}</entry>
+<entry key="syntax.homepage">{0} home page: {1}</entry>
+
+<!--  Error messages -->
+
+<entry key="error.title">Error</entry>
+<entry key="error.message">Error Message</entry>
+<entry key="error.message.mnemonic">M</entry>
+<entry key="error.stacktrace">Stack Trace</entry>
+<entry key="error.stacktrace.mnemonic">T</entry>
+<entry key="error.line_with_code">Line {0}: {1} (error code {2}).</entry>
+<entry key="error.unknown">Unknown error</entry>
+<entry key="error.exec_failed">Failed to execute: {0}</entry>
+<entry key="error.app_failed">{0} failed with exit code {1}</entry>
+<entry key="error.interrupted">Process interrupted</entry>
+<entry key="error.syntax">Syntax error: {0}</entry>
+<entry key="error.syntax.unknown_option">Unknown option ''{0}''. (Use --help or -h for help.)</entry>
+<entry key="error.syntax.only_one">Only one {0} permitted</entry>
+<entry key="error.syntax.only_one_input">Only one input file permitted</entry>
+<entry key="error.syntax.missing_filename">Filename expected after {0}</entry>
+<entry key="error.syntax.missing_input">File name expected after {0}</entry>
+<entry key="error.syntax.batch.missing_in">Input file required for batch mode</entry>
+<entry key="error.syntax.batch.missing_out">Output directory required for batch mode</entry>
+<entry key="error.syntax.batch.unknown_format">Unknown format ''{0}''</entry>
+<entry key="error.exists">{0} already exists</entry>
+
+<!--  TeX Error Messages -->
+
+<entry key="tex.error.bad_param">Parameter digit 1 to 9 expected. Found ''{0}''</entry>
+<entry key="tex.error.no_eg">Missing end group</entry>
+<entry key="tex.error.par_before_eg">Paragraph break found before end group</entry>
+<entry key="tex.error.unexpected_eg">Unexpected end group found</entry>
+<entry key="tex.error.missing_endmath">Missing end math</entry>
+<entry key="tex.error.dollar2_ended_with_dollar">$$ ended with $</entry>
+<entry key="tex.error.not_found">Expected ''{0}'' but not found</entry>
+<entry key="tex.error.missing_param">Argument expected for ''{0}'' but not found</entry>
+<entry key="tex.error.empty_stack">Argument expected but not found (empty stack)</entry>
+<entry key="tex.error.not_math_mode">{0} is only permitted in math mode</entry>
+<entry key="tex.error.invalid_accent">{0} is not a recognised accent </entry>
+<entry key="tex.error.ambiguous_midcs">Ambiguous use of {0}</entry>
+<entry key="tex.error.missing_closing">Missing closing {0}</entry>
+<entry key="tex.error.dimen_expected">Dimension expected</entry>
+<entry key="tex.error.missing_unit">Missing unit</entry>
+<entry key="tex.error.expected">Expected {0}</entry>
+<entry key="tex.error.undefined">Undefined command {0}</entry>
+<entry key="tex.error.undefined_char">Undefined active character ''{0}''</entry>
+<entry key="tex.error.cs_expected">Control sequence expected (found ''{0}'')</entry>
+<entry key="tex.error.number_expected">Number expected (found ''{0}'')</entry>
+<entry key="tex.error.register_undef">Unknown register ''{0}''</entry>
+<entry key="tex.error.syntax">Invalid syntax for {0}</entry>
+<entry key="tex.error.extra">Extra {0}</entry>
+<entry key="tex.error.extra_or_forgotten">Extra {0}, or forgotten {1}</entry>
+<entry key="tex.error.double_subscript">Double subscript _{0}_ (replaced with _{0}'{}'_)</entry>
+<entry key="tex.error.double_superscript">Double superscript ^{0}^ (replaced with ^{0}'{}'^)</entry>
+<entry key="tex.error.illegal_align">Illegal alignment {0}</entry>
+<entry key="tex.error.misplaced_omit">Misplaced \omit</entry>
+<entry key="tex.error.improper_alphabetic_constant">Improper alphabetic constant {0}</entry>
+
+<!--  LaTeX Error Messages -->
+
+<entry key="latex.error.no_alignment">No alignment specifiers found</entry>
+<entry key="latex.error.undefined_counter">No counter ''{0}'' defined</entry>
+<entry key="latex.error.multi_begin_doc">Only one \begin'{'document'}' permitted</entry>
+<entry key="latex.error.no_begin_doc">No \begin'{'document'}' found</entry>
+<entry key="latex.error.multi_cls">Only one \documentclass permitted</entry>
+<entry key="latex.error.missing_key">Missing ''{0}'' key</entry>
+<entry key="latex.error.extra_end">Extra \end'{'{0}'}' found</entry>
+<entry key="latex.error.unaccessible">Unaccessible ''{0}''</entry>
+<entry key="latex.error.defined">'{0}' already defined</entry>
+<entry key="latex.error.illegal_array_arg_char">Illegal character ''{0}'' in array arg</entry>
+<entry key="latex.error.lonely_item">Lonely \item</entry>
+
+<!--  bibtex errors -->
+<entry key="bibtex.error.missing_value">Missing value</entry>
+<entry key="bibtex.error.expecting">Expecting ''{0}''</entry>
+<entry key="bibtex.error.expecting_or">Expecting ''{0}'' or ''{1}''</entry>
+<entry key="bibtex.error.missing_field_part">Missing field part</entry>
+<entry key="bibtex.error.missing_field_name">Missing field name</entry>
+<entry key="bibtex.error.unbalanced_braces">Unbalanced braces</entry>
+<entry key="bibtex.error.immediately_follows_entry_type">''{0}'' immediately follows entry type</entry>
+<entry key="bibtex.error.immediately_follows_field_name">''{0}'' immediately follows field name</entry>
+<entry key="bibtex.error.illegal_end">Illegal end</entry>
+<entry key="bibtex.error.missing">Missing</entry>
+<entry key="bibtex.error.too_many_commas">Too many commas in name ''{0}''</entry>
+<entry key="bibtex.error.string_name_undefined">String name ''{0}'' undefined</entry>
+<entry key="bibtex.error.repeated_entry">Repeated entry ''{0}''</entry>
+
+<!--  Package messages -->
+
+<entry key="probsoln.no_such_db">ProbSoln database ''{0}'' doesn''t exist.</entry>
+<entry key="probsoln.no_such_entry_in_db">Entry ''{0}'' doesn''t exist in ProbSoln database '{1}'.</entry>
+<entry key="probsoln.db_exists">ProbSoln database ''{0}'' already exists.</entry>
+<entry key="probsoln.request_args">Problem ''{0}'' (in database ''{1}'') requires {2} arguments. Please specify</entry>
+<entry key="probsoln.request_arg">Problem ''{0}'' (in database ''{1}'') requires 1 argument. Please specify</entry>
+
+<!--  Image drawing messages -->
+
+<entry key="teximage.error.no_path">No path defined on which to operate</entry>
+
+</properties>

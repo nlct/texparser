@@ -67,12 +67,14 @@ public class Footnote extends ControlSequence
 
       if (opt != null)
       {
-         reg = parser.getSettings().getRegister("c@"+counter);
+         String registerName = String.format("c@%s", counter);
+
+         reg = parser.getSettings().getRegister(registerName);
 
          if (reg == null)
          {
             throw new TeXSyntaxException(parser, 
-               TeXSyntaxException.ERROR_REGISTER_UNDEF, "c@"+counter);
+               TeXSyntaxException.ERROR_REGISTER_UNDEF, registerName);
          }
 
          orgValue.setValue(reg.number(parser));
@@ -143,12 +145,14 @@ public class Footnote extends ControlSequence
 
       if (opt != null)
       {
-         reg = parser.getSettings().getRegister("c@"+counter);
+         String registerName = String.format("c@%s", counter);
+
+         reg = parser.getSettings().getRegister(registerName);
 
          if (reg == null)
          {
             throw new TeXSyntaxException(parser, 
-               TeXSyntaxException.ERROR_REGISTER_UNDEF, "c@"+counter);
+               TeXSyntaxException.ERROR_REGISTER_UNDEF, registerName);
          }
 
          orgValue.setValue(reg.number(parser));

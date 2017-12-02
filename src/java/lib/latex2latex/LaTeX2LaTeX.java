@@ -231,11 +231,11 @@ public class LaTeX2LaTeX extends LaTeXParserListener
    {
       super.beginDocument();
 
-      write(parser.getEscChar());
+      writeCodePoint(parser.getEscChar());
       write("begin");
-      write(parser.getBgChar());
+      writeCodePoint(parser.getBgChar());
       write("document");
-      write(parser.getEgChar());
+      writeCodePoint(parser.getEgChar());
    }
 
    public void endDocument()
@@ -243,11 +243,12 @@ public class LaTeX2LaTeX extends LaTeXParserListener
    {
       try
       {
-         write(parser.getEscChar());
+         writeCodePoint(parser.getEscChar());
          write("end");
-         write(parser.getBgChar());
+         writeCodePoint(parser.getBgChar());
          write("document");
-         writeln(parser.getEgChar());
+         writeCodePoint(parser.getEgChar());
+         writeln();
 
          super.endDocument();
       }
@@ -266,7 +267,8 @@ public class LaTeX2LaTeX extends LaTeXParserListener
    {
       super.documentclass(options, clsName);
 
-      write(parser.getEscChar()+"documentclass");
+      writeCodePoint(parser.getEscChar());
+      write("documentclass");
 
       if (options != null)
       {
@@ -275,7 +277,9 @@ public class LaTeX2LaTeX extends LaTeXParserListener
          write(']');
       }
 
-      write(parser.getBgChar()+clsName+parser.getEgChar());
+      writeCodePoint(parser.getBgChar());
+      write(clsName);
+      writeCodePoint(parser.getEgChar());
    }
 
    public LaTeXSty usepackage(KeyValList options, String styName) throws IOException
@@ -290,7 +294,7 @@ public class LaTeX2LaTeX extends LaTeXParserListener
 
       LaTeXSty sty = super.usepackage(options, styName);
 
-      write(parser.getEscChar());
+      writeCodePoint(parser.getEscChar());
       write("usepackage");
 
       if (options != null)
@@ -300,9 +304,9 @@ public class LaTeX2LaTeX extends LaTeXParserListener
          write(']');
       }
 
-      write(parser.getBgChar());
+      writeCodePoint(parser.getBgChar());
       write(styName);
-      write(parser.getEgChar());
+      writeCodePoint(parser.getEgChar());
 
       return sty;
    }
@@ -442,7 +446,7 @@ public class LaTeX2LaTeX extends LaTeXParserListener
          imgName = builder.toString();
       }
 
-      write(parser.getEscChar());
+      writeCodePoint(parser.getEscChar());
       write("includegraphics");
 
       if (options != null && options.size() > 0)
@@ -452,7 +456,7 @@ public class LaTeX2LaTeX extends LaTeXParserListener
          write(']');
       }
 
-      write(parser.getBgChar());
+      writeCodePoint(parser.getBgChar());
 
       String lc = imgName.toLowerCase();
 
@@ -467,7 +471,7 @@ public class LaTeX2LaTeX extends LaTeXParserListener
          write(imgName);
       }
 
-      write(parser.getEgChar());
+      writeCodePoint(parser.getEgChar());
 
    }
 
@@ -478,20 +482,22 @@ public class LaTeX2LaTeX extends LaTeXParserListener
 
       if (!isReplaceGraphicsPathEnabled())
       {
-         write(parser.getEscChar());
+         writeCodePoint(parser.getEscChar());
          write("graphicspath");
 
-         String bg = ""+parser.getBgChar();
-         String eg = ""+parser.getEgChar();
+         int bg = parser.getBgChar();
+         int eg = parser.getEgChar();
 
-         write(bg);
+         writeCodePoint(bg);
 
          for (TeXObject path : paths)
          {
-            write(bg+path.toString(parser)+eg);
+            writeCodePoint(bg);
+            write(path.toString(parser));
+            writeCodePoint(eg);
          }
 
-         write(eg);
+         writeCodePoint(eg);
       }
    }
 
@@ -521,7 +527,7 @@ public class LaTeX2LaTeX extends LaTeXParserListener
    {
       if (writer != null)
       {
-         writer.print((char)charCode);
+         writer.print(String.format("%c", charCode));
       }
       else
       {
@@ -593,71 +599,71 @@ public class LaTeX2LaTeX extends LaTeXParserListener
      TeXObject secondDelim, TeXObject before, TeXObject after)
     throws IOException
    {
-      char esc = parser.getEscChar();
-      char bg = parser.getBgChar();
-      char eg = parser.getEgChar();
+      int esc = parser.getEscChar();
+      int bg = parser.getBgChar();
+      int eg = parser.getEgChar();
 
       if (firstDelim instanceof Other 
        && secondDelim instanceof Other
-       && ((Other)firstDelim).getCharCode()==(int)'.'
-       && ((Other)secondDelim).getCharCode()==(int)'.')
+       && ((Other)firstDelim).getCharCode()=='.'
+       && ((Other)secondDelim).getCharCode()=='.')
       {
-         write(esc);
+         writeCodePoint(esc);
          write("frac");
-         write(bg);
+         writeCodePoint(bg);
          write(before.toString(parser));
-         write(eg);
-         write(bg);
+         writeCodePoint(eg);
+         writeCodePoint(bg);
          write(after.toString(parser));
-         write(eg);
+         writeCodePoint(eg);
       }
       else if (isStyLoaded("amsmath"))
       {
-         write(esc);
+         writeCodePoint(esc);
          write("genfrac");
 
          // left-delim:
-         write(bg);
+         writeCodePoint(bg);
          write(firstDelim.toString(parser));
-         write(eg);
+         writeCodePoint(eg);
 
          // right-delim:
-         write(bg);
+         writeCodePoint(bg);
          write(secondDelim.toString(parser));
-         write(eg);
+         writeCodePoint(eg);
 
          // thickness:
-         write(bg);
-         write(eg);
+         writeCodePoint(bg);
+         writeCodePoint(eg);
 
          // mathstyle:
-         write(bg);
-         write(eg);
+         writeCodePoint(bg);
+         writeCodePoint(eg);
 
          // numerator:
-         write(bg);
+         writeCodePoint(bg);
          write(before.toString(parser));
-         write(eg);
+         writeCodePoint(eg);
 
          // denominator:
-         write(bg);
+         writeCodePoint(bg);
          write(after.toString(parser));
-         write(eg);
+         writeCodePoint(eg);
       }
       else
       {
-         write(esc);
+         writeCodePoint(esc);
          write("left");
          write(firstDelim.toString(parser));
-         write(esc);
+         writeCodePoint(esc);
          write("frac");
-         write(bg);
+         writeCodePoint(bg);
          write(before.toString(parser));
-         write(eg);
-         write(bg);
+         writeCodePoint(eg);
+         writeCodePoint(bg);
          write(after.toString(parser));
-         write(eg);
-         write(esc);
+         writeCodePoint(eg);
+         writeCodePoint(esc);
          write("right");
          write(secondDelim.toString(parser));
       }
@@ -668,68 +674,68 @@ public class LaTeX2LaTeX extends LaTeXParserListener
      TeXObject before, TeXObject after)
     throws IOException
    {
-      char esc = parser.getEscChar();
-      char bg = parser.getBgChar();
-      char eg = parser.getEgChar();
+      int esc = parser.getEscChar();
+      int bg = parser.getBgChar();
+      int eg = parser.getEgChar();
 
       if (isStyLoaded("amsmath"))
       {
-         write(esc);
+         writeCodePoint(esc);
          write("genfrac");
 
          // left-delim:
-         write(bg);
+         writeCodePoint(bg);
          write(firstDelim.toString(parser));
-         write(eg);
+         writeCodePoint(eg);
 
          // right-delim:
-         write(bg);
+         writeCodePoint(bg);
          write(secondDelim.toString(parser));
-         write(eg);
+         writeCodePoint(eg);
 
          // thickness:
-         write(bg);
+         writeCodePoint(bg);
          write(thickness.toString(parser));
-         write(eg);
+         writeCodePoint(eg);
 
          // mathstyle:
-         write(bg);
-         write(eg);
+         writeCodePoint(bg);
+         writeCodePoint(eg);
 
          // numerator:
-         write(bg);
+         writeCodePoint(bg);
          write(before.toString(parser));
-         write(eg);
+         writeCodePoint(eg);
 
          // denominator:
-         write(bg);
+         writeCodePoint(bg);
          write(after.toString(parser));
-         write(eg);
+         writeCodePoint(eg);
       }
       else if (firstDelim instanceof Other 
        && secondDelim instanceof Other
-       && ((Other)firstDelim).getCharCode()==(int)'.'
-       && ((Other)secondDelim).getCharCode()==(int)'.')
+       && ((Other)firstDelim).getCharCode()=='.'
+       && ((Other)secondDelim).getCharCode()=='.')
       {
-         write(bg);
+         writeCodePoint(bg);
          write(before.toString(parser));
-         write(esc);
+         writeCodePoint(esc);
          write("above ");
          write(thickness.toString(parser));
          write(after.toString(parser));
-         write(eg);
+         writeCodePoint(eg);
       }
       else
       {
-         write(bg);
+         writeCodePoint(bg);
          write(before.toString(parser));
-         write(esc);
+         writeCodePoint(esc);
          write("abovewithdelims ");
          write(firstDelim.toString(parser));
          write(secondDelim.toString(parser));
          write(thickness.toString(parser));
          write(after.toString(parser));
-         write(eg);
+         writeCodePoint(eg);
       }
    }
 
@@ -741,19 +747,19 @@ public class LaTeX2LaTeX extends LaTeXParserListener
    public void subscript(TeXObject arg)
      throws IOException
    {
-      write(parser.getSbChar());
-      write(parser.getBgChar());
+      writeCodePoint(parser.getSbChar());
+      writeCodePoint(parser.getBgChar());
       write(arg.toString(parser));
-      write(parser.getEgChar());
+      writeCodePoint(parser.getEgChar());
    }
 
    public void superscript(TeXObject arg)
      throws IOException
    {
-      write(parser.getSpChar());
-      write(parser.getBgChar());
+      writeCodePoint(parser.getSpChar());
+      writeCodePoint(parser.getBgChar());
       write(arg.toString(parser));
-      write(parser.getEgChar());
+      writeCodePoint(parser.getEgChar());
    }
 
    public TeXApp getTeXApp()
@@ -785,7 +791,7 @@ public class LaTeX2LaTeX extends LaTeXParserListener
      throws IOException
    {
       getTeXApp().message(getTeXApp().getMessage(
-         TeXApp.MESSAGE_READING, file.getAbsolutePath()));
+         TeXApp.MESSAGE_READING, file));
 
       basePath = file.getParentFile().toPath();
 
@@ -796,9 +802,8 @@ public class LaTeX2LaTeX extends LaTeXParserListener
          File outFile = new File(outPath.toFile(), getOutFileName(file));
 
          getTeXApp().message(getTeXApp().getMessage(
-            TeXApp.MESSAGE_WRITING, outFile.getAbsolutePath()));
+            TeXApp.MESSAGE_WRITING, outFile));
          writer = new PrintWriter(outFile);
-
       }
    }
 
@@ -828,18 +833,24 @@ public class LaTeX2LaTeX extends LaTeXParserListener
    public void href(String url, TeXObject text)
     throws IOException
    {
-      String bg = ""+parser.getBgChar();
-      String eg = ""+parser.getEgChar();
+      int bg = parser.getBgChar();
+      int eg = parser.getEgChar();
 
-      write(parser.getEscChar()+"href");
-      write(bg+url+eg);
-      write(bg+text.toString(parser)+eg);
+      writeCodePoint(parser.getEscChar());
+      write("href");
+      writeCodePoint(bg);
+      write(url);
+      writeCodePoint(eg);
+      writeCodePoint(bg);
+      write(text.toString(parser));
+      writeCodePoint(eg);
    }
 
-   public void verb(String name, boolean isStar, char delim, String text)
+   public void verb(String name, boolean isStar, int delim, String text)
      throws IOException
    {
-      write(parser.getEscChar()+name);
+      writeCodePoint(parser.getEscChar());
+      write(name);
 
       if (isStar)
       {
@@ -850,9 +861,9 @@ public class LaTeX2LaTeX extends LaTeXParserListener
          write(" ");
       }
 
-      write(delim);
+      writeCodePoint(delim);
       write(text);
-      write(delim);
+      writeCodePoint(delim);
    }
 
    public void newcommand(byte overwrite,
@@ -860,11 +871,12 @@ public class LaTeX2LaTeX extends LaTeXParserListener
      int numParams, TeXObject defValue, TeXObject definition)
     throws IOException
    {
-      char bg = parser.getBgChar();
-      char eg = parser.getEgChar();
-      char esc = parser.getEscChar();
+      int bg = parser.getBgChar();
+      int eg = parser.getEgChar();
+      int esc = parser.getEscChar();
 
-      write(""+esc+type);
+      writeCodePoint(esc);
+      write(type);
 
       if (isShort)
       {

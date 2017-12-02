@@ -22,8 +22,8 @@ import com.dickimawbooks.texparserapp.TeXParserApp;
 
 public class ProcessFailedException extends Exception
 {
-   public ProcessFailedException(String cmd)
+   public ProcessFailedException(TeXParserApp app, String cmd)
    {
-      super(TeXParserApp.getLabelWithValue("error.exec_failed", cmd));
+      super(app.getMessage("error.exec_failed", cmd));
    }
 }

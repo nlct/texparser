@@ -41,7 +41,7 @@ public class UserNumber implements TeXNumber
       }
       catch (NumberFormatException e)
       {
-         throw new TeXSyntaxException(parser, 
+         throw new TeXSyntaxException(e, parser, 
           TeXSyntaxException.ERROR_NUMBER_EXPECTED, string);
       }
    }
@@ -55,7 +55,7 @@ public class UserNumber implements TeXNumber
       }
       catch (NumberFormatException e)
       {
-         throw new TeXSyntaxException(parser, 
+         throw new TeXSyntaxException(e, parser, 
           TeXSyntaxException.ERROR_NUMBER_EXPECTED, string);
       }
    }

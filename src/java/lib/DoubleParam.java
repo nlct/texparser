@@ -46,7 +46,8 @@ public class DoubleParam implements TeXObject
 
    public String toString(TeXParser parser)
    {
-      return ""+parser.getParamChar()+param.toString(parser);
+      return String.format("%c%s", parser.getParamChar(),
+         param.toString(parser));
    }
 
    public String format()
@@ -64,7 +65,7 @@ public class DoubleParam implements TeXObject
      throws IOException
    {
       TeXObjectList list = new TeXObjectList();
-      list.add(parser.getListener().getOther((int)parser.getParamChar()));
+      list.add(parser.getListener().getOther(parser.getParamChar()));
       list.add(getParam());
 
       return list;

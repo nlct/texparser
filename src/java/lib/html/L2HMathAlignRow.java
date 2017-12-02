@@ -99,7 +99,7 @@ public class L2HMathAlignRow extends L2HAlignRow
       {
          throw new TeXSyntaxException(parser,
            TeXSyntaxException.ERROR_DIMEN_EXPECTED,
-           "\\arraycolsep");
+           String.format("%carraycolsep", parser.getEscChar()));
       }
 
       return ((DimenRegister)reg).getDimension();

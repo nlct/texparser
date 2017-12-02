@@ -83,7 +83,7 @@ public class JmlrObjectRef extends Command
       int n = csvList.size();
 
       expanded.add(n == 1 ? singulartag : pluraltag);
-      expanded.add(listener.getActiveChar((int)'~'));
+      expanded.add(listener.getActiveChar('~'));
       expanded.add(pre);
 
       for (int i = 0; i < n; i++)

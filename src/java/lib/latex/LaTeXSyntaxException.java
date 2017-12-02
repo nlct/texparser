@@ -23,37 +23,16 @@ import com.dickimawbooks.texparserlib.TeXParser;
 
 public class LaTeXSyntaxException extends TeXSyntaxException
 {
-   public LaTeXSyntaxException(TeXParser parser, String errorTag, String param)
-   {
-      super(parser, errorTag, param);
-   }
-
-   public LaTeXSyntaxException(TeXParser parser, String errorTag, String[] params)
+   public LaTeXSyntaxException(TeXParser parser, String errorTag, 
+      Object... params)
    {
       super(parser, errorTag, params);
    }
 
-   public LaTeXSyntaxException(TeXParser parser, String errorTag,
-      String param, Throwable cause)
+   public LaTeXSyntaxException(Throwable cause, TeXParser parser,
+      String errorTag, Object... params)
    {
-      super(parser, errorTag, param, cause);
-   }
-
-   public LaTeXSyntaxException(TeXParser parser, String errorTag,
-      String[] params, Throwable cause)
-   {
-      super(parser, errorTag, params, cause);
-   }
-
-   public LaTeXSyntaxException(TeXParser parser, String errorTag)
-   {
-      super(parser, errorTag);
-   }
-
-   public LaTeXSyntaxException(TeXParser parser, String errorTag,
-     Throwable cause)
-   {
-      super(parser, errorTag, cause);
+      super(cause, parser, errorTag, params);
    }
 
    public static final String ERROR_MULTI_BEGIN_DOC = 

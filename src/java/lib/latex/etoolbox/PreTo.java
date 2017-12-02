@@ -54,7 +54,7 @@ public class PreTo extends ControlSequence
       {
          throw new LaTeXSyntaxException(parser,
            LaTeXSyntaxException.ERROR_UNACCESSIBLE,
-           arg.toString());
+           arg.toString(parser));
       }
 
       ControlSequence hook = (ControlSequence)arg;

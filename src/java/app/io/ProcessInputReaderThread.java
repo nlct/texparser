@@ -24,9 +24,11 @@ import com.dickimawbooks.texparserapp.TeXParserApp;
 
 public class ProcessInputReaderThread extends Thread
 {
-   public ProcessInputReaderThread(Process process, ProcessListener listener)
+   public ProcessInputReaderThread(TeXParserApp app, Process process, 
+      ProcessListener listener)
    {
       super();
+      this.app = app;
       this.process = process;
       this.listener = listener;
    }
@@ -43,27 +45,27 @@ public class ProcessInputReaderThread extends Thread
          String line;
          int lineNum = 0;
 
-         TeXParserApp.checkForInterrupt();
+         app.checkForInterrupt();
 
          while ((line = in.readLine()) != null)
          {
             lineNum++;
             listener.processLine(lineNum, line);
 
-            TeXParserApp.checkForInterrupt();
+            app.checkForInterrupt();
          }
 
          err = new BufferedReader(new InputStreamReader(process.getErrorStream()));
 
          lineNum = 0;
 
-         TeXParserApp.checkForInterrupt();
+         app.checkForInterrupt();
 
          while ((line = err.readLine()) != null)
          {
             lineNum++;
             listener.processErrorLine(lineNum, line);
-            TeXParserApp.checkForInterrupt();
+            app.checkForInterrupt();
          }
       }
       catch (Exception e)
@@ -75,12 +77,12 @@ public class ProcessInputReaderThread extends Thread
             switch (interruptor.getStatus())
             {
                case InterruptTimerTask.STATUS_ABORT:
-                  listener.error(new CancelledException());
+                  listener.error(new CancelledException(app));
                return;
                case InterruptTimerTask.STATUS_TIMEDOUT:
                  listener.error(new CancelledException(
-                    TeXParserApp.getLabelWithValue("error.timedout", 
-                       ""+TeXParserApp.MAX_PROCESS_TIME)));
+                    app.getMessage("error.timedout", 
+                       TeXParserApp.MAX_PROCESS_TIME)));
                return;
             }
          }
@@ -121,4 +123,5 @@ public class ProcessInputReaderThread extends Thread
 
    private Process process;
    private ProcessListener listener;
+   private TeXParserApp app;
 }

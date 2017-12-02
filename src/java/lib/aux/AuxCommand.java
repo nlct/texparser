@@ -65,7 +65,8 @@ public class AuxCommand extends ControlSequence
 
          if (args[i] == null)
          {
-            throw new NullPointerException("null arg " +i+" for "+getName());
+            throw new NullPointerException(String.format(
+              "null arg %d for %s", i, getName()));
          }
       }
 
@@ -85,7 +86,8 @@ public class AuxCommand extends ControlSequence
 
          if (args[i] == null)
          {
-            throw new NullPointerException("null arg " +i+" for "+getName());
+            throw new NullPointerException(String.format(
+              "null arg %d for %s", i, getName()));
          }
       }
 

@@ -61,7 +61,7 @@ public class IndexLocation implements TeXObject
          return;
       }
 
-      throw new IllegalArgumentException("Invalid location type "
+      throw new IllegalArgumentException("Invalid location type: "
        + type);
    }
 

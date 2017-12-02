@@ -78,10 +78,10 @@ public class L2LMathGroup extends MathGroup
       {
          String orgDelim = delim;
 
-         char esc = parser.getEscChar();
+         int esc = parser.getEscChar();
 
-         delim = (openDelim == null ? ""+esc+"[" : openDelim);
-         endDelim = (closeDelim == null ? ""+esc+"]" : closeDelim);
+         delim = (openDelim == null ? String.format("%c[", esc) : openDelim);
+         endDelim = (closeDelim == null ? String.format("%c]", esc):closeDelim);
 
          LaTeX2LaTeX listener = (LaTeX2LaTeX)parser.getListener();
 

@@ -32,10 +32,12 @@ import com.dickimawbooks.texparserapp.TeXParserApp;
 public class ScrollToolBar extends JPanel
    implements ActionListener,ChangeListener
 {
-   public ScrollToolBar(int orientation)
+   public ScrollToolBar(TeXParserAppGuiResources resources, int orientation)
    {
       super();
       setLayout(new BorderLayout());
+
+      this.resources = resources;
 
       backComponent = createNavButton("scrollback");
 
@@ -62,8 +64,9 @@ public class ScrollToolBar extends JPanel
 
    private JButton createNavButton(String action)
    {
-      JButton button = TeXParserAppGuiResources.createActionButton("button",
-        action, this, null, TeXParserApp.getLabel("button", action));
+      JButton button = resources.createActionButton("button",
+        action, this, null,
+        resources.getApplication().getLabel("button", action));
 
       Icon icon = button.getIcon();
 
@@ -159,4 +162,6 @@ public class ScrollToolBar extends JPanel
    private JScrollPane scrollPane;
    private JComponent toolPanel;
    private JComponent backComponent, forwardComponent;
+
+   private TeXParserAppGuiResources resources;
 }

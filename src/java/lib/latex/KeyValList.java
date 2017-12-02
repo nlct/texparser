@@ -252,26 +252,28 @@ public class KeyValList extends HashMap<String,TeXObject>
 
       Iterator<String> it = keySet.iterator();
 
+      Writeable writeable = parser.getListener().getWriteable();
+
       while (it.hasNext())
       {
          String key = it.next();
 
-         parser.getListener().getWriteable().write(key);
+         writeable.write(key);
          TeXObject value = get(key);
 
          if (value != null)
          {
-            parser.getListener().getWriteable().write('=');
-            parser.getListener().getWriteable().write(parser.getBgChar());
+            writeable.write('=');
+            writeable.writeCodePoint(parser.getBgChar());
 
             value.process(parser);
 
-            parser.getListener().getWriteable().write(parser.getEgChar());
+            writeable.writeCodePoint(parser.getEgChar());
          }
 
          if (it.hasNext())
          {
-            parser.getListener().getWriteable().write(',');
+            writeable.write(',');
          }
       }
    }
@@ -305,9 +307,9 @@ public class KeyValList extends HashMap<String,TeXObject>
 
             if (strVal.matches(".*[^\\w].*"))
             {
-               builder.append(parser.getBgChar());
+               builder.appendCodePoint(parser.getBgChar());
                builder.append(strVal);
-               builder.append(parser.getEgChar());
+               builder.appendCodePoint(parser.getEgChar());
             }
             else
             {

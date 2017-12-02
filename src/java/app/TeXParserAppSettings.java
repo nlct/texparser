@@ -34,10 +34,11 @@ import java.net.URL;
  */
 public class TeXParserAppSettings extends Properties
 {
-   public TeXParserAppSettings()
+   public TeXParserAppSettings(TeXParserApp app)
    {
       super();
       recentFiles = new Vector<String>();
+      this.app = app;
 
       setDefaults();
 
@@ -61,7 +62,7 @@ public class TeXParserAppSettings extends Properties
 
       if (home == null)
       {
-         TeXParserApp.debug("No 'user.home' property!");
+         app.debug("No 'user.home' property!");
          return;
       }
 
@@ -69,7 +70,7 @@ public class TeXParserAppSettings extends Properties
 
       if (!homeDir.exists())
       {
-         TeXParserApp.debug("Home directory '"+home+"' doesn't exist!");
+         app.debug("Home directory '"+home+"' doesn't exist!");
          return;
       }
 
@@ -79,7 +80,7 @@ public class TeXParserAppSettings extends Properties
       {
          if (!propertiesPath.isDirectory())
          {
-            TeXParserApp.debug("'"+propertiesPath+"' isn't a directory");
+            app.debug("'"+propertiesPath+"' isn't a directory");
             propertiesPath = null;
             return;
          }
@@ -88,7 +89,7 @@ public class TeXParserAppSettings extends Properties
       {
          if (!propertiesPath.mkdir())
          {
-            TeXParserApp.debug("Unable to mkdir '"+propertiesPath+"'");
+            app.debug("Unable to mkdir '"+propertiesPath+"'");
             propertiesPath = null;
 
             return;
@@ -257,7 +258,7 @@ public class TeXParserAppSettings extends Properties
 
          if (result < 0 || result > STARTUP_CUSTOM)
          {
-            TeXParserApp.debug("Invalid startup setting '"+prop+"'");
+            app.debug("Invalid startup setting '"+prop+"'");
             return STARTUP_HOME;
          }
 
@@ -265,7 +266,7 @@ public class TeXParserAppSettings extends Properties
       }
       catch (NumberFormatException e)
       {
-         TeXParserApp.debug("Invalid startup setting '"+prop+"'");
+         app.debug("Invalid startup setting '"+prop+"'");
          return STARTUP_HOME;
       }
    }
@@ -439,16 +440,16 @@ public class TeXParserAppSettings extends Properties
          String country = locale.getCountry();
 
          URL url = getClass().getResource(DICT_DIR + RESOURCE
-          + "-" + language + "-" + country  + ".prop");
+          + "-" + language + "-" + country  + ".xml");
 
          if (url == null)
          {
             url = getClass().getResource(DICT_DIR + RESOURCE
-              + "-" + language + ".prop");
+              + "-" + language + ".xml");
 
             if (url == null)
             {
-               prop = "en-US";
+               prop = "en-GB";
             }
             else
             {
@@ -493,7 +494,7 @@ public class TeXParserAppSettings extends Properties
 
             if (hsURL == null)
             {
-               TeXParserApp.debug("Can't find language file for "
+               app.debug("Can't find language file for "
                    +language+"-"+country);
                prop = "en-US";
             }
@@ -543,6 +544,8 @@ public class TeXParserAppSettings extends Properties
 
    private final String recentName = "recentfiles";
 
+   private TeXParserApp app;
+
    public static final int STARTUP_HOME   = 0;
    public static final int STARTUP_CWD    = 1;
    public static final int STARTUP_LAST   = 2;
@@ -557,5 +560,5 @@ public class TeXParserAppSettings extends Properties
      = Pattern.compile("texparserapp-([a-z]{2})(-[A-Z]{2})?");
 
    public static final Pattern PATTERN_DICT 
-     = Pattern.compile("texparserapp-([a-z]{2})(-[A-Z]{2})?\\.prop");
+     = Pattern.compile("texparserapp-([a-z]{2})(-[A-Z]{2})?\\.xml");
 }

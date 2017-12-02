@@ -52,7 +52,8 @@ public class Comment extends Ignoreable
 
    public String toString(TeXParser parser)
    {
-      return String.format("%c%s%n", parser.getCommentChar(), builder.toString());
+      return String.format("%c%s%n", parser.getCommentChar(), 
+         builder.toString());
    }
 
    public String toString()

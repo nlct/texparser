@@ -113,14 +113,12 @@ public class ForEachProblem extends ControlSequence
                if (numArgs == 1)
                {
                   response = app.requestUserInput(app.getMessage(
-                    PROBSOLN_REQUEST_ARG, 
-                    new String[] {key, db}));
+                    PROBSOLN_REQUEST_ARG, key, db));
                }
                else
                {
                   response = app.requestUserInput(app.getMessage(
-                    PROBSOLN_REQUEST_ARGS,
-                    new String[] {key, db, ""+numArgs}));
+                    PROBSOLN_REQUEST_ARGS, key, db, numArgs));
                }
 
                TeXObjectList list = new TeXObjectList();

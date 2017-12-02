@@ -134,7 +134,7 @@ public class Lipsum extends Command
          }
          catch (NumberFormatException e)
          {
-            throw new TeXSyntaxException(parser.getLineNumber(),
+            throw new TeXSyntaxException(parser,
               TeXSyntaxException.ERROR_NUMBER_EXPECTED);
          }
       }
@@ -210,7 +210,7 @@ public class Lipsum extends Command
          }
          catch (NumberFormatException e)
          {
-            throw new TeXSyntaxException(parser.getLineNumber(),
+            throw new TeXSyntaxException(parser,
               TeXSyntaxException.ERROR_NUMBER_EXPECTED);
          }
       }

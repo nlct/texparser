@@ -36,16 +36,6 @@ public class VerbChar extends ActiveChar
       this.showSpaces = showSpaces;
    }
 
-   public VerbChar(char c)
-   {
-      this((int)c);
-   }
-
-   public VerbChar(char c, boolean showSpaces)
-   {
-      this((int)c, showSpaces);
-   }
-
    public Object clone()
    {
       return new VerbChar(codePoint, showSpaces);
@@ -95,7 +85,7 @@ public class VerbChar extends ActiveChar
    {
       TeXObjectList list = parser.popRemainingVerb(codePoint);
 
-      parser.getListener().verb("verb", showSpaces, (char)codePoint, 
+      parser.getListener().verb("verb", showSpaces, codePoint, 
         list.toString(parser));
    }
 
@@ -127,7 +117,7 @@ public class VerbChar extends ActiveChar
 
          if (object instanceof Comment)
          {
-            builder.append(parser.getCommentChar());
+            builder.appendCodePoint(parser.getCommentChar());
 
             TeXObjectList list = new TeXObjectList();
             parser.scan(((Comment)object).getText(), list);
@@ -140,7 +130,7 @@ public class VerbChar extends ActiveChar
          }
       }
 
-      parser.getListener().verb("verb", showSpaces, (char)codePoint, 
+      parser.getListener().verb("verb", showSpaces, codePoint, 
         builder.toString());
    }
 

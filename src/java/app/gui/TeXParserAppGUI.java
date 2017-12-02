@@ -36,8 +36,19 @@ public class TeXParserAppGUI extends JFrame
 {
    public TeXParserAppGUI(TeXParserApp application)
    {
-      super(TeXParserApp.appName);
+      super(TeXParserApp.APP_NAME);
       app = application;
+      resources = new TeXParserAppGuiResources(application);
+   }
+
+   public TeXParserApp getApplication()
+   {
+      return app;
+   }
+
+   public TeXParserAppGuiResources getResources()
+   {
+      return resources;
    }
 
    public void actionPerformed(ActionEvent evt)
@@ -58,17 +69,17 @@ public class TeXParserAppGUI extends JFrame
 
    public void warning(String message)
    {
-      TeXParserAppGuiResources.warning(this, message);
+      resources.warning(this, message);
    }
 
    public void error(String message)
    {
-      TeXParserAppGuiResources.error(this, message);
+      resources.error(this, message);
    }
 
    public void error(Exception e)
    {
-      TeXParserAppGuiResources.error(this, e);
+      resources.error(this, e);
    }
 
    private void initHelp()
@@ -90,8 +101,7 @@ public class TeXParserAppGUI extends JFrame
             if (hsURL == null)
             {
                throw new FileNotFoundException(
-                  TeXParserApp.getLabelWithValue("error.resource.not_found",
-                    helpset));
+                  app.getMessage("error.resource.not_found", helpset));
             }
          }
 
@@ -114,19 +124,19 @@ public class TeXParserAppGUI extends JFrame
          }
          catch (BadIDException e)
          {
-            TeXParserAppGuiResources.error(null, e);
+            resources.error(null, e);
          }
       }
       else
       {
-         TeXParserApp.debug("Can't enable help on button (id="+id
+         app.debug("Can't enable help on button (id="+id
            +"): null help broker");
       }
    }
 
    public JButton createHelpButton(String id)
    {
-      JButton button = TeXParserAppGuiResources.createActionButton(
+      JButton button = resources.createActionButton(
          "button", "help", null, 
          KeyStroke.getKeyStroke(KeyEvent.VK_F1, 0));
 
@@ -142,5 +152,5 @@ public class TeXParserAppGUI extends JFrame
    private HelpBroker mainHelpBroker;
    private CSH.DisplayHelpFromSource csh;
 
-
+   private TeXParserAppGuiResources resources;
 }

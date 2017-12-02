@@ -49,8 +49,10 @@ public class L2LBibliography extends L2LControlSequence
 
       Writeable writeable = listener.getWriteable();
 
-      writeable.write(toString(parser)+parser.getBgChar()
-       + bibStr+parser.getEgChar());
+      writeable.write(toString(parser));
+      writeable.writeCodePoint(parser.getBgChar());
+      writeable.write(bibStr);
+      writeable.writeCodePoint(parser.getEgChar());
 
       String[] bibList = bibStr.split(" *, *");
 

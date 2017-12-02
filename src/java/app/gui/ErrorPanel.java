@@ -31,14 +31,16 @@ import com.dickimawbooks.texparserapp.TeXParserApp;
 public class ErrorPanel extends JPanel
   implements ActionListener
 {
-   public ErrorPanel()
+   public ErrorPanel(TeXParserAppGuiResources resources)
    {
       super(new BorderLayout());
 
-      messageArea = TeXParserAppGuiResources.createMessageArea();
-      stackTraceArea = TeXParserAppGuiResources.createMessageArea();
+      TeXParserApp app = resources.getApplication();
 
-      onlyMessageArea = TeXParserAppGuiResources.createMessageArea();
+      messageArea = resources.createMessageArea();
+      stackTraceArea = resources.createMessageArea();
+
+      onlyMessageArea = resources.createMessageArea();
 
       cardLayout = new CardLayout();
 
@@ -49,23 +51,23 @@ public class ErrorPanel extends JPanel
       
       tabbedPane = new JTabbedPane();
 
-      tabbedPane.addTab(TeXParserApp.getLabelWithAlt("error.message", "Error Message"),
+      tabbedPane.addTab(app.getLabelWithAlt("error.message", "Error Message"),
        new JScrollPane(messageArea));
 
       tabbedPane.setMnemonicAt(tabbedPane.getTabCount()-1,
-         TeXParserApp.getMnemonic("error.message"));
+         app.getMnemonic("error.message"));
 
-      tabbedPane.addTab(TeXParserApp.getLabelWithAlt("error.stacktrace", "Stack Trace"),
+      tabbedPane.addTab(app.getLabelWithAlt("error.stacktrace", "Stack Trace"),
        new JScrollPane(stackTraceArea));
 
       tabbedPane.setMnemonicAt(tabbedPane.getTabCount()-1,
-         TeXParserApp.getMnemonic("error.stacktrace"));
+         app.getMnemonic("error.stacktrace"));
 
       cardPanel.add(tabbedPane, "tabbedpane");
 
       JPanel buttonPanel = new JPanel();
 
-      buttonPanel.add(TeXParserAppGuiResources.createActionButton(
+      buttonPanel.add(resources.createActionButton(
          "button", "copy", this, 
          KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.SHIFT_MASK)));
 

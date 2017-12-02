@@ -55,8 +55,8 @@ public class ListItem extends ControlSequence
       }
       catch (java.util.EmptyStackException e)
       {
-         throw new LaTeXSyntaxException(parser, 
-           LaTeXSyntaxException.ERROR_LONELY_ITEM, e);
+         throw new LaTeXSyntaxException(e, parser, 
+           LaTeXSyntaxException.ERROR_LONELY_ITEM);
       }
 
       Group grp = listener.createGroup();
@@ -81,8 +81,8 @@ public class ListItem extends ControlSequence
       }
       catch (java.util.EmptyStackException e)
       {
-         throw new LaTeXSyntaxException(parser, 
-           LaTeXSyntaxException.ERROR_LONELY_ITEM, e);
+         throw new LaTeXSyntaxException(e, parser, 
+           LaTeXSyntaxException.ERROR_LONELY_ITEM);
       }
 
       Group grp = listener.createGroup();

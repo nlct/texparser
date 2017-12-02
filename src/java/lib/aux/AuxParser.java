@@ -180,7 +180,7 @@ public class AuxParser extends DefaultTeXParserListener
       throws IOException
    {
       getTeXApp().message(getTeXApp().getMessage(
-         TeXApp.MESSAGE_READING, file.getAbsolutePath()));
+         TeXApp.MESSAGE_READING, file));
    }
 
    public void addAuxData(AuxData data)

@@ -236,7 +236,7 @@ public class TeXObjectList extends Vector<TeXObject>
 
       if (object instanceof CharObject)
       {
-         char c1 = (char)((CharObject)object).getCharCode();
+         int c1 = ((CharObject)object).getCharCode();
 
          TeXObject nextObj = expandedPopStack(parser);
 
@@ -250,7 +250,7 @@ public class TeXObjectList extends Vector<TeXObject>
                TeXSyntaxException.ERROR_MISSING_UNIT);
          }
 
-         char c2 = (char)((CharObject)nextObj).getCharCode();
+         int c2 = ((CharObject)nextObj).getCharCode();
 
          try
          {
@@ -856,14 +856,14 @@ public class TeXObjectList extends Vector<TeXObject>
    // Pops delimited argument off the stack. If the stack doesn't
    // start with the specified open delimiter, returns null, so can
    // be used to get an optional argument
-   public TeXObject popArg(TeXParser parser, char openDelim, char closeDelim)
+   public TeXObject popArg(TeXParser parser, int openDelim, int closeDelim)
      throws IOException
    {
       return popArg(parser, false, openDelim, closeDelim);
    }
 
    public TeXObject popArg(TeXParser parser, boolean isShort, 
-     char openDelim, char closeDelim)
+     int openDelim, int closeDelim)
    throws IOException
    {
       TeXObject object = popStack(parser, isShort);
@@ -876,7 +876,7 @@ public class TeXObjectList extends Vector<TeXObject>
 
       CharObject charObj = (CharObject)object;
 
-      if (charObj.getCharCode() != (int)openDelim)
+      if (charObj.getCharCode() != openDelim)
       {
          push(object);
          return null;
@@ -894,7 +894,7 @@ public class TeXObjectList extends Vector<TeXObject>
          {
             charObj = (CharObject)object;
 
-            if (charObj.getCharCode() == (int)closeDelim)
+            if (charObj.getCharCode() == closeDelim)
             {
                return list;
             }
@@ -915,10 +915,10 @@ public class TeXObjectList extends Vector<TeXObject>
 
       throw new TeXSyntaxException(parser,
                TeXSyntaxException.ERROR_MISSING_CLOSING,
-        ""+closeDelim);
+               closeDelim);
    }
 
-   public Numerical popNumericalArg(TeXParser parser, char openDelim, char closeDelim)
+   public Numerical popNumericalArg(TeXParser parser, int openDelim, int closeDelim)
      throws IOException
    {
       TeXObject obj = popArg(parser, true, openDelim, closeDelim);
@@ -1443,8 +1443,7 @@ public class TeXObjectList extends Vector<TeXObject>
             {
                throw new TeXSyntaxException(parser,
                  TeXSyntaxException.ERROR_EXTRA_OR_FORGOTTEN,
-                 new String[] {obj.toString(parser), 
-                               bgChar.toString(parser)});
+                 obj.toString(parser), bgChar.toString(parser));
             }
 
             return true;

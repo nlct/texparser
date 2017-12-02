@@ -38,14 +38,14 @@ public class SpChar extends Macro
 
    public String toString(TeXParser parser)
    {
-      return ""+parser.getSpChar();
+      return String.format("%c", parser.getSpChar());
    }
 
    public TeXObjectList string(TeXParser parser)
      throws IOException
    {
       TeXObjectList list = new TeXObjectList();
-      list.add(parser.getListener().getOther((int)parser.getSpChar()));
+      list.add(parser.getListener().getOther(parser.getSpChar()));
 
       return list;
    }
@@ -91,7 +91,7 @@ public class SpChar extends Macro
    public String show(TeXParser parser)
     throws IOException
    {
-      return "superscript character "+parser.getSpChar();
+      return String.format("superscript character %c", parser.getSpChar());
    }
 }
 

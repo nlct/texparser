@@ -358,7 +358,7 @@ public class GenericCommand extends Command
 
       if (!isShort)
       {
-         builder.append(parser.getEscChar());
+         builder.appendCodePoint(parser.getEscChar());
          builder.append("long ");
       }
 
@@ -371,7 +371,7 @@ public class GenericCommand extends Command
             if (obj instanceof Param
              && ((Param)obj).getDigit() == -1)
             {
-               builder.append(parser.getBgChar());
+               builder.appendCodePoint(parser.getBgChar());
             }
             else
             {
@@ -391,7 +391,7 @@ public class GenericCommand extends Command
 
       if (isDelimited)
       {
-         builder.append(parser.getBgChar());
+         builder.appendCodePoint(parser.getBgChar());
       }
 
       return builder.toString();

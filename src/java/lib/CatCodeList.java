@@ -20,7 +20,21 @@ package com.dickimawbooks.texparserlib;
 
 import java.util.Vector;
 
-public class CatCodeList extends Vector<Character>
+public class CatCodeList extends Vector<Integer>
 {
+   public CatCodeList()
+   {
+      super();
+   }
+
+   public CatCodeList(int capacity)
+   {
+      super(capacity);
+   }
+
+   public void add(char c)
+   {
+      add(Integer.valueOf(c));
+   }
 }
 

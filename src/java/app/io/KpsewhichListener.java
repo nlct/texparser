@@ -69,13 +69,13 @@ public class KpsewhichListener implements ProcessListener
    {
       if (thread != null)
       {
-         TeXParserApp.debug("Interrupting "+thread);
+         app.debug("Interrupting "+thread);
          thread.interrupt();
       }
 
       if (process != null)
       {
-         TeXParserApp.debug("Destroying "+process);
+         app.debug("Destroying "+process);
          process.destroy();
       }
    }

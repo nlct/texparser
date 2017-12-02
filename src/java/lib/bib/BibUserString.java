@@ -80,7 +80,8 @@ public class BibUserString implements BibValue
       }
 
 
-      throw new IllegalArgumentException("Invalid argument "+fieldDelimChange);
+      throw new IllegalArgumentException(String.format("Invalid argument: %d",
+         fieldDelimChange));
    }
 
    public String toString()

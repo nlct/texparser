@@ -31,8 +31,8 @@ public class AtAlph extends Command
 
       if (state != UPPER && state != LOWER)
       {
-         throw new IllegalArgumentException("Invalid state '"
-          +state+"' for AtAlph ");
+         throw new IllegalArgumentException(String.format(
+         "Invalid state '%d' for AtAlph ", state));
       }
 
       this.state = state;

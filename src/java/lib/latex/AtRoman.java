@@ -32,8 +32,8 @@ public class AtRoman extends Command
 
       if (state != UPPER && state != LOWER)
       {
-         throw new IllegalArgumentException("Invalid state '"
-          +state+"' for AtRoman ");
+         throw new IllegalArgumentException(String.format(
+          "Invalid state '%d' for AtRoman ", state));
       }
 
       this.state = state;

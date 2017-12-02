@@ -75,7 +75,7 @@ public abstract class ControlSequence extends Macro
    public TeXObjectList string(TeXParser parser)
      throws IOException
    {
-      return parser.string(""+parser.getEscChar()+getName());
+      return parser.string(toString(parser));
    }
 
    public boolean equals(Object obj)
