@@ -795,6 +795,11 @@ public class TeXObjectList extends Vector<TeXObject>
       return size() == 0 ? null : firstElement();
    }
 
+   public TeXObject peekLast()
+   {
+      return size() == 0 ? null : lastElement();
+   }
+
    public TeXObject peekStack()
     throws IOException
    {
