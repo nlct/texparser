@@ -61,6 +61,230 @@ public class ProbSolnData
       return defArgs;
    }
 
+   public TeXObjectList getQuestion(TeXParser parser)
+     throws IOException
+   {
+      TeXObject[] params = null;
+
+      if (numArgs > 0)
+      {
+         params = new TeXObject[numArgs];
+
+         for (int i = 0; i < numArgs; i++)
+         {
+            params[i] = (TeXObject)defArgs.get(i).clone();
+
+            if (params[i] instanceof Group 
+                && !(params[i] instanceof MathGroup))
+            {
+               params[i] = ((Group)params[i]).toList();
+            }
+         }
+      }
+
+      TeXObjectList list = getData(parser, params);
+
+      TeXObjectList question = new TeXObjectList();
+
+      getProblem(parser, list, question, true, false);
+
+      return question;
+   }
+
+   public TeXObjectList getAnswer(TeXParser parser, boolean stripSolutionEnv)
+     throws IOException
+   {
+      TeXObject[] params = null;
+
+      if (numArgs > 0)
+      {
+         params = new TeXObject[numArgs];
+
+         for (int i = 0; i < numArgs; i++)
+         {
+            params[i] = (TeXObject)defArgs.get(i).clone();
+
+            if (params[i] instanceof Group 
+                && !(params[i] instanceof MathGroup))
+            {
+               params[i] = ((Group)params[i]).toList();
+            }
+         }
+      }
+
+      TeXObjectList list = (TeXObjectList)getData(parser, params).clone();
+
+      TeXObjectList answer = new TeXObjectList();
+
+      getProblem(parser, list, answer, false, stripSolutionEnv);
+
+      return answer;
+   }
+
+   private void getProblem(TeXParser parser, TeXObjectList stack,
+     TeXObjectList problem, boolean question, boolean stripSolutionEnv)
+   throws IOException
+   {
+      getProblem(parser, stack, problem, question, stripSolutionEnv, 
+        false, false);
+   }
+
+   private void getProblem(TeXParser parser, TeXObjectList stack,
+     TeXObjectList problem, boolean question, boolean stripSolutionEnv,
+     boolean initOnlyProblem, boolean initOnlySolution)
+   throws IOException
+   {
+      boolean onlyProblem = initOnlyProblem;
+      boolean onlySolution = initOnlySolution;
+
+      TeXParserListener listener = parser.getListener();
+
+      while (!stack.isEmpty())
+      {
+         TeXObject object = stack.pop();
+         boolean addObject = (question && !onlySolution)
+           || (!question && !onlyProblem);
+
+         if (object instanceof TeXCsRef)
+         {
+            object = listener.getControlSequence(((TeXCsRef)object).getName());
+         }
+
+         if (object instanceof Group && !(object instanceof MathGroup))
+         {
+            if (addObject)
+            {
+               Group subGrp = listener.createGroup();
+               problem.add(subGrp);
+
+               getProblem(parser, (Group)object, subGrp, question,
+                  stripSolutionEnv, onlyProblem, onlySolution);
+            }
+         }
+         else if (object instanceof TeXObjectList && !(object instanceof Group))
+         {
+            stack.addAll(0, (TeXObjectList)object);
+         }
+         else if (object instanceof OnlyProblem || object instanceof Question)
+         {
+            onlyProblem = true;
+         }
+         else if (object instanceof OnlySolution)
+         {
+            onlySolution = true;
+         }
+         else if (object instanceof EndDeclaration)
+         {
+            Declaration dec = ((EndDeclaration)object).getDeclaration(parser);
+
+            if (dec instanceof OnlyProblem || object instanceof Question)
+            {
+               onlyProblem = false;
+            }
+            else if (dec instanceof OnlySolution)
+            {
+               onlySolution = false;
+            }
+            else if (addObject)
+            {
+               problem.add(object);
+            }
+         }
+         else if (object instanceof Begin)
+         {
+            TeXObject envName = stack.popArg(parser);
+
+            if (envName instanceof Expandable)
+            {
+               TeXObjectList expanded = ((Expandable)envName).expandfully(
+                 parser, stack);
+
+               if (expanded != null)
+               {
+                  envName = expanded;
+               }
+            }
+
+            String envStr = envName.toString(parser);
+
+            if (envStr.equals("onlyproblem")
+                 || envStr.equals("probsolnquestion"))
+            {
+               onlyProblem = true;
+            }
+            else if (envStr.equals("onlysolution"))
+            {
+               onlySolution = true;
+            }
+            else if (!(stripSolutionEnv && envStr.equals("solution"))
+                     && addObject)
+            {
+               problem.add(object);
+
+               Group subGrp = listener.createGroup();
+               problem.add(subGrp);
+
+               if (envName instanceof TeXObjectList)
+               {
+                  subGrp.addAll((TeXObjectList)envName);
+               }
+               else
+               {
+                  subGrp.add(envName);
+               }
+            }
+         }
+         else if (object instanceof End)
+         {
+            TeXObject envName = stack.popArg(parser);
+
+            if (envName instanceof Expandable)
+            {
+               TeXObjectList expanded = ((Expandable)envName).expandfully(
+                 parser, stack);
+
+               if (expanded != null)
+               {
+                  envName = expanded;
+               }
+            }
+
+            String envStr = envName.toString(parser);
+
+            if (envStr.equals("onlyproblem")
+                 || envStr.equals("probsolnquestion"))
+            {
+               onlyProblem = false;
+            }
+            else if (envStr.equals("onlysolution"))
+            {
+               onlySolution = false;
+            }
+            else if (!(stripSolutionEnv && envStr.equals("solution"))
+                     && addObject)
+            {
+               problem.add(object);
+
+               Group subGrp = listener.createGroup();
+               problem.add(subGrp);
+
+               if (envName instanceof TeXObjectList)
+               {
+                  subGrp.addAll((TeXObjectList)envName);
+               }
+               else
+               {
+                  subGrp.add(envName);
+               }
+            }
+         }
+         else if (addObject)
+         {
+            problem.add(object);
+         }
+      }
+   }
+
    public void process(TeXParser parser)
      throws IOException
    {
@@ -100,7 +324,7 @@ public class ProbSolnData
    private TeXObjectList getData(TeXParser parser, TeXObject[] params)
      throws IOException
    {
-       return getData(parser, params, contents);
+      return getData(parser, params, contents);
    }
 
    private TeXObjectList getData(TeXParser parser, TeXObject[] params,
