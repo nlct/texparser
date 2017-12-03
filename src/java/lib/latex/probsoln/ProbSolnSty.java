@@ -19,8 +19,9 @@
 package com.dickimawbooks.texparserlib.latex.probsoln;
 
 import java.io.IOException;
-import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.Set;
+import java.util.Random;
 
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.primitives.NewIf;
@@ -32,12 +33,22 @@ public class ProbSolnSty extends LaTeXSty
    public ProbSolnSty(KeyValList options, LaTeXParserListener listener)
    throws IOException
    {
+      this(options, listener, 16);
+   }
+
+   public ProbSolnSty(KeyValList options, LaTeXParserListener listener,
+     int dbInitialCapacity)
+   throws IOException
+   {
       super(options, "probsoln", listener);
+      this.dbInitialCapacity = dbInitialCapacity;
 
-      databases = new HashMap<String,ProbSolnDatabase>();
+      databases = new ConcurrentHashMap<String,ProbSolnDatabase>();
 
-      ProbSolnDatabase db = new ProbSolnDatabase("default");
+      ProbSolnDatabase db = new ProbSolnDatabase(dbInitialCapacity, "default");
       databases.put("default", db);
+
+      random = new Random();
    }
 
    public void addDefinitions()
@@ -50,6 +61,14 @@ public class ProbSolnSty extends LaTeXSty
       registerControlSequence(new Question());
       registerControlSequence(new TextEnum());
       registerControlSequence(new ForEachProblem(this));
+      registerControlSequence(new LoadAllProblems(this));
+      registerControlSequence(new LoadSelectedProblems(this));
+      registerControlSequence(new LoadExceptProblems(this));
+      registerControlSequence(new LoadRandomProblems(this));
+      registerControlSequence(new RandSeed(this));
+
+      registerControlSequence(new GenericCommand("prob@currentdb",
+        null, getListener().createString("default")));
 
       if (getParser().getControlSequence("solution") == null)
       {
@@ -124,6 +143,11 @@ public class ProbSolnSty extends LaTeXSty
    public ProbSolnDatabase getDatabase(String name)
      throws ProbSolnException
    {
+      if (tmpDatabase != null && tmpDatabase.getName().equals(name))
+      {
+         return tmpDatabase;
+      }
+
       ProbSolnDatabase db = databases.get(name);
 
       if (db == null)
@@ -150,7 +174,12 @@ public class ProbSolnSty extends LaTeXSty
       return prob;
    }
 
-   public void addDatabase(String name)
+   public boolean isDatabaseDefined(String name)
+   {
+      return databases.containsKey(name);
+   }
+
+   public ProbSolnDatabase addDatabase(String name)
      throws ProbSolnException
    {
       if (databases.containsKey(name))
@@ -159,8 +188,10 @@ public class ProbSolnSty extends LaTeXSty
            ProbSolnException.ERROR_DB_EXISTS, name);
       }
 
-      ProbSolnDatabase db = new ProbSolnDatabase(name);
+      ProbSolnDatabase db = new ProbSolnDatabase(dbInitialCapacity, name);
       databases.put(name, db);
+
+      return db;
    }
 
    public void moveProblem(String label, String source, String target)
@@ -205,14 +236,86 @@ public class ProbSolnSty extends LaTeXSty
    }
 
    public void addProblem(ProbSolnData data)
-   throws ProbSolnException
+   throws IOException
    {
-      ProbSolnDatabase db = getDatabase(currentDb);
+      String dbName = getCurrentDb();
+
+      ProbSolnDatabase db;
+
+      if (tmpDatabase != null && tmpDatabase.getName().equals(dbName))
+      {
+         db = tmpDatabase;
+      }
+      else
+      {
+         db = databases.get(dbName);
+      }
+
+      if (db == null)
+      {
+         addDatabase(dbName);
+      }
 
       db.put(data.getName(), data);
    }
 
-   private String currentDb = "default";
+   public String getCurrentDb() throws IOException
+   {
+      ControlSequence cs = getListener().getControlSequence("prob@currentdb");
 
-   private HashMap<String,ProbSolnDatabase> databases;
+      if (cs == null)
+      {
+         return "default";
+      }
+
+      if (cs instanceof Expandable)
+      {
+         TeXParser parser = getListener().getParser();
+
+         TeXObjectList expanded = ((Expandable)cs).expandfully(parser);
+
+         if (expanded != null)
+         {
+            return expanded.toString(parser);
+         }
+      }
+
+      return "default";
+   }
+
+   public ProbSolnDatabase getTmpDatabase()
+   {
+      if (tmpDatabase == null)
+      {
+         tmpDatabase = new ProbSolnDatabase(dbInitialCapacity, "PROBSOLN#TMP");
+      }
+
+      return tmpDatabase;
+   }
+
+   public void clearTmpDatabase()
+   {
+      if (tmpDatabase != null)
+      {
+         tmpDatabase.clear();
+      }
+   }
+
+   public Random getRandom()
+   {
+      return random;
+   }
+
+   public void setRandomSeed(long seed)
+   {
+      random.setSeed(seed);
+   }
+
+   private ConcurrentHashMap<String,ProbSolnDatabase> databases;
+
+   private ProbSolnDatabase tmpDatabase;
+
+   private int dbInitialCapacity=16;
+
+   private Random random;
 }

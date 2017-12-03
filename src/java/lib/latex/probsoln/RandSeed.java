@@ -19,33 +19,46 @@
 package com.dickimawbooks.texparserlib.latex.probsoln;
 
 import java.io.IOException;
-import java.util.concurrent.ConcurrentHashMap;
+import java.text.CharacterIterator;
+import java.text.StringCharacterIterator;
 
+import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.*;
 
-public class ProbSolnDatabase extends ConcurrentHashMap<String,ProbSolnData>
+public class RandSeed extends ControlSequence
 {
-   public ProbSolnDatabase(String name)
+   public RandSeed(ProbSolnSty sty)
    {
-      super();
-      setName(name);
+      this("PSNrandseed", sty);
    }
 
-   public ProbSolnDatabase(int initialCapacity, String name)
+   public RandSeed(String name, ProbSolnSty sty)
    {
-      super(initialCapacity);
-      setName(name);
+      super(name);
+      this.sty = sty;
    }
 
-   public void setName(String name)
+   public Object clone()
    {
-      this.name = name;
+      return new RandSeed(getName(), sty);
    }
 
-   public String getName()
+   public void process(TeXParser parser, TeXObjectList stack)
+     throws IOException
    {
-      return name;
+      TeXNumber number = stack.popNumber(parser);
+
+      sty.setRandomSeed(number.getValue());
    }
 
-   private String name;
+   public void process(TeXParser parser)
+     throws IOException
+   {
+      TeXNumber number = parser.popNumber();
+
+      sty.setRandomSeed(number.getValue());
+   }
+
+   private ProbSolnSty sty;
+
 }
