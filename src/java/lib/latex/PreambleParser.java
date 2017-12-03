@@ -26,6 +26,7 @@ import java.util.Hashtable;
 import java.util.Vector;
 import java.nio.file.Path;
 import java.nio.file.Files;
+import java.nio.charset.Charset;
 
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.generic.*;
@@ -64,6 +65,16 @@ public class PreambleParser extends LaTeXParserListener
       TeXParser parser = new TeXParser(this);
 
       parser.parse(texFile);
+
+      return parser;
+   }
+
+   public TeXParser parse(File texFile, Charset charset)
+     throws IOException
+   {
+      TeXParser parser = new TeXParser(this);
+
+      parser.parse(texFile, charset);
 
       return parser;
    }
