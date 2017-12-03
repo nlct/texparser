@@ -745,6 +745,23 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       return new UnknownCls(options, clsName, this);
    }
 
+   public void removePackage(LaTeXSty sty)
+   {
+      removeFileReference(sty);
+      loadedPackages.remove(sty);
+   }
+
+   public void usepackage(LaTeXSty sty)
+   {
+      if (isStyLoaded(sty.getName()))
+      {
+         removePackage(sty);
+      }
+
+      addFileReference(sty);
+      loadedPackages.add(sty);
+   }
+
    public LaTeXSty usepackage(KeyValList options, String styName)
    throws IOException
    {

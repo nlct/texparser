@@ -331,6 +331,11 @@ public abstract class DefaultTeXParserListener extends TeXParserListener
       }
    }
 
+   public boolean removeFileReference(TeXPath texPath)
+   {
+      return referencedFiles.remove(texPath);
+   }
+
    public void addSpecialListener(SpecialListener listener)
    {
       specialListeners.add(listener);
