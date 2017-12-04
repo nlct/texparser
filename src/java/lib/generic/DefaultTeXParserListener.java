@@ -82,6 +82,7 @@ public abstract class DefaultTeXParserListener extends TeXParserListener
       parser.putControlSequence(new ExpandAfter());
       parser.putControlSequence(new Csname());
       parser.putControlSequence(new EndCsname());
+      parser.putControlSequence(new IgnoreSpaces());
       parser.putControlSequence(new If());
       parser.putControlSequence(new Ifx());
       parser.putControlSequence(IFTRUE);
