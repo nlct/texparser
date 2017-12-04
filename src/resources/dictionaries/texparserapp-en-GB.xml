@@ -111,7 +111,7 @@ There is NO WARRANTY, to the extent permitted by law.</entry>
 <entry key="latex.error.missing_key">Missing ''{0}'' key</entry>
 <entry key="latex.error.extra_end">Extra \end'{'{0}'}' found</entry>
 <entry key="latex.error.unaccessible">Unaccessible ''{0}''</entry>
-<entry key="latex.error.defined">'{0}' already defined</entry>
+<entry key="latex.error.defined">''{0}'' already defined</entry>
 <entry key="latex.error.illegal_array_arg_char">Illegal character ''{0}'' in array arg</entry>
 <entry key="latex.error.lonely_item">Lonely \item</entry>
 

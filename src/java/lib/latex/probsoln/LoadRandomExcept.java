@@ -26,14 +26,14 @@ import java.util.Vector;
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.*;
 
-public class LoadRandomProblems extends ControlSequence
+public class LoadRandomExcept extends ControlSequence
 {
-   public LoadRandomProblems(ProbSolnSty sty)
+   public LoadRandomExcept(ProbSolnSty sty)
    {
-      this("loadrandomproblems", sty);
+      this("loadrandomexcept", sty);
    }
 
-   public LoadRandomProblems(String name, ProbSolnSty sty)
+   public LoadRandomExcept(String name, ProbSolnSty sty)
    {
       super(name);
       this.sty = sty;
@@ -41,7 +41,7 @@ public class LoadRandomProblems extends ControlSequence
 
    public Object clone()
    {
-      return new LoadRandomProblems(getName(), sty);
+      return new LoadRandomExcept(getName(), sty);
    }
 
    public void process(TeXParser parser)
@@ -107,6 +107,28 @@ public class LoadRandomProblems extends ControlSequence
          }
       }
 
+      TeXObject exceptions = (stack==parser? parser.popNextArg()
+        : stack.popArg(parser));
+
+      if (exceptions instanceof Expandable)
+      {
+         TeXObjectList expanded = null;
+
+         if (stack == parser)
+         {
+            expanded = ((Expandable)exceptions).expandfully(parser);
+         }
+         else
+         {
+            expanded = ((Expandable)exceptions).expandfully(parser, stack);
+         }
+
+         if (expanded != null)
+         {
+            exceptions = expanded;
+         }
+      }
+
       parser.startGroup();
 
       ProbSolnDatabase tmpDb = sty.getTmpDatabase();
@@ -140,11 +162,27 @@ public class LoadRandomProblems extends ControlSequence
 
       if (db.size() > 0)
       {
+         csvList = CsvList.getList(parser, exceptions);
+
+         int n = csvList.size();
+
+         Vector<String> exceptionList = new Vector<String>(n);
+
+         for (int i = 0; i < n; i++)
+         {
+            exceptionList.add(csvList.getValue(i).toString(parser));
+         }
+
          Vector<String> labels = new Vector<String>(db.size());
 
          for (Iterator<String> it=db.keySet().iterator(); it.hasNext(); )
          {
-            labels.add(it.next());
+            String label = it.next();
+
+            if (!exceptionList.contains(label))
+            {
+               labels.add(label);
+            }
          }
 
          Collections.shuffle(labels, sty.getRandom());

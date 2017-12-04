@@ -65,6 +65,7 @@ public class ProbSolnSty extends LaTeXSty
       registerControlSequence(new LoadSelectedProblems(this));
       registerControlSequence(new LoadExceptProblems(this));
       registerControlSequence(new LoadRandomProblems(this));
+      registerControlSequence(new LoadRandomExcept(this));
       registerControlSequence(new RandSeed(this));
 
       registerControlSequence(new GenericCommand("prob@currentdb",
