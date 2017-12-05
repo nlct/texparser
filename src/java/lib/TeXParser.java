@@ -1906,6 +1906,12 @@ public class TeXParser extends TeXObjectList
       return popNumerical(this);
    }
 
+   public Register popRegister()
+     throws IOException
+   {
+      return popRegister(this);
+   }
+
    public TeXObject peekStack()
      throws IOException
    {
@@ -2042,7 +2048,7 @@ public class TeXParser extends TeXObjectList
 
    public ActiveChar removeActiveChar(int code)
    {
-      return activeTable.remove(new Integer(code));
+      return activeTable.remove(Integer.valueOf(code));
    }
 
    public ActiveChar removeActiveChar(boolean isLocal, int code)
@@ -2059,7 +2065,7 @@ public class TeXParser extends TeXObjectList
 
    public void putActiveChar(ActiveChar activeChar)
    {
-      activeTable.put(new Integer(activeChar.getCharCode()),
+      activeTable.put(Integer.valueOf(activeChar.getCharCode()),
         activeChar);
    }
 
@@ -2077,7 +2083,7 @@ public class TeXParser extends TeXObjectList
 
    public ActiveChar getActiveChar(int charCode)
    {
-      Integer intCode = new Integer(charCode);
+      Integer intCode = Integer.valueOf(charCode);
 
       ActiveChar activeChar = settings.getActiveChar(intCode);
 
@@ -2204,7 +2210,7 @@ public class TeXParser extends TeXObjectList
 
    public void allocCount(int index, CountRegister reg)
    {
-      allocCount(new Integer(index), reg);
+      allocCount(Integer.valueOf(index), reg);
    }
 
    public void allocCount(Integer index, CountRegister reg)
@@ -2221,7 +2227,7 @@ public class TeXParser extends TeXObjectList
 
       int alloc = allocReg.getValue()+1;
 
-      while (countAlloc.containsKey(new Integer(alloc)))
+      while (countAlloc.containsKey(Integer.valueOf(alloc)))
       {
          alloc++;
       }
@@ -2233,7 +2239,7 @@ public class TeXParser extends TeXObjectList
 
    public void allocDimen(int index, DimenRegister reg)
    {
-      allocDimen(new Integer(index), reg);
+      allocDimen(Integer.valueOf(index), reg);
    }
 
    public void allocDimen(Integer index, DimenRegister reg)
@@ -2250,12 +2256,41 @@ public class TeXParser extends TeXObjectList
 
       int alloc = allocReg.getValue()+1;
 
-      while (countAlloc.containsKey(new Integer(alloc)))
+      while (countAlloc.containsKey(Integer.valueOf(alloc)))
       {
          alloc++;
       }
 
       allocDimen(alloc, reg);
+      allocReg.setValue(alloc);
+      countAlloc.get(ALLOC_NUMBER).setValue(alloc);
+   }
+
+   public void allocToken(int index, TokenRegister reg)
+   {
+      allocToken(Integer.valueOf(index), reg);
+   }
+
+   public void allocToken(Integer index, TokenRegister reg)
+   {
+      toksAlloc.put(index, reg);
+      reg.setAllocation(index.intValue());
+   }
+
+   public void allocToken(TokenRegister reg)
+   {
+      // Get the most recently allocated number
+
+      CountRegister allocReg = countAlloc.get(ALLOC_TOKS);
+
+      int alloc = allocReg.getValue()+1;
+
+      while (countAlloc.containsKey(Integer.valueOf(alloc)))
+      {
+         alloc++;
+      }
+
+      allocToken(alloc, reg);
       allocReg.setValue(alloc);
       countAlloc.get(ALLOC_NUMBER).setValue(alloc);
    }
@@ -2268,19 +2303,22 @@ public class TeXParser extends TeXObjectList
    private Hashtable<Integer,DimenRegister> dimenAlloc
      = new Hashtable<Integer,DimenRegister>();
 
-   public static final Integer ALLOC_COUNT = new Integer(10);
-   public static final Integer ALLOC_DIMEN = new Integer(11);
-   public static final Integer ALLOC_SKIP = new Integer(12);
-   public static final Integer ALLOC_MUSKIP = new Integer(13);
-   public static final Integer ALLOC_BOX = new Integer(14);
-   public static final Integer ALLOC_TOKS = new Integer(15);
-   public static final Integer ALLOC_INPUT = new Integer(16);
-   public static final Integer ALLOC_OUTPUT = new Integer(17);
-   public static final Integer ALLOC_MATHFAM = new Integer(18);
-   public static final Integer ALLOC_LANGUAGE = new Integer(19);
-   public static final Integer INS_COUNT = new Integer(20);
-   public static final Integer ALLOC_NUMBER = new Integer(21);
-   public static final Integer MINUS_ONE = new Integer(22);
+   private Hashtable<Integer,TokenRegister> toksAlloc
+     = new Hashtable<Integer,TokenRegister>();
+
+   public static final Integer ALLOC_COUNT = Integer.valueOf(10);
+   public static final Integer ALLOC_DIMEN = Integer.valueOf(11);
+   public static final Integer ALLOC_SKIP = Integer.valueOf(12);
+   public static final Integer ALLOC_MUSKIP = Integer.valueOf(13);
+   public static final Integer ALLOC_BOX = Integer.valueOf(14);
+   public static final Integer ALLOC_TOKS = Integer.valueOf(15);
+   public static final Integer ALLOC_INPUT = Integer.valueOf(16);
+   public static final Integer ALLOC_OUTPUT = Integer.valueOf(17);
+   public static final Integer ALLOC_MATHFAM = Integer.valueOf(18);
+   public static final Integer ALLOC_LANGUAGE = Integer.valueOf(19);
+   public static final Integer INS_COUNT = Integer.valueOf(20);
+   public static final Integer ALLOC_NUMBER = Integer.valueOf(21);
+   public static final Integer MINUS_ONE = Integer.valueOf(22);
 
    protected Hashtable<String,ControlSequence> csTable;
 

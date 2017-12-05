@@ -90,6 +90,10 @@ public abstract class DefaultTeXParserListener extends TeXParserListener
       parser.putControlSequence(new Else());
       parser.putControlSequence(new Fi());
       parser.putControlSequence(new NewIf());
+      parser.putControlSequence(new NewCount());
+      parser.putControlSequence(new NewDimen());
+      parser.putControlSequence(new NewToks());
+
       parser.putControlSequence(new MathAccent("vec", 8407));
       parser.putControlSequence(new MathAccent("hat", 0x0302, 0x02C6));
       parser.putControlSequence(new MathAccent("check", 0x030C, 0x02C7));
@@ -163,10 +167,79 @@ public abstract class DefaultTeXParserListener extends TeXParserListener
       return new Undefined(name);
    }
 
+   public DimenRegister newlength(boolean isLocal, String name)
+   {
+      return parser.getSettings().newdimen(isLocal, name);
+   }
+
+   public DimenRegister newlength(String name,
+     TeXDimension dimen)
+    throws TeXSyntaxException
+   {
+      DimenRegister reg = parser.getSettings().newdimen(name);
+
+      reg.setDimension(getParser(), dimen);
+
+      return reg;
+   }
+
+   public DimenRegister newlength(String name,
+     float value, TeXUnit unit)
+   {
+      DimenRegister reg = parser.getSettings().newdimen(name);
+
+      try
+      {
+         reg.setDimension(getParser(), new UserDimension(value, unit));
+      }
+      catch (TeXSyntaxException e)
+      {
+         // this shouldn't happen
+      }
+
+      return reg;
+   }
+
+   public CountRegister newcount(boolean isLocal, String name)
+   {
+      return parser.getSettings().newcount(isLocal, name);
+   }
+
+   public CountRegister newcount(String name, TeXNumber number)
+    throws TeXSyntaxException
+   {
+      CountRegister reg = parser.getSettings().newcount(name);
+
+      reg.setValue(getParser(), number);
+
+      return reg;
+   }
+
+   public CountRegister newcount(String name, int number)
+   {
+      CountRegister reg = parser.getSettings().newcount(name);
+
+      try
+      {
+         reg.setValue(getParser(), new UserNumber(number));
+      }
+      catch (TeXSyntaxException e)
+      {
+         // this shouldn't happen
+      }
+
+      return reg;
+   }
+
+   public TokenRegister newtoks(boolean isLocal, String name)
+   {
+      return parser.getSettings().newtoks(isLocal, name);
+   }
+
    // Gets active character identified by charCode.
    public ActiveChar getActiveChar(int charCode)
    {
-      return getParser().getActiveChar(new Integer(charCode));
+      return getParser().getActiveChar(Integer.valueOf(charCode));
    }
 
    public void putActiveChar(ActiveChar activeChar)

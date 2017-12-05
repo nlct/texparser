@@ -176,4 +176,12 @@ public class TeXSyntaxException extends IOException
       "tex.error.improper_alphabetic_constant";
    public static final String ERROR_EXTRA_OR_FORGOTTEN =
       "tex.error.extra_or_forgotten";
+   public static final String ERROR_REGISTER_EXPECTED =
+      "tex.error.register_expected";
+   public static final String ERROR_NUMERIC_REGISTER_EXPECTED =
+      "tex.error.numeric_register_expected";
+   public static final String ERROR_REGISTER_NOT_NUMERIC =
+      "tex.error.register_not_numeric";
+   public static final String ERROR_REGISTER_NOT_TOKEN =
+      "tex.error.register_not_token";
 }

@@ -56,7 +56,7 @@ public class ItemizeDec extends ListDec
 
       TeXSettings settings = parser.getSettings();
 
-      Register itemdepth = settings.globalAdvanceRegister("@itemdepth",
+      NumericRegister itemdepth = settings.globalAdvanceRegister("@itemdepth",
          LaTeXParserListener.ONE);
 
       String labelitem = "labelitem"

@@ -312,6 +312,36 @@ public class TeXObjectList extends Vector<TeXObject>
                TeXSyntaxException.ERROR_MISSING_UNIT);
    }
 
+   public Register popRegister(TeXParser parser)
+     throws IOException
+   {
+      TeXObject object = popStack(parser, true);
+
+      if (object instanceof Register)
+      {
+         return (Register)object;
+      }
+
+      if (object instanceof Expandable)
+      {
+         TeXObjectList expanded = ((Expandable)object).expandfully(parser,this);
+
+         if (expanded != null)
+         {
+            addAll(0, expanded);
+            object = popStack(parser, true);
+
+            if (object instanceof Register)
+            {
+               return (Register)object;
+            }
+         }
+      }
+
+      throw new TeXSyntaxException(parser,
+         TeXSyntaxException.ERROR_REGISTER_EXPECTED);
+   }
+
    public Numerical popNumerical(TeXParser parser)
    throws IOException
    {
@@ -329,9 +359,9 @@ public class TeXObjectList extends Vector<TeXObject>
 
       object = expandedPopStack(parser, true);
 
-      if (object instanceof Register)
+      if (object instanceof NumericRegister)
       {
-         return (Register)object;
+         return (NumericRegister)object;
       }
 
       if (object instanceof TeXDimension)

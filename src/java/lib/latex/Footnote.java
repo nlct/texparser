@@ -63,13 +63,13 @@ public class Footnote extends ControlSequence
       String counter = mpfn.toString(parser);
 
       UserNumber orgValue = new UserNumber();
-      Register reg = null;
+      NumericRegister reg = null;
 
       if (opt != null)
       {
          String registerName = String.format("c@%s", counter);
 
-         reg = parser.getSettings().getRegister(registerName);
+         reg = parser.getSettings().getNumericRegister(registerName);
 
          if (reg == null)
          {
@@ -141,13 +141,13 @@ public class Footnote extends ControlSequence
       String counter = mpfn.toString(parser);
 
       UserNumber orgValue = new UserNumber();
-      Register reg = null;
+      NumericRegister reg = null;
 
       if (opt != null)
       {
          String registerName = String.format("c@%s", counter);
 
-         reg = parser.getSettings().getRegister(registerName);
+         reg = parser.getSettings().getNumericRegister(registerName);
 
          if (reg == null)
          {

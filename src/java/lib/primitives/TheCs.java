@@ -43,22 +43,18 @@ public class TheCs extends Primitive implements Expandable
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
    throws IOException
    {
-      Numerical arg = stack.popNumerical(parser);
+      Register arg = stack.popRegister(parser);
+
+      TeXObject contents = arg.getContents(parser);
+
+      if (contents instanceof TeXObjectList && !(contents instanceof Group))
+      {
+         return (TeXObjectList)contents;
+      }
 
       TeXObjectList list = new TeXObjectList();
 
-      if (arg instanceof Register)
-      {
-         list.add(((Register)arg).the(parser));
-      }
-      else if (arg instanceof TeXObject)
-      {
-         list.add((TeXObject)arg);
-      }
-      else
-      {
-         list.add(new UserNumber(arg.number(parser)));
-      }
+      list.add(contents);
 
       return list;
    }
@@ -66,22 +62,18 @@ public class TheCs extends Primitive implements Expandable
    public TeXObjectList expandonce(TeXParser parser)
    throws IOException
    {
-      Numerical arg = parser.popNumerical();
+      Register arg = parser.popRegister();
+
+      TeXObject contents = arg.getContents(parser);
+
+      if (contents instanceof TeXObjectList && !(contents instanceof Group))
+      {
+         return (TeXObjectList)contents;
+      }
 
       TeXObjectList list = new TeXObjectList();
 
-      if (arg instanceof Register)
-      {
-         list.add(((Register)arg).the(parser));
-      }
-      else if (arg instanceof TeXObject)
-      {
-         list.add((TeXObject)arg);
-      }
-      else
-      {
-         list.add(new UserNumber(arg.number(parser)));
-      }
+      list.add(contents);
 
       return list;
    }

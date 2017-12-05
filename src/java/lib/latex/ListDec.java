@@ -61,7 +61,7 @@ public class ListDec extends TrivListDec
 
       TeXSettings settings = parser.getSettings();
 
-      Register listdepth = settings.globalAdvanceRegister("@listdepth",
+      NumericRegister listdepth = settings.globalAdvanceRegister("@listdepth",
          LaTeXParserListener.ONE);
 
       ControlSequence cs = parser.getControlSequence(String.format("@list%s",

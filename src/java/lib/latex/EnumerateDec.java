@@ -56,7 +56,7 @@ public class EnumerateDec extends ListDec
 
       TeXSettings settings = parser.getSettings();
 
-      Register enumdepth = settings.globalAdvanceRegister("@enumdepth",
+      NumericRegister enumdepth = settings.globalAdvanceRegister("@enumdepth",
          LaTeXParserListener.ONE);
 
       String enumctrstr = "enum"

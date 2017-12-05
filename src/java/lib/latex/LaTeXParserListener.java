@@ -274,6 +274,8 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       newlength("tabcolsep", 6, TeXUnit.PT);
       newlength("arraycolsep", 5, TeXUnit.PT);
 
+      newtoks(true, "toks@");
+
       newcounter("part");
       newcounter("section");
       newcounter("subsection", "section");
@@ -1228,39 +1230,6 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       return new File(dir, jobname+"."+ext);
    }
 
-   public DimenRegister newlength(boolean isLocal, String name)
-   {
-      return parser.getSettings().newdimen(isLocal, name);
-   }
-
-   public DimenRegister newlength(String name,
-     TeXDimension dimen)
-    throws TeXSyntaxException
-   {
-      DimenRegister reg = parser.getSettings().newdimen(name);
-
-      reg.setDimension(getParser(), dimen);
-
-      return reg;
-   }
-
-   public DimenRegister newlength(String name,
-     float value, TeXUnit unit)
-   {
-      DimenRegister reg = parser.getSettings().newdimen(name);
-
-      try
-      {
-         reg.setDimension(getParser(), new UserDimension(value, unit));
-      }
-      catch (TeXSyntaxException e)
-      {
-         // this shouldn't happen
-      }
-
-      return reg;
-   }
-
    public void newcounter(String name)
    {
       newcounter(name, null);
@@ -1310,7 +1279,7 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
    public int getcountervalue(String name)
     throws TeXSyntaxException,LaTeXSyntaxException
    {
-      Register reg = parser.getSettings().getRegister("c@"+name);
+      NumericRegister reg = parser.getSettings().getNumericRegister("c@"+name);
 
       if (reg == null)
       {

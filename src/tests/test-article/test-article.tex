@@ -22,6 +22,8 @@
 \newcommand*{\dpfrac}[3]{\frac{\partial^2#1}{\partial#2\partial#3}}
 
 \renewcommand*{\vec}[1]{\boldsymbol{#1}}
+\newtoks\mytoks
+\mytoks={token register contents}
 
 \begin{document}
 \maketitle
@@ -31,6 +33,8 @@
 \begin{abstract}
 \lipsum[1]
 \end{abstract}
+
+Token register contents: \the\mytoks.
 
 \section*{An Unnumbered Section}
 \addcontentsline{toc}{section}{An Unnumbered Section}

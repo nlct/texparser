@@ -21,7 +21,7 @@ package com.dickimawbooks.texparserlib;
 import java.io.IOException;
 import java.util.Vector;
 
-public class CountRegister extends Register implements TeXNumber
+public class CountRegister extends NumericRegister implements TeXNumber
 {
    public CountRegister(String name)
    {
@@ -55,7 +55,7 @@ public class CountRegister extends Register implements TeXNumber
       return value;
    }
 
-   public TeXObject the(TeXParser parser)
+   public TeXObject getContents(TeXParser parser)
    {
       return parser.string(""+value);
    }
@@ -81,98 +81,11 @@ public class CountRegister extends Register implements TeXNumber
       value *= factor;
    }
 
-   public void process(TeXParser parser)
+   @Override
+   protected void processNext(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
-      TeXObject object = parser.popStack(parser, true);
-
-      if (object instanceof Expandable)
-      {
-         TeXObjectList expanded = ((Expandable)object).expandfully(parser);
-
-         if (expanded != null)
-         {
-            parser.addAll(expanded);
-            object = parser.popStack(parser, true);
-         }
-      }
-
-      if (object instanceof CharObject
-       && ((CharObject)object).getCharCode() == '=')
-      {
-         object = parser.popStack(parser, true);
-
-         if (object instanceof Expandable)
-         {
-            TeXObjectList expanded = ((Expandable)object).expandfully(parser);
-
-            if (expanded != null)
-            {
-               parser.addAll(expanded);
-               object = parser.popStack(parser, true);
-            }
-         }
-      }
-
-      if (object instanceof Register)
-      {
-         value = ((Register)object).number(parser);
-         return;
-      }
-
-      parser.push(object);
-
-      TeXNumber num = parser.popNumber();
-
-      value = num.getValue();
-   }
-
-   public void process(TeXParser parser, TeXObjectList stack)
-      throws IOException
-   {
-      TeXObject object = stack.popStack(parser, true);
-
-      if (object instanceof Expandable)
-      {
-         TeXObjectList expanded =
-            ((Expandable)object).expandfully(parser, stack);
-
-         if (expanded != null)
-         {
-            stack.addAll(expanded);
-            object = stack.popStack(parser, true);
-         }
-      }
-
-      if (object instanceof CharObject
-       && ((CharObject)object).getCharCode() == '=')
-      {
-         object = stack.popStack(parser, true);
-
-         if (object instanceof Expandable)
-         {
-            TeXObjectList expanded =
-               ((Expandable)object).expandfully(parser, stack);
-
-            if (expanded != null)
-            {
-               stack.addAll(expanded);
-               object = stack.popStack(parser, true);
-            }
-         }
-      }
-
-      if (object instanceof Register)
-      {
-         value = ((Register)object).number(parser);
-         return;
-      }
-
-      stack.push(object);
-
-      TeXNumber num = stack.popNumber(parser);
-
-      value = num.getValue();
+      setValue(parser, stack.popNumber(parser));
    }
 
    public Object clone()

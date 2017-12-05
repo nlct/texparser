@@ -21,7 +21,7 @@ package com.dickimawbooks.texparserlib;
 import java.io.IOException;
 import java.util.Vector;
 
-public class DimenRegister extends Register implements TeXDimension
+public class DimenRegister extends NumericRegister implements TeXDimension
 {
    public DimenRegister(String name)
    {
@@ -89,7 +89,7 @@ public class DimenRegister extends Register implements TeXDimension
       return dimension.number(parser);
    }
 
-   public TeXObject the(TeXParser parser)
+   public TeXObject getContents(TeXParser parser)
     throws TeXSyntaxException
    {
       return parser.string(dimension.toString(parser));
@@ -116,93 +116,10 @@ public class DimenRegister extends Register implements TeXDimension
       dimension.divide(divisor);
    }
 
-   public void process(TeXParser parser)
+   @Override
+   protected void processNext(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
-      TeXObject object = parser.popStack(parser, true);
-
-      if (object instanceof Expandable)
-      {
-         TeXObjectList expanded = ((Expandable)object).expandfully(parser);
-
-         if (expanded != null)
-         {
-            parser.addAll(expanded);
-            object = parser.popStack(parser, true);
-         }
-      }
-
-      if (object instanceof CharObject
-       && ((CharObject)object).getCharCode() == '=')
-      {
-         object = parser.popStack(parser, true);
-
-         if (object instanceof Expandable)
-         {
-            TeXObjectList expanded = ((Expandable)object).expandfully(parser);
-
-            if (expanded != null)
-            {
-               parser.addAll(expanded);
-               object = parser.popStack(parser, true);
-            }
-         }
-      }
-
-      if (object instanceof Register)
-      {
-         setValue(parser, ((Register)object));
-         return;
-      }
-
-      parser.push(object);
-
-      setValue(parser, parser.popDimension());
-   }
-
-   public void process(TeXParser parser, TeXObjectList stack)
-      throws IOException
-   {
-      TeXObject object = stack.popStack(parser, true);
-
-      if (object instanceof Expandable)
-      {
-         TeXObjectList expanded =
-            ((Expandable)object).expandfully(parser, stack);
-
-         if (expanded != null)
-         {
-            stack.addAll(expanded);
-            object = stack.popStack(parser, true);
-         }
-      }
-
-      if (object instanceof CharObject
-       && ((CharObject)object).getCharCode() == '=')
-      {
-         object = stack.popStack(parser, true);
-
-         if (object instanceof Expandable)
-         {
-            TeXObjectList expanded =
-               ((Expandable)object).expandfully(parser, stack);
-
-            if (expanded != null)
-            {
-               stack.addAll(expanded);
-               object = stack.popStack(parser, true);
-            }
-         }
-      }
-
-      if (object instanceof Register)
-      {
-         setValue(parser, ((Register)object));
-         return;
-      }
-
-      stack.push(object);
-
       setValue(parser, stack.popDimension(parser));
    }
 

@@ -642,6 +642,36 @@ public class TeXSettings
       currentBgColor = color;
    }
 
+   public NumericRegister getNumericRegister(String name)
+    throws TeXSyntaxException
+   {
+      Register reg = getRegister(name);
+
+      if (reg == null || reg instanceof NumericRegister)
+      {
+         return (NumericRegister)reg;
+      }
+
+      throw new TeXSyntaxException(parser, 
+        TeXSyntaxException.ERROR_REGISTER_NOT_NUMERIC,
+        name);
+   }
+
+   public TokenRegister getTokenRegister(String name)
+    throws TeXSyntaxException
+   {
+      Register reg = getRegister(name);
+
+      if (reg == null || reg instanceof TokenRegister)
+      {
+         return (TokenRegister)reg;
+      }
+
+      throw new TeXSyntaxException(parser, 
+        TeXSyntaxException.ERROR_REGISTER_NOT_TOKEN,
+        name);
+   }
+
    public Register getRegister(String name)
    {
       Register reg = localRegisters.get(name);
@@ -771,6 +801,36 @@ public class TeXSettings
       }
    }
 
+   public TokenRegister toksdef(String name, int alloc)
+   {
+      TokenRegister reg = new TokenRegister(name);
+      parser.allocToken(alloc, reg);
+      putRegister(reg);
+
+      return reg;
+   }
+
+   public TokenRegister newtoks(String name)
+   {
+      TokenRegister reg = new TokenRegister(name);
+      parser.allocToken(reg);
+      putRegister(reg);
+
+      return reg;
+   }
+
+   public TokenRegister newtoks(boolean isLocal, String name)
+   {
+      if (isLocal || parent == null)
+      {
+         return newtoks(name);
+      }
+      else
+      {
+         return parent.newtoks(isLocal, name);
+      }
+   }
+
    protected Register putRegister(Register register)
    {
       Register rootReg = register;
@@ -821,7 +881,13 @@ public class TeXSettings
          }
       }
 
-      reg.setValue(parser, value);
+      if (!(reg instanceof NumericRegister))
+      {
+         throw new TeXSyntaxException(parser, 
+            TeXSyntaxException.ERROR_NUMERIC_REGISTER_EXPECTED);
+      }
+
+      ((NumericRegister)reg).setValue(parser, value);
    }
 
    public void globalSetRegister(String name, Numerical value)
@@ -837,7 +903,13 @@ public class TeXSettings
             TeXSyntaxException.ERROR_REGISTER_UNDEF, name);
       }
 
-      reg.setValue(parser, value);
+      if (!(reg instanceof NumericRegister))
+      {
+         throw new TeXSyntaxException(parser, 
+            TeXSyntaxException.ERROR_NUMERIC_REGISTER_EXPECTED);
+      }
+
+      ((NumericRegister)reg).setValue(parser, value);
 
       if (parent != null)
       {
@@ -845,13 +917,13 @@ public class TeXSettings
 
          Register rootReg = root.getRegister(name);
 
-         if (rootReg == null)
+         if (rootReg == null || !(rootReg instanceof NumericRegister))
          {
-            root.putRegister((Register)reg.clone());
+            root.putRegister((NumericRegister)reg.clone());
          }
          else if (reg != rootReg)
          {
-            rootReg.setValue(parser, reg);
+            ((NumericRegister)rootReg).setValue(parser, (NumericRegister)reg);
          }
       }
    }
@@ -883,10 +955,16 @@ public class TeXSettings
          }
       }
 
-      reg.advance(parser, value);
+      if (!(reg instanceof NumericRegister))
+      {
+         throw new TeXSyntaxException(parser, 
+            TeXSyntaxException.ERROR_NUMERIC_REGISTER_EXPECTED);
+      }
+
+      ((NumericRegister)reg).advance(parser, value);
    }
 
-   public Register globalAdvanceRegister(String name, Numerical value)
+   public NumericRegister globalAdvanceRegister(String name, Numerical value)
      throws TeXSyntaxException
    {
       Register reg = getRegister(name);
@@ -899,7 +977,13 @@ public class TeXSettings
             TeXSyntaxException.ERROR_REGISTER_UNDEF, name);
       }
 
-      reg.advance(parser, value);
+      if (!(reg instanceof NumericRegister))
+      {
+         throw new TeXSyntaxException(parser, 
+            TeXSyntaxException.ERROR_NUMERIC_REGISTER_EXPECTED);
+      }
+
+      ((NumericRegister)reg).advance(parser, value);
 
       if (parent != null)
       {
@@ -907,17 +991,17 @@ public class TeXSettings
 
          Register rootReg = root.getRegister(name);
 
-         if (rootReg == null)
+         if (rootReg == null || !(rootReg instanceof NumericRegister))
          {
-            root.putRegister((Register)reg.clone());
+            root.putRegister((NumericRegister)reg.clone());
          }
          else if (reg != rootReg)
          {
-            rootReg.setValue(parser, reg);
+            ((NumericRegister)rootReg).setValue(parser, (NumericRegister)reg);
          }
       }
 
-      return reg;
+      return (NumericRegister)reg;
    }
 
    public void localMultiplyRegister(String name, Numerical value)
@@ -947,7 +1031,13 @@ public class TeXSettings
          }
       }
 
-      reg.multiply(value.number(parser));
+      if (!(reg instanceof NumericRegister))
+      {
+         throw new TeXSyntaxException(parser, 
+            TeXSyntaxException.ERROR_NUMERIC_REGISTER_EXPECTED);
+      }
+
+      ((NumericRegister)reg).multiply(value.number(parser));
    }
 
    public void globalMultiplyRegister(String name, Numerical value)
@@ -963,7 +1053,13 @@ public class TeXSettings
             TeXSyntaxException.ERROR_REGISTER_UNDEF, name);
       }
 
-      reg.multiply(value.number(parser));
+      if (!(reg instanceof NumericRegister))
+      {
+         throw new TeXSyntaxException(parser, 
+            TeXSyntaxException.ERROR_NUMERIC_REGISTER_EXPECTED);
+      }
+
+      ((NumericRegister)reg).multiply(value.number(parser));
 
       if (parent != null)
       {
@@ -971,13 +1067,13 @@ public class TeXSettings
 
          Register rootReg = root.getRegister(name);
 
-         if (rootReg == null)
+         if (rootReg == null || !(rootReg instanceof NumericRegister))
          {
-            root.putRegister((Register)reg.clone());
+            root.putRegister((NumericRegister)reg.clone());
          }
          else if (reg != rootReg)
          {
-            rootReg.setValue(parser, reg);
+            ((NumericRegister)rootReg).setValue(parser, (NumericRegister)reg);
          }
       }
    }
@@ -1009,7 +1105,13 @@ public class TeXSettings
          }
       }
 
-      reg.divide(value.number(parser));
+      if (!(reg instanceof NumericRegister))
+      {
+         throw new TeXSyntaxException(parser, 
+            TeXSyntaxException.ERROR_NUMERIC_REGISTER_EXPECTED);
+      }
+
+      ((NumericRegister)reg).divide(value.number(parser));
    }
 
    public void globalDivideRegister(String name, Numerical value)
@@ -1025,7 +1127,13 @@ public class TeXSettings
             TeXSyntaxException.ERROR_REGISTER_UNDEF, name);
       }
 
-      reg.divide(value.number(parser));
+      if (!(reg instanceof NumericRegister))
+      {
+         throw new TeXSyntaxException(parser, 
+            TeXSyntaxException.ERROR_NUMERIC_REGISTER_EXPECTED);
+      }
+
+      ((NumericRegister)reg).divide(value.number(parser));
 
       if (parent != null)
       {
@@ -1033,13 +1141,13 @@ public class TeXSettings
 
          Register rootReg = root.getRegister(name);
 
-         if (rootReg == null)
+         if (rootReg == null || !(rootReg instanceof NumericRegister))
          {
-            root.putRegister((Register)reg.clone());
+            root.putRegister((NumericRegister)reg.clone());
          }
          else if (reg != rootReg)
          {
-            rootReg.setValue(parser, reg);
+            ((NumericRegister)rootReg).setValue(parser, (NumericRegister)reg);
          }
       }
    }

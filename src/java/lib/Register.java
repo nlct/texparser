@@ -18,7 +18,9 @@
 */
 package com.dickimawbooks.texparserlib;
 
-public abstract class Register extends ControlSequence implements Numerical
+import java.io.IOException;
+
+public abstract class Register extends ControlSequence
 {
    public Register(String name)
    {
@@ -35,18 +37,116 @@ public abstract class Register extends ControlSequence implements Numerical
       return allocation;
    }
 
-   public abstract TeXObject the(TeXParser parser)
-    throws TeXSyntaxException;
+   public abstract TeXObject getContents(TeXParser parser)
+     throws TeXSyntaxException;
 
-   public abstract void advance(TeXParser parser, Numerical increment)
-    throws TeXSyntaxException;
+   public abstract void setContents(TeXParser parser, TeXObject contents)
+     throws TeXSyntaxException;
+   
+   protected void processNext(TeXParser parser, TeXObjectList stack)
+      throws IOException
+   {
+      TeXObject object;
 
-   public abstract void divide(int divisor);
+      if (parser == stack)
+      {
+         object = parser.popNextArg();
+      }
+      else
+      {
+         object = stack.popArg(parser);
+      }
 
-   public abstract void multiply(int factor);
+      setContents(parser, object);
+   }
 
-   public abstract void setValue(TeXParser parser, Numerical value)
-    throws TeXSyntaxException;
+   public void process(TeXParser parser)
+      throws IOException
+   {
+      TeXObject object = parser.popStack(parser, true);
+
+      if (object instanceof Expandable)
+      {
+         TeXObjectList expanded = ((Expandable)object).expandfully(parser);
+
+         if (expanded != null)
+         {
+            parser.addAll(expanded);
+            object = parser.popStack(parser, true);
+         }
+      }
+
+      if (object instanceof CharObject
+       && ((CharObject)object).getCharCode() == '=')
+      {
+         object = parser.popStack(parser, true);
+
+         if (object instanceof Expandable)
+         {
+            TeXObjectList expanded = ((Expandable)object).expandfully(parser);
+
+            if (expanded != null)
+            {
+               parser.addAll(expanded);
+               object = parser.popStack(parser, true);
+            }
+         }
+      }
+
+      if (object instanceof Register)
+      {
+         setContents(parser, object);
+         return;
+      }
+
+      parser.push(object);
+      processNext(parser, parser);
+   }
+
+   public void process(TeXParser parser, TeXObjectList stack)
+      throws IOException
+   {
+      TeXObject object = stack.popStack(parser, true);
+
+      if (object instanceof Expandable)
+      {
+         TeXObjectList expanded =
+            ((Expandable)object).expandfully(parser, stack);
+
+         if (expanded != null)
+         {
+            stack.addAll(expanded);
+            object = stack.popStack(parser, true);
+         }
+      }
+
+      if (object instanceof CharObject
+       && ((CharObject)object).getCharCode() == '=')
+      {
+         object = stack.popStack(parser, true);
+
+         if (object instanceof Expandable)
+         {
+            TeXObjectList expanded =
+               ((Expandable)object).expandfully(parser, stack);
+
+            if (expanded != null)
+            {
+               stack.addAll(expanded);
+               object = stack.popStack(parser, true);
+            }
+         }
+      }
+
+      if (object instanceof Register)
+      {
+         setContents(parser, object);
+         return;
+      }
+
+      parser.push(object);
+      processNext(parser, stack);
+   }
 
    protected int allocation = -1;
 }
