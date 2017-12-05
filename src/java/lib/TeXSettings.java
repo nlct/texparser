@@ -56,6 +56,21 @@ public class TeXSettings
       return parent.getRoot();
    }
 
+   public void addAfterGroup(TeXObject object)
+   {
+      if (afterGroup == null)
+      {
+         afterGroup = new TeXObjectList();
+      }
+
+      afterGroup.add(object);
+   }
+
+   public TeXObjectList getAfterGroup()
+   {
+      return afterGroup;
+   }
+
    public int getCurrentMode()
    {
       return currentMode;
@@ -2679,5 +2694,7 @@ public class TeXSettings
    protected Hashtable<String,ControlSequence> csTable;
 
    protected Hashtable<Integer,ActiveChar> activeTable;
+
+   protected TeXObjectList afterGroup;
 }
 

@@ -2102,7 +2102,13 @@ public class TeXParser extends TeXObjectList
 
    public void endGroup()
    {
+      TeXObjectList afterGroup = settings.getAfterGroup();
       settings = settings.getParent();
+
+      if (afterGroup != null)
+      {
+         addAll(0, afterGroup);
+      }
    }
 
    public TeXSettings getSettings()
