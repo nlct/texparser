@@ -57,4 +57,8 @@ public class LaTeXSyntaxException extends TeXSyntaxException
       "latex.error.undefined_counter";
    public static final String ERROR_LONELY_ITEM = 
       "latex.error.lonely_item";
+   public static final String PACKAGE_ERROR = 
+      "latex.package.error";
+   public static final String CLASS_ERROR = 
+      "latex.class.error";
 }

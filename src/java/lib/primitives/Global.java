@@ -16,55 +16,64 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
-package com.dickimawbooks.texparserlib;
+package com.dickimawbooks.texparserlib.primitives;
 
-public class TokenRegister extends Register
+import java.io.IOException;
+
+import com.dickimawbooks.texparserlib.*;
+
+public class Global extends Primitive
 {
-   public TokenRegister(String name)
+   public Global()
    {
-      this(name, new TeXObjectList());
+      this("global");
    }
 
-   public TokenRegister(String name, TeXObjectList contentsList)
+   public Global(String name)
    {
       super(name);
-      contents = contentsList;
    }
 
    public Object clone()
    {
-      return new TokenRegister(getName(), (TeXObjectList)contents.clone());
+      return new Global(getName());
    }
 
-   public void setContents(TeXParser parser, TeXObject object)
-    throws TeXSyntaxException
+   public void process(TeXParser parser, TeXObjectList stack)
+      throws IOException
    {
-      contents.clear();
+      TeXObject object = stack.popToken();
 
-      if (object instanceof TeXObjectList && !(object instanceof Group))
+      if (object instanceof TeXCsRef)
       {
-         TeXObjectList list = (TeXObjectList)object;
+         object = parser.getListener().getControlSequence(
+           ((TeXCsRef)object).getName());
+      }
 
-         int n = list.size();
+      if (object instanceof Macro)
+      {
+         ((Macro)object).setPrefix(Macro.PREFIX_GLOBAL);
 
-         contents.ensureCapacity(n);
-
-         for (TeXObject obj : list)
+         if (parser == stack)
          {
-            contents.add((TeXObject)obj.clone());
+            object.process(parser);
          }
+         else
+         {
+            object.process(parser, stack);
+         }
+
+         ((Macro)object).clearPrefix();
       }
       else
       {
-         contents.add((TeXObject)object.clone());
+         stack.push(object);
       }
    }
 
-   public TeXObject getContents(TeXParser parser)
-    throws TeXSyntaxException
+   public void process(TeXParser parser)
+      throws IOException
    {
-      return (TeXObject)contents.clone();
+      process(parser, parser);
    }
-
-   private TeXObjectList contents;
 }

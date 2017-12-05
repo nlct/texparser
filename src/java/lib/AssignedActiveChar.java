@@ -54,7 +54,7 @@ public class AssignedActiveChar extends ActiveChar
       return underlying.isPar();
    }
 
-   protected void setPrefix(byte prefix)
+   public void setPrefix(byte prefix)
    {
       if (underlying instanceof Macro)
       {
@@ -65,7 +65,7 @@ public class AssignedActiveChar extends ActiveChar
       }
    }
 
-   protected void clearPrefix()
+   public void clearPrefix()
    {
       if (underlying instanceof Macro)
       {

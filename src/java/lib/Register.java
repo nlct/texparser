@@ -25,6 +25,7 @@ public abstract class Register extends ControlSequence
    public Register(String name)
    {
       super(name);
+      setAllowsPrefix(true);
    }
 
    public void setAllocation(int alloc)
@@ -43,7 +44,7 @@ public abstract class Register extends ControlSequence
    public abstract void setContents(TeXParser parser, TeXObject contents)
      throws TeXSyntaxException;
    
-   protected void processNext(TeXParser parser, TeXObjectList stack)
+   protected TeXObject popValue(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
       TeXObject object;
@@ -57,7 +58,7 @@ public abstract class Register extends ControlSequence
          object = stack.popArg(parser);
       }
 
-      setContents(parser, object);
+      return object;
    }
 
    public void process(TeXParser parser)
@@ -93,14 +94,26 @@ public abstract class Register extends ControlSequence
          }
       }
 
+      TeXObject value;
+
       if (object instanceof Register)
       {
-         setContents(parser, object);
-         return;
+         value = ((Register)object).getContents(parser);
+      }
+      else
+      {
+         parser.push(object);
+         value = popValue(parser, parser);
       }
 
-      parser.push(object);
-      processNext(parser, parser);
+      if (getPrefix() == PREFIX_GLOBAL)
+      {
+         parser.getSettings().globalSetRegister(getName(), value);
+      }
+      else
+      {
+         parser.getSettings().localSetRegister(getName(), value);
+      }
    }
 
    public void process(TeXParser parser, TeXObjectList stack)
@@ -138,14 +151,26 @@ public abstract class Register extends ControlSequence
          }
       }
 
+      TeXObject value;
+
       if (object instanceof Register)
       {
-         setContents(parser, object);
-         return;
+         value = ((Register)object).getContents(parser);
+      }
+      else
+      {
+         parser.push(object);
+         value = popValue(parser, stack);
       }
 
-      parser.push(object);
-      processNext(parser, stack);
+      if (getPrefix() == PREFIX_GLOBAL)
+      {
+         parser.getSettings().globalSetRegister(getName(), value);
+      }
+      else
+      {
+         parser.getSettings().localSetRegister(getName(), value);
+      }
    }
 
    protected int allocation = -1;

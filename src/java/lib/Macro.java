@@ -42,7 +42,7 @@ public abstract class Macro implements TeXObject
       this.isShort = isShort;
    }
 
-   protected void setPrefix(byte prefix)
+   public void setPrefix(byte prefix)
    {
       if (allowsPrefix)
       {
@@ -55,7 +55,7 @@ public abstract class Macro implements TeXObject
       return allowsPrefix ? prefix : PREFIX_NONE;
    }
 
-   protected void clearPrefix()
+   public void clearPrefix()
    {
       prefix = PREFIX_NONE;
    }

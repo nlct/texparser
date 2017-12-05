@@ -49,7 +49,7 @@ public class GenericError extends ControlSequence
 
       if (msg instanceof Expandable)
       {
-         TeXObjectList expanded = msg.expandfully(parser);
+         TeXObjectList expanded = ((Expandable)msg).expandfully(parser);
 
          if (expanded != null)
          {
@@ -70,7 +70,7 @@ public class GenericError extends ControlSequence
 
       if (msg instanceof Expandable)
       {
-         TeXObjectList expanded = msg.expandfully(parser, list);
+         TeXObjectList expanded = ((Expandable)msg).expandfully(parser, list);
 
          if (expanded != null)
          {

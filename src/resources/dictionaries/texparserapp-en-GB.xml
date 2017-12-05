@@ -104,6 +104,7 @@ There is NO WARRANTY, to the extent permitted by law.</entry>
 <entry key="tex.error.numeric register_expected">Numeric register expected</entry>
 <entry key="tex.error.register_not_numeric">Register ''{0}'' not numeric</entry>
 <entry key="tex.error.register_not_token">Register ''{0}'' not a token register</entry>
+<entry key="tex.error.generic">{0}</entry>
 
 <!--  LaTeX Error Messages -->
 
@@ -118,6 +119,8 @@ There is NO WARRANTY, to the extent permitted by law.</entry>
 <entry key="latex.error.defined">''{0}'' already defined</entry>
 <entry key="latex.error.illegal_array_arg_char">Illegal character ''{0}'' in array arg</entry>
 <entry key="latex.error.lonely_item">Lonely \item</entry>
+<entry key="latex.package.error">Package {0} Error: {1}</entry>
+<entry key="latex.class.error">Class {0} Error: {1}</entry>
 
 <!--  bibtex errors -->
 <entry key="bibtex.error.missing_value">Missing value</entry>

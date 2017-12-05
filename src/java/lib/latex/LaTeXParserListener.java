@@ -426,6 +426,21 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       addFontSizeDeclaration("scriptsize", TeXSettings.SIZE_SCRIPT);
       addFontSizeDeclaration("tiny", TeXSettings.SIZE_TINY);
 
+      parser.putControlSequence(
+        new GenericCommand(true, "@spaces", null, 
+         new TeXObject[]{new TeXCsRef("space"), new TeXCsRef("space"),
+          new TeXCsRef("space"), new TeXCsRef("space")}));
+
+      parser.putControlSequence(new GenericError());
+      parser.putControlSequence(new PackageError());
+      parser.putControlSequence(new PackageError(
+       "PackageErrorNoLine", LaTeXSyntaxException.PACKAGE_ERROR));
+
+      parser.putControlSequence(new PackageError(
+       "ClassError", LaTeXSyntaxException.CLASS_ERROR));
+      parser.putControlSequence(new PackageError(
+       "ClassErrorNoLine", LaTeXSyntaxException.CLASS_ERROR));
+
       parser.putControlSequence(new DocumentStyle());
    }
 

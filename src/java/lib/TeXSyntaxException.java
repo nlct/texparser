@@ -184,4 +184,6 @@ public class TeXSyntaxException extends IOException
       "tex.error.register_not_numeric";
    public static final String ERROR_REGISTER_NOT_TOKEN =
       "tex.error.register_not_token";
+   public static final String ERROR_GENERIC =
+      "tex.error.generic";
 }

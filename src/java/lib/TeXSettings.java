@@ -869,7 +869,7 @@ public class TeXSettings
       return rootReg;
    }
 
-   public void localSetRegister(String name, Numerical value)
+   public void localSetRegister(String name, TeXObject value)
      throws TeXSyntaxException
    {
       Register reg = localRegisters.get(name);
@@ -896,16 +896,10 @@ public class TeXSettings
          }
       }
 
-      if (!(reg instanceof NumericRegister))
-      {
-         throw new TeXSyntaxException(parser, 
-            TeXSyntaxException.ERROR_NUMERIC_REGISTER_EXPECTED);
-      }
-
-      ((NumericRegister)reg).setValue(parser, value);
+      reg.setContents(parser, value);
    }
 
-   public void globalSetRegister(String name, Numerical value)
+   public void globalSetRegister(String name, TeXObject value)
      throws TeXSyntaxException
    {
       Register reg = getRegister(name);
@@ -918,13 +912,7 @@ public class TeXSettings
             TeXSyntaxException.ERROR_REGISTER_UNDEF, name);
       }
 
-      if (!(reg instanceof NumericRegister))
-      {
-         throw new TeXSyntaxException(parser, 
-            TeXSyntaxException.ERROR_NUMERIC_REGISTER_EXPECTED);
-      }
-
-      ((NumericRegister)reg).setValue(parser, value);
+      reg.setContents(parser, value);
 
       if (parent != null)
       {
@@ -932,13 +920,13 @@ public class TeXSettings
 
          Register rootReg = root.getRegister(name);
 
-         if (rootReg == null || !(rootReg instanceof NumericRegister))
+         if (rootReg == null)
          {
-            root.putRegister((NumericRegister)reg.clone());
+            root.putRegister((Register)reg.clone());
          }
          else if (reg != rootReg)
          {
-            ((NumericRegister)rootReg).setValue(parser, (NumericRegister)reg);
+            rootReg.setContents(parser, reg.getContents(parser));
          }
       }
    }
@@ -977,6 +965,34 @@ public class TeXSettings
       }
 
       ((NumericRegister)reg).advance(parser, value);
+   }
+
+   public void localSetRegister(String name, Numerical value)
+     throws TeXSyntaxException
+   {
+      if (value instanceof TeXObject)
+      {
+         localSetRegister(name, (TeXObject)value);
+      }
+      else
+      {
+         localSetRegister(name, 
+            (TeXObject)new UserNumber(value.number(parser)));
+      }
+   }
+
+   public void globalSetRegister(String name, Numerical value)
+     throws TeXSyntaxException
+   {
+      if (value instanceof TeXObject)
+      {
+         globalSetRegister(name, (TeXObject)value);
+      }
+      else
+      {
+         globalSetRegister(name, 
+           (TeXObject)new UserNumber(value.number(parser)));
+      }
    }
 
    public NumericRegister globalAdvanceRegister(String name, Numerical value)

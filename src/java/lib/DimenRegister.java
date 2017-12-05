@@ -117,10 +117,10 @@ public class DimenRegister extends NumericRegister implements TeXDimension
    }
 
    @Override
-   protected void processNext(TeXParser parser, TeXObjectList stack)
+   protected TeXObject popValue(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
-      setValue(parser, stack.popDimension(parser));
+      return stack.popDimension(parser);
    }
 
    public Object clone()

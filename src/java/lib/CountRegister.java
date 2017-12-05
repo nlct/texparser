@@ -82,10 +82,10 @@ public class CountRegister extends NumericRegister implements TeXNumber
    }
 
    @Override
-   protected void processNext(TeXParser parser, TeXObjectList stack)
+   protected TeXObject popValue(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
-      setValue(parser, stack.popNumber(parser));
+      return stack.popNumber(parser);
    }
 
    public Object clone()
