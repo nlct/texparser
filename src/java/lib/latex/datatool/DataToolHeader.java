@@ -76,18 +76,44 @@ public class DataToolHeader implements TeXObject
       return type;
    }
 
-   public void setType(byte type)
+   public void setType(byte newType)
    {
-      switch (type)
+      switch (newType)
       {
          case TYPE_UNDEF:
          case TYPE_STRING:
          case TYPE_INT:
          case TYPE_REAL:
          case TYPE_CURRENCY:
-            this.type = type;
+            this.type = newType;
+         break;
          default:
-            throw new IllegalArgumentException("Invalid data type "+type);
+            throw new IllegalArgumentException("Invalid data type "+newType);
+      }
+   }
+
+   public void updateType(DataElement element)
+   {
+      byte newType = element.getDataType();
+
+      switch (type)
+      {
+         case TYPE_UNDEF:
+         case TYPE_INT:
+           type = newType;
+         break;
+         case TYPE_REAL:
+           if (newType != TYPE_INT)
+           {
+              type = newType;
+           }
+         break;
+         case TYPE_CURRENCY:
+           if (newType == TYPE_STRING)
+           {
+              type = newType;
+           }
+         break;
       }
    }
 

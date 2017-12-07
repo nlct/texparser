@@ -65,7 +65,30 @@ public class DataToolEntry implements TeXObject
 
    public void setContents(TeXObject contents)
    {
-      this.contents = contents;
+      if (contents instanceof DataElement)
+      {
+         this.contents = contents;
+      }
+      else
+      {
+         try
+         {
+            DataElement element = sty.getElement(contents);
+
+            if (element == null)
+            {
+               this.contents = contents;
+            }
+            else
+            {
+               this.contents = element;
+            }
+         }
+         catch (IOException e)
+         {
+            this.contents = contents;
+         }
+      }
    }
 
    public static DataToolEntry toEntry(TeXParser parser, TeXObjectList stack,

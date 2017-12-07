@@ -18,7 +18,7 @@
 */
 package com.dickimawbooks.texparserlib.latex.datatool;
 
-import java.util.Hashtable;
+import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
 import java.io.IOException;
 
@@ -31,6 +31,16 @@ public class DataToolSty extends LaTeXSty
    throws IOException
    {
       super(options, "datatool", listener);
+
+      currencyCsNameList = new Vector<String>();
+
+      currencyCsNameList.add("$");
+      currencyCsNameList.add("pounds");
+      currencyCsNameList.add("textsterling");
+      currencyCsNameList.add("textdollar");
+      currencyCsNameList.add("textyen");
+      currencyCsNameList.add("texteuro");
+      currencyCsNameList.add("euro");
    }
 
    public void addDefinitions()
@@ -46,6 +56,7 @@ public class DataToolSty extends LaTeXSty
       registerControlSequence(new DTLdeletedb("DTLgdeletedb", true, this));
       registerControlSequence(new DTLrowcount(this));
       registerControlSequence(new DTLcolumncount(this));
+      registerControlSequence(new DTLnewdbentry(this));
 
       registerControlSequence(new GenericCommand("DTLunsettype"));
       registerControlSequence(new GenericCommand("DTLstringtype", null,
@@ -245,6 +256,85 @@ public class DataToolSty extends LaTeXSty
       return row;
    }
 
+   public boolean isCurrencySymbol(TeXObject obj)
+   {
+      if (!(obj instanceof ControlSequence))
+      {
+         return false;
+      }
+
+      return currencyCsNameList.contains(((ControlSequence)obj).getName());
+   }
+
+   public DataElement getElement(TeXObject entry)
+     throws IOException
+   {
+      TeXParser parser = getListener().getParser();
+
+      // does it start with a currency marker?
+
+      if (entry instanceof TeXObjectList)
+      {
+         TeXObjectList list = (TeXObjectList)entry;
+         TeXObject first = list.peekStack();
+
+         if (first == null)
+         {// empty
+            return null;
+         }
+
+         if (isCurrencySymbol(first))
+         {
+            first = list.popStack(parser);
+
+            // is the remainder numerical?
+
+            try
+            {
+               return new DataCurrencyElement(this, first, 
+                Double.parseDouble(list.toString(parser).trim()));
+            }
+            catch (NumberFormatException e)
+            {// not numeric
+
+               list.add(0, first);
+               return new DataStringElement(list);
+            }
+         }
+      }
+
+      String str = entry.toString(parser).trim();
+
+      // is it an integer?
+
+      try
+      {
+         return new DataIntElement(this, Integer.parseInt(str));
+      }
+      catch (NumberFormatException e)
+      {
+      }
+
+      // is it a real number?
+
+      try
+      {
+         return new DataRealElement(this, Double.parseDouble(str));
+      }
+      catch (NumberFormatException e)
+      {
+      }
+
+      if (entry instanceof TeXObjectList)
+      {
+         return new DataStringElement((TeXObjectList)entry);
+      }
+
+      DataStringElement elem = new DataStringElement();
+      elem.add(entry);
+      return elem;
+   }
+
    public DataToolEntry addNewEntry(String dbName, String colLabel, 
      TeXObject element)
    throws IOException
@@ -275,6 +365,13 @@ public class DataToolSty extends LaTeXSty
       DataToolEntry entry = new DataToolEntry(this, header.getColumnIndex(),
          element);
       row.add(entry);
+
+      TeXObject contents = entry.getContents();
+
+      if (contents instanceof DataElement)
+      {
+         header.updateType((DataElement)contents);
+      }
 
       update(dbName, rows);
 
@@ -489,6 +586,7 @@ public class DataToolSty extends LaTeXSty
    }
 
    private ConcurrentHashMap<String,DataBase> databases;
+   private Vector<String> currencyCsNameList;
 
    public static final String ERROR_DB_EXISTS="datatool.db_exists";
    public static final String ERROR_DB_DOESNT_EXIST="datatool.db_doesnt_exist";
