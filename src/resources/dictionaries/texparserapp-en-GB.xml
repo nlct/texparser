@@ -145,6 +145,14 @@ There is NO WARRANTY, to the extent permitted by law.</entry>
 <entry key="probsoln.request_args">Problem ''{0}'' (in database ''{1}'') requires {2} arguments. Please specify</entry>
 <entry key="probsoln.request_arg">Problem ''{0}'' (in database ''{1}'') requires 1 argument. Please specify</entry>
 
+<!-- datatool messages -->
+
+<entry key="datatool.db_exists">Database ''{0}'' already exists.</entry>
+<entry key="datatool.db_doesnt_exist">Database ''{0}'' doesn''t exist.</entry>
+<entry key="datatool.mismatched">Unmatched ''{0}'' (ended with ''{1}'').</entry>
+<entry key="datatool.invalid.header">Invalid header specs ''{0}''.</entry>
+<entry key="datatool.invalid.contents">Invalid contents specs ''{0}''.</entry>
+
 <!--  Image drawing messages -->
 
 <entry key="teximage.error.no_path">No path defined on which to operate</entry>

@@ -1,0 +1,19 @@
+\documentclass{article}
+
+\usepackage{datatool}
+
+\begin{document}
+
+Data
+\DTLifdbexists{data}{exists}{doesn't exist}.
+
+\DTLnewdb{data}
+Data
+\DTLifdbexists{data}{exists}{doesn't exist}.
+
+New row.\DTLnewrow{data}
+
+Row count: \DTLrowcount{data}.
+Column count: \DTLcolumncount{data}.
+
+\end{document}

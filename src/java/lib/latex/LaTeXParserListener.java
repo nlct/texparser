@@ -61,6 +61,7 @@ import com.dickimawbooks.texparserlib.latex.fourier.*;
 import com.dickimawbooks.texparserlib.latex.fontenc.*;
 import com.dickimawbooks.texparserlib.latex.tipa.*;
 import com.dickimawbooks.texparserlib.latex.upgreek.*;
+import com.dickimawbooks.texparserlib.latex.datatool.*;
 
 public abstract class LaTeXParserListener extends DefaultTeXParserListener
 {
@@ -956,6 +957,11 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       if (styName.equals("tipa"))
       {
          return new TipaSty(options, this);
+      }
+
+      if (styName.equals("datatool"))
+      {
+         return new DataToolSty(options, this);
       }
 
       if (styName.equals("xspace"))

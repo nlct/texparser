@@ -2041,9 +2041,22 @@ public class TeXParser extends TeXObjectList
          return cs;
       }
 
-      cs = csTable.get(name);
+      return csTable.get(name);
+   }
 
-      return cs;
+   public ControlSequence removeControlSequence(boolean isLocal, String name)
+   {
+      if (isLocal)
+      {
+         ControlSequence cs = settings.removeLocalControlSequence(name);
+
+         if (cs != null)
+         {
+            return cs;
+         }
+      }
+
+      return csTable.remove(name);
    }
 
    public ActiveChar removeActiveChar(int code)

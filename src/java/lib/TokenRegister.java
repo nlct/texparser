@@ -25,46 +25,28 @@ public class TokenRegister extends Register
       this(name, new TeXObjectList());
    }
 
-   public TokenRegister(String name, TeXObjectList contentsList)
+   public TokenRegister(String name, TeXObject contents)
    {
       super(name);
-      contents = contentsList;
+      this.contents = contents;
    }
 
    public Object clone()
    {
-      return new TokenRegister(getName(), (TeXObjectList)contents.clone());
+      return new TokenRegister(getName(), (TeXObject)contents.clone());
    }
 
    public void setContents(TeXParser parser, TeXObject object)
     throws TeXSyntaxException
    {
-      contents.clear();
-
-      if (object instanceof TeXObjectList && !(object instanceof Group))
-      {
-         TeXObjectList list = (TeXObjectList)object;
-
-         int n = list.size();
-
-         contents.ensureCapacity(n);
-
-         for (TeXObject obj : list)
-         {
-            contents.add((TeXObject)obj.clone());
-         }
-      }
-      else
-      {
-         contents.add((TeXObject)object.clone());
-      }
+      contents = object;
    }
 
    public TeXObject getContents(TeXParser parser)
     throws TeXSyntaxException
    {
-      return (TeXObject)contents.clone();
+      return contents;
    }
 
-   private TeXObjectList contents;
+   private TeXObject contents;
 }

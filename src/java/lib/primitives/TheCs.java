@@ -45,7 +45,7 @@ public class TheCs extends Primitive implements Expandable
    {
       Register arg = stack.popRegister(parser);
 
-      TeXObject contents = arg.getContents(parser);
+      TeXObject contents = (TeXObject)arg.getContents(parser).clone();
 
       if (contents instanceof TeXObjectList && !(contents instanceof Group))
       {
@@ -64,7 +64,7 @@ public class TheCs extends Primitive implements Expandable
    {
       Register arg = parser.popRegister();
 
-      TeXObject contents = arg.getContents(parser);
+      TeXObject contents = (TeXObject)arg.getContents(parser).clone();
 
       if (contents instanceof TeXObjectList && !(contents instanceof Group))
       {

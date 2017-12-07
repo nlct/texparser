@@ -721,6 +721,51 @@ public class TeXSettings
       csTable.put(cs.getName(), cs);
    }
 
+   public ControlSequence removeLocalControlSequence(String name)
+   {
+      ControlSequence cs = csTable.remove(name);
+
+      if (cs == null)
+      {
+         cs = removeLocalRegister(name);
+      }
+
+      return cs;
+   }
+
+   public ControlSequence removeGlobalControlSequence(String name)
+   {
+      ControlSequence cs = csTable.remove(name);
+
+      if (cs == null)
+      {
+         cs = localRegisters.remove(name);
+      }
+
+      ControlSequence parentCs = parser.removeControlSequence(false, name);
+
+      if (parentCs != null)
+      {
+         cs = parentCs;
+      }
+
+      TeXSettings root = parser.getSettings();
+
+      if (this == root || parent == null)
+      {
+         return cs;
+      }
+
+      parentCs = parent.removeGlobalControlSequence(name);
+
+      if (parentCs != null)
+      {
+         cs = parentCs;
+      }
+
+      return cs;
+   }
+
    public ActiveChar getActiveChar(Integer code)
    {
       ActiveChar ac = activeTable.get(code);
@@ -1183,18 +1228,34 @@ public class TeXSettings
       }
    }
 
-   private void removeLocalRegister(String name)
+   private Register removeLocalRegister(String name)
    {
+      Register cs = localRegisters.remove(name);
+
+      putControlSequence(parser.getListener().createUndefinedCs(name));
+
+      return cs;
+   }
+
+   private Register removeGlobalRegister(String name)
+   {
+      Register cs = localRegisters.remove(name);
+
       TeXSettings root = parser.getSettings();
 
       if (this == root || parent == null)
       {
-         return;
+         return cs;
       }
 
-      localRegisters.remove(name);
+      Register reg = parent.removeGlobalRegister(name);
 
-      parent.removeLocalRegister(name);
+      if (reg != null)
+      {
+         cs = reg;
+      }
+
+      return cs;
    }
 
    public boolean isMathBold()

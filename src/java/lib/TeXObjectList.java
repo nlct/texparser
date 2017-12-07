@@ -221,6 +221,51 @@ public class TeXObjectList extends Vector<TeXObject>
       return list;
    }
 
+   public boolean popCsMarker(TeXParser parser, String name)
+    throws IOException
+   {
+      TeXObject token = popToken();
+
+      if (token == null)
+      {
+         return false;
+      }
+
+      if (!(token instanceof ControlSequence && 
+             ((ControlSequence)token).getName().equals(name)))
+      {
+         throw new TeXSyntaxException(parser, 
+            TeXSyntaxException.ERROR_NOT_FOUND, 
+            String.format("%c%s", parser.getEscChar(), name));
+      }
+
+      return true;
+   }
+
+   public TeXObjectList popToCsMarker(TeXParser parser,
+       String name)
+    throws IOException
+   {
+      TeXObjectList list = new TeXObjectList();
+
+      TeXObject token = popToken();
+
+      while (token != null)
+      {
+         if ((token instanceof ControlSequence && 
+             ((ControlSequence)token).getName().equals(name)))
+         {
+            return list;
+         }
+
+         list.add(token);
+      }
+
+      throw new TeXSyntaxException(parser, 
+         TeXSyntaxException.ERROR_NOT_FOUND, 
+         String.format("%c%s", parser.getEscChar(), name));
+   }
+
    public TeXUnit popUnit(TeXParser parser)
     throws IOException
    {
