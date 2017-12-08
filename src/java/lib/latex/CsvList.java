@@ -180,4 +180,149 @@ public class CsvList extends TeXObjectList
 
       return valList;
    }
+
+   public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
+    throws IOException
+   {
+      return expandonce(parser);
+   }
+
+   public TeXObjectList expandonce(TeXParser parser)
+    throws IOException
+   {
+      TeXObjectList list = new TeXObjectList(capacity());
+
+      for (int i = 0; i < size(); i++)
+      {
+         if (i > 0)
+         {
+            list.add(parser.getListener().getOther(','));
+         }
+
+         list.add((TeXObject)get(i).clone());
+      }
+
+      return list;
+   }
+
+   public TeXObjectList expandfully(TeXParser parser, TeXObjectList stack)
+    throws IOException
+   {
+      return expandonce(parser, stack).expandfully(parser, stack);
+   }
+
+   public TeXObjectList expandfully(TeXParser parser)
+    throws IOException
+   {
+      return expandonce(parser).expandfully(parser);
+   }
+
+   public void process(TeXParser parser, TeXObjectList stack)
+    throws IOException
+   {
+      boolean isFirst = true;
+
+      StackMarker marker = null;
+
+      if (stack != parser && stack != null)
+      {
+         marker = new StackMarker();
+         add(marker);
+
+         addAll(stack);
+         stack.clear();
+      }
+
+      while (size() > 0)
+      {
+         TeXObject object = remove(0);
+
+         if (object.equals(marker))
+         {
+            break;
+         }
+
+         if (object instanceof TeXCsRef)
+         {
+            object = parser.getListener().getControlSequence(
+               ((TeXCsRef)object).getName());
+         }
+
+         if (!(object instanceof Ignoreable))
+         {
+            if (isFirst)
+            {
+               isFirst = false;
+            }
+            else
+            {
+               parser.getListener().getOther(',').process(parser, stack);
+            }
+
+            object.process(parser, this);
+         }
+      }
+
+      if (!isEmpty())
+      {
+         stack.addAll(this);
+         clear();
+      }
+   }
+
+   public void process(TeXParser parser)
+    throws IOException
+   {
+      boolean isFirst = true;
+
+      while (size() > 0)
+      {
+         TeXObject object = remove(0);
+
+         if (object instanceof TeXCsRef)
+         {
+            object = parser.getListener().getControlSequence(
+               ((TeXCsRef)object).getName());
+         }
+
+         if (!(object instanceof Ignoreable))
+         {
+            if (isFirst)
+            {
+               isFirst = false;
+            }
+            else
+            {
+               parser.getListener().getOther(',').process(parser);
+            }
+
+            object.process(parser, this);
+         }
+      }
+   }
+
+   public String toString(TeXParser parser)
+   {
+      StringBuilder builder = new StringBuilder();
+      boolean isFirst = true;
+
+      for (TeXObject obj : this)
+      {
+         if (!(obj instanceof Ignoreable))
+         {
+            if (isFirst)
+            {
+               isFirst = false;
+            }
+            else
+            {
+               builder.append(',');
+            }
+         }
+
+         builder.append(obj.toString(parser));
+      }
+
+      return builder.toString();
+   }
 }

@@ -38,5 +38,32 @@ Is $10 < 10$ and $10 < 15$? \dtlifintopenbetween{10}{10}{15}{True}{False}.
 
 Is $10 \leq 10$ and $10 \leq 15$? \dtlifintclosedbetween{10}{10}{15}{True}{False}.
 
+\def\mylist{zebra,aardvark,duck,antelope,parrot}
+List: \mylist.
+Number of items: \DTLnumitemsinlist{\mylist}{\tmp}\tmp.
+Is duck in list? \DTLifinlist{duck}{\mylist}{true}{false}.
+Is armadillo in list? \DTLifinlist{armadillo}{\mylist}{true}{false}.
 
+Clearing list.\def\mylist{}
+
+Inserting `zebra' into list.\dtlinsertinto{zebra}{\mylist}{\dtlcompare}
+Updated list: \mylist.
+
+Inserting `aardvark' into list.\dtlinsertinto{aardvark}{\mylist}{\dtlcompare}
+Updated list: \mylist.
+
+Inserting `duck' into list.\dtlinsertinto{duck}{\mylist}{\dtlcompare}
+Updated list: \mylist.
+
+Inserting `antelope' into list.\dtlinsertinto{antelope}{\mylist}{\dtlcompare}
+Updated list: \mylist.
+
+Inserting `parrot' into list.\dtlinsertinto{parrot}{\mylist}{\dtlcompare}
+Updated list: \mylist.
+
+Inserting `cow' into list.\dtlinsertinto{cow}{\mylist}{\dtlcompare}
+Updated list: \mylist.
+
+Inserting `zygote' into list.\dtlinsertinto{zygote}{\mylist}{\dtlcompare}
+Updated list: \mylist.
 \end{document}

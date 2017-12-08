@@ -84,7 +84,7 @@ public class TeXObjectList extends Vector<TeXObject>
          TeXObjectList expanded = group.expandfully(parser, this);
          if (expanded.get(0) instanceof BgChar)
          {
-            BgChar bgChar = (BgChar)expanded.remove(0);
+            BgChar bgChar = (BgChar)expanded.pop();
             group = bgChar.createGroup(parser);
             expanded.popRemainingGroup(parser, group, isShort, bgChar);
             if (!expanded.isEmpty())
@@ -132,7 +132,7 @@ public class TeXObjectList extends Vector<TeXObject>
    {
       while (size() > 0 && (get(0) instanceof Ignoreable))
       {
-         remove(0);
+         pop();
       }
 
       if (size() == 0)
@@ -140,7 +140,7 @@ public class TeXObjectList extends Vector<TeXObject>
          return null;
       }
 
-      TeXObject obj = remove(0);
+      TeXObject obj = pop();
 
       if (isShort && obj.isPar())
       {
@@ -181,7 +181,7 @@ public class TeXObjectList extends Vector<TeXObject>
              ((get(0) instanceof Ignoreable)
               || (skipWhiteSpace && get(0) instanceof WhiteSpace)))
       {
-         remove(0);
+         pop();
       }
 
       if (size() == 0)
@@ -189,7 +189,7 @@ public class TeXObjectList extends Vector<TeXObject>
          return null;
       }
 
-      return remove(0);
+      return pop();
    }
 
    public TeXObject pop()
@@ -234,7 +234,7 @@ public class TeXObjectList extends Vector<TeXObject>
             break;
          }
 
-         obj = remove(0);
+         obj = pop();
 
          if (obj instanceof Ignoreable)
          {
@@ -853,6 +853,36 @@ public class TeXObjectList extends Vector<TeXObject>
       popNumber(parser, expandedPopStack(parser), builder, base);
    }
 
+   public ControlSequence popControlSequence(TeXParser parser)
+    throws IOException
+   {
+      TeXObject obj = popArg(parser);
+
+      if (obj instanceof TeXObjectList)
+      {
+         TeXObjectList list = (TeXObjectList)obj;
+
+         obj = list.popToken();
+
+         if (obj == null || list.peekStack() != null)
+         {
+            throw new TeXSyntaxException(parser,
+               TeXSyntaxException.ERROR_CS_EXPECTED,
+                obj == null ? list.toString(parser) :
+                 String.format("%s%s", obj.toString(parser),
+                 list.toString(parser)));
+         }
+      }
+
+      if (!(obj instanceof ControlSequence))
+      {
+         throw new TeXSyntaxException(parser,
+            TeXSyntaxException.ERROR_CS_EXPECTED, obj.toString(parser));
+      }
+
+      return (ControlSequence)obj;
+   }
+
    public void push(TeXObject object)
    {
       if (object == this)
@@ -1202,7 +1232,7 @@ public class TeXObjectList extends Vector<TeXObject>
 
       while (!remaining.isEmpty())
       {
-         TeXObject object = remaining.remove(0);
+         TeXObject object = remaining.pop();
 
          TeXObjectList expanded = null;
 
@@ -1245,7 +1275,7 @@ public class TeXObjectList extends Vector<TeXObject>
 
       while (!remaining.isEmpty())
       {
-         TeXObject object = remaining.remove(0);
+         TeXObject object = remaining.pop();
 
          if (object.equals(marker))
          {
@@ -1286,7 +1316,7 @@ public class TeXObjectList extends Vector<TeXObject>
 
       while (!remaining.isEmpty())
       {
-         TeXObject object = remaining.remove(0);
+         TeXObject object = remaining.pop();
 
          TeXObjectList expanded = null;
 
@@ -1328,7 +1358,7 @@ public class TeXObjectList extends Vector<TeXObject>
 
       while (!remaining.isEmpty())
       {
-         TeXObject object = remaining.remove(0);
+         TeXObject object = remaining.pop();
 
          if (object.equals(marker))
          {
@@ -1560,7 +1590,7 @@ public class TeXObjectList extends Vector<TeXObject>
    {
       while (size() > 0)
       {
-         TeXObject obj = remove(0);
+         TeXObject obj = pop();
 
          if (obj instanceof AssignedMacro)
          {

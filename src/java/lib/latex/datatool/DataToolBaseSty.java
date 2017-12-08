@@ -36,10 +36,20 @@ public class DataToolBaseSty extends LaTeXSty
 
    public void addDefinitions()
    {
+      TeXParser parser = getListener().getParser();
+
+      sortCountReg = parser.getSettings().newcount(false, "dtl@sortresult");
+
       registerControlSequence(new DTLnewcurrencysymbol(this));
       registerControlSequence(new DTLsetdefaultcurrency(this));
       registerControlSequence(new DTLifintopenbetween());
       registerControlSequence(new DTLifintclosedbetween());
+      registerControlSequence(new DTLifinlist());
+      registerControlSequence(new DTLnumitemsinlist());
+      registerControlSequence(new DTLinsertinto(this));
+      registerControlSequence(new DTLinsertinto("edtlinsertinto", true, this));
+      registerControlSequence(new DTLcompare());
+      registerControlSequence(new DTLcompare("dtlicompare", false));
 
       addCurrencySymbol("$");
       addCurrencySymbol("pounds");
@@ -130,8 +140,15 @@ public class DataToolBaseSty extends LaTeXSty
       return ifThenSty;
    }
 
+   public CountRegister getSortCountRegister()
+   {
+      return sortCountReg;
+   }
+
    private IfThenSty ifThenSty;
 
    private Vector<TeXObject> currencySymbolList;
    private TeXObject defaultCurrency;
+
+   private CountRegister sortCountReg;
 }
