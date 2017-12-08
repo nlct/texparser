@@ -62,6 +62,7 @@ import com.dickimawbooks.texparserlib.latex.fontenc.*;
 import com.dickimawbooks.texparserlib.latex.tipa.*;
 import com.dickimawbooks.texparserlib.latex.upgreek.*;
 import com.dickimawbooks.texparserlib.latex.datatool.*;
+import com.dickimawbooks.texparserlib.latex.ifthen.*;
 
 public abstract class LaTeXParserListener extends DefaultTeXParserListener
 {
@@ -769,6 +770,24 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       loadedPackages.remove(sty);
    }
 
+   public LaTeXSty requirepackage(String name)
+   throws IOException
+   {
+      LaTeXSty sty = getLoadedPackage(name);
+
+      if (sty != null)
+      {
+         return sty;
+      }
+
+      sty = getLaTeXSty(null, name);
+
+      addFileReference(sty);
+      loadedPackages.add(sty);
+
+      return sty;
+   }
+
    public void usepackage(LaTeXSty sty)
    {
       if (isStyLoaded(sty.getName()))
@@ -962,6 +981,16 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       if (styName.equals("datatool"))
       {
          return new DataToolSty(options, this);
+      }
+
+      if (styName.equals("datatool-base"))
+      {
+         return new DataToolBaseSty(options, this);
+      }
+
+      if (styName.equals("ifthen"))
+      {
+         return new IfThenSty(options, this);
       }
 
       if (styName.equals("xspace"))

@@ -18,4 +18,25 @@ New row.\DTLnewrow{data}
 Row count: \DTLrowcount{data}.
 Column count: \DTLcolumncount{data}.
 
+Is $10 < 2$? \ifthenelse{\(10 < 2\)}{True}{False}.
+
+Is 3 odd? \ifthenelse{\isodd{3}}{True}{False}.
+
+Is 4 odd? \ifthenelse{\isodd{4}}{True}{False}.
+
+Is 3 odd or is 4 odd? \ifthenelse{\isodd{3}\OR\isodd{4}}{True}{False}.
+
+Is 3 odd and is 4 odd? \ifthenelse{\isodd{3}\AND\isodd{4}}{True}{False}.
+
+Is 3 not odd? \ifthenelse{\NOT\isodd{3}}{True}{False}.
+
+Is $10 < 2$? \ifthenelse{10 < 2}{True}{False}.
+
+Is $10 < 12$ and $12 < 15$? \ifthenelse{10 < 12 \AND 12 < 15}{True}{False}.
+
+Is $10 < 10$ and $10 < 15$? \dtlifintopenbetween{10}{10}{15}{True}{False}.
+
+Is $10 \leq 10$ and $10 \leq 15$? \dtlifintclosedbetween{10}{10}{15}{True}{False}.
+
+
 \end{document}

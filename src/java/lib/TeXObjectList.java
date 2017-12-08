@@ -148,6 +148,16 @@ public class TeXObjectList extends Vector<TeXObject>
             TeXSyntaxException.ERROR_PAR_BEFORE_EG);
       }
 
+      if (obj instanceof AssignedMacro)
+      {
+         TeXObject underlying = ((AssignedMacro)obj).getUnderlying();
+
+         if (underlying instanceof BgChar)
+         {
+            obj = underlying;
+         }
+      }
+
       if (obj instanceof BgChar)
       {
          Group group = ((BgChar)obj).createGroup(parser);
@@ -161,7 +171,15 @@ public class TeXObjectList extends Vector<TeXObject>
    public TeXObject popToken()
      throws IOException
    {
-      while (size() > 0 && (get(0) instanceof Ignoreable))
+      return popToken(false);
+   }
+
+   public TeXObject popToken(boolean skipWhiteSpace)
+     throws IOException
+   {
+      while (size() > 0 && 
+             ((get(0) instanceof Ignoreable)
+              || (skipWhiteSpace && get(0) instanceof WhiteSpace)))
       {
          remove(0);
       }
@@ -200,6 +218,16 @@ public class TeXObjectList extends Vector<TeXObject>
          }
 
          TeXObject obj = firstElement();
+
+         if (obj instanceof AssignedMacro)
+         {
+            TeXObject underlying = ((AssignedMacro)obj).getUnderlying();
+
+            if (underlying instanceof BgChar)
+            {
+               obj = underlying;
+            }
+         }
 
          if (obj instanceof Group || obj instanceof BgChar)
          {
@@ -878,6 +906,12 @@ public class TeXObjectList extends Vector<TeXObject>
    public TeXObject peekStack()
     throws IOException
    {
+      return peekStack(false);
+   }
+
+   public TeXObject peekStack(boolean skipWhiteSpace)
+    throws IOException
+   {
       if (size() == 0)
       {
          return null;
@@ -887,7 +921,8 @@ public class TeXObjectList extends Vector<TeXObject>
       {
          TeXObject obj = get(i);
 
-         if (!(obj instanceof Ignoreable))
+         if (!(obj instanceof Ignoreable
+               || (skipWhiteSpace && obj instanceof WhiteSpace)))
          {
             return obj;
          }
@@ -969,6 +1004,16 @@ public class TeXObjectList extends Vector<TeXObject>
          object = pop();
 
          if (object == null) break;
+
+         if (object instanceof AssignedMacro)
+         {
+            TeXObject underlying = ((AssignedMacro)object).getUnderlying();
+
+            if (underlying instanceof BgChar)
+            {
+               object = underlying;
+            }
+         }
 
          if (object instanceof CharObject)
          {
@@ -1516,6 +1561,16 @@ public class TeXObjectList extends Vector<TeXObject>
       while (size() > 0)
       {
          TeXObject obj = remove(0);
+
+         if (obj instanceof AssignedMacro)
+         {
+            TeXObject underlying = ((AssignedMacro)obj).getUnderlying();
+
+            if (underlying instanceof EgChar || underlying instanceof BgChar)
+            {
+               obj = underlying;
+            }
+         }
 
          if (obj instanceof EgChar)
          {

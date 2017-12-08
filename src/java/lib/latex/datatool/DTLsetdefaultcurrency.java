@@ -16,39 +16,42 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
-package com.dickimawbooks.texparserlib.primitives;
+package com.dickimawbooks.texparserlib.latex.datatool;
 
 import java.io.IOException;
-import java.io.EOFException;
 
 import com.dickimawbooks.texparserlib.*;
+import com.dickimawbooks.texparserlib.latex.*;
 
-public class IfFalse extends If implements TeXBoolean
+public class DTLsetdefaultcurrency extends ControlSequence
 {
-   public IfFalse()
+   public DTLsetdefaultcurrency(DataToolBaseSty sty)
    {
-      this("iffalse");
+      this("DTLsetdefaultcurrency", sty);
    }
 
-   public IfFalse(String name)
+   public DTLsetdefaultcurrency(String name, DataToolBaseSty sty)
    {
       super(name);
+      this.sty = sty;
    }
 
    public Object clone()
    {
-      return new IfFalse(getName());
+      return new DTLsetdefaultcurrency(getName(), sty);
    }
 
-   public boolean booleanValue()
+   public void process(TeXParser parser, TeXObjectList stack)
+     throws IOException
    {
-      return false;
+      sty.setDefaultCurrency(stack.popArg(parser));
    }
 
-   protected boolean istrue(TeXParser parser, TeXObjectList stack)
-   throws IOException
+   public void process(TeXParser parser)
+     throws IOException
    {
-      return false;
+      sty.setDefaultCurrency(parser.popNextArg());
    }
 
+   protected DataToolBaseSty sty;
 }

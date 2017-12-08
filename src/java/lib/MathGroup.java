@@ -72,7 +72,7 @@ public class MathGroup extends Group
    {
       StringBuilder builder = new StringBuilder();
 
-      builder.append("MathGroup");
+      builder.append(getClass().getSimpleName());
 
       String delim = (isInLine() ? "$" : "$$");
 

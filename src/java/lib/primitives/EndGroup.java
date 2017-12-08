@@ -23,32 +23,32 @@ import java.io.EOFException;
 
 import com.dickimawbooks.texparserlib.*;
 
-public class IfFalse extends If implements TeXBoolean
+public class EndGroup extends Primitive
 {
-   public IfFalse()
+   public EndGroup()
    {
-      this("iffalse");
+      this("endgroup");
    }
 
-   public IfFalse(String name)
+   public EndGroup(String name)
    {
       super(name);
    }
 
    public Object clone()
    {
-      return new IfFalse(getName());
+      return new EndGroup(getName());
    }
 
-   public boolean booleanValue()
+   public void process(TeXParser parser, TeXObjectList stack)
+      throws IOException
    {
-      return false;
+      parser.endGroup();
    }
 
-   protected boolean istrue(TeXParser parser, TeXObjectList stack)
-   throws IOException
+   public void process(TeXParser parser)
+      throws IOException
    {
-      return false;
+      parser.endGroup();
    }
-
 }

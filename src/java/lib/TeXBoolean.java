@@ -16,39 +16,9 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
-package com.dickimawbooks.texparserlib.primitives;
+package com.dickimawbooks.texparserlib;
 
-import java.io.IOException;
-import java.io.EOFException;
-
-import com.dickimawbooks.texparserlib.*;
-
-public class IfFalse extends If implements TeXBoolean
+public interface TeXBoolean extends TeXObject
 {
-   public IfFalse()
-   {
-      this("iffalse");
-   }
-
-   public IfFalse(String name)
-   {
-      super(name);
-   }
-
-   public Object clone()
-   {
-      return new IfFalse(getName());
-   }
-
-   public boolean booleanValue()
-   {
-      return false;
-   }
-
-   protected boolean istrue(TeXParser parser, TeXObjectList stack)
-   throws IOException
-   {
-      return false;
-   }
-
+   public boolean booleanValue();
 }

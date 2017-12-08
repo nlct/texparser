@@ -24,6 +24,8 @@ import java.io.IOException;
 
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.*;
+import com.dickimawbooks.texparserlib.latex.ifthen.IfThenSty;
+import com.dickimawbooks.texparserlib.primitives.EndGraf;
 
 public class DataToolSty extends LaTeXSty
 {
@@ -31,16 +33,6 @@ public class DataToolSty extends LaTeXSty
    throws IOException
    {
       super(options, "datatool", listener);
-
-      currencyCsNameList = new Vector<String>();
-
-      currencyCsNameList.add("$");
-      currencyCsNameList.add("pounds");
-      currencyCsNameList.add("textsterling");
-      currencyCsNameList.add("textdollar");
-      currencyCsNameList.add("textyen");
-      currencyCsNameList.add("texteuro");
-      currencyCsNameList.add("euro");
    }
 
    public void addDefinitions()
@@ -57,6 +49,8 @@ public class DataToolSty extends LaTeXSty
       registerControlSequence(new DTLrowcount(this));
       registerControlSequence(new DTLcolumncount(this));
       registerControlSequence(new DTLnewdbentry(this));
+
+      registerControlSequence(new EndGraf("DTLpar"));
 
       registerControlSequence(new GenericCommand("DTLunsettype"));
       registerControlSequence(new GenericCommand("DTLstringtype", null,
@@ -78,6 +72,18 @@ public class DataToolSty extends LaTeXSty
      throws IOException
    {
       getListener().usepackage(null, "etoolbox");
+
+      LaTeXSty sty = getListener().requirepackage("datatool-base");
+
+      if (sty == null || !(sty instanceof DataToolBaseSty))
+      {
+         dataToolBaseSty = new DataToolBaseSty(null, getListener());
+         getListener().usepackage(dataToolBaseSty);
+      }
+      else
+      {
+         dataToolBaseSty = (DataToolBaseSty)sty;
+      }
    }
 
    public static String getContentsRegisterName(String dbName)
@@ -256,14 +262,25 @@ public class DataToolSty extends LaTeXSty
       return row;
    }
 
-   public boolean isCurrencySymbol(TeXObject obj)
+   public DataToolHeader addNewColumn(String dbName, String key)
+   throws IOException
    {
-      if (!(obj instanceof ControlSequence))
+      DataToolHeaderRow headers = getHeaderContents(dbName);
+
+      DataToolHeader header = headers.getHeader(key);
+
+      if (header != null)
       {
-         return false;
+         throw new LaTeXSyntaxException(getListener().getParser(),
+           ERROR_HEADER_EXISTS, key);
       }
 
-      return currencyCsNameList.contains(((ControlSequence)obj).getName());
+      header = new DataToolHeader(this, headers.getMaxIndex()+1, key);
+
+      headers.add(header);
+      update(dbName, headers);
+
+      return header;
    }
 
    public DataElement getElement(TeXObject entry)
@@ -283,7 +300,7 @@ public class DataToolSty extends LaTeXSty
             return null;
          }
 
-         if (isCurrencySymbol(first))
+         if (dataToolBaseSty.isCurrencySymbol(first))
          {
             first = list.popStack(parser);
 
@@ -585,12 +602,24 @@ public class DataToolSty extends LaTeXSty
       return db;
    }
 
+   public DataToolBaseSty getDataToolBaseSty()
+   {
+      return dataToolBaseSty;
+   }
+
+   public IfThenSty getIfThenSty()
+   {
+      return dataToolBaseSty.getIfThenSty();
+   }
+
+   private DataToolBaseSty dataToolBaseSty;
+
    private ConcurrentHashMap<String,DataBase> databases;
-   private Vector<String> currencyCsNameList;
 
    public static final String ERROR_DB_EXISTS="datatool.db_exists";
    public static final String ERROR_DB_DOESNT_EXIST="datatool.db_doesnt_exist";
    public static final String ERROR_MISMATCHED="datatool.mismatched";
+   public static final String ERROR_HEADER_EXISTS="datatool.header.exists";
    public static final String ERROR_INVALID_HEADER="datatool.invalid.header";
    public static final String ERROR_INVALID_CONTENTS
      ="datatool.invalid.contents";

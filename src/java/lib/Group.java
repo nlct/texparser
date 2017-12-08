@@ -251,7 +251,8 @@ public class Group extends TeXObjectList
 
    public String toString()
    {
-      return "Group{"+super.toString()+"}";
+      return String.format("%s{%s}", getClass().getSimpleName(),
+       super.toString());
    }
 
    public String format()

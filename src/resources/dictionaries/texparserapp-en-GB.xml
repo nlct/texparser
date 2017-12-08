@@ -152,6 +152,12 @@ There is NO WARRANTY, to the extent permitted by law.</entry>
 <entry key="datatool.mismatched">Unmatched ''{0}'' (ended with ''{1}'').</entry>
 <entry key="datatool.invalid.header">Invalid header specs ''{0}''.</entry>
 <entry key="datatool.invalid.contents">Invalid contents specs ''{0}''.</entry>
+<entry key="datatool.header.exists">Header ''{0}'' already exists.</entry>
+<entry key="datatool.header.doesnt_exist">Header ''{0}'' doesn''t exist.</entry>
+
+<!--  ifthen messages -->
+
+<entry key="ifthen.invalid.condition">Invalid condition ''{0}''.</entry>
 
 <!--  Image drawing messages -->
 

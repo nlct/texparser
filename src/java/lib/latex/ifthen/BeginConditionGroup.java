@@ -16,39 +16,35 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
-package com.dickimawbooks.texparserlib.primitives;
+package com.dickimawbooks.texparserlib.latex.ifthen;
 
 import java.io.IOException;
-import java.io.EOFException;
 
 import com.dickimawbooks.texparserlib.*;
+import com.dickimawbooks.texparserlib.latex.*;
+import com.dickimawbooks.texparserlib.primitives.BeginGroup;
 
-public class IfFalse extends If implements TeXBoolean
+public class BeginConditionGroup extends BeginGroup
 {
-   public IfFalse()
+   public BeginConditionGroup()
    {
-      this("iffalse");
+      this("(");
    }
 
-   public IfFalse(String name)
+   public BeginConditionGroup(String name)
    {
       super(name);
    }
 
    public Object clone()
    {
-      return new IfFalse(getName());
+      return new BeginConditionGroup(getName());
    }
 
-   public boolean booleanValue()
+   @Override
+   protected Group createGroup(TeXParser parser)
    {
-      return false;
-   }
-
-   protected boolean istrue(TeXParser parser, TeXObjectList stack)
-   throws IOException
-   {
-      return false;
+      return new ConditionGroup();
    }
 
 }

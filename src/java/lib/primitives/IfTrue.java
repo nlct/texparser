@@ -23,7 +23,7 @@ import java.io.EOFException;
 
 import com.dickimawbooks.texparserlib.*;
 
-public class IfTrue extends If
+public class IfTrue extends If implements TeXBoolean
 {
    public IfTrue()
    {
@@ -38,6 +38,11 @@ public class IfTrue extends If
    public Object clone()
    {
       return new IfTrue(getName());
+   }
+
+   public boolean booleanValue()
+   {
+      return true;
    }
 
    protected boolean istrue(TeXParser parser, TeXObjectList stack)

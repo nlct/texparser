@@ -16,39 +16,42 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
-package com.dickimawbooks.texparserlib.primitives;
+package com.dickimawbooks.texparserlib.latex.ifthen;
 
 import java.io.IOException;
-import java.io.EOFException;
 
 import com.dickimawbooks.texparserlib.*;
+import com.dickimawbooks.texparserlib.latex.*;
 
-public class IfFalse extends If implements TeXBoolean
+public class IFnot extends ControlSequence implements UnaryConditionalOperator
 {
-   public IfFalse()
+   public IFnot()
    {
-      this("iffalse");
+      this("not");
    }
 
-   public IfFalse(String name)
+   public IFnot(String name)
    {
       super(name);
    }
 
    public Object clone()
    {
-      return new IfFalse(getName());
+      return new IFnot(getName());
    }
 
-   public boolean booleanValue()
+   public void process(TeXParser parser, TeXObjectList stack)
+     throws IOException
    {
-      return false;
    }
 
-   protected boolean istrue(TeXParser parser, TeXObjectList stack)
-   throws IOException
+   public void process(TeXParser parser)
+     throws IOException
    {
-      return false;
    }
 
+   public boolean evaluate(boolean value)
+   {
+      return !value;
+   }
 }
