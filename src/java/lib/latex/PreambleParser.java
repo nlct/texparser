@@ -30,6 +30,7 @@ import java.nio.charset.Charset;
 
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.generic.*;
+import com.dickimawbooks.texparserlib.primitives.Undefined;
 
 /**
  * Parses LaTeX document preamble
@@ -56,7 +57,7 @@ public class PreambleParser extends LaTeXParserListener
    // Ignore unknown commands
    public ControlSequence createUndefinedCs(String name)
    {
-      return new GenericCommand(name);
+      return new Undefined(name, Undefined.ACTION_IGNORE);
    }
 
    public TeXParser parse(File texFile)
