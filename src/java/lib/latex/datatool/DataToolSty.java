@@ -202,6 +202,19 @@ public class DataToolSty extends LaTeXSty
       return db;
    }
 
+   public DataBase getDataBase(String name)
+      throws IOException
+   {
+      DataBase db = databases.get(name);
+
+      if (db == null)
+      {
+         db = update(name);
+      }
+
+      return db;
+   }
+
    public DataBase clearDataBase(String name, boolean global)
       throws TeXSyntaxException
    {
