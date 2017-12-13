@@ -64,7 +64,7 @@ public class DataToolHeaderRow extends Vector<DataToolHeader>
 
       DataToolHeader header;
 
-      while ((header = DataToolHeader.toHeader(parser, stack, sty)) != null)
+      while ((header = DataToolHeader.popHeader(parser, stack, sty)) != null)
       {
          row.add(header);
       }

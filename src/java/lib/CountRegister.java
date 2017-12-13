@@ -81,13 +81,6 @@ public class CountRegister extends NumericRegister implements TeXNumber
       value *= factor;
    }
 
-   @Override
-   protected TeXObject popValue(TeXParser parser, TeXObjectList stack)
-      throws IOException
-   {
-      return stack.popNumber(parser);
-   }
-
    public Object clone()
    {
       CountRegister reg = new CountRegister(getName(), value);

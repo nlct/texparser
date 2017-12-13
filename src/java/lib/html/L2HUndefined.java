@@ -33,12 +33,17 @@ public class L2HUndefined extends Undefined
 
    public L2HUndefined(String name)
    {
-      super(name);
+      this(name, ACTION_ERROR);
+   }
+
+   public L2HUndefined(String name, byte action)
+   {
+      super(name, action);
    }
 
    public Object clone()
    {
-      return new L2HUndefined(getName());
+      return new L2HUndefined(getName(), getAction());
    }
 
    public void process(TeXParser parser, TeXObjectList stack)
@@ -58,8 +63,24 @@ public class L2HUndefined extends Undefined
       }
       else
       {
-         listener.getTeXApp().error(new TeXSyntaxException(
-            parser, TeXSyntaxException.ERROR_UNDEFINED, getName()));
+         TeXApp texApp = listener.getTeXApp();
+
+         switch (getAction())
+         {
+            case ACTION_ERROR:
+               texApp.error(new TeXSyntaxException(
+                  parser, TeXSyntaxException.ERROR_UNDEFINED, getName()));
+            break;
+            case ACTION_WARN:
+               texApp.warning(parser, 
+                   texApp.getMessage(TeXSyntaxException.ERROR_UNDEFINED,
+                   getName()));
+            break;
+            case ACTION_MESSAGE:
+               texApp.message(texApp.getMessage(
+                  TeXSyntaxException.ERROR_UNDEFINED, getName()));
+            break;
+         }
       }
    }
 }

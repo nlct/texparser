@@ -127,11 +127,18 @@ public class DataToolHeader implements TeXObject
       this.title = title;
    }
 
-   public static DataToolHeader toHeader(TeXParser parser, TeXObjectList stack,
+   public static DataToolHeader popHeader(TeXParser parser, TeXObjectList stack,
      DataToolSty sty)
       throws IOException
    {
-      if (stack.peekStack() instanceof DataToolHeader)
+      TeXObject token = stack.peekStack();
+
+      if (token == null)
+      {
+         return null;
+      }
+
+      if (token instanceof DataToolHeader)
       {
          return (DataToolHeader)stack.popToken();
       }
@@ -151,53 +158,15 @@ public class DataToolHeader implements TeXObject
 
       stack.popCsMarker(parser, "db@key@id@w");
 
-      TeXObjectList object = stack.popToCsMarker(parser, "db@key@id@end@");
+      TeXObjectList list = stack.popToCsMarker(parser, "db@key@id@end@");
 
-      if (object instanceof Expandable)
-      {
-         TeXObjectList expanded;
-
-         if (parser == stack)
-         {
-            expanded = ((Expandable)object).expandfully(parser);
-         }
-         else
-         {
-            expanded = ((Expandable)object).expandfully(parser, stack);
-         }
-
-         if (expanded != null)
-         {
-            object = expanded;
-         }
-      }
-
-      String keyStr = object.toString(parser);
+      String keyStr = list.toString(parser);
 
       stack.popCsMarker(parser, "db@type@id@w");
 
-      object = stack.popToCsMarker(parser, "db@type@id@end@");
+      list = stack.popToCsMarker(parser, "db@type@id@end@");
 
-      if (object instanceof Expandable)
-      {
-         TeXObjectList expanded;
-
-         if (parser == stack)
-         {
-            expanded = ((Expandable)object).expandfully(parser);
-         }
-         else
-         {
-            expanded = ((Expandable)object).expandfully(parser, stack);
-         }
-
-         if (expanded != null)
-         {
-            object = expanded;
-         }
-      }
-
-      String dataType = object.toString(parser).trim();
+      String dataType = list.toString(parser).trim();
 
       byte type;
 
@@ -220,7 +189,7 @@ public class DataToolHeader implements TeXObject
 
       stack.popCsMarker(parser, "db@header@id@w");
 
-      object = stack.popToCsMarker(parser, "db@header@id@end@");
+      list = stack.popToCsMarker(parser, "db@header@id@end@");
 
       stack.popCsMarker(parser, "db@col@id@w");
 
@@ -243,7 +212,7 @@ public class DataToolHeader implements TeXObject
 
       try
       {
-         return new DataToolHeader(sty, columnIndex, keyStr, type, object);
+         return new DataToolHeader(sty, columnIndex, keyStr, type, list);
       }
       catch (IllegalArgumentException e)
       {

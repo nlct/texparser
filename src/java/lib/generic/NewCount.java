@@ -51,7 +51,7 @@ public class NewCount extends ControlSequence
             TeXSyntaxException.ERROR_CS_EXPECTED, object);
       }
 
-      parser.getSettings().newcount(getPrefix() == PREFIX_GLOBAL, 
+      parser.getSettings().newcount(getPrefix() != PREFIX_GLOBAL, 
         ((ControlSequence)object).getName());
    }
 

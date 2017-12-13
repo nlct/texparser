@@ -197,24 +197,21 @@ public class TeXParser extends TeXObjectList
          if (isActive(codePoint)) return true;
       }
 
-      Integer character = Integer.valueOf(codePoint);
+      int catCode = getCatCode(codePoint);
 
-      if (catcodes[type] != null)
+      return type == catCode;
+   }
+
+   public void setCatCode(boolean isLocal, int c, int catCode)
+   {
+      if (isLocal)
       {
-         return catcodes[type].contains(character);
+         settings.setCatCode(c, catCode);
       }
-
-      // Check if it's TYPE_OTHER
-
-      for (int i = 0; i < catcodes.length; i++)
+      else
       {
-         if (catcodes[i] != null && catcodes[i].contains(character))
-         {
-            return false;
-         }
+         setCatCode(c, catCode);
       }
-
-      return true;
    }
 
    public void setCatCode(int c, int catCode)
@@ -242,7 +239,7 @@ public class TeXParser extends TeXObjectList
    }
 
    // gets the cat code of c
-   public int getCatCode(int c)
+   public int getRootCatCode(int c)
    {
       Integer character = Integer.valueOf(c);
 
@@ -255,6 +252,11 @@ public class TeXParser extends TeXObjectList
       }
 
       return TYPE_OTHER;
+   }
+
+   public int getCatCode(int c)
+   {
+      return settings.getCatCode(c);
    }
 
    public int getLineNumber()
@@ -412,6 +414,13 @@ public class TeXParser extends TeXObjectList
    private boolean parseEOL(int c, TeXObjectList list)
      throws IOException
    {
+      return parseEOL(c, list, false);
+   }
+
+   private boolean parseEOL(int c, TeXObjectList list,
+     boolean followsControlWord)
+     throws IOException
+   {
       boolean isNotEof = true;
 
       if (c == '\n')
@@ -457,7 +466,7 @@ public class TeXParser extends TeXObjectList
 
                reset();
 
-               eolFound(list);
+               eolFound(list, followsControlWord);
             }
          }
          else if (isCatCode(TYPE_EOL, c))
@@ -484,7 +493,7 @@ public class TeXParser extends TeXObjectList
                throw new EOFException();
             }
 
-            eolFound(list);
+            eolFound(list, followsControlWord);
          }
       }
       else if (c == '\r')
@@ -530,7 +539,7 @@ public class TeXParser extends TeXObjectList
 
                reset();
 
-               eolFound(list);
+               eolFound(list, followsControlWord);
             }
          }
          else if (isCatCode(TYPE_EOL, c))
@@ -549,7 +558,7 @@ public class TeXParser extends TeXObjectList
             // not a paragraph break, just one LF
             reset();
 
-            eolFound(list);
+            eolFound(list, followsControlWord);
          }
       }
       else // Neither CR nor LF
@@ -579,7 +588,7 @@ public class TeXParser extends TeXObjectList
 
             reset();
 
-            eolFound(list);
+            eolFound(list, followsControlWord);
          }
       }
 
@@ -672,10 +681,20 @@ public class TeXParser extends TeXObjectList
       return c != -1;
    }
 
-   private void eolFound(TeXObjectList list)
+   private void eolFound(TeXObjectList list, boolean followsControlWord)
      throws IOException
    {
-      list.add(listener.getEol());
+      if (followsControlWord)
+      {
+         SkippedEols skipped = listener.createSkippedEols();
+         skipped.add(listener.getEol());
+
+         list.add(skipped);
+      }
+      else
+      {
+         list.add(listener.getEol());
+      }
    }
 
    private void parFound(TeXObjectList list)
@@ -912,7 +931,71 @@ public class TeXParser extends TeXObjectList
       return true;
    }
 
-   public boolean popRemainingGroup(TeXParser parser, Group group, boolean isShort, BgChar bgChar)
+   public CatCodeChanger isCatCodeChanger(TeXObject obj)
+   {
+      if (obj instanceof CatCodeChanger)
+      {
+         return (CatCodeChanger)obj;
+      }
+
+      if (obj instanceof TeXCsRef)
+      {
+         return isCatCodeChanger(getControlSequence(
+          ((TeXCsRef)obj).getName()));
+      }
+
+      if (obj instanceof AssignedMacro)
+      {
+         return isCatCodeChanger(((AssignedMacro)obj).getUnderlying());
+      }
+
+      return null;
+   }
+
+   public EgChar isEndGroup(TeXObject obj)
+   {
+      if (obj instanceof EgChar)
+      {
+         return (EgChar)obj;
+      }
+
+      if (obj instanceof AssignedMacro)
+      {
+         return isEndGroup(((AssignedMacro)obj).getUnderlying());
+      }
+
+      if (obj instanceof TeXCsRef)
+      {
+         return isEndGroup(getControlSequence(
+          ((TeXCsRef)obj).getName()));
+      }
+
+      return null;
+   }
+
+   public BgChar isBeginGroup(TeXObject obj)
+   {
+      if (obj instanceof BgChar)
+      {
+         return (BgChar)obj;
+      }
+
+      if (obj instanceof AssignedMacro)
+      {
+         return isBeginGroup(((AssignedMacro)obj).getUnderlying());
+      }
+
+      if (obj instanceof TeXCsRef)
+      {
+         return isBeginGroup(getControlSequence(
+          ((TeXCsRef)obj).getName()));
+      }
+
+      return null;
+   }
+
+   public boolean popRemainingGroup(TeXParser parser, Group group, 
+      boolean isShort, BgChar bgChar)
       throws IOException
    {
       return popRemainingGroup(group, isShort, bgChar);
@@ -921,49 +1004,72 @@ public class TeXParser extends TeXObjectList
    public boolean popRemainingGroup(Group group, boolean isShort, BgChar bgChar)
       throws IOException
    {
-      while (true)
+      startGroup();
+
+      try
       {
-         if (isEmpty())
+         while (true)
          {
-            if (!fetchNext(isShort)) return false;
-         }
+            if (isEmpty())
+            {
+               if (!fetchNext(isShort))
+               {
+                  return false;
+               }
+            }
 
-         TeXObject obj = remove(0);
+            TeXObject obj = remove(0);
 
-         if (obj instanceof EgChar)
-         {
-            if (!((EgChar)obj).matches(bgChar))
+            CatCodeChanger catCodeChanger = isCatCodeChanger(obj);
+
+            if (catCodeChanger != null)
+            {
+               catCodeChanger.applyCatCodeChange(this);
+            }
+
+            EgChar egChar = isEndGroup(obj);
+
+            if (egChar != null)
+            {
+               if (!egChar.matches(bgChar))
+               {
+                  throw new TeXSyntaxException(this,
+                    TeXSyntaxException.ERROR_EXTRA_OR_FORGOTTEN,
+                    egChar.toString(this), bgChar.toString(this));
+               }
+
+               return true;
+            }
+
+            bgChar = isBeginGroup(obj);
+
+            if (isShort && obj.isPar())
             {
                throw new TeXSyntaxException(this,
-                 TeXSyntaxException.ERROR_EXTRA_OR_FORGOTTEN,
-                 obj.toString(this), bgChar.toString(this));
+                  TeXSyntaxException.ERROR_PAR_BEFORE_EG);
             }
-
-            return true;
-         }
-
-         if (isShort && obj.isPar())
-         {
-            throw new TeXSyntaxException(this,
-               TeXSyntaxException.ERROR_PAR_BEFORE_EG);
-         }
-         else if (obj instanceof BgChar)
-         {
-            Group subGrp = ((BgChar)obj).createGroup(this);
-
-            if (!popRemainingGroup(subGrp, isShort, (BgChar)obj))
+            else if (bgChar != null)
             {
+               Group subGrp = bgChar.createGroup(this);
+
+               if (!popRemainingGroup(subGrp, isShort, bgChar))
+               {
+                  group.add(subGrp);
+
+                  return false;
+               }
+
                group.add(subGrp);
-
-               return false;
             }
-
-            group.add(subGrp);
+            else
+            {
+               group.add(obj);
+            }
          }
-         else
-         {
-            group.add(obj);
-         }
+      }
+      finally
+      {
+         endGroup();
       }
    }
 
@@ -974,52 +1080,70 @@ public class TeXParser extends TeXObjectList
 
       mark(1);
 
-      while ((c = read()) != -1)
+      startGroup();
+
+      try
       {
-         if (isCatCode(TYPE_EG, c))
+         while ((c = read()) != -1)
          {
-            return true;
-         }
-
-         if (isCatCode(TYPE_BG, c))
-         {
-            Group subGroup = listener.createGroup();
-
-            boolean result = readGroup(subGroup, isShort);
-            group.add(subGroup);
-
-            if (!result)
+            if (isCatCode(TYPE_EG, c))
             {
-               return false;
+               return true;
             }
 
-            continue;
+            if (isCatCode(TYPE_BG, c))
+            {
+               Group subGroup = listener.createGroup();
+
+               boolean result = readGroup(subGroup, isShort);
+               group.add(subGroup);
+
+               if (!result)
+               {
+                  return false;
+               }
+
+               continue;
+            }
+
+            reset();
+
+            fetchNext(group, isShort);
+
+            TeXObject obj = group.lastElement();
+
+            CatCodeChanger catCodeChanger = isCatCodeChanger(obj);
+
+            if (catCodeChanger != null)
+            {
+               catCodeChanger.applyCatCodeChange(this);
+            }
+
+            EgChar egChar = isEndGroup(obj);
+
+            if (egChar != null)
+            {
+               group.remove(group.size()-1);
+            }
+
+            if (isShort && isPar(obj))
+            {
+               throw new TeXSyntaxException(this,
+                  TeXSyntaxException.ERROR_PAR_BEFORE_EG);
+            }
+
+            mark(1);
          }
 
-         reset();
-
-         fetchNext(group, isShort);
-
-         TeXObject obj = group.lastElement();
-
-         if (obj instanceof EgChar)
-         {
-            group.remove(group.size()-1);
-         }
-
-         if (isShort && isPar(obj))
+         if (c == -1)
          {
             throw new TeXSyntaxException(this,
-               TeXSyntaxException.ERROR_PAR_BEFORE_EG);
+               TeXSyntaxException.ERROR_NO_EG);
          }
-
-         mark(1);
       }
-
-      if (c == -1)
+      finally
       {
-         throw new TeXSyntaxException(this,
-            TeXSyntaxException.ERROR_NO_EG);
+         endGroup();
       }
 
       return c != -1;
@@ -1057,18 +1181,36 @@ public class TeXParser extends TeXObjectList
       mark(1);
       int c;
 
-      while ((c = read()) != -1)
+      startGroup();
+
+      try
       {
-         if (isCatCode(TYPE_MATH, c))
+         while ((c = read()) != -1)
          {
-            return;
+            if (isCatCode(TYPE_MATH, c))
+            {
+               return;
+            }
+
+            reset();
+
+            fetchNext(math, true);
+
+            TeXObject obj = math.lastElement();
+
+            CatCodeChanger catCodeChanger = isCatCodeChanger(obj);
+
+            if (catCodeChanger != null)
+            {
+               catCodeChanger.applyCatCodeChange(this);
+            }
+
+            mark(1);
          }
-
-         reset();
-
-         fetchNext(math, true);
-
-         mark(1);
+      }
+      finally
+      {
+         endGroup();
       }
 
       throw new EOFException();
@@ -1080,38 +1222,56 @@ public class TeXParser extends TeXObjectList
       mark(1);
       int c;
 
-      while ((c = read()) != -1)
+      startGroup();
+
+      try
       {
-         if (isCatCode(TYPE_MATH, c))
+         while ((c = read()) != -1)
          {
+            if (isCatCode(TYPE_MATH, c))
+            {
+               mark(1);
+               c = read();
+
+               if (c == -1)
+               {
+                  throw new TeXSyntaxException(
+                     getCurrentFile(),
+                     getLineNumber(),
+                     TeXSyntaxException.ERROR_MISSING_ENDMATH);
+               }
+
+               if (!isCatCode(TYPE_MATH, c))
+               {
+                  reset();
+                  throw new TeXSyntaxException(
+                     getCurrentFile(),
+                     getLineNumber(),
+                     TeXSyntaxException.ERROR_DOLLAR2_ENDED_WITH_DOLLAR);
+               }
+
+               return;
+            }
+
+            reset();
+
+            fetchNext(math, true);
+
+            TeXObject obj = math.lastElement();
+
+            CatCodeChanger catCodeChanger = isCatCodeChanger(obj);
+
+            if (catCodeChanger != null)
+            {
+               catCodeChanger.applyCatCodeChange(this);
+            }
+
             mark(1);
-            c = read();
-
-            if (c == -1)
-            {
-               throw new TeXSyntaxException(
-                  getCurrentFile(),
-                  getLineNumber(),
-                  TeXSyntaxException.ERROR_MISSING_ENDMATH);
-            }
-
-            if (!isCatCode(TYPE_MATH, c))
-            {
-               reset();
-               throw new TeXSyntaxException(
-                  getCurrentFile(),
-                  getLineNumber(),
-                  TeXSyntaxException.ERROR_DOLLAR2_ENDED_WITH_DOLLAR);
-            }
-
-            return;
          }
-
-         reset();
-
-         fetchNext(math, true);
-
-         mark(1);
+      }
+      finally
+      {
+         endGroup();
       }
 
       throw new EOFException();
@@ -1246,7 +1406,7 @@ public class TeXParser extends TeXObjectList
 
                if (macro.length() == 0)
                {
-                  cs = new TeXCsRef(" ");
+                  cs = new TeXCsRef("\n");
                }
                else
                {
@@ -1255,7 +1415,7 @@ public class TeXParser extends TeXObjectList
 
                list.add(cs);
 
-               parseEOL(c, list);
+               parseEOL(c, list, true);
             }
             else if (macro.length() == 0)
             {
@@ -1736,10 +1896,12 @@ public class TeXParser extends TeXObjectList
             ((TeXCsRef)object).getName());
       }
 
-      if (object instanceof BgChar)
+      BgChar bgChar = isBeginGroup(object);
+
+      if (bgChar != null)
       {
-         Group group = ((BgChar)object).createGroup(this);
-         popRemainingGroup(group, isShort, (BgChar)object);
+         Group group = bgChar.createGroup(this);
+         popRemainingGroup(group, isShort, bgChar);
 
          return group;
       }
@@ -1760,10 +1922,12 @@ public class TeXParser extends TeXObjectList
 
          object = expanded.remove(0);
 
-         if (object instanceof BgChar)
+         bgChar = isBeginGroup(object);
+
+         if (bgChar != null)
          {
-            Group grp = ((BgChar)object).createGroup(this);
-            expanded.popRemainingGroup(this, grp, isShort, (BgChar)object);
+            Group grp = bgChar.createGroup(this);
+            expanded.popRemainingGroup(this, grp, isShort, bgChar);
             addAll(0, expanded);
 
             return grp;
@@ -1814,10 +1978,12 @@ public class TeXParser extends TeXObjectList
          return popStack(isShort);
       }
 
-      if (object instanceof BgChar)
+      BgChar bgChar = isBeginGroup(object);
+
+      if (bgChar != null)
       {
-         Group group = ((BgChar)object).createGroup(this);
-         popRemainingGroup(group, isShort, (BgChar)object);
+         Group group = bgChar.createGroup(this);
+         popRemainingGroup(group, isShort, bgChar);
          return group;
       }
 
@@ -1825,6 +1991,12 @@ public class TeXParser extends TeXObjectList
    }
 
    public TeXObject popToken()
+     throws IOException
+   {
+      return popToken(false);
+   }
+
+   public TeXObject popToken(boolean skipWhiteSpace)
      throws IOException
    {
       if (size() == 0)
@@ -1839,11 +2011,12 @@ public class TeXParser extends TeXObjectList
 
       TeXObject object = remove(0);
 
-      if (object instanceof Ignoreable)
+      if (object instanceof Ignoreable || 
+          (skipWhiteSpace && object instanceof WhiteSpace))
       {
          listener.skipping((Ignoreable)object);
 
-         return popToken();
+         return popToken(skipWhiteSpace);
       }
 
       return object;
@@ -1868,7 +2041,9 @@ public class TeXParser extends TeXObjectList
 
          TeXObject obj = firstElement();
 
-         if (obj instanceof Group || obj instanceof BgChar)
+         BgChar bgChar = isBeginGroup(obj);
+
+         if (obj instanceof Group || bgChar != null)
          {
             break;
          }

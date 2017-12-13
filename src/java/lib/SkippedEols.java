@@ -28,6 +28,12 @@ public class SkippedEols extends Ignoreable
       contents = new Vector<Eol>();
    }
 
+   public SkippedEols(Eol eol)
+   {
+      this();
+      add(eol);
+   }
+
    public int size()
    {
       return contents.size();

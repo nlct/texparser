@@ -54,11 +54,11 @@ public class TeXSyntaxException extends IOException
    public TeXSyntaxException(Throwable cause, TeXParser parser, String errorTag,
       Object... params)
    {
-      this(parser == null ? null : parser.getCurrentFile(),
+      this(cause, 
+           parser == null ? null : parser.getCurrentFile(),
            parser == null ? -1 : parser.getLineNumber(), 
            errorTag,
-           params,
-           cause);
+           params);
    }
 
    public TeXSyntaxException(File file, int lineNumber, String errorTag,
@@ -178,12 +178,16 @@ public class TeXSyntaxException extends IOException
       "tex.error.extra_or_forgotten";
    public static final String ERROR_REGISTER_EXPECTED =
       "tex.error.register_expected";
+   public static final String ERROR_REGISTER_EXPECTED_BUT_FOUND =
+      "tex.error.register_expected_but_found";
    public static final String ERROR_NUMERIC_REGISTER_EXPECTED =
       "tex.error.numeric_register_expected";
    public static final String ERROR_REGISTER_NOT_NUMERIC =
       "tex.error.register_not_numeric";
    public static final String ERROR_REGISTER_NOT_TOKEN =
       "tex.error.register_not_token";
+   public static final String ERROR_FILE_NOT_FOUND =
+      "tex.error.file.not.found";
    public static final String ERROR_GENERIC =
       "tex.error.generic";
 }

@@ -68,7 +68,7 @@ public class DTLrowcount extends Command
 
       TeXObjectList list = new TeXObjectList();
 
-      list.add(new UserNumber(sty.getRowCount(dbArg.toString(parser))));
+      list.add(new UserNumber(sty.getRowCount(dbArg.format())));
 
       return list;
    }

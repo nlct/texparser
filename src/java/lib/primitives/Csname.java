@@ -23,7 +23,7 @@ import java.io.EOFException;
 
 import com.dickimawbooks.texparserlib.*;
 
-public class Csname extends Primitive
+public class Csname extends Primitive implements Expandable
 {
    public Csname()
    {
@@ -40,41 +40,104 @@ public class Csname extends Primitive
       return new Csname(getName());
    }
 
+   public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
+      throws IOException
+   {
+      TeXObjectList list = new TeXObjectList();
+
+      String name = csname(parser, stack);
+
+      ControlSequence cs = parser.getControlSequence(name);
+
+      if (cs == null)
+      {
+         list.add(new TeXCsRef(name));
+      }
+      else
+      {
+         list.add(cs);
+      }
+
+      return list;
+   }
+
+   public TeXObjectList expandonce(TeXParser parser)
+      throws IOException
+   {
+      return expandonce(parser, parser);
+   }
+
+   public TeXObjectList expandfully(TeXParser parser, TeXObjectList stack)
+      throws IOException
+   {
+      ControlSequence cs = parser.getControlSequence(csname(parser, stack));
+
+      if (cs == null)
+      {
+         TeXObjectList list = new TeXObjectList();
+         list.add(parser.getListener().getControlSequence("relax"));
+         return list;
+      }
+      else if (cs instanceof Expandable)
+      {
+         return ((Expandable)cs).expandfully(parser, stack);
+      }
+
+      TeXObjectList list = new TeXObjectList();
+      list.add(cs);
+      return list;
+   }
+
+   public TeXObjectList expandfully(TeXParser parser)
+      throws IOException
+   {
+      ControlSequence cs = parser.getControlSequence(csname(parser, parser));
+
+      if (cs == null)
+      {
+         TeXObjectList list = new TeXObjectList();
+         list.add(parser.getListener().getControlSequence("relax"));
+         return list;
+      }
+      else if (cs instanceof Expandable)
+      {
+         return ((Expandable)cs).expandfully(parser);
+      }
+
+      TeXObjectList list = new TeXObjectList();
+      list.add(cs);
+      return list;
+   }
+
    public String csname(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
       TeXObjectList list = new TeXObjectList();
-      TeXObject obj = stack.popStack(parser);
+      TeXObject obj = stack.popToken(true);
 
-      while (!(obj instanceof EndCsname))
+      while (!(obj instanceof ControlSequence
+                && ((ControlSequence)obj).getName().equals("endcsname")))
       {
+         if (obj == null)
+         {
+            throw new TeXSyntaxException(new NullPointerException(), parser, 
+             TeXSyntaxException.ERROR_EXPECTED, "\\endcsname");
+         }
+
          list.add(obj);
          obj = stack.popStack(parser);
       }
 
-      TeXObjectList expanded = list.expandfully(parser, stack);
+      TeXObjectList expanded;
 
-      if (expanded == null)
+      if (parser == stack)
       {
-         expanded = list;
+         expanded = list.expandfully(parser);
       }
-
-      return list.toString(parser);
-   }
-
-   private String csname(TeXParser parser)
-      throws IOException
-   {
-      TeXObjectList list = new TeXObjectList();
-      TeXObject obj = parser.popStack();
-
-      while (!(obj instanceof EndCsname))
+      else
       {
-         list.add(obj);
-         obj = parser.popStack();
+         expanded = list.expandfully(parser, stack);
       }
-
-      TeXObjectList expanded = list.expandfully(parser);
 
       if (expanded == null)
       {
@@ -98,7 +161,8 @@ public class Csname extends Primitive
    public void process(TeXParser parser)
       throws IOException
    {
-      ControlSequence cs = parser.getControlSequence(csname(parser));
+      ControlSequence cs = parser.getControlSequence(
+         csname(parser, parser));
 
       if (cs != null)
       {

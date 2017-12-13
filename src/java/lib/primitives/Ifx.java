@@ -43,42 +43,22 @@ public class Ifx extends If
    protected boolean istrue(TeXParser parser, TeXObjectList stack)
    throws IOException
    {
-      TeXObject firstArg;
+      TeXObject firstArg = parser.popToken(true);
 
-      if (parser == stack || stack == null)
-      {
-         firstArg = parser.popStack();
-      }
-      else
-      {
-         firstArg = stack.popStack(parser);
+      TeXObject secondArg = parser.popToken(true);
 
-         if (firstArg == null)
-         {
-            firstArg = parser.popStack();
-         }
+      if (firstArg instanceof ControlSequence 
+          && secondArg instanceof ControlSequence
+          && ((ControlSequence)firstArg).getName().equals(
+             ((ControlSequence)secondArg).getName()))
+      {
+         return true;
       }
 
       if (firstArg instanceof TeXCsRef)
       {
          firstArg = parser.getListener().getControlSequence(
             ((TeXCsRef)firstArg).getName());
-      }
-
-      TeXObject secondArg;
-
-      if (parser == stack || stack == null)
-      {
-         secondArg = parser.popStack();
-      }
-      else
-      {
-         secondArg = stack.popStack(parser);
-
-         if (secondArg == null)
-         {
-            secondArg = parser.popStack();
-         }
       }
 
       if (secondArg instanceof TeXCsRef)

@@ -55,7 +55,11 @@ public class Input extends ControlSequence
          }
       }
 
-      doInput(parser, arg);
+      if (!doInput(parser, arg))
+      {
+         throw new TeXSyntaxException(parser,
+           TeXSyntaxException.ERROR_FILE_NOT_FOUND, arg.toString(parser));
+      }
     }
 
    public void process(TeXParser parser)
@@ -73,7 +77,11 @@ public class Input extends ControlSequence
          }
       }
 
-      doInput(parser, arg);
+      if (!doInput(parser, arg))
+      {
+         throw new TeXSyntaxException(parser,
+           TeXSyntaxException.ERROR_FILE_NOT_FOUND, arg.toString(parser));
+      }
    }
 
    protected boolean doInput(TeXParser parser, TeXObject arg)
@@ -83,9 +91,11 @@ public class Input extends ControlSequence
 
       TeXPath texPath = new TeXPath(parser, arg.toString(parser));
 
+      if (!listener.input(texPath)) return false;
+
       listener.addFileReference(texPath);
 
-      return listener.input(texPath);
+      return true;
   }
 
 }

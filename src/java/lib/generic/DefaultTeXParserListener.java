@@ -57,6 +57,8 @@ public abstract class DefaultTeXParserListener extends TeXParserListener
       parser.putControlSequence(new AboveWithDelims());
       parser.putControlSequence(new ControlSpace());
       parser.putControlSequence(new SpaceCs());
+      parser.putControlSequence(new SpaceCs("\n"));
+      parser.putControlSequence(new SpaceCs("\t"));
       parser.putControlSequence(new DiscretionaryHyphen());
       parser.putControlSequence(new ItalicCorrection());
       parser.putControlSequence(new OverWithDelims());
@@ -172,7 +174,7 @@ public abstract class DefaultTeXParserListener extends TeXParserListener
 
    public ControlSequence createUndefinedCs(String name)
    {
-      return new Undefined(name);
+      return new Undefined(name, Undefined.ACTION_ERROR);
    }
 
    public DimenRegister newlength(boolean isLocal, String name)

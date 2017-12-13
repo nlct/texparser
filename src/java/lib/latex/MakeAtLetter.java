@@ -23,6 +23,7 @@ import java.io.IOException;
 import com.dickimawbooks.texparserlib.*;
 
 public class MakeAtLetter extends ControlSequence
+  implements CatCodeChanger
 {
    public MakeAtLetter()
    {
@@ -39,6 +40,12 @@ public class MakeAtLetter extends ControlSequence
       return new MakeAtLetter(getName());
    }
 
+   public void applyCatCodeChange(TeXParser parser)
+      throws IOException
+   {
+      parser.setCatCode(true, '@', TeXParser.TYPE_LETTER);
+   }
+
    public void process(TeXParser parser, TeXObjectList list)
      throws IOException
    {
@@ -48,7 +55,7 @@ public class MakeAtLetter extends ControlSequence
    public void process(TeXParser parser)
      throws IOException
    {
-      parser.setCatCode('@', TeXParser.TYPE_LETTER);
+      applyCatCodeChange(parser);
    }
 
 }

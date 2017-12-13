@@ -33,6 +33,7 @@ public class NewIf extends Primitive
    public NewIf(String name)
    {
       super(name);
+      setAllowsPrefix(true);
    }
 
    public Object clone()
@@ -40,7 +41,8 @@ public class NewIf extends Primitive
       return new NewIf(getName());
    }
 
-   public static void createConditional(TeXParser parser, TeXObject obj)
+   public static void createConditional(boolean isLocal,
+      TeXParser parser, TeXObject obj)
       throws IOException
    {
        if (!(obj instanceof ControlSequence))
@@ -49,12 +51,13 @@ public class NewIf extends Primitive
             TeXSyntaxException.ERROR_CS_EXPECTED, obj.toString(parser));
        }
 
-       createConditional(parser, ((ControlSequence)obj).getName());
+       createConditional(isLocal, parser, ((ControlSequence)obj).getName());
    }
 
-   public static void createConditional(TeXParser parser, String name)
+   public static void createConditional(boolean isLocal,
+      TeXParser parser, String name)
    {
-       parser.putControlSequence(new IfFalse(name));
+       parser.putControlSequence(isLocal, new IfFalse(name));
 
        TeXObjectList list = new TeXObjectList();
 
@@ -80,12 +83,15 @@ public class NewIf extends Primitive
    public void process(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
-      createConditional(parser, stack.popToken());
+      createConditional(getPrefix() != PREFIX_GLOBAL, parser, stack.popToken());
+      clearPrefix();
    }
 
    public void process(TeXParser parser)
       throws IOException
    {
-      createConditional(parser, parser.popToken());
+      createConditional(getPrefix() != PREFIX_GLOBAL, parser, 
+        parser.popToken());
+      clearPrefix();
    }
 }

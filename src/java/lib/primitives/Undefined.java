@@ -27,17 +27,18 @@ public class Undefined extends Primitive
 {
    public Undefined()
    {
-      this("undefined");
+      this("undefined", ACTION_ERROR);
    }
 
-   public Undefined(String name)
+   public Undefined(String name, byte action)
    {
       super(name);
+      setAction(action);
    }
 
    public Object clone()
    {
-      return new Undefined(getName());
+      return new Undefined(getName(), action);
    }
 
    public void process(TeXParser parser, TeXObjectList stack)
@@ -49,7 +50,48 @@ public class Undefined extends Primitive
    public void process(TeXParser parser)
       throws IOException
    {
-      throw new TeXSyntaxException(
-         parser, TeXSyntaxException.ERROR_UNDEFINED, getName());
+      TeXApp texApp = parser.getListener().getTeXApp();
+
+      switch (action)
+      {
+         case ACTION_ERROR:
+            throw new TeXSyntaxException(
+            parser, TeXSyntaxException.ERROR_UNDEFINED, getName());
+         case ACTION_WARN:
+            texApp.warning(parser, 
+              texApp.getMessage(TeXSyntaxException.ERROR_UNDEFINED, getName()));
+         break;
+         case ACTION_MESSAGE:
+            texApp.message( 
+              texApp.getMessage(TeXSyntaxException.ERROR_UNDEFINED, getName()));
+         break;
+      }
    }
+
+   public void setAction(byte newAction)
+   {
+      switch (newAction)
+      {
+         case ACTION_ERROR:
+         case ACTION_WARN:
+         case ACTION_MESSAGE:
+         case ACTION_IGNORE:
+            action = newAction;
+         break;
+         default:
+           throw new IllegalArgumentException(
+              "Invalid undefined action "+newAction);
+      }
+   }
+
+   public byte getAction()
+   {
+      return action;
+   }
+
+   private byte action=ACTION_ERROR;
+   public static final byte ACTION_ERROR=0;
+   public static final byte ACTION_WARN=1;
+   public static final byte ACTION_MESSAGE=2;
+   public static final byte ACTION_IGNORE=3;
 }

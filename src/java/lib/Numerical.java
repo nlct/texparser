@@ -18,7 +18,7 @@
 */
 package com.dickimawbooks.texparserlib;
 
-public interface Numerical
+public interface Numerical extends TeXObject
 {
    public void advance(TeXParser parser, Numerical increment)
     throws TeXSyntaxException;
@@ -28,8 +28,4 @@ public interface Numerical
    public void multiply(int factor);
 
    public int number(TeXParser parser) throws TeXSyntaxException;
-
-   public String toString(TeXParser parser);
-
-   public String format();
 }

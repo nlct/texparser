@@ -82,9 +82,11 @@ public class TeXObjectList extends Vector<TeXObject>
          Group group = (Group)object;
 
          TeXObjectList expanded = group.expandfully(parser, this);
-         if (expanded.get(0) instanceof BgChar)
+         BgChar bgChar = parser.isBeginGroup(expanded.get(0));
+
+         if (bgChar != null)
          {
-            BgChar bgChar = (BgChar)expanded.pop();
+            expanded.pop();
             group = bgChar.createGroup(parser);
             expanded.popRemainingGroup(parser, group, isShort, bgChar);
             if (!expanded.isEmpty())
@@ -99,12 +101,19 @@ public class TeXObjectList extends Vector<TeXObject>
          object = popStack(parser, isShort);
       }
 
-      if (object instanceof BgChar)
+      BgChar bgChar = parser.isBeginGroup(object);
+
+      if (bgChar != null)
       {
-         Group group = ((BgChar)object).createGroup(parser);
-         popRemainingGroup(parser, group, isShort, (BgChar)object);
+         Group group = bgChar.createGroup(parser);
+         popRemainingGroup(parser, group, isShort, bgChar);
 
          return group;
+      }
+
+      if (object instanceof NumericExpansion)
+      {
+         return ((NumericExpansion)object).expandToNumber(parser, this);
       }
 
       if (!(object instanceof Expandable))
@@ -148,20 +157,12 @@ public class TeXObjectList extends Vector<TeXObject>
             TeXSyntaxException.ERROR_PAR_BEFORE_EG);
       }
 
-      if (obj instanceof AssignedMacro)
-      {
-         TeXObject underlying = ((AssignedMacro)obj).getUnderlying();
+      BgChar bgChar = parser.isBeginGroup(obj);
 
-         if (underlying instanceof BgChar)
-         {
-            obj = underlying;
-         }
-      }
-
-      if (obj instanceof BgChar)
+      if (bgChar != null)
       {
-         Group group = ((BgChar)obj).createGroup(parser);
-         popRemainingGroup(parser, group, isShort, (BgChar)obj);
+         Group group = bgChar.createGroup(parser);
+         popRemainingGroup(parser, group, isShort, bgChar);
          return group;
       }
 
@@ -219,17 +220,9 @@ public class TeXObjectList extends Vector<TeXObject>
 
          TeXObject obj = firstElement();
 
-         if (obj instanceof AssignedMacro)
-         {
-            TeXObject underlying = ((AssignedMacro)obj).getUnderlying();
+         BgChar bgChar = parser.isBeginGroup(obj);
 
-            if (underlying instanceof BgChar)
-            {
-               obj = underlying;
-            }
-         }
-
-         if (obj instanceof Group || obj instanceof BgChar)
+         if (obj instanceof Group || bgChar != null)
          {
             break;
          }
@@ -287,6 +280,7 @@ public class TeXObjectList extends Vector<TeXObject>
          }
 
          list.add(token);
+         token = popToken();
       }
 
       throw new TeXSyntaxException(parser, 
@@ -388,7 +382,19 @@ public class TeXObjectList extends Vector<TeXObject>
    public Register popRegister(TeXParser parser)
      throws IOException
    {
-      TeXObject object = popStack(parser, true);
+      TeXObject object = popToken(true);
+
+      if (object == null)
+      {
+         throw new TeXSyntaxException(parser,
+            TeXSyntaxException.ERROR_REGISTER_EXPECTED);
+      }
+
+      if (object instanceof TeXCsRef)
+      {
+         object = parser.getListener().getControlSequence(
+          ((TeXCsRef)object).getName());
+      }
 
       if (object instanceof Register)
       {
@@ -397,12 +403,21 @@ public class TeXObjectList extends Vector<TeXObject>
 
       if (object instanceof Expandable)
       {
-         TeXObjectList expanded = ((Expandable)object).expandfully(parser,this);
+         TeXObjectList expanded;
+
+         if (this == parser)
+         {
+            expanded = ((Expandable)object).expandfully(parser);
+         }
+         else
+         {
+            expanded = ((Expandable)object).expandfully(parser,this);
+         }
 
          if (expanded != null)
          {
             addAll(0, expanded);
-            object = popStack(parser, true);
+            object = popToken(true);
 
             if (object instanceof Register)
             {
@@ -412,7 +427,8 @@ public class TeXObjectList extends Vector<TeXObject>
       }
 
       throw new TeXSyntaxException(parser,
-         TeXSyntaxException.ERROR_REGISTER_EXPECTED);
+         TeXSyntaxException.ERROR_REGISTER_EXPECTED_BUT_FOUND,
+          object.toString(parser));
    }
 
    public Numerical popNumerical(TeXParser parser)
@@ -812,6 +828,12 @@ public class TeXObjectList extends Vector<TeXObject>
          return ((Group)object).toList().popNumber(parser);
       }
 
+      if (object instanceof ControlSequence)
+      {
+         throw new TeXSyntaxException(parser, 
+          TeXSyntaxException.ERROR_NUMBER_EXPECTED, object.toString(parser));
+      }
+
       StringBuilder builder = new StringBuilder();
       
       popNumber(parser, object, builder, base);
@@ -1035,15 +1057,7 @@ public class TeXObjectList extends Vector<TeXObject>
 
          if (object == null) break;
 
-         if (object instanceof AssignedMacro)
-         {
-            TeXObject underlying = ((AssignedMacro)object).getUnderlying();
-
-            if (underlying instanceof BgChar)
-            {
-               object = underlying;
-            }
-         }
+         BgChar bgChar = parser.isBeginGroup(object);
 
          if (object instanceof CharObject)
          {
@@ -1054,10 +1068,10 @@ public class TeXObjectList extends Vector<TeXObject>
                return list;
             }
          }
-         else if (object instanceof BgChar)
+         else if (bgChar != null)
          {
             Group group = parser.getListener().createGroup();
-            popRemainingGroup(parser, group, isShort, (BgChar)object);
+            popRemainingGroup(parser, group, isShort, bgChar);
             object = group;
          }
          else if (isShort && object.isPar())
@@ -1592,38 +1606,32 @@ public class TeXObjectList extends Vector<TeXObject>
       {
          TeXObject obj = pop();
 
-         if (obj instanceof AssignedMacro)
-         {
-            TeXObject underlying = ((AssignedMacro)obj).getUnderlying();
+         EgChar egChar = parser.isEndGroup(obj);
 
-            if (underlying instanceof EgChar || underlying instanceof BgChar)
-            {
-               obj = underlying;
-            }
-         }
-
-         if (obj instanceof EgChar)
+         if (egChar != null)
          {
-            if (!((EgChar)obj).matches(bgChar))
+            if (!egChar.matches(bgChar))
             {
                throw new TeXSyntaxException(parser,
                  TeXSyntaxException.ERROR_EXTRA_OR_FORGOTTEN,
-                 obj.toString(parser), bgChar.toString(parser));
+                 egChar.toString(parser), bgChar.toString(parser));
             }
 
             return true;
          }
+
+         BgChar bgChar2 = parser.isBeginGroup(obj);
 
          if (isShort && obj.isPar())
          {
             throw new TeXSyntaxException(parser,
                TeXSyntaxException.ERROR_PAR_BEFORE_EG);
          }
-         else if (obj instanceof BgChar)
+         else if (bgChar2 != null)
          {
-            Group subGrp = ((BgChar)obj).createGroup(parser);
+            Group subGrp = bgChar2.createGroup(parser);
 
-            if (!popRemainingGroup(parser, subGrp, isShort, ((BgChar)obj)))
+            if (!popRemainingGroup(parser, subGrp, isShort, bgChar2))
             {
                group.add(subGrp);
 

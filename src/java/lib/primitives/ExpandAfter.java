@@ -40,52 +40,32 @@ public class ExpandAfter extends Primitive implements Expandable
       return new ExpandAfter(getName());
    }
 
-   public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
+   protected void pushTo(TeXParser parser, TeXObjectList stack,
+    TeXObjectList list)
    throws IOException
    {
-      TeXObject firstArg = stack.popStack(parser);
+      TeXObject firstArg = stack.popToken(true);
 
-      if (firstArg == null)
+      TeXObject secondArg = stack.popToken();
+
+      if (secondArg instanceof TeXCsRef)
       {
-         return expandonce(parser);
+         secondArg = parser.getControlSequence(
+           ((TeXCsRef)secondArg).getName());
       }
 
-      TeXObject secondArg = stack.popStack(parser);
-
-      if (secondArg == null)
+      if (secondArg instanceof Expandable)
       {
-         secondArg = parser.popStack();
-      }
+         TeXObjectList expanded;
 
-      TeXObjectList list = new TeXObjectList();
-
-      if (secondArg instanceof Group)
-      {
-         Group grp = (Group)secondArg;
-
-         TeXObject obj = grp.pop();
-
-         if (obj instanceof Expandable)
+         if (parser == stack)
          {
-            TeXObjectList expanded = ((Expandable)obj).expandonce(parser, grp);
-
-            if (expanded == null)
-            {
-               grp.push(obj);
-            }
-            else
-            {
-               grp.addAll(0, expanded);
-            }
+            expanded = ((Expandable)secondArg).expandonce(parser);
          }
          else
          {
-            grp.push(obj);
+            expanded = ((Expandable)secondArg).expandonce(parser, stack);
          }
-      }
-      else if (secondArg instanceof Expandable)
-      {
-         TeXObjectList expanded = ((Expandable)secondArg).expandonce(parser, stack);
 
          if (expanded != null)
          {
@@ -94,7 +74,7 @@ public class ExpandAfter extends Primitive implements Expandable
       }
 
       if (secondArg instanceof TeXObjectList
-      && !(secondArg instanceof Group))
+           && !(secondArg instanceof Group))
       {
          list.addAll(0, (TeXObjectList)secondArg);
       }
@@ -104,6 +84,14 @@ public class ExpandAfter extends Primitive implements Expandable
       }
 
       list.push(firstArg);
+   }
+
+   public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
+   throws IOException
+   {
+      TeXObjectList list = new TeXObjectList();
+
+      pushTo(parser, stack, list);
 
       return list;
    }
@@ -111,57 +99,9 @@ public class ExpandAfter extends Primitive implements Expandable
    public TeXObjectList expandonce(TeXParser parser)
    throws IOException
    {
-      TeXObject firstArg = parser.popStack();
-
-      TeXObject secondArg = parser.popStack();
-
       TeXObjectList list = new TeXObjectList();
 
-      if (secondArg instanceof Group)
-      {
-         Group grp = (Group)secondArg;
-
-         TeXObject obj = grp.pop();
-
-         if (obj instanceof Expandable)
-         {
-            TeXObjectList expanded = ((Expandable)obj).expandonce(parser, grp);
-
-            if (expanded == null)
-            {
-               grp.push(obj);
-            }
-            else
-            {
-               grp.addAll(0, expanded);
-            }
-         }
-         else
-         {
-            grp.push(obj);
-         }
-      }
-      else if (secondArg instanceof Expandable)
-      {
-         TeXObjectList expanded = ((Expandable)secondArg).expandonce(parser);
-
-         if (expanded != null)
-         {
-            secondArg = expanded;
-         }
-      }
-
-      if (secondArg instanceof TeXObjectList
-      && !(secondArg instanceof Group))
-      {
-         list.addAll(0, (TeXObjectList)secondArg);
-      }
-      else
-      {
-         list.push(secondArg);
-      }
-
-      list.push(firstArg);
+      pushTo(parser, parser, list);
 
       return list;
    }
@@ -181,121 +121,12 @@ public class ExpandAfter extends Primitive implements Expandable
    public void process(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
-      TeXObject firstArg = stack.popStack(parser);
-
-      if (firstArg == null)
-      {
-         process(parser);
-         return;
-      }
-
-      TeXObject secondArg = stack.popStack(parser);
-
-      if (secondArg == null)
-      {
-         secondArg = parser.popStack();
-      }
-
-      if (secondArg instanceof Group)
-      {
-         Group grp = (Group)secondArg;
-
-         TeXObject obj = grp.pop();
-
-         if (obj instanceof Expandable)
-         {
-            TeXObjectList expanded = ((Expandable)obj).expandonce(parser, grp);
-
-            if (expanded == null)
-            {
-               grp.push(obj);
-            }
-            else
-            {
-               grp.addAll(0, expanded);
-            }
-         }
-         else
-         {
-            grp.push(obj);
-         }
-      }
-      else if (secondArg instanceof Expandable)
-      {
-         TeXObjectList expanded = ((Expandable)secondArg).expandonce(parser, stack);
-
-         if (expanded != null)
-         {
-            secondArg = expanded;
-         }
-      }
-
-      if (secondArg instanceof TeXObjectList
-      && !(secondArg instanceof Group))
-      {
-         stack.addAll(0, (TeXObjectList)secondArg);
-      }
-      else
-      {
-         stack.push(secondArg);
-      }
-
-      stack.push(firstArg);
+      pushTo(parser, stack, stack);
    }
 
    public void process(TeXParser parser)
       throws IOException
    {
-      TeXObject firstArg = parser.popStack();
-
-      TeXObject secondArg = parser.popStack();
-
-      if (secondArg instanceof Group)
-      {
-         Group grp = (Group)secondArg;
-
-         TeXObject obj = grp.pop();
-
-         if (obj instanceof Expandable)
-         {
-            TeXObjectList expanded = ((Expandable)obj).expandonce(parser, grp);
-
-            if (expanded == null)
-            {
-               grp.push(obj);
-            }
-            else
-            {
-               grp.addAll(0, expanded);
-            }
-         }
-         else
-         {
-            grp.push(obj);
-         }
-      }
-      else if (secondArg instanceof Expandable)
-      {
-         TeXObjectList expanded = ((Expandable)secondArg).expandonce(parser);
-
-         if (expanded != null)
-         {
-            secondArg = expanded;
-         }
-      }
-
-      if (secondArg instanceof TeXObjectList
-      && !(secondArg instanceof Group))
-      {
-         parser.addAll(0, (TeXObjectList)secondArg);
-      }
-      else
-      {
-         parser.push(secondArg);
-      }
-
-      parser.push(firstArg);
+      pushTo(parser, parser, parser);
    }
-
-
 }

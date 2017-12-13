@@ -16,46 +16,13 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
-package com.dickimawbooks.texparserlib.latex;
+package com.dickimawbooks.texparserlib;
 
 import java.io.IOException;
 
-import com.dickimawbooks.texparserlib.*;
-
-public class MakeAtOther extends ControlSequence
-  implements CatCodeChanger
+public interface CatCodeChanger
 {
-   public MakeAtOther()
-   {
-      this("makeatother");
-   }
-
-   public MakeAtOther(String name)
-   {
-      super(name);
-   }
-
-   public Object clone()
-   {
-      return new MakeAtOther(getName());
-   }
-
-   public void applyCatCodeChange(TeXParser parser)
-      throws IOException
-   {
-      parser.setCatCode(true, '@', TeXParser.TYPE_OTHER);
-   }
-
-   public void process(TeXParser parser, TeXObjectList list)
-     throws IOException
-   {
-      process(parser);
-   }
-
-   public void process(TeXParser parser)
-     throws IOException
-   {
-      applyCatCodeChange(parser);
-   }
-
+   // anything popped off parser must be pushed back on
+   public void applyCatCodeChange(TeXParser parser) throws IOException;
 }
+

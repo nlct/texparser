@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2015 Nicola L.C. Talbot
+    Copyright (C) 2013 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -16,48 +16,39 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
-package com.dickimawbooks.texparserlib.generic;
+package com.dickimawbooks.texparserlib.latex.datatool;
 
 import java.io.IOException;
 
 import com.dickimawbooks.texparserlib.*;
+import com.dickimawbooks.texparserlib.latex.*;
 
-public class NewToks extends ControlSequence
+public class DTLsetExpansion extends ControlSequence
 {
-   public NewToks()
-   {
-      this("newtoks");
-   }
-
-   public NewToks(String name)
+   public DTLsetExpansion(String name, boolean on, DataToolSty sty)
    {
       super(name);
-      setAllowsPrefix(true);
+      this.sty = sty;
+      this.on = on;
    }
 
    public Object clone()
    {
-      return new NewToks(getName());
+      return new DTLsetExpansion(getName(), on, sty);
    }
 
    public void process(TeXParser parser, TeXObjectList stack)
-      throws IOException
+     throws IOException
    {
-      TeXObject object = stack.popToken();
-
-      if (!(object instanceof ControlSequence))
-      {
-         throw new TeXSyntaxException(parser, 
-            TeXSyntaxException.ERROR_CS_EXPECTED, object);
-      }
-
-      parser.getSettings().newtoks(getPrefix() != PREFIX_GLOBAL, 
-        ((ControlSequence)object).getName());
+      process(parser);
    }
 
    public void process(TeXParser parser)
-      throws IOException
+     throws IOException
    {
-      process(parser, parser);
+      sty.setExpansion(on);
    }
+
+   protected DataToolSty sty;
+   protected boolean on;
 }

@@ -44,132 +44,54 @@ public abstract class Register extends ControlSequence
    public abstract void setContents(TeXParser parser, TeXObject contents)
      throws TeXSyntaxException;
    
-   protected TeXObject popValue(TeXParser parser, TeXObjectList stack)
-      throws IOException
-   {
-      TeXObject object;
-
-      if (parser == stack)
-      {
-         object = parser.popNextArg();
-      }
-      else
-      {
-         object = stack.popArg(parser);
-      }
-
-      return object;
-   }
+   protected abstract TeXObject popValue(TeXParser parser, TeXObjectList stack)
+      throws IOException;
 
    public void process(TeXParser parser)
       throws IOException
    {
-      TeXObject object = parser.popStack(parser, true);
-
-      if (object instanceof Expandable)
-      {
-         TeXObjectList expanded = ((Expandable)object).expandfully(parser);
-
-         if (expanded != null)
-         {
-            parser.addAll(expanded);
-            object = parser.popStack(parser, true);
-         }
-      }
-
-      if (object instanceof CharObject
-       && ((CharObject)object).getCharCode() == '=')
-      {
-         object = parser.popStack(parser, true);
-
-         if (object instanceof Expandable)
-         {
-            TeXObjectList expanded = ((Expandable)object).expandfully(parser);
-
-            if (expanded != null)
-            {
-               parser.addAll(expanded);
-               object = parser.popStack(parser, true);
-            }
-         }
-      }
-
-      TeXObject value;
-
-      if (object instanceof Register)
-      {
-         value = ((Register)object).getContents(parser);
-      }
-      else
-      {
-         parser.push(object);
-         value = popValue(parser, parser);
-      }
-
-      if (getPrefix() == PREFIX_GLOBAL)
-      {
-         parser.getSettings().globalSetRegister(getName(), value);
-      }
-      else
-      {
-         parser.getSettings().localSetRegister(getName(), value);
-      }
+      process(parser, parser);
    }
 
    public void process(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
-      TeXObject object = stack.popStack(parser, true);
-
-      if (object instanceof Expandable)
-      {
-         TeXObjectList expanded =
-            ((Expandable)object).expandfully(parser, stack);
-
-         if (expanded != null)
-         {
-            stack.addAll(expanded);
-            object = stack.popStack(parser, true);
-         }
-      }
+      TeXObject object = stack.popToken(true);
 
       if (object instanceof CharObject
        && ((CharObject)object).getCharCode() == '=')
       {
-         object = stack.popStack(parser, true);
+         object = stack.popToken(true);
+      }
 
-         if (object instanceof Expandable)
+      if (object instanceof TeXCsRef)
+      {
+         ControlSequence cs = parser.getControlSequence(
+          ((TeXCsRef)object).getName());
+
+         if (cs instanceof Register)
          {
-            TeXObjectList expanded =
-               ((Expandable)object).expandfully(parser, stack);
-
-            if (expanded != null)
-            {
-               stack.addAll(expanded);
-               object = stack.popStack(parser, true);
-            }
+            object = cs;
+         }
+         else
+         {
+            stack.push(object);
+            object = popValue(parser, stack);
          }
       }
-
-      TeXObject value;
-
-      if (object instanceof Register)
+      else if (!(object instanceof Register))
       {
-         value = ((Register)object).getContents(parser);
-      }
-      else
-      {
-         parser.push(object);
-         value = popValue(parser, stack);
+         stack.push(object);
+         object = popValue(parser, stack);
       }
 
       if (getPrefix() == PREFIX_GLOBAL)
       {
-         parser.getSettings().globalSetRegister(getName(), value);
+         parser.getSettings().globalSetRegister(getName(), object);
       }
       else
       {
-         parser.getSettings().localSetRegister(getName(), value);
+         parser.getSettings().localSetRegister(getName(), object);
       }
    }
 

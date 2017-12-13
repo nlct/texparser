@@ -308,7 +308,7 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       parser.getSettings().newcount("@enumdepth");
       parser.getSettings().newcount("@itemdepth");
 
-      NewIf.createConditional(parser, "if@nmbrlist");
+      NewIf.createConditional(true, parser, "if@nmbrlist");
 
       parser.putControlSequence(new TrivListDec());
       parser.putControlSequence(new ListDec());

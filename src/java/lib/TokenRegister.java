@@ -18,6 +18,8 @@
 */
 package com.dickimawbooks.texparserlib;
 
+import java.io.IOException;
+
 public class TokenRegister extends Register
 {
    public TokenRegister(String name)
@@ -46,6 +48,23 @@ public class TokenRegister extends Register
     throws TeXSyntaxException
    {
       return contents;
+   }
+
+   protected TeXObject popValue(TeXParser parser, TeXObjectList stack)
+      throws IOException
+   {
+      TeXObject object;
+
+      if (parser == stack)
+      {
+         object = parser.popNextArg();
+      }
+      else
+      {
+         object = stack.popArg(parser);
+      }
+
+      return object;
    }
 
    private TeXObject contents;

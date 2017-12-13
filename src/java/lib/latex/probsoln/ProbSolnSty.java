@@ -135,9 +135,9 @@ public class ProbSolnSty extends LaTeXSty
    protected void preOptions()
      throws IOException
    {
-      NewIf.createConditional(getListener().getParser(),
+      NewIf.createConditional(true, getListener().getParser(),
         "ifshowanswers");
-      NewIf.createConditional(getListener().getParser(),
+      NewIf.createConditional(true, getListener().getParser(),
         "ifusedefaultprobargs");
    }
 

@@ -13,11 +13,11 @@ test-nested	: app tests/output
 
 test-obs	: app tests/output
 	rm -f -r tests/output/test-obsolete
-	bin/texparserapp --in tests/test-obsolete/test-obs.tex --output tests/output/test-obsolete
+	bin/texparserapp --debug --in tests/test-obsolete/test-obs.tex --output tests/output/test-obsolete
 
 test-sw	: app tests/output
 	rm -f -r tests/output/test-sw
-	bin/texparserapp --in tests/test-sw/test-sw.tex --output tests/output/test-sw
+	bin/texparserapp --debug --in tests/test-sw/test-sw.tex --output tests/output/test-sw
 
 test-abs : app tests/output
 	rm -f -r tests/output/test-abs
@@ -41,7 +41,7 @@ test-lists : app tests/output
 
 test-datatool : app tests/output
 	rm -f -r tests/output/test-datatool
-	bin/texparserapp --in tests/test-datatool/test-datatool.tex --output tests/output/test-datatool --html
+	bin/texparserapp --debug --in tests/test-datatool/test-datatool.tex --output tests/output/test-datatool --html
 
 test-jmlr	: app tests/output
 	rm -f -r tests/output/test-jmlr

@@ -18,6 +18,8 @@
 */
 package com.dickimawbooks.texparserlib;
 
+import java.io.IOException;
+
 public abstract class NumericRegister extends Register implements Numerical
 {
    public NumericRegister(String name)
@@ -35,9 +37,31 @@ public abstract class NumericRegister extends Register implements Numerical
    public abstract void setValue(TeXParser parser, Numerical value)
     throws TeXSyntaxException;
 
+   protected TeXObject popValue(TeXParser parser, TeXObjectList stack)
+      throws IOException
+   {
+      TeXObject object;
+
+      if (parser == stack)
+      {
+         object = parser.popNumerical();
+      }
+      else
+      {
+         object = stack.popNumerical(parser);
+      }
+
+      return object;
+   }
+
    public void setContents(TeXParser parser, TeXObject object)
     throws TeXSyntaxException
    {
+      if (!(object instanceof Numerical))
+      {
+         object = new UserNumber(parser, object.format());
+      }
+
       if (!(object instanceof Numerical))
       {
          throw new TeXSyntaxException(parser,

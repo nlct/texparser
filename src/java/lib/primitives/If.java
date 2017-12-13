@@ -115,37 +115,9 @@ public class If extends Primitive implements Expandable
    protected boolean istrue(TeXParser parser, TeXObjectList stack)
    throws IOException
    {
-      TeXObject firstArg;
+      TeXObject firstArg = parser.popToken(true);
 
-      if (parser == stack || stack == null)
-      {
-         firstArg = parser.popToken();
-      }
-      else
-      {
-         firstArg = stack.popToken();
-
-         if (firstArg == null)
-         {
-            firstArg = parser.popToken();
-         }
-      }
-
-      TeXObject secondArg;
-
-      if (parser == stack || stack == null)
-      {
-         secondArg = parser.popToken();
-      }
-      else
-      {
-         secondArg = stack.popToken();
-
-         if (secondArg == null)
-         {
-            secondArg = parser.popToken();
-         }
-      }
+      TeXObject secondArg = parser.popToken(true);
 
       if (firstArg instanceof TeXCsRef)
       {
@@ -187,119 +159,40 @@ public class If extends Primitive implements Expandable
    }
 
    protected void doTruePart(TeXParser parser, TeXObjectList stack,
-     TeXObjectList expanded)
+     TeXObjectList list)
    throws IOException
    {
-      TeXObject obj;
-
-      if (parser == stack || stack == null)
-      {
-         obj = parser.popStack();
-      }
-      else
-      {
-         obj = stack.popStack(parser);
-
-         if (obj == null)
-         {
-            obj = parser.popStack();
-         }
-      }
+      TeXObject obj = stack.popToken();
 
       if (obj instanceof Expandable)
       {
-         TeXObjectList expandedObj;
+         TeXObjectList expanded;
 
-         if (parser == stack || stack == null)
+         if (parser == stack)
          {
-            expandedObj = ((Expandable)obj).expandfully(parser);
+            expanded = ((Expandable)obj).expandfully(parser);
          }
          else
          {
-            expandedObj = ((Expandable)obj).expandfully(parser, stack);
+            expanded = ((Expandable)obj).expandfully(parser, stack);
          }
 
-         if (expandedObj != null)
+         if (expanded != null)
          {
-            obj = expandedObj;
+            stack.addAll(0, expanded);
+            obj = stack.popToken();
          }
       }
 
-      if (obj instanceof Fi)
-      {
-         return;
-      }
-      else if (obj instanceof Else)
+      if (obj instanceof Else)
       {
          skipToFi(parser, stack);
       }
-      else if (obj instanceof TeXObjectList
-           && !(obj instanceof Group))
+      else if (!(obj instanceof Fi))
       {
-         TeXObjectList list = (TeXObjectList)obj;
-
-         for (int i = 0, n = list.size(); i < n; i++)
+         if (list == null)
          {
-            obj = list.get(i);
-
-            if (obj instanceof Fi)
-            {
-               if (i != n-1)
-               {
-                  if (stack == parser || stack == null)
-                  {
-                     parser.addAll(0, list.subList(i+1, n-1));
-                  }
-                  else
-                  {
-                     stack.addAll(0, list.subList(i+1, n-1));
-                  }
-               }
-
-               return;
-            }
-            else if (obj instanceof Else)
-            {
-               if (i != n-1)
-               {
-                  if (stack == parser || stack == null)
-                  {
-                     parser.addAll(0, list.subList(i+1, n-1));
-                  }
-                  else
-                  {
-                     stack.addAll(0, list.subList(i+1, n-1));
-                  }
-               }
-
-               skipToFi(parser, stack);
-               return;
-            }
-            else
-            {
-               if (expanded == null)
-               {
-                  if (stack == parser || stack == null)
-                  {
-                     obj.process(parser);
-                  }
-                  else
-                  {
-                     obj.process(parser, stack);
-                  }
-               }
-               else
-               {
-                  expanded.add(obj);
-               }
-            }
-         }
-      }
-      else
-      {
-         if (expanded == null)
-         {
-            if (parser == stack || stack == null)
+            if (parser == stack)
             {
                obj.process(parser);
             }
@@ -310,83 +203,31 @@ public class If extends Primitive implements Expandable
          }
          else
          {
-            expanded.add(obj);
+            list.add(obj);
          }
 
-         doTruePart(parser, stack, expanded);
+         doTruePart(parser, stack, list);
       }
    }
 
    protected void skipToFi(TeXParser parser, TeXObjectList stack)
     throws IOException
    {
-      TeXObject obj;
+      TeXObject obj = stack.popToken();
 
-      if (parser == stack || stack == null)
+      if (obj instanceof TeXCsRef)
       {
-         obj = parser.popStack();
-      }
-      else
-      {
-         obj = stack.popStack(parser);
-
-         if (obj == null)
-         {
-            obj = parser.popStack();
-         }
+         obj = parser.getListener().getControlSequence(
+           ((TeXCsRef)obj).getName());
       }
 
-      if (obj instanceof Expandable)
+      if (obj == null)
       {
-         TeXObjectList expanded;
-
-         if (parser == stack || stack == null)
-         {
-            expanded = ((Expandable)obj).expandfully(parser);
-         }
-         else
-         {
-            expanded = ((Expandable)obj).expandfully(parser, stack);
-         }
-
-         if (expanded != null)
-         {
-            obj = expanded;
-         }
+         throw new TeXSyntaxException(parser, 
+           TeXSyntaxException.ERROR_EXPECTED, "\\fi");
       }
 
-      if (obj instanceof Fi)
-      {
-         return;
-      }
-      else if (obj instanceof TeXObjectList
-           && !(obj instanceof Group))
-      {
-         TeXObjectList list = (TeXObjectList)obj;
-
-         for (int i = 0, n = list.size(); i < n; i++)
-         {
-            obj = list.get(i);
-
-            if (obj instanceof Fi)
-            {
-               if (i != n-1)
-               {
-                  if (stack == parser || stack == null)
-                  {
-                     parser.addAll(0, list.subList(i+1, n-1));
-                  }
-                  else
-                  {
-                     stack.addAll(0, list.subList(i+1, n-1));
-                  }
-               }
-
-               return;
-            }
-         }
-      }
-      else
+      if (!(obj instanceof Fi))
       {
          skipToFi(parser, stack);
       }
@@ -395,96 +236,28 @@ public class If extends Primitive implements Expandable
    protected boolean skipToElse(TeXParser parser, TeXObjectList stack)
     throws IOException
    {
-      TeXObject obj;
+      TeXObject obj = stack.popToken();
 
-      if (parser == stack || stack == null)
+      if (obj instanceof TeXCsRef)
       {
-         obj = parser.popStack();
-      }
-      else
-      {
-         obj = stack.popStack(parser);
-
-         if (obj == null)
-         {
-            obj = parser.popStack();
-         }
+         obj = parser.getListener().getControlSequence(
+           ((TeXCsRef)obj).getName());
       }
 
-      if (obj instanceof Expandable)
+      if (obj == null)
       {
-         TeXObjectList expanded;
-
-         if (parser == stack || stack == null)
-         {
-            expanded = ((Expandable)obj).expandfully(parser);
-         }
-         else
-         {
-            expanded = ((Expandable)obj).expandfully(parser, stack);
-         }
-
-         if (expanded != null)
-         {
-            if (obj instanceof Group || expanded.isEmpty())
-            {
-               obj = expanded;
-            }
-            else
-            {
-               obj = expanded.remove(0);
-
-               if (!expanded.isEmpty())
-               {
-                  if (stack == null)
-                  {
-                     parser.addAll(0, expanded);
-                  }
-                  else
-                  {
-                     stack.addAll(0, expanded);
-                  }
-               }
-            }
-         }
+         throw new TeXSyntaxException(parser, 
+           TeXSyntaxException.ERROR_EXPECTED, "\\fi");
       }
 
-      if (obj.equals(ELSE))
-      {
-         return true;
-      }
-      else if (obj.equals(FI))
+      if (obj instanceof Fi)
       {
          return false;
       }
-      else if (obj instanceof TeXObjectList
-           && !(obj instanceof Group))
+
+      if (obj instanceof Else)
       {
-         TeXObjectList list = (TeXObjectList)obj;
-
-         for (int i = 0, n = list.size(); i < n; i++)
-         {
-            obj = list.get(i);
-
-            boolean isElse = obj.equals(ELSE);
-
-            if (isElse || obj.equals(FI))
-            {
-               if (i != n-1)
-               {
-                  if (stack == parser || stack == null)
-                  {
-                     parser.addAll(0, list.subList(i+1, n-1));
-                  }
-                  else
-                  {
-                     stack.addAll(0, list.subList(i+1, n-1));
-                  }
-               }
-
-               return isElse;
-            }
-         }
+         return true;
       }
 
       return skipToElse(parser, stack);
@@ -509,117 +282,36 @@ public class If extends Primitive implements Expandable
    }
 
    protected void doRemainingFalsePart(TeXParser parser, TeXObjectList stack,
-      TeXObjectList expanded)
+     TeXObjectList list)
    throws IOException
    {
-      TeXObject obj;
-
-      if (parser == stack || stack == null)
-      {
-         obj = parser.popStack();
-      }
-      else
-      {
-         obj = stack.popStack(parser);
-
-         if (obj == null)
-         {
-            obj = parser.popStack();
-         }
-      }
+      TeXObject obj = stack.popToken();
 
       if (obj instanceof Expandable)
       {
-         TeXObjectList expandedObj;
+         TeXObjectList expanded;
 
-         if (parser == stack || stack == null)
+         if (parser == stack)
          {
-            expandedObj = ((Expandable)obj).expandfully(parser);
+            expanded = ((Expandable)obj).expandfully(parser);
          }
          else
          {
-            expandedObj = ((Expandable)obj).expandfully(parser, stack);
+            expanded = ((Expandable)obj).expandfully(parser, stack);
          }
 
-         if (expandedObj != null)
+         if (expanded != null)
          {
-            if (obj instanceof Group || expandedObj.isEmpty())
-            {
-               obj = expandedObj;
-            }
-            else
-            {
-               obj = expandedObj.remove(0);
-
-               if (!expandedObj.isEmpty())
-               {
-                  if (stack == null)
-                  {
-                     parser.addAll(0, expandedObj);
-                  }
-                  else
-                  {
-                     stack.addAll(0, expandedObj);
-                  }
-               }
-            }
+            stack.addAll(0, expanded);
+            obj = stack.popToken();
          }
       }
 
-      if (obj.equals(FI))
+      if (!(obj instanceof Fi))
       {
-         return;
-      }
-      else if (obj instanceof TeXObjectList
-           && !(obj instanceof Group))
-      {
-         TeXObjectList list = (TeXObjectList)obj;
-
-         for (int i = 0, n = list.size(); i < n; i++)
+         if (list == null)
          {
-            obj = list.get(i);
-
-            if (obj.equals(FI))
-            {
-               if (i != n-1)
-               {
-                  if (stack == parser || stack == null)
-                  {
-                     parser.addAll(0, list.subList(i+1, n-1));
-                  }
-                  else
-                  {
-                     stack.addAll(0, list.subList(i+1, n-1));
-                  }
-               }
-
-               return;
-            }
-            else
-            {
-               if (expanded == null)
-               {
-                  if (stack == parser || stack == null)
-                  {
-                     obj.process(parser);
-                  }
-                  else
-                  {
-                     obj.process(parser, stack);
-                  }
-               }
-               else
-               {
-                  expanded.add(obj);
-               }
-            }
-         }
-      }
-      else
-      {
-         if (expanded == null)
-         {
-            if (parser == stack || stack == null)
+            if (parser == stack)
             {
                obj.process(parser);
             }
@@ -630,10 +322,10 @@ public class If extends Primitive implements Expandable
          }
          else
          {
-            expanded.add(obj);
+            list.add(obj);
          }
 
-         doRemainingFalsePart(parser, stack, expanded);
+         doFalsePart(parser, stack, list);
       }
    }
 
@@ -654,6 +346,4 @@ public class If extends Primitive implements Expandable
       return obj.getClass().getName().equals(getClass().getName());
    }
 
-   public static final Else ELSE = new Else();
-   public static final Fi FI = new Fi();
 }

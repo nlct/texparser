@@ -2737,6 +2737,52 @@ public class TeXSettings
       new int[]{(int)'9', 0x1D7FF}
    };
 
+   public void setCatCode(int c, int catCode)
+   {
+      if (catcodes == null)
+      {
+         catcodes = new CatCodeList[16];
+      }
+
+      if (catcodes[catCode] == null)
+      {
+         catcodes[catCode] = new CatCodeList();
+      }
+
+      catcodes[catCode].add(Integer.valueOf(c));
+   }
+
+   public int getCatCode(int charCode)
+   {
+      if (catcodes == null)
+      {
+         if (parent == null)
+         {
+            return parser.getRootCatCode(charCode);
+         }
+         else
+         {
+            return parent.getCatCode(charCode);
+         }
+      }
+
+      for (int i = 0; i < catcodes.length; i++)
+      {
+         if (catcodes[i] != null && catcodes[i].contains(charCode))
+         {
+            return i;
+         }
+      }
+
+      if (parent == null)
+      {
+         return parser.getRootCatCode(charCode);
+      }
+      else
+      {
+         return parent.getCatCode(charCode);
+      }
+   }
 
    private int currentFontFamily   = INHERIT;
    private int currentFontShape    = INHERIT;
@@ -2773,5 +2819,7 @@ public class TeXSettings
    protected Hashtable<Integer,ActiveChar> activeTable;
 
    protected TeXObjectList afterGroup;
+
+   protected CatCodeList[] catcodes=null;
 }
 

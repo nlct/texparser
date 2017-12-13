@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2015 Nicola L.C. Talbot
+    Copyright (C) 2013 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -16,48 +16,63 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
-package com.dickimawbooks.texparserlib.generic;
+package com.dickimawbooks.texparserlib.latex.datatool;
 
 import java.io.IOException;
 
 import com.dickimawbooks.texparserlib.*;
+import com.dickimawbooks.texparserlib.latex.*;
 
-public class NewToks extends ControlSequence
+public class DTLmessage extends ControlSequence
 {
-   public NewToks()
+   public DTLmessage()
    {
-      this("newtoks");
+      this("dtl@message");
    }
 
-   public NewToks(String name)
+   public DTLmessage(String name)
    {
       super(name);
-      setAllowsPrefix(true);
    }
 
    public Object clone()
    {
-      return new NewToks(getName());
+      return new DTLmessage(getName());
    }
 
    public void process(TeXParser parser, TeXObjectList stack)
-      throws IOException
+     throws IOException 
    {
-      TeXObject object = stack.popToken();
+      TeXObject msg = stack.popArg(parser);
 
-      if (!(object instanceof ControlSequence))
+      if (msg instanceof Expandable)
       {
-         throw new TeXSyntaxException(parser, 
-            TeXSyntaxException.ERROR_CS_EXPECTED, object);
+         TeXObjectList expanded = ((Expandable)msg).expandfully(parser,stack);
+
+         if (msg != null)
+         {
+            msg = expanded;
+         }
       }
 
-      parser.getSettings().newtoks(getPrefix() != PREFIX_GLOBAL, 
-        ((ControlSequence)object).getName());
+      parser.getListener().getTeXApp().message(msg.format());
    }
 
    public void process(TeXParser parser)
-      throws IOException
+     throws IOException 
    {
-      process(parser, parser);
+      TeXObject msg = parser.popNextArg();
+
+      if (msg instanceof Expandable)
+      {
+         TeXObjectList expanded = ((Expandable)msg).expandfully(parser);
+
+         if (msg != null)
+         {
+            msg = expanded;
+         }
+      }
+
+      parser.getListener().getTeXApp().message(msg.format());
    }
 }

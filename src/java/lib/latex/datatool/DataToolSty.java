@@ -25,7 +25,7 @@ import java.io.IOException;
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.*;
 import com.dickimawbooks.texparserlib.latex.ifthen.IfThenSty;
-import com.dickimawbooks.texparserlib.primitives.EndGraf;
+import com.dickimawbooks.texparserlib.primitives.*;
 
 public class DataToolSty extends LaTeXSty
 {
@@ -49,8 +49,15 @@ public class DataToolSty extends LaTeXSty
       registerControlSequence(new DTLrowcount(this));
       registerControlSequence(new DTLcolumncount(this));
       registerControlSequence(new DTLnewdbentry(this));
+      registerControlSequence(new DTLmessage());
+
+      registerControlSequence(
+         new DTLsetExpansion("dtlexpandnewvalue", true, this));
+      registerControlSequence(
+         new DTLsetExpansion("dtlnoexpandnewvalue", false, this));
 
       registerControlSequence(new EndGraf("DTLpar"));
+      registerControlSequence(new DTLloaddbtex());
 
       registerControlSequence(new GenericCommand("DTLunsettype"));
       registerControlSequence(new GenericCommand("DTLstringtype", null,
@@ -131,9 +138,26 @@ public class DataToolSty extends LaTeXSty
       return db.getColumnCount();
    }
 
+   public void setExpansion(boolean on)
+   {
+      if (on)
+      {
+         getListener().getParser().putControlSequence(true,
+           new IfTrue("if@dtl@expansion@on"));
+      }
+      else
+      {
+         getListener().getParser().putControlSequence(true,
+           new IfFalse("if@dtl@expansion@on"));
+      }
+   }
+
    public boolean isExpansionOn()
    {
-      return false;// TODO
+      ControlSequence cs = getListener().getParser().getControlSequence(
+        "if@dtl@expansion@on");
+
+      return (cs instanceof IfTrue);
    }
 
    public boolean dbExists(String name)
@@ -532,25 +556,25 @@ public class DataToolSty extends LaTeXSty
       return rows;
    }
 
-   protected DataBase update(String name)
+   protected synchronized DataBase update(String name)
      throws IOException
    {
       return update(name, getHeaderContents(name), getContents(name));
    }
 
-   protected DataBase update(String name, DataToolHeaderRow header)
+   protected synchronized DataBase update(String name, DataToolHeaderRow header)
      throws IOException
    {
       return update(name, header, getContents(name));
    }
 
-   protected DataBase update(String name, DataToolRows rows)
+   protected synchronized DataBase update(String name, DataToolRows rows)
      throws IOException
    {
       return update(name, getHeaderContents(name), rows);
    }
 
-   protected DataBase update(String name, DataToolHeaderRow header,
+   protected synchronized DataBase update(String name, DataToolHeaderRow header,
       DataToolRows rows)
      throws TeXSyntaxException
    {

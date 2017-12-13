@@ -51,7 +51,7 @@ public class NewDimen extends ControlSequence
             TeXSyntaxException.ERROR_CS_EXPECTED, object);
       }
 
-      parser.getSettings().newdimen(getPrefix() == PREFIX_GLOBAL, 
+      parser.getSettings().newdimen(getPrefix() != PREFIX_GLOBAL, 
         ((ControlSequence)object).getName());
    }
 

@@ -1,0 +1,110 @@
+% Created by datatooltk on Thu Jul 11 08:34:07 BST 2013
+\DTLifdbexists{test-para}%
+{\PackageError{datatool}{Database `test-para'
+already exists}{}%
+\aftergroup\endinput}{}%
+\bgroup\makeatletter
+\dtl@message{Reconstructing database
+`test-para'}%
+\expandafter\global\expandafter
+\newtoks\csname dtlkeys@test-para\endcsname
+\expandafter\global
+ \csname dtlkeys@test-para\endcsname={%
+%
+% header block for column 1
+\db@plist@elt@w %
+\db@col@id@w 1%
+\db@col@id@end@ %
+\db@key@id@w Number%
+\db@key@id@end@ %
+\db@type@id@w 1%
+\db@type@id@end@ %
+\db@header@id@w Number%
+\db@header@id@end@ %
+\db@col@id@w 1%
+\db@col@id@end@ %
+\db@plist@elt@end@ %
+% header block for column 2
+\db@plist@elt@w %
+\db@col@id@w 2%
+\db@col@id@end@ %
+\db@key@id@w Notes%
+\db@key@id@end@ %
+\db@type@id@w 0%
+\db@type@id@end@ %
+\db@header@id@w Notes%
+\db@header@id@end@ %
+\db@col@id@w 2%
+\db@col@id@end@ %
+\db@plist@elt@end@ %
+}%
+\expandafter\global\expandafter
+\newtoks\csname dtldb@test-para\endcsname
+\expandafter\global
+\csname dtldb@test-para\endcsname={%
+%
+% Start of row 1
+\db@row@elt@w %
+\db@row@id@w 1%
+\db@row@id@end@ %
+% Column 1
+\db@col@id@w 1%
+\db@col@id@end@ %
+\db@col@elt@w 1%
+\db@col@elt@end@ %
+\db@col@id@w 1%
+\db@col@id@end@ %
+% Column 2
+\db@col@id@w 2%
+\db@col@id@end@ %
+\db@col@elt@w % Here's a comment
+A sample entry with quite a bit of text and here's some \emph{more}
+text with a~formula: $E = mc^2$ and a~displayed equation:
+\[
+  y = \sum_{i=0}^n a_ix^i
+\]\DTLpar This is supposed to be the start of a new paragraph. Here's the 
+next sentence. How about some more text. This sentence ends with a~percentage: 10\%%
+\db@col@elt@end@ %
+\db@col@id@w 2%
+\db@col@id@end@ %
+% End of row 1
+\db@row@id@w 1%
+\db@row@id@end@ %
+\db@row@elt@end@ %
+% Start of row 2
+\db@row@elt@w %
+\db@row@id@w 2%
+\db@row@id@end@ %
+% Column 1
+\db@col@id@w 1%
+\db@col@id@end@ %
+\db@col@elt@w 2%
+\db@col@elt@end@ %
+\db@col@id@w 1%
+\db@col@id@end@ %
+% Column 2
+\db@col@id@w 2%
+\db@col@id@end@ %
+\db@col@elt@w A short note.%
+\db@col@elt@end@ %
+\db@col@id@w 2%
+\db@col@id@end@ %
+% End of row 2
+\db@row@id@w 2%
+\db@row@id@end@ %
+\db@row@elt@end@ %
+}%
+\expandafter\global
+ \expandafter\newcount\csname dtlrows@test-para\endcsname
+\expandafter\global
+ \csname dtlrows@test-para\endcsname=2\relax
+\expandafter\global
+ \expandafter\newcount\csname dtlcols@test-para\endcsname
+\expandafter\global
+ \csname dtlcols@test-para\endcsname=2\relax
+\expandafter
+ \gdef\csname dtl@ci@test-para@Number\endcsname{1}%
+\expandafter
+ \gdef\csname dtl@ci@test-para@Notes\endcsname{2}%
+\egroup
+\def\dtllastloadeddb{test-para}
