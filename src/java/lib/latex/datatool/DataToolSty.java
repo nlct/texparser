@@ -19,6 +19,7 @@
 package com.dickimawbooks.texparserlib.latex.datatool;
 
 import java.util.Vector;
+import java.util.Iterator;
 import java.util.concurrent.ConcurrentHashMap;
 import java.io.IOException;
 
@@ -634,6 +635,11 @@ public class DataToolSty extends LaTeXSty
    public IfThenSty getIfThenSty()
    {
       return dataToolBaseSty.getIfThenSty();
+   }
+
+   public Iterator<String> getDataBaseKeySetIterator()
+   {
+      return databases == null ? null : databases.keySet().iterator();
    }
 
    private DataToolBaseSty dataToolBaseSty;
