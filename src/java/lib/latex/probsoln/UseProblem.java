@@ -101,7 +101,7 @@ public class UseProblem extends ControlSequence
          db = dataset.toString(parser);
       }
 
-      TeXObject object = parser.expandedPopStack(true);
+      TeXObject object = parser.expandedPopStack(TeXObjectList.POP_SHORT);
 
       if (object instanceof Group)
       {

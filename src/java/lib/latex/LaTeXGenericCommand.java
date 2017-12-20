@@ -198,6 +198,8 @@ public class LaTeXGenericCommand extends GenericCommand
    {
       TeXObject[] args = (numArgs == 0 ? null : new TeXObject[numArgs]);
 
+      byte popStyle = isShort ? TeXObjectList.POP_SHORT : 0;
+
       if (numArgs > 0)
       {
          int optIdx = 0;
@@ -210,7 +212,7 @@ public class LaTeXGenericCommand extends GenericCommand
             {
                case SYNTAX_OPTIONAL: 
 
-                  object = remainingStack.popArg(parser, isShort, '[', ']');
+                  object = remainingStack.popArg(parser, popStyle, '[', ']');
 
                   if (object == null)
                   {
@@ -219,7 +221,7 @@ public class LaTeXGenericCommand extends GenericCommand
 
                break;
                case SYNTAX_MANDATORY: 
-                  object = remainingStack.popArg(parser, isShort);
+                  object = remainingStack.popArg(parser, popStyle);
                break;
             }
 
@@ -241,6 +243,8 @@ public class LaTeXGenericCommand extends GenericCommand
 
       if (numArgs > 0)
       {
+         byte popStyle = isShort ? TeXObjectList.POP_SHORT : 0;
+
          int optIdx = 0;
 
          for (int i = 0; i < numArgs; i++)
@@ -251,7 +255,7 @@ public class LaTeXGenericCommand extends GenericCommand
             {
                case SYNTAX_OPTIONAL: 
 
-                  object = parser.popNextArg(isShort, '[', ']');
+                  object = parser.popNextArg(popStyle, '[', ']');
 
                   if (object == null)
                   {
@@ -260,7 +264,7 @@ public class LaTeXGenericCommand extends GenericCommand
 
                break;
                case SYNTAX_MANDATORY: 
-                  object = parser.popNextArg(isShort);
+                  object = parser.popNextArg(popStyle);
                break;
             }
 

@@ -163,6 +163,8 @@ public class GenericCommand extends Command
 
       if (syntax != null)
       {
+         byte popStyle = isShort ? TeXObjectList.POP_SHORT : 0;
+
          for (TeXObject obj : syntax)
          {
             if (obj instanceof Param)
@@ -171,11 +173,11 @@ public class GenericCommand extends Command
                {
                   if (isDelimited && n == numArgs-1)
                   {
-                     args[n] = remainingStack.popToGroup(parser, isShort);
+                     args[n] = remainingStack.popToGroup(parser, popStyle);
                   }
                   else
                   {
-                     args[n] = remainingStack.popStack(parser, isShort);
+                     args[n] = remainingStack.popStack(parser, popStyle);
                   }
 
                   n++;
@@ -183,7 +185,7 @@ public class GenericCommand extends Command
             }
             else
             {
-               TeXObject nextObj = remainingStack.popArg(parser);
+               TeXObject nextObj = remainingStack.popArg(parser, popStyle);
 
                if (nextObj == null || !obj.equals(nextObj))
                {
@@ -236,6 +238,8 @@ public class GenericCommand extends Command
 
       if (syntax != null)
       {
+         byte popStyle = isShort ? TeXObjectList.POP_SHORT : 0;
+
          for (TeXObject obj : syntax)
          {
             if (obj instanceof Param)
@@ -244,11 +248,11 @@ public class GenericCommand extends Command
                {
                   if (isDelimited && n == numArgs-1)
                   {
-                     args[n] = parser.popToGroup(isShort);
+                     args[n] = parser.popToGroup(popStyle);
                   }
                   else
                   {
-                     args[n] = parser.popNextArg(isShort);
+                     args[n] = parser.popNextArg(popStyle);
                   }
 
                   n++;
@@ -256,7 +260,7 @@ public class GenericCommand extends Command
             }
             else
             {
-               TeXObject nextObj = parser.popNextArg(isShort);
+               TeXObject nextObj = parser.popNextArg(popStyle);
 
                if (nextObj == null)
                {

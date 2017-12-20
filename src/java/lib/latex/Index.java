@@ -41,7 +41,9 @@ public class Index extends ControlSequence
 
    public void process(TeXParser parser) throws IOException
    {
-      TeXObject optArg = parser.popNextArg(true, '[', ']');
+      byte popStyle = TeXObjectList.POP_SHORT;
+
+      TeXObject optArg = parser.popNextArg(popStyle, '[', ']');
       String opt = null;
 
       if (optArg != null)
@@ -59,14 +61,16 @@ public class Index extends ControlSequence
          opt = optArg.toString(parser);
       }
 
-      TeXObject arg1 = parser.popNextArg(true);
+      TeXObject arg1 = parser.popNextArg(popStyle);
 
       ((LaTeXParserListener)parser.getListener()).index(opt, arg1);
    }
 
    public void process(TeXParser parser, TeXObjectList stack) throws IOException
    {
-      TeXObject optArg = stack.popArg(parser, true, '[', ']');
+      byte popStyle = TeXObjectList.POP_SHORT;
+
+      TeXObject optArg = stack.popArg(parser, popStyle, '[', ']');
 
       String opt = null;
 
@@ -86,7 +90,7 @@ public class Index extends ControlSequence
          opt = optArg.toString(parser);
       }
 
-      TeXObject arg1 = stack.popArg(parser);
+      TeXObject arg1 = stack.popArg(parser, popStyle);
 
       ((LaTeXParserListener)parser.getListener()).index(opt, arg1);
    }

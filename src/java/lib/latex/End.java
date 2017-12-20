@@ -44,7 +44,7 @@ public class End extends ControlSequence
    {
       LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
 
-      TeXObject arg = list.expandedPopStack(parser, true);
+      TeXObject arg = list.expandedPopStack(parser, TeXObjectList.POP_SHORT);
 
       if (arg instanceof Group)
       {
@@ -93,7 +93,7 @@ public class End extends ControlSequence
    {
       LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
 
-      TeXObject arg = parser.expandedPopStack();
+      TeXObject arg = parser.expandedPopStack(TeXObjectList.POP_SHORT);
 
       if (arg instanceof Group)
       {

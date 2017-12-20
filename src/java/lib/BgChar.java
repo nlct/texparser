@@ -61,7 +61,7 @@ public class BgChar extends Macro
    {
       Group group = createGroup(parser);
 
-      stack.popRemainingGroup(parser, group, false, this);
+      stack.popRemainingGroup(parser, group, (byte)0, this);
 
       stack.push(group);
    }
@@ -71,7 +71,7 @@ public class BgChar extends Macro
    {
       Group group = createGroup(parser);
 
-      parser.popRemainingGroup(group, false, this);
+      parser.popRemainingGroup(group, (byte)0, this);
 
       parser.push(group);
    }

@@ -67,7 +67,10 @@ public class NewCommand extends Command
    public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      TeXObject object = (stack == parser ? parser.popNextArg() : stack.popArg(parser));
+      byte popStyle = TeXObjectList.POP_SHORT;
+
+      TeXObject object = (stack == parser ? 
+        parser.popNextArg(popStyle) : stack.popArg(parser, popStyle));
 
       boolean isStar = false;
 
@@ -75,7 +78,8 @@ public class NewCommand extends Command
        && ((CharObject)object).getCharCode() == (int)'*')
       {
          isStar = true;
-         object = (stack == parser ? parser.popNextArg() : stack.popArg(parser));
+         object = (stack == parser ?
+            parser.popNextArg(popStyle) : stack.popArg(parser, popStyle));
       }
 
       if (object instanceof TeXObjectList)
@@ -83,7 +87,12 @@ public class NewCommand extends Command
          // Use popArg in case there are spaces before or after the
          // control sequence.
 
-         object = ((TeXObjectList)object).popArg(parser);
+         object = ((TeXObjectList)object).popArg(parser, popStyle);
+      }
+
+      if (!isStar)
+      {
+         popStyle = 0;
       }
 
       String csName;
@@ -101,8 +110,8 @@ public class NewCommand extends Command
       }
 
       object = (stack == parser ?
-           parser.popNextArg(true, '[', ']')
-         : stack.popArg(parser, '[', ']'));
+           parser.popNextArg(popStyle, '[', ']')
+         : stack.popArg(parser, popStyle, '[', ']'));
 
       int numParams = 0;
       TeXObject defValue = null;
@@ -143,12 +152,12 @@ public class NewCommand extends Command
          }
 
          defValue = (stack == parser ?
-              parser.popNextArg(true, '[', ']')
-            : stack.popArg(parser, '[', ']'));
+              parser.popNextArg(popStyle, '[', ']')
+            : stack.popArg(parser, popStyle, '[', ']'));
       }
 
       TeXObject definition = (stack == parser ?
-             parser.popNextArg() : stack.popArg(parser));
+             parser.popNextArg(popStyle) : stack.popArg(parser, popStyle));
 
       ((LaTeXParserListener)parser.getListener()).newcommand(
          overwrite, name, csName, isStar, numParams, defValue, definition);

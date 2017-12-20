@@ -72,15 +72,12 @@ public class IfThenSty extends LaTeXSty
    protected TeXBoolean popNumericalCondition(TeXObjectList stack)
      throws IOException
    {
+      byte popStyle = TeXObjectList.POP_IGNORE_LEADING_SPACE;
+
       TeXParser parser = getListener().getParser();
 
       Numerical num1 = stack.popNumerical(parser);
-      TeXObject signArg = stack.popToken(true);
-
-      while (stack.peekStack() instanceof WhiteSpace)
-      {
-         stack.popToken();
-      }
+      TeXObject signArg = stack.popToken(popStyle);
 
       Numerical num2 = stack.popNumerical(parser);
 
@@ -116,15 +113,17 @@ public class IfThenSty extends LaTeXSty
    protected TeXObject popCondition(TeXObjectList stack)
      throws IOException
    {
+      byte popStyle = TeXObjectList.POP_IGNORE_LEADING_SPACE;
+
       TeXParser parser = getListener().getParser();
 
-      TeXObject obj = stack.peekStack(true);
+      TeXObject obj = stack.peekStack(popStyle);
 
       if (obj == null) return null;
 
       if (obj instanceof ConditionGroup || obj instanceof TeXBoolean)
       {
-         return stack.popToken(true);
+         return stack.popToken(popStyle);
       }
       else
       {
@@ -135,15 +134,17 @@ public class IfThenSty extends LaTeXSty
    protected boolean parseCondition(TeXObjectList stack)
      throws IOException
    {
+      byte popStyle = TeXObjectList.POP_IGNORE_LEADING_SPACE;
+
       TeXParser parser = getListener().getParser();
 
-      TeXObject obj = stack.peekStack(true);
+      TeXObject obj = stack.peekStack(popStyle);
 
       UnaryConditionalOperator unaryOp = null;
 
       if (obj instanceof UnaryConditionalOperator)
       {
-         unaryOp = (UnaryConditionalOperator)stack.popToken(true);
+         unaryOp = (UnaryConditionalOperator)stack.popToken(popStyle);
          obj = popCondition(stack);
       }
       else
@@ -178,18 +179,18 @@ public class IfThenSty extends LaTeXSty
          result = unaryOp.evaluate(result);
       }
 
-      while ((obj = stack.peekStack(true)) != null)
+      while ((obj = stack.peekStack(popStyle)) != null)
       {
          if (obj instanceof UnaryConditionalOperator)
          {
-            unaryOp = (UnaryConditionalOperator)stack.popToken(true);
+            unaryOp = (UnaryConditionalOperator)stack.popToken(popStyle);
          }
          else
          {
             unaryOp = null;
          }
 
-         obj = stack.popToken(true);
+         obj = stack.popToken(popStyle);
 
          if (obj == null)
          {

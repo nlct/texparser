@@ -90,6 +90,9 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       indexes = new Hashtable<String,IndexRoot>();
 
       footnotes = new TeXObjectList();
+
+      loadedPackages = new Vector<LaTeXFile>();
+      verbEnv = new Vector<String>();
    }
 
    public boolean isParseAuxEnabled()
@@ -178,12 +181,105 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       return verbEnv.contains(name);
    }
 
+   public boolean containsVerbatim(TeXObject object)
+   {
+      if (object instanceof VerbChar)
+      {
+         return true;
+      }
+      else if (object instanceof ControlSequence)
+      {
+         return getParser().isVerbCommand(((ControlSequence)object).getName());
+      }
+      else if (object instanceof TeXObjectList)
+      {
+         TeXObjectList list = (TeXObjectList)object;
+
+         for (int i = 0; i < list.size(); i++)
+         {
+            object = list.get(i);
+
+            if (object instanceof TeXObjectList)
+            {
+               if (containsVerbatim(object))
+               {
+                  return true;
+               }
+            }
+            else if (object instanceof ControlSequence)
+            {
+               ControlSequence cs = (ControlSequence)object;
+               String csName = cs.getName();
+
+               if (getParser().isVerbCommand(csName))
+               {
+                  return true;
+               }
+
+               if (csName.equals("begin"))
+               {
+                  i++;
+                  object = null;
+
+                  while (i < list.size())
+                  {
+                     TeXObject nextObj = list.get(i);
+                     i++;
+
+                     if (!(nextObj instanceof Ignoreable))
+                     {
+                        object = nextObj;
+                        break;
+                     }
+                  }
+
+                  if (object == null)
+                  {
+                     return false;
+                  }
+
+                  if (object instanceof Group)
+                  {
+                     object = ((Group)object).toList();
+                  }
+                  else if (object instanceof BgChar)
+                  {
+                     TeXObjectList grp = new TeXObjectList();
+                     i++;
+
+                     while (i < list.size())
+                     {
+                        object = list.get(i);
+                        i++;
+
+                        if (object instanceof EgChar)
+                        {
+                           break;
+                        }
+
+                        grp.add(object);
+                     }
+
+                     object = grp;
+                  }
+
+                  String envName = object.toString(getParser());
+
+                  if (isVerbEnv(envName))
+                  {
+                     return true;
+                  }
+               }
+            }
+         }
+      }
+
+      return false;
+   }
+
    protected void addPredefined()
    {
       super.addPredefined();
-
-      loadedPackages = new Vector<LaTeXFile>();
-      verbEnv = new Vector<String>();
 
       addVerbEnv("verbatim");
       addVerbEnv("verbatim*");
@@ -817,6 +913,11 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
 
    public LaTeXSty getLoadedPackage(String styName)
    {
+      if (loadedPackages == null)
+      {
+         return null;
+      }
+
       for (LaTeXFile lfile : loadedPackages)
       {
          if (lfile instanceof LaTeXSty)

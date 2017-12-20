@@ -61,7 +61,7 @@ public class DTLloaddbtex extends ControlSequence
       if (csArg instanceof TeXObjectList)
       {
          TeXObjectList list = (TeXObjectList)csArg;
-         csArg = list.popToken(true);
+         csArg = list.popToken(TeXObjectList.POP_SHORT);
       }
 
       if (fileArg instanceof Expandable)

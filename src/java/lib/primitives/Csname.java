@@ -113,7 +113,7 @@ public class Csname extends Primitive implements Expandable
       throws IOException
    {
       TeXObjectList list = new TeXObjectList();
-      TeXObject obj = stack.popToken(true);
+      TeXObject obj = stack.popToken(TeXObjectList.POP_IGNORE_LEADING_SPACE);
 
       while (!(obj instanceof ControlSequence
                 && ((ControlSequence)obj).getName().equals("endcsname")))

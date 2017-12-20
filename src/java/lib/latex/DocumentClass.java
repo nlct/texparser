@@ -42,9 +42,11 @@ public class DocumentClass extends ControlSequence
    public void process(TeXParser parser, TeXObjectList list)
      throws IOException
    {
-      TeXObject options = list.popArg(parser, '[', ']');
+      byte popStyle = TeXObjectList.POP_SHORT;
 
-      TeXObject cls = list.popArg(parser);
+      TeXObject options = list.popArg(parser, popStyle, '[', ']');
+
+      TeXObject cls = list.popArg(parser, popStyle);
 
       TeXObjectList expanded = null;
 
@@ -79,9 +81,11 @@ public class DocumentClass extends ControlSequence
    public void process(TeXParser parser)
      throws IOException
    {
-      TeXObject options = parser.popNextArg(true, '[', ']');
+      byte popStyle = TeXObjectList.POP_SHORT;
 
-      TeXObject cls = parser.popNextArg(true);
+      TeXObject options = parser.popNextArg(popStyle, '[', ']');
+
+      TeXObject cls = parser.popNextArg(popStyle);
 
       TeXObjectList expanded = null;
 

@@ -22,6 +22,8 @@ import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.Set;
 import java.util.Random;
+import java.util.Vector;
+import java.util.Iterator;
 
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.primitives.NewIf;
@@ -33,17 +35,36 @@ public class ProbSolnSty extends LaTeXSty
    public ProbSolnSty(KeyValList options, LaTeXParserListener listener)
    throws IOException
    {
-      this(options, listener, 16);
+      this(options, listener, 16, false);
+   }
+
+   public ProbSolnSty(KeyValList options, LaTeXParserListener listener,
+    boolean saveDefOrder)
+   throws IOException
+   {
+      this(options, listener, 16, saveDefOrder);
    }
 
    public ProbSolnSty(KeyValList options, LaTeXParserListener listener,
      int dbInitialCapacity)
    throws IOException
    {
+      this(options, listener, dbInitialCapacity, false);
+   }
+
+   public ProbSolnSty(KeyValList options, LaTeXParserListener listener,
+     int dbInitialCapacity, boolean saveDefOrder)
+   throws IOException
+   {
       super(options, "probsoln", listener);
       this.dbInitialCapacity = dbInitialCapacity;
 
       databases = new ConcurrentHashMap<String,ProbSolnDatabase>();
+
+      if (saveDefOrder)
+      {
+         allEntries = new Vector<ProbSolnData>(dbInitialCapacity);
+      }
 
       ProbSolnDatabase db = new ProbSolnDatabase(dbInitialCapacity, "default");
       databases.put("default", db);
@@ -223,6 +244,7 @@ public class ProbSolnSty extends LaTeXSty
            ProbSolnException.ERROR_NO_SUCH_DB, target);
       }
 
+      data.setDataBaseLabel(target);
       db.put(label, data);
    }
 
@@ -257,7 +279,18 @@ public class ProbSolnSty extends LaTeXSty
          addDatabase(dbName);
       }
 
+      data.setDataBaseLabel(dbName);
       db.put(data.getName(), data);
+
+      if (allEntries != null && !(allEntries.contains(data)))
+      {
+         allEntries.add(data);
+      }
+   }
+
+   public Iterator<ProbSolnData> allEntriesIterator()
+   {
+      return allEntries == null ? null : allEntries.iterator();
    }
 
    public String getCurrentDb() throws IOException
@@ -315,6 +348,8 @@ public class ProbSolnSty extends LaTeXSty
    private ConcurrentHashMap<String,ProbSolnDatabase> databases;
 
    private ProbSolnDatabase tmpDatabase;
+
+   private Vector<ProbSolnData> allEntries=null;
 
    private int dbInitialCapacity=16;
 

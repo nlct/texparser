@@ -115,9 +115,11 @@ public class If extends Primitive implements Expandable
    protected boolean istrue(TeXParser parser, TeXObjectList stack)
    throws IOException
    {
-      TeXObject firstArg = parser.popToken(true);
+      byte popStyle = TeXObjectList.POP_IGNORE_LEADING_SPACE;
 
-      TeXObject secondArg = parser.popToken(true);
+      TeXObject firstArg = parser.popToken(popStyle);
+
+      TeXObject secondArg = parser.popToken(popStyle);
 
       if (firstArg instanceof TeXCsRef)
       {

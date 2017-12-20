@@ -28,17 +28,28 @@ public class ProbSolnData
 {
    public ProbSolnData(String name, TeXObjectList contents)
    {
-      this(name, 0, null, contents);
+      this(name, 0, null, contents, "default");
+   }
+
+   public ProbSolnData(String name, TeXObjectList contents, String dbLabel)
+   {
+      this(name, 0, null, contents, dbLabel);
    }
 
    public ProbSolnData(String name, int numArgs,
       TeXObjectList defArgs, TeXObjectList contents)
    {
-      super();
+      this(name, numArgs, defArgs, contents, "default");
+   }
+
+   public ProbSolnData(String name, int numArgs,
+      TeXObjectList defArgs, TeXObjectList contents, String dbLabel)
+   {
       setName(name);
       this.numArgs = numArgs;
       this.defArgs = defArgs;
       this.contents = contents;
+      this.dbLabel = dbLabel;
    }
 
    public void setName(String name)
@@ -49,6 +60,16 @@ public class ProbSolnData
    public String getName()
    {
       return name;
+   }
+
+   public void setDataBaseLabel(String dbLabel)
+   {
+      this.dbLabel = dbLabel;
+   }
+
+   public String getDataBaseLabel()
+   {
+      return dbLabel;
    }
 
    public int getNumArgs()
@@ -367,11 +388,11 @@ public class ProbSolnData
 
    public String toString()
    {
-      return String.format("ProbSolnData[name=%s,args=(n=%d,default=%s),contents=%s]",
-        name, numArgs, defArgs, contents);
+      return String.format("ProbSolnData[name=%s,db=%s,args=(n=%d,default=%s),contents=%s]",
+        name, dbLabel, numArgs, defArgs, contents);
    }
 
-   private String name;
+   private String name, dbLabel;
 
    private int numArgs = 0;
 

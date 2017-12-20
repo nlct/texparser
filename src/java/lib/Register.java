@@ -56,12 +56,12 @@ public abstract class Register extends ControlSequence
    public void process(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
-      TeXObject object = stack.popToken(true);
+      TeXObject object = stack.popToken(TeXObjectList.POP_IGNORE_LEADING_SPACE);
 
       if (object instanceof CharObject
        && ((CharObject)object).getCharCode() == '=')
       {
-         object = stack.popToken(true);
+         object = stack.popToken(TeXObjectList.POP_IGNORE_LEADING_SPACE);
       }
 
       if (object instanceof TeXCsRef)

@@ -44,9 +44,11 @@ public class ExpandAfter extends Primitive implements Expandable
     TeXObjectList list)
    throws IOException
    {
-      TeXObject firstArg = stack.popToken(true);
+      byte popStyle = TeXObjectList.POP_IGNORE_LEADING_SPACE;
 
-      TeXObject secondArg = stack.popToken();
+      TeXObject firstArg = stack.popToken(popStyle);
+
+      TeXObject secondArg = stack.popToken(popStyle);
 
       if (secondArg instanceof TeXCsRef)
       {

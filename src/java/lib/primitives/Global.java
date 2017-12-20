@@ -42,7 +42,7 @@ public class Global extends Primitive
    public void process(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
-      TeXObject object = stack.popToken(true);
+      TeXObject object = stack.popToken(TeXObjectList.POP_IGNORE_LEADING_SPACE);
 
       if (object instanceof TeXCsRef)
       {

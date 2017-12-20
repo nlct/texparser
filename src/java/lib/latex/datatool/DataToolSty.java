@@ -205,7 +205,12 @@ public class DataToolSty extends LaTeXSty
    public DataBase getDataBase(String name)
       throws IOException
    {
-      DataBase db = databases.get(name);
+      DataBase db = null;
+
+      if (databases != null)
+      {
+         db = databases.get(name);
+      }
 
       if (db == null)
       {
@@ -222,7 +227,7 @@ public class DataToolSty extends LaTeXSty
 
       DataBase db = null;
 
-      if (databases != null)
+      if (databases == null)
       {
          databases = new ConcurrentHashMap<String,DataBase>();
       }

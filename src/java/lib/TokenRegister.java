@@ -57,11 +57,11 @@ public class TokenRegister extends Register
 
       if (parser == stack)
       {
-         object = parser.popNextArg();
+         object = parser.popNextArg(TeXObjectList.POP_IGNORE_LEADING_SPACE);
       }
       else
       {
-         object = stack.popArg(parser);
+         object = stack.popArg(parser, TeXObjectList.POP_IGNORE_LEADING_SPACE);
       }
 
       return object;

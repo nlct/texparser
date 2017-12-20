@@ -258,6 +258,12 @@ public class DataToolEntry implements TeXObject
       return contents.equals(entry.contents);
    }
 
+   public String toString()
+   {
+      return String.format("%s[column=%d,contents=%s]",
+        getClass().getSimpleName(), column, contents);
+   }
+
    private DataToolSty sty;
 
    private int column;

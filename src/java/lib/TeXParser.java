@@ -995,13 +995,13 @@ public class TeXParser extends TeXObjectList
    }
 
    public boolean popRemainingGroup(TeXParser parser, Group group, 
-      boolean isShort, BgChar bgChar)
+      byte popStyle, BgChar bgChar)
       throws IOException
    {
-      return popRemainingGroup(group, isShort, bgChar);
+      return popRemainingGroup(group, popStyle, bgChar);
    }
 
-   public boolean popRemainingGroup(Group group, boolean isShort, BgChar bgChar)
+   public boolean popRemainingGroup(Group group, byte popStyle, BgChar bgChar)
       throws IOException
    {
       startGroup();
@@ -1012,7 +1012,7 @@ public class TeXParser extends TeXObjectList
          {
             if (isEmpty())
             {
-               if (!fetchNext(isShort))
+               if (!fetchNext(isShort(popStyle)))
                {
                   return false;
                }
@@ -1043,7 +1043,7 @@ public class TeXParser extends TeXObjectList
 
             bgChar = isBeginGroup(obj);
 
-            if (isShort && obj.isPar())
+            if (isShort(popStyle) && obj.isPar())
             {
                throw new TeXSyntaxException(this,
                   TeXSyntaxException.ERROR_PAR_BEFORE_EG);
@@ -1052,7 +1052,7 @@ public class TeXParser extends TeXObjectList
             {
                Group subGrp = bgChar.createGroup(this);
 
-               if (!popRemainingGroup(subGrp, isShort, bgChar))
+               if (!popRemainingGroup(subGrp, popStyle, bgChar))
                {
                   group.add(subGrp);
 
@@ -1821,35 +1821,35 @@ public class TeXParser extends TeXObjectList
    public TeXObject popNextArg()
      throws IOException
    {
-      return popNextArg(false);
+      return popNextArg((byte)0);
    }
 
-   public TeXObject popNextArg(boolean isShort)
+   public TeXObject popNextArg(byte popStyle)
      throws IOException
    {
       if (size() == 0)
       {
-         fetchNext(isShort);
+         fetchNext(isShort(popStyle));
       }
 
-      return popArg(isShort);
+      return popArg(popStyle);
    }
 
    public TeXObject popNextArg(int openDelim, int closeDelim)
      throws IOException
    {
-      return popNextArg(false, openDelim, closeDelim);
+      return popNextArg((byte)0, openDelim, closeDelim);
    }
 
-   public TeXObject popNextArg(boolean isShort, int openDelim, int closeDelim)
+   public TeXObject popNextArg(byte popStyle, int openDelim, int closeDelim)
      throws IOException
    {
       if (size() == 0)
       {
-         fetchNext(isShort);
+         fetchNext(isShort(popStyle));
       }
 
-      return popArg(isShort, openDelim, closeDelim);
+      return popArg(popStyle, openDelim, closeDelim);
    }
 
    public Numerical popNumericalArg(int openDelim, int closeDelim)
@@ -1858,16 +1858,22 @@ public class TeXParser extends TeXObjectList
       return popNumericalArg(this, openDelim, closeDelim);
    }
 
-   public TeXObject popArg(boolean isShort)
+   public TeXObject popArg()
     throws IOException
    {
-      return super.popArg(this, isShort);
+      return super.popArg(this);
    }
 
-   public TeXObject popArg(boolean isShort, int openDelim, int closeDelim)
+   public TeXObject popArg(byte popStyle)
+    throws IOException
+   {
+      return super.popArg(this, popStyle);
+   }
+
+   public TeXObject popArg(byte popStyle, int openDelim, int closeDelim)
    throws IOException
    {
-      return super.popArg(this, isShort, openDelim, closeDelim);
+      return super.popArg(this, popStyle, openDelim, closeDelim);
    }
 
    public TeXObject expandedPopStack(TeXParser parser) throws IOException
@@ -1875,20 +1881,20 @@ public class TeXParser extends TeXObjectList
       return parser.expandedPopStack();
    }
 
-   public TeXObject expandedPopStack(TeXParser parser, boolean isShort)
+   public TeXObject expandedPopStack(TeXParser parser, byte popStyle)
       throws IOException
    {
-      return parser.expandedPopStack(isShort);
+      return parser.expandedPopStack(popStyle);
    }
 
    public TeXObject expandedPopStack() throws IOException
    {
-      return expandedPopStack(false);
+      return expandedPopStack((byte)0);
    }
 
-   public TeXObject expandedPopStack(boolean isShort) throws IOException
+   public TeXObject expandedPopStack(byte popStyle) throws IOException
    {
-      TeXObject object = popStack(isShort);
+      TeXObject object = popStack(popStyle);
 
       if (object instanceof TeXCsRef)
       {
@@ -1901,7 +1907,7 @@ public class TeXParser extends TeXObjectList
       if (bgChar != null)
       {
          Group group = bgChar.createGroup(this);
-         popRemainingGroup(group, isShort, bgChar);
+         popRemainingGroup(group, popStyle, bgChar);
 
          return group;
       }
@@ -1927,7 +1933,7 @@ public class TeXParser extends TeXObjectList
          if (bgChar != null)
          {
             Group grp = bgChar.createGroup(this);
-            expanded.popRemainingGroup(this, grp, isShort, bgChar);
+            expanded.popRemainingGroup(this, grp, popStyle, bgChar);
             addAll(0, expanded);
 
             return grp;
@@ -1945,23 +1951,23 @@ public class TeXParser extends TeXObjectList
       return popStack();
    }
 
-   public TeXObject popStack(TeXParser parser, boolean isShort)
+   public TeXObject popStack(TeXParser parser, byte popStyle)
       throws IOException
    {
-      return popStack(isShort);
+      return popStack(popStyle);
    }
 
    public TeXObject popStack() throws IOException
    {
-      return popStack(false);
+      return popStack((byte)0);
    }
 
-   public TeXObject popStack(boolean isShort)
+   public TeXObject popStack(byte popStyle)
      throws IOException
    {
       if (size() == 0)
       {
-         fetchNext(isShort);
+         fetchNext(isShort(popStyle));
       }
 
       if (size() == 0)
@@ -1971,11 +1977,11 @@ public class TeXParser extends TeXObjectList
 
       TeXObject object = remove(0);
 
-      if (object instanceof Ignoreable)
+      if (object instanceof Ignoreable && !isRetainIgnoreables(popStyle))
       {
          listener.skipping((Ignoreable)object);
 
-         return popStack(isShort);
+         return popStack(popStyle);
       }
 
       BgChar bgChar = isBeginGroup(object);
@@ -1983,7 +1989,7 @@ public class TeXParser extends TeXObjectList
       if (bgChar != null)
       {
          Group group = bgChar.createGroup(this);
-         popRemainingGroup(group, isShort, bgChar);
+         popRemainingGroup(group, popStyle, bgChar);
          return group;
       }
 
@@ -1993,15 +1999,15 @@ public class TeXParser extends TeXObjectList
    public TeXObject popToken()
      throws IOException
    {
-      return popToken(false);
+      return popToken((byte)0);
    }
 
-   public TeXObject popToken(boolean skipWhiteSpace)
+   public TeXObject popToken(byte popStyle)
      throws IOException
    {
       if (size() == 0)
       {
-         fetchNext(false);
+         fetchNext(isShort(popStyle));
       }
 
       if (size() == 0)
@@ -2011,18 +2017,21 @@ public class TeXParser extends TeXObjectList
 
       TeXObject object = remove(0);
 
-      if (object instanceof Ignoreable || 
-          (skipWhiteSpace && object instanceof WhiteSpace))
+      if (object instanceof WhiteSpace && isIgnoreLeadingSpace(popStyle))
+      {
+         return popToken(popStyle);
+      }
+      else if (object instanceof Ignoreable && !isRetainIgnoreables(popStyle))
       {
          listener.skipping((Ignoreable)object);
 
-         return popToken(skipWhiteSpace);
+         return popToken(popStyle);
       }
 
       return object;
    }
 
-   public TeXObjectList popToGroup(boolean isShort)
+   public TeXObjectList popToGroup(byte popStyle)
      throws IOException
    {
       TeXObjectList list = new TeXObjectList();
@@ -2031,7 +2040,7 @@ public class TeXParser extends TeXObjectList
       {
          if (size() == 0)
          {
-            fetchNext(isShort);
+            fetchNext(isShort(popStyle));
          }
 
          if (size() == 0)
@@ -2050,7 +2059,7 @@ public class TeXParser extends TeXObjectList
 
          obj = remove(0);
 
-         if (obj instanceof Ignoreable)
+         if (obj instanceof Ignoreable && !isRetainIgnoreables(popStyle))
          {
             listener.skipping((Ignoreable)obj);
          }
