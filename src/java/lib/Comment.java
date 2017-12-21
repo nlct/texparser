@@ -42,6 +42,11 @@ public class Comment extends Ignoreable
       return builder.toString();
    }
 
+   public boolean isEmpty()
+   {
+      return builder.length() == 0;
+   }
+
    public Object clone()
    {
       Comment obj = new Comment();
