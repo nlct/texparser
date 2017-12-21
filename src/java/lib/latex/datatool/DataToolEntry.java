@@ -121,7 +121,9 @@ public class DataToolEntry implements TeXObject
 
       stack.popCsMarker(parser, "db@col@elt@w");
 
-      object = stack.popToCsMarker(parser, "db@col@elt@end@");
+      object = stack.popToCsMarker(parser, "db@col@elt@end@",
+        (byte)(TeXObjectList.POP_RETAIN_IGNOREABLES
+               | TeXObjectList.POP_IGNORE_LEADING_SPACE));
 
       if (sty.isExpansionOn() && object instanceof Expandable)
       {

@@ -1067,9 +1067,9 @@ public class TeXParserApp implements TeXApp
       app.runApplication();
    }
 
-   public static final String APP_VERSION = "0.3b.20171220";
+   public static final String APP_VERSION = "0.3b.20171221";
    public static final String APP_NAME = "texparserapp";
-   public static final String APP_DATE = "2017-12-20";
+   public static final String APP_DATE = "2017-12-21";
 
    public static long MAX_PROCESS_TIME=0L;
 

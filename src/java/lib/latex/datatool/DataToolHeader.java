@@ -131,7 +131,7 @@ public class DataToolHeader implements TeXObject
      DataToolSty sty)
       throws IOException
    {
-      TeXObject token = stack.peekStack();
+      TeXObject token = stack.peekStack(TeXObjectList.POP_IGNORE_LEADING_SPACE);
 
       if (token == null)
       {
@@ -140,7 +140,8 @@ public class DataToolHeader implements TeXObject
 
       if (token instanceof DataToolHeader)
       {
-         return (DataToolHeader)stack.popToken();
+         return (DataToolHeader)stack.popToken(
+            TeXObjectList.POP_IGNORE_LEADING_SPACE);
       }
 
       if (!stack.popCsMarker(parser, "db@plist@elt@w"))

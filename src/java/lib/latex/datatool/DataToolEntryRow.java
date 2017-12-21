@@ -77,17 +77,21 @@ public class DataToolEntryRow extends Vector<DataToolEntry>
      TeXObjectList stack, DataToolSty sty)
       throws IOException
    {
-      if (stack.peekStack() instanceof DataToolEntryRow)
+      if (stack.peekStack(TeXObjectList.POP_IGNORE_LEADING_SPACE)
+            instanceof DataToolEntryRow)
       {
-         return (DataToolEntryRow)stack.popToken();
+         return (DataToolEntryRow)stack.popToken(
+            TeXObjectList.POP_IGNORE_LEADING_SPACE);
       }
 
-      if (!stack.popCsMarker(parser, "db@row@elt@w"))
+      if (!stack.popCsMarker(parser, "db@row@elt@w", 
+            TeXObjectList.POP_IGNORE_LEADING_SPACE))
       {
          return null;
       }
 
-      if (!stack.popCsMarker(parser, "db@row@id@w"))
+      if (!stack.popCsMarker(parser, "db@row@id@w", 
+            TeXObjectList.POP_IGNORE_LEADING_SPACE))
       {
          return null;
       }

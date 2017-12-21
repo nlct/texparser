@@ -66,6 +66,11 @@ public class TeXObjectList extends Vector<TeXObject>
 
       TeXObject object = popStack(parser, popStyle);
 
+      if (isIgnoreLeadingSpace(popStyle))
+      {
+         popStyle = (byte)(popStyle^POP_IGNORE_LEADING_SPACE);
+      }
+
       if (object instanceof TeXCsRef)
       {
          object = parser.getListener().getControlSequence(
@@ -88,8 +93,7 @@ public class TeXObjectList extends Vector<TeXObject>
          {
             expanded.pop();
             group = bgChar.createGroup(parser);
-            expanded.popRemainingGroup(parser, group, 
-               (byte)(popStyle^POP_IGNORE_LEADING_SPACE), bgChar);
+            expanded.popRemainingGroup(parser, group, popStyle, bgChar);
 
             if (!expanded.isEmpty())
             {
@@ -179,6 +183,11 @@ public class TeXObjectList extends Vector<TeXObject>
          return null;
       }
 
+      if (isIgnoreLeadingSpace(popStyle))
+      {
+         popStyle = (byte)(popStyle^POP_IGNORE_LEADING_SPACE);
+      }
+
       TeXObject obj = pop();
 
       if (isShort(popStyle) && obj.isPar())
@@ -192,9 +201,7 @@ public class TeXObjectList extends Vector<TeXObject>
       if (bgChar != null)
       {
          Group group = bgChar.createGroup(parser);
-         popRemainingGroup(parser, group, 
-           (byte)(popStyle^POP_IGNORE_LEADING_SPACE), 
-           bgChar);
+         popRemainingGroup(parser, group, popStyle, bgChar);
 
          return group;
       }
@@ -230,8 +237,17 @@ public class TeXObjectList extends Vector<TeXObject>
       }
       else if (skipWhiteSpace)
       {
-         while (size() > 0 && (get(0) instanceof WhiteSpace))
+         while (size() > 0)
          {
+            TeXObject obj = get(0);
+
+            if (!(obj instanceof WhiteSpace
+               || obj instanceof SkippedSpaces
+               || obj instanceof SkippedEols))
+            {
+               break;
+            }
+
             pop();
          }
       }
@@ -319,7 +335,13 @@ public class TeXObjectList extends Vector<TeXObject>
    public boolean popCsMarker(TeXParser parser, String name)
     throws IOException
    {
-      TeXObject token = popToken();
+      return popCsMarker(parser, name, (byte)0);
+   }
+
+   public boolean popCsMarker(TeXParser parser, String name, byte popStyle)
+    throws IOException
+   {
+      TeXObject token = popToken(popStyle);
 
       if (token == null)
       {
@@ -337,13 +359,24 @@ public class TeXObjectList extends Vector<TeXObject>
       return true;
    }
 
+   public TeXObjectList popToCsMarker(TeXParser parser, String name)
+    throws IOException
+   {
+      return popToCsMarker(parser, name, (byte)0);
+   }
+
    public TeXObjectList popToCsMarker(TeXParser parser,
-       String name)
+       String name, byte popStyle)
     throws IOException
    {
       TeXObjectList list = new TeXObjectList();
 
-      TeXObject token = popToken();
+      TeXObject token = popToken(popStyle);
+
+      if (isIgnoreLeadingSpace(popStyle))
+      {
+         popStyle = (byte)(popStyle^POP_IGNORE_LEADING_SPACE);
+      }
 
       while (token != null)
       {
@@ -354,7 +387,7 @@ public class TeXObjectList extends Vector<TeXObject>
          }
 
          list.add(token);
-         token = popToken();
+         token = popToken(popStyle);
       }
 
       throw new TeXSyntaxException(parser, 
