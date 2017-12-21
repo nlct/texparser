@@ -21,6 +21,7 @@ package com.dickimawbooks.texparserlib;
 import java.util.Iterator;
 import java.util.Vector;
 import java.util.Hashtable;
+import java.util.regex.Pattern;
 import java.text.CharacterIterator;
 import java.text.StringCharacterIterator;
 import java.io.*;
@@ -2496,6 +2497,57 @@ public class TeXParser extends TeXObjectList
       allocToken(alloc, reg);
       allocReg.setValue(alloc);
       countAlloc.get(ALLOC_NUMBER).setValue(alloc);
+   }
+
+   public TokenRegister getTokenRegister(Pattern p)
+   {
+      for (Iterator<Integer> it = toksAlloc.keySet().iterator();
+           it.hasNext(); )
+      {
+         Integer key = it.next();
+         TokenRegister reg = toksAlloc.get(key);
+
+         if (p.matcher(reg.getName()).matches())
+         {
+            return reg;
+         }
+      }
+
+      return null;
+   }
+
+   public DimenRegister getDimenRegister(Pattern p)
+   {
+      for (Iterator<Integer> it = dimenAlloc.keySet().iterator();
+           it.hasNext(); )
+      {
+         Integer key = it.next();
+         DimenRegister reg = dimenAlloc.get(key);
+
+         if (p.matcher(reg.getName()).matches())
+         {
+            return reg;
+         }
+      }
+
+      return null;
+   }
+
+   public CountRegister getCountRegister(Pattern p)
+   {
+      for (Iterator<Integer> it = countAlloc.keySet().iterator();
+           it.hasNext(); )
+      {
+         Integer key = it.next();
+         CountRegister reg = countAlloc.get(key);
+
+         if (p.matcher(reg.getName()).matches())
+         {
+            return reg;
+         }
+      }
+
+      return null;
    }
 
    private TeXSettings settings;
