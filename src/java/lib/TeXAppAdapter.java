@@ -90,6 +90,10 @@ public class TeXAppAdapter implements TeXApp
       }
    }
 
+   public void progress(int percentage)
+   {
+   }
+
    public void copyFile(File orgFile, File newFile)
      throws IOException,InterruptedException
    {

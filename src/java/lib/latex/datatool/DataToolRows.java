@@ -165,7 +165,7 @@ public class DataToolRows extends Vector<DataToolEntryRow>
    }
 
    public static DataToolRows toRows(TeXParser parser,
-     TeXObjectList stack, DataToolSty sty)
+     TeXObjectList stack, DataToolSty sty, int likelyRowCount)
       throws IOException
    {
       if (stack.peekStack() instanceof DataToolRows)
@@ -176,9 +176,24 @@ public class DataToolRows extends Vector<DataToolEntryRow>
       DataToolRows rows = new DataToolRows(sty);
       DataToolEntryRow row;
 
+      int progress=0;
+      TeXApp texApp = null;
+
+      if (likelyRowCount > 0)
+      {
+         texApp = parser.getListener().getTeXApp();
+         texApp.progress(progress);
+      }
+
       while ((row = DataToolEntryRow.toEntryRow(parser, stack, sty)) != null)
       {
          rows.add(row);
+
+         if (texApp != null)
+         {
+            progress++;
+            texApp.progress((100*progress)/likelyRowCount);
+         }
       }
 
       return rows;

@@ -201,6 +201,10 @@ public class TeXParserApp implements TeXApp
       parser.parse(new File(inFileName));
    }
 
+   public void progress(int percentage)
+   {
+   }
+
    public void message(String text)
    {
       System.out.println(text);
@@ -1067,9 +1071,9 @@ public class TeXParserApp implements TeXApp
       app.runApplication();
    }
 
-   public static final String APP_VERSION = "0.3b.20171221";
+   public static final String APP_VERSION = "0.3b.20180117";
    public static final String APP_NAME = "texparserapp";
-   public static final String APP_DATE = "2017-12-21";
+   public static final String APP_DATE = "2018-01-17";
 
    public static long MAX_PROCESS_TIME=0L;
 

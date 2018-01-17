@@ -50,6 +50,8 @@ public interface TeXApp
 
    public void error(Exception e);
 
+   public void progress(int percentage);
+
    // This method should check read and write permissions
    public void copyFile(File orgFile, File newFile)
      throws IOException,InterruptedException;

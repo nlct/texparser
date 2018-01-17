@@ -567,7 +567,16 @@ public class DataToolSty extends LaTeXSty
       }
       else
       {
-         rows = DataToolRows.toRows(parser, (TeXObjectList)contents, this);
+         cs = parser.getControlSequence(getRowCountRegisterName(name));
+         int rowCount = 0;
+
+         if (cs instanceof CountRegister)
+         {
+            rowCount = ((CountRegister)cs).getValue();
+         }
+
+         rows = DataToolRows.toRows(parser, (TeXObjectList)contents, this,
+           rowCount);
       }
 
       reg.setContents(parser, rows);
