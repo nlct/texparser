@@ -39,14 +39,7 @@ public abstract class CharObject implements TeXObject
 
    public String toString(TeXParser parser)
    {
-      int code = parser.getSettings().getCharCode(charCode);
-
-      if (code == -1)
-      {
-         code = charCode;
-      }
-
-      return String.format("%c", code);
+      return parser.getSettings().getCharString(charCode);
    }
 
    public String toString()
@@ -80,9 +73,7 @@ public abstract class CharObject implements TeXObject
 
    public void process(TeXParser parser) throws IOException
    {
-      int c = parser.getSettings().getCharCode(charCode);
-
-      parser.getListener().getWriteable().writeCodePoint(c == -1 ? charCode : c);
+      parser.getListener().getWriteable().write(toString(parser));
    }
 
    public void process(TeXParser parser, TeXObjectList stack)

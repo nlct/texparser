@@ -1499,18 +1499,47 @@ public class TeXSettings
       }
    }
 
+   public String getCharString(int charCode)
+   {
+      int mappedCode = getCharCode(charCode);
+
+      if (mappedCode == FontEncoding.CHAR_MAP_COMPOUND)
+      {
+         FontEncoding fontEncoding = getFontEncoding();
+
+         if (fontEncoding != null)
+         {
+            return fontEncoding.getCharString(charCode);
+         }
+      }
+
+      if (mappedCode == FontEncoding.CHAR_MAP_NONE)
+      {
+         return String.format("%c", charCode);
+      }
+      else
+      {
+         return String.format("%c", mappedCode);
+      }
+   }
+
    public int getCharCode(int charCode)
    {
       FontEncoding fontEncoding = getFontEncoding();
 
       if (fontEncoding != null)
       {
-         charCode = fontEncoding.getCharCode(charCode);
+         int mappedCharCode = fontEncoding.getCharCode(charCode);
+
+         if (mappedCharCode != FontEncoding.CHAR_MAP_NONE)
+         {
+            return mappedCharCode;
+         }
       }
 
       if (getCharMapMode() == CHAR_MAP_OFF)
       {
-         return -1;
+         return FontEncoding.CHAR_MAP_NONE;
       }
 
       switch (getMode())
@@ -1522,7 +1551,7 @@ public class TeXSettings
               return 0x2019;
            }
 
-           return -1;
+           return FontEncoding.CHAR_MAP_NONE;
 
          case MODE_INLINE_MATH:
          case MODE_DISPLAY_MATH:
@@ -1609,7 +1638,7 @@ public class TeXSettings
 
       }
 
-      return -1;
+      return FontEncoding.CHAR_MAP_NONE;
    }
 
    public static int getCode(int charCode, int[][] array)

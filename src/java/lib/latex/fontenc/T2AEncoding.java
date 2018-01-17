@@ -29,11 +29,6 @@ public class T2AEncoding extends FontEncoding
       super("T2A");
    }
 
-   public int getCharCode(int charCode)
-   {
-      return charCode;
-   }
-
    public void addDefinitions(TeXSettings settings)
    {
       TeXParserListener listener = settings.getParser().getListener();

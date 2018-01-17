@@ -32,9 +32,16 @@ public class FontEncoding
       return name;
    }
 
+   public String getCharString(int charCode)
+   {
+      int code = getCharCode(charCode);
+
+      return String.format("%c", code < 0 ? charCode : code);
+   }
+
    public int getCharCode(int charCode)
    {
-      return charCode;
+      return CHAR_MAP_NONE;
    }
 
    public void addDefinitions(TeXSettings settings)
@@ -42,4 +49,7 @@ public class FontEncoding
    }
 
    private String name;
+
+   public static final int CHAR_MAP_NONE=-1;
+   public static final int CHAR_MAP_COMPOUND=-2;
 }
