@@ -258,6 +258,11 @@ public class ProbSolnSty extends LaTeXSty
       return databases.size();
    }
 
+   public int getTotalProblemCount()
+   {
+      return allEntries == null ? 0 : allEntries.size();
+   }
+
    public void addProblem(ProbSolnData data)
    throws IOException
    {
