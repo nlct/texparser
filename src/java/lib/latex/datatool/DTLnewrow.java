@@ -57,6 +57,17 @@ public class DTLnewrow extends ControlSequence
 
       try
       {
+         if (object instanceof Expandable)
+         {
+            TeXObjectList expanded = ((Expandable)object).expandfully(parser,
+             stack);
+
+            if (expanded != null)
+            {
+               object = expanded;
+            }
+         }
+
          sty.addNewRow(object.toString(parser));
       }
       catch (LaTeXSyntaxException e)
@@ -84,6 +95,16 @@ public class DTLnewrow extends ControlSequence
 
       try
       {
+         if (object instanceof Expandable)
+         {
+            TeXObjectList expanded = ((Expandable)object).expandfully(parser);
+
+            if (expanded != null)
+            {
+               object = expanded;
+            }
+         }
+
          sty.addNewRow(object.toString(parser));
       }
       catch (LaTeXSyntaxException e)

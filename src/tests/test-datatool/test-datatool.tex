@@ -14,21 +14,22 @@ Row count: \DTLrowcount{\mydata}.
 Column count: \DTLcolumncount{\mydata}.
 
 \section{Creating a Database}
-About to create new database `test2'.
+\newcommand{\testdata}{test2}
+About to create new database `\testdata'.
 
 Data
-\DTLifdbexists{test2}{exists}{doesn't exist}.
+\DTLifdbexists{\testdata}{exists}{doesn't exist}.
 
-\DTLnewdb{test2}
+\DTLnewdb{\testdata}
 Data
-\DTLifdbexists{test2}{exists}{doesn't exist}.
+\DTLifdbexists{\testdata}{exists}{doesn't exist}.
 
-New row.\DTLnewrow{test2}
-\DTLnewdbentry{test2}{Info}{sample}
-\DTLnewdbentry{test2}{Value}{1.23}
+New row.\DTLnewrow{\testdata}
+\DTLnewdbentry{\testdata}{Info}{sample}
+\DTLnewdbentry{\testdata}{Value}{1.23}
 
-Row count: \DTLrowcount{test2}.
-Column count: \DTLcolumncount{test2}.
+Row count: \DTLrowcount{\testdata}.
+Column count: \DTLcolumncount{\testdata}.
 
 \section{Conditionals}
 
