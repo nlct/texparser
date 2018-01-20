@@ -42,11 +42,18 @@ public class PreambleParser extends LaTeXParserListener
    public PreambleParser(TeXApp texApp)
      throws IOException
    {
+      this(texApp, Undefined.ACTION_IGNORE);
+   }
+
+   public PreambleParser(TeXApp texApp, byte undefAction)
+     throws IOException
+   {
       super(null);
       this.texApp = texApp;
 
       setWriteable(this);
 
+      this.undefAction = undefAction;
    }
 
    public TeXApp getTeXApp()
@@ -57,7 +64,7 @@ public class PreambleParser extends LaTeXParserListener
    // Ignore unknown commands
    public ControlSequence createUndefinedCs(String name)
    {
-      return new Undefined(name, Undefined.ACTION_IGNORE);
+      return new Undefined(name, undefAction);
    }
 
    public TeXParser parse(File texFile)
@@ -205,4 +212,6 @@ public class PreambleParser extends LaTeXParserListener
    private TeXApp texApp;
 
    private File file;
+
+   private byte undefAction = Undefined.ACTION_IGNORE;
 }
