@@ -380,8 +380,9 @@ public class Symbol extends ControlSequence implements Expandable,CaseChangeable
 
    public static final Object[][] MATH_SYMBOLS = 
    {
-      new Object[]{"digamma", new Integer(0x1D7CB)},
-      new Object[]{"25B3ll", new Integer(0x2200)},
+      new Object[]{"digamma", new Integer(0x03DD)},
+      new Object[]{"Digamma", new Integer(0x03DC)},
+      new Object[]{"forall", new Integer(0x2200)},
       new Object[]{"complement", new Integer(0x2201)},
       new Object[]{"partial", new Integer(0x2202)},
       new Object[]{"varpartialdiff", new Integer(0x1D715)},
