@@ -51,7 +51,8 @@ public class L2HTextSubscript extends ControlSequence
    {
       TeXObject arg = stack.popArg(parser);
 
-      if (hasUnicodeSupport(arg))
+      if (((L2HConverter)parser.getListener()).supportUnicodeScript()
+           && hasUnicodeSupport(arg))
       {
          stack.push(convert(parser, arg));
       }
@@ -71,7 +72,8 @@ public class L2HTextSubscript extends ControlSequence
    {
       TeXObject arg = parser.popNextArg();
 
-      if (hasUnicodeSupport(arg))
+      if (((L2HConverter)parser.getListener()).supportUnicodeScript()
+           && hasUnicodeSupport(arg))
       {
          parser.push(convert(parser, arg));
       }

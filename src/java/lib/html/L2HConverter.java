@@ -443,6 +443,16 @@ public class L2HConverter extends LaTeXParserListener
    {
    }
 
+   public boolean supportUnicodeScript()
+   {
+      return unicodeScriptSupport;
+   }
+
+   public void setSupportUnicodeScript(boolean support)
+   {
+      unicodeScriptSupport = support;
+   }
+
    public boolean useMathJax()
    {
       return useMathJax;
@@ -1084,6 +1094,8 @@ public class L2HConverter extends LaTeXParserListener
    private Path outPath, basePath;
 
    private boolean useMathJax=true;
+
+   private boolean unicodeScriptSupport=true;
 
    private String suffix = "html";
 
