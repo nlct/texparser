@@ -97,6 +97,13 @@ public class TeXPath
 
       for (int i = 0; i < n; i++)
       {
+         // strip quoted material if present
+
+         if (split[i].startsWith("\"") && split[i].endsWith("\""))
+         {
+            split[i] = split[i].substring(1, split[i].length()-1);
+         }
+
          if (parent == null)
          {
             parent = new File(split[i]);
@@ -105,6 +112,11 @@ public class TeXPath
          {
             parent = new File(parent, split[i]);
          }
+      }
+
+      if (split[n].startsWith("\"") && split[n].endsWith("\""))
+      {
+         split[n] = split[n].substring(1, split[n].length()-1);
       }
 
       if (!defExt.isEmpty() && !split[n].contains("."))
