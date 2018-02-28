@@ -73,7 +73,7 @@ public class Def extends Primitive
       if (cs instanceof ControlSequence)
       {
          parser.putControlSequence(isLocal, 
-           new GenericCommand(((ControlSequence)cs).getName(),
+           new GenericCommand(isShort(), ((ControlSequence)cs).getName(),
              syntax, definition));
       }
       else

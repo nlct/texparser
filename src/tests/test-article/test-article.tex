@@ -25,6 +25,12 @@
 \newtoks\mytoks
 \mytoks={token register contents}
 
+\long\def\longfoo#1{Foo
+
+#1
+
+bar}
+
 \begin{document}
 \maketitle
 
@@ -35,6 +41,7 @@
 \end{abstract}
 
 Token register contents: \the\mytoks.
+\longfoo{test}.
 
 \section*{An Unnumbered Section}
 \addcontentsline{toc}{section}{An Unnumbered Section}

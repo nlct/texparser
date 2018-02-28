@@ -34,13 +34,15 @@ public abstract class Macro implements TeXObject
 
    public boolean isShort()
    {
-      return isShort;
+      return ((prefix & (int)PREFIX_LONG) == (int)PREFIX_LONG) ? false : isShort;
    }
 
    protected void setShort(boolean isShort)
    {
       this.isShort = isShort;
    }
+
+   // prefix should be cleared after use and doesn't change isShort
 
    public void setPrefix(byte prefix)
    {

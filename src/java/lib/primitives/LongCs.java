@@ -22,21 +22,21 @@ import java.io.IOException;
 
 import com.dickimawbooks.texparserlib.*;
 
-public class Global extends Prefix
+public class LongCs extends Prefix
 {
-   public Global()
+   public LongCs()
    {
-      this("global");
+      this("long");
    }
 
-   public Global(String name)
+   public LongCs(String name)
    {
-      super(name, Macro.PREFIX_GLOBAL);
+      super(name, Macro.PREFIX_LONG);
    }
 
    public Object clone()
    {
-      return new Global(getName());
+      return new LongCs(getName());
    }
 
 }

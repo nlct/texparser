@@ -97,6 +97,7 @@ public abstract class DefaultTeXParserListener extends TeXParserListener
       parser.putControlSequence(new NewDimen());
       parser.putControlSequence(new NewToks());
       parser.putControlSequence(new Global());
+      parser.putControlSequence(new LongCs());
       parser.putControlSequence(new BeginGroup());
       parser.putControlSequence(new EndGroup());
       parser.putControlSequence(new AssignedControlSequence(

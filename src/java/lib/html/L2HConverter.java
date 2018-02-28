@@ -21,6 +21,7 @@ package com.dickimawbooks.texparserlib.html;
 import java.io.*;
 import java.nio.file.Path;
 import java.nio.file.Files;
+import java.nio.charset.Charset;
 import java.util.Vector;
 import java.util.Stack;
 
@@ -83,9 +84,16 @@ public class L2HConverter extends LaTeXParserListener
    public L2HConverter(TeXApp app, boolean useMathJax, File outDir,
      Vector<AuxData> auxData, boolean parseAux)
    {
+      this(app, useMathJax, outDir, auxData, parseAux, null);
+   }
+
+   public L2HConverter(TeXApp app, boolean useMathJax, File outDir,
+     Vector<AuxData> auxData, boolean parseAux, Charset outCharSet)
+   {
       super(null, auxData, parseAux);
       this.texApp = app;
       this.outPath = (outDir == null ? null : outDir.toPath());
+      this.htmlCharSet = outCharSet;
 
       this.styCs = new Vector<String>();
 
@@ -615,6 +623,11 @@ public class L2HConverter extends LaTeXParserListener
       writeable.writeln("<html>");
       writeable.writeln("<head>");
 
+      writeable.writeln(String.format(
+       "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=%s\">", 
+       htmlCharSet == null ? 
+         Charset.defaultCharset().name() : 
+         htmlCharSet.name()));
 
       writeable.writeln("<style type=\"text/css\">");
       writeCssStyles();
@@ -985,7 +998,15 @@ public class L2HConverter extends LaTeXParserListener
 
          getTeXApp().message(getTeXApp().getMessage(
             TeXApp.MESSAGE_WRITING, outFile));
-         writer = new PrintWriter(outFile);
+
+         if (htmlCharSet == null)
+         {
+            writer = new PrintWriter(outFile);
+         }
+         else
+         {
+            writer = new PrintWriter(outFile, htmlCharSet.name());
+         }
       }
    }
 
@@ -1088,6 +1109,8 @@ public class L2HConverter extends LaTeXParserListener
    private int indexLoc = 0;
 
    private Writer writer;
+
+   private Charset htmlCharSet = null;
 
    private TeXApp texApp;
 
