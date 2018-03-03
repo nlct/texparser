@@ -417,7 +417,7 @@ public class L2HConverter extends LaTeXParserListener
    {
       if (writer == null) return;
 
-      write(""+c);
+      write(String.format("%c", c));
    }
 
    public void writeln(String str)

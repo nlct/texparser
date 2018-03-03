@@ -50,7 +50,7 @@ public abstract class CharObject implements TeXObject
 
    public String format()
    {
-      return String.format("%c", getCharCode());
+      return new String(Character.toChars(getCharCode()));
    }
 
    public TeXObjectList string(TeXParser parser)

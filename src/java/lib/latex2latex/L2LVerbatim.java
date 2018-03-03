@@ -56,19 +56,25 @@ public class L2LVerbatim extends Verbatim
    public void process(TeXParser parser)
     throws IOException
    {
-      parser.getListener().getWriteable().write(
-        String.format("%cbegin%c%s%c",
-          parser.getEscChar(), parser.getBgChar(), getName(),
-          parser.getEgChar()));
+      Writeable writeable = parser.getListener().getWriteable();
+
+      writeable.writeCodePoint(parser.getEscChar());
+      writeable.write("begin");
+      writeable.writeCodePoint(parser.getBgChar());
+      writeable.write(getName());
+      writeable.writeCodePoint(parser.getEgChar());
    }
 
    public void end(TeXParser parser)
     throws IOException
    {
-      parser.getListener().getWriteable().write(
-        String.format("%cend%c%s%c",
-          parser.getEscChar(), parser.getBgChar(), getName(),
-          parser.getEgChar()));
+      Writeable writeable = parser.getListener().getWriteable();
+
+      writeable.writeCodePoint(parser.getEscChar());
+      writeable.write("end");
+      writeable.writeCodePoint(parser.getBgChar());
+      writeable.write(getName());
+      writeable.writeCodePoint(parser.getEgChar());
    }
 
 }

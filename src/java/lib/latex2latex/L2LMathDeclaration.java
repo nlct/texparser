@@ -63,10 +63,11 @@ public class L2LMathDeclaration extends MathDeclaration
       {
          Writeable writeable = parser.getListener().getWriteable();
 
-         writeable.write(String.format("%c%s",
-           parser.getEscChar(), getName()));
+         writeable.writeCodePoint(parser.getEscChar());
 
-         if (parser.isLetter(getName().charAt(0)))
+         writeable.write(getName());
+
+         if (parser.isLetter(getName().codePointAt(0)))
          {
             TeXObject nextObj = stack.peek();
 
@@ -78,8 +79,11 @@ public class L2LMathDeclaration extends MathDeclaration
       }
       else
       {
-         listener.write(String.format("%cbegin%c%s%c", 
-          parser.getEscChar(), parser.getBgChar(), getName(), parser.getEgChar()));
+         listener.writeCodePoint(parser.getEscChar());
+         listener.write("begin");
+         listener.writeCodePoint(parser.getBgChar());
+         listener.write(getName());
+         listener.writeCodePoint(parser.getEgChar());
       }
    }
 
@@ -96,10 +100,10 @@ public class L2LMathDeclaration extends MathDeclaration
       {
          Writeable writeable = parser.getListener().getWriteable();
 
-         writeable.write(String.format("%c%s",
-           parser.getEscChar(), getName()));
+         writeable.writeCodePoint(parser.getEscChar());
+         writeable.write(getName());
    
-         if (parser.isLetter(getName().charAt(0)))
+         if (parser.isLetter(getName().codePointAt(0)))
          {
             if (parser.size() == 0)
             {
@@ -116,8 +120,11 @@ public class L2LMathDeclaration extends MathDeclaration
       }
       else
       {
-         listener.write(String.format("%cbegin%c%s%c", 
-          parser.getEscChar(), parser.getBgChar(), getName(), parser.getEgChar()));
+         listener.writeCodePoint(parser.getEscChar());
+         listener.write("begin");
+         listener.writeCodePoint(parser.getBgChar());
+         listener.write(getName());
+         listener.writeCodePoint(parser.getEgChar());
       }
    }
 
@@ -133,10 +140,11 @@ public class L2LMathDeclaration extends MathDeclaration
       {
          Writeable writeable = parser.getListener().getWriteable();
 
-         writeable.write(String.format("%c%s",
-           parser.getEscChar(), endDec.getName()));
+         writeable.writeCodePoint(parser.getEscChar());
+
+         writeable.write(endDec.getName());
    
-         if (parser.isLetter(endDec.getName().charAt(0)))
+         if (parser.isLetter(endDec.getName().codePointAt(0)))
          {
             if (parser.size() == 0)
             {
@@ -153,8 +161,11 @@ public class L2LMathDeclaration extends MathDeclaration
       }
       else
       {
-         listener.write(String.format("%cend%c%s%c", 
-          parser.getEscChar(), parser.getBgChar(), getName(), parser.getEgChar()));
+         listener.writeCodePoint(parser.getEscChar());
+         listener.write("end");
+         listener.writeCodePoint(parser.getBgChar());
+         listener.write(getName());
+         listener.writeCodePoint(parser.getEgChar());
       }
    }
 }

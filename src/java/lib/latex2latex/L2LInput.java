@@ -50,9 +50,10 @@ public class L2LInput extends Input
       {
          Writeable writeable = parser.getListener().getWriteable();
 
-         writeable.write(String.format("%s%c%s%c",
-           toString(parser), parser.getBgChar(), arg.toString(parser), 
-             parser.getEgChar()));
+         writeable.write(toString(parser));
+         writeable.writeCodePoint(parser.getBgChar());
+         writeable.write(arg.toString(parser));
+         writeable.writeCodePoint(parser.getEgChar());
       }
 
       return done;

@@ -40,10 +40,10 @@ public class L2LControlSequence extends ControlSequence
    {
       Writeable writeable = parser.getListener().getWriteable();
 
-      writeable.write(String.format("%c%s", 
-        parser.getEscChar(), getName()));
+      writeable.writeCodePoint(parser.getEscChar());
+      writeable.write(getName());
 
-      if (parser.isLetter(getName().charAt(0)))
+      if (parser.isLetter(getName().codePointAt(0)))
       {
          TeXObject nextObj = stack.peek();
 
@@ -59,10 +59,10 @@ public class L2LControlSequence extends ControlSequence
    {
       Writeable writeable = parser.getListener().getWriteable();
 
-      writeable.write(String.format("%c%s", 
-        parser.getEscChar(), getName()));
+      writeable.writeCodePoint(parser.getEscChar());
+      writeable.write(getName());
 
-      if (parser.isLetter(getName().charAt(0)))
+      if (parser.isLetter(getName().codePointAt(0)))
       {
          if (parser.size() == 0)
          {

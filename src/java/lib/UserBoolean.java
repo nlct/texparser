@@ -55,13 +55,15 @@ public class UserBoolean implements TeXBoolean
 
    public String toString(TeXParser parser)
    {
-      return String.format("%cif%s", parser.getEscChar(), value);
+      return String.format("%sif%s", 
+        new String(Character.toChars(parser.getEscChar())), value);
    }
 
    public TeXObjectList string(TeXParser parser) throws IOException
    {
       return parser.getListener().createString(
-        String.format("%cif%s", parser.getEscChar(), value));
+        String.format("%sif%s", 
+          new String(Character.toChars(parser.getEscChar())), value));
    }
 
    public void process(TeXParser parser) throws IOException

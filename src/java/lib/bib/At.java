@@ -213,7 +213,7 @@ public class At extends ActiveChar
 
    public String toString(TeXParser parser)
    {
-      return String.format("%c", (char)charCode);
+      return new String(Character.toChars(charCode));
    }
 
    public int charCode = (int)'@';

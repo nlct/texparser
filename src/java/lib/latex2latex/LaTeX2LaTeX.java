@@ -527,7 +527,17 @@ public class LaTeX2LaTeX extends LaTeXParserListener
    {
       if (writer != null)
       {
-         writer.print(String.format("%c", charCode));
+         if (charCode <= Character.MAX_VALUE)
+         {
+            writer.print((char)charCode);
+         }
+         else
+         {
+            for (char c : Character.toChars(charCode))
+            {
+               writer.print(c);
+            }
+         }
       }
       else
       {
@@ -871,19 +881,19 @@ public class LaTeX2LaTeX extends LaTeXParserListener
      int numParams, TeXObject defValue, TeXObject definition)
     throws IOException
    {
-      int bg = parser.getBgChar();
-      int eg = parser.getEgChar();
-      int esc = parser.getEscChar();
+      String bg = new String(Character.toChars(parser.getBgChar()));
+      String eg = new String(Character.toChars(parser.getEgChar()));
+      String esc = new String(Character.toChars(parser.getEscChar()));
 
-      writeCodePoint(esc);
+      write(esc);
       write(type);
 
       if (isShort)
       {
-         write("*");
+         write('*');
       }
 
-      write(String.format("%c%c%s%c", bg, esc, csName, eg));
+      write(String.format("%s%s%s%s", bg, esc, csName, eg));
 
       if (numParams > 0)
       {
@@ -895,7 +905,7 @@ public class LaTeX2LaTeX extends LaTeXParserListener
          }
       }
 
-      write(String.format("%c%s%c", bg, definition.toString(parser), eg));
+      write(String.format("%s%s%s", bg, definition.toString(parser), eg));
    }
 
    private Path outPath, basePath;

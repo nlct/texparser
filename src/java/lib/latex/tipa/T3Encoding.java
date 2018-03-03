@@ -167,7 +167,24 @@ public class T3Encoding extends FontEncoding
          case 188 : return 0x02C0;
          case 189 : return 0x02C2;
          case 190 : return 0x02C3;
-         //case 191 : ?? tone letter stem
+         case 191 : return '|';// ? tone letter stem - closest match is a bar
+         case 32: return 0x02CA;// ? Celtic Palatalization Mark
+         //case 35: ??// ? Hooktop
+         //case 36: ??// ? Right Hook
+         //case 37: ??// ? Palatalization Hook
+         case 92: return 0x02BD;
+         case 94: return 0x02FA;
+         case 95: return 0x02F9;
+         case 123: return 0x01C1;// ??
+         case 125: return 0x01C2;
+         case 126: return 0x02DE;
+         case 127: return 0x02CC;
+         case 146: return 0x01C0;
+         case 147: return 0x01C1;// ??
+         case 148: return 0x2193;// ??
+         case 149: return 0x2191;// ??
+         case 150: return 0x2197;// ??
+         case 151: return 0x2198;// ??
       }
 
       return CHAR_MAP_NONE;

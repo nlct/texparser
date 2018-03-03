@@ -39,12 +39,12 @@ public class BgChar extends Macro
 
    public String format()
    {
-      return String.format("%c", charCode);
+      return new String(Character.toChars(charCode));
    }
 
    public String toString(TeXParser parser)
    {
-      return String.format("%c", parser.getBgChar());
+      return new String(Character.toChars(parser.getBgChar()));
    }
 
    public TeXObjectList string(TeXParser parser)
@@ -80,7 +80,8 @@ public class BgChar extends Macro
    public String show(TeXParser parser)
     throws IOException
    {
-      return String.format("begin-group character %c", charCode);
+      return String.format("begin-group character %s", 
+        new String(Character.toChars(charCode)));
    }
 
    public int getCharCode()

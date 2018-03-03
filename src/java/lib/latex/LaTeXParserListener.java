@@ -565,7 +565,8 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
          {
             throw new TeXSyntaxException(parser,
              TeXSyntaxException.ERROR_UNDEFINED,
-             String.format("%c%s", parser.getEscChar(), csName));
+             String.format("%s%s", 
+              new String(Character.toChars(parser.getEscChar())), csName));
          }
       }
       else

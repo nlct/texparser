@@ -89,8 +89,10 @@ public class Begin extends Command
          ControlSequence cs = listener.getControlSequence(name);
 
          TeXObjectList contents = new TeXObjectList();
-         String endEnv = String.format("%c%s%c",
-            parser.getBgChar(), name, parser.getEgChar());
+         String endEnv = String.format("%s%s%s",
+            new String(Character.toChars(parser.getBgChar())), 
+            name, 
+            new String(Character.toChars(parser.getEgChar())));
 
          while (true)
          {

@@ -33,7 +33,7 @@ public class Tab implements TeXObject
 
    public String toString(TeXParser parser)
    {
-      return String.format("%c", parser.getTabChar());
+      return new String(Character.toChars(parser.getTabChar()));
    }
 
    public String toString()

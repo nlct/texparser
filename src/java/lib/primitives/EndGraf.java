@@ -58,7 +58,8 @@ public class EndGraf extends Primitive
    public TeXObjectList string(TeXParser parser)
      throws IOException
    {
-      return parser.string(String.format("%c%s", parser.getEscChar(), name));
+      return parser.string(String.format("%s%s", 
+       new String(Character.toChars(parser.getEscChar())), name));
    }
 
    public void process(TeXParser parser, TeXObjectList list)

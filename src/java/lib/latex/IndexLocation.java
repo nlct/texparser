@@ -187,11 +187,11 @@ public class IndexLocation implements TeXObject
          return location.toString(parser);
       }
 
-      return String.format("%s%c%s%c",
+      return String.format("%s%s%s%s",
         format.toString(parser),
-        parser.getBgChar(),
+        new String(Character.toChars(parser.getBgChar())),
         location.toString(parser),
-        parser.getEgChar());
+        new String(Character.toChars(parser.getEgChar())));
    }
 
    public String toString()

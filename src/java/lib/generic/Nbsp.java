@@ -46,7 +46,7 @@ public class Nbsp extends ActiveChar
 
    public String format()
    {
-      return String.format("%c", (int)charCode);
+      return new String(Character.toChars(charCode));
    }
 
    public int getCharCode()

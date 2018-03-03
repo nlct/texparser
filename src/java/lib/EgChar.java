@@ -44,12 +44,12 @@ public class EgChar extends Macro
 
    public String format()
    {
-      return String.format("%c", charCode);
+      return new String(Character.toChars(charCode));
    }
 
    public String toString(TeXParser parser)
    {
-      return String.format("%c", parser.getEgChar());
+      return new String(Character.toChars(parser.getEgChar()));
    }
 
    public TeXObjectList string(TeXParser parser)
@@ -79,7 +79,8 @@ public class EgChar extends Macro
    public String show(TeXParser parser)
     throws IOException
    {
-      return String.format("end-group character %c", charCode);
+      return String.format("end-group character %s", 
+       new String(Character.toChars(charCode)));
    }
 
    public boolean matches(BgChar bgChar)

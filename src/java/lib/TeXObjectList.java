@@ -353,7 +353,8 @@ public class TeXObjectList extends Vector<TeXObject>
       {
          throw new TeXSyntaxException(parser, 
             TeXSyntaxException.ERROR_NOT_FOUND, 
-            String.format("%c%s", parser.getEscChar(), name));
+            String.format("%s%s", 
+              new String(Character.toChars(parser.getEscChar())), name));
       }
 
       return true;
@@ -392,7 +393,8 @@ public class TeXObjectList extends Vector<TeXObject>
 
       throw new TeXSyntaxException(parser, 
          TeXSyntaxException.ERROR_NOT_FOUND, 
-         String.format("%c%s", parser.getEscChar(), name));
+         String.format("%s%s", 
+          new String(Character.toChars(parser.getEscChar())), name));
    }
 
    public TeXUnit popUnit(TeXParser parser)
@@ -429,7 +431,9 @@ public class TeXObjectList extends Vector<TeXObject>
 
          try
          {
-            return parser.getListener().createUnit(String.format("%c%c", c1, c2));
+            return parser.getListener().createUnit(String.format("%s%s",
+             new String(Character.toChars(c1)), 
+             new String(Character.toChars(c2))));
          }
          catch (TeXSyntaxException e)
          {
@@ -548,7 +552,8 @@ public class TeXObjectList extends Vector<TeXObject>
       {
          int codePoint = ((CharObject)object).getCharCode();
 
-         if (codePoint == '"' || codePoint == '\'' || codePoint == '`')
+         if (codePoint == '"' || codePoint == '\'' || codePoint == '`'
+             || Character.isDigit(codePoint))
          {
             return popNumber(parser);
          }
@@ -941,6 +946,13 @@ public class TeXObjectList extends Vector<TeXObject>
 
       popLeadingWhiteSpace();
 
+      if (builder.length() == 0)
+      {
+         throw new TeXSyntaxException(parser,
+          TeXSyntaxException.ERROR_NUMBER_EXPECTED, 
+          object.toString(parser));
+      }
+
       return new UserNumber(parser, builder.toString(), base);
    }
 
@@ -951,7 +963,17 @@ public class TeXObjectList extends Vector<TeXObject>
    {
       if (object == null) return;
 
-      String str = object.toString(parser);
+      String str;
+
+      if (object instanceof CharObject)
+      {
+         // don't allow font encoding etc to convert the character
+         str = new String(Character.toChars(((CharObject)object).getCharCode()));
+      }
+      else
+      {
+         str = object.toString(parser);
+      }
 
       try
       {

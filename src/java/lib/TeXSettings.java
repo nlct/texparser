@@ -1515,11 +1515,11 @@ public class TeXSettings
 
       if (mappedCode == FontEncoding.CHAR_MAP_NONE)
       {
-         return String.format("%c", charCode);
+         return new String(Character.toChars(charCode));
       }
       else
       {
-         return String.format("%c", mappedCode);
+         return new String(Character.toChars(mappedCode));
       }
    }
 

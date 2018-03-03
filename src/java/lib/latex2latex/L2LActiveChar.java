@@ -41,7 +41,7 @@ public class L2LActiveChar extends ActiveChar
 
    public String toString(TeXParser parser)
    {
-      return String.format("%c", charCode);
+      return new String(Character.toChars(charCode));
    }
 
    public Object clone()

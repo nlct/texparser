@@ -54,8 +54,10 @@ public class Param implements TeXObject
 
    public String toString(TeXParser parser)
    {
-      return digit == -1 ? String.format("%c", parser.getParamChar())
-                         : String.format("%c%d", parser.getParamChar(), digit);
+      String charStr = new String(Character.toChars(parser.getParamChar()));
+
+      return digit == -1 ? String.format("%s", charStr)
+                         : String.format("%s%d", charStr, digit);
    }
 
    public String format()

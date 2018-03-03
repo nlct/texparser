@@ -73,9 +73,9 @@ public class MathEg extends EgChar implements Expandable
 
    public String format()
    {
-      return isInLine() ?
-         String.format("%c", (char)getCharCode()) :
-         String.format("%c%c", (char)getCharCode(), (char)getCharCode());
+      String charStr = new String(Character.toChars(getCharCode()));
+
+      return isInLine() ? charStr : String.format("%s%s", charStr, charStr);
    }
 
    public String toString()
@@ -106,7 +106,8 @@ public class MathEg extends EgChar implements Expandable
    public String show(TeXParser parser)
     throws IOException
    {
-      return String.format("math character %c", (char)getCharCode());
+      return String.format("math character %s", 
+        new String(Character.toChars(getCharCode())));
    }
 
    public boolean isInLine()

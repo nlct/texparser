@@ -53,9 +53,12 @@ public class L2LBegin extends Begin
          decl.doModeSwitch(parser);
       }
 
-      listener.write(String.format("%c%s%c%s%c",
-        parser.getEscChar(), getName(), 
-        parser.getBgChar(), name, parser.getEgChar()));
+      listener.write(String.format("%s%s%s%s%s",
+        new String(Character.toChars(parser.getEscChar())), 
+        getName(), 
+        new String(Character.toChars(parser.getBgChar())), 
+        name, 
+        new String(Character.toChars(parser.getEgChar()))));
 
    }
 }

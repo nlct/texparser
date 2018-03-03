@@ -147,25 +147,12 @@ public class AssignedActiveChar extends ActiveChar
 
    public String toString(TeXParser parser)
    {
-      StringBuilder builder = new StringBuilder(2);
-
-      try
-      {
-         builder.appendCodePoint(charCode);
-      }
-      catch (IllegalArgumentException e)
-      {
-         return String.format("%c", (char)charCode);
-      }
-
-      return builder.toString();
+      return toString();
    }
 
    public String toString()
    {
-      StringBuilder builder = new StringBuilder(2);
-      builder.appendCodePoint(getCharCode());
-      return builder.toString();
+      return new String(Character.toChars(charCode));
    }
 
    public TeXObjectList string(TeXParser parser)

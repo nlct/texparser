@@ -119,7 +119,8 @@ public class L2HAlignRow extends AlignRow
       {
          throw new TeXSyntaxException(parser,
            TeXSyntaxException.ERROR_DIMEN_EXPECTED,
-           String.format("%ctabcolsep", parser.getEscChar()));
+           String.format("%stabcolsep", 
+             new String(Character.toChars(parser.getEscChar()))));
       }
 
       return ((DimenRegister)reg).getDimension();

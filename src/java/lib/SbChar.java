@@ -33,7 +33,7 @@ public class SbChar extends Macro
 
    public String toString(TeXParser parser)
    {
-      return String.format("%c", parser.getSbChar());
+      return new String(Character.toChars(parser.getSbChar()));
    }
 
    public String format()
@@ -92,7 +92,8 @@ public class SbChar extends Macro
    public String show(TeXParser parser)
     throws IOException
    {
-      return String.format("subscript character %c", parser.getSbChar());
+      return String.format("subscript character %s", 
+       new String(Character.toChars(parser.getSbChar())));
    }
 }
 

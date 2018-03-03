@@ -626,7 +626,7 @@ public class TeXParser extends TeXObjectList
          }
 
          Eol eol = listener.getEol();
-         eol.setEol(String.format("%c", c));
+         eol.setEol(new String(Character.toChars(c)));
          skipped.add(eol);
 
          mark(1);
@@ -908,7 +908,8 @@ public class TeXParser extends TeXObjectList
             throw new TeXSyntaxException(
                getCurrentFile(),
                getLineNumber(),
-               TeXSyntaxException.ERROR_BAD_PARAM, String.format("%c", c));
+               TeXSyntaxException.ERROR_BAD_PARAM, 
+                new String(Character.toChars(c)));
          }
       }
       else
@@ -925,7 +926,8 @@ public class TeXParser extends TeXObjectList
          else
          {
             throw new TeXSyntaxException(this,
-               TeXSyntaxException.ERROR_BAD_PARAM, String.format("%c", c));
+               TeXSyntaxException.ERROR_BAD_PARAM, 
+               new String(Character.toChars(c)));
          }
       }
 
@@ -1422,7 +1424,7 @@ public class TeXParser extends TeXObjectList
             {
                // Control Symbol
 
-               cs = new TeXCsRef(String.format("%c", c));
+               cs = new TeXCsRef(new String(Character.toChars(c)));
 
                list.add(cs);
             }
@@ -1567,7 +1569,7 @@ public class TeXParser extends TeXObjectList
          {
             throw new TeXSyntaxException(this, 
               TeXSyntaxException.ERROR_UNDEFINED_CHAR, 
-              String.format("%c", c));
+              new String(Character.toChars(c)));
          }
 
          list.add(obj);
@@ -2338,7 +2340,9 @@ public class TeXParser extends TeXObjectList
    {
       int c = getSpecialChar(TYPE_MATH, '$');
 
-      return isinline ? String.format("%c", c) : String.format("%c%c", c, c);
+      String charStr = new String(Character.toChars(c));
+
+      return isinline ? charStr : String.format("%s%s", charStr, charStr);
    }
 
    public int getCommentChar()

@@ -58,7 +58,7 @@ public class VerbChar extends ActiveChar
 
    public String toString()
    {
-      return String.format("%c", codePoint);
+      return new String(Character.toChars(codePoint));
    }
 
    public TeXObjectList expandonce(TeXParser parser)

@@ -28,13 +28,13 @@ public abstract class ActiveChar extends Macro implements Expandable
 
    public String toString()
    {
-      return String.format("%s[char=%c]",
-        getClass().getSimpleName(), (char)getCharCode());
+      return String.format("%s[char=%s]",
+        getClass().getSimpleName(), format());
    }
 
    public String format()
    {
-      return String.format("%c", (char)getCharCode());
+      return new String(Character.toChars(getCharCode()));
    }
 
    public TeXObjectList string(TeXParser parser) throws IOException

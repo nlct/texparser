@@ -36,7 +36,7 @@ public class FontEncoding
    {
       int code = getCharCode(charCode);
 
-      return String.format("%c", code < 0 ? charCode : code);
+      return new String(Character.toChars(code));
    }
 
    public int getCharCode(int charCode)

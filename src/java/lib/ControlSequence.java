@@ -69,7 +69,8 @@ public abstract class ControlSequence extends Macro
 
    public String toString(TeXParser parser)
    {
-      return String.format("%c%s", parser.getEscChar(), getName());
+      return String.format("%s%s", 
+        new String(Character.toChars(parser.getEscChar())), getName());
    }
 
    public TeXObjectList string(TeXParser parser)
