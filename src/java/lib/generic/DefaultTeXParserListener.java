@@ -333,6 +333,11 @@ public abstract class DefaultTeXParserListener extends TeXParserListener
       return new Symbol(name, code);
    }
 
+   public ControlSequence createSymbol(String name, int code, FontEncoding enc)
+   {
+      return new EncodingSymbol(name, code, enc);
+   }
+
    public GreekSymbol createGreekSymbol(String name, int code)
    {
       return new GreekSymbol(name, code);

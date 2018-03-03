@@ -73,6 +73,8 @@ public abstract class TeXParserListener
 
    public abstract Symbol createSymbol(String name, int code);
 
+   public abstract ControlSequence createSymbol(String name, int code, FontEncoding enc);
+
    public abstract GreekSymbol createGreekSymbol(String name, int code);
 
    public abstract BinarySymbol createBinarySymbol(String name, int code);

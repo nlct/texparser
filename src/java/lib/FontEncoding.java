@@ -36,6 +36,11 @@ public class FontEncoding
    {
       int code = getCharCode(charCode);
 
+      if (code == CHAR_MAP_NONE)
+      {
+         code = charCode;
+      }
+
       return new String(Character.toChars(code));
    }
 

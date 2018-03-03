@@ -196,6 +196,11 @@ public class LaTeX2LaTeX extends LaTeXParserListener
       return new L2LSymbol(name, code);
    }
 
+   public ControlSequence createSymbol(String name, int code, FontEncoding enc)
+   {
+      return new L2LSymbol(name, code);
+   }
+
    public GreekSymbol createGreekSymbol(String name, int code)
    {
       return new L2LGreekSymbol(name, code);
