@@ -198,8 +198,17 @@ A & B & C & D\\
 \end{table}
 
 \section{IPA}
-\textipa{x \char146 x \char147 x \char 148 x \char 149 x \char 150 x
-\char 151 x}
+\textipa{@"A\AA \char 197} \AA \char 197
+\textschwa
+
+\section{Loops}
+
+\newcount\myctr
+\loop
+ \advance\myctr by 1\relax
+ \the\myctr.
+\ifnum\myctr<10
+\repeat
 
 \bibliographystyle{plain}
 \bibliography{xampl}

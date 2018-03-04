@@ -104,6 +104,12 @@ public abstract class DefaultTeXParserListener extends TeXParserListener
         "bgroup", getBgChar(parser.getBgChar())));
       parser.putControlSequence(new AssignedControlSequence(
         "egroup", getEgChar(parser.getEgChar())));
+      parser.putControlSequence(new LoopCs());
+      parser.putControlSequence(new Advance());
+      parser.putControlSequence(new Multiply());
+      parser.putControlSequence(new Divide());
+      parser.putControlSequence(new IfNum());
+      parser.putControlSequence(new IfDim());
 
       parser.putControlSequence(new MathAccent("vec", 8407));
       parser.putControlSequence(new MathAccent("hat", 0x0302, 0x02C6));

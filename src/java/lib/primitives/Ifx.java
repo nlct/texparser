@@ -40,7 +40,7 @@ public class Ifx extends If
       return new Ifx(getName());
    }
 
-   protected boolean istrue(TeXParser parser, TeXObjectList stack)
+   public boolean istrue(TeXParser parser, TeXObjectList stack)
    throws IOException
    {
       byte popStyle = TeXObjectList.POP_IGNORE_LEADING_SPACE;

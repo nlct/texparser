@@ -45,7 +45,7 @@ public class IfTrue extends If implements TeXBoolean
       return true;
    }
 
-   protected boolean istrue(TeXParser parser, TeXObjectList stack)
+   public boolean istrue(TeXParser parser, TeXObjectList stack)
    throws IOException
    {
       return true;

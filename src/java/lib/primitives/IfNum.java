@@ -23,32 +23,51 @@ import java.io.EOFException;
 
 import com.dickimawbooks.texparserlib.*;
 
-public class IfFalse extends If implements TeXBoolean
+public class IfNum extends If
 {
-   public IfFalse()
+   public IfNum()
    {
-      this("iffalse");
+      this("ifnum");
    }
 
-   public IfFalse(String name)
+   public IfNum(String name)
    {
       super(name);
    }
 
    public Object clone()
    {
-      return new IfFalse(getName());
-   }
-
-   public boolean booleanValue()
-   {
-      return false;
+      return new IfNum(getName());
    }
 
    public boolean istrue(TeXParser parser, TeXObjectList stack)
    throws IOException
    {
-      return false;
+      Numerical firstArg = stack.popNumerical(parser);
+
+      TeXObject comparison = stack.popToken(
+        TeXObjectList.POP_IGNORE_LEADING_SPACE);
+
+      if (!(comparison instanceof CharObject))
+      {
+         throw new TeXSyntaxException(parser, TeXSyntaxException.ERROR_EXPECTED,
+           "<, =, >");
+      }
+
+      int charCode = ((CharObject)comparison).getCharCode();
+
+      Numerical secondArg = stack.popNumerical(parser);
+
+      switch (charCode)
+      {
+         case '<': return firstArg.number(parser) < secondArg.number(parser);
+         case '>': return firstArg.number(parser) > secondArg.number(parser);
+         case '=': return firstArg.number(parser) == secondArg.number(parser);
+      }
+
+      throw new TeXSyntaxException(parser, TeXSyntaxException.ERROR_EXPECTED,
+           "<, =, >");
+
    }
 
 }

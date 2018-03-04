@@ -112,7 +112,7 @@ public class If extends Primitive implements Expandable
       }
    }
 
-   protected boolean istrue(TeXParser parser, TeXObjectList stack)
+   public boolean istrue(TeXParser parser, TeXObjectList stack)
    throws IOException
    {
       byte popStyle = TeXObjectList.POP_IGNORE_LEADING_SPACE;
