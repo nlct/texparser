@@ -27,23 +27,52 @@ public class PreTo extends ControlSequence
 {
    public PreTo()
    {
-      this("preto");
+      this("preto", false, true, false, false);
    }
 
-   public PreTo(String name)
+   public PreTo(String name, boolean isGlobal, boolean isPre, 
+      boolean expandCode, boolean isCsname)
    {
       super(name);
+      this.isGlobal = isGlobal;
+      this.isPre = isPre;
+      this.expandCode = expandCode;
+      this.isCsname = isCsname;
    }
 
    public Object clone()
    {
-      return new PreTo(getName());
+      return new PreTo(getName(), isGlobal, isPre, expandCode, isCsname);
    }
 
    public void process(TeXParser parser, TeXObjectList list)
      throws IOException
    {
       TeXObject arg = (list == parser ? parser.popNextArg():list.popArg(parser));
+
+      if (isCsname)
+      {
+         if (arg instanceof Expandable)
+         {
+            TeXObjectList expanded;
+
+            if (list == parser)
+            {
+               expanded = ((Expandable)arg).expandfully(parser);
+            }
+            else
+            {
+               expanded = ((Expandable)arg).expandfully(parser, list);
+            }
+
+            if (expanded != null)
+            {
+               arg = expanded;
+            }
+         }
+
+         arg = parser.getListener().getControlSequence(arg.toString(parser));
+      }
 
       if (arg instanceof TeXCsRef)
       {
@@ -61,9 +90,32 @@ public class PreTo extends ControlSequence
 
       TeXObject code = (list == parser ? parser.popNextArg():list.popArg(parser));
 
+      if (expandCode && code instanceof Expandable)
+      {
+         TeXObjectList expanded;
+
+         if (list == parser)
+         {
+            expanded = ((Expandable)code).expandfully(parser);
+         }
+         else
+         {
+            expanded = ((Expandable)code).expandfully(parser, list);
+         }
+
+         if (expanded != null)
+         {
+            code = expanded;
+         }
+      }
+
       TeXObjectList syntax = hook.getSyntax();
       TeXObjectList defn = new TeXObjectList();
-      defn.add(code);
+
+      if (isPre)
+      {
+         defn.add(code);
+      }
 
       if (hook instanceof GenericCommand)
       {
@@ -93,10 +145,15 @@ public class PreTo extends ControlSequence
          defn.add(parser.getListener().createUndefinedCs(hook.toString(parser)));
       }
 
+      if (!isPre)
+      {
+         defn.add(code);
+      }
+
       GenericCommand cs = new GenericCommand(
         hook.isShort(), hook.getName(), syntax, defn);
 
-      parser.putControlSequence(getPrefix() != PREFIX_GLOBAL, cs);
+      parser.putControlSequence(!isGlobal, cs);
    }
 
    public void process(TeXParser parser)
@@ -104,4 +161,6 @@ public class PreTo extends ControlSequence
    {
       process(parser, parser);
    }
+
+   private boolean isGlobal, isPre, expandCode, isCsname;
 }

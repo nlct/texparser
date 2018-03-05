@@ -35,6 +35,40 @@ public class EtoolboxSty extends LaTeXSty
    public void addDefinitions()
    {
       registerControlSequence(new PreTo());
+      registerControlSequence(new PreTo("gpreto", true,
+        true, false, false));
+      registerControlSequence(new PreTo("epreto", false,
+        true, true, false));
+      registerControlSequence(new PreTo("xpreto", true,
+        true, true, false));
+      registerControlSequence(new PreTo("cspreto", false,
+        true, false, true));
+      registerControlSequence(new PreTo("csgpreto", true,
+        true, false, true));
+      registerControlSequence(new PreTo("csepreto", false,
+        true, true, true));
+      registerControlSequence(new PreTo("csxpreto", true,
+        true, true, true));
+
+      registerControlSequence(new PreTo("appto", false,
+        false, false, false));
+      registerControlSequence(new PreTo("gappto", true,
+        false, false, false));
+      registerControlSequence(new PreTo("eappto", false,
+        false, true, false));
+      registerControlSequence(new PreTo("xappto", true,
+        false, true, false));
+      registerControlSequence(new PreTo("csappto", false,
+        false, false, true));
+      registerControlSequence(new PreTo("csgappto", true,
+        false, false, true));
+      registerControlSequence(new PreTo("cseappto", false,
+        false, true, true));
+      registerControlSequence(new PreTo("csxappto", true,
+        false, true, true));
+
+      registerControlSequence(new IfDefEmpty());
+      registerControlSequence(new IfDefEmpty("ifcsempty", true));
    }
 
    public void processOption(String option)
