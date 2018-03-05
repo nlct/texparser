@@ -343,6 +343,73 @@ public class TeXParser extends TeXObjectList
       }
    }
 
+   public TeXObjectList readLine(TeXReader otherReader, boolean retainEol)
+     throws IOException
+   {
+      if (otherReader.isEnded())
+      {
+         return null;
+      }
+
+      TeXReader orgReader = reader;
+      TeXReader orgParent = otherReader.getParent();
+
+      TeXObjectList list = new TeXObjectList();
+
+      TeXObjectList pending = null;
+
+      try
+      {
+         if (size() > 0)
+         {
+            pending = new TeXObjectList();
+            pending.addAll(this);
+            clear();
+         }
+
+         otherReader.setParent(reader);
+         reader = otherReader;
+
+         TeXObject obj = pop();
+
+         while (!(obj instanceof Eol) && obj != null 
+                  && !(otherReader.isEnded()))
+         {
+            list.add(obj);
+            obj = pop();
+         }
+
+         if (retainEol && obj instanceof Eol)
+         {
+            list.add(obj);
+         }
+
+         if (list.size() > 0 && list.lastElement() instanceof Par)
+         {
+            list.remove(list.size()-1);
+         }
+      }
+      catch (EOFException e)
+      {
+         if (list.size() == 0)
+         {
+            return null;
+         }
+      }
+      finally
+      {
+         reader = orgReader;
+         otherReader.setParent(orgParent);
+
+         if (pending != null)
+         {
+            addAll(0, pending);
+         }
+      }
+
+      return list;
+   }
+
    public TeXObjectList string(TeXParser parser)
     throws IOException
    {
@@ -2099,7 +2166,7 @@ public class TeXParser extends TeXObjectList
       return popRegister(this);
    }
 
-   public TeXObject peekStack()
+   public TeXObject peekStack(byte popStyle)
      throws IOException
    {
       int idx = 0;
@@ -2111,16 +2178,34 @@ public class TeXParser extends TeXObjectList
 
       TeXObject obj = firstElement();
 
-      while (obj instanceof Ignoreable)
+      if (isIgnoreLeadingSpace(popStyle))
       {
-         idx++;
-
-         if (size() == idx)
+         while (obj instanceof Ignoreable 
+             || obj instanceof WhiteSpace)
          {
-            fetchNext();
-         }
+            idx++;
 
-         obj = get(idx);
+            if (size() == idx)
+            {
+               fetchNext();
+            }
+
+            obj = get(idx);
+         }
+      }
+      else
+      {
+         while (obj instanceof Ignoreable)
+         {
+            idx++;
+
+            if (size() == idx)
+            {
+               fetchNext();
+            }
+
+            obj = get(idx);
+         }
       }
 
       return obj;

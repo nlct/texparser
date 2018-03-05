@@ -156,6 +156,8 @@ There is NO WARRANTY, to the extent permitted by law.</entry>
 <entry key="datatool.invalid.contents">Invalid contents specs ''{0}''.</entry>
 <entry key="datatool.header.exists">Header ''{0}'' already exists.</entry>
 <entry key="datatool.header.doesnt_exist">Header ''{0}'' doesn''t exist.</entry>
+<entry key="datatool.row.not.found">Row index ''{0}'' doesn''t exist.</entry>
+<entry key="datatool.loaddb.message">Database ''{0}'' loaded from ''{1}'' (column count={2}, row count={3}).</entry>
 
 <!--  ifthen messages -->
 

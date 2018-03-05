@@ -60,6 +60,16 @@ public class DataBase
       return headerRow;
    }
 
+   public DataToolHeader getHeader(String key)
+   {
+      return headerRow.getHeader(key);
+   }
+
+   public DataToolHeader getHeader(int columnIndex)
+   {
+      return headerRow.getHeader(columnIndex);
+   }
+
    public DataToolRows getData()
    {
       return dataRows;

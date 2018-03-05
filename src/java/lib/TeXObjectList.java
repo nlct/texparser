@@ -1462,6 +1462,11 @@ public class TeXObjectList extends Vector<TeXObject>
       {
          TeXObject object = remaining.pop();
 
+         if (object instanceof Ignoreable)
+         {
+            continue;
+         }
+
          TeXObjectList expanded = null;
 
          if (object instanceof Expandable)
@@ -1507,6 +1512,11 @@ public class TeXObjectList extends Vector<TeXObject>
          if (object.equals(marker))
          {
             break;
+         }
+
+         if (object instanceof Ignoreable)
+         {
+            continue;
          }
 
          TeXObjectList expanded = null;

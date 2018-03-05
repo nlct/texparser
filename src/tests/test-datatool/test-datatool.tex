@@ -3,6 +3,18 @@
 \usepackage{datatool}
 
 \begin{document}
+\section{Reading a CSV file}
+\DTLloaddb{csvdata}{test.csv}
+Just loaded database: csvdata.
+
+Data base `csvdata' \DTLifdbexists{csvdata}{exists}{doesn't exist}.
+
+Row count: \DTLrowcount{csvdata}.
+Column count: \DTLcolumncount{csvdata}.
+
+\DTLforeach*{csvdata}{\Fieldi=Field1,\Fieldii=Field2,\Fieldiii=Field3}{Field1:
+`\Fieldi', Field2: `\Fieldii', Field3: `\Fieldiii'\par}
+
 \section{Loading a Database}
 \DTLloaddbtex{\mydata}{test.dbtex}
 

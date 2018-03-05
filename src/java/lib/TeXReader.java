@@ -31,6 +31,7 @@ public class TeXReader implements Readable,Closeable
       this.parent = parent;
       this.source = string;
       reader = new StringReader(string);
+      isOpen = true;
    }
 
    public TeXReader(String string)
@@ -55,6 +56,8 @@ public class TeXReader implements Readable,Closeable
            new LineNumberReader(Files.newBufferedReader(file.toPath(),
             charset)));
       }
+
+      isOpen = true;
    }
 
    public TeXReader(TeXReader parent, File file)
@@ -91,22 +94,50 @@ public class TeXReader implements Readable,Closeable
 
    public int read() throws IOException
    {
-      return reader.read();
+      int c = reader.read();
+
+      if (c == -1)
+      {
+         eofFound = true;
+      }
+
+      return c;
    }
 
    public int read(char[] cbuf) throws IOException
    {
-      return reader.read(cbuf);
+      int result = reader.read(cbuf);
+
+      if (result == -1)
+      {
+         eofFound = true;
+      }
+
+      return result;
    }
 
    public int read(char[] cbuf, int off, int len) throws IOException
    {
-      return reader.read(cbuf, off, len);
+      int result = reader.read(cbuf, off, len);
+
+      if (result == -1)
+      {
+         eofFound = true;
+      }
+
+      return result;
    }
 
    public int read(CharBuffer cb) throws IOException
    {
-      return reader.read(cb);
+      int result = reader.read(cb);
+
+      if (result == -1)
+      {
+         eofFound = true;
+      }
+
+      return result;
    }
 
    public long skip(long n) throws IOException
@@ -121,7 +152,18 @@ public class TeXReader implements Readable,Closeable
 
    public void close() throws IOException
    {
+      isOpen = false;
       reader.close();
+   }
+
+   public boolean isClosed()
+   {
+      return !isOpen;
+   }
+
+   public boolean isEnded()
+   {
+      return eofFound;
    }
 
    public Object getSource()
@@ -169,4 +211,5 @@ public class TeXReader implements Readable,Closeable
    private TeXReader parent;
    private Object source;
    private TeXObjectList pending;
+   private boolean isOpen = false, eofFound=false;
 }

@@ -51,6 +51,10 @@ public class DataToolSty extends LaTeXSty
       registerControlSequence(new DTLcolumncount(this));
       registerControlSequence(new DTLnewdbentry(this));
       registerControlSequence(new DTLmessage());
+      registerControlSequence(new DTLforeach(this));
+      registerControlSequence(new DTLsetdelimiter(this));
+      registerControlSequence(new DTLsetseparator(this));
+      registerControlSequence(new DTLsettabseparator(this));
 
       registerControlSequence(
          new DTLsetExpansion("dtlexpandnewvalue", true, this));
@@ -59,6 +63,10 @@ public class DataToolSty extends LaTeXSty
 
       registerControlSequence(new EndGraf("DTLpar"));
       registerControlSequence(new DTLloaddbtex());
+      registerControlSequence(new DTLloaddb(this));
+
+      registerControlSequence(new GenericCommand("dtldefaultkey",
+       null, getListener().createString("Column")));
 
       registerControlSequence(new GenericCommand("DTLunsettype"));
       registerControlSequence(new GenericCommand("DTLstringtype", null,
@@ -669,6 +677,28 @@ public class DataToolSty extends LaTeXSty
       return databases == null ? null : databases.keySet().iterator();
    }
 
+   public int getSeparator()
+   {
+      return separator;
+   }
+
+   public int getDelimiter()
+   {
+      return delimiter;
+   }
+
+   public void setSeparator(int charCode)
+   {
+      separator = charCode;
+   }
+
+   public void setDelimiter(int charCode)
+   {
+      delimiter = charCode;
+   }
+
+   private int separator=',', delimiter='"';
+
    private DataToolBaseSty dataToolBaseSty;
 
    private ConcurrentHashMap<String,DataBase> databases;
@@ -677,7 +707,13 @@ public class DataToolSty extends LaTeXSty
    public static final String ERROR_DB_DOESNT_EXIST="datatool.db_doesnt_exist";
    public static final String ERROR_MISMATCHED="datatool.mismatched";
    public static final String ERROR_HEADER_EXISTS="datatool.header.exists";
+   public static final String ERROR_HEADER_DOESNT_EXIST="datatool.header.doesnt_exist";
    public static final String ERROR_INVALID_HEADER="datatool.invalid.header";
    public static final String ERROR_INVALID_CONTENTS
      ="datatool.invalid.contents";
+   public static final String ERROR_ROW_NOT_FOUND
+     ="datatool.row.not.found";
+
+   public static final String MESSAGE_LOADDB
+     ="datatool.loaddb.message";
 }
