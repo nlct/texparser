@@ -134,5 +134,6 @@ public class DimenRegister extends NumericRegister implements TeXDimension
        getClass().getSimpleName(), getName(), dimension);
    }
 
+
    private TeXGlue dimension;
 }

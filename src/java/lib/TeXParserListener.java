@@ -99,6 +99,9 @@ public abstract class TeXParserListener
 
    public abstract SkippedEols createSkippedEols();
 
+   // returns page layout length in bp
+   public abstract float getPageDimension(int type);
+
    public TeXUnit createUnit(String unitName)
     throws TeXSyntaxException
    {

@@ -16,41 +16,48 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
-package com.dickimawbooks.texparserlib;
+package com.dickimawbooks.texparserlib.latex;
 
 import java.io.IOException;
 
-public abstract class Declaration extends Command
+import com.dickimawbooks.texparserlib.*;
+
+public class ProvidesFile extends ControlSequence
 {
-   public Declaration(String name)
+   public ProvidesFile()
+   {
+      this("ProvidesFile");
+   }
+
+   public ProvidesFile(String name)
    {
       super(name);
    }
 
-   public abstract void end(TeXParser parser) throws IOException;
-
-   public abstract boolean isModeSwitcher();
-
-   public EndDeclaration getEndDeclaration()
+   public Object clone()
    {
-      return endDeclaration;
+      return new ProvidesFile(getName());
    }
 
-   public void setEndDeclaration(EndDeclaration decl)
+   // All arguments are ignored
+
+   public void process(TeXParser parser, TeXObjectList list)
+     throws IOException
    {
-      endDeclaration = decl;
+      TeXObject options = list.popArg(parser, '[', ']');
+
+      TeXObject name = list.popArg(parser);
+
+      TeXObject version = list.popArg(parser, '[', ']');
    }
 
-   public String getArgTypes()
+   public void process(TeXParser parser)
+     throws IOException
    {
-      return argTypes;
-   }
+      TeXObject options = parser.popNextArg('[', ']');
 
-   protected void setArgTypes(String argTypes)
-   {
-      this.argTypes = argTypes;
-   }
+      TeXObject name = parser.popNextArg();
 
-   protected EndDeclaration endDeclaration;
-   private String argTypes=null;
+      TeXObject version = parser.popNextArg('[', ']');
+   }
 }

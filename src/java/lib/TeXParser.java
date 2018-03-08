@@ -1751,7 +1751,14 @@ public class TeXParser extends TeXObjectList
                }
                catch (EOFException e)
                {
-                  return;
+                  if (this.reader == reader)
+                  {
+                     this.reader = reader.getParent();
+                  }
+                  else
+                  {
+                     break;
+                  }
                }
                catch (TeXSyntaxException e)
                {
@@ -2597,6 +2604,23 @@ public class TeXParser extends TeXObjectList
          TokenRegister reg = toksAlloc.get(key);
 
          if (p.matcher(reg.getName()).matches())
+         {
+            return reg;
+         }
+      }
+
+      return null;
+   }
+
+   public DimenRegister getDimenRegister(String name)
+   {
+      for (Iterator<Integer> it = dimenAlloc.keySet().iterator();
+           it.hasNext(); )
+      {
+         Integer key = it.next();
+         DimenRegister reg = dimenAlloc.get(key);
+
+         if (name.equals(reg.getName()))
          {
             return reg;
          }

@@ -21,6 +21,7 @@ package com.dickimawbooks.texparserapp;
 
 import java.util.Properties;
 import java.util.Vector;
+import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 import java.text.MessageFormat;
@@ -166,7 +167,7 @@ public class TeXParserApp implements TeXApp
       errorListener = guiApp;
    }
 
-   public void latex2latex(String inFileName, File outDir)
+   public void latex2latex(File inFileName, File outDir)
      throws IOException
    {
       this.inFileName = inFileName;
@@ -182,10 +183,10 @@ public class TeXParserApp implements TeXApp
 
       TeXParser parser = new TeXParser(listener);
 
-      parser.parse(new File(inFileName));
+      parser.parse(inFileName);
    }
 
-   public void latex2html(String inFileName, File outDir)
+   public void latex2html(File inFileName, File outDir)
      throws IOException
    {
       this.inFileName = inFileName;
@@ -200,12 +201,14 @@ public class TeXParserApp implements TeXApp
       L2HConverter listener = new L2HConverter(this, true, outDir, true)
       {
          public L2HImage toImage(TeXParser parser, String preamble, 
-          String content, String mimeType, TeXObject alt, String name)
+          String content, String mimeType, TeXObject alt, String name, 
+          boolean crop)
          throws IOException
          {
             try
             {
-               return createImage(parser, preamble, content, mimeType, alt, name);
+               return createImage(parser, preamble, content, mimeType, alt, 
+                 name, crop);
             }
             catch (InterruptedException e)
             {
@@ -217,15 +220,13 @@ public class TeXParserApp implements TeXApp
 
       TeXParser parser = new TeXParser(listener);
 
-      parser.parse(new File(inFileName));
-
       try
       {
-         deleteTempDir();
+         parser.parse(inFileName);
       }
-      catch (IOException e)
+      finally
       {
-         error(e);
+         deleteTempDir();
       }
    }
 
@@ -244,7 +245,8 @@ public class TeXParserApp implements TeXApp
    }
 
    public L2HImage createImage(TeXParser parser, String preamble, 
-    String content, String mimetype, TeXObject alt, String name)
+    String content, String mimetype, TeXObject alt, String name,
+    boolean crop)
    throws IOException,InterruptedException
    {
       L2HConverter listener = (L2HConverter)parser.getListener();
@@ -278,7 +280,6 @@ public class TeXParserApp implements TeXApp
          }
 
          writer.println("\\batchmode");
-         writer.println("\\documentclass{standalone}");
          writer.println(preamble);
          writer.println("\\begin{document}");
          writer.println(content);
@@ -299,7 +300,10 @@ public class TeXParserApp implements TeXApp
          }
 
          int exitCode = execCommandAndWaitFor(
-            new String[]{invoker, name}, null, tmpDir);
+            new String[]{invoker, name}, 
+            new String[]{String.format("TEXINPUTS=%s%c", 
+              inFileName.getParentFile().getAbsolutePath(),
+              File.pathSeparatorChar)}, tmpDir);
 
          if (exitCode != 0)
          {
@@ -314,6 +318,29 @@ public class TeXParserApp implements TeXApp
 
          File pdfFile = new File(tmpDir, name+".pdf");
          Path destPath;
+
+         if (crop)
+         {
+            invoker = "pdfcrop";
+
+            String croppedPdfName = name+"-crop.pdf";
+
+            exitCode = execCommandAndWaitFor(
+               new String[]{invoker, pdfFile.getName(), croppedPdfName},
+               null, tmpDir);
+
+            if (exitCode == 0)
+            {
+               pdfFile = new File(tmpDir, croppedPdfName);
+            }
+            else
+            {
+               warning(parser, getMessage("error.app_failed",
+                 String.format("%s \"%s\"", invoker, 
+                    pdfFile.getName(), croppedPdfName),
+                 exitCode));
+            }
+         }
 
          int width = 0;
          int height = 0;
@@ -858,7 +885,25 @@ public class TeXParserApp implements TeXApp
          }
       }
 
-      Process p = Runtime.getRuntime().exec(cmd, envp, dir);
+      ProcessBuilder pb = new ProcessBuilder(cmd);
+
+      if (dir != null)
+      {
+         pb.directory(dir);
+      }
+
+      if (envp != null)
+      {
+         Map<String, String> env = pb.environment();
+
+         for (String pair : envp)
+         {
+            String[] split = pair.split("=", 2);
+            env.put(split[0], split[1]);
+         }
+      }
+
+      Process p = pb.start();
 
       listener.setProcess(p);
 
@@ -1265,7 +1310,7 @@ public class TeXParserApp implements TeXApp
                  getMessage("error.syntax.only_one_input"));
             }
 
-            inFileName = args[i];
+            inFileName = new File(args[i]);
          }
          else if (args[i].charAt(0) == '-')
          {
@@ -1282,7 +1327,7 @@ public class TeXParserApp implements TeXApp
                  getMessage("error.syntax.only_one_input"));
             }
 
-            inFileName = args[i];
+            inFileName = new File(args[i]);
          }
       }
    }
@@ -1323,9 +1368,9 @@ public class TeXParserApp implements TeXApp
       app.runApplication();
    }
 
-   public static final String APP_VERSION = "0.4b.20180305";
+   public static final String APP_VERSION = "0.4b.20180308";
    public static final String APP_NAME = "texparserapp";
-   public static final String APP_DATE = "2018-03-05";
+   public static final String APP_DATE = "2018-03-08";
 
    public static long MAX_PROCESS_TIME=0L;
 
@@ -1337,7 +1382,7 @@ public class TeXParserApp implements TeXApp
 
    private TeXParserAppGUI guiApp = null;
 
-   private String inFileName;
+   private File inFileName;
 
    private File outDir;
 

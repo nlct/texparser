@@ -24,6 +24,9 @@ import java.nio.file.Files;
 import java.nio.charset.Charset;
 import java.util.Vector;
 import java.util.Stack;
+import java.util.Iterator;
+import java.util.HashMap;
+import java.awt.Color;
 
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.primitives.*;
@@ -96,6 +99,7 @@ public class L2HConverter extends LaTeXParserListener
       this.htmlCharSet = outCharSet;
 
       this.styCs = new Vector<String>();
+      defaultStyles = new HashMap<String,String>();
 
       setWriteable(this);
       setUseMathJax(useMathJax);
@@ -104,6 +108,32 @@ public class L2HConverter extends LaTeXParserListener
    protected void addPredefined()
    {
       super.addPredefined();
+
+      ControlSequence cs = getParser().getControlSequence("fbox");
+
+      if (cs instanceof FrameBox)
+      {
+         try
+         {
+            defaultStyles.put(getFrameBoxSpecs((FrameBox)cs), "fbox");
+         }
+         catch (IOException e)
+         {
+         }
+      }
+
+      cs = getParser().getControlSequence("mbox");
+
+      if (cs instanceof FrameBox)
+      {
+         try
+         {
+            defaultStyles.put(getFrameBoxSpecs((FrameBox)cs), "mbox");
+         }
+         catch (IOException e)
+         {
+         }
+      }
 
       // Add 
       // \providecommand{\IfTeXParserLib}[2]{#2}
@@ -131,7 +161,6 @@ public class L2HConverter extends LaTeXParserListener
       putControlSequence(new L2HContentsLine());
       putControlSequence(new L2HBibItem());
       putControlSequence(new L2HMaketitle());
-      putControlSequence(new L2HMbox());
 
       putControlSequence(new L2HTextSuperscript());
       putControlSequence(new L2HTextSubscript());
@@ -200,7 +229,7 @@ public class L2HConverter extends LaTeXParserListener
    }
 
    public L2HImage toImage(TeXParser parser, String preamble, 
-    String content, String mimeType, TeXObject alt, String name)
+    String content, String mimeType, TeXObject alt, String name, boolean crop)
    throws IOException
    {
       return null;
@@ -602,8 +631,6 @@ public class L2HConverter extends LaTeXParserListener
       writeln("div.date { display: block; text-align: center; font-size: medium;}");
       writeln("div.bibliography { display: block; margin-left: 4em; }");
       writeln("div.bibitem { display: inline; float: left; text-indent: -3em; }");
-      writeln("div.mbox { display: inline; }");
-
       writeln("span.numberline { display: inline-block; width: 3em; }");
       writeln("div.toc-part { padding-left: .5em; padding-bottom: 2ex; font-weight: bold; font-size: large;}");
       writeln("div.toc-chapter { padding-left: .5em; padding-bottom: 2ex; font-weight: bold; font-size: large;}");
@@ -619,6 +646,13 @@ public class L2HConverter extends LaTeXParserListener
       writeln("span.numitem { float: left; margin-left: -3em; text-align: right; min-width: 2.5em; }");
       writeln("span.bulletitem { float: left; margin-left: -1em; }");
       writeln("span.descitem { font: normal; font-weight: bold; }");
+
+      for (Iterator<String> it = defaultStyles.keySet().iterator();
+           it.hasNext();)
+      {
+         String style = it.next();
+         writeln(String.format(".%s {%s}", defaultStyles.get(style), style));
+      }
 
       for (String style : extraCssStyles)
       {
@@ -679,7 +713,23 @@ public class L2HConverter extends LaTeXParserListener
       }
 
       writeable.writeln("</head>");
-      writeable.writeln("<body>");
+      writeable.write("<body");
+
+      Color fgCol = getParser().getSettings().getFgColor();
+      Color bgCol = getParser().getSettings().getBgColor();
+
+      if (fgCol != null)
+      {
+         writeable.write(String.format(" text=\"%s\"", getHtmlColor(fgCol)));
+      }
+
+      if (bgCol != null)
+      {
+         writeable.write(String.format(" background=\"%s\"", 
+           getHtmlColor(bgCol)));
+      }
+
+      writeable.writeln(">");
 
       super.beginDocument();
 
@@ -1039,7 +1089,7 @@ public class L2HConverter extends LaTeXParserListener
 
    public ControlSequence createUndefinedCs(String name)
    {
-      return new L2HUndefined(name);
+      return new L2HUndefined(name, getUndefinedAction());
    }
 
    public void doFootnoteRule() throws IOException
@@ -1121,6 +1171,273 @@ public class L2HConverter extends LaTeXParserListener
       super.endList(trivlist);
    }
 
+   public String getHtmlColor(Color col)
+   {
+      if (col == Color.BLACK)
+      {
+         return "black";
+      }
+      else if (col == Color.BLUE)
+      {
+         return "blue";
+      }
+      else if (col == Color.CYAN)
+      {
+         return "cyan";
+      }
+      else if (col == Color.GRAY)
+      {
+         return "gray";
+      }
+      else if (col == Color.GREEN)
+      {
+         return "green";
+      }
+      else if (col == Color.MAGENTA)
+      {
+         return "magenta";
+      }
+      else if (col == Color.ORANGE)
+      {
+         return "orange";
+      }
+      else if (col == Color.PINK)
+      {
+         return "pink";
+      }
+      else if (col == Color.RED)
+      {
+         return "red";
+      }
+      else if (col == Color.WHITE)
+      {
+         return "white";
+      }
+      else if (col == Color.YELLOW)
+      {
+         return "yellow";
+      }
+      else
+      {
+         return String.format("rgb(%d,%d,%d)", col.getRed(), col.getGreen(),
+           col.getBlue());
+      }
+   }
+
+   public String getHtmlDimension(TeXDimension dimen)
+    throws IOException
+   {
+      float value = dimen.getValue();
+      TeXUnit unit = dimen.getUnit();
+
+      if (unit instanceof FixedUnit)
+      {
+         int id = ((FixedUnit)unit).getId();
+
+         switch (id)
+         {
+            case FixedUnit.UNIT_IN:
+            case FixedUnit.UNIT_CM:
+            case FixedUnit.UNIT_MM:
+              return String.format("%f%s", value, FixedUnit.UNIT_NAMES[id]);
+            case FixedUnit.UNIT_BP:
+              return String.format("%fpt", value);
+         }
+      }
+
+      if (unit == TeXUnit.EM)
+      {
+         return String.format("%fem", value);
+      }
+
+      if (unit == TeXUnit.EX)
+      {
+         return String.format("%fex", value);
+      }
+
+      if (unit instanceof PercentUnit)
+      {
+         return String.format("%f%%", value);
+      }
+
+      return String.format("%fpt", unit.toUnit(getParser(), value, TeXUnit.BP));
+   }
+
+   public void startColor(Color color, boolean isForeground)
+     throws IOException
+   {
+      if (isInDocEnv())
+      {
+         write("<span style=\"");
+
+         if (isForeground)
+         {
+            write("color: ");
+         }
+         else
+         {
+            write("background-color: ");
+         }
+
+         write(String.format(" %s\">", getHtmlColor(color)));
+      }
+   }
+
+   public void endColor(boolean isForeground)
+     throws IOException
+   {
+      if (isInDocEnv())
+      {
+         write("</span>");
+      }
+   }
+
+   protected String getFrameBoxSpecs(FrameBox fbox)
+    throws IOException
+   {
+      StringBuilder builder = new StringBuilder();
+
+      if (fbox.isInLine())
+      {
+         builder.append("display: inline-block; ");
+      }
+
+      switch (fbox.getHAlign())
+      {
+         case FrameBox.ALIGN_LEFT:
+            builder.append("text-align: left; ");
+         break;
+         case FrameBox.ALIGN_CENTER:
+            builder.append("text-align: center; ");
+         break;
+         case FrameBox.ALIGN_RIGHT:
+            builder.append("text-align: right; ");
+         break;
+      }
+
+      switch (fbox.getVAlign())
+      {
+         case FrameBox.ALIGN_TOP:
+            builder.append("vertical-align: top; ");
+         break;
+         case FrameBox.ALIGN_MIDDLE:
+            builder.append("vertical-align: middle; ");
+         break;
+         case FrameBox.ALIGN_BOTTOM:
+            builder.append("vertical-align: bottom; ");
+         break;
+         case FrameBox.ALIGN_BASE:
+            builder.append("vertical-align: base; ");
+         break;
+      }
+
+      switch (fbox.getStyle())
+      {
+         case FrameBox.BORDER_SOLID:
+           builder.append("border-style: solid; ");
+         break;
+         case FrameBox.BORDER_DOUBLE:
+           builder.append("border-style: double; ");
+         break;
+      }
+
+      Color col = fbox.getBorderColor(getParser());
+
+      if (col != null)
+      {
+         builder.append(String.format("border-color: %s; ", getHtmlColor(col)));
+      }
+
+      TeXDimension borderwidth = fbox.getBorderWidth(getParser());
+
+      if (borderwidth != null)
+      {
+         builder.append(String.format("border-width: %s; ", 
+            getHtmlDimension(borderwidth)));
+      }
+
+      TeXDimension innersep = fbox.getInnerMargin(getParser());
+
+      if (innersep != null)
+      {
+         builder.append(String.format("padding: %s; ", getHtmlDimension(innersep)));
+      }
+
+      col = fbox.getForegroundColor(getParser());
+
+      if (col != null)
+      {
+         builder.append(String.format("color: %s; ", getHtmlColor(col)));
+      }
+
+      col = fbox.getBackgroundColor(getParser());
+
+      if (col != null)
+      {
+         builder.append(String.format("background-color: %s; ",
+           getHtmlColor(col)));
+      }
+
+      TeXDimension width = fbox.getWidth(getParser());
+
+      if (width != null)
+      {
+         builder.append(String.format("width: %s; ", getHtmlDimension(width)));
+      }
+
+      TeXDimension height = fbox.getHeight(getParser());
+
+      if (height != null)
+      {
+         builder.append(String.format("height: %s; ", 
+           getHtmlDimension(height)));
+      }
+
+      return builder.toString();
+   }
+
+   public void startFrameBox(FrameBox fbox)
+    throws IOException
+   {
+      String specs = getFrameBoxSpecs(fbox);
+
+      if (fbox.isInLine())
+      {
+         write("<span ");
+      }
+      else
+      {
+         write("<div ");
+      }
+
+      String style = defaultStyles.get(specs);
+
+      if (style == null)
+      {
+         write(String.format("style=\"%s\"", specs));
+      }
+      else
+      {
+         write(String.format("class=\"%s\"", style));
+      }
+
+      write(">");
+   }
+
+   public void endFrameBox(FrameBox fbox)
+    throws IOException
+   {
+      if (fbox.isInLine())
+      {
+         write("</span>");
+      }
+      else
+      {
+         write("</div>");
+      }
+   }
+
+
    private Vector<String> styCs;
 
    private int indexLoc = 0;
@@ -1140,6 +1457,8 @@ public class L2HConverter extends LaTeXParserListener
    private String suffix = "html";
 
    private Vector<String> extraCssStyles = new Vector<String>();
+
+   private HashMap<String,String> defaultStyles;
 
    private Stack<TrivListDec> trivListStack = new Stack<TrivListDec>();
 }

@@ -96,5 +96,10 @@ public class CountRegister extends NumericRegister implements TeXNumber
        getClass().getSimpleName(), getName(), value);
    }
 
+   public String format()
+   {
+      return ""+value;
+   }
+
    private int value = 0;
 }

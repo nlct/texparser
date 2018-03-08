@@ -69,6 +69,7 @@ public class L2HToImage extends ControlSequence
       TeXObject alt = null;
       String type = null;
       String name = null;
+      boolean crop = true;
 
       if (options != null)
       {
@@ -89,6 +90,17 @@ public class L2HToImage extends ControlSequence
             type = typeObj.toString(parser);
          }
 
+         TeXObject cropObj = keyValList.getExpandedValue("crop", parser, stack);
+
+         if (cropObj != null)
+         {
+            String cropVal = cropObj.toString(parser).trim();
+
+            if (!cropVal.isEmpty())
+            {
+               crop = Boolean.valueOf(cropVal).booleanValue();
+            }
+         }
       }
 
       if (alt == null)
@@ -126,6 +138,26 @@ public class L2HToImage extends ControlSequence
       {
          StringBuilder builder = new StringBuilder();
 
+         LaTeXFile cls = listener.getDocumentClass();
+
+         if (cls == null)
+         {
+            builder.append("\\documentclass{article}");
+         }
+         else
+         {
+            builder.append("\\documentclass");
+
+            KeyValList styOpts = cls.getOptions();
+
+            if (styOpts != null)
+            {
+               builder.append(String.format("[%s]", styOpts.format()));
+            }
+
+            builder.append(String.format("{%s}%n", cls.getName()));
+         }
+
          for (LaTeXFile lf : listener.getLoadedPackages())
          {
             builder.append("\\usepackage");
@@ -134,44 +166,19 @@ public class L2HToImage extends ControlSequence
 
             if (styOpts != null)
             {
-               builder.append('[');
-
-               for (Iterator<String> it = styOpts.keySet().iterator();
-                    it.hasNext(); )
-               {
-                  String opt = it.next();
-
-                  builder.append(opt);
-
-                  TeXObject val = styOpts.get(opt);
-
-                  if (val != null)
-                  {
-                     String valStr = val.toString(parser).trim();
-
-                     if (!valStr.isEmpty())
-                     {
-                        builder.append(String.format("={%s}", valStr));
-                     }
-                  }
-
-                  if (it.hasNext())
-                  {
-                     builder.append(",");
-                  }
-               }
-
-               builder.append(']');
+               builder.append(String.format("[%s]", styOpts.format()));
             }
 
             builder.append(String.format("{%s}%n", lf.getName()));
          }
 
+         builder.append("\\pagestyle{empty}%n");
+
          preamble = builder.toString();
       }
 
       L2HImage image = listener.toImage(parser, preamble, 
-       arg.toString(parser), type, alt, name);
+       arg.toString(parser), type, alt, name, crop);
 
       if (image != null)
       {

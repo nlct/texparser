@@ -21,7 +21,7 @@ package com.dickimawbooks.texparserlib.generic;
 import java.io.IOException;
 import java.io.EOFException;
 import java.io.File;
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.Vector;
 import java.text.CharacterIterator;
 import java.text.StringCharacterIterator;
@@ -43,6 +43,35 @@ public abstract class DefaultTeXParserListener extends TeXParserListener
    {
       referencedFiles = new Vector<TeXPath>();
       specialListeners = new Vector<SpecialListener>();
+      pageDimensions = new HashMap<Integer,Float>();
+
+      // Initialise to TeX's defaults (bp)
+      pageDimensions.put(Integer.valueOf(PercentUnit.HSIZE), 
+        Float.valueOf(468f));
+      pageDimensions.put(Integer.valueOf(PercentUnit.VSIZE), 
+        Float.valueOf(640.8f));
+
+      pageDimensions.put(Integer.valueOf(PercentUnit.TEXT_WIDTH), 
+         Float.valueOf(468f));
+      pageDimensions.put(Integer.valueOf(PercentUnit.TEXT_HEIGHT), 
+         Float.valueOf(640.8f));
+
+      pageDimensions.put(Integer.valueOf(PercentUnit.LINE_WIDTH), 
+         Float.valueOf(468f));
+
+      pageDimensions.put(Integer.valueOf(PercentUnit.COLUMN_WIDTH), 
+         Float.valueOf(468f));
+      pageDimensions.put(Integer.valueOf(PercentUnit.COLUMN_HEIGHT), 
+         Float.valueOf(640.8f));
+
+      pageDimensions.put(Integer.valueOf(PercentUnit.PAPER_WIDTH), 
+         Float.valueOf(612f));
+      pageDimensions.put(Integer.valueOf(PercentUnit.PAPER_HEIGHT), 
+         Float.valueOf(1008f));
+
+      pageDimensions.put(Integer.valueOf(PercentUnit.MARGIN_WIDTH), 
+         Float.valueOf(64.8f));
+
    }
 
    protected void addPredefined()
@@ -152,6 +181,9 @@ public abstract class DefaultTeXParserListener extends TeXParserListener
          TeXSettings.SHAPE_EM));
       parser.putControlSequence(getTeXFontShapeDeclaration("sc",
          TeXSettings.SHAPE_SC));
+
+      newlength("hsize", 1, new PercentUnit(PercentUnit.HSIZE));
+      newlength("vsize", 1, new PercentUnit(PercentUnit.VSIZE));
    }
 
    public ControlSequence getTeXFontFamilyDeclaration(String name, int family)
@@ -179,9 +211,19 @@ public abstract class DefaultTeXParserListener extends TeXParserListener
       getParser().putControlSequence(isLocal, cs);
    }
 
+   public byte getUndefinedAction()
+   {
+      return undefAction;
+   }
+
+   public void setUndefinedAction(byte action)
+   {
+      undefAction = action;
+   }
+
    public ControlSequence createUndefinedCs(String name)
    {
-      return new Undefined(name, Undefined.ACTION_ERROR);
+      return new Undefined(name, undefAction);
    }
 
    public DimenRegister newlength(boolean isLocal, String name)
@@ -657,6 +699,18 @@ public abstract class DefaultTeXParserListener extends TeXParserListener
       return IFFALSE.equals(cs);
    }
 
+   public float getPageDimension(int type)
+   {
+      Float val = pageDimensions.get(Integer.valueOf(type));
+
+      return val == null ? 0f : val.floatValue();
+   }
+
+   public void setPageDimension(int type, float value)
+   {
+      pageDimensions.put(Integer.valueOf(type), Float.valueOf(value));
+   }
+
    protected Writeable writeable;
 
    protected Vector<TeXPath> referencedFiles;
@@ -665,4 +719,8 @@ public abstract class DefaultTeXParserListener extends TeXParserListener
 
    public static final IfTrue IFTRUE = new IfTrue();
    public static final IfFalse IFFALSE = new IfFalse();
+
+   protected byte undefAction = Undefined.ACTION_ERROR;
+
+   protected HashMap<Integer,Float> pageDimensions;
 }

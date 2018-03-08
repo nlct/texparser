@@ -30,6 +30,7 @@ import java.util.regex.Matcher;
 import java.nio.charset.Charset;
 import java.nio.charset.IllegalCharsetNameException;
 import java.nio.file.Path;
+import java.awt.Color;
 
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.primitives.*;
@@ -63,6 +64,7 @@ import com.dickimawbooks.texparserlib.latex.tipa.*;
 import com.dickimawbooks.texparserlib.latex.upgreek.*;
 import com.dickimawbooks.texparserlib.latex.datatool.*;
 import com.dickimawbooks.texparserlib.latex.ifthen.*;
+import com.dickimawbooks.texparserlib.latex.color.*;
 
 public abstract class LaTeXParserListener extends DefaultTeXParserListener
 {
@@ -289,7 +291,9 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       parser.putControlSequence(new Begin());
       parser.putControlSequence(new End());
       parser.putControlSequence(new DocumentClass());
+      parser.putControlSequence(new DocumentClass("LoadClass"));
       parser.putControlSequence(new UsePackage());
+      parser.putControlSequence(new UsePackage("RequirePackage"));
       parser.putControlSequence(new NewCommand());
       parser.putControlSequence(new NewCommand("renewcommand",
         NewCommand.OVERWRITE_FORCE));
@@ -342,6 +346,9 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       parser.putControlSequence(new Protect());
       parser.putControlSequence(new Index());
       parser.putControlSequence(new MakeIndex());
+      parser.putControlSequence(new ProvidesFile());
+      parser.putControlSequence(new ProvidesFile("ProvidesClass"));
+      parser.putControlSequence(new ProvidesFile("ProvidesPackage"));
 
       bibliographySection = new TeXObjectList();
       bibliographySection.add(new TeXCsRef("section"));
@@ -369,8 +376,21 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       parser.putControlSequence(
         new GenericCommand("tablename", null, createString("Table")));
 
+      parser.putControlSequence(new FrameBox());
+      parser.putControlSequence(new FrameBox("mbox", 
+        FrameBox.BORDER_NONE, FrameBox.ALIGN_DEFAULT,
+        FrameBox.ALIGN_DEFAULT, true));
+
       newlength("tabcolsep", 6, TeXUnit.PT);
       newlength("arraycolsep", 5, TeXUnit.PT);
+      newlength("fboxsep", 3, TeXUnit.PT);
+      newlength("fboxrule", 0.4f, TeXUnit.PT);
+
+      newlength("linewidth", 100, new PercentUnit());
+      newlength("textwidth", 100, new PercentUnit(PercentUnit.TEXT_WIDTH));
+      newlength("textheight", 100, new PercentUnit(PercentUnit.TEXT_HEIGHT));
+      newlength("columnwidth", 100, new PercentUnit(PercentUnit.COLUMN_WIDTH));
+      newlength("columnheight", 100, new PercentUnit(PercentUnit.COLUMN_HEIGHT));
 
       newtoks(true, "toks@");
 
@@ -906,6 +926,37 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
          addFileReference(sty);
          loadedPackages.add(sty);
 
+         if (sty instanceof UnknownSty)
+         {
+            if (!sty.wasFoundByKpsewhich())
+            {
+               // Not found by kpsewhich so possibly a custom style
+               // which might be simple enough to parse.
+
+               File file = sty.getFile();
+
+               if (file.exists())
+               {
+                  // This may not work if the package is too
+                  // complicated.
+
+                  byte orgAction = getUndefinedAction();
+                  setUndefinedAction(Undefined.ACTION_WARN);
+
+                  try
+                  {
+                     input(sty);
+                  }
+                  catch (IOException e)
+                  {
+                     getTeXApp().error(e);
+                  }
+
+                  setUndefinedAction(orgAction);
+               }
+            }
+         }
+
          return sty;
       }
 
@@ -1098,6 +1149,11 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       if (styName.equals("xspace"))
       {
          return new XspaceSty(options, this);
+      }
+
+      if (styName.equals("color") || styName.equals("xcolor"))
+      {
+         return new ColorSty(options, styName, this);
       }
 
       if (styName.equals("jmlr2e"))
@@ -1652,6 +1708,26 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
    public TrivListDec peekTrivListStack()
    {
       return trivListStack.peek();
+   }
+
+   public void startColor(Color color, boolean isForeground)
+     throws IOException
+   {
+   }
+
+   public void endColor(boolean isForeground)
+     throws IOException
+   {
+   }
+
+   public void startFrameBox(FrameBox fbox)
+    throws IOException
+   {
+   }
+
+   public void endFrameBox(FrameBox fbox)
+    throws IOException
+   {
    }
 
    private Vector<String> verbEnv;

@@ -61,4 +61,6 @@ public class LaTeXSyntaxException extends TeXSyntaxException
       "latex.package.error";
    public static final String CLASS_ERROR = 
       "latex.class.error";
+   public static final String ILLEGAL_ARG_TYPE = 
+      "latex.illegal.argtype";
 }

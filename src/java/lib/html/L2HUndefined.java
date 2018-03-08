@@ -65,21 +65,26 @@ public class L2HUndefined extends Undefined
       {
          TeXApp texApp = listener.getTeXApp();
 
-         switch (getAction())
+         try
          {
-            case ACTION_ERROR:
-               texApp.error(new TeXSyntaxException(
-                  parser, TeXSyntaxException.ERROR_UNDEFINED, getName()));
-            break;
-            case ACTION_WARN:
-               texApp.warning(parser, 
-                   texApp.getMessage(TeXSyntaxException.ERROR_UNDEFINED,
-                   getName()));
-            break;
-            case ACTION_MESSAGE:
-               texApp.message(texApp.getMessage(
-                  TeXSyntaxException.ERROR_UNDEFINED, getName()));
-            break;
+            throw new TeXSyntaxException(
+              parser, TeXSyntaxException.ERROR_UNDEFINED, getName());
+
+         }
+         catch (TeXSyntaxException e)
+         {
+            switch (getAction())
+            {
+               case ACTION_ERROR:
+                  texApp.error(e);
+               break;
+               case ACTION_WARN:
+                  texApp.warning(parser, e.getMessage(texApp));
+               break;
+               case ACTION_MESSAGE:
+                  texApp.message(e.getMessage(texApp));
+               break;
+            }
          }
       }
    }

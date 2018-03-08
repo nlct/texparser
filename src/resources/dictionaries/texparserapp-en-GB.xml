@@ -124,6 +124,7 @@ There is NO WARRANTY, to the extent permitted by law.</entry>
 <entry key="latex.error.lonely_item">Lonely \item</entry>
 <entry key="latex.package.error">Package {0} Error: {1}</entry>
 <entry key="latex.class.error">Class {0} Error: {1}</entry>
+<entry key="latex.illegal.argtype">Illegal argument type {0}</entry>
 
 <!--  bibtex errors -->
 <entry key="bibtex.error.missing_value">Missing value</entry>
@@ -163,6 +164,11 @@ There is NO WARRANTY, to the extent permitted by law.</entry>
 <!--  ifthen messages -->
 
 <entry key="ifthen.invalid.condition">Invalid condition ''{0}''.</entry>
+
+<!-- color messages -->
+<entry key="color.unsupported">Unsupported ''{0}'' model colour {1}</entry>
+<entry key="color.invalid.specs">Invalid specification ''{0}'' for colour model {1}</entry>
+<entry key="color.unknown">Unknown named colour ''{0}''</entry>
 
 <!--  Image drawing messages -->
 

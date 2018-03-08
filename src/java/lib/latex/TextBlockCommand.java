@@ -38,44 +38,89 @@ public class TextBlockCommand extends ControlSequence
 
    public void process(TeXParser parser) throws IOException
    {
-      TeXObject arg = parser.popStack();
+      Group grp = parser.getListener().createGroup();
 
-      if (arg instanceof Group)
+      grp.add(declaration);
+      String argTypes = declaration.getArgTypes();
+
+      if (argTypes != null)
       {
-         ((Group)arg).push(declaration);
+         for (int i = 0; i < argTypes.length(); i++)
+         {
+            char c = argTypes.charAt(i);
+
+            switch (c)
+            {
+               case 'm':
+                  grp.add(parser.popStack());
+               break;
+               case 'o':
+                  TeXObject obj = parser.popNextArg('[', ']');
+
+                  if (obj != null)
+                  {
+                     grp.add(parser.getListener().getOther('['));
+                     grp.add(obj);
+                     grp.add(parser.getListener().getOther(']'));
+                  }
+
+               break;
+               default:
+                 throw new LaTeXSyntaxException(parser, 
+                   LaTeXSyntaxException.ILLEGAL_ARG_TYPE, c);
+            }
+         }
       }
-      else
-      {
-         Group grp = parser.getListener().createGroup();
 
-         grp.add(declaration);
-         grp.add(arg);
+      TeXObject arg = parser.popNextArg();
 
-         arg = grp;
-      }
+      grp.add(arg);
 
-      arg.process(parser);
+      grp.process(parser);
    }
 
    public void process(TeXParser parser, TeXObjectList stack) throws IOException
    {
-      TeXObject arg = stack.popStack(parser);
+      Group grp = parser.getListener().createGroup();
 
-      if (arg instanceof Group)
+      grp.add(declaration);
+      String argTypes = declaration.getArgTypes();
+
+      if (argTypes != null)
       {
-         ((Group)arg).push(declaration);
+         for (int i = 0; i < argTypes.length(); i++)
+         {
+            char c = argTypes.charAt(i);
+
+            switch (c)
+            {
+               case 'm':
+                  grp.add(stack.popStack(parser));
+               break;
+               case 'o':
+                  TeXObject obj = stack.popArg(parser, '[', ']');
+
+                  if (obj != null)
+                  {
+                     grp.add(parser.getListener().getOther('['));
+                     grp.add(obj);
+                     grp.add(parser.getListener().getOther(']'));
+                  }
+
+               break;
+               default:
+                 throw new LaTeXSyntaxException(parser, 
+                   LaTeXSyntaxException.ILLEGAL_ARG_TYPE, c);
+            }
+         }
       }
-      else
-      {
-         Group grp = parser.getListener().createGroup();
 
-         grp.add(declaration);
-         grp.add(arg);
 
-         arg = grp;
-      }
+      TeXObject arg = stack.popArg(parser);
 
-      arg.process(parser, stack);
+      grp.add(arg);
+
+      grp.process(parser, stack);
    }
 
    private Declaration declaration;

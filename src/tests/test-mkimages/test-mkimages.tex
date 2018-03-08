@@ -2,12 +2,33 @@
 \documentclass{article}
 
 \usepackage{tgtermes}
+\usepackage{color}
+\usepackage{lipsum}
+\usepackage{custom-test}
 
 \providecommand{\TeXParserLibToImage}[2][]{#2}
 
 \begin{document}
-Some sample text.
+Some \textcolor{red}{sample} text.
 
-\TeXParserLibToImage[type={image/png}]{Some sample text.}
+\TeXParserLibToImage[type={image/png}]{Some \sample\ text.}
+
+Some more sample text.
+
+\TeXParserLibToImage[type={image/png}]{A Sample List.
+\begin{itemize}
+ \item Item 1
+ \item Item 2
+\end{itemize}}
+
+Another list:
+\begin{itemize}
+ \item Item 1
+ \item Item 2
+\end{itemize}
+
+\lipsum[1]
+
+Some text. \fbox{Some text in box.} Some more text.
 
 \end{document}

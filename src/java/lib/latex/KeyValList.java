@@ -373,8 +373,6 @@ public class KeyValList extends HashMap<String,TeXObject>
 
          if (value != null)
          {
-            builder.append('=');
-
             String strVal = value.toString();
 
             if (strVal.matches(".*[^\\w].*"))
