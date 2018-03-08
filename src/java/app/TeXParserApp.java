@@ -21,12 +21,15 @@ package com.dickimawbooks.texparserapp;
 
 import java.util.Properties;
 import java.util.Vector;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
 import java.text.MessageFormat;
 import java.io.*;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
+import java.nio.charset.Charset;
 
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.plain.*;
@@ -194,11 +197,260 @@ public class TeXParserApp implements TeXApp
             "error.exists", outDir.getAbsolutePath()));
       }
 
-      L2HConverter listener = new L2HConverter(this, true, outDir, true);
+      L2HConverter listener = new L2HConverter(this, true, outDir, true)
+      {
+         public L2HImage toImage(TeXParser parser, String preamble, 
+          String content, String mimeType, TeXObject alt, String name)
+         throws IOException
+         {
+            try
+            {
+               return createImage(parser, preamble, content, mimeType, alt, name);
+            }
+            catch (InterruptedException e)
+            {
+               throw new TeXSyntaxException(e, parser, 
+                 getMessage("error.interrupted"));
+            }
+         }
+      };
 
       TeXParser parser = new TeXParser(listener);
 
       parser.parse(new File(inFileName));
+
+      try
+      {
+         deleteTempDir();
+      }
+      catch (IOException e)
+      {
+         error(e);
+      }
+   }
+
+   private void deleteTempDir() throws IOException
+   {
+      if (tmpDir == null) return;
+
+      File[] files = tmpDir.listFiles();
+
+      for (File f : files)
+      {
+         f.delete();
+      }
+
+      tmpDir.delete();
+   }
+
+   public L2HImage createImage(TeXParser parser, String preamble, 
+    String content, String mimetype, TeXObject alt, String name)
+   throws IOException,InterruptedException
+   {
+      L2HConverter listener = (L2HConverter)parser.getListener();
+
+      if (name == null)
+      {
+         nameIdx++;
+         name = String.format("img%06d", nameIdx);
+      }
+
+      Charset charset = listener.getCharSet();
+      L2HImage image = null;
+      PrintWriter writer = null;
+
+      try
+      {
+         if (tmpDir == null)
+         {
+            tmpDir = Files.createTempDirectory("texparserlib").toFile();
+         }
+
+         File file = new File(tmpDir, name+".tex");
+
+         if (charset == null)
+         {
+            writer = new PrintWriter(file);
+         }
+         else
+         {
+            writer = new PrintWriter(file, charset.name());
+         }
+
+         writer.println("\\batchmode");
+         writer.println("\\documentclass{standalone}");
+         writer.println(preamble);
+         writer.println("\\begin{document}");
+         writer.println(content);
+         writer.println("\\end{document}");
+
+         writer.close();
+         writer = null;
+
+         String invoker;
+
+         if (listener.isStyLoaded("fontspec"))
+         {
+            invoker = "lualatex";
+         }
+         else
+         {
+            invoker = "pdflatex";
+         }
+
+         int exitCode = execCommandAndWaitFor(
+            new String[]{invoker, name}, null, tmpDir);
+
+         if (exitCode != 0)
+         {
+            throw new IOException(getMessage("error.app_failed",
+              String.format("%s \"%s\"", invoker, name), exitCode));
+         }
+
+         if (mimetype == null)
+         {
+            mimetype = "image/png";
+         }
+
+         File pdfFile = new File(tmpDir, name+".pdf");
+         Path destPath;
+
+         int width = 0;
+         int height = 0;
+
+         if (mimetype.equals("application/pdf"))
+         {
+            destPath = (new File(outDir, name+".pdf")).toPath();
+
+            Files.copy(pdfFile.toPath(), destPath);
+         }
+         else if (mimetype.equals("image/png"))
+         {
+            File pngFile = pdfToImage(pdfFile, name, "png");
+
+            DefaultProcessListener processListener = 
+              new DefaultProcessListener(this, 1);
+
+            invoker = "file";
+
+            exitCode = execCommandAndWaitFor(
+               new String[]{invoker, pngFile.getName()}, 
+               null, tmpDir, processListener);
+
+            if (exitCode == 0)
+            {
+               Pattern pat = Pattern.compile(".*: PNG image data, (\\d+) x (\\d+),.*");
+
+               Matcher m = pat.matcher(processListener.getSavedLine());
+
+               if (m.matches())
+               {
+                  try
+                  {
+                     width = Integer.parseInt(m.group(1));
+                     height = Integer.parseInt(m.group(2));
+                  }
+                  catch (NumberFormatException e)
+                  {// shouldn't happen, pattern ensures format correct
+                  }
+               }
+            }
+            else
+            {
+               warning(parser, getMessage("error.app_failed",
+                 String.format("%s \"%s\"", invoker, pngFile.getName()),
+                 exitCode));
+            }
+
+            destPath = (new File(outDir, pngFile.getName())).toPath();
+
+            Files.copy(pngFile.toPath(), destPath);
+         }
+         else if (mimetype.equals("image/jpeg"))
+         {
+            File jpegFile = pdfToImage(pdfFile, name, "jpeg");
+
+            DefaultProcessListener processListener = 
+              new DefaultProcessListener(this, 1);
+
+            invoker = "file";
+
+            exitCode = execCommandAndWaitFor(
+               new String[]{invoker, jpegFile.getName()}, 
+               null, tmpDir, processListener);
+
+            if (exitCode == 0)
+            {
+               Pattern pat = Pattern.compile(
+                  ".*: JPEG image data, .*, (\\d+)x(\\d+),.*");
+
+               Matcher m = pat.matcher(processListener.getSavedLine());
+
+               if (m.matches())
+               {
+                  try
+                  {
+                     width = Integer.parseInt(m.group(1));
+                     height = Integer.parseInt(m.group(2));
+                  }
+                  catch (NumberFormatException e)
+                  {// shouldn't happen, pattern ensures format correct
+                  }
+               }
+            }
+            else
+            {
+               warning(parser, getMessage("error.app_failed",
+                 String.format("%s \"%s\"", invoker, jpegFile.getName()),
+                 exitCode));
+            }
+
+            destPath = (new File(outDir, jpegFile.getName())).toPath();
+
+            Files.copy(jpegFile.toPath(), destPath);
+         }
+         else
+         {
+            warning(parser, getMessage("warning.unsupported.image.type",
+             mimetype));
+
+            mimetype="application/pdf";
+            destPath = (new File(outDir, name+".pdf")).toPath();
+            Files.copy(pdfFile.toPath(), destPath);
+         }
+
+         image = new L2HImage(outDir.toPath().relativize(destPath), 
+          mimetype, width, height, name, alt);
+      }
+      finally
+      {
+         if (writer != null)
+         {
+            writer.close();
+         }
+      }
+
+      return image;
+   }
+
+   protected File pdfToImage(File pdfFile, String basename, String format) 
+     throws IOException,InterruptedException
+   {
+      String invoker = "pdftoppm";
+
+      int exitCode = execCommandAndWaitFor(
+          new String[]{invoker, "-singlefile", "-"+format, 
+               pdfFile.getAbsolutePath(), basename}, 
+            null, tmpDir);
+
+      if (exitCode != 0)
+      {
+         throw new IOException(getMessage("error.app_failed",
+           String.format("%s -singlefile -png \"%s\" \"%s\"", invoker, 
+             pdfFile.getAbsolutePath(), basename), exitCode));
+      }
+
+      return new File(tmpDir, basename+"."+format);
    }
 
    public void progress(int percentage)
@@ -1098,4 +1350,8 @@ public class TeXParserApp implements TeXApp
    private File texmf;
 
    private String outputFormat = "latex";
+
+   private int nameIdx=0;
+
+   private File tmpDir=null;
 }

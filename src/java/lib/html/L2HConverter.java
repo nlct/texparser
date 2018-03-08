@@ -105,6 +105,16 @@ public class L2HConverter extends LaTeXParserListener
    {
       super.addPredefined();
 
+      // Add 
+      // \providecommand{\IfTeXParserLib}[2]{#2}
+      // to the document to provide a conditional that depends on
+      // whether or not the TeX parser library is interpreting the
+      // code.
+      putControlSequence(new AtFirstOfTwo("IfTeXParserLib"));
+
+      // syntax: \TeXParserLibToImage[options]{code}
+      putControlSequence(new L2HToImage());
+
       parser.putControlSequence(new GenericCommand("TeX", null,
         createString("TeX")));
       parser.putControlSequence(new GenericCommand("LaTeX", null,
@@ -187,6 +197,13 @@ public class L2HConverter extends LaTeXParserListener
       catch (IOException e)
       {
       }
+   }
+
+   public L2HImage toImage(TeXParser parser, String preamble, 
+    String content, String mimeType, TeXObject alt, String name)
+   throws IOException
+   {
+      return null;
    }
 
    public BigOperator createBigOperator(String name, int code1, int code2)

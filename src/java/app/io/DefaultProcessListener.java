@@ -24,7 +24,14 @@ public class DefaultProcessListener implements ProcessListener
 {
    public DefaultProcessListener(TeXParserApp application)
    {
+      this(application, -1);
+   }
+
+   public DefaultProcessListener(TeXParserApp application,
+     int saveLineNum)
+   {
       app = application;
+      this.saveLineNum = saveLineNum;
    }
 
    public void setProcess(Process process)
@@ -59,6 +66,15 @@ public class DefaultProcessListener implements ProcessListener
 
    public void processLine(int lineNum, String line)
    {
+      if (lineNum == saveLineNum)
+      {
+         savedLine = line;
+      }
+   }
+
+   public String getSavedLine()
+   {
+      return savedLine;
    }
 
    public void processErrorLine(int lineNum, String line)
@@ -80,4 +96,7 @@ public class DefaultProcessListener implements ProcessListener
    private TeXParserApp app;
    private Process process;
    private Thread thread;
+
+   private String savedLine=null;
+   private int saveLineNum=-1;
 }

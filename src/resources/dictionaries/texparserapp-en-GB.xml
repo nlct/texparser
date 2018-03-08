@@ -27,6 +27,7 @@ There is NO WARRANTY, to the extent permitted by law.</entry>
 <!--  Warnings -->
 <entry key="warning.substituting">Substituting {0} with {1}</entry>
 <entry key="warning.removing">Removing {0}</entry>
+<entry key="warning.unsupported.image.type">Unsupported image type {0}</entry>
 
 <!--  Syntax -->
 <entry key="syntax.title">Syntax:</entry>

@@ -154,6 +154,30 @@ public class KeyValList extends HashMap<String,TeXObject>
       return keyValList;
    }
 
+   public TeXObject getExpandedValue(String key, TeXParser parser,
+     TeXObjectList stack) throws IOException
+   {
+      TeXObject value = getValue(key);
+
+      if (value == null || !(value instanceof Expandable))
+      {
+         return value;
+      }
+
+      TeXObjectList expanded;
+
+      if (parser == stack)
+      {
+         expanded = ((Expandable)value).expandfully(parser);
+      }
+      else
+      {
+         expanded = ((Expandable)value).expandfully(parser, stack);
+      }
+
+      return expanded == null ? value : expanded;
+   }
+
    public TeXObject getValue(String key)
    {
       TeXObject value = get(key);

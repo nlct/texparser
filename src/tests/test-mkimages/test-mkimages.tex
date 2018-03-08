@@ -1,0 +1,13 @@
+% arara: pdflatex
+\documentclass{article}
+
+\usepackage{tgtermes}
+
+\providecommand{\TeXParserLibToImage}[2][]{#2}
+
+\begin{document}
+Some sample text.
+
+\TeXParserLibToImage[type={image/png}]{Some sample text.}
+
+\end{document}
