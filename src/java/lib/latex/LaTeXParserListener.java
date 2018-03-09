@@ -349,6 +349,10 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       parser.putControlSequence(new ProvidesFile());
       parser.putControlSequence(new ProvidesFile("ProvidesClass"));
       parser.putControlSequence(new ProvidesFile("ProvidesPackage"));
+      parser.putControlSequence(new AddToHook("AtBeginDocument",
+        "@begindocumenthook"));
+      parser.putControlSequence(new AddToHook("AtEndDocument",
+        "@enddocumenthook"));
 
       bibliographySection = new TeXObjectList();
       bibliographySection.add(new TeXCsRef("section"));
@@ -496,6 +500,11 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       parser.putControlSequence(
         new GenericCommand("thempfn", null, new TeXCsRef("thefootnote")));
       parser.putControlSequence(new Footnote());
+
+      parser.putControlSequence(new MarginPar());
+      parser.putControlSequence(new SwitchMarginSide("reversemarginpar", false));
+      parser.putControlSequence(new SwitchMarginSide("normalmarginpar", true));
+
       parser.putControlSequence(new Thanks());
       parser.putControlSequence(new AtFnSymbol());
 
@@ -810,18 +819,41 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
             auxData = auxListener.getAuxData();
          }
       }
+
+      ControlSequence cs = parser.getControlSequence(
+        "@begindocumenthook");
+
+      if (cs != null)
+      {
+         cs.process(parser);
+      }
    }
 
    public void endDocument()
      throws IOException
    {
-      processFootnotes();
-
       if (!isInDocEnv())
       {
          throw new LaTeXSyntaxException(
             parser,
             LaTeXSyntaxException.ERROR_NO_BEGIN_DOC);
+      }
+
+      processFootnotes();
+
+      ControlSequence cs = parser.getControlSequence(
+        "@enddocumenthook");
+
+      if (cs != null)
+      {
+         try
+         {
+            cs.process(parser);
+         }
+         catch (IOException e)
+         {
+            getTeXApp().error(e);
+         }
       }
 
       throw new EOFException();
@@ -1555,6 +1587,21 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       footnotes.add(footnote);
    }
 
+   public boolean isMarginRight()
+   {
+      return marginright;
+   }
+
+   public void setMarginRight(boolean isRight)
+   {
+      marginright = isRight;
+   }
+
+   public void marginpar(TeXObject leftText, TeXObject rightText)
+     throws IOException
+   {
+   }
+
    public TeXObjectList getAuthor()
    {
       ControlSequence cs = getControlSequence("@author");
@@ -1761,6 +1808,8 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
    private TeXObjectList bibliographySection;
 
    private TeXObjectList footnotes;
+
+   private boolean marginright=true;
 
    private Hashtable<String,IndexRoot> indexes;
 

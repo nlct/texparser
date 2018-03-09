@@ -158,6 +158,8 @@ public class L2HConverter extends LaTeXParserListener
       // syntax: \TeXParserLibToImage[options]{code}
       putControlSequence(new L2HToImage());
 
+      putControlSequence(new HCode());
+
       parser.putControlSequence(new GenericCommand("TeX", null,
         createString("TeX")));
       parser.putControlSequence(new GenericCommand("LaTeX", null,
@@ -611,6 +613,10 @@ public class L2HConverter extends LaTeXParserListener
    public void writeCssStyles()
      throws IOException
    {
+      writeln("#main {margin-left: 5%; margin-right: 15%}");
+      writeln("div.marginleft {position: absolute; left: 0pt; width: 5%;}");
+      writeln("div.marginright {position: absolute; right: 0pt; width: 15%;}");
+
       writeln("div.displaymath { display: block; text-align: center; }");
       writeln("span.eqno { float: right; }");
       writeln("div.table { display: block; text-align: center; }");
@@ -731,12 +737,12 @@ public class L2HConverter extends LaTeXParserListener
       Color fgCol = getParser().getSettings().getFgColor();
       Color bgCol = getParser().getSettings().getBgColor();
 
-      if (fgCol != null)
+      if (fgCol != null && fgCol != Color.BLACK)
       {
          writeable.write(String.format(" text=\"%s\"", getHtmlColor(fgCol)));
       }
 
-      if (bgCol != null)
+      if (bgCol != null && bgCol != Color.WHITE)
       {
          writeable.write(String.format(" background=\"%s\"", 
            getHtmlColor(bgCol)));
@@ -746,17 +752,44 @@ public class L2HConverter extends LaTeXParserListener
 
       super.beginDocument();
 
+      writeable.writeln("<div id=\"main\">");
+
       getParser().getSettings().setCharMapMode(TeXSettings.CHAR_MAP_ON);
    }
 
    public void endDocument()
      throws IOException
    {
+      if (!isInDocEnv())
+      {
+         throw new LaTeXSyntaxException(
+            parser,
+            LaTeXSyntaxException.ERROR_NO_BEGIN_DOC);
+      }
+
       processFootnotes();
+
+      writeable.writeln("</div>");// ends <div id="main">
+
+      ControlSequence cs = parser.getControlSequence(
+        "@enddocumenthook");
+
+      if (cs != null)
+      {
+         try
+         {
+            cs.process(parser);
+         }
+         catch (IOException e)
+         {
+            getTeXApp().error(e);
+         }
+      }
 
       writeable.writeln("</body>");
       writeable.writeln("</html>");
-      super.endDocument();
+
+      throw new EOFException();
    }
 
    public void overwithdelims(TeXObject firstDelim,
@@ -1103,6 +1136,30 @@ public class L2HConverter extends LaTeXParserListener
    public ControlSequence createUndefinedCs(String name)
    {
       return new L2HUndefined(name, getUndefinedAction());
+   }
+
+   public void marginpar(TeXObject leftText, TeXObject rightText)
+     throws IOException
+   {
+      write("<div class=\"margin");
+
+      try
+      {
+         if (isMarginRight())
+         {
+            write("right\">");
+            rightText.process(parser);
+         }
+         else
+         {
+            write("left\">");
+            leftText.process(parser);
+         }
+      }
+      finally
+      {
+         write("</div>");
+      }
    }
 
    public void doFootnoteRule() throws IOException
