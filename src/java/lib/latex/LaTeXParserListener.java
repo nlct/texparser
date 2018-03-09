@@ -321,12 +321,16 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       parser.putControlSequence(new EnsureMath());
       parser.putControlSequence(new Frac());
       parser.putControlSequence(new GenericCommand("@empty"));
+
       parser.putControlSequence(new AtIfNextChar());
       parser.putControlSequence(new AtFirstOfTwo());
       parser.putControlSequence(new AtSecondOfTwo());
       parser.putControlSequence(new AtFirstOfOne());
       parser.putControlSequence(new AtGobble());
       parser.putControlSequence(new AtGobbleTwo());
+      parser.putControlSequence(new AtIfPackageLoaded());
+      parser.putControlSequence(new AtIfClassLoaded());
+
       parser.putControlSequence(new AtAlph("@Alph", AtAlph.UPPER));
       parser.putControlSequence(new AtAlph("@alph", AtAlph.LOWER));
       parser.putControlSequence(new AtRoman("@Roman", AtRoman.UPPER));
@@ -903,6 +907,42 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       docCls = getLaTeXCls(options, clsName);
 
       addFileReference(docCls);
+
+      if (docCls instanceof UnknownCls)
+      {
+         if (!docCls.wasFoundByKpsewhich())
+         {
+            // Not found by kpsewhich so possibly a custom class
+            // which might be simple enough to parse.
+
+            File file = docCls.getFile();
+
+            if (file.exists())
+            {
+               // This may not work if the class is too
+               // complicated.
+
+               byte orgAction = getUndefinedAction();
+               setUndefinedAction(Undefined.ACTION_WARN);
+
+               int orgCatCode = parser.getCatCode('@');
+
+               try
+               {
+                  parser.setCatCode(true, '@', TeXParser.TYPE_LETTER);
+                  input(docCls);
+               }
+               catch (IOException e)
+               {
+                  getTeXApp().error(e);
+               }
+
+               parser.setCatCode(true, '@', orgCatCode);
+
+               setUndefinedAction(orgAction);
+            }
+         }
+      }
    }
 
    public LaTeXCls getLaTeXCls(KeyValList options, String clsName)
@@ -983,14 +1023,19 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
                   byte orgAction = getUndefinedAction();
                   setUndefinedAction(Undefined.ACTION_WARN);
 
+                  int orgCatCode = parser.getCatCode('@');
+
                   try
                   {
+                     parser.setCatCode(true, '@', TeXParser.TYPE_LETTER);
                      input(sty);
                   }
                   catch (IOException e)
                   {
                      getTeXApp().error(e);
                   }
+
+                  parser.setCatCode(true, '@', orgCatCode);
 
                   setUndefinedAction(orgAction);
                }
