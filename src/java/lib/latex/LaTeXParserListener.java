@@ -376,21 +376,29 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       parser.putControlSequence(
         new GenericCommand("tablename", null, createString("Table")));
 
+      newlength("fboxsep", 3, TeXUnit.PT);
+      newlength("fboxrule", 0.4f, TeXUnit.PT);
+
       parser.putControlSequence(new FrameBox());
-      parser.putControlSequence(new FrameBox("mbox", 
-        FrameBox.BORDER_NONE, FrameBox.ALIGN_DEFAULT,
-        FrameBox.ALIGN_DEFAULT, true));
+      parser.putControlSequence(new MBox());
+      parser.putControlSequence(new FrameBox("framebox"));
+      parser.putControlSequence(new MBox("makebox"));
+      parser.putControlSequence(new MBox("frame",
+        FrameBox.BORDER_SOLID,
+        new UserDimension(1, FixedUnit.BP), 
+        new UserDimension(0, FixedUnit.BP)));
 
       newlength("tabcolsep", 6, TeXUnit.PT);
       newlength("arraycolsep", 5, TeXUnit.PT);
-      newlength("fboxsep", 3, TeXUnit.PT);
-      newlength("fboxrule", 0.4f, TeXUnit.PT);
 
       newlength("linewidth", 100, new PercentUnit());
       newlength("textwidth", 100, new PercentUnit(PercentUnit.TEXT_WIDTH));
       newlength("textheight", 100, new PercentUnit(PercentUnit.TEXT_HEIGHT));
       newlength("columnwidth", 100, new PercentUnit(PercentUnit.COLUMN_WIDTH));
       newlength("columnheight", 100, new PercentUnit(PercentUnit.COLUMN_HEIGHT));
+      newlength("paperwidth", 100, new PercentUnit(PercentUnit.PAPER_WIDTH));
+      newlength("paperheight", 100, new PercentUnit(PercentUnit.PAPER_HEIGHT));
+      newlength("marginparwidth", 100, new PercentUnit(PercentUnit.MARGIN_WIDTH));
 
       newtoks(true, "toks@");
 

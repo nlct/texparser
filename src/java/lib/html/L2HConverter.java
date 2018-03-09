@@ -135,6 +135,19 @@ public class L2HConverter extends LaTeXParserListener
          }
       }
 
+      cs = getParser().getControlSequence("frame");
+
+      if (cs instanceof FrameBox)
+      {
+         try
+         {
+            defaultStyles.put(getFrameBoxSpecs((FrameBox)cs), "frame");
+         }
+         catch (IOException e)
+         {
+         }
+      }
+
       // Add 
       // \providecommand{\IfTeXParserLib}[2]{#2}
       // to the document to provide a conditional that depends on

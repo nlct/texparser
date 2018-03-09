@@ -31,19 +31,37 @@ public class FrameBox extends ControlSequence
       this("fbox", BORDER_SOLID, ALIGN_DEFAULT, ALIGN_DEFAULT, true);
    }
 
+   public FrameBox(String name)
+   {
+      this(name, BORDER_SOLID, ALIGN_DEFAULT, ALIGN_DEFAULT, true);
+   }
+
    public FrameBox(String name, byte style, byte halign, byte valign, 
       boolean isinline)
+   {
+      this(name, style, halign, valign, isinline, null, null);
+   }
+
+   public FrameBox(String name, byte style, byte halign, byte valign, 
+      boolean isinline, TeXDimension borderWidth, TeXDimension innerMargin)
    {
       super(name);
       setStyle(style);
       setHAlign(halign);
       setVAlign(valign);
       setIsInLine(isinline);
+      currentBorderWidth = borderWidth;
+      currentInnerMargin = innerMargin;
    }
 
    public Object clone()
    {
-      return new FrameBox(getName(), style, halign, valign, isInline);
+      return new FrameBox(getName(), style, halign, valign, isInline,
+        currentBorderWidth == null ? null : 
+          (TeXDimension)currentBorderWidth.clone(),
+        currentInnerMargin == null ? null : 
+          (TeXDimension)currentInnerMargin.clone()
+      );
    }
 
    public boolean isInLine()
@@ -120,60 +138,211 @@ public class FrameBox extends ControlSequence
 
    public Color getBorderColor(TeXParser parser) throws IOException
    {
-      return null;
+      return currentBorderColor;
    }
 
    public Color getForegroundColor(TeXParser parser) throws IOException
    {
-      return null;
+      return currentFgColor;
    }
 
    public Color getBackgroundColor(TeXParser parser) throws IOException
    {
-      return null;
+      return currentBgColor;
    }
 
    public TeXDimension getBorderWidth(TeXParser parser) throws IOException
    {
-      return parser.getDimenRegister("fboxrule");
+      return currentBorderWidth == null ? parser.getDimenRegister("fboxrule")
+        : currentBorderWidth;
    }
 
    public TeXDimension getInnerMargin(TeXParser parser) throws IOException
    {
-      return parser.getDimenRegister("fboxsep");
+      return currentInnerMargin == null ? parser.getDimenRegister("fboxsep")
+        : currentInnerMargin;
    }
 
    public TeXDimension getWidth(TeXParser parser) throws IOException
    {
-      return null;
+      return currentWidth;
    }
 
    public TeXDimension getHeight(TeXParser parser) throws IOException
    {
-      return null;
+      return currentHeight;
+   }
+
+   protected void popSettings(TeXParser parser, TeXObjectList stack)
+     throws IOException
+   {
+      TeXObject width = null;
+
+      if (parser == stack)
+      {
+         width = parser.popNextArg('[', ']');
+      }
+      else
+      {
+         width = stack.popArg(parser, '[', ']');
+      }
+
+      if (width != null)
+      {
+         if (width instanceof Expandable)
+         {
+            TeXObjectList expanded;
+
+            if (parser == stack)
+            {
+               expanded = ((Expandable)width).expandfully(parser);
+            }
+            else
+            {
+               expanded = ((Expandable)width).expandfully(parser, stack);
+            }
+
+            if (expanded != null)
+            {
+               width = expanded;
+            }
+         }
+
+         if (width instanceof TeXObjectList)
+         {
+            width = ((TeXObjectList)width).popDimension(parser);
+         }
+
+         TeXObject pos = null;
+
+         if (parser == stack)
+         {
+            pos = parser.popNextArg('[', ']');
+         }
+         else
+         {
+            pos = stack.popArg(parser, '[', ']');
+         }
+
+         if (pos != null)
+         {
+            if (pos instanceof Expandable)
+            {
+               TeXObjectList expanded;
+
+               if (parser == stack)
+               {
+                  expanded = ((Expandable)pos).expandfully(parser);
+               }
+               else
+               {
+                  expanded = ((Expandable)pos).expandfully(parser, stack);
+               }
+
+               if (expanded != null)
+               {
+                  pos = expanded;
+               }
+            }
+
+            String val = pos.toString(parser).trim();
+
+            if (val.equals("c"))
+            {
+               halign = ALIGN_CENTER;
+            }
+            else if (val.equals("l"))
+            {
+               halign = ALIGN_LEFT;
+            }
+            else if (val.equals("r"))
+            {
+               halign = ALIGN_RIGHT;
+            }
+            else
+            {
+               TeXApp texApp = parser.getListener().getTeXApp();
+
+               texApp.warning(parser, texApp.getMessage(
+                 LaTeXSyntaxException.ILLEGAL_ARG_TYPE, val));
+            }
+         }
+      }
+
+      if (width instanceof TeXDimension)
+      {
+         currentWidth = (TeXDimension)width;
+      }
+
    }
 
    public void process(TeXParser parser) throws IOException
    {
-      TeXObject arg1 = parser.popNextArg();
-
-      LaTeXParserListener listener = ((LaTeXParserListener)parser.getListener());
-
-      listener.startFrameBox(this);
-      arg1.process(parser);
-      listener.endFrameBox(this);
+      process(parser, parser);
    }
 
-   public void process(TeXParser parser, TeXObjectList list) throws IOException
+   public void process(TeXParser parser, TeXObjectList stack) throws IOException
    {
-      TeXObject arg1 = list.popArg(parser);
+      TeXDimension orgWidth = currentWidth;
+      TeXDimension orgHeight = currentHeight;
+      byte orgHalign = halign;
+      byte orgValign = valign;
+      Color orgBorderColor = currentBorderColor;
+      Color orgFgColor = currentFgColor;
+      Color orgBgColor = currentBgColor;
+      TeXDimension orgBorderWidth = currentBorderWidth;
+      TeXDimension orgInnerMargin = currentInnerMargin;
+
+      popSettings(parser, stack);
+
+      TeXObject arg;
+
+      if (parser == stack)
+      {
+         arg = parser.popNextArg();
+      }
+      else
+      {
+         arg = stack.popArg(parser);
+      }
 
       LaTeXParserListener listener = ((LaTeXParserListener)parser.getListener());
 
       listener.startFrameBox(this);
-      arg1.process(parser, list);
-      listener.endFrameBox(this);
+
+      try
+      {
+         arg.process(parser, stack);
+      }
+      finally
+      {
+         try
+         {
+            listener.endFrameBox(this);
+         }
+         finally
+         {
+            currentWidth = orgWidth;
+            currentHeight = orgHeight;
+            currentBorderColor = orgBorderColor;
+            currentFgColor = orgFgColor;
+            currentBgColor = orgBgColor;
+            currentBorderWidth = orgBorderWidth;
+            currentInnerMargin = orgInnerMargin;
+            halign = orgHalign;
+            valign = orgValign;
+         }
+      }
    }
+
+   protected TeXDimension currentWidth=null;
+   protected TeXDimension currentHeight=null;
+   protected TeXDimension currentBorderWidth = null;
+   protected TeXDimension currentInnerMargin = null;
+
+   protected Color currentBorderColor=null;
+   protected Color currentFgColor=null;
+   protected Color currentBgColor=null;
 
    private byte style = BORDER_SOLID;
    private byte halign = ALIGN_DEFAULT;
