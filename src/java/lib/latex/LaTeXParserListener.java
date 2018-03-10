@@ -300,6 +300,9 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       parser.putControlSequence(new UsePackage("RequirePackage", false));
       parser.putControlSequence(
         new UsePackage("RequirePackageWithOptions", true));
+      parser.putControlSequence(new PassOptionsToPackage());
+      parser.putControlSequence(new PassOptionsToPackage(
+         "PassOptionsToClass", "cls"));
 
       parser.putControlSequence(new NewCommand());
       parser.putControlSequence(new NewCommand("renewcommand",
