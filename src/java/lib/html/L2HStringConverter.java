@@ -107,4 +107,9 @@ public class L2HStringConverter extends L2HConverter
       return html;
    }
 
+   public void startSection(boolean isNumbered, String tag, String name)
+    throws IOException
+   {
+   }
+
 }

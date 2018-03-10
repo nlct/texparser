@@ -259,6 +259,11 @@ public class L2HImage implements Expandable
       process(parser, parser);
    }
 
+   public Path getPath()
+   {
+      return path;
+   }
+
    private String getData()
    {
       int n = path.getNameCount();

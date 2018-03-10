@@ -29,26 +29,33 @@ public class TeXPath
    public TeXPath(TeXParser parser, String texPath)
      throws IOException
    {
-      this(parser, texPath, "tex", true);
+      this(parser, texPath, true, "tex");
    }
 
    public TeXPath(TeXParser parser, String texPath, boolean useKpsewhich)
      throws IOException
    {
-      this(parser, texPath, "tex", useKpsewhich);
+      this(parser, texPath, useKpsewhich, "tex");
    }
 
-   public TeXPath(TeXParser parser, String texPath, String defExt)
+   public TeXPath(TeXParser parser, String texPath, String... defExt)
      throws IOException
    {
-      this(parser, texPath, defExt, true);
+      this(parser, texPath, true, defExt);
    }
 
    public TeXPath(TeXParser parser, String texPath, String defExt,
      boolean useKpsewhich)
      throws IOException
    {
-      init(parser, texPath, defExt, useKpsewhich);
+      init(parser, texPath, useKpsewhich, defExt);
+   }
+
+   public TeXPath(TeXParser parser, String texPath,
+     boolean useKpsewhich, String... defExt)
+     throws IOException
+   {
+      init(parser, texPath, useKpsewhich, defExt);
    }
 
    public TeXPath(TeXParser parser, File file)
@@ -77,31 +84,46 @@ public class TeXPath
 
    }
 
-   private void init(TeXParser parser, String texPath, String defExt)
+   private void init(TeXParser parser, String texPath, String... defExt)
      throws IOException
    {
-      init(parser, texPath, defExt, true);
+      init(parser, texPath, true, defExt);
    }
 
-   private void init(TeXParser parser, String texPath, String defExt,
-     boolean useKpsewhich)
+   private void init(TeXParser parser, String texPath,
+     boolean useKpsewhich, String... defExt)
      throws IOException
    {
       File parent = (parser == null ? null : parser.getCurrentParentFile());
 
       base = (parent == null ? null : parent.toPath());
 
+      // This deals with the entire path enclosed within double
+      // quotes.
+      if (texPath.startsWith("\"") && texPath.endsWith("\""))
+      {
+         texPath = texPath.substring(1, texPath.length()-1);
+      }
+
       String[] split = texPath.split("/");
+
+      // is texPath an absolute path?
+
+      File root = (new File(split[0]+File.separator));
+
+      if (root.isAbsolute())
+      {
+         base = null;
+         parent = root;
+      }
 
       int n = split.length-1;
 
       for (int i = 0; i < n; i++)
       {
-         // strip quoted material if present
-
-         if (split[i].startsWith("\"") && split[i].endsWith("\""))
+         if (split[i].isEmpty())
          {
-            split[i] = split[i].substring(1, split[i].length()-1);
+            continue;
          }
 
          if (parent == null)
@@ -114,18 +136,92 @@ public class TeXPath
          }
       }
 
+      // This deals with the case where the last element is obtained
+      // from \jobname
       if (split[n].startsWith("\"") && split[n].endsWith("\""))
       {
          split[n] = split[n].substring(1, split[n].length()-1);
       }
 
-      if (!defExt.isEmpty() && !split[n].contains("."))
+      File file = null;
+
+      String baseName = split[n];
+
+      boolean hasExtension = baseName.contains(".");
+
+      if (hasExtension && (parent != null && parent.isAbsolute()))
       {
-         split[n] += "."+defExt;
+         file = new File(parent, split[n]);
+
+         if (file.exists())
+         {
+            relative = file.toPath();
+            return;
+         }
       }
 
-      File file = (parent == null ? new File(split[n]) : 
-        new File(parent, split[n]));
+      if (defExt.length > 0 && !hasExtension)
+      {
+         for (String ext : defExt)
+         {
+            if (ext.isEmpty())
+            {
+               split[n] = baseName;
+            }
+            else
+            {
+               split[n] = baseName+"."+ext;
+            }
+
+            file = (parent == null ? new File(split[n]) : 
+              new File(parent, split[n]));
+
+            // Does file exist?
+
+            if (file.exists())
+            {
+               if (base == null)
+               {
+                  relative = file.toPath();
+               }
+               else
+               {
+                  relative = base.relativize(file.toPath());
+               }
+
+               return;
+            }
+
+            if (useKpsewhich && parser != null)
+            {
+               // Can kpsewhich find the file?
+
+               try
+               {
+                  String loc = parser.getListener().getTeXApp().kpsewhich(split[n]);
+
+                  if (loc != null && !loc.isEmpty())
+                  {
+                     foundByKpsewhich = true;
+
+                     init(parser, loc, false, "");
+
+                     return;
+                  }
+               }
+               catch (IOException|InterruptedException e)
+               {
+                  // kpsewhich couldn't find the file
+               }
+            }
+         }
+
+         split[n] = baseName+"."+defExt[0];
+         useKpsewhich = false;
+      }
+
+      file = (parent == null ? new File(split[n]) : 
+           new File(parent, split[n]));
 
       if (base == null)
       {
@@ -150,7 +246,7 @@ public class TeXPath
             {
                foundByKpsewhich = true;
 
-               init(parser, loc, "", false);
+               init(parser, loc, false, "");
             }
          }
          catch (IOException|InterruptedException e)
@@ -237,8 +333,9 @@ public class TeXPath
 
    public File getFile()
    {
-      return (base == null ? relative.toFile() : 
-         base.resolve(relative).toFile());
+      Path path = (base == null ? relative : base.resolve(relative));
+
+      return path.toFile();
    }
 
    public Path getPath()
@@ -251,14 +348,26 @@ public class TeXPath
       return relative;
    }
 
+   public Path getLeaf()
+   {
+      return relative.getName(relative.getNameCount()-1);
+   }
+
    public Path getFileName()
    {
       return relative.getFileName();
    }
 
+   public boolean isAbsolute()
+   {
+      return relative.isAbsolute();
+   }
+
    public boolean exists()
    {
-      return getFile().exists();
+      File file = getFile();
+
+      return file == null ? false : file.exists();
    }
 
    public boolean equals(Object obj)

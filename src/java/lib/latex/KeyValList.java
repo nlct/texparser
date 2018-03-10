@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Set;
 import java.util.Iterator;
+import java.util.Vector;
 
 import com.dickimawbooks.texparserlib.*;
 
@@ -31,8 +32,20 @@ public class KeyValList extends HashMap<String,TeXObject>
    public KeyValList()
    {
       super();
+      keyList = new Vector<String>();
    }
 
+   public TeXObject put(String key, TeXObject value)
+   {
+      TeXObject oldValue = super.put(key, value);
+
+      if (oldValue == null)
+      {
+         keyList.add(key);
+      }
+
+      return oldValue;
+   }
    
    public static KeyValList getList(TeXParser parser, TeXObject object)
      throws IOException
@@ -178,6 +191,27 @@ public class KeyValList extends HashMap<String,TeXObject>
       return expanded == null ? value : expanded;
    }
 
+   // Returns null if option not in list
+   public Boolean getBoolean(String key, TeXParser parser,
+     TeXObjectList stack) throws IOException
+   {
+      TeXObject obj = getExpandedValue(key, parser, stack);
+
+      if (obj == null)
+      {
+         return null;
+      }
+
+      String value = obj.toString(parser).trim();
+
+      if (value.isEmpty())
+      {
+         return Boolean.TRUE;
+      }
+
+      return Boolean.valueOf(value);
+   }
+
    public TeXObject getValue(String key)
    {
       TeXObject value = get(key);
@@ -272,9 +306,7 @@ public class KeyValList extends HashMap<String,TeXObject>
    public void process(TeXParser parser)
      throws IOException
    {
-      Set<String> keySet = keySet();
-
-      Iterator<String> it = keySet.iterator();
+      Iterator<String> it = getOrderedKeyIterator();
 
       Writeable writeable = parser.getListener().getWriteable();
 
@@ -401,4 +433,10 @@ public class KeyValList extends HashMap<String,TeXObject>
       return false;
    }
 
+   public Iterator<String> getOrderedKeyIterator()
+   {
+      return keyList.iterator();
+   }
+
+   private Vector<String> keyList;
 }

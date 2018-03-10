@@ -772,12 +772,12 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       return new FontFamilyDeclaration(name, family);
    }
 
-   public UnknownReference createUnknownReference(String label)
+   public TeXObject createUnknownReference(String label)
    {
       return new UnknownReference(this, label);
    }
 
-   public UnknownReference createUnknownReference(TeXObject label)
+   public TeXObject createUnknownReference(TeXObject label)
    {
       return new UnknownReference(this, label);
    }
@@ -1622,9 +1622,14 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       return bibliographySection;
    }
 
-   public void setBibiographySection(TeXObjectList object)
+   public void setBibliographySection(TeXObjectList object)
    {
       bibliographySection = object;
+   }
+
+   public void addToBibliographySection(TeXObject object)
+   {
+      bibliographySection.add(object);
    }
 
    public void addFootnote(TeXObject footnote)

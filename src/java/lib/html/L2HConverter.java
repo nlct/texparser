@@ -21,12 +21,15 @@ package com.dickimawbooks.texparserlib.html;
 import java.io.*;
 import java.nio.file.Path;
 import java.nio.file.Files;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.util.Vector;
 import java.util.Stack;
 import java.util.Iterator;
 import java.util.HashMap;
 import java.awt.Color;
+import java.awt.Dimension;
 
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.primitives.*;
@@ -100,6 +103,7 @@ public class L2HConverter extends LaTeXParserListener
 
       this.styCs = new Vector<String>();
       defaultStyles = new HashMap<String,String>();
+      internalReferences = new HashMap<String,TeXObject>();
 
       setWriteable(this);
       setUseMathJax(useMathJax);
@@ -172,6 +176,13 @@ public class L2HConverter extends LaTeXParserListener
       putControlSequence(new L2HNoBreakSpace());
       putControlSequence(new SpaceCs("newblock"));
       putControlSequence(new L2HTheBibliography());
+
+      addToBibliographySection(new TeXCsRef("label"));
+      addToBibliographySection(createGroup("bib"));
+
+      addInternalReference("bib", new TeXCsRef("refname"));
+      addInternalReference("toc", new TeXCsRef("contentsname"));
+
       putControlSequence(new L2HTableOfContents());
       putControlSequence(new L2HContentsLine());
       putControlSequence(new L2HBibItem());
@@ -243,7 +254,48 @@ public class L2HConverter extends LaTeXParserListener
       }
    }
 
-   public L2HImage toImage(TeXParser parser, String preamble, 
+   public void addInternalReference(String label, TeXObject object)
+   {
+      internalReferences.put(label, object);
+   }
+
+   public TeXObject createUnknownReference(String label)
+   {
+      TeXObject object = internalReferences.get(label);
+
+      if (object != null)
+      {
+         return object;
+      }
+
+      return super.createUnknownReference(label);
+   }
+
+   public TeXObject createUnknownReference(TeXObject label)
+   {
+      try
+      {
+         if (label instanceof Expandable)
+         {
+            TeXObjectList expanded = ((Expandable)label).expandfully(parser);
+
+            if (expanded != null)
+            {
+               label = expanded;
+            }
+         }
+
+         return createUnknownReference(label.toString(parser));
+      }
+      catch (IOException e)
+      {
+         getTeXApp().error(e);
+      }
+
+      return super.createUnknownReference(label);
+   }
+
+   public L2HImage toImage(String preamble, 
     String content, String mimeType, TeXObject alt, String name, boolean crop)
    throws IOException
    {
@@ -614,6 +666,9 @@ public class L2HConverter extends LaTeXParserListener
      throws IOException
    {
       writeln("#main {margin-left: 5%; margin-right: 15%}");
+      writeln("div.tomain {position: absolute; left: 0pt; width: 5%; text-align: right; font-size: x-small;}");
+      writeln("div.tomain a {text-decoration: none;}");
+      writeln("div.labellink {display: inline; font-size: x-small; margin-left: 1em; margin-right: 1em;}");
       writeln("div.marginleft {position: absolute; left: 0pt; width: 5%;}");
       writeln("div.marginright {position: absolute; right: 0pt; width: 15%;}");
 
@@ -684,6 +739,16 @@ public class L2HConverter extends LaTeXParserListener
       extraCssStyles.add(style);
    }
 
+   public void addToHead(String content)
+   {
+      if (extraHead == null)
+      {
+         extraHead = new Vector<String>();
+      }
+
+      extraHead.add(content);
+   }
+
    public void documentclass(KeyValList options, String clsName)
      throws IOException
    {
@@ -706,6 +771,14 @@ public class L2HConverter extends LaTeXParserListener
       if (useMathJax())
       {
          writeMathJaxHeader();
+      }
+
+      if (extraHead != null)
+      {
+         for (String content : extraHead)
+         {
+            writeable.writeln(content);
+         }
       }
    }
 
@@ -918,11 +991,229 @@ public class L2HConverter extends LaTeXParserListener
       write("</code>");
    }
 
-   public void includegraphics(KeyValList options, String file)
+   public String getImagePreamble() throws IOException
+   {
+      String preamble = null;
+
+      ControlSequence cs = parser.getControlSequence(
+         "TeXParserLibToImagePreamble");
+
+      if (cs != null && cs instanceof Expandable)
+      {
+         TeXObjectList expanded;
+
+         expanded = ((Expandable)cs).expandonce(parser);
+
+         if (expanded != null)
+         {
+            preamble = expanded.toString(parser);
+         }
+      }
+
+      if (preamble == null)
+      {
+         LaTeXFile cls = getDocumentClass();
+
+         StringBuilder builder = new StringBuilder();
+
+         if (cls == null)
+         {
+            builder.append("\\documentclass{article}");
+         }
+         else
+         {
+            builder.append("\\documentclass");
+
+            KeyValList styOpts = cls.getOptions();
+
+            if (styOpts != null)
+            {
+               builder.append(String.format("[%s]", styOpts.format()));
+            }
+
+            builder.append(String.format("{%s}%n", cls.getName()));
+         }
+
+         for (LaTeXFile lf : getLoadedPackages())
+         {
+            builder.append("\\usepackage");
+
+            KeyValList styOpts = lf.getOptions();
+
+            if (styOpts != null)
+            {
+               builder.append(String.format("[%s]", styOpts.format()));
+            }
+
+            builder.append(String.format("{%s}%n", lf.getName()));
+         }
+
+         builder.append("\\pagestyle{empty}%n");
+
+         preamble = builder.toString();
+      }
+
+      return preamble;
+   }
+
+   public static String getMimeType(String filename)
+   {
+      int idx = filename.lastIndexOf(".");
+
+      if (idx < 0)
+      {
+         return null;
+      }
+
+      String ext = filename.substring(idx).toLowerCase();
+
+      if (ext.equals("pdf"))
+      {
+         return MIME_TYPE_PDF;
+      }
+
+      if (ext.equals("png"))
+      {
+         return MIME_TYPE_PNG;
+      }
+
+      if (ext.equals("jpeg") || ext.equals("jpg"))
+      {
+         return MIME_TYPE_JPEG;
+      }
+
+      return null;
+   }
+
+   public Dimension getImageSize(File file, String mimetype)
+   {
+      return null;
+   }
+
+   public void includegraphics(KeyValList options, String filename)
      throws IOException
    {
-      // This doesn't take the options or file format into account.
-      write(String.format("<img src=\"%s\"/>", file));
+      TeXPath imagePath = new TeXPath(parser, filename, true, "png", "jpeg", "pdf");
+
+      File file = imagePath.getFile();
+
+      if (!file.exists())
+      {
+         throw new TeXSyntaxException(parser, 
+          TeXSyntaxException.ERROR_FILE_NOT_FOUND, filename);
+      }
+
+      TeXObject alt = null;
+
+      String type=getMimeType(file.getName());
+      L2HImage image=null;
+
+      int n = 0;
+
+      if (options != null)
+      {
+         n = options.size();
+
+         alt = options.getValue("alt");
+
+         if (alt != null)
+         {
+            n--;
+         }
+      }
+
+      if (n > 0)
+      {
+         StringBuilder content = new StringBuilder("\\includegraphics[");
+         String sep = null;
+
+         for (Iterator<String> it = options.getOrderedKeyIterator();
+              it.hasNext();)
+         {
+            String key = it.next();
+
+            if (sep != null)
+            {
+               content.append(sep);
+            }
+
+            if (!key.equals("alt"))
+            {
+               content.append(String.format("%s={%s}", key, 
+                 options.getValue(key).toString(parser)));
+            }
+
+            sep = ",";
+         }
+
+         content.append("]{");
+         content.append(filename);
+         content.append('}');
+
+         image = toImage(getImagePreamble(),
+          content.toString(), type, alt, null, true);
+      }
+
+      if (image != null)
+      {
+         image.process(parser);
+      }
+      else
+      {
+         Path relPath=imagePath.getRelative();
+         File dest;
+
+         if (imagePath.isAbsolute())
+         {
+            dest = (outPath == null ? new File(file.getName())
+                    : new File(outPath.toFile(), file.getName()));
+   
+            relPath = imagePath.getLeaf();
+         }
+         else
+         {
+            dest = (outPath == null ? imagePath.getRelative() 
+               : outPath.resolve(imagePath.getRelative())).toFile();
+         }
+
+         Dimension dim = getImageSize(file, type);
+
+         write(String.format("<object data=\"%s\"", getUri(relPath)));
+
+         if (type != null)
+         {
+            write(String.format(" type=\"%s\"", type));
+         }
+
+         if (dim != null)
+         {
+            write(String.format(" width=\"%d\" height=\"%d\"",
+              dim.width, dim.height));
+         }
+
+         write(">");
+
+         try
+         {
+            if (alt != null)
+            {
+               alt.process(parser);
+            }
+         }
+         finally
+         {
+            write("</object>");
+         }
+
+         try
+         {
+            getTeXApp().copyFile(file, dest);
+         }
+         catch (InterruptedException e)
+         {
+            getTeXApp().error(e);
+         }
+      }
    }
 
    protected void writeTransform(String tag, String property)
@@ -1333,6 +1624,44 @@ public class L2HConverter extends LaTeXParserListener
       return String.format("%fpt", unit.toUnit(getParser(), value, TeXUnit.BP));
    }
 
+   public String getUri(Path path)
+   {
+      if (path.isAbsolute())
+      {
+         return path.toUri().toString();
+      }
+
+      String str;
+      int n = path.getNameCount();
+
+      if (n == 1)
+      {
+         str = path.toString();
+      }
+      else
+      {
+         StringBuilder builder = new StringBuilder(path.getName(0).toString());
+
+         for (int i = 1; i < n; i++)
+         {
+            builder.append('/');
+            builder.append(path.getName(i).toString());
+         }
+
+         str = builder.toString();
+      }
+
+      try
+      {
+         return (new URI(str)).toString();
+      }
+      catch (URISyntaxException e)
+      {
+         getTeXApp().error(e);
+         return str;
+      }
+   }
+
    public void startColor(Color color, boolean isForeground)
      throws IOException
    {
@@ -1507,6 +1836,59 @@ public class L2HConverter extends LaTeXParserListener
       }
    }
 
+   public HtmlTag createLinkBox(String label)
+   {
+      ControlSequence cs = parser.getControlSequence("TeXParserLibLinkName");
+      String text = "[link]";
+
+      if (cs instanceof Expandable)
+      {
+         try
+         {
+            TeXObjectList expanded = parser.expandfully(parser);
+
+            if (expanded != null)
+            {
+               text = expanded.toString(parser);
+            }
+         }
+         catch (IOException e)
+         {
+            getTeXApp().error(e);
+         }
+      }
+
+      return new HtmlTag(String.format(
+       "<div class=\"labellink\"><a href=\"#%s\">%s</a></div>",
+         label, text));
+   }
+
+   public void startSection(boolean isNumbered, String tag, String name)
+    throws IOException
+   {
+      ControlSequence cs = parser.getControlSequence("TeXParserLibToTopName");
+      String text = "[top]";
+
+      if (cs instanceof Expandable)
+      {
+         try
+         {
+            TeXObjectList expanded = parser.expandfully(parser);
+
+            if (expanded != null)
+            {
+               text = expanded.toString(parser);
+            }
+         }
+         catch (IOException e)
+         {
+            getTeXApp().error(e);
+         }
+      }
+      write(String.format(
+       "<div class=\"tomain\"><a href=\"#main\">%s</a></div>",
+       text));
+   }
 
    private Vector<String> styCs;
 
@@ -1526,9 +1908,17 @@ public class L2HConverter extends LaTeXParserListener
 
    private String suffix = "html";
 
+   private Vector<String> extraHead=null;
+
    private Vector<String> extraCssStyles = new Vector<String>();
+
+   private HashMap<String,TeXObject> internalReferences;
 
    private HashMap<String,String> defaultStyles;
 
    private Stack<TrivListDec> trivListStack = new Stack<TrivListDec>();
+
+   public static final String MIME_TYPE_PDF = "application/pdf";
+   public static final String MIME_TYPE_PNG = "image/png";
+   public static final String MIME_TYPE_JPEG = "image/jpeg";
 }

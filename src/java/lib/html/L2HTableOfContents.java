@@ -65,6 +65,8 @@ public class L2HTableOfContents extends ControlSequence
          stack.push(listener.getControlSequence("input"));
       }
 
+      stack.push(listener.createGroup("toc"));
+      stack.push(new TeXCsRef("label"));
       stack.push(new TeXCsRef("contentsname"));
       stack.push(listener.getOther('*'));
       stack.push(cs);
@@ -93,6 +95,8 @@ public class L2HTableOfContents extends ControlSequence
          parser.push(listener.getControlSequence("input"));
       }
 
+      parser.push(listener.createGroup("toc"));
+      parser.push(new TeXCsRef("label"));
       parser.push(new TeXCsRef("contentsname"));
       parser.push(listener.getOther('*'));
       parser.push(cs);

@@ -21,6 +21,7 @@ package com.dickimawbooks.texparserlib.html;
 import java.io.IOException;
 import java.util.Vector;
 import java.util.Iterator;
+import java.awt.Color;
 
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.*;
@@ -67,6 +68,8 @@ public class L2HToImage extends ControlSequence
       KeyValList keyValList = null;
 
       TeXObject alt = null;
+      TeXObject preAlt = null;
+      TeXObject postAlt = null;
       String type = null;
       String name = null;
       boolean crop = true;
@@ -75,6 +78,8 @@ public class L2HToImage extends ControlSequence
       {
          keyValList = KeyValList.getList(parser, options);
          alt = keyValList.getValue("alt");
+         preAlt =keyValList.getValue("pre-alt"); 
+         postAlt =keyValList.getValue("post-alt"); 
 
          TeXObject nameObj = keyValList.getExpandedValue("name", parser, stack);
 
@@ -90,17 +95,9 @@ public class L2HToImage extends ControlSequence
             type = typeObj.toString(parser);
          }
 
-         TeXObject cropObj = keyValList.getExpandedValue("crop", parser, stack);
+         Boolean boolVal = keyValList.getBoolean("crop", parser, stack);
 
-         if (cropObj != null)
-         {
-            String cropVal = cropObj.toString(parser).trim();
-
-            if (!cropVal.isEmpty())
-            {
-               crop = Boolean.valueOf(cropVal).booleanValue();
-            }
-         }
+         crop = (boolVal == null ? false : boolVal.booleanValue());
       }
 
       if (alt == null)
@@ -108,77 +105,63 @@ public class L2HToImage extends ControlSequence
          alt = arg;
       }
 
-      String preamble = null;
-
-      ControlSequence cs = parser.getControlSequence(
-         "TeXParserLibToImagePreamble");
-
-      if (cs != null && cs instanceof Expandable)
+      if (preAlt != null)
       {
-         TeXObjectList expanded;
-
-         if (stack == parser)
+         if (alt instanceof TeXObjectList && !(alt instanceof Group))
          {
-            expanded = ((Expandable)cs).expandonce(parser);
+            ((TeXObjectList)alt).push(preAlt);
          }
          else
          {
-            expanded = ((Expandable)cs).expandonce(parser, stack);
+            TeXObjectList list = new TeXObjectList();
+            list.add(preAlt);
+            list.add(alt);
+            alt = list;
          }
+      }
 
-         if (expanded != null)
+      if (postAlt != null)
+      {
+         if (alt instanceof TeXObjectList && !(alt instanceof Group))
          {
-            preamble = expanded.toString(parser);
+            ((TeXObjectList)alt).add(postAlt);
+         }
+         else
+         {
+            TeXObjectList list = new TeXObjectList();
+            list.add(alt);
+            list.add(postAlt);
+            alt = list;
          }
       }
 
       L2HConverter listener = (L2HConverter)parser.getListener();
 
-      if (preamble == null)
+      String preamble = listener.getImagePreamble();
+
+      StringBuilder content = new StringBuilder();
+
+      Color fgCol = parser.getSettings().getFgColor();
+      Color bgCol = parser.getSettings().getBgColor();
+
+      if (fgCol != null && fgCol != Color.BLACK)
       {
-         StringBuilder builder = new StringBuilder();
-
-         LaTeXFile cls = listener.getDocumentClass();
-
-         if (cls == null)
-         {
-            builder.append("\\documentclass{article}");
-         }
-         else
-         {
-            builder.append("\\documentclass");
-
-            KeyValList styOpts = cls.getOptions();
-
-            if (styOpts != null)
-            {
-               builder.append(String.format("[%s]", styOpts.format()));
-            }
-
-            builder.append(String.format("{%s}%n", cls.getName()));
-         }
-
-         for (LaTeXFile lf : listener.getLoadedPackages())
-         {
-            builder.append("\\usepackage");
-
-            KeyValList styOpts = lf.getOptions();
-
-            if (styOpts != null)
-            {
-               builder.append(String.format("[%s]", styOpts.format()));
-            }
-
-            builder.append(String.format("{%s}%n", lf.getName()));
-         }
-
-         builder.append("\\pagestyle{empty}%n");
-
-         preamble = builder.toString();
+         content.append(String.format("\\color[rgb]{%0.3f,%0.3f,%0.3f}",
+           fgCol.getRed()/255.0f, fgCol.getGreen()/255.0f,
+           fgCol.getBlue()/255.0f));
       }
 
-      L2HImage image = listener.toImage(parser, preamble, 
-       arg.toString(parser), type, alt, name, crop);
+      if (bgCol != null && bgCol != Color.WHITE)
+      {
+         content.append(String.format("\\pagecolor[rgb]{%0.3f,%0.3f,%0.3f}",
+           bgCol.getRed()/255.0f, bgCol.getGreen()/255.0f,
+           bgCol.getBlue()/255.0f));
+      }
+
+      content.append(arg.toString(parser));
+
+      L2HImage image = listener.toImage(preamble, 
+       content.toString(), type, alt, name, crop);
 
       if (image != null)
       {

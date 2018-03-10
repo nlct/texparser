@@ -41,102 +41,10 @@ public class L2HSection extends Section
       return new L2HSection(getName());
    }
 
-   protected void unnumbered(TeXParser parser, TeXObjectList stack,
-       TeXObject arg)
-   throws IOException
+   protected TeXObject popLabel(TeXParser parser, TeXObjectList stack)
+     throws IOException
    {
       L2HConverter listener = (L2HConverter)parser.getListener();
-
-      String tag = getTag();
-
-      if (tag == null)
-      {
-         listener.write("<div class=\""+getName()+"\">");
-      }
-      else
-      {
-         listener.write("<"+tag+">");
-      }
-
-      TeXObject cs = parser.getControlSequence("theH"+getName()+"*");
-
-      if (cs == null)
-      {
-         cs = parser.getControlSequence("the"+getName()+"*");
-      }
-
-      if (cs != null)
-      {
-         if (cs instanceof Expandable)
-         {
-            TeXObjectList expanded;
-
-            if (parser == stack || stack == null)
-            {
-               expanded = ((Expandable)cs).expandfully(parser);
-            }
-            else
-            {
-               expanded = ((Expandable)cs).expandfully(parser, stack);
-            }
-
-            if (expanded != null)
-            {
-               cs = expanded;
-            }
-         }
-
-         String counter = getName()+"*";
-
-         listener.write(String.format("<a name=\"%s\"></a>",
-           HtmlTag.getUriFragment(counter+"."+cs.toString(parser))));
-
-         listener.stepcounter(counter);
-      }
-
-      if (parser == stack || stack == null)
-      {
-         arg.process(parser);
-      }
-      else
-      {
-         arg.process(parser, stack);
-      }
-
-      if (tag == null)
-      {
-         listener.write("</div>");
-      }
-      else
-      {
-         listener.write("</"+tag+">");
-      }
-   }
-
-   protected void numbered(TeXParser parser, TeXObjectList stack,
-     TeXObject optArg, TeXObject arg)
-       throws IOException
-   {
-      L2HConverter listener = (L2HConverter)parser.getListener();
-
-      TeXObjectList list = new TeXObjectList();
-
-      String tag = getTag();
-
-      if (tag == null)
-      {
-         list.add(new HtmlTag("<div class=\""+getName()+"\">"));
-      }
-      else
-      {
-         list.add(new HtmlTag("<"+tag+">"));
-      }
-
-      list.add(listener.getControlSequence("the"+getName()));
-      list.add(listener.getOther('.'));
-      list.add(listener.getSpace());
-
-      // Is there a label following the section command?
 
       TeXObject object;
 
@@ -149,7 +57,7 @@ public class L2HSection extends Section
          object = stack.popStack(parser);
       }
 
-      while (object instanceof WhiteSpace || object.isPar())
+      while (object != null && (object instanceof WhiteSpace || object.isPar()))
       {
          if (parser == stack || stack == null)
          {
@@ -198,21 +106,151 @@ public class L2HSection extends Section
             }
          }
 
-         list.add(1, new HtmlTag("<a name=\""
-           +HtmlTag.getUriFragment(label.toString(parser))+"\">"));
+         return label;
+      }
+
+      if (parser == stack || stack == null)
+      {
+         parser.push(object);
+      }
+      else
+      {
+         stack.push(object);
+      }
+
+      return null;
+   }
+
+   protected void unnumbered(TeXParser parser, TeXObjectList stack,
+       TeXObject arg)
+   throws IOException
+   {
+      L2HConverter listener = (L2HConverter)parser.getListener();
+
+      String tag = getTag();
+
+      listener.startSection(false, tag, getName());
+
+      if (tag == null)
+      {
+         listener.write("<div class=\""+getName()+"\">");
+      }
+      else
+      {
+         listener.write("<"+tag+">");
+      }
+
+      TeXObject cs = parser.getControlSequence("theH"+getName()+"*");
+      String labelName = null;
+
+      if (cs == null)
+      {
+         cs = parser.getControlSequence("the"+getName()+"*");
+      }
+
+      if (cs != null)
+      {
+         if (cs instanceof Expandable)
+         {
+            TeXObjectList expanded;
+
+            if (parser == stack || stack == null)
+            {
+               expanded = ((Expandable)cs).expandfully(parser);
+            }
+            else
+            {
+               expanded = ((Expandable)cs).expandfully(parser, stack);
+            }
+
+            if (expanded != null)
+            {
+               cs = expanded;
+            }
+         }
+
+         String counter = getName()+"*";
+
+         TeXObject label = popLabel(parser, stack);
+
+         if (label != null)
+         {
+            labelName = label.toString(parser);
+         }
+         else
+         {
+            labelName = HtmlTag.getUriFragment(counter+"."+cs.toString(parser));
+         }
+
+         listener.write(String.format("<a name=\"%s\"></a>", labelName));
+
+         listener.stepcounter(counter);
+      }
+
+      if (parser == stack || stack == null)
+      {
+         arg.process(parser);
+      }
+      else
+      {
+         arg.process(parser, stack);
+      }
+
+      if (labelName != null)
+      {
+         listener.createLinkBox(labelName).process(parser);
+      }
+
+      if (tag == null)
+      {
+         listener.write("</div>");
+      }
+      else
+      {
+         listener.write("</"+tag+">");
+      }
+   }
+
+   protected void numbered(TeXParser parser, TeXObjectList stack,
+     TeXObject optArg, TeXObject arg)
+       throws IOException
+   {
+      L2HConverter listener = (L2HConverter)parser.getListener();
+
+      TeXObjectList list = new TeXObjectList();
+
+      String tag = getTag();
+
+      listener.startSection(true, tag, getName());
+
+      if (tag == null)
+      {
+         list.add(new HtmlTag("<div class=\""+getName()+"\">"));
+      }
+      else
+      {
+         list.add(new HtmlTag("<"+tag+">"));
+      }
+
+      list.add(listener.getControlSequence("the"+getName()));
+      list.add(listener.getOther('.'));
+      list.add(listener.getSpace());
+
+      String labelName=null;
+
+      // Is there a label following the section command?
+
+      TeXObject label = popLabel(parser, stack);
+
+      if (label != null)
+      {
+         labelName = HtmlTag.getUriFragment(label.toString(parser));
+
+         list.add(1, new HtmlTag(String.format("<a name=\"%s\">", labelName)));
          list.add(new HtmlTag("</a>"));
       }
       else
       {
-         if (parser == stack || stack == null)
-         {
-            parser.push(object);
-         }
-         else
-         {
-            stack.push(object);
-         }
-
          TeXObject cs = parser.getControlSequence("theH"+getName());
 
          if (cs == null)
@@ -241,13 +279,20 @@ public class L2HSection extends Section
                }
             }
 
-            list.add(1, new HtmlTag("<a name=\""
-              +HtmlTag.getUriFragment(getName()+"."+cs.toString(parser))+"\">"));
+            labelName = HtmlTag.getUriFragment(String.format("%s.%s", 
+              getName(), cs.toString(parser)));
+
+            list.add(1, new HtmlTag(String.format("<a name=\"%s\">", labelName)));
             list.add(new HtmlTag("</a>"));
          }
       }
 
       list.add(arg);
+
+      if (labelName != null)
+      {
+         list.add(listener.createLinkBox(labelName));
+      }
 
       if (tag == null)
       {

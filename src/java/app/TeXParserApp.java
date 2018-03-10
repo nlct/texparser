@@ -31,6 +31,7 @@ import java.nio.file.Files;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.nio.charset.Charset;
+import java.awt.Dimension;
 
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.plain.*;
@@ -200,14 +201,14 @@ public class TeXParserApp implements TeXApp
 
       L2HConverter listener = new L2HConverter(this, true, outDir, true)
       {
-         public L2HImage toImage(TeXParser parser, String preamble, 
+         public L2HImage toImage(String preamble, 
           String content, String mimeType, TeXObject alt, String name, 
           boolean crop)
          throws IOException
          {
             try
             {
-               return createImage(parser, preamble, content, mimeType, alt, 
+               return createImage(getParser(), preamble, content, mimeType, alt, 
                  name, crop);
             }
             catch (InterruptedException e)
@@ -216,7 +217,24 @@ public class TeXParserApp implements TeXApp
                  getMessage("error.interrupted"));
             }
          }
+
+         public Dimension getImageSize(File file, String mimetype)
+         {
+            try
+            {
+               return getImageFileDimensions(getParser(), file, mimetype);
+            }
+            catch (IOException | InterruptedException e)
+            {
+               return null;
+            }
+         }
       };
+
+      if (extraHead != null)
+      {
+         listener.addToHead(extraHead);
+      }
 
       TeXParser parser = new TeXParser(listener);
 
@@ -313,7 +331,7 @@ public class TeXParserApp implements TeXApp
 
          if (mimetype == null)
          {
-            mimetype = "image/png";
+            mimetype = L2HConverter.MIME_TYPE_PNG;
          }
 
          File pdfFile = new File(tmpDir, name+".pdf");
@@ -342,95 +360,29 @@ public class TeXParserApp implements TeXApp
             }
          }
 
-         int width = 0;
-         int height = 0;
+         Dimension imageDim = null;
 
-         if (mimetype.equals("application/pdf"))
+         if (mimetype.equals(L2HConverter.MIME_TYPE_PDF))
          {
             destPath = (new File(outDir, name+".pdf")).toPath();
 
             Files.copy(pdfFile.toPath(), destPath);
          }
-         else if (mimetype.equals("image/png"))
+         else if (mimetype.equals(L2HConverter.MIME_TYPE_PNG))
          {
             File pngFile = pdfToImage(pdfFile, name, "png");
 
-            DefaultProcessListener processListener = 
-              new DefaultProcessListener(this, 1);
-
-            invoker = "file";
-
-            exitCode = execCommandAndWaitFor(
-               new String[]{invoker, pngFile.getName()}, 
-               null, tmpDir, processListener);
-
-            if (exitCode == 0)
-            {
-               Pattern pat = Pattern.compile(".*: PNG image data, (\\d+) x (\\d+),.*");
-
-               Matcher m = pat.matcher(processListener.getSavedLine());
-
-               if (m.matches())
-               {
-                  try
-                  {
-                     width = Integer.parseInt(m.group(1));
-                     height = Integer.parseInt(m.group(2));
-                  }
-                  catch (NumberFormatException e)
-                  {// shouldn't happen, pattern ensures format correct
-                  }
-               }
-            }
-            else
-            {
-               warning(parser, getMessage("error.app_failed",
-                 String.format("%s \"%s\"", invoker, pngFile.getName()),
-                 exitCode));
-            }
+            imageDim = getImageFileDimensions(parser, pngFile, mimetype);
 
             destPath = (new File(outDir, pngFile.getName())).toPath();
 
             Files.copy(pngFile.toPath(), destPath);
          }
-         else if (mimetype.equals("image/jpeg"))
+         else if (mimetype.equals(L2HConverter.MIME_TYPE_JPEG))
          {
             File jpegFile = pdfToImage(pdfFile, name, "jpeg");
 
-            DefaultProcessListener processListener = 
-              new DefaultProcessListener(this, 1);
-
-            invoker = "file";
-
-            exitCode = execCommandAndWaitFor(
-               new String[]{invoker, jpegFile.getName()}, 
-               null, tmpDir, processListener);
-
-            if (exitCode == 0)
-            {
-               Pattern pat = Pattern.compile(
-                  ".*: JPEG image data, .*, (\\d+)x(\\d+),.*");
-
-               Matcher m = pat.matcher(processListener.getSavedLine());
-
-               if (m.matches())
-               {
-                  try
-                  {
-                     width = Integer.parseInt(m.group(1));
-                     height = Integer.parseInt(m.group(2));
-                  }
-                  catch (NumberFormatException e)
-                  {// shouldn't happen, pattern ensures format correct
-                  }
-               }
-            }
-            else
-            {
-               warning(parser, getMessage("error.app_failed",
-                 String.format("%s \"%s\"", invoker, jpegFile.getName()),
-                 exitCode));
-            }
+            imageDim = getImageFileDimensions(parser, jpegFile, mimetype);
 
             destPath = (new File(outDir, jpegFile.getName())).toPath();
 
@@ -441,9 +393,18 @@ public class TeXParserApp implements TeXApp
             warning(parser, getMessage("warning.unsupported.image.type",
              mimetype));
 
-            mimetype="application/pdf";
+            mimetype=L2HConverter.MIME_TYPE_PDF;
             destPath = (new File(outDir, name+".pdf")).toPath();
             Files.copy(pdfFile.toPath(), destPath);
+         }
+
+         int width=0;
+         int height=0;
+
+         if (imageDim != null)
+         {
+            width = imageDim.width;
+            height = imageDim.height;
          }
 
          image = new L2HImage(outDir.toPath().relativize(destPath), 
@@ -458,6 +419,67 @@ public class TeXParserApp implements TeXApp
       }
 
       return image;
+   }
+
+   public Dimension getImageFileDimensions(TeXParser parser, File file, 
+     String type)
+     throws IOException,InterruptedException
+   {
+      DefaultProcessListener processListener = 
+        new DefaultProcessListener(this, 1);
+
+      String invoker = "file";
+
+      int exitCode = execCommandAndWaitFor(
+         new String[]{invoker, file.getName()}, null, null, processListener);
+
+      Pattern pat = null;
+
+      if (L2HConverter.MIME_TYPE_PNG.equals(type))
+      {
+         pat = PNG_INFO;
+      }
+      else if (L2HConverter.MIME_TYPE_JPEG.equals(type))
+      {
+         pat = JPEG_INFO;
+      }
+      else
+      {
+         return null;
+      }
+         
+      if (exitCode == 0)
+      {
+         String line = processListener.getSavedLine();
+
+         if (line == null)
+         {
+            return null;
+         }
+
+         Matcher m = pat.matcher(line);
+
+         if (m.matches())
+         {
+            try
+            {
+               return new Dimension(
+                  Integer.parseInt(m.group(1)),
+                  Integer.parseInt(m.group(2)));
+            }
+            catch (NumberFormatException e)
+            {// shouldn't happen, pattern ensures format correct
+            }
+         }
+      }
+      else
+      {
+         warning(parser, getMessage("error.app_failed",
+           String.format("%s \"%s\"", invoker, file.getName()),
+           exitCode));
+      }
+
+      return null;
    }
 
    protected File pdfToImage(File pdfFile, String basename, String format) 
@@ -672,13 +694,25 @@ public class TeXParserApp implements TeXApp
    public void copyFile(File src, File dest)
    throws IOException
    {
+      if (!isReadAccessAllowed(src))
+      {
+         throw new IOException(getMessage("message.no.read", src));
+      }
+
+      if (!isWriteAccessAllowed(dest))
+      {
+         throw new IOException(getMessage("message.no.write", dest));
+      }
+
       File destDirFile = dest.getParentFile();
 
       if (!destDirFile.exists())
       {
+          debug(String.format("mkdir %s", destDirFile));
           Files.createDirectories(destDirFile.toPath());
       }
 
+      debug(String.format("%s -> %s", src, dest));
       Files.copy(src.toPath(), dest.toPath());
    }
 
@@ -1265,6 +1299,18 @@ public class TeXParserApp implements TeXApp
          {
             outputFormat = "html";
          }
+         else if (args[i].equals("--head"))
+         {
+            i++;
+
+            if (i == args.length)
+            {
+               throw new InvalidSyntaxException(
+                 getMessage("error.syntax.missing_filename", args[i-1]));
+            }
+
+            extraHead = args[i];
+         }
          else if (args[i].equals("--debug"))
          {
             debugMode = true;
@@ -1398,5 +1444,12 @@ public class TeXParserApp implements TeXApp
 
    private int nameIdx=0;
 
+   private String extraHead=null;
+
    private File tmpDir=null;
+
+   public static final Pattern PNG_INFO =
+    Pattern.compile(".*: PNG image data, (\\d+) x (\\d+),.*");
+   public static final Pattern JPEG_INFO =
+    Pattern.compile(".*: JPEG image data, .*, (\\d+)x(\\d+),.*");
 }
