@@ -26,11 +26,18 @@ import com.dickimawbooks.texparserlib.latex.*;
 
 public class GraphicsSty extends LaTeXSty
 {
-   public GraphicsSty(KeyValList options, String name, 
-      LaTeXParserListener listener)
+   public GraphicsSty(KeyValList options, 
+      LaTeXParserListener listener, boolean loadParentOptions)
    throws IOException
    {
-      super(options, name, listener);
+      this(options, "graphics", listener, loadParentOptions);
+   }
+
+   public GraphicsSty(KeyValList options, String name, 
+      LaTeXParserListener listener, boolean loadParentOptions)
+   throws IOException
+   {
+      super(options, name, listener, loadParentOptions);
    }
 
    public void addDefinitions()

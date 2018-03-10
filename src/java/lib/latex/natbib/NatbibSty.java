@@ -25,10 +25,11 @@ import com.dickimawbooks.texparserlib.latex.*;
 
 public class NatbibSty extends LaTeXSty
 {
-   public NatbibSty(KeyValList options, LaTeXParserListener listener)
+   public NatbibSty(KeyValList options, LaTeXParserListener listener, 
+     boolean loadParentOptions)
    throws IOException
    {
-      super(options, "natbib", listener);
+      super(options, "natbib", listener, loadParentOptions);
    }
 
    public void addDefinitions()

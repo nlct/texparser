@@ -42,14 +42,7 @@ public class AtIfClassLoaded extends AtIfPackageLoaded
 
    public boolean isLoaded(LaTeXParserListener listener, String name)
    {
-      LaTeXFile docCls = listener.getDocumentClass();
-
-      if (docCls == null)
-      {
-         return false;
-      }
-
-      return docCls.getName().equals(name);
+      return listener.isClassLoaded(name);
    }
 
 }

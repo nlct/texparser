@@ -267,10 +267,11 @@ public class LaTeX2LaTeX extends LaTeXParserListener
       }
    }
 
-   public void documentclass(KeyValList options, String clsName)
+   public void documentclass(KeyValList options, String clsName, 
+     boolean loadParentOptions)
      throws IOException
    {
-      super.documentclass(options, clsName);
+      super.documentclass(options, clsName, loadParentOptions);
 
       writeCodePoint(parser.getEscChar());
       write("documentclass");
@@ -287,7 +288,9 @@ public class LaTeX2LaTeX extends LaTeXParserListener
       writeCodePoint(parser.getEgChar());
    }
 
-   public LaTeXSty usepackage(KeyValList options, String styName) throws IOException
+   public LaTeXSty usepackage(KeyValList options, String styName, 
+     boolean loadParentOptions)
+     throws IOException
    {
       if (styName.equals("graphics") || styName.equals("epsfig"))
       {
@@ -297,7 +300,7 @@ public class LaTeX2LaTeX extends LaTeXParserListener
          styName = "graphicx";
       }
 
-      LaTeXSty sty = super.usepackage(options, styName);
+      LaTeXSty sty = super.usepackage(options, styName, loadParentOptions);
 
       writeCodePoint(parser.getEscChar());
       write("usepackage");

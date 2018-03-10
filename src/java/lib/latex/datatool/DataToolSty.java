@@ -30,10 +30,11 @@ import com.dickimawbooks.texparserlib.primitives.*;
 
 public class DataToolSty extends LaTeXSty
 {
-   public DataToolSty(KeyValList options, LaTeXParserListener listener)
+   public DataToolSty(KeyValList options, LaTeXParserListener listener, 
+      boolean loadParentOptions)
    throws IOException
    {
-      super(options, "datatool", listener);
+      super(options, "datatool", listener, loadParentOptions);
    }
 
    public void addDefinitions()
@@ -87,13 +88,13 @@ public class DataToolSty extends LaTeXSty
    protected void preOptions()
      throws IOException
    {
-      getListener().usepackage(null, "etoolbox");
+      getListener().requirepackage(null, "etoolbox", false);
 
-      LaTeXSty sty = getListener().requirepackage("datatool-base");
+      LaTeXSty sty = getListener().requirepackage(null, "datatool-base", true);
 
       if (sty == null || !(sty instanceof DataToolBaseSty))
       {
-         dataToolBaseSty = new DataToolBaseSty(null, getListener());
+         dataToolBaseSty = new DataToolBaseSty(null, getListener(), true);
          getListener().usepackage(dataToolBaseSty);
       }
       else

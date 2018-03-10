@@ -29,17 +29,17 @@ import com.dickimawbooks.texparserlib.generic.*;
 public class JmlrCls extends LaTeXCls
 {
    public JmlrCls(KeyValList options, 
-      LaTeXParserListener listener)
+      LaTeXParserListener listener, boolean loadParentOptions)
    throws IOException
    {
-      this(options, "jmlr", listener);
+      this(options, "jmlr", listener, loadParentOptions);
    }
 
    public JmlrCls(KeyValList options, String name, 
-      LaTeXParserListener listener)
+      LaTeXParserListener listener, boolean loadParentOptions)
    throws IOException
    {
-      super(options, name, listener);
+      super(options, name, listener, loadParentOptions);
    }
 
    public void addDefinitions()
@@ -188,13 +188,13 @@ public class JmlrCls extends LaTeXCls
    {
       LaTeXParserListener listener = getListener();
 
-      listener.usepackage(null, "xkeyval");
-      listener.usepackage(null, "calc");
-      listener.usepackage(null, "etoolbox");
+      listener.requirepackage("xkeyval");
+      listener.requirepackage("calc");
+      listener.requirepackage("etoolbox");
 
-      listener.usepackage(null, "amsmath");
-      listener.usepackage(null, "amssymb");
-      LaTeXSty sty = listener.usepackage(null, "natbib");
+      listener.requirepackage("amsmath");
+      listener.requirepackage("amssymb");
+      LaTeXSty sty = listener.requirepackage("natbib");
 
       if (sty == null)
       {
@@ -206,17 +206,17 @@ public class JmlrCls extends LaTeXCls
          sty.processOption("round");
       }
 
-      listener.usepackage(null, "graphicx");
-      listener.usepackage(null, "url");
+      listener.requirepackage("graphicx");
+      listener.requirepackage("url");
 
       KeyValList opts = new KeyValList();
       opts.put("x11names", new GenericCommand("empty"));
-      listener.usepackage(opts, "xcolor");
+      listener.requirepackage(opts, "xcolor", false);
 
       opts = new KeyValList();
       opts.put("algo2e", new GenericCommand("empty"));
       opts.put("ruled", new GenericCommand("empty"));
-      listener.usepackage(opts, "algorithm2e");
+      listener.requirepackage(opts, "algorithm2e", false);
 
    }
 
@@ -239,8 +239,8 @@ public class JmlrCls extends LaTeXCls
          cs.process(parser);
       }
 
-      listener.usepackage(null, "hyperref");
-      listener.usepackage(null, "nameref");
+      listener.requirepackage(null, "hyperref", false);
+      listener.requirepackage(null, "nameref", false);
 
       registerControlSequence(new GenericCommand("@jmlrproceedings",
        null, listener.createString("Journal of Machine Learning Research")));

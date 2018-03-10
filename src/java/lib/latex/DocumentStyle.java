@@ -142,11 +142,11 @@ public class DocumentStyle extends ControlSequence
       }
 
       listener.substituting(toString(parser), (new DocumentClass()).toString(parser));
-      listener.documentclass(keyValList, clsName);
+      listener.documentclass(keyValList, clsName, false);
 
       for (String sty : styList)
       {
-         listener.usepackage(null, sty);
+         listener.usepackage(null, sty, false);
       }
    }
 }

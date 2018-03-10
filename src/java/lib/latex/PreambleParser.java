@@ -96,10 +96,11 @@ public class PreambleParser extends LaTeXParserListener
    {
       PreambleParser listener = new PreambleParser(app)
       {
-         public void documentclass(KeyValList options, String clsName)
+         public void documentclass(KeyValList options, String clsName, 
+            boolean loadParentOptions)
             throws IOException
          {
-            super.documentclass(options, clsName);
+            super.documentclass(options, clsName, loadParentOptions);
             throw new EOFException();
          }
       };

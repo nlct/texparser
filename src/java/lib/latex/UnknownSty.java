@@ -29,14 +29,14 @@ public class UnknownSty extends LaTeXSty
    public UnknownSty(String name, LaTeXParserListener listener)
    throws IOException
    {
-      super(name, listener);
+      this(null, name, listener, false);
    }
 
    public UnknownSty(KeyValList options, String name, 
-      LaTeXParserListener listener)
+      LaTeXParserListener listener, boolean loadParentOptions)
    throws IOException
    {
-      super(options, name, listener);
+      super(options, name, listener, loadParentOptions);
    }
 
    public void addDefinitions()

@@ -26,17 +26,18 @@ public class UsePackage extends ControlSequence
 {
    public UsePackage()
    {
-      this("usepackage");
+      this("usepackage", false);
    }
 
-   public UsePackage(String name)
+   public UsePackage(String name, boolean loadParentOptions)
    {
       super(name);
+      this.loadParentOptions = loadParentOptions;
    }
 
    public Object clone()
    {
-      return new UsePackage(getName());
+      return new UsePackage(getName(), loadParentOptions);
    }
 
    public void preProcess(TeXParser parser, TeXObjectList stack, 
@@ -45,18 +46,35 @@ public class UsePackage extends ControlSequence
    {
    }
 
-   public void process(TeXParser parser, TeXObjectList list)
+   public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      TeXObject options = list.popArg(parser, '[', ']');
+      TeXObject options;
+      TeXObject sty;
 
-      TeXObject sty = list.popArg(parser);
+      if (parser == stack)
+      {
+         options = parser.popNextArg('[', ']');
+         sty = parser.popNextArg();
+      }
+      else
+      {
+         options = stack.popArg(parser, '[', ']');
+         sty = stack.popArg(parser);
+      }
 
       TeXObjectList expanded = null;
 
       if (sty instanceof Expandable)
       {
-         expanded = ((Expandable)sty).expandfully(parser, list);
+         if (parser == stack)
+         {
+            expanded = ((Expandable)sty).expandfully(parser);
+         }
+         else
+         {
+            expanded = ((Expandable)sty).expandfully(parser, stack);
+         }
       }
 
       String styNameList;
@@ -70,48 +88,15 @@ public class UsePackage extends ControlSequence
          styNameList = expanded.toString(parser);
       }
 
-      KeyValList keyValList = null;
+      TeXObject version;
 
-      if (options != null)
+      if (parser == stack)
       {
-         keyValList = KeyValList.getList(parser, options);
-      }
-
-      LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
-
-      preProcess(parser, list, keyValList, styNameList);
-
-      String[] split = styNameList.split(",");
-
-      for (int i = 0; i < split.length; i++)
-      {
-         listener.usepackage(keyValList, split[i].trim());
-      }
-   }
-
-   public void process(TeXParser parser)
-     throws IOException
-   {
-      TeXObject options = parser.popNextArg('[', ']');
-
-      TeXObject sty = parser.popNextArg();
-
-      TeXObjectList expanded = null;
-
-      if (sty instanceof Expandable)
-      {
-         expanded = ((Expandable)sty).expandfully(parser);
-      }
-
-      String styNameList;
-
-      if (expanded == null)
-      {
-         styNameList = sty.toString(parser);
+         version = parser.popNextArg('[', ']');
       }
       else
       {
-         styNameList = expanded.toString(parser);
+         version = stack.popArg(parser, '[', ']');
       }
 
       KeyValList keyValList = null;
@@ -123,7 +108,7 @@ public class UsePackage extends ControlSequence
 
       LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
 
-      preProcess(parser, parser, keyValList, styNameList);
+      preProcess(parser, stack, keyValList, styNameList);
 
       String[] split = styNameList.split(",");
 
@@ -136,7 +121,15 @@ public class UsePackage extends ControlSequence
             styName = "MnSymbol";
          }
 
-         listener.usepackage(keyValList, styName);
+         listener.usepackage(keyValList, split[i].trim(), loadParentOptions);
       }
    }
+
+   public void process(TeXParser parser)
+     throws IOException
+   {
+      process(parser, parser);
+   }
+
+   protected boolean loadParentOptions = false;
 }

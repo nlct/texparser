@@ -27,10 +27,11 @@ import com.dickimawbooks.texparserlib.generic.*;
 
 public class TextCompSty extends LaTeXSty
 {
-   public TextCompSty(KeyValList options, LaTeXParserListener listener)
+   public TextCompSty(KeyValList options, LaTeXParserListener listener, 
+     boolean loadParentOptions)
     throws IOException
    {
-      super(options, "textcomp", listener);
+      super(options, "textcomp", listener, loadParentOptions);
    }
 
    public void addDefinitions()

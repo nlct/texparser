@@ -34,17 +34,17 @@ import com.dickimawbooks.texparserlib.generic.*;
 public class Jmlr2eSty extends LaTeXSty
 {
    public Jmlr2eSty(KeyValList options, 
-      LaTeXParserListener listener)
+      LaTeXParserListener listener, boolean loadParentOptions)
    throws IOException
    {
-      this(options, "jmlr2e", listener);
+      this(options, "jmlr2e", listener, loadParentOptions);
    }
 
    public Jmlr2eSty(KeyValList options, String name, 
-      LaTeXParserListener listener)
+      LaTeXParserListener listener, boolean loadParentOptions)
    throws IOException
    {
-      super(options, name, listener);
+      super(options, name, listener, loadParentOptions);
    }
 
    public void addDefinitions()

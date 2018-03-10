@@ -26,11 +26,11 @@ import com.dickimawbooks.texparserlib.latex.*;
 
 public class BooktabsSty extends LaTeXSty
 {
-   public BooktabsSty(KeyValList options, String name, 
-      LaTeXParserListener listener)
+   public BooktabsSty(KeyValList options, 
+      LaTeXParserListener listener, boolean loadParentOptions)
    throws IOException
    {
-      super(options, name, listener);
+      super(options, "booktabs", listener, loadParentOptions);
    }
 
    public void addDefinitions()

@@ -28,10 +28,11 @@ import com.dickimawbooks.texparserlib.primitives.EndGroup;
 
 public class IfThenSty extends LaTeXSty
 {
-   public IfThenSty(KeyValList options, LaTeXParserListener listener)
+   public IfThenSty(KeyValList options, LaTeXParserListener listener, 
+     boolean loadParentOptions)
    throws IOException
    {
-      super(options, "ifthen", listener);
+      super(options, "ifthen", listener, loadParentOptions);
    }
 
    public void addDefinitions()

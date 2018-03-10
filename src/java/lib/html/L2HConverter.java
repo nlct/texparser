@@ -247,7 +247,7 @@ public class L2HConverter extends LaTeXParserListener
 
       try
       {
-         LaTeXSty sty = getLaTeXSty(null, "hyperref");
+         LaTeXSty sty = getLaTeXSty(null, "hyperref", false);
       }
       catch (IOException e)
       {
@@ -749,10 +749,11 @@ public class L2HConverter extends LaTeXParserListener
       extraHead.add(content);
    }
 
-   public void documentclass(KeyValList options, String clsName)
+   public void documentclass(KeyValList options, String clsName, 
+      boolean loadParentOptions)
      throws IOException
    {
-      super.documentclass(options, clsName);
+      super.documentclass(options, clsName, loadParentOptions);
 
       writeable.writeln("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 3.2 Final//EN\">");
       writeable.writeln("<html>");

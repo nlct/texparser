@@ -27,10 +27,11 @@ import com.dickimawbooks.texparserlib.generic.*;
 
 public class StixSty extends LaTeXSty
 {
-   public StixSty(KeyValList options, LaTeXParserListener listener)
+   public StixSty(KeyValList options, LaTeXParserListener listener, 
+     boolean loadParentOptions)
     throws IOException
    {
-      super(options, "stix", listener);
+      super(options, "stix", listener, loadParentOptions);
    }
 
    public void addDefinitions()

@@ -461,6 +461,24 @@ public abstract class DefaultTeXParserListener extends TeXParserListener
       this.writeable = writeable;
    }
 
+   public boolean isFileLoaded(String name, String ext)
+   {
+      return isFileLoaded(String.format("%s.%s", name, ext));
+   }
+
+   public boolean isFileLoaded(String filename)
+   {
+      for (TeXPath texPath : referencedFiles)
+      {
+         if (texPath.getLeaf().toString().equals(filename))
+         {
+            return true;
+         }
+      }
+
+      return false;
+   }
+
    public void addFileReference(TeXPath texPath)
    {
       if (!referencedFiles.contains(texPath))

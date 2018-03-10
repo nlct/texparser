@@ -26,41 +26,79 @@ import com.dickimawbooks.texparserlib.*;
 
 public abstract class LaTeXSty extends LaTeXFile
 {
-   public LaTeXSty(String name, LaTeXParserListener listener)
+   public LaTeXSty(KeyValList options, String name,
+      LaTeXParserListener listener, boolean loadParentOptions)
    throws IOException
    {
-      this(null, name, "sty", listener);
-   }
-
-   public LaTeXSty(String name, String ext, LaTeXParserListener listener)
-   throws IOException
-   {
-      this(null, name, ext, listener);
-   }
-
-   public LaTeXSty(KeyValList options, String name, 
-      LaTeXParserListener listener)
-   throws IOException
-   {
-      this(options, name, "sty", listener);
+      super(listener.getParser(), options, name, "sty");
+      init(options, name, listener, loadParentOptions);
    }
 
    public LaTeXSty(KeyValList options, String name, String ext,
-      LaTeXParserListener listener)
+      LaTeXParserListener listener, boolean loadParentOptions)
    throws IOException
    {
       super(listener.getParser(), options, name, ext);
+      init(options, name, listener, loadParentOptions);
+   }
+
+   private void init(KeyValList options, String name,
+      LaTeXParserListener listener, boolean loadParentOptions)
+    throws IOException
+   {
       this.name = name;
       this.listener = listener;
+      LaTeXFile prevSty = listener.getCurrentSty(getExtension());
 
-      if (options != null)
+      if (loadParentOptions && prevSty != null)
       {
-         load(options);
+         KeyValList parentOptions = prevSty.getOptions();
+
+         if (parentOptions != null)
+         {
+            for (Iterator<String> it = parentOptions.keySet().iterator();
+                 it.hasNext(); )
+            {
+               String key = it.next();
+               addOptionIfAbsent(key, parentOptions.get(key));
+            }
+
+            options = getOptions();
+         }
       }
-      else
+
+      listener.setCurrentSty(this, getExtension());
+
+      KeyValList passedOptions = listener.getPassedOptions(
+        String.format("%s.%s", getName(), getExtension()));
+
+      if (passedOptions != null)
       {
-         preOptions();
-         postOptions();
+         for (Iterator<String> it = passedOptions.keySet().iterator();
+              it.hasNext(); )
+         {
+            String key = it.next();
+            addOptionIfAbsent(key, passedOptions.get(key));
+         }
+
+         options = getOptions();
+      }
+
+      try
+      {
+         if (options != null)
+         {
+            load(options);
+         }
+         else
+         {
+            preOptions();
+            postOptions();
+         }
+      }
+      finally
+      {
+         listener.setCurrentSty(prevSty, getExtension());
       }
    }
 

@@ -32,31 +32,19 @@ import com.dickimawbooks.texparserlib.latex.*;
 
 public class ProbSolnSty extends LaTeXSty
 {
-   public ProbSolnSty(KeyValList options, LaTeXParserListener listener)
+   public ProbSolnSty(KeyValList options, LaTeXParserListener listener,
+     boolean loadParentOptions)
    throws IOException
    {
-      this(options, listener, 16, false);
+      this(16, false, options, listener, loadParentOptions);
    }
 
-   public ProbSolnSty(KeyValList options, LaTeXParserListener listener,
-    boolean saveDefOrder)
+   public ProbSolnSty(int dbInitialCapacity, boolean saveDefOrder, 
+     KeyValList options, LaTeXParserListener listener,
+     boolean loadParentOptions)
    throws IOException
    {
-      this(options, listener, 16, saveDefOrder);
-   }
-
-   public ProbSolnSty(KeyValList options, LaTeXParserListener listener,
-     int dbInitialCapacity)
-   throws IOException
-   {
-      this(options, listener, dbInitialCapacity, false);
-   }
-
-   public ProbSolnSty(KeyValList options, LaTeXParserListener listener,
-     int dbInitialCapacity, boolean saveDefOrder)
-   throws IOException
-   {
-      super(options, "probsoln", listener);
+      super(options, "probsoln", listener, loadParentOptions);
       this.dbInitialCapacity = dbInitialCapacity;
 
       databases = new ConcurrentHashMap<String,ProbSolnDatabase>();

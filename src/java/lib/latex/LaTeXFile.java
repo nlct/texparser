@@ -86,6 +86,19 @@ public class LaTeXFile extends TeXPath
       return options;
    }
 
+   public void addOptionIfAbsent(String key, TeXObject value)
+   {
+      if (options == null)
+      {
+         options = new KeyValList();
+         options.put(key, value);
+      }
+      else
+      {
+         options.putIfAbsent(key, value);
+      }
+   }
+
    private String baseName;
    private KeyValList options;
    private String ext;

@@ -28,10 +28,11 @@ import com.dickimawbooks.texparserlib.latex.fontenc.FontEncSty;
 
 public class TipaSty extends LaTeXSty
 {
-   public TipaSty(KeyValList options, LaTeXParserListener listener)
+   public TipaSty(KeyValList options, LaTeXParserListener listener, 
+     boolean loadParentOptions)
     throws IOException
    {
-      super(options, "tipa", listener);
+      super(options, "tipa", listener, loadParentOptions);
    }
 
    public void addDefinitions()
@@ -66,7 +67,7 @@ public class TipaSty extends LaTeXSty
 
       if (fontEncSty == null)
       {
-         fontEncSty = (FontEncSty)listener.usepackage(null, "fontenc");
+         fontEncSty = (FontEncSty)listener.usepackage(null, "fontenc", false);
       }
 
       t3Encoding = new T3Encoding();

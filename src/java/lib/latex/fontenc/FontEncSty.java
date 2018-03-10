@@ -27,17 +27,10 @@ import com.dickimawbooks.texparserlib.latex.*;
 public class FontEncSty extends LaTeXSty
 {
    public FontEncSty(KeyValList options,  
-      LaTeXParserListener listener)
+      LaTeXParserListener listener, boolean loadParentOptions)
    throws IOException
    {
-      this(options, "fontenc", listener);
-   }
-
-   public FontEncSty(KeyValList options, String name, 
-      LaTeXParserListener listener)
-   throws IOException
-   {
-      super(options, name, listener);
+      super(options, "fontenc", listener, loadParentOptions);
    }
 
    public void addDefinitions()

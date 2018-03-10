@@ -28,10 +28,11 @@ import com.dickimawbooks.texparserlib.primitives.EndGraf;
 
 public class DataToolBaseSty extends LaTeXSty
 {
-   public DataToolBaseSty(KeyValList options, LaTeXParserListener listener)
+   public DataToolBaseSty(KeyValList options, 
+     LaTeXParserListener listener, boolean loadParentOptions)
    throws IOException
    {
-      super(options, "datatool-base", listener);
+      super(options, "datatool-base", listener, loadParentOptions);
    }
 
    public void addDefinitions()
@@ -71,13 +72,13 @@ public class DataToolBaseSty extends LaTeXSty
    protected void preOptions()
      throws IOException
    {
-      getListener().usepackage(null, "etoolbox");
+      getListener().requirepackage("etoolbox");
 
       LaTeXSty sty = getListener().requirepackage("ifthen");
 
       if (sty == null || !(sty instanceof IfThenSty))
       {
-         ifThenSty = new IfThenSty(null, getListener());
+         ifThenSty = new IfThenSty(null, getListener(), false);
          getListener().usepackage(ifThenSty);
       }
       else

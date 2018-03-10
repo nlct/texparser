@@ -25,10 +25,11 @@ import com.dickimawbooks.texparserlib.latex.*;
 
 public class DocSty extends LaTeXSty
 {
-   public DocSty(KeyValList options, LaTeXParserListener listener)
+   public DocSty(KeyValList options, LaTeXParserListener listener, 
+     boolean loadParentOptions)
    throws IOException
    {
-      super(options, "doc", listener);
+      super(options, "doc", listener, loadParentOptions);
    }
 
    public void addDefinitions()
@@ -46,7 +47,7 @@ public class DocSty extends LaTeXSty
    protected void preOptions()
      throws IOException
    {
-      ((LaTeXParserListener)getListener()).usepackage(null, "shortvrb");
+      ((LaTeXParserListener)getListener()).requirepackage("shortvrb");
    }
 
 }

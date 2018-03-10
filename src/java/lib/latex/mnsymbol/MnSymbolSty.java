@@ -27,10 +27,11 @@ import com.dickimawbooks.texparserlib.generic.*;
 
 public class MnSymbolSty extends LaTeXSty
 {
-   public MnSymbolSty(KeyValList options, LaTeXParserListener listener)
+   public MnSymbolSty(KeyValList options, LaTeXParserListener listener, 
+     boolean loadParentOptions)
     throws IOException
    {
-      super(options, "MnSymbol", listener);
+      super(options, "MnSymbol", listener, loadParentOptions);
    }
 
    public void addDefinitions()

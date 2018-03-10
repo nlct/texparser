@@ -25,10 +25,11 @@ import com.dickimawbooks.texparserlib.latex.*;
 
 public class XspaceSty extends LaTeXSty
 {
-   public XspaceSty(KeyValList options, LaTeXParserListener listener)
+   public XspaceSty(KeyValList options, LaTeXParserListener listener, 
+     boolean loadParentOptions)
     throws IOException
    {
-      super(options, "xspace", listener);
+      super(options, "xspace", listener, loadParentOptions);
    }
 
    public void addDefinitions()

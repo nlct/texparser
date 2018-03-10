@@ -26,10 +26,11 @@ import com.dickimawbooks.texparserlib.primitives.Undefined;
 
 public class MhchemSty extends LaTeXSty
 {
-   public MhchemSty(KeyValList options, LaTeXParserListener listener)
+   public MhchemSty(KeyValList options, LaTeXParserListener listener, 
+     boolean loadParentOptions)
     throws IOException
    {
-      super(options, "mhchem", listener);
+      super(options, "mhchem", listener, loadParentOptions);
    }
 
    public void addDefinitions()

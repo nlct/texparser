@@ -28,16 +28,18 @@ import com.dickimawbooks.texparserlib.latex.*;
 
 public class ColorSty extends LaTeXSty
 {
-   public ColorSty(KeyValList options, LaTeXParserListener listener)
+   public ColorSty(KeyValList options, LaTeXParserListener listener,
+      boolean loadParentOptions)
     throws IOException
    {
-      this(options, "color", listener);
+      this(options, "color", listener, loadParentOptions);
    }
 
-   public ColorSty(KeyValList options, String styname, LaTeXParserListener listener)
+   public ColorSty(KeyValList options, String styname, 
+     LaTeXParserListener listener, boolean loadParentOptions)
     throws IOException
    {
-      super(options, styname, listener);
+      super(options, styname, listener, loadParentOptions);
       initColors();
    }
 

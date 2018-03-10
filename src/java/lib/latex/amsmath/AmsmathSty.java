@@ -26,11 +26,11 @@ import com.dickimawbooks.texparserlib.latex.*;
 
 public class AmsmathSty extends LaTeXSty
 {
-   public AmsmathSty(KeyValList options, String name, 
-      LaTeXParserListener listener)
+   public AmsmathSty(KeyValList options, 
+      LaTeXParserListener listener, boolean loadParentOptions)
    throws IOException
    {
-      super(options, name, listener);
+      super(options, "amsmath", listener, loadParentOptions);
    }
 
    public void addDefinitions()

@@ -27,10 +27,11 @@ import com.dickimawbooks.texparserlib.generic.*;
 
 public class UpGreekSty extends LaTeXSty
 {
-   public UpGreekSty(KeyValList options, LaTeXParserListener listener)
+   public UpGreekSty(KeyValList options, LaTeXParserListener listener, 
+     boolean loadParentOptions)
     throws IOException
    {
-      super(options, "upgreek", listener);
+      super(options, "upgreek", listener, loadParentOptions);
    }
 
    public void addDefinitions()

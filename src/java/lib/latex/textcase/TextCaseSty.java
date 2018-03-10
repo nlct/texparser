@@ -25,17 +25,11 @@ import com.dickimawbooks.texparserlib.latex.*;
 
 public class TextCaseSty extends LaTeXSty
 {
-   public TextCaseSty(KeyValList options, LaTeXParserListener listener)
+   public TextCaseSty(KeyValList options, LaTeXParserListener listener, 
+     boolean loadParentOptions)
    throws IOException
    {
-      this(options, "textcase", listener);
-   }
-
-   public TextCaseSty(KeyValList options, String name, 
-      LaTeXParserListener listener)
-   throws IOException
-   {
-      super(options, name, listener);
+      super(options, "textcase", listener, loadParentOptions);
    }
 
    public void addDefinitions()

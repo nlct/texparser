@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.EOFException;
 import java.io.File;
 import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.Vector;
 import java.util.Stack;
 import java.util.Iterator;
@@ -290,10 +291,16 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
 
       parser.putControlSequence(new Begin());
       parser.putControlSequence(new End());
+
       parser.putControlSequence(new DocumentClass());
-      parser.putControlSequence(new DocumentClass("LoadClass"));
+      parser.putControlSequence(new LoadDocumentClass());
+      parser.putControlSequence(
+         new LoadDocumentClass("LoadClassWithOptions", true));
       parser.putControlSequence(new UsePackage());
-      parser.putControlSequence(new UsePackage("RequirePackage"));
+      parser.putControlSequence(new UsePackage("RequirePackage", false));
+      parser.putControlSequence(
+        new UsePackage("RequirePackageWithOptions", true));
+
       parser.putControlSequence(new NewCommand());
       parser.putControlSequence(new NewCommand("renewcommand",
         NewCommand.OVERWRITE_FORCE));
@@ -893,8 +900,65 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       return docCls == null ? null : docCls.getOptions();
    }
 
+   public boolean isClassLoaded(String name)
+   {
+      if (docCls == null)
+      {
+         return false;
+      }
+
+      if (docCls.getName().equals(name))
+      {
+         return true;
+      }
+
+      if (loadedClasses == null)
+      {
+         return false;
+      }
+
+      // may have been loaded by \LoadClass
+
+      for (LaTeXCls cls : loadedClasses)
+      {
+         if (cls.getName().equals(name))
+         {
+            return true;
+         }
+      }
+
+      return false;
+   }
+
+   public void loadclass(KeyValList options,
+     String clsName, boolean loadParentOptions)
+     throws IOException
+   {
+      if (docCls == null)
+      {
+         documentclass(options, clsName, loadParentOptions);
+         return;
+      }
+
+      LaTeXCls cls = getLaTeXCls(options, clsName, loadParentOptions);
+
+      addFileReference(cls);
+
+      if (loadedClasses == null)
+      {
+         loadedClasses = new Vector<LaTeXCls>();
+      }
+
+      loadedClasses.add(cls);
+
+      if (cls instanceof UnknownCls && parseUnknownPackageEnabled(cls))
+      {
+         parsePackageFile(cls);
+      }
+   }
+
    public void documentclass(KeyValList options,
-     String clsName)
+     String clsName, boolean loadParentOptions)
      throws IOException
    {
       if (docCls != null)
@@ -904,61 +968,31 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
             LaTeXSyntaxException.ERROR_MULTI_CLS);
       }
 
-      docCls = getLaTeXCls(options, clsName);
+      docCls = getLaTeXCls(options, clsName, loadParentOptions);
 
       addFileReference(docCls);
 
-      if (docCls instanceof UnknownCls)
+      if (docCls instanceof UnknownCls && parseUnknownPackageEnabled(docCls))
       {
-         if (!docCls.wasFoundByKpsewhich())
-         {
-            // Not found by kpsewhich so possibly a custom class
-            // which might be simple enough to parse.
-
-            File file = docCls.getFile();
-
-            if (file.exists())
-            {
-               // This may not work if the class is too
-               // complicated.
-
-               byte orgAction = getUndefinedAction();
-               setUndefinedAction(Undefined.ACTION_WARN);
-
-               int orgCatCode = parser.getCatCode('@');
-
-               try
-               {
-                  parser.setCatCode(true, '@', TeXParser.TYPE_LETTER);
-                  input(docCls);
-               }
-               catch (IOException e)
-               {
-                  getTeXApp().error(e);
-               }
-
-               parser.setCatCode(true, '@', orgCatCode);
-
-               setUndefinedAction(orgAction);
-            }
-         }
+         parsePackageFile(docCls);
       }
    }
 
-   public LaTeXCls getLaTeXCls(KeyValList options, String clsName)
+   public LaTeXCls getLaTeXCls(KeyValList options, String clsName, 
+     boolean loadParentOptions)
     throws IOException
    {
       if (clsName.equals("jmlr"))
       {
-         return new JmlrCls(options, this);
+         return new JmlrCls(options, this, loadParentOptions);
       }
 
       if (clsName.equals("jmlrbook"))
       {
-         return new JmlrBookCls(options, this);
+         return new JmlrBookCls(options, this, loadParentOptions);
       }
 
-      return new UnknownCls(options, clsName, this);
+      return new UnknownCls(options, clsName, this, loadParentOptions);
    }
 
    public void removePackage(LaTeXSty sty)
@@ -970,6 +1004,13 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
    public LaTeXSty requirepackage(String name)
    throws IOException
    {
+      return requirepackage(null, name, false);
+   }
+
+   public LaTeXSty requirepackage(KeyValList options, 
+     String name, boolean loadParentOptions)
+   throws IOException
+   {
       LaTeXSty sty = getLoadedPackage(name);
 
       if (sty != null)
@@ -977,7 +1018,7 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
          return sty;
       }
 
-      sty = getLaTeXSty(null, name);
+      sty = getLaTeXSty(options, name, loadParentOptions);
 
       addFileReference(sty);
       loadedPackages.add(sty);
@@ -996,50 +1037,59 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       loadedPackages.add(sty);
    }
 
-   public LaTeXSty usepackage(KeyValList options, String styName)
+   public boolean parseUnknownPackageEnabled(LaTeXFile sty)
+   {
+      // If not found by kpsewhich then possibly a custom package/class
+      // which might be simple enough to parse.
+
+      return !sty.wasFoundByKpsewhich();
+   }
+
+   public void parsePackageFile(LaTeXFile sty)
+   throws IOException
+   {
+      File file = sty.getFile();
+
+      if (file.exists())
+      {
+         // This may not work if the package is too
+         // complicated.
+
+         byte orgAction = getUndefinedAction();
+         setUndefinedAction(Undefined.ACTION_WARN);
+
+         int orgCatCode = parser.getCatCode('@');
+
+         try
+         {
+            parser.setCatCode(true, '@', TeXParser.TYPE_LETTER);
+            input(sty);
+         }
+         catch (IOException e)
+         {
+            getTeXApp().error(e);
+         }
+
+         parser.setCatCode(true, '@', orgCatCode);
+
+         setUndefinedAction(orgAction);
+      }
+   }
+
+   public LaTeXSty usepackage(KeyValList options, String styName, 
+     boolean loadParentOptions)
    throws IOException
    {
       if (!isStyLoaded(styName))
       {
-         LaTeXSty sty = getLaTeXSty(options, styName);
+         LaTeXSty sty = getLaTeXSty(options, styName, loadParentOptions);
 
          addFileReference(sty);
          loadedPackages.add(sty);
 
-         if (sty instanceof UnknownSty)
+         if (sty instanceof UnknownSty && parseUnknownPackageEnabled(sty))
          {
-            if (!sty.wasFoundByKpsewhich())
-            {
-               // Not found by kpsewhich so possibly a custom style
-               // which might be simple enough to parse.
-
-               File file = sty.getFile();
-
-               if (file.exists())
-               {
-                  // This may not work if the package is too
-                  // complicated.
-
-                  byte orgAction = getUndefinedAction();
-                  setUndefinedAction(Undefined.ACTION_WARN);
-
-                  int orgCatCode = parser.getCatCode('@');
-
-                  try
-                  {
-                     parser.setCatCode(true, '@', TeXParser.TYPE_LETTER);
-                     input(sty);
-                  }
-                  catch (IOException e)
-                  {
-                     getTeXApp().error(e);
-                  }
-
-                  parser.setCatCode(true, '@', orgCatCode);
-
-                  setUndefinedAction(orgAction);
-               }
-            }
+            parsePackageFile(sty);
          }
 
          return sty;
@@ -1076,7 +1126,8 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       return fontEncSty;
    }
 
-   public LaTeXSty getLaTeXSty(KeyValList options, String styName)
+   public LaTeXSty getLaTeXSty(KeyValList options, String styName, 
+      boolean loadParentOptions)
    throws IOException
    {
       if (styName.equals("graphics")
@@ -1092,161 +1143,161 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
             loadedPackages.add(lfile);
          }
 
-         return new GraphicsSty(options, styName, this);
+         return new GraphicsSty(options, styName, this, loadParentOptions);
       }
 
       if (styName.equals("amsmath"))
       {
-         return new AmsmathSty(options, styName, this);
+         return new AmsmathSty(options, this, loadParentOptions);
       }
 
       if (styName.equals("amssymb"))
       {
-         return new AmsSymbSty(options, styName, this);
+         return new AmsSymbSty(options, this, loadParentOptions);
       }
 
       if (styName.equals("lipsum"))
       {
-         return new LipsumSty(options, this);
+         return new LipsumSty(options, this, loadParentOptions);
       }
 
       if (styName.equals("etoolbox"))
       {
-         return new EtoolboxSty(options, this);
+         return new EtoolboxSty(options, this, loadParentOptions);
       }
 
       if (styName.equals("hyperref"))
       {
-         return new HyperrefSty(options, this);
+         return new HyperrefSty(options, this, loadParentOptions);
       }
 
       if (styName.equals("inputenc"))
       {
-         return new InputEncSty(options, this);
+         return new InputEncSty(options, this, loadParentOptions);
       }
 
       if (styName.equals("fontenc"))
       {
-         fontEncSty = new FontEncSty(options, this);
+         fontEncSty = new FontEncSty(options, this, loadParentOptions);
          return fontEncSty;
       }
 
       if (styName.equals("natbib"))
       {
-         return new NatbibSty(options, this);
+         return new NatbibSty(options, this, loadParentOptions);
       }
 
       if (styName.equals("wasysym"))
       {
-         return new WasysymSty(options, styName, this);
+         return new WasysymSty(options, this, loadParentOptions);
       }
 
       if (styName.equals("pifont"))
       {
-         return new PifontSty(options, styName, this);
+         return new PifontSty(options, this, loadParentOptions);
       }
 
       if (styName.equals("booktabs"))
       {
-         return new BooktabsSty(options, styName, this);
+         return new BooktabsSty(options, this, loadParentOptions);
       }
 
       if (styName.equals("textcase"))
       {
-         return new TextCaseSty(options, this);
+         return new TextCaseSty(options, this, loadParentOptions);
       }
 
       if (styName.equals("shortvrb"))
       {
-         return new ShortVrbSty(options, this);
+         return new ShortVrbSty(options, this, loadParentOptions);
       }
 
       if (styName.equals("doc"))
       {
-         return new DocSty(options, this);
+         return new DocSty(options, this, loadParentOptions);
       }
 
       if (styName.equals("probsoln"))
       {
-         return new ProbSolnSty(options, this);
+         return new ProbSolnSty(options, this, loadParentOptions);
       }
 
       if (styName.equals("bpchem"))
       {
-         return new BpChemSty(options, this);
+         return new BpChemSty(options, this, loadParentOptions);
       }
 
       if (styName.equals("siunitx"))
       {
-         return new SIunitxSty(options, this);
+         return new SIunitxSty(options, this, loadParentOptions);
       }
 
       if (styName.equals("mhchem"))
       {
-         return new MhchemSty(options, this);
+         return new MhchemSty(options, this, loadParentOptions);
       }
 
       if (styName.equals("stix"))
       {
-         return new StixSty(options, this);
+         return new StixSty(options, this, loadParentOptions);
       }
 
       if (styName.toLowerCase().equals("mnsymbol"))
       {
-         return new MnSymbolSty(options, this);
+         return new MnSymbolSty(options, this, loadParentOptions);
       }
 
       if (styName.equals("textcomp"))
       {
-         return new TextCompSty(options, this);
+         return new TextCompSty(options, this, loadParentOptions);
       }
 
       if (styName.equals("fourier"))
       {
-         return new FourierSty(options, this);
+         return new FourierSty(options, this, loadParentOptions);
       }
 
       if (styName.equals("upgreek"))
       {
-         return new UpGreekSty(options, this);
+         return new UpGreekSty(options, this, loadParentOptions);
       }
 
       if (styName.equals("tipa"))
       {
-         return new TipaSty(options, this);
+         return new TipaSty(options, this, loadParentOptions);
       }
 
       if (styName.equals("datatool"))
       {
-         return new DataToolSty(options, this);
+         return new DataToolSty(options, this, loadParentOptions);
       }
 
       if (styName.equals("datatool-base"))
       {
-         return new DataToolBaseSty(options, this);
+         return new DataToolBaseSty(options, this, loadParentOptions);
       }
 
       if (styName.equals("ifthen"))
       {
-         return new IfThenSty(options, this);
+         return new IfThenSty(options, this, loadParentOptions);
       }
 
       if (styName.equals("xspace"))
       {
-         return new XspaceSty(options, this);
+         return new XspaceSty(options, this, loadParentOptions);
       }
 
       if (styName.equals("color") || styName.equals("xcolor"))
       {
-         return new ColorSty(options, styName, this);
+         return new ColorSty(options, styName, this, loadParentOptions);
       }
 
       if (styName.equals("jmlr2e"))
       {
-         return new Jmlr2eSty(options, this);
+         return new Jmlr2eSty(options, this, loadParentOptions);
       }
 
-      return new UnknownSty(options, styName, this);
+      return new UnknownSty(options, styName, this, loadParentOptions);
    }
 
    public abstract void substituting( 
@@ -1280,8 +1331,8 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
    {
       if (path.toString().endsWith("tcilatex.tex"))
       {
-         usepackage(null, "amsmath");
-         usepackage(null, "graphicx");
+         usepackage(null, "amsmath", false);
+         usepackage(null, "graphicx", false);
          addSpecialListener(new SWSpecialListener());
 
          parser.putControlSequence(new SWFrame());
@@ -1835,15 +1886,77 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
    {
    }
 
+   public void setCurrentSty(LaTeXFile sty, String ext)
+   {
+      if (currentSty == null)
+      {
+         if (sty == null)
+         {
+            return;
+         }
+
+         currentSty = new HashMap<String,LaTeXFile>();
+      }
+
+      if (sty == null)
+      {
+         currentSty.remove(ext);
+      }
+      else
+      {
+         currentSty.put(ext, sty);
+      }
+   }
+
+   public LaTeXFile getCurrentSty(String ext)
+   {
+      return currentSty == null ? null : currentSty.get(ext);
+   }
+
+   public void passOptionsTo(String name, KeyValList options)
+   {
+      if (passOptions == null)
+      {
+         passOptions = new HashMap<String,KeyValList>();
+      }
+      else
+      {
+         KeyValList value = passOptions.get(name);
+
+         if (value != null)
+         {
+            value.putAll(options);
+            return;
+         }
+      }
+
+      passOptions.put(name, options);
+   }
+
+   public KeyValList getPassedOptions(String name)
+   {
+      if (passOptions == null)
+      {
+         return null;
+      }
+
+      return passOptions.get(name);
+   }
+
    private Vector<String> verbEnv;
 
    private Vector<LaTeXFile> loadedPackages;
+   private Vector<LaTeXCls> loadedClasses;
 
    private Vector<AuxData> auxData;
 
    private Hashtable<String,Vector<String>> counters;
 
    private LaTeXFile docCls;
+
+   private HashMap<String,LaTeXFile> currentSty = null;
+
+   private HashMap<String,KeyValList> passOptions=null;
 
    private TeXObjectList graphicsPath = null;
 

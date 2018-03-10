@@ -29,14 +29,14 @@ public class UnknownCls extends LaTeXCls
    public UnknownCls(String name, LaTeXParserListener listener)
    throws IOException
    {
-      super(name, listener);
+      this(null, name, listener, false);
    }
 
    public UnknownCls(KeyValList options, String name, 
-     LaTeXParserListener listener)
+     LaTeXParserListener listener, boolean loadParentOptions)
    throws IOException
    {
-      super(options, name, listener);
+      super(options, name, listener, loadParentOptions);
    }
 
    public void addDefinitions()

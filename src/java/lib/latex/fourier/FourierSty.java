@@ -25,17 +25,11 @@ import com.dickimawbooks.texparserlib.latex.*;
 
 public class FourierSty extends LaTeXSty
 {
-   public FourierSty(KeyValList options, LaTeXParserListener listener)
+   public FourierSty(KeyValList options, LaTeXParserListener listener, 
+     boolean loadParentOptions)
    throws IOException
    {
-      this(options, "fourier", listener);
-   }
-
-   public FourierSty(KeyValList options, String name, 
-      LaTeXParserListener listener)
-   throws IOException
-   {
-      super(options, name, listener);
+      super(options, "fourier", listener, loadParentOptions);
    }
 
    public void addDefinitions()
@@ -58,7 +52,7 @@ public class FourierSty extends LaTeXSty
    protected void preOptions()
      throws IOException
    {
-      getListener().usepackage(null, "textcomp");
+      getListener().requirepackage(null, "textcomp", false);
    }
 
    // very limited support

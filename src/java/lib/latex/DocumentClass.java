@@ -26,72 +26,68 @@ public class DocumentClass extends ControlSequence
 {
    public DocumentClass()
    {
-      this("documentclass");
+      this("documentclass", false);
    }
 
-   public DocumentClass(String name)
+   public DocumentClass(String name, boolean loadParentOptions)
    {
       super(name);
+      this.loadParentOptions = loadParentOptions;
    }
 
    public Object clone()
    {
-      return new DocumentClass(getName());
-   }
-
-   public void process(TeXParser parser, TeXObjectList list)
-     throws IOException
-   {
-      byte popStyle = TeXObjectList.POP_SHORT;
-
-      TeXObject options = list.popArg(parser, popStyle, '[', ']');
-
-      TeXObject cls = list.popArg(parser, popStyle);
-
-      TeXObjectList expanded = null;
-
-      if (cls instanceof Expandable)
-      {
-         expanded = ((Expandable)cls).expandfully(parser, list);
-      }
-
-      String clsName;
-
-      if (expanded == null)
-      {
-         clsName = cls.toString(parser);
-      }
-      else
-      {
-         clsName = expanded.toString(parser);
-      }
-
-      KeyValList keyValList = null;
-
-      if (options != null)
-      {
-         keyValList = KeyValList.getList(parser, options);
-      }
-
-      LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
-
-      listener.documentclass(keyValList, clsName);
+      return new DocumentClass(getName(), loadParentOptions);
    }
 
    public void process(TeXParser parser)
      throws IOException
    {
+      process(parser, parser);
+   }
+
+   public void process(TeXParser parser, TeXObjectList stack)
+     throws IOException
+   {
       byte popStyle = TeXObjectList.POP_SHORT;
 
-      TeXObject options = parser.popNextArg(popStyle, '[', ']');
+      TeXObject options;
+      TeXObject cls;
 
-      TeXObject cls = parser.popNextArg(popStyle);
+      if (parser == stack)
+      {
+         options = stack.popArg(parser, popStyle, '[', ']');
+         cls = stack.popArg(parser, popStyle);
+      }
+      else
+      {
+         options = parser.popNextArg(popStyle, '[', ']');
+         cls = parser.popNextArg(popStyle);
+      }
 
       TeXObjectList expanded = null;
 
       if (cls instanceof Expandable)
       {
-         expanded = ((Expandable)cls).expandfully(parser);
+         if (stack == parser)
+         {
+            expanded = ((Expandable)cls).expandfully(parser);
+         }
+         else
+         {
+            expanded = ((Expandable)cls).expandfully(parser, stack);
+         }
+      }
+
+      TeXObject version;
+
+      if (parser == stack)
+      {
+         version = stack.popArg(parser, popStyle, '[', ']');
+      }
+      else
+      {
+         version = parser.popNextArg(popStyle, '[', ']');
       }
 
       String clsName;
@@ -114,6 +110,15 @@ public class DocumentClass extends ControlSequence
 
       LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
 
-      listener.documentclass(keyValList, clsName);
+      loadDocumentClass(listener, keyValList, clsName);
    }
+
+   protected void loadDocumentClass(LaTeXParserListener listener,
+       KeyValList options, String clsName)
+    throws IOException
+   {
+      listener.documentclass(options, clsName, loadParentOptions);
+   }
+
+   protected boolean loadParentOptions;
 }

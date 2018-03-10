@@ -34,10 +34,11 @@ import com.dickimawbooks.texparserlib.primitives.Undefined;
 
 public class SIunitxSty extends LaTeXSty
 {
-   public SIunitxSty(KeyValList options, LaTeXParserListener listener)
+   public SIunitxSty(KeyValList options, LaTeXParserListener listener, 
+     boolean loadParentOptions)
     throws IOException
    {
-      super(options, "siunitx", listener);
+      super(options, "siunitx", listener, loadParentOptions);
    }
 
    public void addDefinitions()

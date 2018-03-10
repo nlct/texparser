@@ -27,10 +27,11 @@ import com.dickimawbooks.texparserlib.latex.*;
 // implemented.
 public class BpChemSty extends LaTeXSty
 {
-   public BpChemSty(KeyValList options, LaTeXParserListener listener)
+   public BpChemSty(KeyValList options, LaTeXParserListener listener, 
+      boolean loadParentOptions)
     throws IOException
    {
-      super(options, "bpchem", listener);
+      super(options, "bpchem", listener, loadParentOptions);
    }
 
    public void addDefinitions()
@@ -68,7 +69,7 @@ public class BpChemSty extends LaTeXSty
    protected void preOptions()
      throws IOException
    {
-      getListener().usepackage(null, "xspace");
+      getListener().requirepackage(null, "xspace", false);
    }
 
 }

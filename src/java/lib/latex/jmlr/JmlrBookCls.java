@@ -27,16 +27,16 @@ import com.dickimawbooks.texparserlib.latex.*;
 public class JmlrBookCls extends JmlrCls
 {
    public JmlrBookCls(KeyValList options, 
-      LaTeXParserListener listener)
+      LaTeXParserListener listener, boolean loadParentOptions)
    throws IOException
    {
-      super(options, "jmlrbook", listener);
+      super(options, "jmlrbook", listener, loadParentOptions);
    }
 
    protected void preOptions()
    throws IOException
    {
-      getListener().usepackage(null, "setspace");
+      getListener().requirepackage("setspace");
       super.preOptions();
    }
 

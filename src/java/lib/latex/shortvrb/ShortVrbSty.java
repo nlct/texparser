@@ -25,10 +25,11 @@ import com.dickimawbooks.texparserlib.latex.*;
 
 public class ShortVrbSty extends LaTeXSty
 {
-   public ShortVrbSty(KeyValList options, LaTeXParserListener listener)
+   public ShortVrbSty(KeyValList options, LaTeXParserListener listener, 
+     boolean loadParentOptions)
    throws IOException
    {
-      super(options, "shortvrb", listener);
+      super(options, "shortvrb", listener, loadParentOptions);
    }
 
    public void addDefinitions()
