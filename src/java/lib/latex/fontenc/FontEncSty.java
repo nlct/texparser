@@ -40,7 +40,7 @@ public class FontEncSty extends LaTeXSty
       registerControlSequence(new FontEncodingCs(this));
    }
 
-   public void processOption(String option)
+   public void processOption(String option, TeXObject value)
     throws IOException
    {
       FontEncoding encoding = getEncoding(option);

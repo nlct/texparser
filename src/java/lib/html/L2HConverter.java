@@ -247,7 +247,7 @@ public class L2HConverter extends LaTeXParserListener
 
       try
       {
-         LaTeXSty sty = getLaTeXSty(null, "hyperref", false);
+         LaTeXSty sty = requirepackage("hyperref");
       }
       catch (IOException e)
       {

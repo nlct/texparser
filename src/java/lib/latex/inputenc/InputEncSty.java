@@ -40,18 +40,13 @@ public class InputEncSty extends LaTeXSty
       registerControlSequence(new InputEncoding());
    }
 
-   public void processOption(String option)
+   public void processOption(String option, TeXObject value)
     throws IOException
    {
       if (isKnownEncoding(option))
       {
          getListener().setInputEncoding(option);
       }
-   }
-
-   protected void preOptions()
-     throws IOException
-   {
    }
 
    public static Charset getCharSet(String encoding)

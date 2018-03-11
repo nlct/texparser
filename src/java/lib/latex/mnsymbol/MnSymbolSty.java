@@ -54,16 +54,6 @@ public class MnSymbolSty extends LaTeXSty
 
    }
 
-   public void processOption(String option)
-    throws IOException
-   {
-   }
-
-   protected void preOptions()
-     throws IOException
-   {
-   }
-
    private static final Object[][] SYMBOLS = new Object[][]
    {
       new Object[]{"lefttherefore", new Integer(0x002056)},

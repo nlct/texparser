@@ -33,8 +33,7 @@ public class JmlrBookCls extends JmlrCls
       super(options, "jmlrbook", listener, loadParentOptions);
    }
 
-   protected void preOptions()
-   throws IOException
+   protected void preOptions() throws IOException
    {
       getListener().requirepackage("setspace");
       super.preOptions();

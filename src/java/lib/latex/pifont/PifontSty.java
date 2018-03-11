@@ -40,14 +40,4 @@ public class PifontSty extends LaTeXSty
       registerControlSequence(new Ding());
       registerControlSequence(new DingList());
    }
-
-   public void processOption(String option)
-    throws IOException
-   {
-   }
-
-   protected void preOptions()
-     throws IOException
-   {
-   }
 }

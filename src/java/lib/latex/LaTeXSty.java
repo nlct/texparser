@@ -18,11 +18,13 @@
 */
 package com.dickimawbooks.texparserlib.latex;
 
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.io.IOException;
 import java.util.Iterator;
+import java.util.Vector;
 
 import com.dickimawbooks.texparserlib.*;
+import com.dickimawbooks.texparserlib.primitives.Undefined;
 
 public abstract class LaTeXSty extends LaTeXFile
 {
@@ -30,79 +32,81 @@ public abstract class LaTeXSty extends LaTeXFile
       LaTeXParserListener listener, boolean loadParentOptions)
    throws IOException
    {
-      super(listener.getParser(), options, name, "sty");
-      init(options, name, listener, loadParentOptions);
+      super(listener.getParser(), options, name, "sty", loadParentOptions);
    }
 
    public LaTeXSty(KeyValList options, String name, String ext,
       LaTeXParserListener listener, boolean loadParentOptions)
    throws IOException
    {
-      super(listener.getParser(), options, name, ext);
-      init(options, name, listener, loadParentOptions);
+      super(listener.getParser(), options, name, ext, loadParentOptions);
    }
 
-   private void init(KeyValList options, String name,
-      LaTeXParserListener listener, boolean loadParentOptions)
-    throws IOException
+   public void parseFile() throws IOException
    {
-      this.name = name;
-      this.listener = listener;
-      LaTeXFile prevSty = listener.getCurrentSty(getExtension());
-
-      if (loadParentOptions && prevSty != null)
+      if (getFile().exists())
       {
-         KeyValList parentOptions = prevSty.getOptions();
+         // This may not work if the package is too
+         // complicated.
 
-         if (parentOptions != null)
+         byte orgAction = listener.getUndefinedAction();
+         listener.setUndefinedAction(Undefined.ACTION_WARN);
+
+         int orgCatCode = getParser().getCatCode('@');
+
+         ControlSequence orgCurrName = getParser().getControlSequence(
+           "@currname");
+         ControlSequence orgCurrExt = getParser().getControlSequence(
+           "@currext");
+
+         getParser().putControlSequence(true, 
+            new GenericCommand("@currname", null, 
+              listener.createString(getName())));
+
+         getParser().putControlSequence(true, 
+            new GenericCommand("@currext", null, 
+              listener.createString(getExtension())));
+
+         try
          {
-            for (Iterator<String> it = parentOptions.keySet().iterator();
-                 it.hasNext(); )
-            {
-               String key = it.next();
-               addOptionIfAbsent(key, parentOptions.get(key));
-            }
-
-            options = getOptions();
+            getParser().setCatCode(true, '@', TeXParser.TYPE_LETTER);
+            listener.input(this);
          }
-      }
-
-      listener.setCurrentSty(this, getExtension());
-
-      KeyValList passedOptions = listener.getPassedOptions(
-        String.format("%s.%s", getName(), getExtension()));
-
-      if (passedOptions != null)
-      {
-         for (Iterator<String> it = passedOptions.keySet().iterator();
-              it.hasNext(); )
+         catch (IOException e)
          {
-            String key = it.next();
-            addOptionIfAbsent(key, passedOptions.get(key));
+            listener.getTeXApp().error(e);
          }
 
-         options = getOptions();
-      }
-
-      try
-      {
-         if (options != null)
+         if (orgCurrName == null)
          {
-            load(options);
+            getParser().removeControlSequence(true, "@currname");
          }
          else
          {
-            preOptions();
-            postOptions();
+            getParser().putControlSequence(true, orgCurrName);
          }
-      }
-      finally
-      {
-         listener.setCurrentSty(prevSty, getExtension());
+
+         if (orgCurrExt == null)
+         {
+            getParser().removeControlSequence(true, "@currext");
+         }
+         else
+         {
+            getParser().putControlSequence(true, orgCurrExt);
+         }
+
+         getParser().setCatCode(true, '@', orgCatCode);
+
+         listener.setUndefinedAction(orgAction);
       }
    }
 
    public abstract void addDefinitions();
+
+   protected void postOptions() throws IOException
+   {
+      addDefinitions();
+   }
 
    public void registerControlSequence(ControlSequence cs)
    {
@@ -131,73 +135,4 @@ public abstract class LaTeXSty extends LaTeXFile
       return reg;
    }
 
-   public abstract void processOption(String option)
-    throws IOException;
-
-   public void processOptions(KeyValList options)
-   throws IOException
-   {
-      if (options == null) return;
-
-      for (Iterator<String> it = options.keySet().iterator(); it.hasNext();)
-      {
-         String option = it.next();
-
-         if (option != null && !option.isEmpty())
-         {
-            processOption(option);
-         }
-      }
-   }
-
-   protected abstract void preOptions()
-     throws IOException;
-
-   protected void postOptions()
-     throws IOException
-   {
-      addDefinitions();
-   }
-
-   public void load(KeyValList options)
-   throws IOException
-   {
-      preOptions();
-
-      KeyValList clsOptions = listener.getDocumentClassOptions();
-
-      if (clsOptions != options)
-      {
-         processOptions(clsOptions);
-      }
-
-      processOptions(options);
-      postOptions();
-   }
-
-   public String getName()
-   {
-      return name;
-   }
-
-   public boolean equals(Object obj)
-   {
-      if (!(obj instanceof LaTeXSty)) return false;
-
-      return name.equals(((LaTeXSty)obj).getName());
-   }
-
-   public LaTeXParserListener getListener()
-   {
-      return listener;
-   }
-
-   public TeXParser getParser()
-   {
-      return listener.getParser();
-   }
-
-   private String name;
-
-   private LaTeXParserListener listener;
 }

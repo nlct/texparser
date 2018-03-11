@@ -108,6 +108,7 @@ There is NO WARRANTY, to the extent permitted by law.</entry>
 <entry key="tex.error.register_not_token">Register ''{0}'' not a token register</entry>
 <entry key="tex.error.generic">{0}</entry>
 <entry key="tex.error.file.not.found">File ''{0}'' not found.</entry>
+<entry key="tex.error.unexpandable">Can''t expand ''{0}''</entry>
 
 <!--  LaTeX Error Messages -->
 
@@ -125,6 +126,7 @@ There is NO WARRANTY, to the extent permitted by law.</entry>
 <entry key="latex.package.error">Package {0} Error: {1}</entry>
 <entry key="latex.class.error">Class {0} Error: {1}</entry>
 <entry key="latex.illegal.argtype">Illegal argument type {0}</entry>
+<entry key="latex.package.not.loaded">Package ''{0}'' has not been loaded</entry>
 
 <!--  bibtex errors -->
 <entry key="bibtex.error.missing_value">Missing value</entry>

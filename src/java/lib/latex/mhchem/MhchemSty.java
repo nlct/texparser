@@ -37,14 +37,4 @@ public class MhchemSty extends LaTeXSty
    {
       registerControlSequence(new Ce());
    }
-
-   public void processOption(String option)
-    throws IOException
-   {
-   }
-
-   protected void preOptions()
-     throws IOException
-   {
-   }
 }

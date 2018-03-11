@@ -2,4 +2,10 @@
 
 \newcommand{\sample}{\textbf{sample}}
 
+\DeclareOption{bfit}{\renewcommand{\sample}{\textbf{\textit{sample}}}}
+\DeclareOption{it}{\renewcommand{\sample}{\textit{sample}}}
+\DeclareOption{bf}{\renewcommand{\sample}{\textbf{sample}}}
+
+\ProcessOptions
+
 \endinput

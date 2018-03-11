@@ -37,16 +37,6 @@ public class LipsumSty extends LaTeXSty
       registerControlSequence(new SetLipsumDefault(this));
    }
 
-   public void processOption(String option)
-    throws IOException
-   {
-   }
-
-   protected void preOptions()
-     throws IOException
-   {
-   }
-
    public String getDefaultRange()
    {
       return defaultRange;

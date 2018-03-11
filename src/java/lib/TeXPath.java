@@ -353,6 +353,15 @@ public class TeXPath
       return relative.getName(relative.getNameCount()-1);
    }
 
+   public String getExtension()
+   {
+      String name = getLeaf().toString();
+
+      int idx = name.lastIndexOf(".");
+
+      return idx == -1 ? null : name.substring(idx);
+   }
+
    public Path getFileName()
    {
       return relative.getFileName();

@@ -46,16 +46,6 @@ public class SIunitxSty extends LaTeXSty
       registerControlSequence(new Si(this));
    }
 
-   public void processOption(String option)
-    throws IOException
-   {
-   }
-
-   protected void preOptions()
-     throws IOException
-   {
-   }
-
    public TeXObject parseUnit(TeXParser parser, TeXObject arg)
      throws IOException
    {

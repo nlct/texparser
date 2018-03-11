@@ -43,9 +43,10 @@ public class UnknownCls extends LaTeXCls
    {
    }
 
-   public void processOption(String option)
+   public void processOption(String option, TeXObject value)
     throws IOException
    {
+      processDeclaredOption(option, value);
    }
 
    protected void preOptions()

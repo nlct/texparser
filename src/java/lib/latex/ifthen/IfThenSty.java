@@ -50,16 +50,6 @@ public class IfThenSty extends LaTeXSty
       addConditionalControlSequence(new EndConditionGroup());
    }
 
-   public void processOption(String option)
-    throws IOException
-   {
-   }
-
-   protected void preOptions()
-     throws IOException
-   {
-   }
-
    public void addConditionalControlSequence(ControlSequence cs)
    {
       if (localControlSequences == null)

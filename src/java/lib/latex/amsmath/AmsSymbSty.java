@@ -91,14 +91,4 @@ public class AmsSymbSty extends LaTeXSty
       registerControlSequence(listener.createMathSymbol("doublebarwedge", 0x2A5E));
       registerControlSequence(listener.createMathSymbol("Join", 0x2A1D));
    }
-
-   public void processOption(String option)
-    throws IOException
-   {
-   }
-
-   protected void preOptions()
-     throws IOException
-   {
-   }
 }

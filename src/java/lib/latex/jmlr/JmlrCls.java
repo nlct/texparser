@@ -203,7 +203,7 @@ public class JmlrCls extends LaTeXCls
 
       if (sty != null)
       {
-         sty.processOption("round");
+         sty.processOption("round", null);
       }
 
       listener.requirepackage("graphicx");
@@ -267,7 +267,7 @@ public class JmlrCls extends LaTeXCls
       registerControlSequence(new AtSecondOfTwo("ifprint"));
    }
 
-   public void processOption(String option)
+   public void processOption(String option, TeXObject value)
      throws IOException
    {
       LaTeXParserListener listener = getListener();

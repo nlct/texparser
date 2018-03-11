@@ -64,13 +64,7 @@ public class DataToolBaseSty extends LaTeXSty
       addCurrencySymbol("yen");
    }
 
-   public void processOption(String option)
-    throws IOException
-   {
-   }
-
-   protected void preOptions()
-     throws IOException
+   protected void preOptions() throws IOException
    {
       getListener().requirepackage("etoolbox");
 

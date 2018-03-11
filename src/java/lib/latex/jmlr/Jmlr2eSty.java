@@ -55,15 +55,6 @@ public class Jmlr2eSty extends LaTeXSty
       registerControlSequence(new Jmlr2eName(this));
    }
 
-   public void processOption(String option)
-     throws IOException
-   {
-   }
-
-   protected void preOptions() throws IOException
-   {
-   }
-
    public void addAuthor(Group author)
    {
       if (authors == null)

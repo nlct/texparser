@@ -37,14 +37,4 @@ public class HyperrefSty extends LaTeXSty
       registerControlSequence(new NoLinkUrl());
       registerControlSequence(new Url(this));
    }
-
-   public void processOption(String option)
-    throws IOException
-   {
-   }
-
-   protected void preOptions()
-     throws IOException
-   {
-   }
 }

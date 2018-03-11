@@ -43,14 +43,4 @@ public class BooktabsSty extends LaTeXSty
       registerNewLength("lightrulewidth", 0.05f, TeXUnit.EM);
       registerNewLength("cmidrulewidth", 0.03f, TeXUnit.EM);
    }
-
-   public void processOption(String option)
-    throws IOException
-   {
-   }
-
-   protected void preOptions()
-     throws IOException
-   {
-   }
 }

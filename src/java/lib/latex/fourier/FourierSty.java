@@ -44,11 +44,6 @@ public class FourierSty extends LaTeXSty
       }
    }
 
-   public void processOption(String option)
-    throws IOException
-   {
-   }
-
    protected void preOptions()
      throws IOException
    {

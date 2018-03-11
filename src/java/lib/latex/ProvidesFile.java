@@ -39,25 +39,75 @@ public class ProvidesFile extends ControlSequence
       return new ProvidesFile(getName());
    }
 
-   // All arguments are ignored
-
-   public void process(TeXParser parser, TeXObjectList list)
+   public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      TeXObject options = list.popArg(parser, '[', ']');
+      TeXObject options;
+      TeXObject nameArg;
+      TeXObject version;
 
-      TeXObject name = list.popArg(parser);
+      if (parser == stack)
+      {
+         options = parser.popNextArg('[', ']');
+         nameArg = parser.popNextArg();
 
-      TeXObject version = list.popArg(parser, '[', ']');
+         if (nameArg instanceof Expandable)
+         {
+            TeXObjectList expanded = ((Expandable)nameArg).expandfully(parser);
+
+            if (expanded != null)
+            {
+               nameArg = expanded;
+            }
+         }
+
+         version = parser.popNextArg('[', ']');
+      }
+      else
+      {
+         options = stack.popArg(parser, '[', ']');
+         nameArg = stack.popArg(parser);
+
+         if (nameArg instanceof Expandable)
+         {
+            TeXObjectList expanded = ((Expandable)nameArg).expandfully(parser,
+               stack);
+
+            if (expanded != null)
+            {
+               nameArg = expanded;
+            }
+         }
+
+         version = stack.popArg(parser, '[', ']');
+      }
+
+      String name = nameArg.toString(parser);
+
+      LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
+
+      TeXPath texPath = listener.getLastFileReference();
+
+      String ext;
+
+      if (texPath == null)
+      {
+         ext = "tex";
+      }
+      else
+      {
+         ext = texPath.getExtension();
+      }
+
+      parser.putControlSequence(true, new GenericCommand("@currext", null,
+        listener.createString(ext)));
+      parser.putControlSequence(true, new GenericCommand("@currname", null,
+        listener.createString(name)));
    }
 
    public void process(TeXParser parser)
      throws IOException
    {
-      TeXObject options = parser.popNextArg('[', ']');
-
-      TeXObject name = parser.popNextArg();
-
-      TeXObject version = parser.popNextArg('[', ']');
+      process(parser, parser);
    }
 }

@@ -38,14 +38,4 @@ public class AmsmathSty extends LaTeXSty
       registerControlSequence(new Align());
       registerControlSequence(new Align("align*", false));
    }
-
-   public void processOption(String option)
-    throws IOException
-   {
-   }
-
-   protected void preOptions()
-     throws IOException
-   {
-   }
 }

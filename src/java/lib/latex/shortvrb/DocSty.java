@@ -39,11 +39,6 @@ public class DocSty extends LaTeXSty
 
    }
 
-   public void processOption(String option)
-    throws IOException
-   {
-   }
-
    protected void preOptions()
      throws IOException
    {

@@ -71,14 +71,4 @@ public class EtoolboxSty extends LaTeXSty
       registerControlSequence(new IfDefEmpty());
       registerControlSequence(new IfDefEmpty("ifcsempty", true));
    }
-
-   public void processOption(String option)
-    throws IOException
-   {
-   }
-
-   protected void preOptions()
-     throws IOException
-   {
-   }
 }

@@ -96,13 +96,4 @@ public class UpGreekSty extends LaTeXSty
       registerControlSequence(listener.createGreekSymbol("Upomega", 0x03A9));
    }
 
-   public void processOption(String option)
-    throws IOException
-   {
-   }
-
-   protected void preOptions()
-     throws IOException
-   {
-   }
 }

@@ -41,13 +41,4 @@ public class TextCaseSty extends LaTeXSty
       registerControlSequence(new NoCaseChange());
    }
 
-   public void processOption(String option)
-    throws IOException
-   {
-   }
-
-   protected void preOptions()
-     throws IOException
-   {
-   }
 }

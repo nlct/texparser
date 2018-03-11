@@ -190,4 +190,6 @@ public class TeXSyntaxException extends IOException
       "tex.error.file.not.found";
    public static final String ERROR_GENERIC =
       "tex.error.generic";
+   public static final String ERROR_UNEXPANDABLE =
+      "tex.error.unexpandable";
 }

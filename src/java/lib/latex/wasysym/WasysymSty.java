@@ -54,13 +54,4 @@ public class WasysymSty extends LaTeXSty
       registerControlSequence(listener.createMathSymbol("oiint", 0x222F));
    }
 
-   public void processOption(String option)
-    throws IOException
-   {
-   }
-
-   protected void preOptions()
-     throws IOException
-   {
-   }
 }

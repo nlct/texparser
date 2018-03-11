@@ -47,7 +47,7 @@ public class NatbibSty extends LaTeXSty
       }
    }
 
-   public void processOption(String option)
+   public void processOption(String option, TeXObject value)
     throws IOException
    {
       if (option.equals("round"))
@@ -87,11 +87,6 @@ public class NatbibSty extends LaTeXSty
          isSuper = true;
          citestyle = CITE_NUMBERS;
       }
-   }
-
-   protected void preOptions()
-     throws IOException
-   {
    }
 
    public TeXObject getOpenBracket()

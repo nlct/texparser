@@ -78,16 +78,6 @@ public class ColorSty extends LaTeXSty
       registerControlSequence(new TextBlockCommand(name, decl));
    }
 
-   public void processOption(String option)
-    throws IOException
-   {
-   }
-
-   protected void preOptions()
-     throws IOException
-   {
-   }
-
    public Color getColor(TeXParser parser, String model, String specs)
      throws IOException
    {

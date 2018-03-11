@@ -136,16 +136,6 @@ public class StixSty extends LaTeXSty
       }
    }
 
-   public void processOption(String option)
-    throws IOException
-   {
-   }
-
-   protected void preOptions()
-     throws IOException
-   {
-   }
-
    private static final Object[][] GREEK = new Object[][]
    {
       // Greek lower case

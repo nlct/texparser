@@ -361,8 +361,10 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       parser.putControlSequence(new Index());
       parser.putControlSequence(new MakeIndex());
       parser.putControlSequence(new ProvidesFile());
-      parser.putControlSequence(new ProvidesFile("ProvidesClass"));
-      parser.putControlSequence(new ProvidesFile("ProvidesPackage"));
+      parser.putControlSequence(new ProvidesPackage());
+      parser.putControlSequence(new ProvidesPackage("ProvidesClass"));
+      parser.putControlSequence(new DeclareOption());
+      parser.putControlSequence(new ProcessOptions());
       parser.putControlSequence(new AddToHook("AtBeginDocument",
         "@begindocumenthook"));
       parser.putControlSequence(new AddToHook("AtEndDocument",
@@ -893,7 +895,7 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
    {
    }
 
-   public LaTeXFile getDocumentClass()
+   public LaTeXCls getDocumentClass()
    {
       return docCls;
    }
@@ -954,9 +956,13 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
 
       loadedClasses.add(cls);
 
-      if (cls instanceof UnknownCls && parseUnknownPackageEnabled(cls))
+      if (cls instanceof UnknownCls)
       {
          parsePackageFile(cls);
+      }
+      else
+      {
+         cls.processOptions();
       }
    }
 
@@ -975,9 +981,13 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
 
       addFileReference(docCls);
 
-      if (docCls instanceof UnknownCls && parseUnknownPackageEnabled(docCls))
+      if (docCls instanceof UnknownCls)
       {
          parsePackageFile(docCls);
+      }
+      else
+      {
+         docCls.processOptions();
       }
    }
 
@@ -1010,6 +1020,7 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       return requirepackage(null, name, false);
    }
 
+   // returns file if already loaded
    public LaTeXSty requirepackage(KeyValList options, 
      String name, boolean loadParentOptions)
    throws IOException
@@ -1026,6 +1037,15 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       addFileReference(sty);
       loadedPackages.add(sty);
 
+      if (sty instanceof UnknownSty)
+      {
+         parsePackageFile(sty);
+      }
+      else
+      {
+         sty.processOptions();
+      }
+
       return sty;
    }
 
@@ -1040,45 +1060,19 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       loadedPackages.add(sty);
    }
 
-   public boolean parseUnknownPackageEnabled(LaTeXFile sty)
+   public void parsePackageFile(LaTeXSty sty) throws IOException
    {
       // If not found by kpsewhich then possibly a custom package/class
       // which might be simple enough to parse.
+      // Otherwise ignore unknown class/packages
 
-      return !sty.wasFoundByKpsewhich();
-   }
-
-   public void parsePackageFile(LaTeXFile sty)
-   throws IOException
-   {
-      File file = sty.getFile();
-
-      if (file.exists())
+      if (!sty.wasFoundByKpsewhich())
       {
-         // This may not work if the package is too
-         // complicated.
-
-         byte orgAction = getUndefinedAction();
-         setUndefinedAction(Undefined.ACTION_WARN);
-
-         int orgCatCode = parser.getCatCode('@');
-
-         try
-         {
-            parser.setCatCode(true, '@', TeXParser.TYPE_LETTER);
-            input(sty);
-         }
-         catch (IOException e)
-         {
-            getTeXApp().error(e);
-         }
-
-         parser.setCatCode(true, '@', orgCatCode);
-
-         setUndefinedAction(orgAction);
+         sty.parseFile();
       }
    }
 
+   // returns null if already loaded
    public LaTeXSty usepackage(KeyValList options, String styName, 
      boolean loadParentOptions)
    throws IOException
@@ -1090,9 +1084,13 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
          addFileReference(sty);
          loadedPackages.add(sty);
 
-         if (sty instanceof UnknownSty && parseUnknownPackageEnabled(sty))
+         if (sty instanceof UnknownSty)
          {
             parsePackageFile(sty);
+         }
+         else
+         {
+            sty.processOptions();
          }
 
          return sty;
@@ -1129,7 +1127,7 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       return fontEncSty;
    }
 
-   public LaTeXSty getLaTeXSty(KeyValList options, String styName, 
+   protected LaTeXSty getLaTeXSty(KeyValList options, String styName, 
       boolean loadParentOptions)
    throws IOException
    {
@@ -1895,6 +1893,7 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       {
          if (sty == null)
          {
+            currentExt = null;
             return;
          }
 
@@ -1904,16 +1903,97 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       if (sty == null)
       {
          currentSty.remove(ext);
+         currentExt = null;
       }
       else
       {
          currentSty.put(ext, sty);
+         currentExt = ext;
+
       }
    }
 
    public LaTeXFile getCurrentSty(String ext)
    {
       return currentSty == null ? null : currentSty.get(ext);
+   }
+
+   public String getCurrentExtension()
+   {
+      return currentExt;
+   }
+
+   public LaTeXFile getCurrentSty() throws IOException
+   {
+      String ext = getCurrentExtension();
+
+      if (ext == null)
+      {
+         ControlSequence cs = parser.getControlSequence("@currext");
+
+         if (cs instanceof Expandable)
+         {
+            TeXObjectList expanded;
+
+            expanded = ((Expandable)cs).expandfully(parser);
+
+            if (expanded != null)
+            {
+               ext = expanded.toString(parser);
+            }
+         }
+
+         if (ext == null)
+         {
+            ext = getCurrentExtension();
+
+            if (ext == null)
+            {
+               getTeXApp().warning(parser, getTeXApp().getMessage(
+                    TeXSyntaxException.ERROR_UNEXPANDABLE, "@currext"));
+
+               ext = "sty";
+            }
+         }
+      }
+
+      LaTeXFile sty = getCurrentSty(ext);
+
+      if (sty == null)
+      {
+         ControlSequence cs = parser.getControlSequence("@currname");
+         String name=null;
+
+         if (cs instanceof Expandable)
+         {
+            TeXObjectList expanded;
+
+            expanded = ((Expandable)cs).expandfully(parser);
+
+            if (expanded != null)
+            {
+               name = expanded.toString(parser);
+            }
+         }
+
+         if (name == null)
+         {
+            throw new LaTeXSyntaxException(parser, 
+              getTeXApp().getMessage(
+                 TeXSyntaxException.ERROR_UNEXPANDABLE, "@currname"));
+         }
+
+         sty = getLoadedPackage(name);
+
+         if (sty == null)
+         {
+            throw new LaTeXSyntaxException(parser, 
+              getTeXApp().getMessage(
+                 LaTeXSyntaxException.ERROR_PACKAGE_NOT_LOADED, name));
+         }
+      }
+
+      return sty;
    }
 
    public void passOptionsTo(String name, KeyValList options)
@@ -1955,9 +2035,11 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
 
    private Hashtable<String,Vector<String>> counters;
 
-   private LaTeXFile docCls;
+   private LaTeXCls docCls;
 
    private HashMap<String,LaTeXFile> currentSty = null;
+
+   private String currentExt = null;
 
    private HashMap<String,KeyValList> passOptions=null;
 

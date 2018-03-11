@@ -52,15 +52,6 @@ public class GraphicsSty extends LaTeXSty
       registerControlSequence(new Epsfig("psfig"));
    }
 
-   public void processOption(String option)
-    throws IOException
-   {
-   }
-
-   protected void preOptions()
-     throws IOException
-   {
-   }
    public static double getDouble(TeXObject object, TeXParser parser)
       throws TeXSyntaxException
    {

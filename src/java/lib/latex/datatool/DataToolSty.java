@@ -80,13 +80,7 @@ public class DataToolSty extends LaTeXSty
         new UserNumber(DataToolHeader.TYPE_CURRENCY)));
    }
 
-   public void processOption(String option)
-    throws IOException
-   {
-   }
-
-   protected void preOptions()
-     throws IOException
+   protected void preOptions() throws IOException
    {
       getListener().requirepackage(null, "etoolbox", false);
 

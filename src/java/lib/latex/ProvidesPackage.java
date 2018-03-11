@@ -18,39 +18,52 @@
 */
 package com.dickimawbooks.texparserlib.latex;
 
-import java.util.Hashtable;
 import java.io.IOException;
-import java.util.Iterator;
 
 import com.dickimawbooks.texparserlib.*;
 
-public class UnknownSty extends LaTeXSty
+public class ProvidesPackage extends ControlSequence
 {
-   public UnknownSty(String name, LaTeXParserListener listener)
-   throws IOException
+   public ProvidesPackage()
    {
-      this(null, name, listener, false);
+      this("ProvidesPackage");
    }
 
-   public UnknownSty(KeyValList options, String name, 
-      LaTeXParserListener listener, boolean loadParentOptions)
-   throws IOException
+   public ProvidesPackage(String name)
    {
-      super(options, name, listener, loadParentOptions);
+      super(name);
    }
 
-   public void addDefinitions()
+   public Object clone()
    {
+      return new ProvidesPackage(getName());
    }
 
-   public void processOption(String option, TeXObject value)
-    throws IOException
-   {
-      processDeclaredOption(option, value);
-   }
-
-   protected void preOptions()
+   // ignore arguments
+   public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
+      TeXObject options;
+      TeXObject nameArg;
+      TeXObject version;
+
+      if (parser == stack)
+      {
+         options = parser.popNextArg('[', ']');
+         nameArg = parser.popNextArg();
+         version = parser.popNextArg('[', ']');
+      }
+      else
+      {
+         options = stack.popArg(parser, '[', ']');
+         nameArg = stack.popArg(parser);
+         version = stack.popArg(parser, '[', ']');
+      }
+   }
+
+   public void process(TeXParser parser)
+     throws IOException
+   {
+      process(parser, parser);
    }
 }

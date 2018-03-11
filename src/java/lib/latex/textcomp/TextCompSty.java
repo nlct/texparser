@@ -47,16 +47,6 @@ public class TextCompSty extends LaTeXSty
 
    }
 
-   public void processOption(String option)
-    throws IOException
-   {
-   }
-
-   protected void preOptions()
-     throws IOException
-   {
-   }
-
    private static final Object[][] SYMBOLS = new Object[][]
    {
       new Object[]{"textquotedbl", new Integer(0x000022)},

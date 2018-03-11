@@ -53,13 +53,7 @@ public class TipaSty extends LaTeXSty
 
    }
 
-   public void processOption(String option)
-    throws IOException
-   {
-   }
-
-   protected void preOptions()
-     throws IOException
+   protected void preOptions() throws IOException
    {
       LaTeXParserListener listener = getListener();
 

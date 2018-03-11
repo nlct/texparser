@@ -61,13 +61,7 @@ public class BpChemSty extends LaTeXSty
       registerControlSequence(new TheBPCnoa());
    }
 
-   public void processOption(String option)
-    throws IOException
-   {
-   }
-
-   protected void preOptions()
-     throws IOException
+   protected void preOptions() throws IOException
    {
       getListener().requirepackage(null, "xspace", false);
    }

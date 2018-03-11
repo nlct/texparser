@@ -492,6 +492,12 @@ public abstract class DefaultTeXParserListener extends TeXParserListener
       return referencedFiles.remove(texPath);
    }
 
+   public TeXPath getLastFileReference()
+   {
+      int n = referencedFiles.size();
+      return n == 0 ? null : referencedFiles.get(n-1);
+   }
+
    public void addSpecialListener(SpecialListener listener)
    {
       specialListeners.add(listener);

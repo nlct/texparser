@@ -108,7 +108,7 @@ public class ProbSolnSty extends LaTeXSty
 
    }
 
-   public void processOption(String option)
+   public void processOption(String option, TeXObject value)
     throws IOException
    {
       if (option.equals("answers"))
