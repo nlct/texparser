@@ -30,14 +30,17 @@ public class L2HStringConverter extends L2HConverter
 {
    public L2HStringConverter(TeXApp app)
    {
-      super(app);
-
-      setWriteable(this);
+      this(app, null, false);
    }
 
    public L2HStringConverter(TeXApp app, Vector<AuxData> data)
    {
-      super(app, data);
+      this(app, data, false);
+   }
+
+   public L2HStringConverter(TeXApp app, Vector<AuxData> data, boolean parsePackages)
+   {
+      super(app, true, null, data, false, null, parsePackages);
 
       setWriteable(this);
    }

@@ -199,7 +199,8 @@ public class TeXParserApp implements TeXApp
             "error.exists", outDir.getAbsolutePath()));
       }
 
-      L2HConverter listener = new L2HConverter(this, true, outDir, true)
+      L2HConverter listener = new L2HConverter(this, true, outDir, null, true,
+        outCharset, true)
       {
          public L2HImage toImage(String preamble, 
           String content, String mimeType, TeXObject alt, String name, 
@@ -1358,6 +1359,19 @@ public class TeXParserApp implements TeXApp
 
             inFileName = new File(args[i]);
          }
+         else if (args[i].equals("--out-charset"))
+         {
+            i++;
+
+            if (i == args.length)
+            {
+               throw new InvalidSyntaxException(
+                 getMessage("error.syntax.missing_input",
+                   args[i-1]));
+            }
+
+            outCharset = Charset.forName(args[i]);
+         }
          else if (args[i].charAt(0) == '-')
          {
             throw new InvalidSyntaxException(
@@ -1414,9 +1428,9 @@ public class TeXParserApp implements TeXApp
       app.runApplication();
    }
 
-   public static final String APP_VERSION = "0.4b.20180311";
+   public static final String APP_VERSION = "0.4b.20180312";
    public static final String APP_NAME = "texparserapp";
-   public static final String APP_DATE = "2018-03-11";
+   public static final String APP_DATE = "2018-03-12";
 
    public static long MAX_PROCESS_TIME=0L;
 
@@ -1431,6 +1445,8 @@ public class TeXParserApp implements TeXApp
    private File inFileName;
 
    private File outDir;
+
+   private Charset outCharset=null;
 
    private Vector<ProcessListener> currentProcessListeners;
 

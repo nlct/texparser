@@ -42,61 +42,67 @@ public class L2HConverter extends LaTeXParserListener
 {
    public L2HConverter(TeXApp app)
    {
-      this(app, true, null, null, false);
+      this(app, true, null, null, false, null, false);
    }
 
    public L2HConverter(TeXApp app, Vector<AuxData> auxData)
    {
-      this(app, null, auxData);
+      this(app, true, null, auxData, false, null, false);
    }
 
    public L2HConverter(TeXApp app, boolean useMathJax, boolean parseAux)
    {
-      this(app, useMathJax, null, parseAux);
+      this(app, useMathJax, null, null, parseAux, null, false);
    }
 
    public L2HConverter(TeXApp app, boolean useMathJax, Vector<AuxData> auxData)
    {
-      this(app, useMathJax, null, auxData);
+      this(app, useMathJax, null, auxData, false, null, false);
    }
 
    public L2HConverter(TeXApp app, File outDir)
    {
-      this(app, true, outDir);
+      this(app, true, outDir, null, false, null, false);
    }
 
    public L2HConverter(TeXApp app, File outDir, Vector<AuxData> auxData)
    {
-      this(app, true, outDir, auxData);
+      this(app, true, outDir, auxData, false, null, false);
    }
 
    public L2HConverter(TeXApp app, boolean useMathJax, File outDir)
    {
-      this(app, useMathJax, outDir, null);
+      this(app, useMathJax, outDir, null, false, null, false);
    }
 
    public L2HConverter(TeXApp app, boolean useMathJax, File outDir,
      Vector<AuxData> auxData)
    {
-      this(app, useMathJax, outDir, auxData, false);
+      this(app, useMathJax, outDir, auxData, false, null, false);
    }
 
    public L2HConverter(TeXApp app, boolean useMathJax, File outDir,
      boolean parseAux)
    {
-      this(app, useMathJax, outDir, null, parseAux);
+      this(app, useMathJax, outDir, null, parseAux, null, false);
    }
 
    public L2HConverter(TeXApp app, boolean useMathJax, File outDir,
      Vector<AuxData> auxData, boolean parseAux)
    {
-      this(app, useMathJax, outDir, auxData, parseAux, null);
+      this(app, useMathJax, outDir, auxData, parseAux, null, false);
    }
 
    public L2HConverter(TeXApp app, boolean useMathJax, File outDir,
      Vector<AuxData> auxData, boolean parseAux, Charset outCharSet)
    {
-      super(null, auxData, parseAux);
+      this(app, useMathJax, outDir, auxData, parseAux, outCharSet, false);
+   }
+
+   public L2HConverter(TeXApp app, boolean useMathJax, File outDir,
+     Vector<AuxData> auxData, boolean parseAux, Charset outCharSet, boolean parsePackages)
+   {
+      super(null, auxData, parseAux, parsePackages);
       this.texApp = app;
       this.outPath = (outDir == null ? null : outDir.toPath());
       this.htmlCharSet = outCharSet;

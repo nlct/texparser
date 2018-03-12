@@ -86,11 +86,18 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
 
    public LaTeXParserListener(Writeable writeable, Vector<AuxData> auxData, boolean parseAux)
    {
+      this(writeable, auxData, parseAux, false);
+   }
+
+   public LaTeXParserListener(Writeable writeable, Vector<AuxData> auxData, 
+     boolean parseAux, boolean parsePackages)
+   {
       super(writeable);
       setAuxData(auxData);
       setParseAuxEnabled(parseAux);
       counters = new Hashtable<String,Vector<String>>();
       indexes = new Hashtable<String,IndexRoot>();
+      this.parsePackages = parsePackages;
 
       footnotes = new TeXObjectList();
 
@@ -293,16 +300,43 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       parser.putControlSequence(new End());
 
       parser.putControlSequence(new DocumentClass());
-      parser.putControlSequence(new LoadDocumentClass());
-      parser.putControlSequence(
-         new LoadDocumentClass("LoadClassWithOptions", true));
       parser.putControlSequence(new UsePackage());
-      parser.putControlSequence(new UsePackage("RequirePackage", false));
-      parser.putControlSequence(
-        new UsePackage("RequirePackageWithOptions", true));
-      parser.putControlSequence(new PassOptionsToPackage());
-      parser.putControlSequence(new PassOptionsToPackage(
-         "PassOptionsToClass", "cls"));
+
+      if (parsePackages)
+      {
+         parser.putControlSequence(new LoadDocumentClass());
+         parser.putControlSequence(
+            new LoadDocumentClass("LoadClassWithOptions", true));
+         parser.putControlSequence(new UsePackage("RequirePackage", false));
+         parser.putControlSequence(
+           new UsePackage("RequirePackageWithOptions", true));
+         parser.putControlSequence(new PassOptionsToPackage());
+         parser.putControlSequence(new PassOptionsToPackage(
+            "PassOptionsToClass", "cls"));
+         parser.putControlSequence(new ProvidesFile());
+         parser.putControlSequence(new ProvidesPackage());
+         parser.putControlSequence(new ProvidesPackage("ProvidesClass"));
+         parser.putControlSequence(new DeclareOption());
+         parser.putControlSequence(new ProcessOptions());
+         parser.putControlSequence(new ExecuteOptions());
+
+         parser.putControlSequence(new AddToHook("AtBeginDocument",
+           "@begindocumenthook"));
+         parser.putControlSequence(new AddToHook("AtEndDocument",
+           "@enddocumenthook"));
+
+         parser.putControlSequence(new AtIfPackageLoaded());
+         parser.putControlSequence(new AtIfClassLoaded());
+
+         parser.putControlSequence(new PackageError());
+         parser.putControlSequence(new PackageError(
+          "PackageErrorNoLine", LaTeXSyntaxException.PACKAGE_ERROR));
+
+         parser.putControlSequence(new PackageError(
+          "ClassError", LaTeXSyntaxException.CLASS_ERROR));
+         parser.putControlSequence(new PackageError(
+          "ClassErrorNoLine", LaTeXSyntaxException.CLASS_ERROR));
+      }
 
       parser.putControlSequence(new NewCommand());
       parser.putControlSequence(new NewCommand("renewcommand",
@@ -332,14 +366,13 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       parser.putControlSequence(new Frac());
       parser.putControlSequence(new GenericCommand("@empty"));
 
+      parser.putControlSequence(new AtFor());
       parser.putControlSequence(new AtIfNextChar());
       parser.putControlSequence(new AtFirstOfTwo());
       parser.putControlSequence(new AtSecondOfTwo());
       parser.putControlSequence(new AtFirstOfOne());
       parser.putControlSequence(new AtGobble());
       parser.putControlSequence(new AtGobbleTwo());
-      parser.putControlSequence(new AtIfPackageLoaded());
-      parser.putControlSequence(new AtIfClassLoaded());
 
       parser.putControlSequence(new AtAlph("@Alph", AtAlph.UPPER));
       parser.putControlSequence(new AtAlph("@alph", AtAlph.LOWER));
@@ -360,15 +393,6 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       parser.putControlSequence(new Protect());
       parser.putControlSequence(new Index());
       parser.putControlSequence(new MakeIndex());
-      parser.putControlSequence(new ProvidesFile());
-      parser.putControlSequence(new ProvidesPackage());
-      parser.putControlSequence(new ProvidesPackage("ProvidesClass"));
-      parser.putControlSequence(new DeclareOption());
-      parser.putControlSequence(new ProcessOptions());
-      parser.putControlSequence(new AddToHook("AtBeginDocument",
-        "@begindocumenthook"));
-      parser.putControlSequence(new AddToHook("AtEndDocument",
-        "@enddocumenthook"));
 
       bibliographySection = new TeXObjectList();
       bibliographySection.add(new TeXCsRef("section"));
@@ -583,15 +607,6 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
           new TeXCsRef("space"), new TeXCsRef("space")}));
 
       parser.putControlSequence(new GenericError());
-      parser.putControlSequence(new PackageError());
-      parser.putControlSequence(new PackageError(
-       "PackageErrorNoLine", LaTeXSyntaxException.PACKAGE_ERROR));
-
-      parser.putControlSequence(new PackageError(
-       "ClassError", LaTeXSyntaxException.CLASS_ERROR));
-      parser.putControlSequence(new PackageError(
-       "ClassErrorNoLine", LaTeXSyntaxException.CLASS_ERROR));
-
       parser.putControlSequence(new DocumentStyle());
    }
 
@@ -1060,13 +1075,23 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       loadedPackages.add(sty);
    }
 
+   public boolean isParsePackageSupportOn()
+   {
+      return parsePackages;
+   }
+
+   public void setParsePackageSupport(boolean on)
+   {
+      parsePackages = on;
+   }
+
    public void parsePackageFile(LaTeXSty sty) throws IOException
    {
       // If not found by kpsewhich then possibly a custom package/class
       // which might be simple enough to parse.
       // Otherwise ignore unknown class/packages
 
-      if (!sty.wasFoundByKpsewhich())
+      if (parsePackages && !sty.wasFoundByKpsewhich())
       {
          sty.parseFile();
       }
@@ -2042,6 +2067,8 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
    private String currentExt = null;
 
    private HashMap<String,KeyValList> passOptions=null;
+
+   private boolean parsePackages = false;
 
    private TeXObjectList graphicsPath = null;
 

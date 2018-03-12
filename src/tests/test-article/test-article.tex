@@ -219,6 +219,13 @@ A & B & C & D\\
 \ifnum\myctr<10
 \repeat
 
+\makeatletter
+\@for\tmp:=Foo,Bar,Baz\do{\tmp. }
+
+\def\tmplist{Foo,Bar,Baz}
+\@for\tmp:=\tmplist\do{\tmp. }
+\makeatother
+
 \bibliographystyle{plain}
 \bibliography{xampl}
 
