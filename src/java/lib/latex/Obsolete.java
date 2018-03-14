@@ -43,6 +43,7 @@ public class Obsolete extends ControlSequence
       throws IOException
    {
       LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
+      byte popStyle = TeXObjectList.POP_RETAIN_IGNOREABLES;
 
       if (parser.isMathMode() && orgCommand instanceof TeXFontDeclaration)
       {
@@ -62,36 +63,89 @@ public class Obsolete extends ControlSequence
             StringBuilder builder = new StringBuilder();
             builder.append(orgCommand.toString(parser));
 
-            TeXObject firstObj = stack.peek();
+            TeXObject obj;
 
-            if (firstObj instanceof SkippedSpaces)
+            if (stack == parser)
             {
-               stack.pop();
+               obj = parser.popStack(popStyle);
+            }
+            else
+            {
+               obj = stack.popStack(parser, popStyle);
             }
 
-            while (stack.size() > 0)
+            while (obj instanceof Ignoreable)
             {
-               TeXObject obj = stack.peek();
+               repl.add(obj);
+               builder.append(obj.toString(parser));
+
+               if (stack == parser)
+               {
+                  obj = parser.popStack(popStyle);
+               }
+               else
+               {
+                  obj = stack.popStack(parser, popStyle);
+               }
+            }
+
+            while (obj != null)
+            {
+               if (obj instanceof TeXCsRef)
+               {
+                  obj = listener.getControlSequence(((TeXCsRef)obj).getName());
+               }
 
                if ((obj instanceof Declaration
                     && ((Declaration)obj).isModeSwitcher())
+                 || obj instanceof Begin
+                 || obj instanceof End
+                 || obj instanceof EndDeclaration
                  || obj instanceof TeXFontDeclaration)
                {
                   break;
                }
 
                builder.append(obj.toString(parser));
-               grp.add(stack.pop());
+               grp.add(obj);
+
+               if (stack == parser)
+               {
+                  obj = parser.popStack(popStyle);
+               }
+               else
+               {
+                  obj = stack.popStack(parser, popStyle);
+               }
+            }
+
+            if (obj != null)
+            {
+               stack.push(obj);
             }
 
             listener.substituting(builder.toString(), repl.toString(parser));
 
-            repl.process(parser, stack);
+            if (parser == stack)
+            {
+               repl.process(parser);
+            }
+            else
+            {
+               repl.process(parser, stack);
+            }
 
             return;
          }
 
-         orgCommand.process(parser, stack);
+         if (parser == stack)
+         {
+            orgCommand.process(parser);
+         }
+         else
+         {
+            orgCommand.process(parser, stack);
+         }
 
          return;
       }
@@ -99,121 +153,20 @@ public class Obsolete extends ControlSequence
       listener.substituting( 
         orgCommand.toString(parser), replacementCommand.toString(parser));
 
-      replacementCommand.process(parser, stack);
+      if (parser == stack)
+      {
+         replacementCommand.process(parser);
+      }
+      else
+      {
+         replacementCommand.process(parser, stack);
+      }
    }
 
    public void process(TeXParser parser)
       throws IOException
    {
-      LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
-
-      if (parser.isMathMode() && orgCommand instanceof TeXFontDeclaration)
-      {
-         String mathdecl = "math"+orgCommand.getName();
-
-         ControlSequence cs = parser.getControlSequence(mathdecl);
-
-         if (cs != null)
-         {
-            TeXObjectList repl = new TeXObjectList();
-
-            repl.add(cs);
-
-            Group grp = listener.createGroup();
-            repl.add(grp);
-
-            StringBuilder builder = new StringBuilder();
-            builder.append(orgCommand.toString(parser));
-
-            if (parser.size() == 0)
-            {
-               parser.fetchNext();
-            }
-
-            TeXObject firstObj = parser.firstElement();
-
-            if (firstObj instanceof SkippedSpaces)
-            {
-               parser.pop();
-            }
-
-            while (true)
-            {
-               if (parser.size() == 0)
-               {
-                  parser.fetchNext(true);
-               }
-
-               TeXObject obj = parser.peekStack();
-
-               if (obj instanceof TeXCsRef)
-               {
-                  obj = listener.getControlSequence(((TeXCsRef)obj).getName());
-               }
-
-               if (obj == null
-                || (obj instanceof Declaration
-                     && ((Declaration)obj).isModeSwitcher())
-                || obj instanceof TeXFontDeclaration
-                || (obj instanceof EndDeclaration
-                  && ((EndDeclaration)obj).isModeSwitcher(parser)))
-               {
-                  break;
-               }
-
-               if (obj instanceof End)
-               {
-                  obj = parser.popStack();
-
-                  if (parser.size() == 0)
-                  {
-                     parser.fetchNext(true);
-                  }
-
-                  TeXObject nextObj = parser.peekStack();
-
-                  if (nextObj instanceof Group)
-                  {
-                     String envName = ((Group)nextObj).toList().toString(parser);
-                     ControlSequence envCs = 
-                       listener.getControlSequence(envName);
-
-                     if (envCs instanceof Declaration)
-                     {
-                        if (((Declaration)envCs).isModeSwitcher())
-                        {
-                           parser.push(obj);
-                           break;
-                        }
-                     }
-                  }
-
-                  builder.append(obj.toString(parser));
-                  grp.add(obj);
-
-                  obj = nextObj;
-               }
-
-               builder.append(obj.toString(parser));
-               grp.add(parser.popStack());
-            }
-
-            listener.substituting(builder.toString(), repl.toString(parser));
-
-            repl.process(parser);
-
-            return;
-         }
-
-         orgCommand.process(parser);
-
-         return;
-      }
-
-      listener.substituting( 
-         orgCommand.toString(parser), replacementCommand.toString(parser));
-
-      replacementCommand.process(parser);
+      process(parser, parser);
    }
 
    public ControlSequence getOriginalCommand()

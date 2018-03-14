@@ -67,13 +67,19 @@ public class L2LMathDeclaration extends MathDeclaration
 
          writeable.write(getName());
 
-         if (parser.isLetter(getName().codePointAt(0)))
-         {
-            TeXObject nextObj = stack.peek();
+         TeXObject nextObj = stack.peekStack(TeXObjectList.POP_RETAIN_IGNOREABLES);
 
-            if (nextObj instanceof Letter)
+         if (nextObj instanceof Ignoreable)
+         {
+            writeable.write(nextObj.toString(parser));
+
+            if (parser == stack)
             {
-               writeable.write(" ");
+               parser.popStack(TeXObjectList.POP_RETAIN_IGNOREABLES);
+            }
+            else
+            {
+               stack.popStack(parser, TeXObjectList.POP_RETAIN_IGNOREABLES);
             }
          }
       }
@@ -90,42 +96,7 @@ public class L2LMathDeclaration extends MathDeclaration
    public void process(TeXParser parser)
      throws IOException
    {
-      doModeSwitch(parser);
-
-      LaTeX2LaTeX listener = (LaTeX2LaTeX)parser.getListener();
-
-      EndDeclaration endDec = getEndDeclaration();
-
-      if (endDec != null)
-      {
-         Writeable writeable = parser.getListener().getWriteable();
-
-         writeable.writeCodePoint(parser.getEscChar());
-         writeable.write(getName());
-   
-         if (parser.isLetter(getName().codePointAt(0)))
-         {
-            if (parser.size() == 0)
-            {
-               parser.fetchNext();
-            }
-      
-            TeXObject nextObj = parser.firstElement();
-
-            if (nextObj instanceof Letter)
-            {
-               writeable.write(" ");
-            }
-         }
-      }
-      else
-      {
-         listener.writeCodePoint(parser.getEscChar());
-         listener.write("begin");
-         listener.writeCodePoint(parser.getBgChar());
-         listener.write(getName());
-         listener.writeCodePoint(parser.getEgChar());
-      }
+      process(parser, parser);
    }
 
    public void end(TeXParser parser) throws IOException

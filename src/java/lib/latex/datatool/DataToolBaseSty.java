@@ -68,17 +68,7 @@ public class DataToolBaseSty extends LaTeXSty
    {
       getListener().requirepackage("etoolbox");
 
-      LaTeXSty sty = getListener().requirepackage("ifthen");
-
-      if (sty == null || !(sty instanceof IfThenSty))
-      {
-         ifThenSty = new IfThenSty(null, getListener(), false);
-         getListener().usepackage(ifThenSty);
-      }
-      else
-      {
-         ifThenSty = (IfThenSty)sty;
-      }
+      ifThenSty = (IfThenSty)getListener().requirepackage("ifthen");
    }
 
    public void addCurrencySymbol(TeXObject symbol)

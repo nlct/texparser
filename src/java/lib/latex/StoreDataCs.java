@@ -69,21 +69,51 @@ public class StoreDataCs extends ControlSequence
 
    protected void setData(TeXParser parser, TeXObject optArg, TeXObject arg)
    {
-      GenericCommand cs = new GenericCommand(getInternalName(), null, arg);
-      parser.putControlSequence(cs);
+      ControlSequence cs = parser.getControlSequence(getInternalName());
+
+      if (cs instanceof GenericCommand)
+      {
+         TeXObjectList definition = ((GenericCommand)cs).getDefinition();
+         definition.clear();
+         definition.add(arg);
+      }
+      else
+      {
+         cs = new GenericCommand(getInternalName(), null, arg);
+         parser.putControlSequence(cs);
+      }
 
       if (getOptionalInternalName() != null)
       {
-         if (optArg == null)
+         cs = parser.getControlSequence(getOptionalInternalName());
+
+         if (cs instanceof GenericCommand)
          {
-            cs = new GenericCommand(getOptionalInternalName(), null, arg);
+            TeXObjectList definition = ((GenericCommand)cs).getDefinition();
+            definition.clear();
+
+            if (optArg == null)
+            {
+               definition.add(arg);
+            }
+            else
+            {
+               definition.add(optArg);
+            }
          }
          else
          {
-            cs = new GenericCommand(getOptionalInternalName(), null, optArg);
-         }
+            if (optArg == null)
+            {
+               cs = new GenericCommand(getOptionalInternalName(), null, arg);
+            }
+            else
+            {
+               cs = new GenericCommand(getOptionalInternalName(), null, optArg);
+            }
 
-         parser.putControlSequence(cs);
+            parser.putControlSequence(cs);
+         }
       }
    }
 

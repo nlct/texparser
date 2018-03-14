@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.EOFException;
 import java.io.File;
 import java.io.PrintWriter;
+import java.nio.charset.Charset;
 import java.util.Hashtable;
 import java.util.Vector;
 import java.util.Iterator;
@@ -31,6 +32,8 @@ import java.nio.file.Files;
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.generic.*;
 import com.dickimawbooks.texparserlib.latex.*;
+import com.dickimawbooks.texparserlib.latex.graphics.*;
+import com.dickimawbooks.texparserlib.latex.inputenc.InputEncSty;
 
 /**
  * Reads in and writes out LaTeX code, replacing
@@ -43,10 +46,23 @@ public class LaTeX2LaTeX extends LaTeXParserListener
    public LaTeX2LaTeX(TeXApp texApp, File outDir)
      throws IOException
    {
-      this(texApp, outDir, false);
+      this(texApp, outDir, null, false);
+   }
+
+   public LaTeX2LaTeX(TeXApp texApp, File outDir, Charset outCharset)
+     throws IOException
+   {
+      this(texApp, outDir, outCharset, false);
    }
 
    public LaTeX2LaTeX(TeXApp texApp, File outDir, boolean replaceGraphicsPath)
+     throws IOException
+   {
+      this(texApp, outDir, null, replaceGraphicsPath);
+   }
+
+   public LaTeX2LaTeX(TeXApp texApp, File outDir, Charset outCharset, 
+      boolean replaceGraphicsPath)
      throws IOException
    {
       super(null);
@@ -271,7 +287,16 @@ public class LaTeX2LaTeX extends LaTeXParserListener
      boolean loadParentOptions)
      throws IOException
    {
-      super.documentclass(options, clsName, loadParentOptions);
+      if (docCls != null)
+      {
+         throw new LaTeXSyntaxException(
+            parser,
+            LaTeXSyntaxException.ERROR_MULTI_CLS);
+      }
+
+      docCls = getLaTeXCls(options, clsName, loadParentOptions);
+
+      addFileReference(docCls);
 
       writeCodePoint(parser.getEscChar());
       write("documentclass");
@@ -288,19 +313,103 @@ public class LaTeX2LaTeX extends LaTeXParserListener
       writeCodePoint(parser.getEgChar());
    }
 
+   public LaTeXSty requirepackage(KeyValList options, String styName, 
+     boolean loadParentOptions)
+     throws IOException
+   {
+      LaTeXSty sty = getLaTeXSty(options, styName, loadParentOptions);;
+      addFileReference(sty);
+      loadedPackages.add(sty);
+
+      writeCodePoint(parser.getEscChar());
+      write("RequirePackage");
+
+      if (options != null)
+      {
+         write('[');
+         write(options.toString(parser));
+         write(']');
+      }
+
+      writeCodePoint(parser.getBgChar());
+      write(styName);
+      writeCodePoint(parser.getEgChar());
+
+      return sty;
+   }
+
    public LaTeXSty usepackage(KeyValList options, String styName, 
      boolean loadParentOptions)
      throws IOException
    {
-      if (styName.equals("graphics") || styName.equals("epsfig"))
+      if (isStyLoaded(styName))
       {
-         getTeXApp().substituting(parser,
-           styName, "graphicx");
+         return null;
+      }
+
+      GraphicsSty graphicsSty = null;
+
+      if (styName.equals("epsfig"))
+      {
+         graphicsSty = new GraphicsSty(options, this, false);
+
+         graphicsSty.registerControlSequence(new Epsfig("epsfig"));
+         graphicsSty.registerControlSequence(new Epsfig("psfig"));
+
+         getTeXApp().substituting(parser, styName, "graphicx");
 
          styName = "graphicx";
       }
+      else if (styName.equals("graphics"))
+      {
+         graphicsSty = new GraphicsSty(options, this, false);
+         getTeXApp().substituting(parser, styName, "graphicx");
 
-      LaTeXSty sty = super.usepackage(options, styName, loadParentOptions);
+         styName = "graphicx";
+      }
+      else if (styName.equals("graphicx"))
+      {
+         graphicsSty = new GraphicsSty(options, this, false);
+      }
+
+      if (graphicsSty != null)
+      {
+         graphicsSty.registerControlSequence(new IncludeGraphics(graphicsSty));
+      }
+
+      LaTeXSty sty = getLaTeXSty(options, styName, loadParentOptions);;
+      addFileReference(sty);
+      loadedPackages.add(sty);
+
+      if (styName.equals("inputenc"))
+      {
+         try
+         {
+            String enc = InputEncSty.getOption(parser, outCharset == null ? 
+               Charset.defaultCharset() : outCharset);
+
+            if (options == null || options.get(enc) == null)
+            {
+               substituting(String.format("\\usepackage[%s]{inputenc}",
+                 options == null ? "" : options.toString(parser)),
+                 String.format("\\usepackage[%s]{inputenc}", enc));
+            }
+
+            writeCodePoint(parser.getEscChar());
+            write("usepackage[");
+            write(enc);
+            write(']');
+            writeCodePoint(parser.getBgChar());
+            write(styName);
+            writeCodePoint(parser.getEgChar());
+         }
+         catch (LaTeXSyntaxException e)
+         {
+            getTeXApp().error(e);
+         }
+
+         return sty;
+      }
 
       writeCodePoint(parser.getEscChar());
       write("usepackage");
@@ -514,14 +623,29 @@ public class LaTeX2LaTeX extends LaTeXParserListener
    {
       for (int i = 0; i < bibPaths.length; i++)
       {
+         if (bibPaths[i].wasFoundByKpsewhich())
+         {
+            continue;
+         }
+
          File file = bibPaths[i].getFile();
 
          if (file.exists())
          {
+             Path dest = bibPaths[i].getRelative();
+
+             if (dest.isAbsolute())
+             {
+                dest = outPath.resolve(bibPaths[i].getLeaf());
+             }
+             else
+             {
+                dest = outPath.resolve(bibPaths[i].getRelative());
+             }
+
              try
              {
-                getTeXApp().copyFile(file, 
-                  outPath.resolve(bibPaths[i].getRelative()).toFile());
+                getTeXApp().copyFile(file, dest.toFile());
              }
              catch (InterruptedException e)
              {
@@ -760,6 +884,7 @@ public class LaTeX2LaTeX extends LaTeXParserListener
    public void skipping(Ignoreable ignoreable)
      throws IOException
    {
+      write(ignoreable.toString(getParser()));
    }
 
    public void subscript(TeXObject arg)
@@ -821,7 +946,15 @@ public class LaTeX2LaTeX extends LaTeXParserListener
 
          getTeXApp().message(getTeXApp().getMessage(
             TeXApp.MESSAGE_WRITING, outFile));
-         writer = new PrintWriter(outFile);
+
+         if (outCharset == null)
+         {
+            writer = new PrintWriter(outFile);
+         }
+         else
+         {
+            writer = new PrintWriter(outFile, outCharset.name());
+         }
       }
    }
 
@@ -918,6 +1051,8 @@ public class LaTeX2LaTeX extends LaTeXParserListener
 
    private Path outPath, basePath;
    private PrintWriter writer;
+
+   private Charset outCharset=null;
 
    private boolean replaceGraphicsPath = false;
 

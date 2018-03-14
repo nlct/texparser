@@ -393,6 +393,7 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       parser.putControlSequence(new Protect());
       parser.putControlSequence(new Index());
       parser.putControlSequence(new MakeIndex());
+      parser.putControlSequence(new Appendix());
 
       bibliographySection = new TeXObjectList();
       bibliographySection.add(new TeXCsRef("section"));
@@ -1071,6 +1072,11 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
          removePackage(sty);
       }
 
+      if (sty instanceof FontEncSty)
+      {
+         fontEncSty = (FontEncSty)sty;
+      }
+
       addFileReference(sty);
       loadedPackages.add(sty);
    }
@@ -1316,6 +1322,11 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       if (styName.equals("color") || styName.equals("xcolor"))
       {
          return new ColorSty(options, styName, this, loadParentOptions);
+      }
+
+      if (styName.equals("jmlrutils"))
+      {
+         return new JmlrUtilsSty(options, this, loadParentOptions);
       }
 
       if (styName.equals("jmlr2e"))
@@ -1912,6 +1923,16 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
    {
    }
 
+   public void startTheorem(String name) throws IOException
+   {
+      getPar().process(parser);
+   }
+
+   public void endTheorem(String name) throws IOException
+   {
+      getPar().process(parser);
+   }
+
    public void setCurrentSty(LaTeXFile sty, String ext)
    {
       if (currentSty == null)
@@ -2053,14 +2074,14 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
 
    private Vector<String> verbEnv;
 
-   private Vector<LaTeXFile> loadedPackages;
-   private Vector<LaTeXCls> loadedClasses;
+   protected Vector<LaTeXFile> loadedPackages;
+   protected Vector<LaTeXCls> loadedClasses;
 
    private Vector<AuxData> auxData;
 
    private Hashtable<String,Vector<String>> counters;
 
-   private LaTeXCls docCls;
+   protected LaTeXCls docCls;
 
    private HashMap<String,LaTeXFile> currentSty = null;
 

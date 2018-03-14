@@ -126,39 +126,32 @@ public class TeXParserApp implements TeXApp
       return guiApp;
    }
 
-   private void doBatchProcess()
+   private void doBatchProcess() throws IOException
    {
-      try
+      if (inFileName == null)
       {
-         if (inFileName == null)
-         {
-            throw new InvalidSyntaxException(
-               getMessage("error.syntax.batch.missing_in"));
-         }
-
-         if (outDir == null)
-         {
-            throw new InvalidSyntaxException(
-               getMessage("error.syntax.batch.missing_out"));
-         }
-
-         if (outputFormat.equals("latex"))
-         {
-            latex2latex(inFileName, outDir);
-         }
-         else if (outputFormat.equals("html"))
-         {
-            latex2html(inFileName, outDir);
-         }
-         else
-         {
-            throw new InvalidSyntaxException(
-               getMessage("error.syntax.batch.unknown_format", outputFormat));
-         }
+         throw new InvalidSyntaxException(
+            getMessage("error.syntax.batch.missing_in", "-h"));
       }
-      catch (IOException e)
+
+      if (outDir == null)
       {
-         error(e);
+         throw new InvalidSyntaxException(
+            getMessage("error.syntax.batch.missing_out"));
+      }
+
+      if (outputFormat.equals("latex"))
+      {
+         latex2latex(inFileName, outDir);
+      }
+      else if (outputFormat.equals("html"))
+      {
+         latex2html(inFileName, outDir);
+      }
+      else
+      {
+         throw new InvalidSyntaxException(
+            getMessage("error.syntax.batch.unknown_format", outputFormat));
       }
    }
 
@@ -180,7 +173,7 @@ public class TeXParserApp implements TeXApp
             "error.exists", outDir.getAbsolutePath()));
       }
 
-      LaTeX2LaTeX listener = new LaTeX2LaTeX(this, outDir);
+      LaTeX2LaTeX listener = new LaTeX2LaTeX(this, outDir, outCharset);
 
       TeXParser parser = new TeXParser(listener);
 
@@ -583,10 +576,10 @@ public class TeXParserApp implements TeXApp
 
       if (exitCode != 0)
       {
-         return null; // file not found
+         return null; // not found
       }
 
-      return listener.getFile().getAbsolutePath();
+      return listener.getResult();
    }
 
    public File getTeXMF()
@@ -999,13 +992,24 @@ public class TeXParserApp implements TeXApp
       System.out.println(getMessage("syntax.gui", "--gui", "-g"));
       System.out.println(getMessage("syntax.batch", "--batch", "-b"));
       System.out.println(getMessage("syntax.in", "--in", "-i", APP_NAME));
+      System.out.println();
+      System.out.println(getMessage("syntax.timeout", "--timeout"));
+      System.out.println(getMessage("syntax.debug", "--debug"));
+      System.out.println(getMessage("syntax.nodebug", "--nodebug"));
+      System.out.println();
+      System.out.println(getMessage("syntax.version", "--version", "-v"));
+      System.out.println(getMessage("syntax.help", "--help", "-h"));
+      System.out.println();
+      System.out.println(getMessage("syntax.output.options"));
+      System.out.println();
       System.out.println(getMessage("syntax.out", "--output", "-o"));
       System.out.println(getMessage("syntax.latex", "--latex"));
       System.out.println(getMessage("syntax.html", "--html"));
-      System.out.println(getMessage("syntax.version", "--version", "-v"));
-      System.out.println(getMessage("syntax.help", "--help", "-h"));
-      System.out.println(getMessage("syntax.debug", "--debug"));
-      System.out.println(getMessage("syntax.nodebug", "--nodebug"));
+      System.out.println(getMessage("syntax.out.charset", "--out-charset"));
+      System.out.println();
+      System.out.println(getMessage("syntax.html.options"));
+      System.out.println();
+      System.out.println(getMessage("syntax.head", "--head"));
       System.out.println();
       System.out.println(getMessage("syntax.bugreport", 
         "https://github.com/nlct/texparser"));
@@ -1406,7 +1410,20 @@ public class TeXParserApp implements TeXApp
       } 
       else
       {
-         doBatchProcess();
+         try
+         {
+            doBatchProcess();
+         }
+         catch (InvalidSyntaxException e)
+         {
+            error(e.getMessage());
+
+            System.exit(1);
+         }
+         catch (Exception e)
+         {
+            error(e);
+         }
       }
    }
 
@@ -1418,6 +1435,12 @@ public class TeXParserApp implements TeXApp
       {
          app.parseArgs(args);
       }
+      catch (InvalidSyntaxException e)
+      {
+         app.error(e.getMessage());
+
+         System.exit(1);
+      }
       catch (Exception e)
       {
          app.error(e);
@@ -1428,9 +1451,9 @@ public class TeXParserApp implements TeXApp
       app.runApplication();
    }
 
-   public static final String APP_VERSION = "0.4b.20180312";
+   public static final String APP_VERSION = "0.4b.20180314";
    public static final String APP_NAME = "texparserapp";
-   public static final String APP_DATE = "2018-03-12";
+   public static final String APP_DATE = "2018-03-14";
 
    public static long MAX_PROCESS_TIME=0L;
 

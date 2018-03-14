@@ -61,7 +61,7 @@ public class TipaSty extends LaTeXSty
 
       if (fontEncSty == null)
       {
-         fontEncSty = (FontEncSty)listener.usepackage(null, "fontenc", false);
+         fontEncSty = (FontEncSty)listener.requirepackage("fontenc");
       }
 
       t3Encoding = new T3Encoding();

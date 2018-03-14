@@ -96,7 +96,7 @@ public class Begin extends Command
 
          while (true)
          {
-            object = stack.popStack(parser);
+            object = stack.popStack(parser, TeXObjectList.POP_RETAIN_IGNOREABLES);
 
             if (object instanceof End
              || (object instanceof TeXCsRef

@@ -2,7 +2,8 @@ APP_VERSION:=$(shell grep "public static final String appVersion" java/app/TeXPa
 IZPACKDIR=/usr/local/IzPack
 
 test	: test-obs test-sw test-abs test-article test-nested test-doc \
-	  test-probsoln test-lists test-datatool test-mkimages
+	  test-probsoln test-lists test-datatool test-mkimages \
+	  test-jmlrutils
 
 tests/output	:
 	mkdir -p tests/output
@@ -26,6 +27,10 @@ test-abs : app tests/output
 test-article : app tests/output
 	rm -f -r tests/output/test-article
 	bin/texparserapp --debug --in tests/test-article/test-article.tex --output tests/output/test-article --html
+
+test-jmlrutils : app tests/output
+	rm -f -r tests/output/test-jmlrutils
+	bin/texparserapp --debug --in tests/test-jmlrutils/test-jmlrutils.tex --output tests/output/test-jmlrutils --html
 
 test-doc : app tests/output
 	rm -f -r tests/output/test-doc

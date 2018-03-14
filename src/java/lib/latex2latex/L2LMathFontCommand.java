@@ -44,13 +44,20 @@ public class L2LMathFontCommand extends MathFontCommand
       writeable.writeCodePoint(parser.getEscChar());
       writeable.write(getName());
 
-      if (parser.isLetter(getName().codePointAt(0)))
-      {
-         TeXObject nextObj = stack.peek();
+      TeXObject nextObj = stack.peekStack(
+        TeXObjectList.POP_RETAIN_IGNOREABLES);
 
-         if (nextObj instanceof Letter)
+      if (nextObj instanceof Ignoreable)
+      {
+         writeable.write(nextObj.toString(parser));
+
+         if (parser == stack)
          {
-            writeable.write(" ");
+            parser.popStack(TeXObjectList.POP_RETAIN_IGNOREABLES);
+         }
+         else
+         {
+            stack.popStack(parser, TeXObjectList.POP_RETAIN_IGNOREABLES);
          }
       }
    }
@@ -58,24 +65,6 @@ public class L2LMathFontCommand extends MathFontCommand
    public void process(TeXParser parser)
       throws IOException
    {
-      Writeable writeable = parser.getListener().getWriteable();
-
-      writeable.writeCodePoint(parser.getEscChar());
-      writeable.write(getName());
-
-      if (parser.isLetter(getName().codePointAt(0)))
-      {
-         if (parser.size() == 0)
-         {
-            parser.fetchNext();
-         }
-
-         TeXObject nextObj = parser.firstElement();
-
-         if (nextObj instanceof Letter)
-         {
-            writeable.write(" ");
-         }
-      }
+      process(parser, parser);
    }
 }

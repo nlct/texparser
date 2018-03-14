@@ -76,7 +76,7 @@ public class FixedUnit extends TeXUnit
 
    public String toString(TeXParser parser)
    {
-      return toString();
+      return format();
    }
 
    public String format()

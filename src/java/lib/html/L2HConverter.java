@@ -239,6 +239,13 @@ public class L2HConverter extends LaTeXParserListener
       parser.putControlSequence(new L2HEqnarray());
       parser.putControlSequence(new L2HEqnarray("eqnarray*", false));
 
+      putControlSequence(new GenericCommand(true, "bigskip", null, 
+       new TeXObject[] {new HtmlTag("<div class=\"bigskip\"></div>")}));
+      putControlSequence(new GenericCommand(true, "medskip", null, 
+       new TeXObject[] {new HtmlTag("<div class=\"medskip\"></div>")}));
+      putControlSequence(new GenericCommand(true, "smallskip", null, 
+       new TeXObject[] {new HtmlTag("<div class=\"smallskip\"></div>")}));
+
       putControlSequence(new L2Hhfill("hfill"));
       putControlSequence(new L2Hhfill("hfil"));
 
@@ -719,6 +726,10 @@ public class L2HConverter extends LaTeXParserListener
       writeln("div.toc-subsubsection { padding-left: 2em; }");
       writeln("div.toc-paragraph { padding-left: 2.5em; }");
       writeln("div.toc-subparagraph { padding-left: 3em; }");
+
+      writeln("div.bigskip { padding-left: 0pt; padding-right: 0pt; padding-top: 0pt; padding-bottom: 2ex;}");
+      writeln("div.medskip { padding-left: 0pt; padding-right: 0pt; padding-top: 0pt; padding-bottom: 1ex;}");
+      writeln("div.smallskip { padding-left: 0pt; padding-right: 0pt; padding-top: 0pt; padding-bottom: .5ex;}");
 
       writeln(".displaylist { display: block; list-style-type: none; }");
       writeln(".inlinelist { display: inline; }");
@@ -1841,6 +1852,18 @@ public class L2HConverter extends LaTeXParserListener
       {
          write("</div>");
       }
+   }
+
+   public void startTheorem(String name) throws IOException
+   {
+      write("<div class=\"");
+      write(name);
+      write("\">");
+   }
+
+   public void endTheorem(String name) throws IOException
+   {
+      write("</div>");
    }
 
    public HtmlTag createLinkBox(String label)

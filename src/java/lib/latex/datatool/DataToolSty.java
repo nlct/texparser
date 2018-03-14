@@ -84,17 +84,8 @@ public class DataToolSty extends LaTeXSty
    {
       getListener().requirepackage(null, "etoolbox", false);
 
-      LaTeXSty sty = getListener().requirepackage(null, "datatool-base", true);
-
-      if (sty == null || !(sty instanceof DataToolBaseSty))
-      {
-         dataToolBaseSty = new DataToolBaseSty(null, getListener(), true);
-         getListener().usepackage(dataToolBaseSty);
-      }
-      else
-      {
-         dataToolBaseSty = (DataToolBaseSty)sty;
-      }
+      dataToolBaseSty = (DataToolBaseSty)getListener().requirepackage(
+         null, "datatool-base", true);
    }
 
    public static String getContentsRegisterName(String dbName)

@@ -1,0 +1,54 @@
+% arara: pdflatex
+% arara: pdflatex
+\documentclass{article}
+
+\usepackage[T1]{fontenc}
+\usepackage{lipsum}
+\usepackage{jmlrutils}
+
+\title{Sample Document}
+\author{Sample Author}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+\lipsum[1]
+\end{abstract}
+
+\section{Introduction}
+
+This is a sample article. \sectionref{sec:method} discusses
+the method used. \equationref{eq:emc2} is an interesting
+equation. Some other stuff is in \appendixref{apd:first}.
+
+\lipsum
+
+\section{Method}\label{sec:method}
+
+\lipsum
+
+\begin{equation}\label{eq:emc2}
+E = mc^{2}
+\end{equation}
+
+\lipsum
+
+
+\section{Sample}
+A sample section.
+
+\begin{theorem}
+A sample theorem.
+\begin{proof}
+Sample proof.
+\end{proof}
+\end{theorem}
+
+\appendix
+\section{First Appendix}\label{apd:first}
+
+\lipsum
+
+
+\end{document}

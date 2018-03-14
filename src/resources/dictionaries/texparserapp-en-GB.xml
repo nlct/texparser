@@ -36,14 +36,20 @@ There is NO WARRANTY, to the extent permitted by law.</entry>
 <entry key="syntax.general">General Options:</entry>
 <entry key="syntax.gui">{0} (or {1})			GUI interface.</entry>
 <entry key="syntax.batch">{0} (or {1})			No GUI interface. (Default.)</entry>
-<entry key="syntax.in">{0} (or {1}) &lt;TeX file&gt;	Parse &lt;TeX file&gt;.</entry>
-<entry key="syntax.out">{0} (or {1}) &lt;directory&gt;	Save output in &lt;directory&gt;, which must not already exist.</entry>
-<entry key="syntax.latex">{0}		Set the output format to LaTeX (default)</entry>
-<entry key="syntax.html">{0}		Set the output format to HTML</entry>
+<entry key="syntax.in">{0} (or {1}) &lt;TeX file&gt;		Parse &lt;TeX file&gt;.</entry>
 <entry key="syntax.version">{0} (or {1})		Print version and exit.</entry>
 <entry key="syntax.help">{0} (or {1})			Print this help message and exit.</entry>
-<entry key="syntax.debug">{0}			Switch on debug mode.</entry>
-<entry key="syntax.nodebug">{0}		Switch off debug mode. (Default.)</entry>
+<entry key="syntax.debug">{0}				Switch on debug mode.</entry>
+<entry key="syntax.nodebug">{0}			Switch off debug mode. (Default.)</entry>
+<entry key="syntax.timeout">{0} &lt;n&gt;			Timeout processes after &lt;n&gt; milliseconds.</entry>
+<entry key="syntax.output.options">Output Options:</entry>
+<entry key="syntax.out">{0} (or {1}) &lt;directory&gt;	Save output in &lt;directory&gt;, 
+				which must not already exist.</entry>
+<entry key="syntax.latex">{0}				Set the output format to LaTeX (default)</entry>
+<entry key="syntax.html">{0}				Set the output format to HTML</entry>
+<entry key="syntax.out.charset">{0} &lt;charset&gt;			Set the character encoding to &lt;charset&gt; for the output files.</entry>
+<entry key="syntax.html.options">HTML Options:</entry>
+<entry key="syntax.head">{0} &lt;html&gt;			Add &lt;head&gt; code to HTML header.</entry>
 <entry key="syntax.bugreport">Report bugs to: {0}</entry>
 <entry key="syntax.homepage">{0} home page: {1}</entry>
 
@@ -65,7 +71,7 @@ There is NO WARRANTY, to the extent permitted by law.</entry>
 <entry key="error.syntax.only_one_input">Only one input file permitted</entry>
 <entry key="error.syntax.missing_filename">Filename expected after {0}</entry>
 <entry key="error.syntax.missing_input">File name expected after {0}</entry>
-<entry key="error.syntax.batch.missing_in">Input file required for batch mode</entry>
+<entry key="error.syntax.batch.missing_in">Input file required for batch mode (use ''{0}'' for help).</entry>
 <entry key="error.syntax.batch.missing_out">Output directory required for batch mode</entry>
 <entry key="error.syntax.batch.unknown_format">Unknown format ''{0}''</entry>
 <entry key="error.exists">{0} already exists</entry>
@@ -166,6 +172,10 @@ There is NO WARRANTY, to the extent permitted by law.</entry>
 <!--  ifthen messages -->
 
 <entry key="ifthen.invalid.condition">Invalid condition ''{0}''.</entry>
+
+<!--  inputenc messages -->
+
+<entry key="inputenc.unknown.encoding">Unknown encoding ''{0}''.</entry>
 
 <!-- color messages -->
 <entry key="color.unsupported">Unsupported ''{0}'' model colour {1}</entry>

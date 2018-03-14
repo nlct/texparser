@@ -33,7 +33,7 @@ public class KpsewhichListener implements ProcessListener
    {
       try
       {
-         result = new File(line);
+         result = line;
       }
       catch (NumberFormatException e)
       {
@@ -50,7 +50,7 @@ public class KpsewhichListener implements ProcessListener
       app.error(e);
    }
 
-   public File getFile()
+   public String getResult()
    {
       return result;
    }
@@ -92,7 +92,7 @@ public class KpsewhichListener implements ProcessListener
 
    private InterruptTimerTask interruptor;
    private TeXParserApp app;
-   private File result = null;
+   private String result = null;
    private Process process;
    private Thread thread;
 }

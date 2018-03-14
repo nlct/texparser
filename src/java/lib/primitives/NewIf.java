@@ -57,7 +57,14 @@ public class NewIf extends Primitive
    public static void createConditional(boolean isLocal,
       TeXParser parser, String name)
    {
-       parser.putControlSequence(isLocal, new IfFalse(name));
+      createConditional(isLocal, parser, name, false);
+   }
+
+   public static void createConditional(boolean isLocal,
+      TeXParser parser, String name, boolean initialValue)
+   {
+       parser.putControlSequence(isLocal,
+         initialValue ? new IfTrue(name) : new IfFalse(name));
 
        TeXObjectList list = new TeXObjectList();
 
