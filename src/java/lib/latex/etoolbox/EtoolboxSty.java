@@ -35,6 +35,17 @@ public class EtoolboxSty extends LaTeXSty
 
    public void addDefinitions()
    {
+      // Definitions
+
+      registerControlSequence(new CsDef());
+      registerControlSequence(new CsDef("csgdef", true, false, false));
+      registerControlSequence(new CsDef("csedef", true, true, true));
+      registerControlSequence(new CsDef("csxdef", true, false, true));
+      registerControlSequence(new CsDef("protected@csedef", true, true, true));
+      registerControlSequence(new CsDef("protected@csxdef", true, false, true));
+
+      // Hooks
+
       registerControlSequence(new PreTo());
       registerControlSequence(new PreTo("gpreto", true,
         true, false, false));
@@ -49,6 +60,10 @@ public class EtoolboxSty extends LaTeXSty
       registerControlSequence(new PreTo("csepreto", false,
         true, true, true));
       registerControlSequence(new PreTo("csxpreto", true,
+        true, true, true));
+      registerControlSequence(new PreTo("protected@csepreto", false,
+        true, true, true));
+      registerControlSequence(new PreTo("protected@csxpreto", true,
         true, true, true));
 
       registerControlSequence(new PreTo("appto", false,
@@ -66,6 +81,10 @@ public class EtoolboxSty extends LaTeXSty
       registerControlSequence(new PreTo("cseappto", false,
         false, true, true));
       registerControlSequence(new PreTo("csxappto", true,
+        false, true, true));
+      registerControlSequence(new PreTo("protected@cseappto", false,
+        false, true, true));
+      registerControlSequence(new PreTo("protected@csxappto", true,
         false, true, true));
 
       registerControlSequence(new IfDefEmpty());
