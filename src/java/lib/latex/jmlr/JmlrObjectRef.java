@@ -71,6 +71,27 @@ public class JmlrObjectRef extends Command
       return expand(parser, labels, singulartag, pluraltag, pre, post);
     }
 
+   protected void expandLabel(TeXParser parser, TeXObjectList expanded,
+      TeXObject label)
+       throws IOException
+   {
+      TeXParserListener listener = parser.getListener();
+
+      expanded.add(new TeXCsRef("ref"));
+
+      if (label instanceof Group || !(label instanceof TeXObjectList))
+      {
+         expanded.add(label);
+      }
+      else
+      {
+         Group grp = listener.createGroup();
+
+         grp.addAll((TeXObjectList)label);
+         expanded.add(grp);
+      }
+   }
+
     protected TeXObjectList expand(TeXParser parser, TeXObject labels,
      TeXObject singulartag, TeXObject pluraltag, TeXObject pre, TeXObject post)
        throws IOException
@@ -82,8 +103,12 @@ public class JmlrObjectRef extends Command
 
       int n = csvList.size();
 
-      expanded.add(n == 1 ? singulartag : pluraltag);
-      expanded.add(listener.getActiveChar('~'));
+      if (singulartag != null && pluraltag != null)
+      {
+         expanded.add(n == 1 ? singulartag : pluraltag);
+         expanded.add(listener.getActiveChar('~'));
+      }
+
       expanded.add(pre);
 
       for (int i = 0; i < n; i++)
@@ -102,19 +127,7 @@ public class JmlrObjectRef extends Command
             }
          }
 
-         expanded.add(new TeXCsRef("ref"));
-
-         if (label instanceof Group || !(label instanceof TeXObjectList))
-         {
-            expanded.add(label);
-         }
-         else
-         {
-            Group grp = listener.createGroup();
-
-            grp.addAll((TeXObjectList)label);
-            expanded.add(grp);
-         }
+         expandLabel(parser, expanded, label);
       }
 
       expanded.add(post);

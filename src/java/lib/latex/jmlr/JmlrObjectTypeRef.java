@@ -38,16 +38,24 @@ public class JmlrObjectTypeRef extends JmlrObjectRef
    public JmlrObjectTypeRef(String tag, String name, 
      TeXObject pre, TeXObject post)
    {
+      this(tag, name, pre, post, true);
+   }
+
+   public JmlrObjectTypeRef(String tag, String name, 
+     TeXObject pre, TeXObject post, boolean prefixName)
+   {
       super(name);
       this.tag = tag;
       this.pre = pre;
       this.post = post;
+      this.prefixName = prefixName;
    }
 
    public Object clone()
    {
       return new JmlrObjectTypeRef(getTag(), getName(),
-       (TeXObject)getPre().clone(), (TeXObject)getPost().clone());
+       (TeXObject)getPre().clone(), (TeXObject)getPost().clone(),
+       prefixName);
    }
 
    public String getTag()
@@ -65,6 +73,11 @@ public class JmlrObjectTypeRef extends JmlrObjectRef
       return post;
    }
 
+   public boolean useNamePrefix()
+   {
+      return prefixName;
+   }
+
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
@@ -72,13 +85,19 @@ public class JmlrObjectTypeRef extends JmlrObjectRef
           parser.popNextArg() :
           stack.popArg(parser));
 
-      TeXObject singulartag = new TeXCsRef(getTag()+"refname");
+      TeXObject singulartag = null;
+      TeXObject pluraltag = null;
 
-      TeXObject pluraltag = new TeXCsRef(getTag()+"srefname");
+      if (prefixName)
+      {
+         singulartag = new TeXCsRef(getTag()+"refname");
+         pluraltag = new TeXCsRef(getTag()+"srefname");
+      }
 
       return expand(parser, labels, singulartag, pluraltag, pre, post);
    }
 
    private String tag;
    private TeXObject pre, post;
+   private boolean prefixName;
 }

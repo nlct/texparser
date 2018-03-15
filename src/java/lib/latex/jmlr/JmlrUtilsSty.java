@@ -150,8 +150,8 @@ public class JmlrUtilsSty extends LaTeXSty
 
       if (supportSubFloats)
       {
-         newsubfloat("figure");
-         newsubfloat("table");
+         newsubfloat("figure", "fig");
+         newsubfloat("table", "tab");
 
          NewIf.createConditional(true, parser, "ifjmlrutilssubfloats", true);
       }
@@ -267,7 +267,7 @@ public class JmlrUtilsSty extends LaTeXSty
       }
    }
 
-   public void newsubfloat(String floatname)
+   public void newsubfloat(String floatname, String abbr)
    {
       String countername = "sub"+floatname;
 
@@ -286,6 +286,9 @@ public class JmlrUtilsSty extends LaTeXSty
 
       registerControlSequence(new GenericCommand(listener, true, 
         String.format("@%slabel", countername), 1, def));
+
+      registerControlSequence(new JmlrSubFloatRef(
+        String.format("sub%sref", abbr), floatname));
    }
 
    public void newtheorem(String envname, String counter, 
