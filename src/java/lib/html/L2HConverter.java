@@ -249,6 +249,11 @@ public class L2HConverter extends LaTeXParserListener
       putControlSequence(new L2Hhfill("hfill"));
       putControlSequence(new L2Hhfill("hfil"));
 
+      putControlSequence(new GenericCommand(true, "quad", null, 
+       new TeXObject[] {new HtmlTag("<span class=\"quad\"></span>")}));
+      putControlSequence(new GenericCommand(true, "qquad", null, 
+       new TeXObject[] {new HtmlTag("<span class=\"qquad\"></span>")}));
+
       putControlSequence(new L2HNormalFont());
 
       putControlSequence(new GenericCommand(true, "labelitemii", null,
@@ -730,6 +735,9 @@ public class L2HConverter extends LaTeXParserListener
       writeln("div.bigskip { padding-left: 0pt; padding-right: 0pt; padding-top: 0pt; padding-bottom: 2ex;}");
       writeln("div.medskip { padding-left: 0pt; padding-right: 0pt; padding-top: 0pt; padding-bottom: 1ex;}");
       writeln("div.smallskip { padding-left: 0pt; padding-right: 0pt; padding-top: 0pt; padding-bottom: .5ex;}");
+
+      writeln("span.quad { padding-left: 0pt; padding-right: 1em; padding-top: 0pt; padding-bottom: 0pt;}");
+      writeln("span.qquad { padding-left: 0pt; padding-right: 2em; padding-top: 0pt; padding-bottom: 0pt;}");
 
       writeln(".displaylist { display: block; list-style-type: none; }");
       writeln(".inlinelist { display: inline; }");
@@ -1920,6 +1928,11 @@ public class L2HConverter extends LaTeXParserListener
        text));
    }
 
+   public TeXObject getAnchor(String anchorName)
+   {
+      return new HtmlTag(String.format("<a name=\"%s\"></a>", anchorName));
+   }
+
    private Vector<String> styCs;
 
    private int indexLoc = 0;
@@ -1945,6 +1958,7 @@ public class L2HConverter extends LaTeXParserListener
    private HashMap<String,TeXObject> internalReferences;
 
    private HashMap<String,String> defaultStyles;
+
 
    private Stack<TrivListDec> trivListStack = new Stack<TrivListDec>();
 

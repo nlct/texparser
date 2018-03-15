@@ -4,6 +4,7 @@
 
 \usepackage[T1]{fontenc}
 \usepackage{lipsum}
+\usepackage{graphicx}
 \usepackage{jmlrutils}
 
 \title{Sample Document}
@@ -21,18 +22,46 @@
 This is a sample article. \sectionref{sec:method} discusses
 the method used. \equationref{eq:emc2} is an interesting
 equation. Some other stuff is in \appendixref{apd:first}.
+See also \figureref{fig:example1,fig:example2,fig:sub-a,fig:sub-b}.
 
-\lipsum
+\lipsum[1]
 
 \section{Method}\label{sec:method}
 
-\lipsum
+\lipsum[2]
 
 \begin{equation}\label{eq:emc2}
 E = mc^{2}
 \end{equation}
 
-\lipsum
+\lipsum[3]
+
+\begin{figure}
+\floatconts
+ {fig:example1}% label
+ {\caption{An example image}}% caption
+ {\includegraphics[width=.5\linewidth]{example-image}}% contents
+\end{figure}
+
+\begin{figure}
+\floatconts
+ {fig:example2}% label
+ {\caption{Another example image}}% caption
+ {\includegraphics[width=.5\linewidth]{example-image-a}}% contents
+\end{figure}
+
+\begin{figure}
+\floatconts
+ {fig:example3}% label
+ {\caption{An example image with sub-figures}}% caption
+ {% contents
+  \subfigure
+   {\label{fig:sub-a}\includegraphics[width=.25\linewidth]{example-image-b}}%
+  \quad
+  \subfigure
+   {\label{fig:sub-b}\includegraphics[width=.25\linewidth]{example-image-c}}%
+ }
+\end{figure}
 
 
 \section{Sample}

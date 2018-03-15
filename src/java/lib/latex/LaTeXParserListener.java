@@ -115,6 +115,11 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       this.parseAux = parseAux;
    }
 
+   public TeXObject getAnchor(String anchorName)
+   {
+      return null;
+   }
+
    public TeXObject getCitation(TeXObject label)
       throws IOException
    {
@@ -426,6 +431,7 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
 
       parser.putControlSequence(new FrameBox());
       parser.putControlSequence(new MBox());
+      parser.putControlSequence(new ParBox());
       parser.putControlSequence(new FrameBox("framebox"));
       parser.putControlSequence(new MBox("makebox"));
       parser.putControlSequence(new MBox("frame",

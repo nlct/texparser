@@ -45,18 +45,27 @@ public class FrameBox extends ControlSequence
    public FrameBox(String name, byte style, byte halign, byte valign, 
       boolean isinline, TeXDimension borderWidth, TeXDimension innerMargin)
    {
+      this(name, style, halign, valign, isinline, false, borderWidth, innerMargin);
+   }
+
+   public FrameBox(String name, byte style, byte halign, byte valign, 
+      boolean isinline, boolean isMultiLine, 
+      TeXDimension borderWidth, TeXDimension innerMargin)
+   {
       super(name);
       setStyle(style);
       setHAlign(halign);
       setVAlign(valign);
       setIsInLine(isinline);
+      setIsMultiLine(isMultiLine);
       currentBorderWidth = borderWidth;
       currentInnerMargin = innerMargin;
    }
 
    public Object clone()
    {
-      return new FrameBox(getName(), style, halign, valign, isInline,
+      return new FrameBox(getName(), style, halign, valign, 
+        isInline, isMultiLine,
         currentBorderWidth == null ? null : 
           (TeXDimension)currentBorderWidth.clone(),
         currentInnerMargin == null ? null : 
@@ -72,6 +81,16 @@ public class FrameBox extends ControlSequence
    public void setIsInLine(boolean isinline)
    {
       this.isInline = isinline;
+   }
+
+   public boolean isMultiLine()
+   {
+      return isMultiLine;
+   }
+
+   public void setIsMultiLine(boolean isMultiLine)
+   {
+      this.isMultiLine = isMultiLine;
    }
 
    public byte getStyle()
@@ -276,6 +295,19 @@ public class FrameBox extends ControlSequence
 
    }
 
+   protected TeXObject popContents(TeXParser parser, TeXObjectList stack)
+     throws IOException
+   {
+      if (parser == stack)
+      {
+         return parser.popNextArg();
+      }
+      else
+      {
+         return stack.popArg(parser);
+      }
+   }
+
    public void process(TeXParser parser) throws IOException
    {
       process(parser, parser);
@@ -293,18 +325,10 @@ public class FrameBox extends ControlSequence
       TeXDimension orgBorderWidth = currentBorderWidth;
       TeXDimension orgInnerMargin = currentInnerMargin;
 
+      parser.startGroup();
       popSettings(parser, stack);
 
-      TeXObject arg;
-
-      if (parser == stack)
-      {
-         arg = parser.popNextArg();
-      }
-      else
-      {
-         arg = stack.popArg(parser);
-      }
+      TeXObject arg = popContents(parser, stack);
 
       LaTeXParserListener listener = ((LaTeXParserListener)parser.getListener());
 
@@ -322,6 +346,7 @@ public class FrameBox extends ControlSequence
          }
          finally
          {
+            parser.endGroup();
             currentWidth = orgWidth;
             currentHeight = orgHeight;
             currentBorderColor = orgBorderColor;
@@ -344,10 +369,12 @@ public class FrameBox extends ControlSequence
    protected Color currentFgColor=null;
    protected Color currentBgColor=null;
 
-   private byte style = BORDER_SOLID;
-   private byte halign = ALIGN_DEFAULT;
-   private byte valign = ALIGN_DEFAULT;
-   private boolean isInline = true;
+   protected byte style = BORDER_SOLID;
+   protected byte halign = ALIGN_DEFAULT;
+   protected byte valign = ALIGN_DEFAULT;
+
+   protected boolean isInline = true;
+   protected boolean isMultiLine = true;
 
    public static final byte BORDER_NONE=0;
    public static final byte BORDER_SOLID=1;

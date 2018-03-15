@@ -48,6 +48,15 @@ public class JmlrUtilsSty extends LaTeXSty
       LaTeXParserListener listener = getListener();
       TeXParser parser = getParser();
 
+      // Only create \iftablecaptiontop if not already defined
+
+      if (parser.getControlSequence("iftablecaptiontop") == null)
+      {
+         NewIf.createConditional(true, parser, "iftablecaptiontop", true);
+      }
+
+      // Cross-referencing
+
       registerControlSequence(new GenericCommand("@jmlr@reflistsep", null,
         listener.createString(", ")));
       registerControlSequence(new GenericCommand("@jmlr@reflistlastsep", null,
@@ -130,6 +139,26 @@ public class JmlrUtilsSty extends LaTeXSty
       registerControlSequence(new JmlrObjectTypeRef("exampleref"));
       registerControlSequence(new JmlrObjectTypeRef("appendix"));
       registerControlSequence(new JmlrObjectTypeRef("part"));
+
+      // Figures, tables and algorithms
+
+      registerControlSequence(new FloatConts());
+      registerControlSequence(new FloatConts("table"));
+      registerControlSequence(new FloatConts("figure"));
+
+      registerControlSequence(new AtJmlrIfGraphicxLoaded());
+
+      if (supportSubFloats)
+      {
+         newsubfloat("figure");
+         newsubfloat("table");
+
+         NewIf.createConditional(true, parser, "ifjmlrutilssubfloats", true);
+      }
+      else
+      {
+         NewIf.createConditional(true, parser, "ifjmlrutilssubfloats", false);
+      }
 
       if (supportMaths)
       {
@@ -236,6 +265,27 @@ public class JmlrUtilsSty extends LaTeXSty
       {
          supportSubFloats=false;
       }
+   }
+
+   public void newsubfloat(String floatname)
+   {
+      String countername = "sub"+floatname;
+
+      listener.newcounter(countername, null, "@alph");
+      listener.addtoreset(countername, floatname);
+
+      registerControlSequence(new SubFloat(floatname));
+
+      String sublabel = String.format("sub%slabel", floatname);
+
+      registerControlSequence(new SubFloatLabel(sublabel));
+
+      TeXObjectList def = new TeXObjectList();
+      def.add(listener.getParam(1));
+      def.add(new TeXCsRef(sublabel));
+
+      registerControlSequence(new GenericCommand(listener, true, 
+        String.format("@%slabel", countername), 1, def));
    }
 
    public void newtheorem(String envname, String counter, 
