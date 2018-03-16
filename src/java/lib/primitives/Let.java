@@ -71,7 +71,7 @@ public class Let extends Primitive
       doAssignment(parser, firstArg, secondArg);
    }
 
-   private void doAssignment(TeXParser parser,
+   protected void doAssignment(TeXParser parser,
      TeXObject firstArg, TeXObject secondArg)
    {
       if (secondArg instanceof TeXCsRef)

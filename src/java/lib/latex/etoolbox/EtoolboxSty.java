@@ -44,6 +44,17 @@ public class EtoolboxSty extends LaTeXSty
       registerControlSequence(new CsDef("protected@csedef", true, true, true));
       registerControlSequence(new CsDef("protected@csxdef", true, false, true));
 
+      registerControlSequence(new CsLetCs());
+      registerControlSequence(new CsLetCs("cslet", true, false));
+      registerControlSequence(new CsLetCs("letcs", false, true));
+
+      registerControlSequence(new AtNameUse("csuse"));
+
+      registerControlSequence(new Undef());
+      registerControlSequence(new Undef("gundef", true, false));
+      registerControlSequence(new Undef("csundef", false, true));
+      registerControlSequence(new Undef("csgundef", true, true));
+
       // Hooks
 
       registerControlSequence(new PreTo());
@@ -89,5 +100,8 @@ public class EtoolboxSty extends LaTeXSty
 
       registerControlSequence(new IfDefEmpty());
       registerControlSequence(new IfDefEmpty("ifcsempty", true));
+
+      registerControlSequence(new IfDefString());
+      registerControlSequence(new IfDefString("ifcsstring", true));
    }
 }

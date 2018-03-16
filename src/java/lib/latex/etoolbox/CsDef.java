@@ -110,7 +110,7 @@ public class CsDef extends Def
          }
       }
 
-      parser.putControlSequence(isLocal,
+      parser.putControlSequence(isLocal(),
         new GenericCommand(isShort(), csname.toString(parser),
              syntax, definition));
    }
