@@ -80,7 +80,7 @@ public class IfDefString extends ControlSequence implements Expandable
       }
       else if (arg instanceof TeXCsRef)
       {
-         arg = parser.getListener.getControlSequence(((TeXCsRef)arg).getName());
+         arg = parser.getListener().getControlSequence(((TeXCsRef)arg).getName());
       }
 
       if (arg instanceof GenericCommand)
@@ -131,7 +131,7 @@ public class IfDefString extends ControlSequence implements Expandable
          falsePart = stack.popArg(parser);
       }
 
-      if (arg.toString(parser).strArg.toString(parser))
+      if (arg.toString(parser).equals(strArg.toString(parser)))
       {
          if (truePart instanceof TeXObjectList 
               && !(truePart instanceof Group))

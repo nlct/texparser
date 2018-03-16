@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.util.Vector;
 
 import com.dickimawbooks.texparserlib.*;
+import com.dickimawbooks.texparserlib.primitives.IfTrue;
 
 public class AtFor extends Command
 {
@@ -46,12 +47,30 @@ public class AtFor extends Command
    {
       TeXObjectList list = new TeXObjectList();
 
+      boolean xfor = ((LaTeXParserListener)parser.getListener()).isStyLoaded(
+        "xfor");
+
       for (int i = 0; i < csvList.size(); i++)
       {
          TeXObject obj = csvList.getValue(i);
 
          cs.getDefinition().clear();
          cs.getDefinition().add(obj);
+
+         if (xfor)
+         {
+            if (i == csvList.size())
+            {
+               parser.putControlSequence(true, 
+                 parser.getListener().createUndefinedCs("@nnil"));
+            }
+            else
+            {
+               parser.putControlSequence(true, new GenericCommand(true,
+                  "@xfor@nextelement", null, 
+                    new TeXObject[] {csvList.getValue(i+1)}));
+            }
+         }
 
          TeXObject loopBody = (TeXObject)code.clone();
 
@@ -83,6 +102,26 @@ public class AtFor extends Command
          {
             list.add(loopBody);
          }
+
+         if (xfor)
+         {
+            ControlSequence ifCs = parser.getControlSequence("if@endfor");
+
+            if (ifCs instanceof IfTrue)
+            {
+               CsvList remainder = new CsvList();
+
+               for (int j = i+1; j < csvList.size(); j++)
+               {
+                  remainder.add(csvList.get(j));
+               }
+
+               parser.putControlSequence(true, new GenericCommand(true,
+                 "@forremainder", null, new TeXObject[] {remainder}));
+
+               break;
+            }
+         }
       }
 
       return list;
@@ -94,12 +133,30 @@ public class AtFor extends Command
    {
       TeXObjectList list = new TeXObjectList();
 
+      boolean xfor = ((LaTeXParserListener)parser.getListener()).isStyLoaded(
+        "xfor");
+
       for (int i = 0; i < csvList.size(); i++)
       {
          TeXObject obj = csvList.getValue(i);
 
          cs.getDefinition().clear();
          cs.getDefinition().add(obj);
+
+         if (xfor)
+         {
+            if (i == csvList.size())
+            {
+               parser.putControlSequence(true, 
+                 parser.getListener().createUndefinedCs("@nnil"));
+            }
+            else
+            {
+               parser.putControlSequence(true, new GenericCommand(true,
+                  "@xfor@nextelement", null, 
+                    new TeXObject[] {csvList.getValue(i+1)}));
+            }
+         }
 
          TeXObject loopBody = (TeXObject)code.clone();
 
@@ -131,6 +188,26 @@ public class AtFor extends Command
          {
             list.add(loopBody);
          }
+
+         if (xfor)
+         {
+            ControlSequence ifCs = parser.getControlSequence("if@endfor");
+
+            if (ifCs instanceof IfTrue)
+            {
+               CsvList remainder = new CsvList();
+
+               for (int j = i+1; j < csvList.size(); j++)
+               {
+                  remainder.add(csvList.get(j));
+               }
+
+               parser.putControlSequence(true, new GenericCommand(true,
+                 "@forremainder", null, new TeXObject[] {remainder}));
+
+               break;
+            }
+         }
       }
 
       return list;
@@ -140,12 +217,30 @@ public class AtFor extends Command
      GenericCommand cs, CsvList csvList, TeXObject code)
      throws IOException
    {
+      boolean xfor = ((LaTeXParserListener)parser.getListener()).isStyLoaded(
+        "xfor");
+
       for (int i = 0; i < csvList.size(); i++)
       {
          TeXObject obj = csvList.getValue(i);
 
          cs.getDefinition().clear();
          cs.getDefinition().add(obj);
+
+         if (xfor)
+         {
+            if (i == csvList.size())
+            {
+               parser.putControlSequence(true, 
+                 parser.getListener().createUndefinedCs("@nnil"));
+            }
+            else
+            {
+               parser.putControlSequence(true, new GenericCommand(true,
+                  "@xfor@nextelement", null, 
+                    new TeXObject[] {csvList.getValue(i+1)}));
+            }
+         }
 
          TeXObject loopBody = (TeXObject)code.clone();
 
@@ -175,6 +270,26 @@ public class AtFor extends Command
          else
          {
             loopBody.process(parser, stack);
+         }
+
+         if (xfor)
+         {
+            ControlSequence ifCs = parser.getControlSequence("if@endfor");
+
+            if (ifCs instanceof IfTrue)
+            {
+               CsvList remainder = new CsvList();
+
+               for (int j = i+1; j < csvList.size(); j++)
+               {
+                  remainder.add(csvList.get(j));
+               }
+
+               parser.putControlSequence(true, new GenericCommand(true,
+                 "@forremainder", null, new TeXObject[] {remainder}));
+
+               break;
+            }
          }
       }
 

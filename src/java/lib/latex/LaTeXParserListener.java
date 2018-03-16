@@ -54,6 +54,7 @@ import com.dickimawbooks.texparserlib.latex.shortvrb.*;
 import com.dickimawbooks.texparserlib.latex.probsoln.*;
 import com.dickimawbooks.texparserlib.latex.bpchem.*;
 import com.dickimawbooks.texparserlib.latex.xspace.*;
+import com.dickimawbooks.texparserlib.latex.xfor.*;
 import com.dickimawbooks.texparserlib.latex.siunitx.*;
 import com.dickimawbooks.texparserlib.latex.mhchem.*;
 import com.dickimawbooks.texparserlib.latex.stix.*;
@@ -1324,6 +1325,11 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       if (styName.equals("xspace"))
       {
          return new XspaceSty(options, this, loadParentOptions);
+      }
+
+      if (styName.equals("xfor"))
+      {
+         return new XforSty(options, this, loadParentOptions);
       }
 
       if (styName.equals("color") || styName.equals("xcolor"))
