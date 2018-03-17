@@ -62,4 +62,6 @@ public class BibTeXSyntaxException extends TeXSyntaxException
       "bibtex.error.string_name_undefined";
    public static final String ERROR_REPEATED_ENTRY = 
       "bibtex.error.repeated_entry";
+   public static final String ERROR_MISSING_ID = 
+      "bibtex.error.missing.id";
 }

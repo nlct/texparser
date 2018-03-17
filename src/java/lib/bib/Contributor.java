@@ -49,6 +49,11 @@ public class Contributor
    public Contributor(TeXObject forenameList, TeXObject vonList, 
      TeXObject surnameList, TeXObject suffixList)
    {
+      forenamesObject = forenameList;
+      vonObject = vonList;
+      surnameObject = surnameList;
+      suffixObject = suffixList;
+
       if (forenameList != null)
       {
          forenames = forenameList.format();
@@ -75,9 +80,19 @@ public class Contributor
       return forenames;
    }
 
+   public TeXObject getForenamesObject()
+   {
+      return forenamesObject;
+   }
+
    public String getSurname()
    {
       return surname;
+   }
+
+   public TeXObject getSurnameObject()
+   {
+      return surnameObject;
    }
 
    public String getVonPart()
@@ -85,9 +100,19 @@ public class Contributor
       return von;
    }
 
+   public TeXObject getVonPartObject()
+   {
+      return vonObject;
+   }
+
    public String getSuffix()// Jr etc
    {
       return suffix;
+   }
+
+   public TeXObject getSuffixObject()
+   {
+      return suffixObject;
    }
 
    public String format()
@@ -138,9 +163,21 @@ public class Contributor
       forenames = name;
    }
 
+   public void setForenames(String name, TeXObject object)
+   {
+      forenames = name;
+      forenamesObject = object;
+   }
+
    public void setSurname(String name)
    {
       surname = name;
+   }
+
+   public void setSurname(String name, TeXObject object)
+   {
+      surname = name;
+      surnameObject = object;
    }
 
    public void setVonPart(String name)
@@ -148,13 +185,30 @@ public class Contributor
       von = name;
    }
 
+   public void setVonPart(String name, TeXObject object)
+   {
+      von = name;
+      vonObject = object;
+   }
+
    public void setSuffix(String name)
    {
       suffix = name;
+   }
+
+   public void setSuffix(String name, TeXObject object)
+   {
+      suffix = name;
+      suffixObject = object;
    }
 
    private String forenames;
    private String surname;
    private String von;
    private String suffix;
+
+   private TeXObject forenamesObject=null;
+   private TeXObject surnameObject=null;
+   private TeXObject vonObject=null;
+   private TeXObject suffixObject=null;
 }

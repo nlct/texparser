@@ -145,12 +145,18 @@ public class BibEntry extends BibData
    {
       TeXObjectList idList = readKeyObject(parser, contents);
 
+      if (idList == null)
+      {
+         throw new BibTeXSyntaxException(parser,
+           BibTeXSyntaxException.ERROR_MISSING_ID);
+      }
+
       String id = idList.format();
 
       if (id.isEmpty())
       {
          throw new BibTeXSyntaxException(parser,
-           BibTeXSyntaxException.ERROR_MISSING_FIELD_NAME);
+           BibTeXSyntaxException.ERROR_MISSING_ID);
       }
 
       setId(id);
@@ -182,6 +188,11 @@ public class BibEntry extends BibData
       while (!contents.isEmpty())
       {
          String key = readKey(parser, contents);
+
+         if (key == null)
+         {
+            break;
+         }
 
          object = contents.popStack(parser);
 
@@ -284,6 +295,16 @@ public class BibEntry extends BibData
 
       while (!list.isEmpty())
       {
+         if (word == null)
+         {
+            list.popLeadingWhiteSpace();
+
+            if (list.isEmpty())
+            {
+               break;
+            }
+         }
+
          TeXObject object = list.pop();
 
          if (word == null)
@@ -333,21 +354,6 @@ public class BibEntry extends BibData
                   }
                }
             }
-            else if (object instanceof WhiteSpace)
-            {
-               while (!list.isEmpty())
-               {
-                  TeXObject nextObj = list.peek();
-
-                  if (!(nextObj instanceof WhiteSpace
-                         || nextObj instanceof Ignoreable))
-                  {
-                     break;
-                  }
-
-                  object = list.pop();
-               }
-            }
             else
             {
                word = new TeXObjectList();
@@ -388,7 +394,6 @@ public class BibEntry extends BibData
      Vector<TeXObjectList> list)
     throws IOException
    {
-
       int commaCount = 0;
 
       StringBuffer buffer = new StringBuffer();
@@ -574,7 +579,11 @@ public class BibEntry extends BibData
             name = nameList;
          }
 
-         nameList.add(parser.getListener().getSpace());
+         if (!nameList.isEmpty())
+         {
+            nameList.add(parser.getListener().getSpace());
+         }
+
          nameList.add(word);
       }
 

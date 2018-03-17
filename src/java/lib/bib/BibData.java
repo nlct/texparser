@@ -72,8 +72,7 @@ public abstract class BibData
 
       if (object == null)
       {
-         throw new BibTeXSyntaxException(parser,
-           BibTeXSyntaxException.ERROR_MISSING_FIELD_NAME);
+         return null;
       }
 
       while (object != null)
@@ -124,11 +123,16 @@ public abstract class BibData
    {
       TeXObjectList list = readKeyObject(parser, stack);
 
+      if (list == null)
+      {
+         return null;
+      }
+
       String key = list.format();
 
       if (key.isEmpty())
       {
-         throw new BibTeXSyntaxException(parser,
+         throw new BibTeXSyntaxException(parser, 
            BibTeXSyntaxException.ERROR_MISSING_FIELD_NAME);
       }
 

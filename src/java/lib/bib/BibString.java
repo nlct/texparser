@@ -51,6 +51,12 @@ public class BibString extends BibData
    {
       key = readKey(parser, contents);
 
+      if (key == null)
+      {
+         throw new BibTeXSyntaxException(parser, 
+           BibTeXSyntaxException.ERROR_MISSING_FIELD_NAME);
+      }
+
       TeXObject object = contents.popStack(parser);
 
       while (object != null && object instanceof WhiteSpace)
