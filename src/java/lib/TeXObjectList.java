@@ -1128,11 +1128,11 @@ public class TeXObjectList extends Vector<TeXObject>
    }
 
    // Pops an argument off the stack. Removes any top level
-   // grouping.
+   // grouping. Ignore leading white space.
    public TeXObject popArg(TeXParser parser)
     throws IOException
    {
-      return popArg(parser, (byte)0);
+      return popArg(parser, POP_IGNORE_LEADING_SPACE);
    }
 
    public TeXObject popArg(TeXParser parser, byte popStyle)
@@ -1155,7 +1155,7 @@ public class TeXObjectList extends Vector<TeXObject>
    public TeXObject popArg(TeXParser parser, int openDelim, int closeDelim)
      throws IOException
    {
-      return popArg(parser, (byte)0, openDelim, closeDelim);
+      return popArg(parser, POP_IGNORE_LEADING_SPACE, openDelim, closeDelim);
    }
 
    public TeXObject popArg(TeXParser parser, byte popStyle, 

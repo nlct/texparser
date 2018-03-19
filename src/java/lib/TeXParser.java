@@ -1898,15 +1898,74 @@ public class TeXParser extends TeXObjectList
    public TeXObject popNextArg()
      throws IOException
    {
-      return popNextArg((byte)0);
+      return popNextArg(POP_IGNORE_LEADING_SPACE);
    }
 
    public TeXObject popNextArg(byte popStyle)
      throws IOException
    {
-      if (size() == 0)
+      boolean skipIgnoreables = !isRetainIgnoreables(popStyle);
+      boolean skipLeadingWhiteSpace = isIgnoreLeadingSpace(popStyle);
+
+      if (skipIgnoreables && skipLeadingWhiteSpace)
       {
-         fetchNext(isShort(popStyle));
+         while (size() == 0)
+         {
+            if (!fetchNext(isShort(popStyle)))
+            {
+               throw new EOFException();
+            }
+
+            TeXObject obj = get(0);
+
+            if (!((obj instanceof Ignoreable) || (obj instanceof WhiteSpace)))
+            {
+               break;
+            }
+
+            pop();
+         }
+      }
+      else if (skipIgnoreables)
+      {
+         while (size() == 0)
+         {
+            if (!fetchNext(isShort(popStyle)))
+            {
+               throw new EOFException();
+            }
+
+            if (!(get(0) instanceof Ignoreable))
+            {
+               break;
+            }
+
+            pop();
+         }
+      }
+      else if (skipLeadingWhiteSpace)
+      {
+         while (size() == 0)
+         {
+            if (!fetchNext(isShort(popStyle)))
+            {
+               throw new EOFException();
+            }
+
+            if (!(get(0) instanceof WhiteSpace))
+            {
+               break;
+            }
+
+            pop();
+         }
+      }
+      else if (size() == 0)
+      {
+         if (!fetchNext(isShort(popStyle)))
+         {
+            throw new EOFException();
+         }
       }
 
       return popArg(popStyle);
@@ -1915,7 +1974,7 @@ public class TeXParser extends TeXObjectList
    public TeXObject popNextArg(int openDelim, int closeDelim)
      throws IOException
    {
-      return popNextArg((byte)0, openDelim, closeDelim);
+      return popNextArg(POP_IGNORE_LEADING_SPACE, openDelim, closeDelim);
    }
 
    public TeXObject popNextArg(byte popStyle, int openDelim, int closeDelim)
