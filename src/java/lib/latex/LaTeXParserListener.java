@@ -371,6 +371,7 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       parser.putControlSequence(new EnsureMath());
       parser.putControlSequence(new Frac());
       parser.putControlSequence(new GenericCommand("@empty"));
+      parser.putControlSequence(new SymbolCs());
 
       parser.putControlSequence(new AtFor());
       parser.putControlSequence(new AtIfNextChar());
