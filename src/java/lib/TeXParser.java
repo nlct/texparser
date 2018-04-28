@@ -1472,11 +1472,12 @@ public class TeXParser extends TeXObjectList
 
             if (isCatCode(TYPE_EOL, c))
             {
-               // Control sequence ended with EOL
+               // Control sequence ended with EOL.
 
                if (macro.length() == 0)
                {
-                  cs = new TeXCsRef("\n");
+                  // Treat as backslash space.
+                  cs = new TeXCsRef(" ");
                }
                else
                {
