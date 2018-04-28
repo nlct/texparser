@@ -23,6 +23,7 @@ There is NO WARRANTY, to the extent permitted by law.</entry>
 <entry key="message.moving">Moving {0} -> {0}</entry>
 <entry key="message.no.read">No read access for {0}...</entry>
 <entry key="message.no.write">No write access for {0}...</entry>
+<entry key="message.charset">Encoding: {0}</entry>
 
 <!--  Warnings -->
 <entry key="warning.substituting">Substituting {0} with {1}</entry>

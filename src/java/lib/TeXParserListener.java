@@ -26,8 +26,9 @@ import com.dickimawbooks.texparserlib.generic.*;
 
 public abstract class TeXParserListener
 {
-   // Called when parser starts to parse file
-   public abstract void beginParse(File file)
+   // Called when parser starts to parse file. May be used to add
+   // transcript messages.
+   public abstract void beginParse(File file, Charset encoding)
       throws IOException;
 
    // Called when parser finishes parse file

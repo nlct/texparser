@@ -186,7 +186,7 @@ public class PreambleParser extends LaTeXParserListener
       this.file = null;
    }
 
-   public void beginParse(File file)
+   public void beginParse(File file, Charset encoding)
       throws IOException
    {
       this.file = file;

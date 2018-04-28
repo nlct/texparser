@@ -1809,7 +1809,7 @@ public class TeXParser extends TeXObjectList
 
       try
       {
-         listener.beginParse(file);
+         listener.beginParse(file, charset);
 
          parse(new TeXReader(this.reader, file, charset));
       }
@@ -1861,7 +1861,7 @@ public class TeXParser extends TeXObjectList
 
       try
       {
-         listener.beginParse(file);
+         listener.beginParse(file, charset);
 
          parse(new TeXReader(this.reader, file, charset));
       }

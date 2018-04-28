@@ -108,7 +108,7 @@ public class BibParser extends DefaultTeXParserListener
          parser.setCatCode('~', TeXParser.TYPE_OTHER);
       }
 
-      parser.parse(bibFile);
+      parser.parse(bibFile, charset);
       parser.setCatCode('@', atcode);
       parser.setCatCode('#', hashcode);
 
@@ -193,11 +193,17 @@ public class BibParser extends DefaultTeXParserListener
    {
    }
 
-   public void beginParse(File file)
+   public void beginParse(File file, Charset encoding)
       throws IOException
    {
       getTeXApp().message(getTeXApp().getMessage(
          TeXApp.MESSAGE_READING, file));
+
+      if (encoding != null)
+      {
+         getTeXApp().message(getTeXApp().getMessage(
+            TeXApp.MESSAGE_ENCODING, encoding));
+      }
    }
 
    public void addBibData(BibData data)

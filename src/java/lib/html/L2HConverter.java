@@ -1403,11 +1403,17 @@ public class L2HConverter extends LaTeXParserListener
    {
    }
 
-   public void beginParse(File file)
+   public void beginParse(File file, Charset encoding)
     throws IOException
    {
       getTeXApp().message(getTeXApp().getMessage(
          TeXApp.MESSAGE_READING, file));
+
+      if (encoding != null)
+      {
+         getTeXApp().message(getTeXApp().getMessage(
+            TeXApp.MESSAGE_ENCODING, encoding));
+      }
 
       basePath = file.getParentFile().toPath();
 
@@ -1435,6 +1441,9 @@ public class L2HConverter extends LaTeXParserListener
          }
          else
          {
+            getTeXApp().message(getTeXApp().getMessage(
+               TeXApp.MESSAGE_ENCODING, htmlCharSet));
+
             writer = new PrintWriter(outFile, htmlCharSet.name());
          }
       }

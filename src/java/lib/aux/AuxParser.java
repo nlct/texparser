@@ -176,11 +176,17 @@ public class AuxParser extends DefaultTeXParserListener
    {
    }
 
-   public void beginParse(File file)
+   public void beginParse(File file, Charset encoding)
       throws IOException
    {
       getTeXApp().message(getTeXApp().getMessage(
          TeXApp.MESSAGE_READING, file));
+
+      if (encoding != null)
+      {
+         getTeXApp().message(getTeXApp().getMessage(
+            TeXApp.MESSAGE_ENCODING, encoding));
+      }
    }
 
    public void addAuxData(AuxData data)

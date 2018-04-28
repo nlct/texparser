@@ -66,4 +66,5 @@ public interface TeXApp
    public static String MESSAGE_WRITING = "message.writing";
    public static String MESSAGE_NO_READ = "message.no.read";
    public static String MESSAGE_NO_WRITE = "message.no.write";
+   public static String MESSAGE_ENCODING = "message.charset";
 }
