@@ -196,7 +196,12 @@ public class TeXObjectList extends Vector<TeXObject>
             TeXSyntaxException.ERROR_PAR_BEFORE_EG);
       }
 
-      BgChar bgChar = parser.isBeginGroup(obj);
+      BgChar bgChar = null;
+
+      if (parser != null)
+      {
+         bgChar = parser.isBeginGroup(obj);
+      }
 
       if (bgChar != null)
       {

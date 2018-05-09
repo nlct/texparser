@@ -331,6 +331,6 @@ public class LaTeXFile extends TeXPath
    private Vector<String> declaredOptions = null;
    private HashMap<String,TeXObject> declaredOptionCode=null;
    private TeXObject defaultOptionCode = null;
-   private boolean loadParentOptions=false;
+   protected boolean loadParentOptions=false;
    private LaTeXFile prevSty=null;
 }

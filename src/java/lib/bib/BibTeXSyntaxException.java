@@ -64,4 +64,6 @@ public class BibTeXSyntaxException extends TeXSyntaxException
       "bibtex.error.repeated_entry";
    public static final String ERROR_MISSING_ID = 
       "bibtex.error.missing.id";
+   public static final String ERROR_INVALID_ID = 
+      "bibtex.error.invalid.id";
 }

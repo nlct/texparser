@@ -143,7 +143,17 @@ public class BibEntry extends BibData
     TeXObjectList contents, TeXObject endGroupChar)
      throws IOException
    {
-      TeXObjectList idList = readKeyObject(parser, contents);
+      TeXObjectList idList = null;
+
+      try
+      {
+         idList = readKeyObject(parser, contents);
+      }
+      catch (BibTeXSyntaxException e)
+      {
+         throw new BibTeXSyntaxException(e, parser,
+          BibTeXSyntaxException.ERROR_INVALID_ID, e.getParams());
+      }
 
       if (idList == null)
       {
