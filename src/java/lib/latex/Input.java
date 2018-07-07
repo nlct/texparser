@@ -32,12 +32,18 @@ public class Input extends ControlSequence
 
    public Input(String name)
    {
+      this(name, NOT_FOUND_ACTION_ERROR);
+   }
+
+   public Input(String name, byte notFoundAction)
+   {
       super(name);
+      this.notFoundAction = notFoundAction;
    }
 
    public Object clone()
    {
-      return new Input(getName());
+      return new Input(getName(), notFoundAction);
    }
 
    public void process(TeXParser parser, TeXObjectList stack)
@@ -57,8 +63,21 @@ public class Input extends ControlSequence
 
       if (!doInput(parser, arg))
       {
-         throw new TeXSyntaxException(parser,
-           TeXSyntaxException.ERROR_FILE_NOT_FOUND, arg.toString(parser));
+         switch (notFoundAction)
+         {
+            case NOT_FOUND_ACTION_WARN:
+
+              TeXApp texapp = parser.getListener().getTeXApp();
+
+              texapp.warning(parser, texapp.getMessage(
+                 TeXSyntaxException.ERROR_FILE_NOT_FOUND, 
+                  arg.toString(parser)));
+            break;
+            case NOT_FOUND_ACTION_ERROR:
+               throw new TeXSyntaxException(parser,
+               TeXSyntaxException.ERROR_FILE_NOT_FOUND, 
+               arg.toString(parser));
+         }
       }
     }
 
@@ -79,8 +98,21 @@ public class Input extends ControlSequence
 
       if (!doInput(parser, arg))
       {
-         throw new TeXSyntaxException(parser,
-           TeXSyntaxException.ERROR_FILE_NOT_FOUND, arg.toString(parser));
+         switch (notFoundAction)
+         {
+            case NOT_FOUND_ACTION_WARN:
+
+              TeXApp texapp = parser.getListener().getTeXApp();
+
+              texapp.warning(parser, texapp.getMessage(
+                 TeXSyntaxException.ERROR_FILE_NOT_FOUND, 
+                  arg.toString(parser)));
+            break;
+            case NOT_FOUND_ACTION_ERROR:
+               throw new TeXSyntaxException(parser,
+               TeXSyntaxException.ERROR_FILE_NOT_FOUND, 
+               arg.toString(parser));
+         }
       }
    }
 
@@ -98,4 +130,9 @@ public class Input extends ControlSequence
       return true;
   }
 
+  private byte notFoundAction=NOT_FOUND_ACTION_ERROR;
+
+  public static final byte NOT_FOUND_ACTION_ERROR=0;
+  public static final byte NOT_FOUND_ACTION_WARN=1;
+  public static final byte NOT_FOUND_ACTION_IGNORE=2;
 }

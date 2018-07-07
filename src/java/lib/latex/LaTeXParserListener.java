@@ -355,6 +355,7 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       parser.putControlSequence(new PageRef());
       parser.putControlSequence(new NameRef());
       parser.putControlSequence(new Input());
+      parser.putControlSequence(new Input("@input", Input.NOT_FOUND_ACTION_WARN));
       parser.putControlSequence(new InputIfFileExists());
       parser.putControlSequence(new IfFileExists());
       parser.putControlSequence(new MakeAtLetter());

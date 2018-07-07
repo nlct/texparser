@@ -31,6 +31,7 @@ import java.nio.charset.Charset;
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.generic.*;
 import com.dickimawbooks.texparserlib.latex.NewCommand;
+import com.dickimawbooks.texparserlib.latex.Input;
 
 /**
  * Parses aux files
@@ -90,6 +91,8 @@ public class AuxParser extends DefaultTeXParserListener
    {
       super.addPredefined();
 
+      putControlSequence(new Input("@input", Input.NOT_FOUND_ACTION_WARN));
+
       addAuxCommand("newlabel", 2);
       addAuxCommand("bibstyle", 1);
       addAuxCommand("citation", 1);
@@ -109,7 +112,8 @@ public class AuxParser extends DefaultTeXParserListener
    {
       ControlSequence cs = super.getControlSequence(name);
 
-      return (cs instanceof AuxCommand || cs instanceof AuxIgnoreable) ? cs 
+      return (cs instanceof Input || cs instanceof AuxCommand 
+              || cs instanceof AuxIgnoreable) ? cs 
         : new AuxIgnoreable(name);
    }
 
