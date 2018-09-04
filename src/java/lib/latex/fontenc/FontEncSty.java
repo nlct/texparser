@@ -45,10 +45,14 @@ public class FontEncSty extends LaTeXSty
    {
       FontEncoding encoding = getEncoding(option);
 
-      LaTeXParserListener listener = getListener();
+      if (encoding != null)
+      {
+         LaTeXParserListener listener = getListener();
 
-      TeXSettings settings = listener.getParser().getSettings();
-      settings.setFontEncoding(encoding);
+         TeXSettings settings = listener.getParser().getSettings();
+         encoding.addDefinitions(settings);
+         settings.setFontEncoding(encoding);
+      }
    }
 
    protected void preOptions()
