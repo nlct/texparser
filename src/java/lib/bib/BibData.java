@@ -86,6 +86,10 @@ public abstract class BibData
          {// allow @ in label
             object = parser.getListener().getOther('@');
          }
+         else if (object instanceof SbChar)
+         {// allow _ in label
+            object = parser.getListener().getOther('_');
+         }
 
          if (object instanceof CharObject)
          {
