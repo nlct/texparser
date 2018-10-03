@@ -268,6 +268,10 @@ public class Symbol extends ControlSequence implements Expandable,CaseChangeable
       new Object[]{"NG", new Integer(0x014A)},
       new Object[]{"th", new Integer(0x00FE)},
       new Object[]{"TH", new Integer(0x00DE)},
+      new Object[]{"dh", new Integer(0x00F0)},
+      new Object[]{"DH", new Integer(0x00D0)},
+      new Object[]{"dj", new Integer(0x0111)},
+      new Object[]{"DJ", new Integer(0x0110)},
       new Object[]{"quotedblbase", new Integer(0x201E)},
       new Object[]{"quotesinglbase", new Integer(0x201A)},
    };
