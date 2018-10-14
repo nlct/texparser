@@ -67,6 +67,7 @@ import com.dickimawbooks.texparserlib.latex.upgreek.*;
 import com.dickimawbooks.texparserlib.latex.datatool.*;
 import com.dickimawbooks.texparserlib.latex.ifthen.*;
 import com.dickimawbooks.texparserlib.latex.color.*;
+import com.dickimawbooks.texparserlib.latex.mfirstuc.*;
 
 public abstract class LaTeXParserListener extends DefaultTeXParserListener
 {
@@ -1317,6 +1318,11 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       if (styName.equals("datatool-base"))
       {
          return new DataToolBaseSty(options, this, loadParentOptions);
+      }
+
+      if (styName.equals("mfirstuc"))
+      {
+         return new MfirstucSty(options, this, loadParentOptions);
       }
 
       if (styName.equals("ifthen"))

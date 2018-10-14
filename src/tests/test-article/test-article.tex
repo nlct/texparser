@@ -14,6 +14,7 @@
 \usepackage{textcomp}
 \usepackage{graphicx}
 \usepackage{tipa}
+\usepackage{mfirstuc}
 \usepackage[colorlinks]{hyperref}
 
 \title{Sample Article}
@@ -156,6 +157,10 @@ Upper: \uppercase{\foo}. Lower: \lowercase{\FOO}.
 TC: Upper: \MakeTextUppercase{\foo}. Lower:
 \MakeTextLowercase{\FOO}.
 
+\makefirstuc{first letter upper}.
+\makefirstuc{\textbf{first} letter upper}.
+\MFUnocap{of}
+\capitalisewords{the book of words}.
 
 \section{Another Section}
 
