@@ -50,6 +50,7 @@ public class MfirstucSty extends LaTeXSty
         MakeFirstUc.EXPANSION_ONCE));
       registerControlSequence(new CapitaliseWords(this, "ecapitalisewords",
         MakeFirstUc.EXPANSION_FULL));
+      registerControlSequence(new CapitaliseFmtWords(this));
       registerControlSequence(new MakeFirstUc("MFUcapword"));
       registerControlSequence(new MFUnocap(this));
       registerControlSequence(new MFUnocap(this, "gMFUnocap", true));

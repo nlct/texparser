@@ -24,66 +24,26 @@ import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.primitives.IfTrue;
 import com.dickimawbooks.texparserlib.latex.*;
 
-public class CapitaliseWords extends ControlSequence implements Expandable
+public class CapitaliseFmtWords extends CapitaliseWords
 {
-   public CapitaliseWords(MfirstucSty sty)
+   public CapitaliseFmtWords(MfirstucSty sty)
    {
-      this(sty, "capitalisewords", MakeFirstUc.EXPANSION_NONE);
+      this(sty, "capitalisefmtwords", MakeFirstUc.EXPANSION_NONE);
    }
 
-   public CapitaliseWords(MfirstucSty sty, String name)
+   public CapitaliseFmtWords(MfirstucSty sty, String name)
    {
       this(sty, name, MakeFirstUc.EXPANSION_NONE);
    }
 
-   public CapitaliseWords(MfirstucSty sty, String name, byte expansion)
+   public CapitaliseFmtWords(MfirstucSty sty, String name, byte expansion)
    {
-      super(name);
-
-      if (expansion == MakeFirstUc.EXPANSION_NONE 
-          || expansion == MakeFirstUc.EXPANSION_ONCE
-          || expansion == MakeFirstUc.EXPANSION_FULL)
-      {
-         this.expansion = expansion;
-      }
-      else
-      {
-         throw new IllegalArgumentException(
-           "Invalid expansion value "+expansion);
-      }
-
-      this.sty = sty;
+      super(sty, name, expansion);
    }
 
    public Object clone()
    {
-      return new CapitaliseWords(sty, getName(), expansion);
-   }
-
-   public boolean isWordBoundary(TeXParser parser, TeXObject object)
-   {
-      ControlSequence cs = parser.getControlSequence("ifMFUhyphen");
-
-      if (cs instanceof IfTrue 
-           && object instanceof CharObject
-           && ((CharObject)object).getCharCode() == '-')
-      {
-         return true;
-      }
-
-      return object instanceof Space;
-   }
-
-   public boolean isPunctuation(TeXObject object)
-   {
-      return object instanceof CharObject
-       && !Character.isAlphabetic(((CharObject)object).getCharCode());
-   }
-
-   public TeXObjectList expandonce(TeXParser parser)
-     throws IOException
-   {
-      return expandonce(parser, parser);
+      return new CapitaliseFmtWords(sty, getName(), expansion);
    }
 
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
@@ -98,6 +58,22 @@ public class CapitaliseWords extends ControlSequence implements Expandable
       else
       {
          arg = stack.popArg(parser);
+      }
+
+      boolean isStar = false;
+
+      if (arg instanceof CharObject && ((CharObject)arg).getCharCode() == '*')
+      {
+         isStar = true;
+
+         if (stack == parser)
+         {
+            arg = parser.popNextArg();
+         }
+         else
+         {
+            arg = stack.popArg(parser);
+         }
       }
 
       if (expansion == MakeFirstUc.EXPANSION_ONCE)
@@ -182,25 +158,46 @@ public class CapitaliseWords extends ControlSequence implements Expandable
                break;
             }
 
-            TeXObjectList word = new TeXObjectList();
-
-            while (object != null && !isWordBoundary(parser, object))
+            if (object instanceof ControlSequence 
+                 && (!isStar || (isStar && wordIdx == 0)))
             {
                object = list.popStack(parser);
-               word.add(object);
-               object = list.peekStack();
-            }
 
-            if (wordIdx > 0 && sty.isException(word))
-            {
-               expanded.addAll(word);
+               expanded.add(object);
+               Group grp = listener.createGroup();
+               expanded.add(grp);
+
+               grp.add(new TeXCsRef("capitalisewords"));
+               object = list.popStack(parser);
+
+               if (object != null)
+               {
+                  grp.add(object);
+                  object = list.peekStack();
+               }
             }
             else
             {
-               expanded.add(new TeXCsRef("MFUcapword"));
-               Group grp = listener.createGroup();
-               grp.addAll(word);
-               expanded.add(grp);
+               TeXObjectList word = new TeXObjectList();
+
+               while (object != null && !isWordBoundary(parser, object))
+               {
+                  object = list.popStack(parser);
+                  word.add(object);
+                  object = list.peekStack();
+               }
+
+               if (wordIdx > 0 && sty.isException(word))
+               {
+                  expanded.addAll(word);
+               }
+               else
+               {
+                  expanded.add(new TeXCsRef("MFUcapword"));
+                  Group grp = listener.createGroup();
+                  grp.addAll(word);
+                  expanded.add(grp);
+               }
             }
 
             wordIdx++;
@@ -219,30 +216,4 @@ public class CapitaliseWords extends ControlSequence implements Expandable
       return expanded;
    }
 
-   public TeXObjectList expandfully(TeXParser parser)
-     throws IOException
-   {
-      return expandonce(parser).expandfully(parser);
-   }
-
-   public TeXObjectList expandfully(TeXParser parser, TeXObjectList stack)
-     throws IOException
-   {
-      return expandonce(parser, stack).expandfully(parser, stack);
-   }
-
-   public void process(TeXParser parser, TeXObjectList stack)
-     throws IOException
-   {
-      expandonce(parser, stack).process(parser, stack);
-   }
-
-   public void process(TeXParser parser)
-     throws IOException
-   {
-      expandonce(parser).process(parser);
-   }
-
-   protected byte expansion = MakeFirstUc.EXPANSION_NONE;
-   protected MfirstucSty sty;
 }
