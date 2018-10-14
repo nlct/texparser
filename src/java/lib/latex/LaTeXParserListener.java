@@ -1325,6 +1325,11 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
          return new MfirstucSty(options, this, loadParentOptions);
       }
 
+      if (styName.equals("mfirstuc-english"))
+      {
+         return new MfirstucEnglishSty(options, this, loadParentOptions);
+      }
+
       if (styName.equals("ifthen"))
       {
          return new IfThenSty(options, this, loadParentOptions);

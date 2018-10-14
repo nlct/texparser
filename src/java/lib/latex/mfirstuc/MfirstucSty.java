@@ -55,6 +55,11 @@ public class MfirstucSty extends LaTeXSty
       registerControlSequence(new MFUnocap(this, "gMFUnocap", true));
    }
 
+   public void addException(String word)
+   {
+      addException(getListener().createString(word), false);
+   }
+
    public void addException(TeXObject word, boolean global)
    {
       ControlSequence cs = getParser().getControlSequence("@mfu@nocaplist");
