@@ -512,7 +512,7 @@ public class Symbol extends ControlSequence implements Expandable,CaseChangeable
       new Object[]{"star", new Integer(0x22C6)},
       new Object[]{"times", new Integer(0x00D7)},
       new Object[]{"triangleleft", new Integer(0x25C3)},
-      new Object[]{"triangleright", new Integer(0x25B9)},
+      new Object[]{"triangleright", new Integer(0x25B7)},
       new Object[]{"unlhd", new Integer(0x22B4)},
       new Object[]{"unrhd", new Integer(0x22B5)},
       new Object[]{"uplus", new Integer(0x228E)},
