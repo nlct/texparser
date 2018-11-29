@@ -109,7 +109,7 @@ public class TeXPath
 
       // is texPath an absolute path?
 
-      File root = (new File(split[0]+File.separator));
+      File root = (new File(split[0].isEmpty() ? File.separator : split[0]));
 
       if (root.isAbsolute())
       {
@@ -119,7 +119,7 @@ public class TeXPath
 
       int n = split.length-1;
 
-      for (int i = 0; i < n; i++)
+      for (int i = 1; i < n; i++)
       {
          if (split[i].isEmpty())
          {
