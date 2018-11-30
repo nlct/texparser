@@ -111,15 +111,18 @@ public class TeXPath
 
       File root = (new File(split[0].isEmpty() ? File.separator : split[0]));
 
+      int i = 0;
+
       if (root.isAbsolute())
       {
          base = null;
          parent = root;
+         i = 1;
       }
 
       int n = split.length-1;
 
-      for (int i = 1; i < n; i++)
+      for (; i < n; i++)
       {
          if (split[i].isEmpty())
          {
