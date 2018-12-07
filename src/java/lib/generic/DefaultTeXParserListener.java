@@ -158,6 +158,8 @@ public abstract class DefaultTeXParserListener extends TeXParserListener
         null, new TeXObject[]{getOther('`')}));
       parser.putControlSequence(new GenericCommand(true, "rq", 
         null, new TeXObject[]{getOther('\'')}));
+      parser.putControlSequence(new GenericCommand(true, ",", 
+        null, new TeXObject[]{getOther(0x2006)}));
 
       // TeX font changing declarations
 
