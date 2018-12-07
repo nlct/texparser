@@ -25,6 +25,7 @@ import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.*;
 import com.dickimawbooks.texparserlib.latex.ifthen.IfThenSty;
 import com.dickimawbooks.texparserlib.primitives.EndGraf;
+import com.dickimawbooks.texparserlib.primitives.NewIf;
 
 public class DataToolBaseSty extends LaTeXSty
 {
@@ -40,13 +41,26 @@ public class DataToolBaseSty extends LaTeXSty
       TeXParser parser = getListener().getParser();
 
       sortCountReg = parser.getSettings().newcount(false, "dtl@sortresult");
+      NewIf.createConditional(true, parser, "ifDTLlistskipempty", true);
 
       registerControlSequence(new DTLnewcurrencysymbol(this));
       registerControlSequence(new DTLsetdefaultcurrency(this));
       registerControlSequence(new DTLifintopenbetween());
       registerControlSequence(new DTLifintclosedbetween());
+
       registerControlSequence(new DTLifinlist());
       registerControlSequence(new DTLnumitemsinlist());
+      registerControlSequence(new DTLformatlist());
+
+      registerControlSequence(new AtFirstOfOne("DTLlistformatitem"));
+      registerControlSequence(new GenericCommand("DTLlistformatoxford"));
+      registerControlSequence(new GenericCommand("DTLlistformatsep",
+        null, getListener().createString(", ")));
+      registerControlSequence(new GenericCommand(true, "DTLlistformatlastsep",
+        null, new TeXObject[] {new TeXCsRef("space"), 
+          new TeXCsRef("DTLandname"), new TeXCsRef("space")}));
+      registerControlSequence(new DTLandname());
+
       registerControlSequence(new DTLinsertinto(this));
       registerControlSequence(new DTLinsertinto("edtlinsertinto", true, this));
       registerControlSequence(new DTLcompare());

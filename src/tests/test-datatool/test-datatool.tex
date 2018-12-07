@@ -67,9 +67,17 @@ Is $10 \leq 10$ and $10 \leq 15$? \dtlifintclosedbetween{10}{10}{15}{True}{False
 
 \section{Lists}
 
-\def\mylist{zebra,aardvark,duck,antelope,parrot}
+\def\mylist{zebra,aardvark,,duck,antelope,parrot}
 List: \mylist.
-Number of items: \DTLnumitemsinlist{\mylist}{\tmp}\tmp.
+Number of non-empty items: \DTLnumitemsinlist{\mylist}{\tmp}\tmp.
+Formatted list: \DTLformatlist{\mylist}.
+
+Number of items in list (including empty): 
+\DTLlistskipemptyfalse
+\DTLnumitemsinlist{\mylist}{\tmp}\tmp.
+Formatted list: \DTLformatlist{\mylist}.
+\DTLlistskipemptytrue
+
 Is duck in list? \DTLifinlist{duck}{\mylist}{true}{false}.
 Is armadillo in list? \DTLifinlist{armadillo}{\mylist}{true}{false}.
 

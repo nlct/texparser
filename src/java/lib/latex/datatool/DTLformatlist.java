@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2018 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -24,26 +24,40 @@ import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.primitives.IfTrue;
 import com.dickimawbooks.texparserlib.latex.*;
 
-public class DTLnumitemsinlist extends ControlSequence
+public class DTLformatlist extends Command
 {
-   public DTLnumitemsinlist()
+   public DTLformatlist()
    {
-      this("DTLnumitemsinlist");
+      this("DTLformatlist");
    }
 
-   public DTLnumitemsinlist(String name)
+   public DTLformatlist(String name)
    {
       super(name);
    }
 
    public Object clone()
    {
-      return new DTLnumitemsinlist(getName());
+      return new DTLformatlist(getName());
    }
 
-   public void process(TeXParser parser, TeXObjectList stack)
+   public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
+      TeXObject next = (parser == stack ? parser.popStack() : stack.pop());
+
+      boolean isStar=false;
+
+      if (next != null && next instanceof CharObject
+       && ((CharObject)next).getCharCode() == (int)'*')
+      {
+         isStar = true;
+      }
+      else
+      {
+         stack.push(next);
+      }
+
       TeXObject list;
 
       if (parser == stack)
@@ -93,19 +107,50 @@ public class DTLnumitemsinlist extends ControlSequence
          }
       }
 
-      ControlSequence cmd = stack.popControlSequence(parser);
-
-      String csName = cmd.getName();
-
       if (csvList == null)
       {
          csvList = CsvList.getList(parser, list);
       }
 
-      int n = 0;
+      TeXObjectList expandedList = new TeXObjectList();
+      TeXObjectList expanded;
+
+      if (isStar)
+      {
+         expanded = expandedList;
+      }
+      else
+      {
+         expanded = parser.getListener().createGroup();
+         expandedList.add(expanded);
+      }
 
       ControlSequence ifCs = parser.getControlSequence("ifDTLlistskipempty");
       boolean skipEmpty = (ifCs instanceof IfTrue);
+
+      int n;
+
+      if (skipEmpty)
+      {
+         n = 0;
+
+         for (int i = 0; i < csvList.size(); i++)
+         {
+            TeXObject obj = csvList.getValue(i);
+
+            if (!(obj instanceof TeXObjectList 
+                   && ((TeXObjectList)obj).size() == 0))
+            {
+               n++;
+            }
+         }
+      }
+      else
+      {
+         n = csvList.size();
+      }
+
+      int j = 0;
 
       for (int i = 0; i < csvList.size(); i++)
       {
@@ -114,18 +159,53 @@ public class DTLnumitemsinlist extends ControlSequence
          if (!skipEmpty || !(obj instanceof TeXObjectList 
                 && ((TeXObjectList)obj).size() == 0))
          {
-            n++;
+            if (j == 0)
+            {// no sep
+            }
+            else if (j == n-1)
+            {
+               if (n > 2)
+               {
+                  expanded.add(new TeXCsRef("DTLlistformatoxford"));
+               }
+
+               expanded.add(new TeXCsRef("DTLlistformatlastsep"));
+            }
+            else
+            {
+               expanded.add(new TeXCsRef("DTLlistformatsep"));
+            }
+
+            expanded.add(new TeXCsRef("DTLlistformatitem"));
+
+            Group grp = parser.getListener().createGroup();
+            grp.add(obj);
+            expanded.add(grp);
+
+            j++;
          }
       }
 
-      parser.putControlSequence(true, new GenericCommand(true,
-         csName, null, new UserNumber(n)));
+      return expandedList;
    }
 
-   public void process(TeXParser parser)
+   public TeXObjectList expandonce(TeXParser parser)
      throws IOException
    {
-      process(parser, parser);
+      return expandonce(parser, parser);
    }
+
+   public TeXObjectList expandfully(TeXParser parser, TeXObjectList stack)
+     throws IOException
+   {
+      return expandonce(parser, stack).expandfully(parser, stack);
+   }
+
+   public TeXObjectList expandfully(TeXParser parser)
+     throws IOException
+   {
+      return expandonce(parser).expandfully(parser);
+   }
+
 
 }
