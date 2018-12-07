@@ -51,6 +51,7 @@ public class DataToolBaseSty extends LaTeXSty
       registerControlSequence(new DTLifinlist());
       registerControlSequence(new DTLnumitemsinlist());
       registerControlSequence(new DTLlistelement());
+      registerControlSequence(new DTLfetchlistelement());
       registerControlSequence(new DTLformatlist());
 
       registerControlSequence(new AtFirstOfOne("DTLlistformatitem"));
