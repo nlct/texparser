@@ -1992,8 +1992,67 @@ public class TeXParser extends TeXObjectList
    public Numerical popNumericalArg(int openDelim, int closeDelim)
      throws IOException
    {
-      return popNumericalArg(this, openDelim, closeDelim);
+      TeXObject obj = popNextArg(POP_SHORT, openDelim, closeDelim);
+
+      if (obj == null) return null;
+
+      if (obj instanceof Numerical)
+      {
+         return (Numerical)obj;
+      }
+
+      TeXObjectList expanded = null;
+
+      if (obj instanceof Expandable)
+      {
+         expanded = ((Expandable)obj).expandfully(this);
+      }
+
+      if (expanded != null)
+      {
+         obj = expanded;
+      }
+
+      if (obj instanceof TeXObjectList)
+      {
+         return ((TeXObjectList)obj).popNumerical(this);
+      }
+
+      return new UserNumber(this, obj.toString(this));
    }
+
+   public Numerical popNumericalArg()
+     throws IOException
+   {
+      TeXObject obj = popNextArg(POP_SHORT);
+
+      if (obj == null) return null;
+
+      if (obj instanceof Numerical)
+      {
+         return (Numerical)obj;
+      }
+
+      TeXObjectList expanded = null;
+
+      if (obj instanceof Expandable)
+      {
+         expanded = ((Expandable)obj).expandfully(this);
+      }
+
+      if (expanded != null)
+      {
+         obj = expanded;
+      }
+
+      if (obj instanceof TeXObjectList)
+      {
+         return ((TeXObjectList)obj).popNumerical(this);
+      }
+
+      return new UserNumber(this, obj.toString(this));
+   }
+
 
    public TeXObject popArg()
     throws IOException

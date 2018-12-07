@@ -50,6 +50,7 @@ public class DataToolBaseSty extends LaTeXSty
 
       registerControlSequence(new DTLifinlist());
       registerControlSequence(new DTLnumitemsinlist());
+      registerControlSequence(new DTLlistelement());
       registerControlSequence(new DTLformatlist());
 
       registerControlSequence(new AtFirstOfOne("DTLlistformatitem"));
@@ -150,4 +151,6 @@ public class DataToolBaseSty extends LaTeXSty
    private TeXObject defaultCurrency;
 
    private CountRegister sortCountReg;
+
+   public static final String INDEX_OUT_OF_RANGE="datatool.index.outofrange";
 }

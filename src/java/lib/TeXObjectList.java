@@ -1222,6 +1222,38 @@ public class TeXObjectList extends Vector<TeXObject>
                closeDelim);
    }
 
+   public Numerical popNumericalArg(TeXParser parser)
+     throws IOException
+   {
+      TeXObject obj = popArg(parser, POP_SHORT);
+
+      if (obj == null) return null;
+
+      if (obj instanceof Numerical)
+      {
+         return (Numerical)obj;
+      }
+
+      TeXObjectList expanded = null;
+
+      if (obj instanceof Expandable)
+      {
+         expanded = ((Expandable)obj).expandfully(parser, this);
+      }
+
+      if (expanded != null)
+      {
+         obj = expanded;
+      }
+
+      if (obj instanceof TeXObjectList)
+      {
+         return ((TeXObjectList)obj).popNumerical(parser);
+      }
+
+      return new UserNumber(parser, obj.toString(parser));
+   }
+
    public Numerical popNumericalArg(TeXParser parser, int openDelim, int closeDelim)
      throws IOException
    {
