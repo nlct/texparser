@@ -20,7 +20,7 @@ package com.dickimawbooks.texparserlib;
 
 import java.io.IOException;
 
-public class Param implements TeXObject
+public class Param implements ParameterToken
 {
    public Param(int digit)
    {
@@ -45,31 +45,47 @@ public class Param implements TeXObject
    public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
+      if (digit <= 0)
+      {
+         TeXObject nextToken = stack.peek();
+
+         throw new TeXSyntaxException(parser,
+            TeXSyntaxException.ERROR_BAD_PARAM,
+            nextToken == null ? "" : nextToken.toString(parser));
+      }
    }
 
    public void process(TeXParser parser)
      throws IOException
    {
+      if (digit <= 0)
+      {
+         TeXObject nextToken = parser.peekStack();
+
+         throw new TeXSyntaxException(parser,
+            TeXSyntaxException.ERROR_BAD_PARAM,
+            nextToken == null ? "" : nextToken.toString(parser));
+      }
    }
 
    public String toString(TeXParser parser)
    {
       String charStr = new String(Character.toChars(parser.getParamChar()));
 
-      return digit == -1 ? String.format("%s", charStr)
+      return digit <= 0 ? String.format("%s", charStr)
                          : String.format("%s%d", charStr, digit);
    }
 
    public String format()
    {
-      return (digit == -1 ? "#" : "#"+digit);
+      return (digit <= 0 ? "#" : "#"+digit);
    }
 
    public String toString()
    {
       return String.format("%s[%s]", 
         getClass().getName(),
-        (digit == -1 ? "#" : "#"+digit));
+        (digit <= 0 ? "#" : "#"+digit));
    }
 
    public TeXObjectList string(TeXParser parser)
@@ -91,7 +107,18 @@ public class Param implements TeXObject
       return false;
    }
 
-   // -1 indicates #{
+   public ParameterToken next()
+   {
+      return null;
+   }
+
+   public Param tail()
+   {
+      return this;
+   }
+
+   // -1 indicates #{ 
+   // 0 indicates # not followed by digit or {
    private int digit;
 }
 

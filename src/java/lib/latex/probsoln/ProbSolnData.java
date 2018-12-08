@@ -371,7 +371,7 @@ public class ProbSolnData
          }
          else if (object instanceof DoubleParam)
          {
-            list.add((TeXObject)((DoubleParam)object).getParam().clone());
+            list.add((TeXObject)((DoubleParam)object).next().clone());
          }
          else if (object instanceof TeXObjectList)
          {

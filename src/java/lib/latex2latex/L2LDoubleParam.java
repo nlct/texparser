@@ -22,14 +22,14 @@ import java.io.IOException;
 
 public class L2LDoubleParam extends DoubleParam
 {
-   public L2LDoubleParam(L2LParam param)
+   public L2LDoubleParam(ParameterToken param)
    {
       super(param);
    }
 
    public Object clone()
    {
-      return new L2LDoubleParam((L2LParam)getParam().clone());
+      return new L2LDoubleParam((ParameterToken)next().clone());
    }
 
    public void process(TeXParser parser, TeXObjectList stack)

@@ -2781,6 +2781,14 @@ public class TeXSettings
       catcodes[catCode].add(Integer.valueOf(c));
    }
 
+   public void clearCatCode(int catCode)
+   {
+      if (catcodes != null) 
+      {
+         catcodes[catCode] = null;
+      }
+   }
+
    public int getCatCode(int charCode)
    {
       if (catcodes == null)

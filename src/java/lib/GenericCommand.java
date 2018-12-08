@@ -214,7 +214,7 @@ public class GenericCommand extends Command
          }
          else if (obj instanceof DoubleParam)
          {
-            stack.add(((DoubleParam)obj).getParam());
+            stack.add(((DoubleParam)obj).next());
          }
          else if (obj instanceof TeXObjectList)
          {
@@ -295,7 +295,7 @@ public class GenericCommand extends Command
          }
          else if (obj instanceof DoubleParam)
          {
-            stack.add(((DoubleParam)obj).getParam());
+            stack.add(((DoubleParam)obj).next());
          }
          else if (obj instanceof TeXObjectList)
          {
@@ -323,7 +323,7 @@ public class GenericCommand extends Command
          }
          else if (obj instanceof DoubleParam)
          {
-            stack.add(((DoubleParam)obj).getParam());
+            stack.add(((DoubleParam)obj).next());
          }
          else if (obj instanceof TeXObjectList)
          {

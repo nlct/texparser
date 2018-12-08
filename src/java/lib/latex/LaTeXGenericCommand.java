@@ -292,7 +292,7 @@ public class LaTeXGenericCommand extends GenericCommand
          }
          else if (object instanceof DoubleParam)
          {
-            replacement.add(((DoubleParam)object).getParam());
+            replacement.add(((DoubleParam)object).next());
          }
          else if (object instanceof TeXObjectList)
          {

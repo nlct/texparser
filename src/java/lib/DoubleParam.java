@@ -20,26 +20,64 @@ package com.dickimawbooks.texparserlib;
 
 import java.io.IOException;
 
-// TODO: add support for deeper levels
-
-public class DoubleParam implements TeXObject
+public class DoubleParam implements ParameterToken,Expandable
 {
-   public DoubleParam(Param param)
+   public DoubleParam(ParameterToken param)
    {
-      setParam(param);
+      setNext(param);
    }
 
    public Object clone()
    {
-      return new DoubleParam((Param)param.clone());
+      return new DoubleParam((ParameterToken)param.clone());
    }
 
-   public Param getParam()
+   public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
+     throws IOException
+   {
+      return expandonce(parser);
+   }
+
+   public TeXObjectList expandonce(TeXParser parser)
+     throws IOException
+   {
+      TeXObjectList expanded = new TeXObjectList();
+
+      expanded.add(next());
+
+      return expanded;
+   }
+
+   public TeXObjectList expandfully(TeXParser parser, TeXObjectList stack)
+     throws IOException
+   {
+      return expandonce(parser);
+   }
+
+   public TeXObjectList expandfully(TeXParser parser)
+     throws IOException
+   {
+      return expandonce(parser);
+   }
+
+   public ParameterToken next()
    {
       return param;
    }
 
-   public void setParam(Param param)
+   public Param tail()
+   {
+      if (param instanceof Param)
+      {
+         return (Param)param;
+      }
+      else
+      {
+         return param.tail();
+      }
+   }
+
+   public void setNext(ParameterToken param)
    {
       this.param = param;
    }
@@ -48,18 +86,18 @@ public class DoubleParam implements TeXObject
    {
       return String.format("%s%s", 
          new String(Character.toChars(parser.getParamChar())),
-         param.toString(parser));
+         next().toString(parser));
    }
 
    public String format()
    {
-      return "#"+getParam().format();
+      return "#"+next().format();
    }
 
    public String toString()
    {
       return String.format("%s[param=%s]", getClass().getName(),
-        getParam().toString());
+        next().toString());
    }
 
    public TeXObjectList string(TeXParser parser)
@@ -67,7 +105,7 @@ public class DoubleParam implements TeXObject
    {
       TeXObjectList list = new TeXObjectList();
       list.add(parser.getListener().getOther(parser.getParamChar()));
-      list.add(getParam());
+      list.add(next());
 
       return list;
    }
@@ -75,11 +113,13 @@ public class DoubleParam implements TeXObject
    public void process(TeXParser parser, TeXObjectList list)
      throws IOException
    {
+      list.push(param);
    }
 
    public void process(TeXParser parser)
      throws IOException
    {
+      parser.push(param);
    }
 
    public boolean isPar()
@@ -87,6 +127,6 @@ public class DoubleParam implements TeXObject
       return false;
    }
 
-   private Param param;
+   private ParameterToken param;
 }
 

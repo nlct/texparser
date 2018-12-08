@@ -62,7 +62,7 @@ public abstract class TeXParserListener
 
    public abstract Param getParam(int digit);
 
-   public abstract DoubleParam getDoubleParam(Param param);
+   public abstract DoubleParam getDoubleParam(ParameterToken param);
 
    public abstract Tab getTab();
 

@@ -941,6 +941,46 @@ public class TeXParser extends TeXObjectList
       return c != -1;
    }
 
+   private boolean readParam(TeXObjectList list, ParameterToken paramToken)
+     throws IOException
+   {
+      mark(1);
+      int c = read();
+
+      if (c == -1)
+      {
+         paramToken.tail().setDigit(0);
+         return false;
+      }
+
+      if (isCatCode(TYPE_PARAM, c))
+      {
+         readParam(list, listener.getDoubleParam(paramToken));
+      }
+      else
+      {
+         if (c > '0' && c <= '9')
+         {
+            paramToken.tail().setDigit(c-'0');
+            list.add(paramToken);
+         }
+         else if (isCatCode(TYPE_BG, c))
+         {
+            paramToken.tail().setDigit(-1);
+            list.add(paramToken);
+            reset();
+         }
+         else
+         {
+            paramToken.tail().setDigit(0);
+            list.add(paramToken);
+            reset();
+         }
+      }
+
+      return true;
+   }
+
    private boolean readParam(TeXObjectList list)
      throws IOException
    {
@@ -949,53 +989,27 @@ public class TeXParser extends TeXObjectList
 
       if (c == -1)
       {
-         throw new TeXSyntaxException(
-            getCurrentFile(), getLineNumber(),
-            TeXSyntaxException.ERROR_BAD_PARAM, "EOF");
+         list.add(listener.getParam(0));
+         return false;
       }
 
       if (isCatCode(TYPE_PARAM, c))
       {
-         mark(1);
-         c = read();
-
-         if (c > '0' && c <= '9')
-         {
-            list.add(listener.getDoubleParam(
-              listener.getParam(c-'0')));
-         }
-         else if (isCatCode(TYPE_BG, c))
-         {
-            list.add(listener.getDoubleParam(
-              listener.getParam(-1)));
-            reset();
-         }
-         else
-         {
-            throw new TeXSyntaxException(
-               getCurrentFile(),
-               getLineNumber(),
-               TeXSyntaxException.ERROR_BAD_PARAM, 
-                new String(Character.toChars(c)));
-         }
+         return readParam(list, listener.getParam(0));
+      }
+      else if (c > '0' && c <= '9')
+      {
+         list.add(listener.getParam(c-'0'));
+      }
+      else if (isCatCode(TYPE_BG, c))
+      {
+         list.add(listener.getParam(-1));
+         reset();
       }
       else
       {
-         if (c >= '0' && c <= '9')
-         {
-            list.add(listener.getParam(c-'0'));
-         }
-         else if (isCatCode(TYPE_BG, c))
-         {
-            list.add(listener.getParam(-1));
-            reset();
-         }
-         else
-         {
-            throw new TeXSyntaxException(this,
-               TeXSyntaxException.ERROR_BAD_PARAM, 
-               new String(Character.toChars(c)));
-         }
+         list.add(listener.getParam(0));
+         reset();
       }
 
       return true;
@@ -1541,6 +1555,25 @@ public class TeXParser extends TeXObjectList
                c = readVerb(delim, charList);
 
                charList.add(listener.getOther(c));
+            }
+            else if (cs.getName().equals("detokenize"))
+            {
+               c = read();
+
+               if (isCatCode(TYPE_BG, c))
+               {
+                  c = read();
+
+                  while (!isCatCode(TYPE_EG, c) && c != -1)
+                  {
+                     list.add(listener.getOther(c));
+                     c = read();
+                  }
+               }
+               else
+               {
+                  list.add(listener.getOther(c));
+               }
             }
             else if (cs.getName().equals("string"))
             {

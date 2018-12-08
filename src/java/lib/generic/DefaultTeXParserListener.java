@@ -96,6 +96,7 @@ public abstract class DefaultTeXParserListener extends TeXParserListener
       parser.putControlSequence(new DisplayStyle());
       parser.putControlSequence(new TextStyle());
       parser.putControlSequence(new StringCs());
+      parser.putControlSequence(new Detokenize());
       parser.putControlSequence(new EndInput());
       parser.putControlSequence(new ParCs());
       parser.putControlSequence(new EndGraf());
@@ -338,7 +339,7 @@ public abstract class DefaultTeXParserListener extends TeXParserListener
       return new Param(digit);
    }
 
-   public DoubleParam getDoubleParam(Param param)
+   public DoubleParam getDoubleParam(ParameterToken param)
    {
       return new DoubleParam(param);
    }

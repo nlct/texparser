@@ -182,9 +182,9 @@ public class LaTeX2LaTeX extends LaTeXParserListener
       return new L2LParam(digit);
    }
 
-   public DoubleParam getDoubleParam(Param param)
+   public DoubleParam getDoubleParam(ParameterToken param)
    {
-      return new L2LDoubleParam((L2LParam)param);
+      return new L2LDoubleParam(param);
    }
 
    public Other getOther(int charCode)
