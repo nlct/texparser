@@ -234,6 +234,38 @@ A & B & C & D\\
 \@for\tmp:=\tmplist\do{\tmp. }
 \makeatother
 
+\section{If-Case}
+
+\myctr=3\relax
+In or:
+\ifcase\myctr
+ One%
+ \or 
+ Two%
+ \or
+ Three%
+ \or
+ Four%
+ \else
+ Other%
+\fi
+
+In else:
+\ifcase\myctr
+ One%
+ \or 
+ Two%
+ \else
+ Other%
+\fi
+
+No else:
+\ifcase\myctr
+ One%
+ \or 
+ Two%
+\fi
+
 \bibliographystyle{plain}
 \bibliography{xampl}
 
