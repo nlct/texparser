@@ -42,9 +42,12 @@ public class TeXObjectList extends Vector<TeXObject>
    {
       this(text.length() > 0 ? text.length() : 10);
 
-      for (int i = 0, n = text.length(); i < n; i++)
+      for (int i = 0, n = text.length(); i < n; )
       {
-         add(listener.getOther(text.codePointAt(i)));
+         int cp = text.codePointAt(i);
+         i += Character.charCount(cp);
+
+         add(listener.getOther(cp));
       }
    }
 
