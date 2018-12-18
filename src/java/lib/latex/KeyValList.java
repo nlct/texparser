@@ -98,7 +98,7 @@ public class KeyValList extends HashMap<String,TeXObject>
 
                      if (!key.isEmpty())
                      {
-                        keyValList.put(key, new TeXObjectList());
+                        keyValList.put(key, new MissingValue());
                      }
 
                      keyBuilder.setLength(0);
@@ -151,7 +151,7 @@ public class KeyValList extends HashMap<String,TeXObject>
          if (!key.isEmpty())
          {
             keyValList.put(key, valBuilder == null ? 
-             new TeXObjectList() : valBuilder);
+             new MissingValue() : valBuilder);
          }
       }
       else
@@ -160,7 +160,7 @@ public class KeyValList extends HashMap<String,TeXObject>
 
          if (!key.isEmpty())
          {
-            keyValList.put(key, new TeXObjectList());
+            keyValList.put(key, new MissingValue());
          }
       }
 
@@ -172,7 +172,8 @@ public class KeyValList extends HashMap<String,TeXObject>
    {
       TeXObject value = getValue(key);
 
-      if (value == null || !(value instanceof Expandable))
+      if (value == null || value instanceof MissingValue
+          || !(value instanceof Expandable))
       {
          return value;
       }
@@ -216,7 +217,8 @@ public class KeyValList extends HashMap<String,TeXObject>
    {
       TeXObject value = get(key);
 
-      if (value == null || !(value instanceof TeXObjectList))
+      if (value == null || value instanceof MissingValue
+          || !(value instanceof TeXObjectList))
       {
          return value;
       }
@@ -317,7 +319,7 @@ public class KeyValList extends HashMap<String,TeXObject>
          writeable.write(key);
          TeXObject value = get(key);
 
-         if (value != null)
+         if (value != null && !(value instanceof MissingValue))
          {
             writeable.write('=');
             writeable.writeCodePoint(parser.getBgChar());
@@ -349,13 +351,7 @@ public class KeyValList extends HashMap<String,TeXObject>
          builder.append(key);
          TeXObject value = get(key);
 
-         if (value instanceof TeXObjectList
-          && ((TeXObjectList)value).isEmpty())
-         {
-            value = null;
-         }
-
-         if (value != null)
+         if (value != null && !(value instanceof MissingValue))
          {
             builder.append('=');
 
@@ -397,13 +393,7 @@ public class KeyValList extends HashMap<String,TeXObject>
          builder.append(key);
          TeXObject value = get(key);
 
-         if (value instanceof TeXObjectList
-          && ((TeXObjectList)value).isEmpty())
-         {
-            value = null;
-         }
-
-         if (value != null)
+         if (value != null && !(value instanceof MissingValue))
          {
             String strVal = value.toString();
 
