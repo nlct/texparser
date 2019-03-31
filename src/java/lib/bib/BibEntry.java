@@ -139,6 +139,17 @@ public class BibEntry extends BibData
       return null;
    }
 
+
+   /*
+    * Checks if given key is permitted. Returns false if
+    * key and its associated value should be skipped.
+    * Throws exception if the use of the key is prohibited.
+    */ 
+   public boolean checkField(String key) throws BibTeXSyntaxException
+   {
+      return true;
+   }
+
    public void parseContents(TeXParser parser, 
     TeXObjectList contents, TeXObject endGroupChar)
      throws IOException
@@ -236,7 +247,10 @@ public class BibEntry extends BibData
               BibTeXSyntaxException.ERROR_MISSING_FIELD_PART);
          }
 
-         putField(key, value);
+         if (checkField(key))
+         {
+            putField(key, value);
+         }
       }
    }
 
