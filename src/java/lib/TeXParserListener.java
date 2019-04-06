@@ -82,6 +82,8 @@ public abstract class TeXParserListener
 
    public abstract MathSymbol createMathSymbol(String name, int code);
 
+   public abstract DelimiterSymbol createDelimiterSymbol(String name, int code);
+
    public abstract Group createGroup();
 
    public abstract Group createGroup(String text);

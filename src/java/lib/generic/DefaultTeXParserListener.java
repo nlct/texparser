@@ -402,6 +402,11 @@ public abstract class DefaultTeXParserListener extends TeXParserListener
       return new MathSymbol(name, code);
    }
 
+   public DelimiterSymbol createDelimiterSymbol(String name, int code)
+   {
+      return new DelimiterSymbol(name, code);
+   }
+
    public BigOperator createBigOperator(String name, int code)
    {
       return new BigOperator(name, code);

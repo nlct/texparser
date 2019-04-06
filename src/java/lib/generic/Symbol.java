@@ -171,6 +171,14 @@ public class Symbol extends ControlSequence implements Expandable,CaseChangeable
          parser.putControlSequence(listener.createBinarySymbol(name, code));
       }
 
+      for (int i = 0; i < DELIMITER_SYMBOLS.length; i++)
+      {
+         String name = DELIMITER_SYMBOLS[i][0].toString();
+         int code = ((Integer)DELIMITER_SYMBOLS[i][1]).intValue();
+
+         parser.putControlSequence(listener.createDelimiterSymbol(name, code));
+      }
+
       for (int i = 0; i < BIG_MATH_SYMBOLS.length; i++)
       {
          String name = BIG_MATH_SYMBOLS[i][0].toString();
@@ -316,6 +324,14 @@ public class Symbol extends ControlSequence implements Expandable,CaseChangeable
       new Object[]{"bigtriangledown", new Integer(0x25BD), new Integer(0x25BD)},
       new Object[]{"varbigtriangleup", new Integer(0x25B3), new Integer(0x25B3)},
       new Object[]{"varbigtriangledown", new Integer(0x25BD), new Integer(0x25BD)},
+   };
+
+   public static final Object[][] DELIMITER_SYMBOLS = 
+   {
+      new Object[]{"vert", new Integer(0x2223)},// divides
+      new Object[]{"Vert", new Integer(0x2225)},// parallel
+      new Object[]{"langle", new Integer(0x27E8)},
+      new Object[]{"rangle", new Integer(0x27E9)},
    };
 
    // Some of the upper case Greek symbols aren't
