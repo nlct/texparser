@@ -327,11 +327,16 @@ public class Symbol extends ControlSequence implements Expandable,CaseChangeable
    };
 
    public static final Object[][] DELIMITER_SYMBOLS = 
-   {
+   {// approximate
       new Object[]{"vert", new Integer(0x2223)},// divides
       new Object[]{"Vert", new Integer(0x2225)},// parallel
       new Object[]{"langle", new Integer(0x27E8)},
       new Object[]{"rangle", new Integer(0x27E9)},
+      // not taking spacing into account
+      new Object[]{"lvert", new Integer(0x2223)},
+      new Object[]{"rvert", new Integer(0x2223)},
+      new Object[]{"lVert", new Integer(0x2225)},
+      new Object[]{"rVert", new Integer(0x2225)},
    };
 
    // Some of the upper case Greek symbols aren't
