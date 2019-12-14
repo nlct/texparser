@@ -540,7 +540,9 @@ public class TeXParserAppSettings extends Properties
 
    private File propertiesPath = null;
 
-   private final String propertiesName="texparsertest.prop";
+   public static final String RESOURCE = "texparser";
+
+   private final String propertiesName= RESOURCE+".prop";
 
    private final String recentName = "recentfiles";
 
@@ -554,11 +556,9 @@ public class TeXParserAppSettings extends Properties
    public static final String HELPSET_DIR = "/resources/helpsets/";
    public static final String DICT_DIR = "/resources/dictionaries/";
 
-   public static final String RESOURCE = "texparsertest";
-
    public static final Pattern PATTERN_HELPSET 
-     = Pattern.compile("texparsertest-([a-z]{2})(-[A-Z]{2})?");
+     = Pattern.compile(RESOURCE+"-([a-z]{2})(-[A-Z]{2})?");
 
    public static final Pattern PATTERN_DICT 
-     = Pattern.compile("texparsertest-([a-z]{2})(-[A-Z]{2})?\\.xml");
+     = Pattern.compile(RESOURCE+"-([a-z]{2})(-[A-Z]{2})?\\.xml");
 }

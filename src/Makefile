@@ -62,12 +62,14 @@ app     : lib lib/texparserlib.jar lib/texparsertest.jar \
 	  resources/helpsets/texparser-en/Map.jhm \
 	  resources/LICENSE
 
-dist    : source ../dist/texparser-installer.jar
+dist    : source ../dist/texparser-installer.jar ../dist
 	cp doc/texparser.pdf ../dist
 
 ../dist/texparser-installer.jar        : app installer/install.xml
 	$(IZPACKDIR)/bin/compile installer/install.xml -b . \
 	-o ../dist/texparser-installer.jar -k standard
+
+../dist	: mkdir ../dist
 
 lib/texparserlib.jar      : lib classes/com/dickimawbooks/texparserlib/TeXParser.class 
 	cd classes; \

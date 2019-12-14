@@ -1024,7 +1024,8 @@ public class TeXParserApp implements TeXApp
          getMessage("about.version", APP_NAME, APP_VERSION, APP_DATE),
 // Copyright line shouldn't get translated (according to
 // http://www.gnu.org/prep/standards/standards.html)
-        "Copyright (C) 2013 Nicola L. C. Talbot (www.dickimaw-books.com)",
+         String.format("Copyright (C) 2013-%s Nicola L. C. Talbot (www.dickimaw-books.com)",
+          APP_DATE.substring(0, 4)),
          getMessage("about.legal"));
 
       String translator = getLabelWithAlt("about.translator_info", null);
