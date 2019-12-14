@@ -16,14 +16,19 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
-package com.dickimawbooks.texparserapp;
+package com.dickimawbooks.texparsertest.io;
 
-public interface ErrorListener
+import com.dickimawbooks.texparsertest.TeXParserApp;
+
+public class CancelledException extends InterruptedException
 {
-   public void error(Exception e);
+   public CancelledException(TeXParserApp app)
+   {
+      this(app.getMessage("error.interrupted"));
+   }
 
-   public void error(String message);
-
-   public void warning(String message);
-
+   public CancelledException(String message)
+   {
+      super(message);
+   }
 }

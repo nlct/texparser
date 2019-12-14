@@ -17,7 +17,7 @@
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-package com.dickimawbooks.texparserapp;
+package com.dickimawbooks.texparsertest;
 
 import java.util.Properties;
 import java.util.Vector;
@@ -40,8 +40,8 @@ import com.dickimawbooks.texparserlib.latex.*;
 import com.dickimawbooks.texparserlib.latex2latex.*;
 import com.dickimawbooks.texparserlib.html.*;
 
-import com.dickimawbooks.texparserapp.gui.*;
-import com.dickimawbooks.texparserapp.io.*;
+import com.dickimawbooks.texparsertest.gui.*;
+import com.dickimawbooks.texparsertest.io.*;
 
 public class TeXParserApp implements TeXApp
 {
@@ -1452,7 +1452,7 @@ public class TeXParserApp implements TeXApp
    }
 
    public static final String APP_VERSION = "0.7b.20191214";
-   public static final String APP_NAME = "texparserapp";
+   public static final String APP_NAME = "texparsertest";
    public static final String APP_DATE = "2019-12-14";
 
    public static long MAX_PROCESS_TIME=0L;

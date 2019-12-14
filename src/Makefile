@@ -1,4 +1,4 @@
-APP_VERSION:=$(shell grep "public static final String appVersion" java/app/TeXParserApp.java | sed "s/public\sstatic\sfinal\sString\sappVersion=//" | tr -d "\"\; ")
+APP_VERSION:=$(shell grep "public static final String appVersion" java/test/TeXParserApp.java | sed "s/public\sstatic\sfinal\sString\sappVersion=//" | tr -d "\"\; ")
 IZPACKDIR=/usr/local/IzPack
 
 test	: test-obs test-abs test-article test-nested test-doc \
@@ -10,55 +10,55 @@ tests/output	:
 
 test-nested	: app tests/output
 	rm -f -r tests/output/test-nested-env-group
-	bin/texparserapp --debug --in tests/test-nested-env-group/test-nested-env-group.tex --output tests/output/test-nested-env-group
+	bin/texparsertest --debug --in tests/test-nested-env-group/test-nested-env-group.tex --output tests/output/test-nested-env-group
 
 test-obs	: app tests/output
 	rm -f -r tests/output/test-obsolete
-	bin/texparserapp --debug --in tests/test-obsolete/test-obs.tex --output tests/output/test-obsolete
+	bin/texparsertest --debug --in tests/test-obsolete/test-obs.tex --output tests/output/test-obsolete
 
 test-sw	: app tests/output
 	rm -f -r tests/output/test-sw
-	bin/texparserapp --debug --in tests/test-sw/test-sw.tex --output tests/output/test-sw
+	bin/texparsertest --debug --in tests/test-sw/test-sw.tex --output tests/output/test-sw
 
 test-abs : app tests/output
 	rm -f -r tests/output/test-abs
-	bin/texparserapp --debug --in tests/test-abs/test-abs.tex --output tests/output/test-abs --html
+	bin/texparsertest --debug --in tests/test-abs/test-abs.tex --output tests/output/test-abs --html
 
 test-article : app tests/output
 	rm -f -r tests/output/test-article
-	bin/texparserapp --debug --in tests/test-article/test-article.tex --output tests/output/test-article --html
+	bin/texparsertest --debug --in tests/test-article/test-article.tex --output tests/output/test-article --html
 
 test-jmlrutils : app tests/output
 	rm -f -r tests/output/test-jmlrutils
-	bin/texparserapp --debug --in tests/test-jmlrutils/test-jmlrutils.tex --output tests/output/test-jmlrutils --html
+	bin/texparsertest --debug --in tests/test-jmlrutils/test-jmlrutils.tex --output tests/output/test-jmlrutils --html
 
 test-doc : app tests/output
 	rm -f -r tests/output/test-doc
-	bin/texparserapp --in tests/test-doc/test-doc.tex --output tests/output/test-doc --html
+	bin/texparsertest --in tests/test-doc/test-doc.tex --output tests/output/test-doc --html
 
 test-probsoln : app tests/output
 	rm -f -r tests/output/test-probsoln
-	bin/texparserapp --debug --in tests/test-probsoln/test-probsoln.tex --output tests/output/test-probsoln --html
+	bin/texparsertest --debug --in tests/test-probsoln/test-probsoln.tex --output tests/output/test-probsoln --html
 
 test-lists : app tests/output
 	rm -f -r tests/output/test-lists
-	bin/texparserapp --in tests/test-lists/test-lists.tex --output tests/output/test-lists --html
+	bin/texparsertest --in tests/test-lists/test-lists.tex --output tests/output/test-lists --html
 
 test-datatool : app tests/output
 	rm -f -r tests/output/test-datatool
-	bin/texparserapp --debug --in tests/test-datatool/test-datatool.tex --output tests/output/test-datatool --html
+	bin/texparsertest --debug --in tests/test-datatool/test-datatool.tex --output tests/output/test-datatool --html
 
 test-jmlr	: app tests/output
 	rm -f -r tests/output/test-jmlr
-	bin/texparserapp --in tests/test-jmlr/test-jmlr.tex --output tests/output/test-jmlr
+	bin/texparsertest --in tests/test-jmlr/test-jmlr.tex --output tests/output/test-jmlr
 
 test-mkimages : app tests/output
 	rm -f -r tests/output/test-mkimages
-	bin/texparserapp --debug --in tests/test-mkimages/test-mkimages.tex --output tests/output/test-mkimages --html
+	bin/texparsertest --debug --in tests/test-mkimages/test-mkimages.tex --output tests/output/test-mkimages --html
 
-app     : lib lib/texparserlib.jar lib/texparserapp.jar \
+app     : lib lib/texparserlib.jar lib/texparsertest.jar \
 	  lib/resources lib/texparser-splash.png \
-	  bin/texparserapp lib/icons \
+	  bin/texparsertest lib/icons \
 	  resources/helpsets/texparser-en/Map.jhm \
 	  resources/LICENSE
 
@@ -76,15 +76,15 @@ lib/texparserlib.jar      : lib classes/com/dickimawbooks/texparserlib/TeXParser
 	com/dickimawbooks/texparserlib/*/*.class \
 	com/dickimawbooks/texparserlib/*/*/*.class 
 
-lib/texparserapp.jar      : java/app/Manifest.txt \
-			classes/com/dickimawbooks/texparserapp/TeXParserApp.class 
+lib/texparsertest.jar      : java/app/Manifest.txt \
+			classes/com/dickimawbooks/texparsertest/TeXParserApp.class 
 	cd classes; \
-	jar cmf ../java/app/Manifest.txt ../lib/texparserapp.jar \
-	com/dickimawbooks/texparserapp/*.class \
-	com/dickimawbooks/texparserapp/*/*.class \
-	com/dickimawbooks/texparserapp/icons/*.png
+	jar cmf ../java/app/Manifest.txt ../lib/texparsertest.jar \
+	com/dickimawbooks/texparsertest/*.class \
+	com/dickimawbooks/texparsertest/*/*.class \
+	com/dickimawbooks/texparsertest/icons/*.png
 
-classes/com/dickimawbooks/texparserapp/TeXParserApp.class   : classes/com/dickimawbooks/texparserapp \
+classes/com/dickimawbooks/texparsertest/TeXParserApp.class   : classes/com/dickimawbooks/texparsertest \
 	java/app/*.java java/app/*/*.java java/app/icons/*.png \
 	lib/javahelp2.jar lib/jlfgr-1_0.jar lib/texparserlib.jar
 	cd java/app; \
@@ -92,16 +92,16 @@ classes/com/dickimawbooks/texparserapp/TeXParserApp.class   : classes/com/dickim
 	 -Xlint:unchecked -Xlint:deprecation \
 	-cp ../../lib/javahelp2.jar:../../lib/jlfgr-1_0.jar:../../lib/texparserlib.jar \
 	*.java */*.java
-	mkdir -p classes/com/dickimawbooks/texparserapp/icons
-	cp java/app/icons/*.png classes/com/dickimawbooks/texparserapp/icons/
+	mkdir -p classes/com/dickimawbooks/texparsertest/icons
+	cp java/app/icons/*.png classes/com/dickimawbooks/texparsertest/icons/
 
 classes/com/dickimawbooks/texparserlib/TeXParser.class   : classes/com/dickimawbooks/texparserlib \
 	java/lib/*.java java/lib/*/*.java java/lib/*/*/*.java
 	cd java/lib; \
 	javac -target 1.7 -source 1.7 -d ../../classes -Xlint:unchecked -Xlint:deprecation *.java */*.java */*/*.java
 
-classes/com/dickimawbooks/texparserapp    :
-	mkdir -p classes/com/dickimawbooks/texparserapp
+classes/com/dickimawbooks/texparsertest    :
+	mkdir -p classes/com/dickimawbooks/texparsertest
 
 classes/com/dickimawbooks/texparserlib    :
 	mkdir -p classes/com/dickimawbooks/texparserlib
@@ -142,9 +142,9 @@ source	:
 
 clean   :
 	\rm -f classes/com/dickimawbooks/texparserlib/*.class
-	\rm -f classes/com/dickimawbooks/texparserapp/*.class
+	\rm -f classes/com/dickimawbooks/texparsertest/*.class
 
 squeaky :
-	\rm -f lib/texparserapp.jar
+	\rm -f lib/texparsertest.jar
 	\rm -f lib/texparserlib.jar
 

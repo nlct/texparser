@@ -1,5 +1,5 @@
 #!/bin/sh
 
 bindir=`dirname $0`
-java -splash:"$bindir/../lib/texparserapp-splash.png" -jar
-"$bindir/../lib/texparserapp.jar" --gui $@
+java -splash:"$bindir/../lib/texparsertest-splash.png" -jar
+"$bindir/../lib/texparsertest.jar" --gui $@

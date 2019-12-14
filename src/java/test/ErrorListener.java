@@ -16,14 +16,14 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
-package com.dickimawbooks.texparserapp.io;
+package com.dickimawbooks.texparsertest;
 
-import com.dickimawbooks.texparserapp.TeXParserApp;
-
-public class ProcessFailedException extends Exception
+public interface ErrorListener
 {
-   public ProcessFailedException(TeXParserApp app, String cmd)
-   {
-      super(app.getMessage("error.exec_failed", cmd));
-   }
+   public void error(Exception e);
+
+   public void error(String message);
+
+   public void warning(String message);
+
 }

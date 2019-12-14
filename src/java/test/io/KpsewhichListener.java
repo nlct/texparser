@@ -16,22 +16,43 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
-package com.dickimawbooks.texparserapp.io;
+package com.dickimawbooks.texparsertest.io;
 
-import com.dickimawbooks.texparserapp.TeXParserApp;
+import java.io.File;
 
-public class DefaultProcessListener implements ProcessListener
+import com.dickimawbooks.texparsertest.TeXParserApp;
+
+public class KpsewhichListener implements ProcessListener
 {
-   public DefaultProcessListener(TeXParserApp application)
-   {
-      this(application, -1);
-   }
-
-   public DefaultProcessListener(TeXParserApp application,
-     int saveLineNum)
+   public KpsewhichListener(TeXParserApp application)
    {
       app = application;
-      this.saveLineNum = saveLineNum;
+   }
+
+   public void processLine(int lineNum, String line)
+   {
+      try
+      {
+         result = line;
+      }
+      catch (NumberFormatException e)
+      {
+      }
+   }
+
+   public void processErrorLine(int lineNum, String line)
+   {
+      System.err.println(line);
+   }
+
+   public void error(Exception e)
+   {
+      app.error(e);
+   }
+
+   public String getResult()
+   {
+      return result;
    }
 
    public void setProcess(Process process)
@@ -42,11 +63,6 @@ public class DefaultProcessListener implements ProcessListener
    public void setThread(Thread thread)
    {
       this.thread = thread;
-   }
-
-   public void error(Exception e)
-   {
-      app.error(e);
    }
 
    public void terminateProcess()
@@ -64,24 +80,6 @@ public class DefaultProcessListener implements ProcessListener
       }
    }
 
-   public void processLine(int lineNum, String line)
-   {
-      if (lineNum == saveLineNum)
-      {
-         savedLine = line;
-      }
-   }
-
-   public String getSavedLine()
-   {
-      return savedLine;
-   }
-
-   public void processErrorLine(int lineNum, String line)
-   {
-      System.err.println(line);
-   }
-
    public void setInterruptor(InterruptTimerTask interruptor)
    {
       this.interruptor = interruptor;
@@ -94,9 +92,8 @@ public class DefaultProcessListener implements ProcessListener
 
    private InterruptTimerTask interruptor;
    private TeXParserApp app;
+   private String result = null;
    private Process process;
    private Thread thread;
-
-   private String savedLine=null;
-   private int saveLineNum=-1;
 }
+

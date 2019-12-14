@@ -16,43 +16,22 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
-package com.dickimawbooks.texparserapp.io;
+package com.dickimawbooks.texparsertest.io;
 
-import java.io.File;
+import com.dickimawbooks.texparsertest.TeXParserApp;
 
-import com.dickimawbooks.texparserapp.TeXParserApp;
-
-public class KpsewhichListener implements ProcessListener
+public class DefaultProcessListener implements ProcessListener
 {
-   public KpsewhichListener(TeXParserApp application)
+   public DefaultProcessListener(TeXParserApp application)
+   {
+      this(application, -1);
+   }
+
+   public DefaultProcessListener(TeXParserApp application,
+     int saveLineNum)
    {
       app = application;
-   }
-
-   public void processLine(int lineNum, String line)
-   {
-      try
-      {
-         result = line;
-      }
-      catch (NumberFormatException e)
-      {
-      }
-   }
-
-   public void processErrorLine(int lineNum, String line)
-   {
-      System.err.println(line);
-   }
-
-   public void error(Exception e)
-   {
-      app.error(e);
-   }
-
-   public String getResult()
-   {
-      return result;
+      this.saveLineNum = saveLineNum;
    }
 
    public void setProcess(Process process)
@@ -63,6 +42,11 @@ public class KpsewhichListener implements ProcessListener
    public void setThread(Thread thread)
    {
       this.thread = thread;
+   }
+
+   public void error(Exception e)
+   {
+      app.error(e);
    }
 
    public void terminateProcess()
@@ -80,6 +64,24 @@ public class KpsewhichListener implements ProcessListener
       }
    }
 
+   public void processLine(int lineNum, String line)
+   {
+      if (lineNum == saveLineNum)
+      {
+         savedLine = line;
+      }
+   }
+
+   public String getSavedLine()
+   {
+      return savedLine;
+   }
+
+   public void processErrorLine(int lineNum, String line)
+   {
+      System.err.println(line);
+   }
+
    public void setInterruptor(InterruptTimerTask interruptor)
    {
       this.interruptor = interruptor;
@@ -92,8 +94,9 @@ public class KpsewhichListener implements ProcessListener
 
    private InterruptTimerTask interruptor;
    private TeXParserApp app;
-   private String result = null;
    private Process process;
    private Thread thread;
-}
 
+   private String savedLine=null;
+   private int saveLineNum=-1;
+}

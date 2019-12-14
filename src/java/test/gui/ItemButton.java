@@ -16,7 +16,7 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
-package com.dickimawbooks.texparserapp.gui;
+package com.dickimawbooks.texparsertest.gui;
 
 import java.net.URL;
 import java.awt.Dimension;
@@ -24,7 +24,7 @@ import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.border.*;
 
-import com.dickimawbooks.texparserapp.TeXParserApp;
+import com.dickimawbooks.texparsertest.TeXParserApp;
 
 /**
  * Provides a JMenuItem that optionally has an associated button in

@@ -35,7 +35,7 @@ import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.primitives.*;
 import com.dickimawbooks.texparserlib.generic.*;
 import com.dickimawbooks.texparserlib.latex.*;
-import com.dickimawbooks.texparserlib.aux.*;
+import com.dickimawbooks.texparserlib.auxfile.*;
 
 public class L2HConverter extends LaTeXParserListener
    implements Writeable

@@ -16,20 +16,23 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
-package com.dickimawbooks.texparserapp.io;
+package com.dickimawbooks.texparsertest.io;
 
-/**
- * Exception thrown when encountering invalid syntax.
- */
-public class InvalidSyntaxException extends java.io.IOException
+public interface ProcessListener
 {
-   public InvalidSyntaxException(String message)
-   {
-      super(message);
-   }
+   public void setProcess(Process process);
 
-   public InvalidSyntaxException(String message, Throwable cause)
-   {
-      super(message, cause);
-   }
+   public void setThread(Thread thread);
+
+   public void processLine(int lineNum, String line);
+
+   public void processErrorLine(int lineNum, String line);
+
+   public void error(Exception e);
+
+   public void terminateProcess();
+
+   public void setInterruptor(InterruptTimerTask interruptor);
+
+   public InterruptTimerTask getInterruptor();
 }

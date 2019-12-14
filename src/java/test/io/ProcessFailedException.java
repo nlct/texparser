@@ -16,23 +16,14 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
-package com.dickimawbooks.texparserapp.io;
+package com.dickimawbooks.texparsertest.io;
 
-public interface ProcessListener
+import com.dickimawbooks.texparsertest.TeXParserApp;
+
+public class ProcessFailedException extends Exception
 {
-   public void setProcess(Process process);
-
-   public void setThread(Thread thread);
-
-   public void processLine(int lineNum, String line);
-
-   public void processErrorLine(int lineNum, String line);
-
-   public void error(Exception e);
-
-   public void terminateProcess();
-
-   public void setInterruptor(InterruptTimerTask interruptor);
-
-   public InterruptTimerTask getInterruptor();
+   public ProcessFailedException(TeXParserApp app, String cmd)
+   {
+      super(app.getMessage("error.exec_failed", cmd));
+   }
 }

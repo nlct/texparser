@@ -16,7 +16,7 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
-package com.dickimawbooks.texparserapp.gui;
+package com.dickimawbooks.texparsertest.gui;
 
 import java.awt.*;
 import java.io.*;
@@ -26,7 +26,7 @@ import javax.swing.*;
 
 import javax.help.*;
 
-import com.dickimawbooks.texparserapp.*;
+import com.dickimawbooks.texparsertest.*;
 
 /**
  * Main GUI frame

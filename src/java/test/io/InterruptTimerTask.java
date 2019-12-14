@@ -1,6 +1,6 @@
-package com.dickimawbooks.texparserapp.io;
+package com.dickimawbooks.texparsertest.io;
 
-import com.dickimawbooks.texparserapp.TeXParserApp;
+import com.dickimawbooks.texparsertest.TeXParserApp;
 
 // adapted from http://kylecartmell.com/?p=9
 

@@ -24,7 +24,7 @@ import java.util.Vector;
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.generic.*;
 import com.dickimawbooks.texparserlib.latex.*;
-import com.dickimawbooks.texparserlib.aux.AuxData;
+import com.dickimawbooks.texparserlib.auxfile.AuxData;
 
 public class L2HStringConverter extends L2HConverter
 {

@@ -36,7 +36,7 @@ import java.awt.Color;
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.primitives.*;
 import com.dickimawbooks.texparserlib.generic.*;
-import com.dickimawbooks.texparserlib.aux.*;
+import com.dickimawbooks.texparserlib.auxfile.*;
 import com.dickimawbooks.texparserlib.latex.graphics.*;
 import com.dickimawbooks.texparserlib.latex.amsmath.*;
 import com.dickimawbooks.texparserlib.latex.tcilatex.*;

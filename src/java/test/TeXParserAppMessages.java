@@ -16,7 +16,7 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
-package com.dickimawbooks.texparserapp;
+package com.dickimawbooks.texparsertest;
 
 import java.util.Hashtable;
 import java.util.Properties;
@@ -24,7 +24,7 @@ import java.util.Iterator;
 import java.text.MessageFormat;
 import java.text.ChoiceFormat;
 
-import com.dickimawbooks.texparserapp.io.InvalidSyntaxException;
+import com.dickimawbooks.texparsertest.io.InvalidSyntaxException;
 
 public class TeXParserAppMessages extends Hashtable<String,MessageFormat>
 {

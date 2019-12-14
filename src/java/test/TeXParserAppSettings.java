@@ -16,7 +16,7 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
-package com.dickimawbooks.texparserapp;
+package com.dickimawbooks.texparsertest;
 
 import java.util.Properties;
 import java.io.*;
@@ -30,7 +30,7 @@ import java.util.Locale;
 import java.net.URL;
 
 /**
- * Application settings for texparserapp.
+ * Application settings for texparsertest.
  */
 public class TeXParserAppSettings extends Properties
 {
@@ -51,11 +51,11 @@ public class TeXParserAppSettings extends Properties
 
       if (System.getProperty("os.name").toLowerCase().startsWith("win"))
       {
-         base = "texparserapp-settings";
+         base = "texparsertest-settings";
       }
       else
       {
-         base = ".texparserapp";
+         base = ".texparsertest";
       }
 
       String home = System.getProperty("user.home");
@@ -540,7 +540,7 @@ public class TeXParserAppSettings extends Properties
 
    private File propertiesPath = null;
 
-   private final String propertiesName="texparserapp.prop";
+   private final String propertiesName="texparsertest.prop";
 
    private final String recentName = "recentfiles";
 
@@ -554,11 +554,11 @@ public class TeXParserAppSettings extends Properties
    public static final String HELPSET_DIR = "/resources/helpsets/";
    public static final String DICT_DIR = "/resources/dictionaries/";
 
-   public static final String RESOURCE = "texparserapp";
+   public static final String RESOURCE = "texparsertest";
 
    public static final Pattern PATTERN_HELPSET 
-     = Pattern.compile("texparserapp-([a-z]{2})(-[A-Z]{2})?");
+     = Pattern.compile("texparsertest-([a-z]{2})(-[A-Z]{2})?");
 
    public static final Pattern PATTERN_DICT 
-     = Pattern.compile("texparserapp-([a-z]{2})(-[A-Z]{2})?\\.xml");
+     = Pattern.compile("texparsertest-([a-z]{2})(-[A-Z]{2})?\\.xml");
 }

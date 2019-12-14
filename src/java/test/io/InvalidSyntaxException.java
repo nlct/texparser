@@ -16,19 +16,20 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
-package com.dickimawbooks.texparserapp.io;
+package com.dickimawbooks.texparsertest.io;
 
-import com.dickimawbooks.texparserapp.TeXParserApp;
-
-public class CancelledException extends InterruptedException
+/**
+ * Exception thrown when encountering invalid syntax.
+ */
+public class InvalidSyntaxException extends java.io.IOException
 {
-   public CancelledException(TeXParserApp app)
-   {
-      this(app.getMessage("error.interrupted"));
-   }
-
-   public CancelledException(String message)
+   public InvalidSyntaxException(String message)
    {
       super(message);
+   }
+
+   public InvalidSyntaxException(String message, Throwable cause)
+   {
+      super(message, cause);
    }
 }
