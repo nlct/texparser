@@ -76,24 +76,24 @@ lib/texparserlib.jar      : lib classes/com/dickimawbooks/texparserlib/TeXParser
 	com/dickimawbooks/texparserlib/*/*.class \
 	com/dickimawbooks/texparserlib/*/*/*.class 
 
-lib/texparsertest.jar      : java/app/Manifest.txt \
+lib/texparsertest.jar      : java/test/Manifest.txt \
 			classes/com/dickimawbooks/texparsertest/TeXParserApp.class 
 	cd classes; \
-	jar cmf ../java/app/Manifest.txt ../lib/texparsertest.jar \
+	jar cmf ../java/test/Manifest.txt ../lib/texparsertest.jar \
 	com/dickimawbooks/texparsertest/*.class \
 	com/dickimawbooks/texparsertest/*/*.class \
 	com/dickimawbooks/texparsertest/icons/*.png
 
 classes/com/dickimawbooks/texparsertest/TeXParserApp.class   : classes/com/dickimawbooks/texparsertest \
-	java/app/*.java java/app/*/*.java java/app/icons/*.png \
+	java/test/*.java java/test/*/*.java java/test/icons/*.png \
 	lib/javahelp2.jar lib/jlfgr-1_0.jar lib/texparserlib.jar
-	cd java/app; \
+	cd java/test; \
 	javac -d ../../classes \
 	 -Xlint:unchecked -Xlint:deprecation \
 	-cp ../../lib/javahelp2.jar:../../lib/jlfgr-1_0.jar:../../lib/texparserlib.jar \
 	*.java */*.java
 	mkdir -p classes/com/dickimawbooks/texparsertest/icons
-	cp java/app/icons/*.png classes/com/dickimawbooks/texparsertest/icons/
+	cp java/test/icons/*.png classes/com/dickimawbooks/texparsertest/icons/
 
 classes/com/dickimawbooks/texparserlib/TeXParser.class   : classes/com/dickimawbooks/texparserlib \
 	java/lib/*.java java/lib/*/*.java java/lib/*/*/*.java
