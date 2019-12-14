@@ -2,6 +2,9 @@
 
 This code is *highly experimental* and still under construction. It
 comes with no guarantees, no warranties and is not future-proof.
+Note that version 0.8b has some file name changes. The most
+important one being the renaming of the former `aux` directory
+(see issue #1).
 
 ## PURPOSE
 
@@ -49,13 +52,16 @@ occur in the `description` when defining constants, but that's less
 important to `bib2gls` since entries aren't usually sorted by their
 description).
 
-The accompanying `texparserapp.jar` is a command line application
+The accompanying `texparsertest.jar` is a command line application
 provided to test the `texparserlib.jar` library. It's not intended for
-general use.
+general use. (For this reason, I've renamed it from
+`texparserapp.jar` to `texparsertest.jar`. There is still a script
+called `texparserapp` in the `bin` directory which does the same
+thing as `texparsertest`.)
 
 Syntax:
 
-`texparserapp` [`--html`] `--in` &lt;*tex file*&gt; `--output` &lt;*out dir*&gt;
+`texparsertest` [`--html`] `--in` &lt;*tex file*&gt; `--output` &lt;*out dir*&gt;
 
 This parses &lt;*tex file*&gt; and saves the new file in &lt;*out dir*&gt; and
 copies over any included images. It will run `epstopdf` on any eps
@@ -68,6 +74,10 @@ The output directory &lt;*out dir*&gt; must not exist. This is a
 precautionary measure to ensure you don't accidentally overwrite the
 original files.
 
+I experimented with including a GUI to provide a way of testing the
+library with a graphical interface but I haven't had time to develop
+it further. The command line interface is usually sufficient. I may
+remove the GUI part in future versions.
 
 ## TEST FILES
 
@@ -80,7 +90,7 @@ The test file `src/tests/test-obsolete/test-obs.tex` contains obsolete
 commands such as `\bf`, `\centerline` and `\epsfig`.
 ```bash
 cd src/tests
-texparserapp --in test-obsolete/test-obs.tex --output output/test-obsolete
+texparsertest --in test-obsolete/test-obs.tex --output output/test-obsolete
 ```
 This will create the directory `output/test-obsolete` and create a
 file in it called `test-obs.tex` which is the original file with the
@@ -111,7 +121,7 @@ replaces
 the wmf image.
 ```bash
 cd src/tests
-texparserap --in test-sw/test-sw.tex --output output/test-sw
+texparsertest --in test-sw/test-sw.tex --output output/test-sw
 ```
 This creates the directory `output/test-sw` and writes a copy of
 `test-sw.tex` with the relevant substitutions. The image file
@@ -126,7 +136,7 @@ abstracts to HTML. Images aren't supported. MathJax is used to
 render math mode.
 ```bash
 cd src/tests
-texparserapp --in test-article/test-article.tex --output output/test-article --html
+texparsertest --in test-article/test-article.tex --output output/test-article --html
 ```
 The `bib2gls` application uses the HTML conversion without MathJax
 when trying to interpret the sort value when the `sort` field is
