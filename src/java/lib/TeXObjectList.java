@@ -1856,6 +1856,32 @@ public class TeXObjectList extends Vector<TeXObject>
       return false;
    }
 
+   public TeXObjectList trim()
+   {
+      // strip redundant white space and grouping
+
+      while (size() > 0
+             && (firstElement() instanceof WhiteSpace
+                  || firstElement() instanceof Ignoreable))
+      {
+         remove(0);
+      }
+
+      while (size() > 0
+             && (lastElement() instanceof WhiteSpace
+                  || lastElement() instanceof Ignoreable))
+      {
+         remove(size()-1);
+      }
+
+      if (size() == 1 && (get(0) instanceof Group))
+      {
+         return ((Group)get(0)).toList();
+      }
+
+      return this;
+   }
+
    private ArrayDeque<Declaration> declarations
      = new ArrayDeque<Declaration>();
 

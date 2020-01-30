@@ -113,7 +113,7 @@ public class KeyValList extends HashMap<String,TeXObject>
 
                   if (!key.isEmpty())
                   {
-                     keyValList.put(key, valBuilder);
+                     keyValList.put(key, valBuilder.trim());
                   }
 
                   keyBuilder.setLength(0);
@@ -151,7 +151,7 @@ public class KeyValList extends HashMap<String,TeXObject>
          if (!key.isEmpty())
          {
             keyValList.put(key, valBuilder == null ? 
-             new MissingValue() : valBuilder);
+             new MissingValue() : valBuilder.trim());
          }
       }
       else
