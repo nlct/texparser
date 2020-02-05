@@ -1148,6 +1148,11 @@ public class TeXObjectList extends Vector<TeXObject>
    {
       TeXObject object = popStack(parser, popStyle);
 
+      if (object == null && !(this instanceof TeXParser))
+      {
+         object = parser.popNextArg(popStyle);
+      }
+
       if (object instanceof Group
        && !(object instanceof MathGroup))
       {
@@ -1171,6 +1176,11 @@ public class TeXObjectList extends Vector<TeXObject>
    throws IOException
    {
       TeXObject object = popStack(parser, popStyle);
+
+      if (object == null && !(this instanceof TeXParser))
+      {
+         object = parser.popStack(popStyle);
+      }
 
       if (!(object instanceof CharObject))
       {
