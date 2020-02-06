@@ -30,6 +30,11 @@ public class AtGobble extends Command
       this("@gobble", 1);
    }
 
+   public AtGobble(String name)
+   {
+      this(name, 1);
+   }
+
    public AtGobble(String name, int numParams)
    {
       super(name);
