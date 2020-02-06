@@ -27,23 +27,32 @@ public class AtGobble extends Command
 {
    public AtGobble()
    {
-      this("@gobble");
+      this("@gobble", 1);
    }
 
-   public AtGobble(String name)
+   public AtGobble(String name, int numParams)
    {
       super(name);
+      this.numParams = numParams;
    }
 
    public Object clone()
    {
-      return new AtGobble(getName());
+      return new AtGobble(getName(), getNumParams());
+   }
+
+   public int getNumParams()
+   {
+      return numParams;
    }
 
    public TeXObjectList expandonce(TeXParser parser)
      throws IOException
    {
-      TeXObject arg = parser.popNextArg();
+      for (int i = 0; i < numParams; i++)
+      {
+         parser.popNextArg();
+      }
 
       return new TeXObjectList();
    }
@@ -51,7 +60,10 @@ public class AtGobble extends Command
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      TeXObject arg = stack.popArg(parser);
+      for (int i = 0; i < numParams; i++)
+      {
+         stack.popArg(parser);
+      }
 
       return new TeXObjectList();
    }
@@ -70,12 +82,19 @@ public class AtGobble extends Command
 
    public void process(TeXParser parser) throws IOException
    {
-      parser.popNextArg();
+      for (int i = 0; i < numParams; i++)
+      {
+         parser.popNextArg();
+      }
    }
 
    public void process(TeXParser parser, TeXObjectList list) throws IOException
    {
-      list.popArg(parser);
+      for (int i = 0; i < numParams; i++)
+      {
+         list.popArg(parser);
+      }
    }
 
+   private int numParams;
 }

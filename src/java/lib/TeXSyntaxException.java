@@ -113,6 +113,11 @@ public class TeXSyntaxException extends IOException
 
    public String getMessage(TeXApp app)
    {
+      if (app == null)
+      {
+         return getMessage();
+      }
+
       String msg = app.getMessage(errorTag, params);
 
       if (file == null && lineNum == -1)
