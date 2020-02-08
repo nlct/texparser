@@ -345,6 +345,8 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
           "ClassErrorNoLine", LaTeXSyntaxException.CLASS_ERROR));
       }
 
+      parser.putControlSequence(new AtCtrErr());
+
       parser.putControlSequence(new NewCommand());
       parser.putControlSequence(new NewCommand("renewcommand",
         NewCommand.OVERWRITE_FORCE));
@@ -391,6 +393,19 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       parser.putControlSequence(new AtAlph("@alph", AtAlph.LOWER));
       parser.putControlSequence(new AtRoman("@Roman", AtRoman.UPPER));
       parser.putControlSequence(new AtRoman("@roman", AtRoman.LOWER));
+
+      parser.putControlSequence(new NewCounter());
+      parser.putControlSequence(new AddToCounter());
+      parser.putControlSequence(new StepCounter());
+      parser.putControlSequence(new StepCounter("refstepcounter"));
+      parser.putControlSequence(new Value());
+      parser.putControlSequence(new Value("arabic"));
+      parser.putControlSequence(new NumberCs("@arabic"));
+      parser.putControlSequence(new Roman());
+      parser.putControlSequence(new Roman("roman", AtRoman.LOWER));
+      parser.putControlSequence(new Alph());
+      parser.putControlSequence(new Alph("alph", AtAlph.LOWER));
+      parser.putControlSequence(new FnSymbol());
 
       parser.putControlSequence(new Verbatim());
       parser.putControlSequence(new Verbatim("verbatim*"));

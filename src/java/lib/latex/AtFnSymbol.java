@@ -72,12 +72,18 @@ public class AtFnSymbol extends Command
       return list;
    }
 
-   protected TeXObject getSymbol(TeXParser parser, TeXNumber arg)
+   public static TeXObject getSymbol(TeXParser parser, TeXNumber arg)
+   throws IOException
+   {
+      return getSymbol(parser, arg.number(parser));
+   }
+
+   public static TeXObject getSymbol(TeXParser parser, int num)
    throws IOException
    {
       TeXParserListener listener = parser.getListener();
 
-      switch (arg.number(parser))
+      switch (num)
       {
          case 0: return new TeXObjectList();
          case 1: return listener.getOther('*');
@@ -91,7 +97,8 @@ public class AtFnSymbol extends Command
          case 9: return listener.createString("‡‡");
       }
 
-      return new TeXCsRef("@ctrerr");
+      throw new LaTeXSyntaxException(parser,
+         LaTeXSyntaxException.ERROR_COUNTER_OUT_OF_RANGE, num, "0-9");
    }
 
    public void process(TeXParser parser) throws IOException

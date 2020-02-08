@@ -266,6 +266,21 @@ No else:
  Two%
 \fi
 
+\section{Counters}
+
+\newcounter{mycounter}
+Counter value: \themycounter.
+
+Add 10.
+\addtocounter{mycounter}{10}
+Counter value: \themycounter.
+Roman: \Roman{mycounter}; lowercase: \roman{mycounter}.
+Alph: \Alph{mycounter}; lowercase: \alph{mycounter}.
+Subtract 6.
+\addtocounter{mycounter}{-6}
+New value: \arabic{mycounter}.
+Fn: \fnsymbol{mycounter}.
+
 \bibliographystyle{plain}
 \bibliography{xampl}
 

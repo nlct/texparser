@@ -2034,16 +2034,14 @@ public class TeXParser extends TeXObjectList
          return (Numerical)obj;
       }
 
-      TeXObjectList expanded = null;
-
       if (obj instanceof Expandable)
       {
-         expanded = ((Expandable)obj).expandfully(this);
-      }
+         TeXObjectList expanded = ((Expandable)obj).expandfully(this);
 
-      if (expanded != null)
-      {
-         obj = expanded;
+         if (expanded != null)
+         {
+            obj = expanded;
+         }
       }
 
       if (obj instanceof TeXObjectList)
@@ -2066,16 +2064,14 @@ public class TeXParser extends TeXObjectList
          return (Numerical)obj;
       }
 
-      TeXObjectList expanded = null;
-
       if (obj instanceof Expandable)
       {
-         expanded = ((Expandable)obj).expandfully(this);
-      }
+         TeXObjectList expanded = ((Expandable)obj).expandfully(this);
 
-      if (expanded != null)
-      {
-         obj = expanded;
+         if (expanded != null)
+         {
+            obj = expanded;
+         }
       }
 
       if (obj instanceof TeXObjectList)

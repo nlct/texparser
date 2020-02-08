@@ -561,7 +561,8 @@ public class TeXObjectList extends Vector<TeXObject>
          int codePoint = ((CharObject)object).getCharCode();
 
          if (codePoint == '"' || codePoint == '\'' || codePoint == '`'
-             || Character.isDigit(codePoint))
+             || Character.isDigit(codePoint)
+             || codePoint == '-' || codePoint == '+')
          {
             return popNumber(parser);
          }
@@ -947,6 +948,14 @@ public class TeXObjectList extends Vector<TeXObject>
       }
 
       StringBuilder builder = new StringBuilder();
+
+      if (object instanceof CharObject && 
+          (((CharObject)object).getCharCode() == '+'
+            || ((CharObject)object).getCharCode() == '-'))
+      {
+         builder.appendCodePoint(((CharObject)object).getCharCode());
+         object = expandedPopStack(parser);
+      }
       
       popNumber(parser, object, builder, base);
 
@@ -1247,16 +1256,14 @@ public class TeXObjectList extends Vector<TeXObject>
          return (Numerical)obj;
       }
 
-      TeXObjectList expanded = null;
-
       if (obj instanceof Expandable)
       {
-         expanded = ((Expandable)obj).expandfully(parser, this);
-      }
+         TeXObjectList expanded = ((Expandable)obj).expandfully(parser, this);
 
-      if (expanded != null)
-      {
-         obj = expanded;
+         if (expanded != null)
+         {
+            obj = expanded;
+         }
       }
 
       if (obj instanceof TeXObjectList)
@@ -1279,16 +1286,14 @@ public class TeXObjectList extends Vector<TeXObject>
          return (Numerical)obj;
       }
 
-      TeXObjectList expanded = null;
-
       if (obj instanceof Expandable)
       {
-         expanded = ((Expandable)obj).expandfully(parser, this);
-      }
+         TeXObjectList expanded = ((Expandable)obj).expandfully(parser, this);
 
-      if (expanded != null)
-      {
-         obj = expanded;
+         if (expanded != null)
+         {
+            obj = expanded;
+         }
       }
 
       if (obj instanceof TeXObjectList)

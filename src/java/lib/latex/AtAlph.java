@@ -78,9 +78,13 @@ public class AtAlph extends Command
    protected TeXObject getSymbol(TeXParser parser, TeXNumber arg)
    throws IOException
    {
-      TeXParserListener listener = parser.getListener();
+      return getSymbol(parser, arg.number(parser), state);
+   }
 
-      int num = arg.number(parser);
+   public static TeXObject getSymbol(TeXParser parser, int num, byte state)
+   throws IOException
+   {
+      TeXParserListener listener = parser.getListener();
 
       if (num == 0)
       {

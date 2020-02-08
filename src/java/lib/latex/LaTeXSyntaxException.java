@@ -65,4 +65,8 @@ public class LaTeXSyntaxException extends TeXSyntaxException
       "latex.illegal.argtype";
    public static final String ERROR_PACKAGE_NOT_LOADED = 
    "latex.package.not.loaded";
+   public static final String ERROR_COUNTER_TOO_LARGE = 
+   "latex.error.counter.too.large";
+   public static final String ERROR_COUNTER_OUT_OF_RANGE = 
+   "latex.error.counter.out.of.range";
 }
