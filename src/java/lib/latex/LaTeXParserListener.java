@@ -364,6 +364,7 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       parser.putControlSequence(new MakeAtLetter());
       parser.putControlSequence(new MakeAtOther());
       parser.putControlSequence(new Ignorespaces());
+      parser.putControlSequence(new NoBreakSpace());
       parser.putControlSequence(new Centerline());
       parser.putControlSequence(new Verb());
       parser.putControlSequence(new Cr("\\"));
