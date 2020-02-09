@@ -866,7 +866,7 @@ public class TeXObjectList extends Vector<TeXObject>
             popStack(parser, POP_IGNORE_LEADING_SPACE);
             base = 16;
          }
-         if (codePoint == '\'')
+         else if (codePoint == '\'')
          {
             popStack(parser, POP_IGNORE_LEADING_SPACE);
             base = 8;
@@ -928,8 +928,14 @@ public class TeXObjectList extends Vector<TeXObject>
          }
       }
 
+      return popNumber(parser, base);
+   }
+
+   public TeXNumber popNumber(TeXParser parser, int base)
+     throws IOException
+   {
       popLeadingWhiteSpace();
-      object = expandedPopStack(parser);
+      TeXObject object = expandedPopStack(parser);
 
       if (object instanceof TeXNumber)
       {
