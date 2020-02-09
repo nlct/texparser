@@ -1759,6 +1759,49 @@ public class TeXObjectList extends Vector<TeXObject>
       return builder.toString();
    }
 
+   public String substring(TeXParser parser, int startIdx, int endIdx)
+   {
+      StringBuilder builder = new StringBuilder();
+
+      for (int i = startIdx; i < endIdx; i++)
+      {
+         TeXObject object = get(i);
+
+         builder.append(object.toString(parser));
+
+         if (object instanceof ControlSequence
+         && ((ControlSequence)object).isControlWord(parser)
+         && i < endIdx-1)
+         {
+            object = get(i+1);
+           
+            if (object instanceof Letter)
+            {
+               builder.append(" ");
+            }
+            else if (object instanceof TeXObjectList
+                && !(object instanceof Group))
+            {
+               i++;
+               String str = ((TeXObjectList)object).toString(parser);
+               if (str.isEmpty())
+               {
+                  continue;
+               }
+
+               if (parser.isLetter(str.charAt(0)))
+               {
+                  builder.append(" ");
+               }
+
+               builder.append(str);
+            }
+         }
+      }
+
+      return builder.toString();
+   }
+
    public TeXObjectList string(TeXParser parser)
      throws IOException
    {
