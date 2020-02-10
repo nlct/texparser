@@ -318,7 +318,8 @@ public class AtFor extends Command
       if (!(arg instanceof ControlSequence))
       {
          throw new LaTeXSyntaxException(parser, 
-           TeXSyntaxException.ERROR_CS_EXPECTED, arg.toString(parser));
+           TeXSyntaxException.ERROR_CS_EXPECTED, arg.toString(parser),
+                arg.getClass().getSimpleName());
       }
       
       GenericCommand cs = new GenericCommand(((ControlSequence)arg).getName());
@@ -431,7 +432,8 @@ public class AtFor extends Command
       if (!(arg instanceof ControlSequence))
       {
          throw new LaTeXSyntaxException(parser, 
-           TeXSyntaxException.ERROR_CS_EXPECTED, arg.toString(parser));
+           TeXSyntaxException.ERROR_CS_EXPECTED, arg.toString(parser),
+                arg.getClass().getSimpleName());
       }
       
       GenericCommand cs = new GenericCommand(((ControlSequence)arg).getName());
@@ -542,7 +544,8 @@ public class AtFor extends Command
       if (!(arg instanceof ControlSequence))
       {
          throw new LaTeXSyntaxException(parser, 
-           TeXSyntaxException.ERROR_CS_EXPECTED, arg.toString(parser));
+           TeXSyntaxException.ERROR_CS_EXPECTED, arg.toString(parser),
+                arg.getClass().getSimpleName());
       }
       
       GenericCommand cs = new GenericCommand(((ControlSequence)arg).getName());

@@ -48,7 +48,8 @@ public class NewIf extends Primitive
        if (!(obj instanceof ControlSequence))
        {
           throw new TeXSyntaxException(parser,
-            TeXSyntaxException.ERROR_CS_EXPECTED, obj.toString(parser));
+            TeXSyntaxException.ERROR_CS_EXPECTED, obj.toString(parser),
+                arg.getClass().getSimpleName());
        }
 
        createConditional(isLocal, parser, ((ControlSequence)obj).getName());

@@ -90,7 +90,8 @@ public class DTLloaddbtex extends ControlSequence
       if (!(csArg instanceof ControlSequence))
       {
          throw new TeXSyntaxException(parser, 
-           TeXSyntaxException.ERROR_CS_EXPECTED, csArg.toString(parser));
+           TeXSyntaxException.ERROR_CS_EXPECTED, csArg.toString(parser),
+                csArg.getClass().getSimpleName());
       }
 
       String name = ((ControlSequence)csArg).getName();

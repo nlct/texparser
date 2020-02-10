@@ -48,7 +48,8 @@ public class NewToks extends ControlSequence
       if (!(object instanceof ControlSequence))
       {
          throw new TeXSyntaxException(parser, 
-            TeXSyntaxException.ERROR_CS_EXPECTED, object);
+            TeXSyntaxException.ERROR_CS_EXPECTED, object,
+              object.getClass().getSimpleName());
       }
 
       parser.getSettings().newtoks(getPrefix() != PREFIX_GLOBAL, 

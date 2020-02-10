@@ -48,7 +48,8 @@ public class NewCount extends ControlSequence
       if (!(object instanceof ControlSequence))
       {
          throw new TeXSyntaxException(parser, 
-            TeXSyntaxException.ERROR_CS_EXPECTED, object);
+            TeXSyntaxException.ERROR_CS_EXPECTED, object,
+              object.getClass().getSimpleName());
       }
 
       parser.getSettings().newcount(getPrefix() != PREFIX_GLOBAL, 

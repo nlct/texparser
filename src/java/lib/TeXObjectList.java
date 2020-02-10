@@ -1030,14 +1030,16 @@ public class TeXObjectList extends Vector<TeXObject>
                TeXSyntaxException.ERROR_CS_EXPECTED,
                 obj == null ? list.toString(parser) :
                  String.format("%s%s", obj.toString(parser),
-                 list.toString(parser)));
+                 list.toString(parser)),
+                obj.getClass().getSimpleName());
          }
       }
 
       if (!(obj instanceof ControlSequence))
       {
          throw new TeXSyntaxException(parser,
-            TeXSyntaxException.ERROR_CS_EXPECTED, obj.toString(parser));
+            TeXSyntaxException.ERROR_CS_EXPECTED, obj.toString(parser),
+                obj.getClass().getSimpleName());
       }
 
       return (ControlSequence)obj;

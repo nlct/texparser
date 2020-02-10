@@ -106,7 +106,7 @@ public class NewCommand extends Command
          throw new TeXSyntaxException(
             parser,
             TeXSyntaxException.ERROR_CS_EXPECTED,
-            object.format());
+            object.format(), object.getClass().getSimpleName());
       }
 
       object = (stack == parser ?
