@@ -353,6 +353,11 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       parser.putControlSequence(new NewCommand("providecommand",
         NewCommand.OVERWRITE_SKIP));
 
+      // make \DeclareRobustCommand behave like \providecommand
+      // (this library has different expansion rules to TeX)
+      parser.putControlSequence(new NewCommand("DeclareRobustCommand",
+        NewCommand.OVERWRITE_SKIP));
+
       parser.putControlSequence(new Label());
       parser.putControlSequence(new Ref());
       parser.putControlSequence(new PageRef());
