@@ -49,7 +49,7 @@ public class NewIf extends Primitive
        {
           throw new TeXSyntaxException(parser,
             TeXSyntaxException.ERROR_CS_EXPECTED, obj.toString(parser),
-                arg.getClass().getSimpleName());
+                obj.getClass().getSimpleName());
        }
 
        createConditional(isLocal, parser, ((ControlSequence)obj).getName());
