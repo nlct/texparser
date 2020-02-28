@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2020 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -33,17 +33,13 @@ public abstract class MidControlSequence extends ControlSequence
 
    public void process(TeXParser parser) throws IOException
    {
-      throw new TeXSyntaxException(
-         parser.getCurrentFile(),
-         parser.getLineNumber(),
+      throw new TeXSyntaxException(parser,
          TeXSyntaxException.ERROR_AMBIGUOUS_MIDCS, getName());
    }
 
    public void process(TeXParser parser, TeXObjectList stack) throws IOException
    {
-      throw new TeXSyntaxException(
-         parser.getCurrentFile(),
-         parser.getLineNumber(),
+      throw new TeXSyntaxException(parser,
          TeXSyntaxException.ERROR_AMBIGUOUS_MIDCS, getName());
    }
 

@@ -282,8 +282,7 @@ public class Accent extends ControlSequence
 
          object.process(parser, stack);
 
-         throw new TeXSyntaxException(
-             parser,
+         throw new TeXSyntaxException(parser,
              TeXSyntaxException.ERROR_INVALID_ACCENT,
              object.toString(parser));
       }

@@ -866,8 +866,7 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
    {
       if (isInDocEnv())
       {
-         throw new LaTeXSyntaxException(
-            parser,
+         throw new LaTeXSyntaxException(parser,
             LaTeXSyntaxException.ERROR_MULTI_BEGIN_DOC);
       }
 
@@ -901,8 +900,7 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
    {
       if (!isInDocEnv())
       {
-         throw new LaTeXSyntaxException(
-            parser,
+         throw new LaTeXSyntaxException(parser,
             LaTeXSyntaxException.ERROR_NO_BEGIN_DOC);
       }
 
@@ -1023,8 +1021,7 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
    {
       if (docCls != null)
       {
-         throw new LaTeXSyntaxException(
-            parser,
+         throw new LaTeXSyntaxException(parser,
             LaTeXSyntaxException.ERROR_MULTI_CLS);
       }
 

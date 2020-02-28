@@ -46,8 +46,7 @@ public class OverWithDelims extends MidControlSequence
    {
       if (!parser.isMathMode())
       {
-         throw new TeXSyntaxException(
-           parser,
+         throw new TeXSyntaxException(parser,
            TeXSyntaxException.ERROR_NOT_MATH_MODE,
            getName());
       }
@@ -67,8 +66,7 @@ public class OverWithDelims extends MidControlSequence
 
       if (following.size() == 0)
       {
-         throw new TeXSyntaxException(
-          parser,
+         throw new TeXSyntaxException(parser,
           TeXSyntaxException.ERROR_MISSING_PARAM,
           getName());
       }

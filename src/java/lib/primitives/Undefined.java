@@ -55,8 +55,8 @@ public class Undefined extends Primitive
       switch (action)
       {
          case ACTION_ERROR:
-            throw new TeXSyntaxException(
-            parser, TeXSyntaxException.ERROR_UNDEFINED, getName());
+            throw new TeXSyntaxException(parser, 
+            TeXSyntaxException.ERROR_UNDEFINED, getName());
          case ACTION_WARN:
             texApp.warning(parser, 
               texApp.getMessage(TeXSyntaxException.ERROR_UNDEFINED, getName()));

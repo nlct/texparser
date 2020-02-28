@@ -861,8 +861,7 @@ public class L2HConverter extends LaTeXParserListener
    {
       if (!isInDocEnv())
       {
-         throw new LaTeXSyntaxException(
-            parser,
+         throw new LaTeXSyntaxException(parser,
             LaTeXSyntaxException.ERROR_NO_BEGIN_DOC);
       }
 

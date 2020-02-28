@@ -61,8 +61,7 @@ public class BigOperator extends MathSymbol
             cp = dispCodePoint;
          break;
          default:
-            throw new TeXSyntaxException(
-              parser,
+            throw new TeXSyntaxException(parser,
               TeXSyntaxException.ERROR_NOT_MATH_MODE,
               toString(parser));
       }

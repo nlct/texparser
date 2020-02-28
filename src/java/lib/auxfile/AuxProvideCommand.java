@@ -93,8 +93,7 @@ public class AuxProvideCommand extends ControlSequence
       }
       else
       {
-         throw new TeXSyntaxException(
-            parser,
+         throw new TeXSyntaxException(parser,
             TeXSyntaxException.ERROR_CS_EXPECTED,
             object.format(), object.getClass().getSimpleName());
       }
@@ -134,8 +133,7 @@ public class AuxProvideCommand extends ControlSequence
             }
             catch (NumberFormatException e)
             {
-               throw new TeXSyntaxException(
-                 parser,
+               throw new TeXSyntaxException(parser,
                  TeXSyntaxException.ERROR_NUMBER_EXPECTED, 
                   object.toString(parser));
             }

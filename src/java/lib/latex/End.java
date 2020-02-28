@@ -63,8 +63,8 @@ public class End extends ControlSequence
 
       if (currenv == null)
       {
-         throw new LaTeXSyntaxException(
-             parser, LaTeXSyntaxException.ERROR_EXTRA_END, name);
+         throw new LaTeXSyntaxException(parser,
+            LaTeXSyntaxException.ERROR_EXTRA_END, name);
       }
 
       if (currenv instanceof Expandable)
@@ -83,8 +83,8 @@ public class End extends ControlSequence
 
       if (!name.equals(currenv.toString(parser)))
       {
-         throw new LaTeXSyntaxException(
-             parser, LaTeXSyntaxException.ERROR_EXTRA_END, name);
+         throw new LaTeXSyntaxException(parser, 
+             LaTeXSyntaxException.ERROR_EXTRA_END, name);
       }
    }
 
@@ -112,8 +112,8 @@ public class End extends ControlSequence
 
       if (currenv == null)
       {
-         throw new LaTeXSyntaxException(
-             parser, LaTeXSyntaxException.ERROR_EXTRA_END, name);
+         throw new LaTeXSyntaxException(parser, 
+             LaTeXSyntaxException.ERROR_EXTRA_END, name);
       }
 
       if (currenv instanceof Expandable)
@@ -132,8 +132,8 @@ public class End extends ControlSequence
 
       if (!name.equals(currenv.toString(parser)))
       {
-         throw new LaTeXSyntaxException(
-             parser, LaTeXSyntaxException.ERROR_EXTRA_END, name);
+         throw new LaTeXSyntaxException(parser, 
+             LaTeXSyntaxException.ERROR_EXTRA_END, name);
       }
    }
 

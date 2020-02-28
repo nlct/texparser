@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2020 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -413,9 +413,7 @@ public class TeXObjectList extends Vector<TeXObject>
 
       if (object == null)
       {
-         throw new TeXSyntaxException(
-            parser.getCurrentFile(),
-            parser.getLineNumber(),
+         throw new TeXSyntaxException(parser,
             TeXSyntaxException.ERROR_MISSING_UNIT);
       }
 
@@ -429,9 +427,7 @@ public class TeXObjectList extends Vector<TeXObject>
          {
             push(object);
 
-            throw new TeXSyntaxException(
-               parser.getCurrentFile(),
-               parser.getLineNumber(),
+            throw new TeXSyntaxException(parser,
                TeXSyntaxException.ERROR_MISSING_UNIT);
          }
 
@@ -485,17 +481,13 @@ public class TeXObjectList extends Vector<TeXObject>
          push(nextObj);
          push(object);
 
-         throw new TeXSyntaxException(
-               parser.getCurrentFile(),
-               parser.getLineNumber(),
+         throw new TeXSyntaxException(parser,
                TeXSyntaxException.ERROR_MISSING_UNIT);
       }
 
       push(object);
 
-      throw new TeXSyntaxException(
-               parser.getCurrentFile(),
-               parser.getLineNumber(),
+      throw new TeXSyntaxException(parser,
                TeXSyntaxException.ERROR_MISSING_UNIT);
    }
 

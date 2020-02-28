@@ -289,8 +289,7 @@ public class LaTeX2LaTeX extends LaTeXParserListener
    {
       if (docCls != null)
       {
-         throw new LaTeXSyntaxException(
-            parser,
+         throw new LaTeXSyntaxException(parser,
             LaTeXSyntaxException.ERROR_MULTI_CLS);
       }
 

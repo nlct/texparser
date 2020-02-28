@@ -64,8 +64,7 @@ public class MathSymbol extends Symbol
    {
       if (!parser.isMathMode())
       {
-         throw new TeXSyntaxException(
-           parser,
+         throw new TeXSyntaxException(parser,
            TeXSyntaxException.ERROR_NOT_MATH_MODE,
            toString(parser));
       }

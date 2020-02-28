@@ -67,8 +67,8 @@ public class L2HUndefined extends Undefined
 
          try
          {
-            throw new TeXSyntaxException(
-              parser, TeXSyntaxException.ERROR_UNDEFINED, getName());
+            throw new TeXSyntaxException(parser, 
+               TeXSyntaxException.ERROR_UNDEFINED, getName());
 
          }
          catch (TeXSyntaxException e)

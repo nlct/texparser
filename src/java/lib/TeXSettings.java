@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2020 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -928,9 +928,7 @@ public class TeXSettings
 
          if (reg == null)
          {
-            throw new TeXSyntaxException(
-               parser.getCurrentFile(),
-               parser.getLineNumber(),
+            throw new TeXSyntaxException(parser,
                TeXSyntaxException.ERROR_REGISTER_UNDEF, name);
          }
 
@@ -951,9 +949,7 @@ public class TeXSettings
 
       if (reg == null)
       {
-         throw new TeXSyntaxException(
-            parser.getCurrentFile(),
-            parser.getLineNumber(),
+         throw new TeXSyntaxException(parser,
             TeXSyntaxException.ERROR_REGISTER_UNDEF, name);
       }
 
@@ -990,9 +986,7 @@ public class TeXSettings
 
          if (reg == null)
          {
-            throw new TeXSyntaxException(
-               parser.getCurrentFile(),
-               parser.getLineNumber(),
+            throw new TeXSyntaxException(parser,
                TeXSyntaxException.ERROR_REGISTER_UNDEF, name);
          }
 
@@ -1047,9 +1041,7 @@ public class TeXSettings
 
       if (reg == null)
       {
-         throw new TeXSyntaxException(
-            parser.getCurrentFile(),
-            parser.getLineNumber(),
+         throw new TeXSyntaxException(parser,
             TeXSyntaxException.ERROR_REGISTER_UNDEF, name);
       }
 
@@ -1094,9 +1086,7 @@ public class TeXSettings
 
          if (reg == null)
          {
-            throw new TeXSyntaxException(
-               parser.getCurrentFile(),
-               parser.getLineNumber(),
+            throw new TeXSyntaxException(parser,
                TeXSyntaxException.ERROR_REGISTER_UNDEF, name);
          }
 
@@ -1123,9 +1113,7 @@ public class TeXSettings
 
       if (reg == null)
       {
-         throw new TeXSyntaxException(
-            parser.getCurrentFile(),
-            parser.getLineNumber(),
+         throw new TeXSyntaxException(parser,
             TeXSyntaxException.ERROR_REGISTER_UNDEF, name);
       }
 
@@ -1168,9 +1156,7 @@ public class TeXSettings
 
          if (reg == null)
          {
-            throw new TeXSyntaxException(
-               parser.getCurrentFile(),
-               parser.getLineNumber(),
+            throw new TeXSyntaxException(parser,
                TeXSyntaxException.ERROR_REGISTER_UNDEF, name);
          }
 
@@ -1197,9 +1183,7 @@ public class TeXSettings
 
       if (reg == null)
       {
-         throw new TeXSyntaxException(
-            parser.getCurrentFile(),
-            parser.getLineNumber(),
+         throw new TeXSyntaxException(parser,
             TeXSyntaxException.ERROR_REGISTER_UNDEF, name);
       }
 

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2020 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -1241,9 +1241,7 @@ public class TeXParser extends TeXObjectList
 
       if (c == -1)
       {
-         throw new TeXSyntaxException(
-            getCurrentFile(),
-            getLineNumber(),
+         throw new TeXSyntaxException(this,
             TeXSyntaxException.ERROR_MISSING_ENDMATH);
       }
       else if (isCatCode(TYPE_MATH, c))
@@ -1319,18 +1317,14 @@ public class TeXParser extends TeXObjectList
 
                if (c == -1)
                {
-                  throw new TeXSyntaxException(
-                     getCurrentFile(),
-                     getLineNumber(),
+                  throw new TeXSyntaxException(this,
                      TeXSyntaxException.ERROR_MISSING_ENDMATH);
                }
 
                if (!isCatCode(TYPE_MATH, c))
                {
                   reset();
-                  throw new TeXSyntaxException(
-                     getCurrentFile(),
-                     getLineNumber(),
+                  throw new TeXSyntaxException(this,
                      TeXSyntaxException.ERROR_DOLLAR2_ENDED_WITH_DOLLAR);
                }
 
@@ -1378,9 +1372,7 @@ public class TeXParser extends TeXObjectList
 
       if (c == -1)
       {
-         throw new TeXSyntaxException(
-            getCurrentFile(),
-            getLineNumber(),
+         throw new TeXSyntaxException(this,
             TeXSyntaxException.ERROR_NOT_FOUND, terminator);
       }
 
