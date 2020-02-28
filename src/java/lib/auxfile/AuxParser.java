@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2020 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -29,8 +29,8 @@ import java.nio.file.Files;
 import java.nio.charset.Charset;
 
 import com.dickimawbooks.texparserlib.*;
+import com.dickimawbooks.texparserlib.primitives.Primitive;
 import com.dickimawbooks.texparserlib.generic.*;
-import com.dickimawbooks.texparserlib.latex.NewCommand;
 import com.dickimawbooks.texparserlib.latex.Input;
 
 /**
@@ -99,8 +99,12 @@ public class AuxParser extends DefaultTeXParserListener
       addAuxCommand("bibdata", 1);
       addAuxCommand("bibcite", 2);
 
-      putControlSequence(new AuxIgnoreable("providecommand", true,
-       new boolean[] {true, false, true}));
+      putControlSequence(new AuxProvideCommand());
+
+      putControlSequence(new AuxIgnoreable("@writefile", false, 
+        new boolean[]{true, true}));
+
+      putControlSequence(new AuxIgnoreable("selectlanguage", true, new boolean[]{true}));
    }
 
    public void addAuxCommand(String name, int numArgs)
@@ -108,13 +112,31 @@ public class AuxParser extends DefaultTeXParserListener
       putControlSequence(new AuxCommand(name, numArgs));
    }
 
+   /*
+    * The aux parser is just intended to gather certain information,
+    * so most commands should be ignored, but there are a few that
+    * need interpreting.
+    */ 
+   public boolean isAllowedAuxCommand(ControlSequence cs)
+   {
+      return (cs instanceof Input
+              || cs instanceof AuxCommand 
+              || cs instanceof AuxIgnoreable 
+              || cs instanceof AssignedControlSequence
+              || cs instanceof AuxProvideCommand
+              || cs instanceof Primitive);
+   }
+
    public ControlSequence getControlSequence(String name)
    {
-      ControlSequence cs = super.getControlSequence(name);
+      ControlSequence cs = getParser().getControlSequence(name);
 
-      return (cs instanceof Input || cs instanceof AuxCommand 
-              || cs instanceof AuxIgnoreable) ? cs 
-        : new AuxIgnoreable(name);
+      return isAllowedAuxCommand(cs) ? cs : new AuxIgnoreable(name);
+   }
+
+   public ControlSequence createUndefinedCs(String name)
+   {
+      return new AuxIgnoreable(name);
    }
 
    public Writeable getWriteable()
