@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2020 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -107,9 +107,29 @@ public class TeXPath
 
       String[] split = texPath.split("/");
 
-      // is texPath an absolute path?
+      /*
+       * Check if texPath is an absolute path. 
+       *
+       * In the event texPath is an absolute path, then:
+       *
+       * On Unix-like systems, split[0] will be empty so "/" is
+       * required to identify the root directory. On Windows,
+       * split[0] will be the drive identifier (e.g. "C:") so this
+       * needs to be followed by the file separator (e.g. "C:\").
+       * See https://github.com/nlct/bib2gls/issues/3#issuecomment-597620407
+       *
+       * If texPath is a relative path, then appending the file
+       * separator to the first element shouldn't be a problem
+       * provided it's a directory. For example, if texPath is
+       * "foo/bar.tex" then it should be okay to identify the first
+       * element as "foo/" (or "foo\" for Windows). The only thing
+       * to watch out for is if texPath is just a file name "foo.tex",
+       * in which case split.length=1. (There's no reason I can
+       * think of for texPath to be just the root directory, since
+       * texPath should typically be a path to a file.)
+       */
 
-      File root = new File(split[0] + File.separator);
+      File root = new File(split.length == 1 ? split[0] : split[0] + File.separator);
 
       int i = 0;
 
