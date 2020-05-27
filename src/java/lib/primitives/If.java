@@ -164,27 +164,7 @@ public class If extends Primitive implements Expandable
      TeXObjectList list)
    throws IOException
    {
-      TeXObject obj = stack.popToken();
-
-      if (obj instanceof Expandable)
-      {
-         TeXObjectList expanded;
-
-         if (parser == stack)
-         {
-            expanded = ((Expandable)obj).expandfully(parser);
-         }
-         else
-         {
-            expanded = ((Expandable)obj).expandfully(parser, stack);
-         }
-
-         if (expanded != null)
-         {
-            stack.addAll(0, expanded);
-            obj = stack.popToken();
-         }
-      }
+      TeXObject obj = stack.expandedPopStack(parser);
 
       if (obj instanceof Else)
       {
