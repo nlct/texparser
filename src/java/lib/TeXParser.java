@@ -2849,6 +2849,6 @@ public class TeXParser extends TeXObjectList
 
    private String jobname = null;
 
-   public static final String VERSION = "0.9.2.3b";
-   public static final String VERSION_DATE = "2020-05-27";
+   public static final String VERSION = "0.9.2.4b";
+   public static final String VERSION_DATE = "2020-05-30";
 }

@@ -276,10 +276,15 @@ Add 10.
 Counter value: \themycounter.
 Roman: \Roman{mycounter}; lowercase: \roman{mycounter}.
 Alph: \Alph{mycounter}; lowercase: \alph{mycounter}.
+
+Number=10? \ifnum\value{mycounter}=10 true\else false\fi
+
 Subtract 6.
 \addtocounter{mycounter}{-6}
 New value: \arabic{mycounter}.
 Fn: \fnsymbol{mycounter}.
+
+Number=10? \ifnum\value{mycounter}=10 true\else false\fi
 
 \bibliographystyle{plain}
 \bibliography{xampl}

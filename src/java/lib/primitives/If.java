@@ -287,7 +287,7 @@ public class If extends Primitive implements Expandable
             list.add(obj);
          }
 
-         doFalsePart(parser, stack, list);
+         doRemainingFalsePart(parser, stack, list);
       }
    }
 
