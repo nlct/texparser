@@ -24,9 +24,9 @@ import java.util.Vector;
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.*;
 
-public class SiPerPower extends ControlSequence
+public class SiPrePower extends ControlSequence
 {
-   public SiPerPower(SIunitxSty sty, String name, int power)
+   public SiPrePower(SIunitxSty sty, String name, int power)
    {
       super(name);
       this.sty = sty;
@@ -35,7 +35,7 @@ public class SiPerPower extends ControlSequence
 
    public Object clone()
    {
-      return new SiPerPower(sty, getName(), power);
+      return new SiPrePower(sty, getName(), power);
    }
 
    public int getPower()
@@ -49,7 +49,8 @@ public class SiPerPower extends ControlSequence
    {
       TeXObject nextObj = stack.peekStack();
 
-      if (nextObj instanceof SIUnitCs)
+      if (nextObj instanceof SIUnitCs || nextObj instanceof SIPrefixCs
+          || nextObj instanceof SiPer)
       {
          stack.push(sty.createUnitSep(parser));
       }
@@ -59,13 +60,21 @@ public class SiPerPower extends ControlSequence
 
       if (parser.isMathMode())
       {
-         grp.add(new UserNumber(-power));
+         grp.add(new UserNumber(power));
          stack.push(parser.getListener().createSpChar());
       }
       else
       {
-         grp.add(new TeXCsRef("textminus"));
-         grp.add(new UserNumber(power));
+         if (power < 0)
+         {
+            grp.add(new TeXCsRef("textminus"));
+            grp.add(new UserNumber(-power));
+         }
+         else
+         {
+            grp.add(new UserNumber(power));
+         }
+
          stack.push(new TeXCsRef("textsuperscript"));
       }
 

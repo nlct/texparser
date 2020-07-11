@@ -53,7 +53,7 @@ public class SiPower extends ControlSequence
    {
       TeXObject nextObj = stack.peekStack();
 
-      if (nextObj instanceof SIUnitCs)
+      if (nextObj instanceof SIUnitCs || nextObj instanceof SIPrefixCs)
       {
          stack.push(sty.createUnitSep(parser));
       }

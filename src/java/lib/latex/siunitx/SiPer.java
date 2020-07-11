@@ -24,26 +24,138 @@ import java.util.Vector;
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.*;
 
-public class SiPer extends SiPower
+public class SiPer extends ControlSequence
 {
    public SiPer(SIunitxSty sty)
    {
-      this(sty, "per", 1);
+      this(sty, "per");
    }
 
-   public SiPer(SIunitxSty sty, String name, int power)
+   public SiPer(SIunitxSty sty, String name)
    {
-      super(sty, name, power);
+      super(name);
+      this.sty = sty;
    }
 
    public Object clone()
    {
-      return new SiPer(sty, getName(), getPower());
+      return new SiPer(sty, getName());
    }
 
-   protected TeXObject getPowerObject(int pow)
+   protected void process(TeXParser parser, TeXObjectList stack,
+     SiPrePower perPower, TeXObject prefix, TeXObject arg, SiPower postPower)
+    throws IOException
    {
-      return new UserNumber(-pow);
+      TeXObject nextObj = stack.peekStack();
+
+      if (nextObj instanceof SIUnitCs || arg instanceof SIPrefixCs)
+      {
+         stack.push(sty.createUnitSep(parser));
+      }
+
+      int power = -1;
+
+      if (perPower != null)
+      {
+         power = -perPower.getPower();
+      }
+
+      if (postPower != null)
+      {
+         power *= postPower.getPower();
+      }
+
+      Group grp = parser.getListener().createGroup();
+      stack.push(grp);
+
+      if (parser.isMathMode())
+      {
+         grp.add(new UserNumber(power));
+         stack.push(parser.getListener().createSpChar());
+      }
+      else
+      {
+         if (power < 0)
+         {
+            grp.add(new TeXCsRef("textminus"));
+            grp.add(new UserNumber(-power));
+         }
+         else
+         {
+            grp.add(new UserNumber(power));
+         }
+
+         stack.push(new TeXCsRef("textsuperscript"));
+      }
+
+      stack.push(arg);
+
+      if (prefix != null)
+      {
+         stack.push(prefix);
+      }
    }
 
+   public void process(TeXParser parser) throws IOException
+   {
+      TeXObject arg = parser.popNextArg();
+
+      TeXObject prefix = null;
+      SiPrePower perPower = null;
+      SiPower postPower = null;
+
+      if (arg instanceof SiPrePower)
+      {
+         perPower = (SiPrePower)arg;
+         arg = parser.popNextArg();
+      }
+
+      if (arg instanceof SIPrefixCs)
+      {
+         prefix = arg;
+         arg = parser.popNextArg();
+      }
+
+      TeXObject nextArg = parser.peekStack();
+
+      if (nextArg instanceof SiPower)
+      {
+         postPower = (SiPower)parser.popNextArg();
+      }
+
+      process(parser, parser, perPower, prefix, arg, postPower);
+   }
+
+   public void process(TeXParser parser, TeXObjectList stack)
+      throws IOException
+   {
+      TeXObject arg = stack.popArg(parser);
+
+      TeXObject prefix = null;
+      SiPrePower perPower = null;
+      SiPower postPower = null;
+
+      if (arg instanceof SiPrePower)
+      {
+         perPower = (SiPrePower)arg;
+         arg = stack.popArg(parser);
+      }
+
+      if (arg instanceof SIPrefixCs)
+      {
+         prefix = arg;
+         arg = stack.popArg(parser);
+      }
+
+      TeXObject nextArg = stack.peekStack();
+
+      if (nextArg instanceof SiPower)
+      {
+         postPower = (SiPower)stack.popArg(parser);
+      }
+
+      process(parser, stack, perPower, prefix, arg, postPower);
+   }
+
+   private SIunitxSty sty;
 }

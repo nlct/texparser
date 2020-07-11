@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2020 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -142,11 +142,11 @@ public class SIunitxSty extends LaTeXSty
       }
       else if (name.equals("square"))
       {
-         return new SiPerPower(this, "square", 2);
+         return new SiPrePower(this, "square", 2);
       }
       else if (name.equals("cubic"))
       {
-         return new SiPerPower(this, "cubic", 3);
+         return new SiPrePower(this, "cubic", 3);
       }
       else if (name.equals("squared"))
       {
