@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2020 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -51,6 +51,16 @@ public class L2HTextSubscript extends ControlSequence
    {
       TeXObject arg = stack.popArg(parser);
 
+      if (arg instanceof Expandable)
+      {
+         TeXObjectList expanded = ((Expandable)arg).expandfully(parser, stack);
+
+         if (expanded != null)
+         {
+            arg = expanded;
+         }
+      }
+
       if (((L2HConverter)parser.getListener()).supportUnicodeScript()
            && hasUnicodeSupport(arg))
       {
@@ -71,6 +81,16 @@ public class L2HTextSubscript extends ControlSequence
    throws IOException
    {
       TeXObject arg = parser.popNextArg();
+
+      if (arg instanceof Expandable)
+      {
+         TeXObjectList expanded = ((Expandable)arg).expandfully(parser);
+
+         if (expanded != null)
+         {
+            arg = expanded;
+         }
+      }
 
       if (((L2HConverter)parser.getListener()).supportUnicodeScript()
            && hasUnicodeSupport(arg))
