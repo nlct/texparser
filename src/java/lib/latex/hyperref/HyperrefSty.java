@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2020 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -36,5 +36,9 @@ public class HyperrefSty extends LaTeXSty
       registerControlSequence(new Href(this));
       registerControlSequence(new NoLinkUrl());
       registerControlSequence(new Url(this));
+      registerControlSequence(new AtFirstOfTwo("texorpdfstring"));
+      // automatically implement unicode package option
+      registerControlSequence(new AtFirstOfTwo("ifpdfstringunicode"));
+      registerControlSequence(new SymbolCs("unichar"));
    }
 }
