@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013-2020 Nicola L.C. Talbot
+    Copyright (C) 2020 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -24,9 +24,9 @@ import java.util.Vector;
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.*;
 
-public class SiPower extends ControlSequence
+public class SiPerPower extends ControlSequence
 {
-   public SiPower(SIunitxSty sty, String name, int power)
+   public SiPerPower(SIunitxSty sty, String name, int power)
    {
       super(name);
       this.sty = sty;
@@ -35,7 +35,7 @@ public class SiPower extends ControlSequence
 
    public Object clone()
    {
-      return new SiPower(sty, getName(), power);
+      return new SiPerPower(sty, getName(), power);
    }
 
    public int getPower()
@@ -43,13 +43,9 @@ public class SiPower extends ControlSequence
       return power;
    }
 
-   public void process(TeXParser parser) throws IOException
-   {
-      process(parser, parser);
-   }
-
-   public void process(TeXParser parser, TeXObjectList stack)
-      throws IOException
+   protected void process(TeXParser parser, TeXObjectList stack,
+     TeXObject prefix, TeXObject arg)
+    throws IOException
    {
       TeXObject nextObj = stack.peekStack();
 
@@ -58,16 +54,58 @@ public class SiPower extends ControlSequence
          stack.push(sty.createUnitSep(parser));
       }
 
-      stack.push(new UserNumber(power));
+      Group grp = parser.getListener().createGroup();
+      stack.push(grp);
 
       if (parser.isMathMode())
       {
+         grp.add(new UserNumber(-power));
          stack.push(parser.getListener().createSpChar());
       }
       else
       {
+         grp.add(new TeXCsRef("textminus"));
+         grp.add(new UserNumber(power));
          stack.push(new TeXCsRef("textsuperscript"));
       }
+
+      stack.push(arg);
+
+      if (prefix != null)
+      {
+         stack.push(prefix);
+      }
+   }
+
+   public void process(TeXParser parser) throws IOException
+   {
+      TeXObject arg = parser.popNextArg();
+
+      TeXObject prefix = null;
+
+      if (arg instanceof SIPrefixCs)
+      {
+         prefix = arg;
+         arg = parser.popNextArg();
+      }
+
+      process(parser, parser, prefix, arg);
+   }
+
+   public void process(TeXParser parser, TeXObjectList stack)
+      throws IOException
+   {
+      TeXObject arg = stack.popArg(parser);
+
+      TeXObject prefix = null;
+
+      if (arg instanceof SIPrefixCs)
+      {
+         prefix = arg;
+         arg = stack.popArg(parser);
+      }
+
+      process(parser, stack, prefix, arg);
    }
 
    protected SIunitxSty sty;

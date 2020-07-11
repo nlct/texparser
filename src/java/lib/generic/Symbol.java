@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2020 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -228,6 +228,7 @@ public class Symbol extends ControlSequence implements Expandable,CaseChangeable
       new Object[]{"textexclamdown", new Integer(0x00A1)},
       new Object[]{"textgreater", new Integer((int)'>')},
       new Object[]{"textless", new Integer((int)'<')},
+      new Object[]{"textminus", new Integer(0x2212)},
       new Object[]{"textperiodcentered", new Integer(0x00B7)},
       new Object[]{"textasteriskcentered", new Integer(0xFF0A)},
       new Object[]{"textquestiondown", new Integer(0x00BF)},

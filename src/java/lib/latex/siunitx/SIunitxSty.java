@@ -142,11 +142,11 @@ public class SIunitxSty extends LaTeXSty
       }
       else if (name.equals("square"))
       {
-         return new SiPower(this, "square", 2);
+         return new SiPerPower(this, "square", 2);
       }
       else if (name.equals("cubic"))
       {
-         return new SiPower(this, "cubic", 3);
+         return new SiPerPower(this, "cubic", 3);
       }
       else if (name.equals("squared"))
       {
