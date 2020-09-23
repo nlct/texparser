@@ -366,6 +366,8 @@ public class TeXPath
       return (base == null ? relative : base.resolve(relative));
    }
 
+   // Use getRelativePath() instead
+   @Deprecated
    public Path getRelative()
    {
       return relative;
