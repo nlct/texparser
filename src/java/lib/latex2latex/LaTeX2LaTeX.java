@@ -470,11 +470,11 @@ public class LaTeX2LaTeX extends LaTeXParserListener
 
          if (file.exists())
          {
-            File destFile = outPath.resolve(path.getRelative()).toFile();
+            File destFile = outPath.resolve(path.getRelativePath()).toFile();
 
             copyImageFile(file, destFile);
 
-            return path.getRelative();
+            return path.getRelativePath();
          }
       }
       else
@@ -487,7 +487,7 @@ public class LaTeX2LaTeX extends LaTeXParserListener
             (new File(File.separatorChar == '/' ?
               grpaths[i] : 
               grpaths[i].replaceAll("/", File.separator)
-            ).toPath()).resolve(path.getRelative());
+            ).toPath()).resolve(path.getRelativePath());
 
             File file = (basePath == null ?  subPath :
               basePath.resolve(subPath)).toFile();
@@ -523,9 +523,9 @@ public class LaTeX2LaTeX extends LaTeXParserListener
          }
          else
          {
-            for (int i = 0; i < IMAGE_EXT.length; i++)
+            for (int i = 0; i < imageExtensions.length; i++)
             {
-                String name = imgName+"."+IMAGE_EXT[i];
+                String name = imgName+"."+imageExtensions[i];
 
                 TeXPath path = new TeXPath(parser, name);
 
@@ -631,7 +631,7 @@ public class LaTeX2LaTeX extends LaTeXParserListener
 
          if (file.exists())
          {
-             Path dest = bibPaths[i].getRelative();
+             Path dest = bibPaths[i].getRelativePath();
 
              if (dest.isAbsolute())
              {
@@ -639,7 +639,7 @@ public class LaTeX2LaTeX extends LaTeXParserListener
              }
              else
              {
-                dest = outPath.resolve(bibPaths[i].getRelative());
+                dest = outPath.resolve(bibPaths[i].getRelativePath());
              }
 
              try
