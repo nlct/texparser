@@ -113,6 +113,9 @@ public class L2HConverter extends LaTeXParserListener
 
       setWriteable(this);
       setUseMathJax(useMathJax);
+
+      setImageExtensions("svg", "SVG", "png", "PNG", "jpg", "JPG", "jpeg", "JPEG",
+        "gif", "GIF", "pdf", "PDF");
    }
 
    protected void addPredefined()
@@ -1118,14 +1121,24 @@ public class L2HConverter extends LaTeXParserListener
    public void includegraphics(KeyValList options, String filename)
      throws IOException
    {
-      TeXPath imagePath = new TeXPath(parser, filename, true, "png", "jpeg", "pdf");
-
-      File file = imagePath.getFile();
+      File file = getImageFile(filename);
 
       if (!file.exists())
       {
          throw new TeXSyntaxException(parser, 
           TeXSyntaxException.ERROR_FILE_NOT_FOUND, filename);
+      }
+
+      Path imagePath = file.toPath();
+      Path relPath;
+
+      if (imagePath.startsWith(basePath))
+      {
+         relPath = basePath.relativize(imagePath);
+      }
+      else
+      {
+         relPath = imagePath.getName(imagePath.getNameCount()-1);
       }
 
       TeXObject alt = null;
@@ -1185,22 +1198,6 @@ public class L2HConverter extends LaTeXParserListener
       }
       else
       {
-         Path relPath=imagePath.getRelative();
-         File dest;
-
-         if (imagePath.isAbsolute())
-         {
-            dest = (outPath == null ? new File(file.getName())
-                    : new File(outPath.toFile(), file.getName()));
-   
-            relPath = imagePath.getLeaf();
-         }
-         else
-         {
-            dest = (outPath == null ? imagePath.getRelative() 
-               : outPath.resolve(imagePath.getRelative())).toFile();
-         }
-
          Dimension dim = getImageSize(file, type);
 
          write(String.format("<object data=\"%s\"", getUri(relPath)));
@@ -1230,9 +1227,11 @@ public class L2HConverter extends LaTeXParserListener
             write("</object>");
          }
 
+         Path dest = (outPath == null ? relPath : outPath.resolve(relPath));
+
          try
          {
-            getTeXApp().copyFile(file, dest);
+            getTeXApp().copyFile(file, dest.toFile());
          }
          catch (InterruptedException e)
          {
