@@ -328,6 +328,11 @@ public class TeXParser extends TeXObjectList
       reader.reset();
    }
 
+   public void terminate()
+   {
+      reader.closeAll(listener.getTeXApp());
+   }
+
    public void scan(String text, TeXObjectList list)
      throws IOException
    {
