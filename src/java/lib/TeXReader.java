@@ -94,6 +94,8 @@ public class TeXReader implements Readable,Closeable
 
    public int read() throws IOException
    {
+      if (isClosed()) return -1;
+
       int c = reader.read();
 
       if (c == -1)
@@ -106,6 +108,8 @@ public class TeXReader implements Readable,Closeable
 
    public int read(char[] cbuf) throws IOException
    {
+      if (isClosed()) return -1;
+
       int result = reader.read(cbuf);
 
       if (result == -1)
@@ -118,6 +122,8 @@ public class TeXReader implements Readable,Closeable
 
    public int read(char[] cbuf, int off, int len) throws IOException
    {
+      if (isClosed()) return -1;
+
       int result = reader.read(cbuf, off, len);
 
       if (result == -1)
@@ -130,6 +136,8 @@ public class TeXReader implements Readable,Closeable
 
    public int read(CharBuffer cb) throws IOException
    {
+      if (isClosed()) return -1;
+
       int result = reader.read(cb);
 
       if (result == -1)
@@ -166,6 +174,27 @@ public class TeXReader implements Readable,Closeable
       return eofFound;
    }
 
+   // forcibly close this and all ancestors and clear any pending
+   // stacks
+   public void closeAll(TeXApp app)
+   {
+      try
+      {
+         close();
+      }
+      catch (IOException e)
+      {
+         app.error(e);
+      }
+
+      pending = null;
+
+      if (parent != null)
+      {
+         parent.closeAll(app);
+      }
+   }
+
    public Object getSource()
    {
       return source;
@@ -176,9 +205,26 @@ public class TeXReader implements Readable,Closeable
       return parent;
    }
 
+   public TeXReader getBaseReader()
+   {
+      if (parent == null) return this;
+
+      return parent.getBaseReader();
+   }
+
    public Reader getReader()
    {
       return reader;
+   }
+
+   /* Is this a descendant of other */
+   public boolean isDescendantOf(TeXReader other)
+   {
+      if (parent == null) return false;
+
+      if (other == parent) return true;
+
+      return parent.isDescendantOf(other);
    }
 
    public void setParent(TeXReader parentReader)
@@ -186,6 +232,12 @@ public class TeXReader implements Readable,Closeable
       if (this == parentReader)
       {
          throw new IllegalArgumentException("Reader can't be its own parent");
+      }
+
+      if (parentReader != null && parentReader.isDescendantOf(this))
+      {
+         throw new IllegalArgumentException(
+          "Parent reader can't be its child's descendant");
       }
 
       this.parent = parentReader;
