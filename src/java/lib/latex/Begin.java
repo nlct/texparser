@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2020 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -22,7 +22,7 @@ import java.io.IOException;
 
 import com.dickimawbooks.texparserlib.*;
 
-public class Begin extends Command
+public class Begin extends ControlSequence
 {
    public Begin()
    {
@@ -39,28 +39,24 @@ public class Begin extends Command
       return new Begin(getName());
    }
 
-   public TeXObjectList expandonce(TeXParser parser, TeXObjectList list)
+   protected void beginHook(String name, TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      return null;
    }
 
-   public TeXObjectList expandonce(TeXParser parser)
+   protected void doBegin(TeXParser parser, TeXObjectList stack, String name)
      throws IOException
    {
-      return null;
-   }
+      ControlSequence cs = parser.getListener().getControlSequence(name);
 
-   public TeXObjectList expandfully(TeXParser parser, TeXObjectList list)
-     throws IOException
-   {
-      return null;
-   }
-
-   public TeXObjectList expandfully(TeXParser parser)
-     throws IOException
-   {
-      return null;
+      if (stack == parser)
+      {
+         cs.process(parser);
+      }
+      else
+      {
+         cs.process(parser, stack);
+      }
    }
 
    public void process(TeXParser parser, TeXObjectList stack)
@@ -77,6 +73,8 @@ public class Begin extends Command
       }
 
       String name = object.toString(parser);
+
+      beginHook(name, parser, stack);
 
       if (name.equals("document"))
       {
@@ -138,21 +136,6 @@ public class Begin extends Command
       else
       {
          doBegin(parser, stack, name);
-      }
-   }
-
-   protected void doBegin(TeXParser parser, TeXObjectList stack, String name)
-     throws IOException
-   {
-      ControlSequence cs = parser.getListener().getControlSequence(name);
-
-      if (stack == parser)
-      {
-         cs.process(parser);
-      }
-      else
-      {
-         cs.process(parser, stack);
       }
    }
 
