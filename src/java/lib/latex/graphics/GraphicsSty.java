@@ -48,6 +48,7 @@ public class GraphicsSty extends LaTeXSty
       registerControlSequence(new ReflectBox());
       registerControlSequence(new ResizeBox());
       registerControlSequence(new GraphicsPath());
+      registerControlSequence(new DeclareGraphicsExtensions());
       registerControlSequence(new Epsfig("epsfig"));
       registerControlSequence(new Epsfig("psfig"));
    }

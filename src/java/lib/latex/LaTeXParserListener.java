@@ -428,6 +428,7 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       parser.putControlSequence(new Index());
       parser.putControlSequence(new MakeIndex());
       parser.putControlSequence(new Appendix());
+      parser.putControlSequence(new Typeout());
 
       bibliographySection = new TeXObjectList();
       bibliographySection.add(new TeXCsRef("section"));
@@ -1479,6 +1480,16 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       return graphicsPath;
    }
 
+   public void setImageExtensions(String... ext)
+   {
+      imageExtensions = ext;
+   }
+
+   public String[] getImageExtensions()
+   {
+      return imageExtensions;
+   }
+
    public String getInputEncoding()
    {
       return inputEncoding;
@@ -1512,7 +1523,7 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
             (new File(File.separatorChar == '/' ?
               grpaths[i] : 
               grpaths[i].replaceAll("/", File.separator)
-            ).toPath()).resolve(path.getRelative());
+            ).toPath()).resolve(path.getRelativePath());
 
             File file = (basePath == null ?  subPath :
               basePath.resolve(subPath)).toFile();
@@ -1572,6 +1583,12 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       return grpaths;
    }
 
+   public File getImageFile(String imageName)
+     throws IOException
+   {
+      return getImage(getGraphicsPaths(), imageName);
+   }
+
    public File getImage(String[] grpaths, String imgName)
      throws IOException
    {
@@ -1585,9 +1602,9 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
          }
          else
          {
-            for (int i = 0; i < IMAGE_EXT.length; i++)
+            for (int i = 0; i < imageExtensions.length; i++)
             {
-                String name = imgName+"."+IMAGE_EXT[i];
+                String name = imgName+"."+imageExtensions[i];
 
                 TeXPath path = new TeXPath(parser, name);
 
@@ -2140,6 +2157,12 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
 
    private TeXObjectList graphicsPath = null;
 
+   protected String[] imageExtensions = new String[]
+   {
+      "pdf", "PDF", "png", "PNG", "jpg", "JPG", "jpeg", "JPEG",
+      "eps", "EPS", "ps", "PS", "gif", "GIF"
+   };
+
    private boolean docEnvFound = false;
 
    private String inputEncoding = null;
@@ -2165,12 +2188,6 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
    public static final UserNumber ZERO = new UserNumber(0);
    public static final UserNumber ONE = new UserNumber(1);
    public static final UserNumber MINUS_ONE = new UserNumber(-1);
-
-   public static final String[] IMAGE_EXT = new String[]
-   {
-      "pdf", "PDF", "png", "PNG", "jpg", "JPG", "jpeg", "JPEG",
-      "eps", "EPS", "ps", "PS", "gif", "GIF"
-   };
 
    public static final Pattern PTSIZE_PATTERN = Pattern.compile("(\\d+)pt");
 }
