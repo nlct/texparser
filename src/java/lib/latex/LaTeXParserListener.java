@@ -2136,6 +2136,63 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       return passOptions.get(name);
    }
 
+   public void startHierarchicalUnit(String type, int hierarchicalLevel,
+     String prefix, String title, String label)
+   {
+      HierarchicalUnit unit = new HierarchicalUnit(hierarchicalLevel, type);
+
+      if (hierarchicalUnitStack.empty())
+      {
+         hierarchicalUnitStack.push(unit);
+         startUnit(type, prefix, title, label);
+         return;
+      }
+
+      HierarchicalUnit currentUnit = hierarchicalUnitStack.peek();
+
+      int compare = unit.compareTo(currentUnit);
+
+      if (compare > 0)
+      {// deeper
+         hierarchicalUnitStack.push(unit);
+         startUnit(type, prefix, title, label);
+      }
+      else if (compare == 0)
+      {// same level
+         currentUnit = hierarchicalUnitStack.pop();
+         endUnit(currentUnit.getType());
+         hierarchicalUnitStack.push(unit);
+         startUnit(type, prefix, title, label);
+      }
+      else
+      {
+         do
+         {
+            currentUnit = hierarchicalUnitStack.pop();
+            endUnit(currentUnit.getType());
+
+            if (hierarchicalUnitStack.empty())
+            {
+               break;
+            }
+
+            currentUnit = hierarchicalUnitStack.peek();
+         }
+         while (unit.compareTo(currentUnit) <= 0);
+
+         hierarchicalUnitStack.push(unit);
+         startUnit(type, prefix, title, label);
+      }
+   }
+
+   public void startUnit(String type, String prefix, String title, String label)
+   {
+   }
+
+   public void endUnit(String type)
+   {
+   }
+
    private Vector<String> verbEnv;
 
    protected Vector<LaTeXFile> loadedPackages;
@@ -2184,6 +2241,9 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
    private boolean indexingEnabled = false;
 
    private Stack<TrivListDec> trivListStack = new Stack<TrivListDec>();
+
+   private Stack<HierarchicalUnit> hierarchicalUnitStack 
+      = new Stack<HierarchicalUnit>();
 
    public static final UserNumber ZERO = new UserNumber(0);
    public static final UserNumber ONE = new UserNumber(1);
