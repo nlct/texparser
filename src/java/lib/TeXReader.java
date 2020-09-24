@@ -72,6 +72,12 @@ public class TeXReader implements Readable,Closeable
       this(null, file, null);
    }
 
+   public TeXReader(File file, Charset charset)
+    throws IOException
+   {
+      this(null, file, charset);
+   }
+
    public int getLineNumber()
    {
       if (reader instanceof LineNumberReader)
