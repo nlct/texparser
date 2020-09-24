@@ -21,7 +21,7 @@ package com.dickimawbooks.texparserlib;
 import java.io.IOException;
 import java.util.Vector;
 
-public class AssignedActiveChar extends ActiveChar
+public class AssignedActiveChar extends ActiveChar implements AssignedMacro
 {
    public AssignedActiveChar(int charCode, TeXObject underlying)
    {
@@ -161,6 +161,21 @@ public class AssignedActiveChar extends ActiveChar
       TeXObjectList list = new TeXObjectList();
       list.add(parser.getListener().getOther(charCode));
       return list;
+   }
+
+   public TeXObject getUnderlying()
+   {
+      return underlying;
+   }
+
+   public TeXObject getBaseUnderlying()
+   {
+      if (underlying instanceof AssignedMacro)
+      {
+         return ((AssignedMacro)underlying).getBaseUnderlying();
+      }
+
+      return underlying;
    }
 
    private TeXObject underlying;

@@ -24,4 +24,7 @@ import java.util.Vector;
 public interface AssignedMacro extends TeXObject
 {
    public TeXObject getUnderlying();
+
+   // If nested assigned macros, get the deepest underlying non-AssignedMacro
+   public TeXObject getBaseUnderlying();
 }

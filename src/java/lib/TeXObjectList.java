@@ -74,6 +74,11 @@ public class TeXObjectList extends Vector<TeXObject>
          popStyle = (byte)(popStyle^POP_IGNORE_LEADING_SPACE);
       }
 
+      if (object instanceof AssignedMacro)
+      {
+         object = ((AssignedMacro)object).getBaseUnderlying();
+      }
+
       if (object instanceof TeXCsRef)
       {
          object = parser.getListener().getControlSequence(

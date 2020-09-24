@@ -57,8 +57,31 @@ public abstract class NumericRegister extends Register implements Numerical
    public void setContents(TeXParser parser, TeXObject object)
     throws TeXSyntaxException
    {
+      if (object instanceof AssignedMacro)
+      {
+         object = ((AssignedMacro)object).getBaseUnderlying();
+      }
+
       if (!(object instanceof Numerical))
       {
+         if (object instanceof Expandable)
+         {
+            try
+            {
+               TeXObjectList expanded = ((Expandable)object).expandfully(parser);
+
+               if (expanded != null)
+               {
+                  object = expanded;
+               }
+            }
+            catch (IOException e)
+            {
+               throw new TeXSyntaxException(e, parser,
+                 TeXSyntaxException.ERROR_NUMBER_EXPECTED, object.toString(parser));
+            }
+         }
+
          object = new UserNumber(parser, object.format());
       }
 

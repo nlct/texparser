@@ -144,5 +144,15 @@ public class AssignedControlSequence extends Command
       return underlying;
    }
 
+   public TeXObject getBaseUnderlying()
+   {
+      if (underlying instanceof AssignedMacro)
+      {
+         return ((AssignedMacro)underlying).getBaseUnderlying();
+      }
+
+      return underlying;
+   }
+
    private TeXObject underlying;
 }

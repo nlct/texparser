@@ -689,6 +689,18 @@ public class TeXSettings
 
    public Register getRegister(String name)
    {
+      ControlSequence cs = parser.getListener().getControlSequence(name);
+
+      if (cs instanceof AssignedMacro)
+      {
+         TeXObject obj = ((AssignedMacro)cs).getBaseUnderlying();
+
+         if (obj instanceof ControlSequence)
+         {
+            name = ((ControlSequence)obj).getName();
+         }
+      }
+
       Register reg = localRegisters.get(name);
 
       if (reg == null && parent != null)
