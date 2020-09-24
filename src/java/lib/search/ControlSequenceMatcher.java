@@ -29,7 +29,7 @@ public class ControlSequenceMatcher implements SearchMatcher
 {
    public ControlSequenceMatcher(Pattern pattern)
    {
-      this.pattern = pattern;
+      this(pattern, FLAG_PROCESS | FLAG_EXPANSION);
    }
 
    public ControlSequenceMatcher(Pattern pattern, int flags)
@@ -65,6 +65,11 @@ public class ControlSequenceMatcher implements SearchMatcher
    public int getFlags()
    {
       return flags;
+   }
+
+   public String toString()
+   {
+      return String.format("%s[pattern=%s,flags=%d]", getClass().getSimpleName(), pattern, flags);
    }
 
    private Pattern pattern;

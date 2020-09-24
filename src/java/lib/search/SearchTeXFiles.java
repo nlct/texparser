@@ -97,6 +97,11 @@ public class SearchTeXFiles extends LaTeXParserListener
       return searchResults;
    }
 
+   public void clearResults()
+   {
+      searchResults.clear();
+   }
+
    public ControlSequence getControlSequence(String name)
    {
       ControlSequence cs = super.getControlSequence(name);
@@ -132,9 +137,39 @@ public class SearchTeXFiles extends LaTeXParserListener
    {
    }
 
+   public void addSearchResultListener(SearchResultListener listener)
+   {
+      if (searchResultListeners == null)
+      {
+         searchResultListeners = new Vector<SearchResultListener>();
+      }
+
+      searchResultListeners.add(listener);
+   }
+
+   public boolean removeSearchResultListener(SearchResultListener listener)
+   {
+      if (searchResultListeners == null)
+      {
+         return false;
+      }
+
+      return searchResultListeners.remove(listener);
+   }
+
    public void registerMatch(SearchObject object) throws SearchTerminatedException
    {
-      searchResults.add(new SearchResult(parser, object));
+      SearchResult result = new SearchResult(parser, object);
+
+      if (searchResultListeners != null)
+      {
+         for (SearchResultListener listener : searchResultListeners)
+         {
+            listener.matchFound(result);
+         }
+      }
+
+      searchResults.add(result);
 
       if (stopOnNextMatch)
       {
@@ -261,6 +296,7 @@ public class SearchTeXFiles extends LaTeXParserListener
       return texApp;
    }
 
+   private Vector<SearchResultListener> searchResultListeners;
    private Vector<SearchMatcher> searchMatchers;
    private Vector<SearchResult> searchResults;
    private boolean stopOnNextMatch=false;

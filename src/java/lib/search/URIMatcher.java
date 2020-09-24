@@ -87,6 +87,11 @@ public class URIMatcher implements SearchMatcher
       return m.matches();
    }
 
+   public String toString()
+   {
+      return String.format("%s[pattern=%s,type=%d]", getClass().getSimpleName(), pattern, type);
+   }
+
    private Pattern pattern;
    private int type;
 
