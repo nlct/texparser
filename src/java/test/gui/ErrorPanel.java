@@ -69,7 +69,7 @@ public class ErrorPanel extends JPanel
 
       buttonPanel.add(resources.createActionButton(
          "button", "copy", this, 
-         KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.SHIFT_MASK)));
+         KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.SHIFT_DOWN_MASK)));
 
       add(buttonPanel, "East");
 

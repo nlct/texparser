@@ -54,16 +54,16 @@ public class FourierSty extends LaTeXSty
 
    private static final Object[][] SYMBOLS = new Object[][]
    {
-      new Object[]{"danger", new Integer(0x26A0)},
-      new Object[]{"textxswup", new Integer(0x2694)},
-      new Object[]{"noway", new Integer(0x26D4)},
-      new Object[]{"starredbullet", new Integer(0x2726)},
-      new Object[]{"grimace", new Integer(0x1F61F)},// ?
-      new Object[]{"decosix", new Integer(0x2727)},// ?
-      new Object[]{"aldineright", new Integer(0x2766)},
-      new Object[]{"bomb", new Integer(0x1F4A3)},
-      new Object[]{"lefthand", new Integer(0x261E)},
-      new Object[]{"righthand", new Integer(0x261C)},
-      new Object[]{"eurologo", new Integer(0x20AC)},
+      new Object[]{"danger", Integer.valueOf(0x26A0)},
+      new Object[]{"textxswup", Integer.valueOf(0x2694)},
+      new Object[]{"noway", Integer.valueOf(0x26D4)},
+      new Object[]{"starredbullet", Integer.valueOf(0x2726)},
+      new Object[]{"grimace", Integer.valueOf(0x1F61F)},// ?
+      new Object[]{"decosix", Integer.valueOf(0x2727)},// ?
+      new Object[]{"aldineright", Integer.valueOf(0x2766)},
+      new Object[]{"bomb", Integer.valueOf(0x1F4A3)},
+      new Object[]{"lefthand", Integer.valueOf(0x261E)},
+      new Object[]{"righthand", Integer.valueOf(0x261C)},
+      new Object[]{"eurologo", Integer.valueOf(0x20AC)},
    };
 }

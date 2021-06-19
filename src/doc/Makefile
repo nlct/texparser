@@ -1,4 +1,4 @@
-APP_VERSION:=$(shell grep "public static final String APP_VERSION" ../java/test/TeXParserApp.java | sed "s/public\sstatic\sfinal\sString\sappVersion=//" | tr -d "\"\; ")
+APP_VERSION:=$(shell grep "public static final String APP_VERSION" ../java/test/TeXParserApp.java | sed "s/public\sstatic\sfinal\sString\sAPP_VERSION\s=\s//" | tr -d "\"\; ")
 
 doc	: texparser.pdf
 

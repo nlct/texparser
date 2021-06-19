@@ -792,13 +792,13 @@ public class TeXSettings
 
    public void putActiveChar(ActiveChar activeChar)
    {
-      activeTable.put(new Integer(activeChar.getCharCode()),
+      activeTable.put(Integer.valueOf(activeChar.getCharCode()),
         activeChar);
    }
 
    public ActiveChar removeActiveChar(int code)
    {
-      return removeActiveChar(new Integer(code));
+      return removeActiveChar(Integer.valueOf(code));
    }
 
    public ActiveChar removeActiveChar(Integer code)

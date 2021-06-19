@@ -1,9 +1,15 @@
 APP_VERSION:=$(shell grep "public static final String appVersion" java/test/TeXParserApp.java | sed "s/public\sstatic\sfinal\sString\sappVersion=//" | tr -d "\"\; ")
 IZPACKDIR=/usr/local/IzPack
 
+ifeq ($(origin JAVA8BOOTCLASSLIB),undefined)
+TARGET_VERSION :=
+else
+TARGET_VERSION := -target 1.8 -source 1.8 -bootclasspath $(JAVA8BOOTCLASSLIB)/rt.jar:$(JAVA8BOOTCLASSLIB)/charsets.jar:$(JAVA8BOOTCLASSLIB)/jfr.jar:$(JAVA8BOOTCLASSLIB)/jfxswt.jar:$(JAVA8BOOTCLASSLIB)/jce.jar:$(JAVA8BOOTCLASSLIB)/jsse.jar:$(JAVA8BOOTCLASSLIB)/deploy.jar:$(JAVA8BOOTCLASSLIB)/plugin.jar:$(JAVA8BOOTCLASSLIB)/javaws.jar:$(JAVA8BOOTCLASSLIB)/resources.jar:$(JAVA8BOOTCLASSLIB)/management-agent.jar:$(JAVA8BOOTCLASSLIB)/security/US_export_policy.jar:$(JAVA8BOOTCLASSLIB)/security/local_policy.jar:$(JAVA8BOOTCLASSLIB)/ext/cldrdata.jar:$(JAVA8BOOTCLASSLIB)/ext/dnsns.jar:$(JAVA8BOOTCLASSLIB)/ext/jfxrt.jar:$(JAVA8BOOTCLASSLIB)/ext/nashorn.jar:$(JAVA8BOOTCLASSLIB)/ext/sunpkcs11.jar:$(JAVA8BOOTCLASSLIB)/ext/localedata.jar:$(JAVA8BOOTCLASSLIB)/ext/sunec.jar:$(JAVA8BOOTCLASSLIB)/ext/jaccess.jar:$(JAVA8BOOTCLASSLIB)/ext/zipfs.jar:$(JAVA8BOOTCLASSLIB)/ext/sunjce_provider.jar
+endif
+
 test	: test-obs test-abs test-article test-nested test-doc \
 	  test-probsoln test-lists test-datatool test-mkimages \
-	  test-jmlrutils test-search
+	  test-jmlrutils 
 
 tests/output	:
 	mkdir -p tests/output
@@ -24,9 +30,12 @@ test-abs : app tests/output
 	rm -f -r tests/output/test-abs
 	bin/texparsertest --debug --in tests/test-abs/test-abs.tex --output tests/output/test-abs --html
 
-test-article : app tests/output
+test-article : app tests/test-article/test-article.pdf tests/output
 	rm -f -r tests/output/test-article
 	bin/texparsertest --debug --in tests/test-article/test-article.tex --output tests/output/test-article --html
+
+tests/test-article/test-article.pdf	: tests/test-article/test-article.tex
+					cd tests/test-article; arara test-article
 
 test-jmlrutils : app tests/output
 	rm -f -r tests/output/test-jmlrutils
@@ -117,7 +126,7 @@ classes/com/dickimawbooks/texparsertest/TeXParserApp.class   : classes/com/dicki
 classes/com/dickimawbooks/texparserlib/TeXParser.class   : classes/com/dickimawbooks/texparserlib \
 	java/lib/*.java java/lib/*/*.java java/lib/*/*/*.java
 	cd java/lib; \
-	javac -target 1.7 -source 1.7 -d ../../classes -Xlint:unchecked -Xlint:deprecation *.java */*.java */*/*.java
+	javac $(TARGET_VERSION) -d ../../classes -Xlint:unchecked -Xlint:deprecation *.java */*.java */*/*.java
 
 classes/com/dickimawbooks/texparsertest    :
 	mkdir -p classes/com/dickimawbooks/texparsertest
