@@ -6,6 +6,8 @@ Note that version 0.8b has some file name changes. The most
 important one being the renaming of the former `aux` directory
 (see issue #1).
 
+The `refactored` branch is a work in progress.
+
 ## PURPOSE
 
 My Java application
