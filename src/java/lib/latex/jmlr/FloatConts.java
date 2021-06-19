@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -43,6 +43,7 @@ public class FloatConts extends ControlSequence
       this.type = type;
    }
 
+   @Override
    public Object clone()
    {
       return new FloatConts(getName(), type);
@@ -57,66 +58,23 @@ public class FloatConts extends ControlSequence
          return "table";
       }
 
-      if (cs instanceof Expandable)
-      {
-         TeXObjectList expanded = ((Expandable)cs).expandfully(parser);
+      cs = parser.expandFully(cs, parser);
 
-         if (expanded != null)
-         {
-            cs = expanded;
-         }
-      }
-
-      return cs.toString(parser);
+      return cs.stripToString(parser);
    }
 
+   @Override
    public void process(TeXParser parser) throws IOException
    {
       process(parser, parser);
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack) throws IOException
    {
-      TeXObject labelArg;
+      String label = parser.popRequiredString(stack);
 
-      if (parser == stack)
-      {
-         labelArg = parser.popNextArg();
-      }
-      else
-      {
-         labelArg = stack.popArg(parser);
-      }
-
-      if (labelArg instanceof Expandable)
-      {
-         TeXObjectList expanded;
-
-         if (parser == stack)
-         {
-            expanded = ((Expandable)labelArg).expandfully(parser);
-         }
-         else
-         {
-            expanded = ((Expandable)labelArg).expandfully(parser, stack);
-         }
-
-         if (expanded != null)
-         {
-            labelArg = expanded;
-         }
-      }
-
-      TeXObject captionArg;
-
-      if (parser == stack)
-      {
-         captionArg = parser.popNextArg();
-      }
-      else
-      {
-         captionArg = stack.popArg(parser);
-      }
+      TeXObject captionArg = parser.popRequired(stack);
 
       String captionType;
 
@@ -129,28 +87,14 @@ public class FloatConts extends ControlSequence
          captionType = type;
       }
 
-      TeXObject contentsArg;
-
-      if (parser == stack)
-      {
-         contentsArg = parser.popNextArg();
-      }
-      else
-      {
-         contentsArg = stack.popArg(parser);
-      }
-
-      ControlSequence cs = parser.getControlSequence(
-         String.format("if%scaptiontop", captionType));
+      TeXObject contentsArg = parser.popRequired(stack);
 
       boolean top=false;
 
-      if (cs instanceof IfTrue)
+      if (parser.isControlSequenceTrue(String.format("if%scaptiontop", captionType)))
       {
          top = true;
       }
-
-      String label = labelArg.toString(parser);
 
       LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
 
@@ -195,14 +139,7 @@ public class FloatConts extends ControlSequence
          }
       }
 
-      if (parser == stack)
-      {
-         list.process(parser);
-      }
-      else
-      {
-         list.process(parser, stack);
-      }
+      parser.processObject(list, stack);
    }
 
    private String type;

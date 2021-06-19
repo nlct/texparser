@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -37,6 +37,7 @@ public class DataToolSty extends LaTeXSty
       super(options, "datatool", listener, loadParentOptions);
    }
 
+   @Override
    public void addDefinitions()
    {
       registerControlSequence(new DTLifDbExists(this));
@@ -80,6 +81,7 @@ public class DataToolSty extends LaTeXSty
         new UserNumber(DataToolHeader.TYPE_CURRENCY)));
    }
 
+   @Override
    protected void preOptions() throws IOException
    {
       getListener().requirepackage(null, "etoolbox", false);
@@ -149,10 +151,7 @@ public class DataToolSty extends LaTeXSty
 
    public boolean isExpansionOn()
    {
-      ControlSequence cs = getListener().getParser().getControlSequence(
-        "if@dtl@expansion@on");
-
-      return (cs instanceof IfTrue);
+      return getListener().getParser().isControlSequenceTrue("if@dtl@expansion@on");
    }
 
    public boolean dbExists(String name)

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -19,7 +19,9 @@
 package com.dickimawbooks.texparserlib.latex;
 
 import java.io.IOException;
+import java.util.Locale;
 import java.util.Date;
+import java.util.Calendar;
 import java.text.DateFormat;
 
 import com.dickimawbooks.texparserlib.*;
@@ -41,42 +43,64 @@ public class Today extends Command
       return new Today(getName());
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
       return expandonce(parser);
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser)
      throws IOException
    {
-      return parser.getListener().createString(DateFormat.getDateInstance().format(new Date()));
+      return parser.getListener().createString(
+         DateFormat.getDateInstance().format(new Date()));
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
       return expandfully(parser);
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser)
      throws IOException
    {
       return expandonce(parser);
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
       process(parser);
    }
 
+   @Override
    public void process(TeXParser parser)
       throws IOException
    {
-      Writeable writeable = parser.getListener().getWriteable();
+      TeXSettings settings = parser.getSettings();
+      Locale locale = settings.getLocale();
 
-      writeable.write(DateFormat.getDateInstance().format(new Date()));
+      DateFormat df = DateFormat.getDateInstance(DateFormat.DEFAULT, locale);
+      Calendar cal = Calendar.getInstance(locale);
+
+      LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
+
+      Writeable writeable = listener.getWriteable();
+
+      DocumentBlock block = new DocumentBlock("datetime", 
+        DocumentBlock.DISPLAY_INLINE);
+      block.setAttribute("date", cal);
+      block.setAttribute("locale", locale);
+
+      listener.startBlock(block);
+      writeable.write(df.format(cal.getTime()));
+      listener.endBlock(block);
    }
 
 }

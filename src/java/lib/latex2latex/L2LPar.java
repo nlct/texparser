@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -27,23 +27,25 @@ public class L2LPar extends Par
       super();
    }
 
+   @Override
    public Object clone()
    {
       return new L2LPar();
    }
 
-   public void process(TeXParser parser, TeXObjectList list)
+   @Override
+   public void process(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
       process(parser);
    }
 
+   @Override
    public void process(TeXParser parser)
       throws IOException
    {
       parser.getListener().getWriteable().write(String.format("%n%n"));
    }
-
 
 }
 

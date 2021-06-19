@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -28,7 +28,7 @@ public class EndConditionGroup extends EndGroup
 {
    public EndConditionGroup()
    {
-      this(")");
+      this("TE@rparen");
    }
 
    public EndConditionGroup(String name)
@@ -36,9 +36,15 @@ public class EndConditionGroup extends EndGroup
       super(name);
    }
 
+   @Override
    public Object clone()
    {
       return new EndConditionGroup(getName());
    }
 
+   @Override
+   public boolean matches(BeginGroupObject bg)
+   {
+      return bg instanceof BeginConditionGroup;
+   }
 }

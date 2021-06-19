@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -83,33 +83,15 @@ public class LaTeX2LaTeX extends LaTeXParserListener
       return replaceGraphicsPath;
    }
 
+   @Override
    protected void addPredefined()
    {
       super.addPredefined();
 
-      putControlSequence(new L2LMathDeclaration("math"));
-
-      L2LMathDeclaration begMathDecl = new L2LMathDeclaration("(");
-      putControlSequence(begMathDecl);
-      putControlSequence(new EndDeclaration(")", begMathDecl));
-
-      L2LMathDeclaration begDispDecl =
-         new L2LMathDeclaration("[", TeXSettings.MODE_DISPLAY_MATH);
-
-      putControlSequence(begDispDecl);
-      putControlSequence(new EndDeclaration("]", begDispDecl));
-
       putControlSequence(
-         new L2LMathDeclaration("displaymath", TeXSettings.MODE_DISPLAY_MATH));
+         createMathDeclaration("align", TeXSettings.MODE_DISPLAY_MATH, true));
       putControlSequence(
-         new L2LMathDeclaration("equation", TeXSettings.MODE_DISPLAY_MATH, true));
-      putControlSequence(
-         new L2LMathDeclaration("equation*", TeXSettings.MODE_DISPLAY_MATH));
-
-      putControlSequence(
-         new L2LMathDeclaration("align", TeXSettings.MODE_DISPLAY_MATH, true));
-      putControlSequence(
-         new L2LMathDeclaration("align*", TeXSettings.MODE_DISPLAY_MATH));
+         createMathDeclaration("align*", TeXSettings.MODE_DISPLAY_MATH, false));
 
       putControlSequence(new L2LBibliography());
       putControlSequence(new L2LVerbatim());
@@ -122,11 +104,20 @@ public class LaTeX2LaTeX extends LaTeXParserListener
       putControlSequence(new Input("include"));
    }
 
+   @Override
+   protected MathDeclaration createMathDeclaration(String name,
+     int mode, boolean numbered)
+   {
+      return new L2LMathDeclaration(name, mode, numbered);
+   }
+
+   @Override
    protected void addMathFontCommand(String name, int style)
    {
       parser.putControlSequence(new L2LMathFontCommand(name, style));
    }
 
+   @Override
    public ControlSequence getControlSequence(String name)
    {
       if (isSkipCmd(name))
@@ -142,111 +133,133 @@ public class LaTeX2LaTeX extends LaTeXParserListener
       return new L2LControlSequence(name);
    }
 
+   @Override
    public ControlSequence createUndefinedCs(String name)
    {
       return new L2LControlSequence(name);
    }
 
+   @Override
    public Comment createComment()
    {
       return new L2LComment();
    }
 
+   @Override
    public SkippedSpaces createSkippedSpaces()
    {
       return new L2LSkippedSpaces();
    }
 
+   @Override
    public SkippedEols createSkippedEols()
    {
       return new L2LSkippedEols();
    }
 
+   @Override
    public Eol getEol()
    {
       return new L2LEol();
    }
 
+   @Override
    public Space getSpace()
    {
       return new L2LSpace();
    }
 
+   @Override
    public ActiveChar getActiveChar(int charCode)
    {
       return new L2LActiveChar(charCode);
    }
 
+   @Override
    public Param getParam(int digit)
    {
       return new L2LParam(digit);
    }
 
+   @Override
    public DoubleParam getDoubleParam(ParameterToken param)
    {
       return new L2LDoubleParam(param);
    }
 
+   @Override
    public Other getOther(int charCode)
    {
       return new L2LOther(charCode);
    }
 
+   @Override
    public Par getPar()
    {
       return new L2LPar();
    }
 
+   @Override
    public Tab getTab()
    {
       return new L2LTab();
    }
 
+   @Override
    public BigOperator createBigOperator(String name, int code1, int code2)
    {
       return new L2LBigOperator(name, code1, code2);
    }
 
+   @Override
    public Symbol createSymbol(String name, int code)
    {
       return new L2LSymbol(name, code);
    }
 
+   @Override
    public ControlSequence createSymbol(String name, int code, FontEncoding enc)
    {
       return new L2LSymbol(name, code);
    }
 
+   @Override
    public GreekSymbol createGreekSymbol(String name, int code)
    {
       return new L2LGreekSymbol(name, code);
    }
 
+   @Override
    public BinarySymbol createBinarySymbol(String name, int code)
    {
       return new L2LBinarySymbol(name, code);
    }
 
+   @Override
    public MathSymbol createMathSymbol(String name, int code)
    {
       return new L2LMathSymbol(name, code);
    }
 
+   @Override
    public Group createGroup()
    {
       return new L2LGroup();
    }
 
+   @Override
    public Group createGroup(String text)
    {
       return new L2LGroup(this, text);
    }
 
+   @Override
    public MathGroup createMathGroup()
    {
       return new L2LMathGroup();
    }
 
+   @Override
    public void beginDocument()
      throws IOException
    {
@@ -259,6 +272,12 @@ public class LaTeX2LaTeX extends LaTeXParserListener
       writeCodePoint(parser.getEgChar());
    }
 
+   @Override
+   protected void trailer() throws IOException
+   {
+   }
+
+   @Override
    public void endDocument()
      throws IOException
    {
@@ -283,6 +302,7 @@ public class LaTeX2LaTeX extends LaTeXParserListener
       }
    }
 
+   @Override
    public void documentclass(KeyValList options, String clsName, 
      boolean loadParentOptions)
      throws IOException
@@ -312,6 +332,7 @@ public class LaTeX2LaTeX extends LaTeXParserListener
       writeCodePoint(parser.getEgChar());
    }
 
+   @Override
    public LaTeXSty requirepackage(KeyValList options, String styName, 
      boolean loadParentOptions)
      throws IOException
@@ -337,6 +358,7 @@ public class LaTeX2LaTeX extends LaTeXParserListener
       return sty;
    }
 
+   @Override
    public LaTeXSty usepackage(KeyValList options, String styName, 
      boolean loadParentOptions)
      throws IOException
@@ -427,6 +449,7 @@ public class LaTeX2LaTeX extends LaTeXParserListener
       return sty;
    }
 
+   @Override
    public void substituting(String original, String replacement)
      throws IOException
    {
@@ -506,6 +529,7 @@ public class LaTeX2LaTeX extends LaTeXParserListener
       return null;
    }
 
+   @Override
    public void includegraphics(KeyValList options, String imgName)
      throws IOException
    {
@@ -591,6 +615,7 @@ public class LaTeX2LaTeX extends LaTeXParserListener
 
    }
 
+   @Override
    public void setGraphicsPath(TeXObjectList paths)
      throws IOException
    {
@@ -617,13 +642,17 @@ public class LaTeX2LaTeX extends LaTeXParserListener
       }
    }
 
-   public void bibliography(TeXPath[] bibPaths)
+   @Override
+   public boolean bibliography(TeXPath[] bibPaths, TeXPath bblPath)
      throws IOException
    {
+      boolean found = false;
+
       for (int i = 0; i < bibPaths.length; i++)
       {
          if (bibPaths[i].wasFoundByKpsewhich())
          {
+            found = true;
             continue;
          }
 
@@ -631,27 +660,31 @@ public class LaTeX2LaTeX extends LaTeXParserListener
 
          if (file.exists())
          {
-             Path dest = bibPaths[i].getRelativePath();
+            Path dest = bibPaths[i].getRelativePath();
 
-             if (dest.isAbsolute())
-             {
-                dest = outPath.resolve(bibPaths[i].getLeaf());
-             }
-             else
-             {
-                dest = outPath.resolve(bibPaths[i].getRelativePath());
-             }
+            if (dest.isAbsolute())
+            {
+               dest = outPath.resolve(bibPaths[i].getLeaf());
+            }
+            else
+            {
+               dest = outPath.resolve(bibPaths[i].getRelativePath());
+            }
 
-             try
-             {
-                getTeXApp().copyFile(file, dest.toFile());
-             }
-             catch (InterruptedException e)
-             {
-                getTeXApp().error(e);
-             }
+            try
+            {
+               getTeXApp().copyFile(file, dest.toFile());
+            }
+            catch (InterruptedException e)
+            {
+               getTeXApp().error(e);
+            }
+
+            found = true;
          }
       }
+
+      return found;
    }
 
    public void writeCodePoint(int charCode) throws IOException

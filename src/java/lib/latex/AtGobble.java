@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -51,6 +51,7 @@ public class AtGobble extends Command
       return numParams;
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser)
      throws IOException
    {
@@ -62,6 +63,7 @@ public class AtGobble extends Command
       return new TeXObjectList();
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
@@ -73,18 +75,21 @@ public class AtGobble extends Command
       return new TeXObjectList();
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser)
      throws IOException
    {
       return expandonce(parser);
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
       return expandonce(parser, stack);
    }
 
+   @Override
    public void process(TeXParser parser) throws IOException
    {
       for (int i = 0; i < numParams; i++)
@@ -93,6 +98,7 @@ public class AtGobble extends Command
       }
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList list) throws IOException
    {
       for (int i = 0; i < numParams; i++)

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -45,6 +45,7 @@ public class AtIfPackageLoaded extends Command
       return listener.isStyLoaded(name);
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser)
      throws IOException
    {
@@ -78,6 +79,7 @@ public class AtIfPackageLoaded extends Command
       return list;
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
@@ -111,6 +113,7 @@ public class AtIfPackageLoaded extends Command
       return list;
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser)
      throws IOException
    {
@@ -158,6 +161,7 @@ public class AtIfPackageLoaded extends Command
       return list;
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
@@ -205,6 +209,7 @@ public class AtIfPackageLoaded extends Command
       return list;
    }
 
+   @Override
    public void process(TeXParser parser) throws IOException
    {
       TeXObject arg1 = parser.popNextArg();
@@ -233,6 +238,7 @@ public class AtIfPackageLoaded extends Command
       }
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack) throws IOException
    {
       TeXObject arg1 = stack.popArg(parser);

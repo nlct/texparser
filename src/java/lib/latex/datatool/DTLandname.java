@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2018 Nicola L.C. Talbot
+    Copyright (C) 2018-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -39,12 +39,14 @@ public class DTLandname extends Command
       return new DTLandname(getName());
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
       return expandonce(parser);
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser)
      throws IOException
    {
@@ -73,12 +75,14 @@ public class DTLandname extends Command
       return expanded;
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
       return expandonce(parser, stack).expandfully(parser, stack);
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser)
      throws IOException
    {

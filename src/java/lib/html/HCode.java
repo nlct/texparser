@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -22,7 +22,7 @@ import java.io.IOException;
 
 import com.dickimawbooks.texparserlib.*;
 
-public class HCode extends ControlSequence implements Expandable
+public class HCode extends Command
 {
    public HCode()
    {
@@ -39,6 +39,7 @@ public class HCode extends ControlSequence implements Expandable
       return new HCode(getName());
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
@@ -51,6 +52,7 @@ public class HCode extends ControlSequence implements Expandable
       return list;
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser)
       throws IOException
    {
@@ -63,18 +65,21 @@ public class HCode extends ControlSequence implements Expandable
       return list;
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
       return expandonce(parser, stack);
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser)
       throws IOException
    {
       return expandonce(parser);
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
@@ -82,6 +87,7 @@ public class HCode extends ControlSequence implements Expandable
       parser.getListener().getWriteable().write(arg.toString(parser));
    }
 
+   @Override
    public void process(TeXParser parser)
       throws IOException
    {

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -33,7 +33,7 @@ public abstract class BibData
    public abstract String getEntryType();
 
    public abstract void parseContents(TeXParser parser, 
-    TeXObjectList contents, TeXObject endGroupChar)
+    AbstractTeXObjectList contents, TeXObject endGroupChar)
      throws IOException;
 
    public static BibData createBibData(String entryType)
@@ -58,17 +58,12 @@ public abstract class BibData
       return new BibEntry(entryType);
    }
 
-   public TeXObjectList readKeyObject(TeXParser parser, TeXObjectList stack)
+   public TeXObjectList readKeyObject(TeXParser parser, AbstractTeXObjectList stack)
      throws IOException
    {
       TeXObjectList list = new TeXObjectList();
 
-      TeXObject object = stack.popStack(parser);
-
-      while (object != null && object instanceof WhiteSpace)
-      {
-         object = stack.popStack(parser);
-      }
+      TeXObject object = stack.popStack(parser, PopStyle.IGNORE_LEADING_SPACE);
 
       if (object == null)
       {
@@ -122,7 +117,7 @@ public abstract class BibData
       return list;
    }
 
-   public String readKey(TeXParser parser, TeXObjectList stack)
+   public String readKey(TeXParser parser, AbstractTeXObjectList stack)
      throws IOException
    {
       TeXObjectList list = readKeyObject(parser, stack);
@@ -143,18 +138,13 @@ public abstract class BibData
       return key;
    }
 
-   public boolean readValue(TeXParser parser, TeXObjectList stack,
+   public boolean readValue(TeXParser parser, AbstractTeXObjectList stack,
       BibValueList bibValList, TeXObject eg)
      throws IOException
    {
       BibParser bibParser = (BibParser)parser.getListener();
 
-      TeXObject object = stack.popStack(parser);
-
-      while (object != null && object instanceof WhiteSpace)
-      {
-         object = stack.popStack(parser);
-      }
+      TeXObject object = stack.popStack(parser, PopStyle.IGNORE_LEADING_SPACE);
 
       if (object == null)
       {
@@ -186,8 +176,7 @@ public abstract class BibData
       {
          bibValList.add(new BibUserString(object));
       }
-      else if (object instanceof CharObject
-            && ((CharObject)object).getCharCode() == (int)'"')
+      else if (parser.isCharacter(object, '"'))
       {
          TeXObjectList list = new TeXObjectList();
          list.add(object);
@@ -197,8 +186,7 @@ public abstract class BibData
          {
             list.add(object);
 
-            if (object instanceof CharObject
-             && ((CharObject)object).getCharCode() == (int)'"')
+            if (parser.isCharacter(object, '"'))
             {
                break;
             }
@@ -286,12 +274,7 @@ public abstract class BibData
          }
       }
 
-      object = stack.popStack(parser);
-
-      while (object != null && object instanceof WhiteSpace)
-      {
-         object = stack.popStack(parser);
-      }
+      object = stack.popStack(parser, PopStyle.IGNORE_LEADING_SPACE);
 
       if (object == null)
       {
@@ -344,18 +327,18 @@ public abstract class BibData
 
    public String format()
    {
-      return format(CASE_NOCHANGE, '{', '}', 
+      return format(CaseChange.NO_CHANGE, '{', '}', 
         BibValue.FIELD_DELIM_NOCHANGE);
    }
 
-   public static String applyCase(String string, byte caseChange)
+   public static String applyCase(String string, CaseChange caseChange)
    {
       switch (caseChange)
       {
-         case CASE_NOCHANGE: return string;
-         case CASE_TO_LOWER: return string.toLowerCase();
-         case CASE_TO_UPPER: return string.toUpperCase();
-         case CASE_INITIAL_CAP:
+         case NO_CHANGE: return string;
+         case TO_LOWER: return string.toLowerCase();
+         case TO_UPPER: return string.toUpperCase();
+         case INITIAL_CAP:
            return string.substring(0,1).toUpperCase()
                 + string.substring(1).toLowerCase();
       }
@@ -363,10 +346,7 @@ public abstract class BibData
       throw new IllegalArgumentException("Invalid caseChange argument");
    }
 
-   public abstract String format(byte caseChange, char openDelim, char closeDelim,
+   public abstract String format(CaseChange caseChange, char openDelim, char closeDelim,
      byte fieldDelimChange);
-
-   public static final byte CASE_NOCHANGE=0, CASE_TO_LOWER=1,
-     CASE_TO_UPPER=2, CASE_INITIAL_CAP=3;
 
 }

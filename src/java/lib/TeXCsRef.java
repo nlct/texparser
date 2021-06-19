@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -20,7 +20,7 @@ package com.dickimawbooks.texparserlib;
 
 import java.io.IOException;
 
-public class TeXCsRef extends ControlSequence implements Expandable
+public class TeXCsRef extends Command
 {
    public TeXCsRef(String name)
    {
@@ -30,9 +30,14 @@ public class TeXCsRef extends ControlSequence implements Expandable
    public TeXObjectList expandonce(TeXParser parser)
       throws IOException
    {
-      ControlSequence cs = parser.getListener().getControlSequence(getName());
+      TeXObject cs = parser.getListener().getControlSequence(getName());
 
       if (cs == null) return null;
+
+      if (cs instanceof AssignedMacro)
+      {
+         cs = ((AssignedMacro)cs).getBaseUnderlying();
+      }
 
       if (!(cs instanceof Expandable))
       {
@@ -41,15 +46,29 @@ public class TeXCsRef extends ControlSequence implements Expandable
          return list;
       }
 
-      return ((Expandable)cs).expandonce(parser);
+      TeXObjectList expanded = ((Expandable)cs).expandonce(parser);
+
+      if (expanded == null)
+      {
+         TeXObjectList list = new TeXObjectList();
+         list.add(cs);
+         return list;
+      }
+
+      return expanded;
    }
 
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
-      ControlSequence cs = parser.getListener().getControlSequence(getName());
+      TeXObject cs = parser.getListener().getControlSequence(getName());
 
       if (cs == null) return null;
+
+      if (cs instanceof AssignedMacro)
+      {
+         cs = ((AssignedMacro)cs).getBaseUnderlying();
+      }
 
       if (!(cs instanceof Expandable))
       {
@@ -58,15 +77,29 @@ public class TeXCsRef extends ControlSequence implements Expandable
          return list;
       }
 
-      return ((Expandable)cs).expandonce(parser, stack);
+      TeXObjectList expanded = ((Expandable)cs).expandonce(parser, stack);
+
+      if (expanded == null)
+      {
+         TeXObjectList list = new TeXObjectList();
+         list.add(cs);
+         return list;
+      }
+
+      return expanded;
    }
 
    public TeXObjectList expandfully(TeXParser parser)
       throws IOException
    {
-      ControlSequence cs = parser.getListener().getControlSequence(getName());
+      TeXObject cs = parser.getListener().getControlSequence(getName());
 
       if (cs == null) return null;
+
+      if (cs instanceof AssignedMacro)
+      {
+         cs = ((AssignedMacro)cs).getBaseUnderlying();
+      }
 
       if (!(cs instanceof Expandable))
       {
@@ -75,15 +108,29 @@ public class TeXCsRef extends ControlSequence implements Expandable
          return list;
       }
 
-      return ((Expandable)cs).expandfully(parser);
+      TeXObjectList expanded = ((Expandable)cs).expandfully(parser);
+
+      if (expanded == null)
+      {
+         TeXObjectList list = new TeXObjectList();
+         list.add(cs);
+         return list;
+      }
+
+      return expanded;
    }
 
    public TeXObjectList expandfully(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
-      ControlSequence cs = parser.getListener().getControlSequence(getName());
+      TeXObject cs = parser.getListener().getControlSequence(getName());
 
       if (cs == null) return null;
+
+      if (cs instanceof AssignedMacro)
+      {
+         cs = ((AssignedMacro)cs).getBaseUnderlying();
+      }
 
       if (!(cs instanceof Expandable))
       {
@@ -92,7 +139,16 @@ public class TeXCsRef extends ControlSequence implements Expandable
          return list;
       }
 
-      return ((Expandable)cs).expandfully(parser, stack);
+      TeXObjectList expanded = ((Expandable)cs).expandfully(parser, stack);
+
+      if (expanded == null)
+      {
+         TeXObjectList list = new TeXObjectList();
+         list.add(cs);
+         return list;
+      }
+
+      return expanded;
    }
 
    public void process(TeXParser parser)

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -21,7 +21,6 @@ package com.dickimawbooks.texparserlib.latex;
 import java.io.IOException;
 import java.io.EOFException;
 import java.io.File;
-import java.util.Hashtable;
 import java.util.HashMap;
 import java.util.Vector;
 import java.util.Stack;
@@ -97,8 +96,8 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       super(writeable);
       setAuxData(auxData);
       setParseAuxEnabled(parseAux);
-      counters = new Hashtable<String,Vector<String>>();
-      indexes = new Hashtable<String,IndexRoot>();
+      counters = new HashMap<String,Vector<String>>();
+      indexes = new HashMap<String,IndexRoot>();
       this.parsePackages = parsePackages;
 
       footnotes = new TeXObjectList();
@@ -188,6 +187,22 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       return AuxData.getLabelForLink(auxData, getParser(), link);
    }
 
+   public CsvList createCsvList()
+   {
+      return new CsvList(getOther(','));
+   }
+
+   public CsvList createCsvList(int capacity)
+   {
+      return new CsvList(getOther(','), capacity);
+   }
+
+   @Override
+   public int getOptionalStartDelim() { return '['; }
+
+   @Override
+   public int getOptionalEndDelim() { return ']'; }
+
    public void addVerbEnv(String name)
    {
       verbEnv.add(name);
@@ -208,15 +223,15 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       {
          return getParser().isVerbCommand(((ControlSequence)object).getName());
       }
-      else if (object instanceof TeXObjectList)
+      else if (object instanceof AbstractTeXObjectList)
       {
-         TeXObjectList list = (TeXObjectList)object;
+         AbstractTeXObjectList list = (AbstractTeXObjectList)object;
 
          for (int i = 0; i < list.size(); i++)
          {
             object = list.get(i);
 
-            if (object instanceof TeXObjectList)
+            if (object instanceof AbstractTeXObjectList)
             {
                if (containsVerbatim(object))
                {
@@ -294,6 +309,7 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       return false;
    }
 
+   @Override
    protected void addPredefined()
    {
       super.addPredefined();
@@ -302,6 +318,13 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       addVerbEnv("verbatim*");
       addVerbEnv("filecontents");
       addVerbEnv("filecontents*");
+
+      // Add 
+      // \providecommand{\IfTeXParserLib}[2]{#2}
+      // to the document to provide a conditional that depends on
+      // whether or not the TeX parser library is interpreting the
+      // code.
+      putControlSequence(new AtFirstOfTwo("IfTeXParserLib"));
 
       parser.putControlSequence(new Begin());
       parser.putControlSequence(new End());
@@ -395,10 +418,10 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       parser.putControlSequence(new AtGobble("@gobblefive", 5));
       parser.putControlSequence(new AtNameUse());
 
-      parser.putControlSequence(new AtAlph("@Alph", AtAlph.UPPER));
-      parser.putControlSequence(new AtAlph("@alph", AtAlph.LOWER));
-      parser.putControlSequence(new AtRoman("@Roman", AtRoman.UPPER));
-      parser.putControlSequence(new AtRoman("@roman", AtRoman.LOWER));
+      parser.putControlSequence(new AtAlph("@Alph", CharacterCase.UPPER));
+      parser.putControlSequence(new AtAlph("@alph", CharacterCase.LOWER));
+      parser.putControlSequence(new AtRoman("@Roman", CharacterCase.UPPER));
+      parser.putControlSequence(new AtRoman("@roman", CharacterCase.LOWER));
 
       parser.putControlSequence(new NewCounter());
       parser.putControlSequence(new AddToCounter());
@@ -408,15 +431,16 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       parser.putControlSequence(new Value("arabic"));
       parser.putControlSequence(new NumberCs("@arabic"));
       parser.putControlSequence(new Roman());
-      parser.putControlSequence(new Roman("roman", AtRoman.LOWER));
+      parser.putControlSequence(new Roman("roman", CharacterCase.LOWER));
       parser.putControlSequence(new Alph());
-      parser.putControlSequence(new Alph("alph", AtAlph.LOWER));
+      parser.putControlSequence(new Alph("alph", CharacterCase.LOWER));
       parser.putControlSequence(new FnSymbol());
 
       parser.putControlSequence(new Verbatim());
       parser.putControlSequence(new Verbatim("verbatim*"));
       parser.putControlSequence(new Tabular());
       parser.putControlSequence(new Tabular("array"));
+      parser.putControlSequence(new TheBibliography());
       parser.putControlSequence(new Bibliography());
       parser.putControlSequence(new BibliographyStyle());
       parser.putControlSequence(new BibItem());
@@ -430,11 +454,6 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       parser.putControlSequence(new Appendix());
       parser.putControlSequence(new Typeout());
 
-      bibliographySection = new TeXObjectList();
-      bibliographySection.add(new TeXCsRef("section"));
-      bibliographySection.add(getOther('*'));
-      bibliographySection.add(new TeXCsRef("refname"));
-
       parser.putControlSequence(
         new GenericCommand("refname", null, createString("References")));
 
@@ -445,11 +464,16 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
         new GenericCommand("abstractname", null, createString("Abstract")));
       parser.putControlSequence(new AbstractDec());
 
+      parser.putControlSequence(new TitlePageDec());
+      parser.putControlSequence(new Maketitle());
       parser.putControlSequence(new Today());
-      parser.putControlSequence(new StoreDataCs("title"));
-      parser.putControlSequence(new StoreDataCs("author"));
-      parser.putControlSequence(new StoreDataCs("date"));
-      parser.putControlSequence(new GenericCommand("@date", null, new TeXCsRef("today")));
+      parser.putControlSequence(new StoreBlockDataCs("title", "@shorttitle", "@title"));
+      parser.putControlSequence(new AuthorCs());
+      parser.putControlSequence(new AuthorAnd());
+
+      StoreBlockDataCs dateCs = new StoreBlockDataCs("date");
+      dateCs.setData(parser, null, new TeXCsRef("today"));
+      parser.putControlSequence(dateCs);
 
       parser.putControlSequence(
         new GenericCommand("figurename", null, createString("Figure")));
@@ -482,6 +506,15 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       newlength("marginparwidth", 100, new PercentUnit(PercentUnit.MARGIN_WIDTH));
 
       newtoks(true, "toks@");
+
+      parser.putControlSequence(new Section());
+      parser.putControlSequence(new Section("subsection", 2));
+      parser.putControlSequence(new Section("subsubsection", 3));
+      parser.putControlSequence(new Section("paragraph", 4));
+      parser.putControlSequence(new Section("subparagraph", 5));
+      parser.putControlSequence(new Section("part", -1));
+
+      newcounter("secnumdepth", new UserNumber(3));
 
       newcounter("part");
       newcounter("section");
@@ -585,20 +618,37 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       parser.putControlSequence(new Thanks());
       parser.putControlSequence(new AtFnSymbol());
 
-      parser.putControlSequence(new MathDeclaration("math"));
+      parser.putControlSequence(createMathDeclaration("math",
+        TeXSettings.MODE_INLINE_MATH, false));
 
-      MathDeclaration begMathDecl = new MathDeclaration("(");
+      MathDeclaration begMathDecl = createMathDeclaration("(", 
+        TeXSettings.MODE_INLINE_MATH, false);
       parser.putControlSequence(begMathDecl);
       parser.putControlSequence(new EndDeclaration(")", begMathDecl));
-      parser.putControlSequence(
-         new MathDeclaration("displaymath", TeXSettings.MODE_DISPLAY_MATH));
 
-      MathDeclaration begDispDecl = new MathDeclaration("[", TeXSettings.MODE_DISPLAY_MATH);
-
+      MathDeclaration begDispDecl = 
+         createMathDeclaration("[", TeXSettings.MODE_DISPLAY_MATH, false);
       parser.putControlSequence(begDispDecl);
       parser.putControlSequence(new EndDeclaration("]", begDispDecl));
+
       parser.putControlSequence(
-         new MathDeclaration("equation", TeXSettings.MODE_DISPLAY_MATH, true));
+         createMathDeclaration("displaymath", TeXSettings.MODE_DISPLAY_MATH, false));
+      parser.putControlSequence(
+         createMathDeclaration("equation", TeXSettings.MODE_DISPLAY_MATH, true));
+      parser.putControlSequence(
+         createMathDeclaration("equation*", TeXSettings.MODE_DISPLAY_MATH, false));
+
+      parser.putControlSequence(new Relax("eqno"));
+      parser.putControlSequence(new GenericCommand(true, "@eqnnum", null,
+          new TeXObject[]
+          { 
+             new TeXCsRef("eqno"),
+             new TeXCsRef("begingroup"),
+               new TeXCsRef("normalfont"), new TeXCsRef("normalcolor"), 
+               getOther('('), new TeXCsRef("theequation"), getOther(')'), 
+             new TeXCsRef("endgroup")
+          }));
+
 
       // Math font commands
 
@@ -638,6 +688,11 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       addFontSizeDeclaration("scriptsize", TeXSettings.SIZE_SCRIPT);
       addFontSizeDeclaration("tiny", TeXSettings.SIZE_TINY);
 
+      parser.putControlSequence(new Relax("normalcolor"));
+      parser.putControlSequence(new GobbleOpt("textcolor", 1, 1));
+      parser.putControlSequence(new GobbleOpt("color", 1, 1));
+      parser.putControlSequence(new GobbleOpt("pagecolor", 1, 1));
+
       parser.putControlSequence(
         new GenericCommand(true, "@spaces", null, 
          new TeXObject[]{new TeXCsRef("space"), new TeXCsRef("space"),
@@ -645,6 +700,12 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
 
       parser.putControlSequence(new GenericError());
       parser.putControlSequence(new DocumentStyle());
+   }
+
+   protected MathDeclaration createMathDeclaration(String name,
+     int mode, boolean numbered)
+   {
+      return new MathDeclaration(name, mode, numbered);
    }
 
    protected void addMathFontCommand(String name, int style)
@@ -662,9 +723,9 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
      int numParams, TeXObject defValue, TeXObject definition)
    throws IOException
    {
-      ControlSequence cs = getControlSequence(csName);
+      ControlSequence cs = getParser().getControlSequence(csName);
 
-      if (cs instanceof Undefined)
+      if (cs == null || cs instanceof Undefined)
       {
          if (overwrite == NewCommand.OVERWRITE_FORCE)
          {
@@ -896,14 +957,17 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       }
    }
 
-   public void endDocument()
-     throws IOException
+   protected void trailer() throws IOException
    {
-      if (!isInDocEnv())
+      // pop any open hierarchical blocks.
+
+      while (!hierarchicalBlockStack.empty())
       {
-         throw new LaTeXSyntaxException(parser,
-            LaTeXSyntaxException.ERROR_NO_BEGIN_DOC);
+         endBlock(hierarchicalBlockStack.pop());
       }
+
+      // process any remaining end declarations
+      parser.getSettings().processEndDeclarations();
 
       processFootnotes();
 
@@ -921,15 +985,28 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
             getTeXApp().error(e);
          }
       }
+   }
+
+   public void endDocument() throws IOException
+   {
+      if (!isInDocEnv())
+      {
+         throw new LaTeXSyntaxException(parser,
+            LaTeXSyntaxException.ERROR_NO_BEGIN_DOC);
+      }
+
+      trailer();
 
       throw new EOFException();
    }
 
-   public void processFootnotes()
-   throws IOException
+   protected void processFootnotes() throws IOException
    {
       if (footnotes.size() > 0)
       {
+         DocumentBlock block = new DocumentBlock("footnotes");
+
+         startBlock(block);
          doFootnoteRule();
 
          while (footnotes.size() > 0)
@@ -937,6 +1014,8 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
             footnotes.pop().process(getParser());
             getPar().process(getParser());
          }
+
+         endBlock(block);
       }
 
    }
@@ -1024,6 +1103,23 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       {
          throw new LaTeXSyntaxException(parser,
             LaTeXSyntaxException.ERROR_MULTI_CLS);
+      }
+
+      if (options != null)
+      {
+         Boolean bool = options.getBoolean("leqno", parser, parser);
+
+         if (bool != null)
+         {
+            setLeqno(bool.booleanValue());
+         }
+
+         bool = options.getBoolean("fleqn", parser, parser);
+
+         if (bool != null)
+         {
+            setFleqn(bool.booleanValue());
+         }
       }
 
       docCls = getLaTeXCls(options, clsName, loadParentOptions);
@@ -1133,6 +1229,35 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       if (parsePackages && !sty.wasFoundByKpsewhich())
       {
          sty.parseFile();
+      }
+      else if (sty instanceof LaTeXCls)
+      {
+         String name = sty.getName();
+
+         if (name.endsWith("report") || name.endsWith("book") 
+              || name.equals("memoir") || name.endsWith("reprt"))
+         {
+            parser.putControlSequence(new Section("chapter", 0));
+            newcounter("chapter");
+
+            parser.putControlSequence(new GenericCommand(true, "@chapapp", null,
+                new TeXObject[] { new TeXCsRef("chaptername") }));
+
+            parser.putControlSequence(
+              new GenericCommand("chaptername", null, createString("Chapter")));
+
+            parser.putControlSequence(
+              new GenericCommand("appendixname", null, createString("Appendix")));
+
+            parser.putControlSequence(new GenericCommand(true, "thesection", null,
+                new TeXObject[] {
+                  new TeXCsRef("thechapter"),
+                  getOther('.'),
+                  new TeXCsRef("number"),
+                new TeXCsRef("c@section")}));
+
+            addtoreset("section", "chapter");
+         }
       }
    }
 
@@ -1411,6 +1536,7 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       return loadedPackages;
    }
 
+   @Override
    public boolean input(TeXPath path)
      throws IOException
    {
@@ -1449,6 +1575,7 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       return (bblPath.exists() ? super.input(bblPath) : false);
    }
 
+   @Override
    public Charset getCharSet()
    {
       Charset charset = null;
@@ -1636,6 +1763,11 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       }
    }
 
+   public AlignCell createAlignCell()
+   {
+      return new AlignCell();
+   }
+
    public AlignRow createAlignRow(TeXObjectList stack)
      throws IOException
    {
@@ -1677,7 +1809,7 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
 
    public void newcounter(String name)
    {
-      newcounter(name, null);
+      newcounter(name, (String)null);
    }
 
    public void newcounter(String name, String parent)
@@ -1685,10 +1817,33 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       newcounter(name, parent, "number");
    }
 
+   public void newcounter(String name, Numerical initialValue)
+   {
+      newcounter(name, null, "number", initialValue);
+   }
+
    public void newcounter(String name, String parent, String format)
    {
+      newcounter(name, parent, format, null);
+   }
+
+   public void newcounter(String name, String parent, String format, 
+     Numerical initialValue)
+   {
       // counters are global
-      parser.getSettings().newcount(false, "c@"+name);
+      CountRegister reg = parser.getSettings().newcount(false, "c@"+name);
+
+      if (initialValue != null)
+      {
+         try
+         {
+            reg.setContents(parser, initialValue);
+         }
+         catch (TeXSyntaxException e)
+         {
+            getTeXApp().error(e);
+         }
+      }
 
       if (parent == null)
       {
@@ -1767,21 +1922,6 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
             resetcounter(dep);
          }
       }
-   }
-
-   public TeXObjectList getBibliographySection()
-   {
-      return bibliographySection;
-   }
-
-   public void setBibliographySection(TeXObjectList object)
-   {
-      bibliographySection = object;
-   }
-
-   public void addToBibliographySection(TeXObject object)
-   {
-      bibliographySection.add(object);
    }
 
    public void addFootnote(TeXObject footnote)
@@ -2136,61 +2276,83 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       return passOptions.get(name);
    }
 
-   public void startHierarchicalUnit(String type, int hierarchicalLevel,
-     String prefix, String title, String label)
+   /**
+    * Starts a hierarchical block that doesn't have an explicit end.
+    * (e.g. <code>\chapter</code> or <code>\section</code>). This
+    * will call startBlock  but will first end any open blocks that
+    * are at the same depth or deeper.
+    */ 
+   public void startHierarchicalBlock(HierarchicalBlock block)
+     throws IOException
    {
-      HierarchicalUnit unit = new HierarchicalUnit(hierarchicalLevel, type);
-
-      if (hierarchicalUnitStack.empty())
+      if (hierarchicalBlockStack.empty())
       {
-         hierarchicalUnitStack.push(unit);
-         startUnit(type, prefix, title, label);
+         hierarchicalBlockStack.push(block);
+         startBlock(block);
          return;
       }
 
-      HierarchicalUnit currentUnit = hierarchicalUnitStack.peek();
+      HierarchicalBlock currentBlock = hierarchicalBlockStack.peek();
 
-      int compare = unit.compareTo(currentUnit);
+      int compare = block.compareTo(currentBlock);
 
       if (compare > 0)
       {// deeper
-         hierarchicalUnitStack.push(unit);
-         startUnit(type, prefix, title, label);
+         hierarchicalBlockStack.push(block);
+         startBlock(block);
       }
       else if (compare == 0)
       {// same level
-         currentUnit = hierarchicalUnitStack.pop();
-         endUnit(currentUnit.getType());
-         hierarchicalUnitStack.push(unit);
-         startUnit(type, prefix, title, label);
+         endBlock(hierarchicalBlockStack.pop());
+         hierarchicalBlockStack.push(block);
+         startBlock(block);
       }
       else
       {
          do
          {
-            currentUnit = hierarchicalUnitStack.pop();
-            endUnit(currentUnit.getType());
+            endBlock(hierarchicalBlockStack.pop());
 
-            if (hierarchicalUnitStack.empty())
+            if (hierarchicalBlockStack.empty())
             {
                break;
             }
 
-            currentUnit = hierarchicalUnitStack.peek();
+            currentBlock = hierarchicalBlockStack.peek();
          }
-         while (unit.compareTo(currentUnit) <= 0);
+         while (block.compareTo(currentBlock) <= 0);
 
-         hierarchicalUnitStack.push(unit);
-         startUnit(type, prefix, title, label);
+         hierarchicalBlockStack.push(block);
+         startBlock(block);
       }
    }
 
-   public void startUnit(String type, String prefix, String title, String label)
+   public void startBlock(DocumentBlock block) throws IOException
    {
    }
 
-   public void endUnit(String type)
+   public void endBlock(DocumentBlock block) throws IOException
    {
+   }
+
+   public void setLeqno(boolean on)
+   {
+      leqno = on;
+   }
+
+   public boolean isLeqno()
+   {
+      return leqno;
+   }
+
+   public void setFleqn(boolean on)
+   {
+      fleqn = on;
+   }
+
+   public boolean isFleqn()
+   {
+      return fleqn;
    }
 
    private Vector<String> verbEnv;
@@ -2200,7 +2362,7 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
 
    private Vector<AuxData> auxData;
 
-   private Hashtable<String,Vector<String>> counters;
+   private HashMap<String,Vector<String>> counters;
 
    protected LaTeXCls docCls;
 
@@ -2220,6 +2382,8 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       "eps", "EPS", "ps", "PS", "gif", "GIF"
    };
 
+   private boolean leqno = false, fleqn = false;
+
    private boolean docEnvFound = false;
 
    private String inputEncoding = null;
@@ -2228,13 +2392,11 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
 
    private boolean parseAux = false;
 
-   private TeXObjectList bibliographySection;
-
    private TeXObjectList footnotes;
 
    private boolean marginright=true;
 
-   private Hashtable<String,IndexRoot> indexes;
+   private HashMap<String,IndexRoot> indexes;
 
    private String mainIndex = "main";
 
@@ -2242,8 +2404,8 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
 
    private Stack<TrivListDec> trivListStack = new Stack<TrivListDec>();
 
-   private Stack<HierarchicalUnit> hierarchicalUnitStack 
-      = new Stack<HierarchicalUnit>();
+   private Stack<HierarchicalBlock> hierarchicalBlockStack 
+      = new Stack<HierarchicalBlock>();
 
    public static final UserNumber ZERO = new UserNumber(0);
    public static final UserNumber ONE = new UserNumber(1);

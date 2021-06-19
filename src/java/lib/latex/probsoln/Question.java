@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -24,7 +24,7 @@ import java.util.Vector;
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.*;
 
-public class Question extends Declaration
+public class Question extends RobustDeclaration
 {
    public Question()
    {
@@ -36,49 +36,30 @@ public class Question extends Declaration
       super(name);
    }
 
+   @Override
    public Object clone()
    {
       return new Question(getName());
    }
 
-   public TeXObjectList expandonce(TeXParser parser, TeXObjectList list)
-      throws IOException
-   {
-      return null;
-   }
-
-   public TeXObjectList expandonce(TeXParser parser)
-      throws IOException
-   {
-      return null;
-   }
-
-   public TeXObjectList expandfully(TeXParser parser, TeXObjectList list)
-      throws IOException
-   {
-      return null;
-   }
-
-   public TeXObjectList expandfully(TeXParser parser)
-      throws IOException
-   {
-      return null;
-   }
-
+   @Override
    public void process(TeXParser parser) throws IOException
    {
       process(parser, parser);
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack) throws IOException
    {
    }
 
+   @Override
    public void end(TeXParser parser)
     throws IOException
    {
    }
 
+   @Override
    public boolean isModeSwitcher()
    {
       return false;

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -35,77 +35,31 @@ public class DTLloaddbtex extends ControlSequence
       super(name);
    }
 
+   @Override
    public Object clone()
    {
       return new DTLloaddbtex(getName());
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      TeXObject csArg;
-
-      TeXObject fileArg;
-
-      if (parser == stack)
-      {
-         csArg = parser.popNextArg();
-         fileArg = parser.popNextArg();
-      }
-      else
-      {
-         csArg = stack.popArg(parser);
-         fileArg = stack.popArg(parser);
-      }
-
-      if (csArg instanceof TeXObjectList)
-      {
-         TeXObjectList list = (TeXObjectList)csArg;
-         csArg = list.popToken(TeXObjectList.POP_SHORT);
-      }
-
-      if (fileArg instanceof Expandable)
-      {
-         TeXObjectList expanded;
-
-         if (parser == stack)
-         {
-            expanded = ((Expandable)fileArg).expandfully(parser);
-         }
-         else
-         {
-            expanded = ((Expandable)fileArg).expandfully(parser, stack);
-         }
-
-         if (expanded != null)
-         {
-            fileArg = expanded;
-         }
-      }
+      ControlSequence cs = parser.popRequiredControlSequence(stack);
+      String filename = parser.popRequiredString(stack);
 
       TeXParserListener listener = parser.getListener();
 
-      TeXPath texPath = new TeXPath(parser, fileArg.toString(parser));
+      TeXPath texPath = new TeXPath(parser, filename);
 
-      if (!(csArg instanceof ControlSequence))
-      {
-         throw new TeXSyntaxException(parser, 
-           TeXSyntaxException.ERROR_CS_EXPECTED, csArg.toString(parser),
-                csArg.getClass().getSimpleName());
-      }
-
-      String name = ((ControlSequence)csArg).getName();
-
-      ControlSequence cs = parser.getControlSequence(name);
-
-      if (cs != null)
+      if (parser.getControlSequence(cs.getName()) != null)
       {
          throw new LaTeXSyntaxException(parser, 
            LaTeXSyntaxException.ERROR_DEFINED, cs.toString(parser));
       }
 
       stack.push(new TeXCsRef("dtllastloadeddb"));
-      stack.push(csArg);
+      stack.push(cs);
       stack.push(new TeXCsRef("let"));
 
       if (!listener.input(texPath))
@@ -117,6 +71,7 @@ public class DTLloaddbtex extends ControlSequence
       listener.addFileReference(texPath);
    }
 
+   @Override
    public void process(TeXParser parser)
      throws IOException
    {

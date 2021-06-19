@@ -57,6 +57,7 @@ public class SearchControlSequence extends AssignedControlSequence
       super.process(parser, stack);
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser)
       throws IOException
    {
@@ -68,6 +69,7 @@ public class SearchControlSequence extends AssignedControlSequence
       return super.expandonce(parser);
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
@@ -79,6 +81,7 @@ public class SearchControlSequence extends AssignedControlSequence
       return super.expandonce(parser, stack);
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser)
       throws IOException
    {
@@ -90,6 +93,7 @@ public class SearchControlSequence extends AssignedControlSequence
       return super.expandfully(parser);
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser, TeXObjectList stack)
       throws IOException
    {

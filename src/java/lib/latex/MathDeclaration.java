@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -22,7 +22,7 @@ import java.io.IOException;
 
 import com.dickimawbooks.texparserlib.*;
 
-public class MathDeclaration extends Declaration
+public class MathDeclaration extends RobustDeclaration
 {
    public MathDeclaration()
    {
@@ -46,30 +46,7 @@ public class MathDeclaration extends Declaration
       this.numbered = numbered;
    }
 
-   public TeXObjectList expandonce(TeXParser parser)
-     throws IOException
-   {
-      return null;
-   }
-
-   public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
-     throws IOException
-   {
-      return null;
-   }
-
-   public TeXObjectList expandfully(TeXParser parser)
-     throws IOException
-   {
-      return null;
-   }
-
-   public TeXObjectList expandfully(TeXParser parser, TeXObjectList stack)
-     throws IOException
-   {
-      return null;
-   }
-
+   @Override
    public Object clone()
    {
       return new MathDeclaration(getName(), mode, numbered);
@@ -88,6 +65,7 @@ public class MathDeclaration extends Declaration
       settings.setMode(orgMode);
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
@@ -95,23 +73,41 @@ public class MathDeclaration extends Declaration
 
       if (isNumbered())
       {
-         ((LaTeXParserListener)parser.getListener()).stepcounter("equation");
+         LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
+
+         listener.stepcounter("equation");
+
+         if (listener.isLeqno())
+         {
+            processEquationNumber(parser);
+         }
       }
    }
 
+   @Override
    public void process(TeXParser parser)
      throws IOException
    {
-      doModeSwitch(parser);
-
-      if (isNumbered())
-      {
-         ((LaTeXParserListener)parser.getListener()).stepcounter("equation");
-      }
+      process(parser, parser);
    }
 
+   protected void processEquationNumber(TeXParser parser) throws IOException
+   {
+      ControlSequence cs = parser.getListener().getControlSequence("@eqnnum");
+
+      cs.process(parser);
+   }
+
+   @Override
    public void end(TeXParser parser) throws IOException
    {
+      LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
+
+      if (isNumbered() && !listener.isLeqno())
+      {
+         processEquationNumber(parser);
+      }
+
       revertModeSwitch(parser);
    }
 
@@ -125,6 +121,7 @@ public class MathDeclaration extends Declaration
       return numbered;
    }
 
+   @Override
    public boolean isModeSwitcher()
    {
       return true;

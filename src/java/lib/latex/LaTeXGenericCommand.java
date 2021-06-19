@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -145,12 +145,14 @@ public class LaTeXGenericCommand extends GenericCommand
       }
    }
 
+   @Override
    public Object clone()
    {
       return new LaTeXGenericCommand(isShort, getName(), latexSyntax, 
         (TeXObjectList)getDefinition().clone());
    }
 
+   @Override
    public boolean equals(Object obj)
    {
       if (obj == null || !(obj instanceof LaTeXGenericCommand)) return false;
@@ -168,37 +170,44 @@ public class LaTeXGenericCommand extends GenericCommand
            && Arrays.equals(defaultArgs, cs.defaultArgs);
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList list)
      throws IOException
    {
       return getReplacement(parser, list);
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser)
      throws IOException
    {
       return getReplacement(parser);
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser, TeXObjectList list)
      throws IOException
    {
       return getReplacement(parser, list).expandfully(parser, list);
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser)
      throws IOException
    {
       return getReplacement(parser).expandfully(parser);
    }
 
-   private TeXObjectList getReplacement(TeXParser parser,
-     TeXObjectList remainingStack)
+   @Override
+   protected TeXObjectList getReplacement(TeXParser parser,
+     AbstractTeXObjectList remainingStack)
      throws IOException
    {
+      TeXParserListener listener = parser.getListener();
+
       TeXObject[] args = (numArgs == 0 ? null : new TeXObject[numArgs]);
 
-      byte popStyle = isShort ? TeXObjectList.POP_SHORT : 0;
+      PopStyle popStyle = isShort ? PopStyle.SHORT : PopStyle.DEFAULT;
 
       if (numArgs > 0)
       {
@@ -212,7 +221,9 @@ public class LaTeXGenericCommand extends GenericCommand
             {
                case SYNTAX_OPTIONAL: 
 
-                  object = remainingStack.popArg(parser, popStyle, '[', ']');
+                  object = remainingStack.popArg(parser, popStyle,
+                    listener.getOptionalStartDelim(), 
+                    listener.getOptionalEndDelim());
 
                   if (object == null)
                   {
@@ -236,14 +247,17 @@ public class LaTeXGenericCommand extends GenericCommand
       return replacement;
    }
 
-   private TeXObjectList getReplacement(TeXParser parser)
+   @Override
+   protected TeXObjectList getReplacement(TeXParser parser)
      throws IOException
    {
+      TeXParserListener listener = parser.getListener();
+
       TeXObject[] args = (numArgs == 0 ? null : new TeXObject[numArgs]);
 
       if (numArgs > 0)
       {
-         byte popStyle = isShort ? TeXObjectList.POP_SHORT : 0;
+         PopStyle popStyle = isShort ? PopStyle.SHORT : PopStyle.DEFAULT;
 
          int optIdx = 0;
 
@@ -255,7 +269,9 @@ public class LaTeXGenericCommand extends GenericCommand
             {
                case SYNTAX_OPTIONAL: 
 
-                  object = parser.popNextArg(popStyle, '[', ']');
+                  object = parser.popNextArg(popStyle,
+                    listener.getOptionalStartDelim(), 
+                    listener.getOptionalEndDelim());
 
                   if (object == null)
                   {
@@ -279,8 +295,8 @@ public class LaTeXGenericCommand extends GenericCommand
       return replacement;
    }
 
-   private void addReplacements(TeXParser parser, TeXObjectList replacement, 
-     TeXObject[] args, TeXObjectList list)
+   protected void addReplacements(TeXParser parser, AbstractTeXObjectList replacement, 
+     TeXObject[] args, AbstractTeXObjectList list)
    {
       for (TeXObject object : list)
       {
@@ -294,12 +310,13 @@ public class LaTeXGenericCommand extends GenericCommand
          {
             replacement.add(((DoubleParam)object).next());
          }
-         else if (object instanceof TeXObjectList)
+         else if (object instanceof AbstractTeXObjectList)
          {
-            TeXObjectList subList = ((TeXObjectList)object).createList();
+            AbstractTeXObjectList subList = 
+               ((AbstractTeXObjectList)object).createList();
             replacement.add(subList);
 
-            addReplacements(parser, subList, args, (TeXObjectList)object);
+            addReplacements(parser, subList, args, (AbstractTeXObjectList)object);
          }
          else
          {
@@ -308,12 +325,14 @@ public class LaTeXGenericCommand extends GenericCommand
       }
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
       getReplacement(parser, stack).process(parser, stack);
    }
 
+   @Override
    public void process(TeXParser parser)
      throws IOException
    {
@@ -330,6 +349,7 @@ public class LaTeXGenericCommand extends GenericCommand
       return latexSyntax == null ? "" : new String(latexSyntax);
    }
 
+   @Override
    public String toString()
    {
       return String.format("%s[name=%s,syntax=%s,definition=%s]",

@@ -19,14 +19,17 @@
 package com.dickimawbooks.texparserlib;
 
 import java.awt.Color;
-import java.util.Hashtable;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Vector;
+import java.io.IOException;
 
 public class TeXSettings
 {
    private TeXSettings()
    {
-      activeTable = new Hashtable<Integer,ActiveChar>();
-      csTable = new Hashtable<String,ControlSequence>();
+      activeTable = new HashMap<Integer,ActiveChar>();
+      csTable = new HashMap<String,ControlSequence>();
    }
 
    public TeXSettings(TeXParser parser)
@@ -69,6 +72,41 @@ public class TeXSettings
    public TeXObjectList getAfterGroup()
    {
       return afterGroup;
+   }
+
+   public void addDeclaration(Declaration declaration)
+   {
+      if (declaration == null)
+      {
+         throw new NullPointerException();
+      }
+
+      if (declarations == null)
+      {
+         declarations = new Vector<Declaration>();
+      }
+
+      declarations.add(declaration);
+   }
+
+   public void processEndDeclarations() throws IOException
+   {
+      if (declarations != null)
+      {
+         while (!declarations.isEmpty())
+         {
+            Declaration decl = declarations.remove(declarations.size()-1);
+
+            decl.end(parser);
+         }
+      }
+   }
+
+   public boolean removeDeclaration(Declaration declaration)
+   {
+      if (declarations == null) return false;
+
+      return declarations.remove(declaration);
    }
 
    public int getCurrentMode()
@@ -315,6 +353,37 @@ public class TeXSettings
       resetAlignmentColumn();
    }
 
+   public void addNoAlign(TeXObject object) throws TeXSyntaxException
+   {
+      if (getStartRowMode() != START_ROW_MODE_TRUE)
+      {
+         throw new TeXSyntaxException(parser, 
+           TeXSyntaxException.ERROR_MISPLACED_NOALIGN);
+      }
+
+      if (noAlignContent == null)
+      {
+         noAlignContent = new Vector<TeXObject>();
+      }
+
+      noAlignContent.add(object);
+   }
+
+   public Vector<TeXObject> getNoAlign()
+   {
+      return noAlignContent;
+   }
+
+   public void clearNoAlign()
+   {
+      noAlignContent = null;
+   }
+
+   public boolean anyNoAlign()
+   {
+      return noAlignContent == null ? false : !noAlignContent().isEmpty();
+   }
+
    public void startColumn()
    {
       setStartColumnMode(START_COLUMN_MODE_TRUE);
@@ -475,6 +544,26 @@ public class TeXSettings
       }
 
       return getCurrentAlignmentColumnCount();
+   }
+
+   public Locale getCurrentLocale()
+   {
+      return currentLocale;
+   }
+
+   public Locale getLocale()
+   {
+      if (currentLocale == null)
+      {
+         if (parent == null)
+         {
+            return Locale.getDefault();
+         }
+
+         return parent.getLocale();
+      }
+
+      return currentLocale;
    }
 
    public Color getCurrentFgColor()
@@ -2840,18 +2929,25 @@ public class TeXSettings
    private Color currentFgColor = null;
    private Color currentBgColor = null;
 
+   private Locale currentLocale = null;
+
    private FontEncoding currentFontEncoding = null;
 
    private TeXParser parser;
 
-   private Hashtable<String,Register> localRegisters 
-     = new Hashtable<String,Register>();
+   private HashMap<String,Register> localRegisters 
+     = new HashMap<String,Register>();
 
-   protected Hashtable<String,ControlSequence> csTable;
+   protected HashMap<String,ControlSequence> csTable;
 
-   protected Hashtable<Integer,ActiveChar> activeTable;
+   protected HashMap<Integer,ActiveChar> activeTable;
 
    protected TeXObjectList afterGroup;
+
+   protected Vector<Declaration> declarations
+     = new Vector<Declaration>();
+
+   protected Vector<TeXObject> noAlignContent;
 
    protected CatCodeList[] catcodes=null;
 }

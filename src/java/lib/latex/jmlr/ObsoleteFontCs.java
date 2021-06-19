@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -45,20 +45,11 @@ public class ObsoleteFontCs extends Declaration
       return false;
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
-      TeXObject arg = stack.popArg(parser);
-
-      if (arg instanceof Expandable)
-      {
-         TeXObjectList expanded = ((Expandable)arg).expandfully(parser, stack);
-
-         if (expanded != null)
-         {
-            arg = expanded;
-         }
-      }
+      TeXObject arg = parser.popRequiredExpandFully(stack);
 
       String obsname = arg.toString(parser);
 
@@ -69,114 +60,44 @@ public class ObsoleteFontCs extends Declaration
       return list;
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser)
       throws IOException
    {
-      TeXObject arg = parser.popNextArg();
-
-      if (arg instanceof Expandable)
-      {
-         TeXObjectList expanded = ((Expandable)arg).expandfully(parser);
-
-         if (expanded != null)
-         {
-            arg = expanded;
-         }
-      }
-
-      String obsname = arg.toString(parser);
-
-      TeXObjectList list = new TeXObjectList();
-
-      list.add(parser.getListener().getControlSequence(obsname));
-
-      return list;
+      return expandonce(parser, parser);
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
-      TeXObject arg = stack.popArg(parser);
-
-      if (arg instanceof Expandable)
-      {
-         TeXObjectList expanded = ((Expandable)arg).expandfully(parser, stack);
-
-         if (expanded != null)
-         {
-            arg = expanded;
-         }
-      }
+      TeXObject arg = parser.popRequiredExpandFully(stack);
 
       String obsname = arg.toString(parser);
 
       TeXObjectList list = null;
 
-      ControlSequence cs = parser.getListener().getControlSequence(obsname);
+      TeXObject cs = parser.expandFully(
+       parser.getListener().getControlSequence(obsname), stack);
 
-      if (cs instanceof Expandable)
-      {
-         list = ((Expandable)cs).expandfully(parser, stack);
-      }
-
-      if (list == null)
-      {
-         list = new TeXObjectList();
-         list.add(cs);
-      }
+      list = new TeXObjectList();
+      list.push(cs);
 
       return list;
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser)
       throws IOException
    {
-      TeXObject arg = parser.popNextArg();
-
-      if (arg instanceof Expandable)
-      {
-         TeXObjectList expanded = ((Expandable)arg).expandfully(parser);
-
-         if (expanded != null)
-         {
-            arg = expanded;
-         }
-      }
-
-      String obsname = arg.toString(parser);
-
-      TeXObjectList list = null;
-
-      ControlSequence cs = parser.getListener().getControlSequence(obsname);
-
-      if (cs instanceof Expandable)
-      {
-         list = ((Expandable)cs).expandfully(parser);
-      }
-
-      if (list == null)
-      {
-         list = new TeXObjectList();
-         list.add(cs);
-      }
-
-      return list;
+      return expandfully(parser, parser);
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
-      TeXObject arg = stack.popArg(parser);
-
-      if (arg instanceof Expandable)
-      {
-         TeXObjectList expanded = ((Expandable)arg).expandfully(parser, stack);
-
-         if (expanded != null)
-         {
-            arg = expanded;
-         }
-      }
+      TeXObject arg = parser.popRequiredExpandFully(stack);
 
       String obsname = arg.toString(parser);
 
@@ -185,28 +106,14 @@ public class ObsoleteFontCs extends Declaration
       stack.push(cs);
    }
 
+   @Override
    public void process(TeXParser parser)
       throws IOException
    {
-      TeXObject arg = parser.popNextArg();
-
-      if (arg instanceof Expandable)
-      {
-         TeXObjectList expanded = ((Expandable)arg).expandfully(parser);
-
-         if (expanded != null)
-         {
-            arg = expanded;
-         }
-      }
-
-      String obsname = arg.toString(parser);
-
-      ControlSequence cs = parser.getListener().getControlSequence(obsname);
-
-      parser.push(cs);
+      process(parser, parser);
    }
 
+   @Override
    public void end(TeXParser parser)
     throws IOException
    {

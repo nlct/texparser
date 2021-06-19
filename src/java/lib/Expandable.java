@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -22,14 +22,12 @@ import java.io.IOException;
 
 public interface Expandable
 {
-   // Use parser.popNextArg() if arguments required
+   // Arguments can be popped as per TeXObject.process
    public TeXObjectList expandonce(TeXParser parser) throws IOException;
 
    public TeXObjectList expandfully(TeXParser parser) throws IOException;
 
    // Local stack:
-
-   // Use stack.popArg(parser) if arguments required
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
      throws IOException;
 

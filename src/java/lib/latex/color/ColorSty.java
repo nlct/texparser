@@ -68,6 +68,8 @@ public class ColorSty extends LaTeXSty
    public void addDefinitions()
    {
       addDeclaration(new ColorDeclaration(this), "textcolor");
+
+      registerControlSequence(new NormalColor(this));
       registerControlSequence(new ColorDeclaration(this, "pagecolor", false));
       registerControlSequence(new DefineColor(this));
    }

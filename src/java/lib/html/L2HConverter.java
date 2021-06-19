@@ -28,6 +28,9 @@ import java.util.Vector;
 import java.util.Stack;
 import java.util.Iterator;
 import java.util.HashMap;
+import java.util.Calendar;
+import java.util.Locale;
+import java.text.SimpleDateFormat;
 import java.awt.Color;
 import java.awt.Dimension;
 
@@ -118,6 +121,23 @@ public class L2HConverter extends LaTeXParserListener
         "gif", "GIF", "pdf", "PDF");
    }
 
+   @Override
+   public ControlSequence getControlSequence(String name)
+   {
+      ControlSequence cs = super.getControlSequence(name);
+
+      if (!useMathJax || isStyControlSequence(cs) 
+          || cs instanceof LaTeXGenericCommand 
+          || cs instanceof L2HMathDeclaration)
+      {
+         return cs;
+      }
+
+      cs = new L2HControlSequence(cs);
+      return cs;
+   }
+
+   @Override
    protected void addPredefined()
    {
       super.addPredefined();
@@ -161,13 +181,6 @@ public class L2HConverter extends LaTeXParserListener
          }
       }
 
-      // Add 
-      // \providecommand{\IfTeXParserLib}[2]{#2}
-      // to the document to provide a conditional that depends on
-      // whether or not the TeX parser library is interpreting the
-      // code.
-      putControlSequence(new AtFirstOfTwo("IfTeXParserLib"));
-
       // syntax: \TeXParserLibToImage[options]{code}
       putControlSequence(new L2HToImage());
 
@@ -184,10 +197,6 @@ public class L2HConverter extends LaTeXParserListener
       putControlSequence(new L2HAmp());
       putControlSequence(new L2HNoBreakSpace());
       putControlSequence(new SpaceCs("newblock"));
-      putControlSequence(new L2HTheBibliography());
-
-      addToBibliographySection(new TeXCsRef("label"));
-      addToBibliographySection(createGroup("bib"));
 
       addInternalReference("bib", new TeXCsRef("refname"));
       addInternalReference("toc", new TeXCsRef("contentsname"));
@@ -195,17 +204,10 @@ public class L2HConverter extends LaTeXParserListener
       putControlSequence(new L2HTableOfContents());
       putControlSequence(new L2HContentsLine());
       putControlSequence(new L2HBibItem());
-      putControlSequence(new L2HMaketitle());
 
       putControlSequence(new L2HTextSuperscript());
       putControlSequence(new L2HTextSubscript());
 
-      putControlSequence(new L2HSection());
-      putControlSequence(new L2HSection("subsection"));
-      putControlSequence(new L2HSection("subsubsection"));
-      putControlSequence(new L2HSection("paragraph"));
-      putControlSequence(new L2HSection("subparagraph"));
-      putControlSequence(new L2HSection("part"));
       putControlSequence(new L2HNumberline());
 
       putControlSequence(new L2HCaption());
@@ -214,27 +216,10 @@ public class L2HConverter extends LaTeXParserListener
       putControlSequence(new L2HFloat("figure"));
       putControlSequence(new L2HFloat("table"));
 
-      putControlSequence(new L2HAbstract());
-
       putControlSequence(new L2HItem());
 
       putControlSequence(new L2HDescriptionLabel());
       putControlSequence(new L2HDescriptionItem());
-
-      putControlSequence(new L2HMathDeclaration("math"));
-
-      MathDeclaration begMathDecl = new L2HMathDeclaration("(");
-      parser.putControlSequence(begMathDecl);
-      parser.putControlSequence(new EndDeclaration(")", begMathDecl));
-      parser.putControlSequence(
-         new L2HMathDeclaration("displaymath", TeXSettings.MODE_DISPLAY_MATH));
-
-      MathDeclaration begDispDecl = new L2HMathDeclaration("[", TeXSettings.MODE_DISPLAY_MATH);
-
-      parser.putControlSequence(begDispDecl);
-      parser.putControlSequence(new EndDeclaration("]", begDispDecl));
-      parser.putControlSequence(
-         new L2HMathDeclaration("equation", TeXSettings.MODE_DISPLAY_MATH, true));
 
       parser.putControlSequence(new L2HTabular());
       parser.putControlSequence(new L2HTabular("array"));
@@ -273,6 +258,13 @@ public class L2HConverter extends LaTeXParserListener
       catch (IOException e)
       {
       }
+   }
+
+   @Override
+   protected MathDeclaration createMathDeclaration(String name,
+     int mode, boolean numbered)
+   {
+      return new L2HMathDeclaration(name, mode, numbered);
    }
 
    public void addInternalReference(String label, TeXObject object)
@@ -323,41 +315,43 @@ public class L2HConverter extends LaTeXParserListener
       return null;
    }
 
-   public BigOperator createBigOperator(String name, int code1, int code2)
-   {
-      return new L2HBigOperator(name, code1, code2);
-   }
-
-   public BigOperator createBigOperator(String name, int code)
-   {
-      return new L2HBigOperator(name, code);
-   }
-
-   public MathSymbol createMathSymbol(String name, int code)
-   {
-      return new L2HMathSymbol(name, code);
-   }
-
+   @Override
    public Letter getLetter(int charCode)
    {
       return new L2HLetter(charCode);
    }
 
+   @Override
    public Other getOther(int charCode)
    {
       return new L2HOther(charCode);
    }
 
+   @Override
    public Par getPar()
    {
       return new L2HPar();
    }
 
+   @Override
+   public Group createGroup()
+   {
+      return new L2HGroup();
+   }
+
+   @Override
+   public Group createGroup(String text)
+   {
+      return new L2HGroup(this, text);
+   }
+
+   @Override
    public MathGroup createMathGroup()
    {
       return new L2HMathGroup();
    }
 
+   @Override
    public AlignRow createAlignRow(TeXObjectList stack)
      throws IOException
    {
@@ -370,6 +364,7 @@ public class L2HConverter extends LaTeXParserListener
       return new L2HMathAlignRow(getParser(), stack, isNumbered);
    }
 
+   @Override
    public void cr(boolean isStar, TeXObject optArg)
      throws IOException
    {
@@ -381,10 +376,9 @@ public class L2HConverter extends LaTeXParserListener
       }
       else
       {
-         writeln("<br>\n");
+         writeln(String.format("<br>%n"));
       }
    }
-
 
    public void setWriter(Writer writer)
    {
@@ -595,6 +589,12 @@ public class L2HConverter extends LaTeXParserListener
       unicodeScriptSupport = support;
    }
 
+   public boolean inMathJaxMode()
+   {
+      return useMathJax 
+         && parser.getSettings().getMode() != TeXSettings.MODE_TEXT;
+   }
+
    public boolean useMathJax()
    {
       return useMathJax;
@@ -694,7 +694,9 @@ public class L2HConverter extends LaTeXParserListener
       writeln("div.marginright {position: absolute; right: 0pt; width: 15%;}");
 
       writeln("div.displaymath { display: block; text-align: center; }");
-      writeln("span.eqno { float: right; }");
+      writeln(".fleqn { text-align: left; }");
+      writeln("span.reqno { float: right; }");
+      writeln("span.leqno { float: left; }");
       writeln("div.table { display: block; text-align: center; }");
 
       writeTabularCss("center", "middle");
@@ -721,9 +723,11 @@ public class L2HConverter extends LaTeXParserListener
       writeln("div.caption { display: block; text-align: center; }");
       writeln("div.marginpar { float: right; }");
       writeln("div.abstract { display: block; margin-right: 4em; margin-left: 4em;}");
-      writeln("div.title { display: block; text-align: center; font-size: x-large;}");
-      writeln("div.author { display: block; text-align: center; font-size: large;}");
-      writeln("div.date { display: block; text-align: center; font-size: medium;}");
+      writeln(".titlepage {text-align: center; }");
+      writeln(".titlepage div.title { display: block; text-align: center; font-size: x-large;}");
+      writeln(".titlepage div.authors { display: block; text-align: center; font-size: large;}");
+      writeln(".titlepage div.authors div.author { display: inline-block; }");
+      writeln(".titlepage div.documentdate { display: block; text-align: center; font-size: medium;}");
       writeln("div.bibliography { display: block; margin-left: 4em; }");
       writeln("div.bibitem { display: inline; float: left; text-indent: -3em; }");
       writeln("span.numberline { display: inline-block; width: 3em; }");
@@ -783,17 +787,60 @@ public class L2HConverter extends LaTeXParserListener
    {
       super.documentclass(options, clsName, loadParentOptions);
 
-      writeable.writeln("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 3.2 Final//EN\">");
-      writeable.writeln("<html>");
+      if (htmlVersion >= 5)
+      {
+         writeable.writeln("<!DOCTYPE html>");
+      }
+      else if (htmlVersion == 4)
+      {
+         writeable.writeln("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01//EN\"");
+         writeable.writeln("   \"http://www.w3.org/TR/html4/strict.dtd\">");
+      }
+      else if (htmlVersion == 3)
+      {
+         writeable.writeln("<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 3.2 Final//EN\">");
+      }
+      else if (htmlVersion == 2)
+      {
+         writeable.writeln("<!DOCTYPE html PUBLIC \"-//IETF//DTD HTML 2.0//EN\">");
+      }
+      else
+      {
+         writeable.writeln("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML Basic 1.1//EN\"");
+         writeable.writeln("   \"http://www.w3.org/TR/xhtml-basic/xhtml-basic11.dtd\">");
+      }
+
+      if (mainLocale != null)
+      {
+         writeable.writeln(String.format("<html lang=\"%s\">", mainLocale));
+      }
+      else
+      {
+         writeable.writeln("<html>");
+      }
+
       writeable.writeln("<head>");
 
-      writeable.writeln(String.format(
-       "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=%s\">", 
-       htmlCharSet == null ? 
-         Charset.defaultCharset().name() : 
-         htmlCharSet.name()));
+      if (htmlVersion >= 5)
+      {
+         writeable.writeln(String.format("<meta charset=\"%s\">",
+          htmlCharSet == null ? 
+            Charset.defaultCharset().name() : 
+            htmlCharSet.name()));
 
-      writeable.writeln("<style type=\"text/css\">");
+         writeable.writeln("<style>");
+      }
+      else
+      {
+         writeable.writeln(String.format(
+          "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=%s\">", 
+          htmlCharSet == null ? 
+            Charset.defaultCharset().name() : 
+            htmlCharSet.name()));
+
+         writeable.writeln("<style type=\"text/css\">");
+      }
+
       writeCssStyles();
       writeable.writeln("</style>");
 
@@ -818,18 +865,13 @@ public class L2HConverter extends LaTeXParserListener
 
       if (!(cs instanceof Undefined) && cs != null)
       {
-         if (cs instanceof Expandable)
-         {
-            TeXObjectList expanded = ((Expandable)cs).expandfully(getParser());
+         cs = getParser().expandFully(cs, getParser());
 
-            if (expanded != null)
-            {
-               cs = expanded;
-            }
-         }
+         // Anything that can't be expanded is likely to be
+         // inappropriate for the <title> tag.
 
          writeable.write("<title>");
-         writeable.write(cs.toString(getParser()));
+         writeable.write(cs.stripToString(getParser()));
          writeable.writeln("</title>");
       }
 
@@ -854,43 +896,229 @@ public class L2HConverter extends LaTeXParserListener
 
       super.beginDocument();
 
+      htmlcomment("start main");
       writeable.writeln("<div id=\"main\">");
 
       getParser().getSettings().setCharMapMode(TeXSettings.CHAR_MAP_ON);
    }
 
-   public void endDocument()
-     throws IOException
+   protected void trailer() throws IOException
    {
-      if (!isInDocEnv())
-      {
-         throw new LaTeXSyntaxException(parser,
-            LaTeXSyntaxException.ERROR_NO_BEGIN_DOC);
-      }
+      writeable.writeln("</div>");
+      htmlcomment("end main");
 
-      processFootnotes();
-
-      writeable.writeln("</div>");// ends <div id="main">
-
-      ControlSequence cs = parser.getControlSequence(
-        "@enddocumenthook");
-
-      if (cs != null)
-      {
-         try
-         {
-            cs.process(parser);
-         }
-         catch (IOException e)
-         {
-            getTeXApp().error(e);
-         }
-      }
+      super.trailer();
 
       writeable.writeln("</body>");
       writeable.writeln("</html>");
+   }
 
-      throw new EOFException();
+   public void startBlock(DocumentBlock block) throws IOException
+   {
+      super.startBlock(block);
+
+      String type = block.getType();
+
+      String label = (String)block.getAttribute("label");
+
+      if (label == null && type.equals("bibliography"))
+      {
+         label = "bib";
+         block.setAttribute("label", label);
+      }
+
+      if (htmlVersion >= 5 && type.equals("datetime"))
+      {
+         writeable.write("<time");
+
+         String pattern=null;
+
+         Calendar cal = (Calendar)block.getAttribute("datetime");
+
+         if (cal != null)
+         {
+            pattern = "YYYY-MM-dd'T'HH:mm:ss.SSSZ";
+         }
+         else
+         {
+            cal = (Calendar)block.getAttribute("date");
+
+            if (cal != null)
+            {
+               pattern = "YYYY-MM-dd";
+            }
+            else
+            {
+               cal = (Calendar)block.getAttribute("time");
+
+               if (cal != null)
+               {
+                  pattern = "HH:mm:ss";
+               }
+            }
+         }
+
+         if (pattern != null)
+         {
+            SimpleDateFormat df;
+
+            Locale locale = (Locale)block.getAttribute("locale");
+
+            if (locale == null)
+            {
+               df = new SimpleDateFormat(pattern);
+            }
+            else
+            {
+               df = new SimpleDateFormat(pattern, locale);
+            }
+
+            writeable.write(String.format(" datetime=\"%s\"", 
+             df.format(cal.getTime())));
+         }
+      }
+      else if (htmlVersion >= 5 && block instanceof HierarchicalBlock)
+      {
+         addLinebreak();
+         writeable.write("<section");
+      }
+      else if (block.getDisplayStyle() == DocumentBlock.DISPLAY_INLINE)
+      {
+         writeable.write("<span");
+      }
+      else
+      {
+         addLinebreak();
+         writeable.write("<div");
+      }
+
+      if (label != null)
+      {
+         writeable.write(String.format(" id=\"%s\"", label));
+      }
+
+      String blockClass = (String)block.getAttribute("class");
+
+      if (blockClass == null)
+      {
+         blockClass = type;
+      }
+
+      writeable.write(String.format(" class=\"%s\"", blockClass));
+
+      writeable.write(">");
+
+      if (label == null)
+      {
+         htmlcomment("start "+type);
+      }
+      else
+      {
+         htmlcomment("start "+type+" "+label);
+      }
+
+      Object title = block.getAttribute("title");
+
+      if (title != null)
+      {
+         String tag = "div";
+
+         if (block instanceof HierarchicalBlock)
+         {
+            int level = ((HierarchicalBlock)block).getLevel();
+
+            if (level <= 1)
+            {
+               tag = "h1";
+            }
+            else if (level <= 6)
+            {
+               tag = "h"+level;
+            }
+         }
+
+         addLinebreak();
+         writeable.write(String.format("<%s", tag));
+
+         writeable.write('>');
+
+         Object prefix = block.getAttribute("prefix");
+
+         if (prefix == null)
+         {
+         }
+         else if (prefix instanceof String)
+         {
+            writeable.write((String)prefix);
+         }
+         else if (prefix instanceof TeXObject)
+         {
+            ((TeXObject)prefix).process(parser);
+         }
+
+         if (title instanceof String)
+         {
+            writeable.write((String)prefix);
+         }
+         else if (title instanceof TeXObject)
+         {
+            ((TeXObject)title).process(parser);
+         }
+
+         writeable.write(String.format("</%s>", tag));
+         addLinebreak();
+      }
+   }
+
+   public void endBlock(DocumentBlock block) throws IOException
+   {
+      String type = block.getType();
+      String label = (String)block.getAttribute("label");
+
+      if (label == null)
+      {
+         htmlcomment("end "+type);
+      }
+      else
+      {
+         htmlcomment("end "+type+" "+label);
+      }
+
+      if (htmlVersion >= 5 && type.equals("datetime"))
+      {
+         writeable.write("</time>");
+      }
+      else if (htmlVersion >= 5 && block instanceof HierarchicalBlock)
+      {
+         writeable.write("</section>");
+         addLinebreak();
+      }
+      else if (block.getDisplayStyle() == DocumentBlock.DISPLAY_INLINE)
+      {
+         writeable.write("</span>");
+      }
+      else
+      {
+         writeable.write("</div>");
+         addLinebreak();
+      }
+
+      super.endBlock(block);
+   }
+
+   public void htmlcomment(String str)
+    throws IOException
+   {
+      writeable.write(String.format("<!-- %s -->", str));
+   }
+
+   public void addLinebreak()
+    throws IOException
+   {
+      if (addLineBreaks)
+      {
+         writeable.writeln("");
+      }
    }
 
    public void overwithdelims(TeXObject firstDelim,
@@ -1657,6 +1885,28 @@ public class L2HConverter extends LaTeXParserListener
       return String.format("%fpt", unit.toUnit(getParser(), value, TeXUnit.BP));
    }
 
+   public String convertLabel(String label)
+   {
+      StringBuilder builder = new StringBuilder();
+
+      for (int i = 0; i < label.length(); )
+      {
+         int cp = label.codePointAt(i);
+         i += Character.charCount(cp);
+
+         if (cp == '\'' || cp == '"' || cp == '<' || cp == '>' || cp == '&')
+         {
+            builder.append(String.format("&#x%X;", cp));
+         }
+         else
+         {
+            builder.appendCodePoint(cp);
+         }
+      }
+
+      return builder.toString();
+   }
+
    public String getUri(Path path)
    {
       if (path.isAbsolute())
@@ -1935,10 +2185,35 @@ public class L2HConverter extends LaTeXParserListener
        text));
    }
 
+   // For cases where \label isn't in a convenient place to move it
+   // to the most local tag.
    public TeXObject getAnchor(String anchorName)
    {
-      return new HtmlTag(String.format("<a name=\"%s\"></a>", anchorName));
+      if (htmlVersion >= 4)
+      {
+         return new HtmlTag(
+           String.format("<span class=\"label\" id=\"%s\"></span>", 
+           convertLabel(anchorName)));
+      }
+      else
+      {
+         return new HtmlTag(String.format("<a name=\"%s\"></a>", 
+           convertLabel(anchorName)));
+      }
    }
+
+   // major version, e.g. 5
+   public void setHtmlVersion(int version)
+   {
+      htmlVersion = version;
+   }
+
+   public int getHtmlVersion()
+   {
+      return htmlVersion;
+   }
+
+   private Locale mainLocale;
 
    private Vector<String> styCs;
 
@@ -1956,6 +2231,8 @@ public class L2HConverter extends LaTeXParserListener
 
    private boolean unicodeScriptSupport=true;
 
+   private int htmlVersion = 5;
+
    private String suffix = "html";
 
    private Vector<String> extraHead=null;
@@ -1966,8 +2243,7 @@ public class L2HConverter extends LaTeXParserListener
 
    private HashMap<String,String> defaultStyles;
 
-
-   private Stack<TrivListDec> trivListStack = new Stack<TrivListDec>();
+   private boolean addLineBreaks=true;
 
    public static final String MIME_TYPE_PDF = "application/pdf";
    public static final String MIME_TYPE_PNG = "image/png";

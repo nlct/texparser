@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -27,17 +27,26 @@ public class DoubleParam implements ParameterToken,Expandable
       setNext(param);
    }
 
+   @Override
    public Object clone()
    {
       return new DoubleParam((ParameterToken)param.clone());
    }
 
+   @Override
+   public int getTeXCategory()
+   {
+      return TYPE_PARAM;
+   }
+
+   @Override
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
       return expandonce(parser);
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser)
      throws IOException
    {
@@ -48,23 +57,27 @@ public class DoubleParam implements ParameterToken,Expandable
       return expanded;
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
       return expandonce(parser);
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser)
      throws IOException
    {
       return expandonce(parser);
    }
 
+   @Override
    public ParameterToken next()
    {
       return param;
    }
 
+   @Override
    public Param tail()
    {
       if (param instanceof Param)
@@ -82,6 +95,7 @@ public class DoubleParam implements ParameterToken,Expandable
       this.param = param;
    }
 
+   @Override
    public String toString(TeXParser parser)
    {
       return String.format("%s%s", 
@@ -89,17 +103,27 @@ public class DoubleParam implements ParameterToken,Expandable
          next().toString(parser));
    }
 
+   @Override
    public String format()
    {
       return "#"+next().format();
    }
 
+   @Override
+   public String stripToString(TeXParser parser)
+     throws IOException
+   {
+      return format();
+   }
+
+   @Override
    public String toString()
    {
       return String.format("%s[param=%s]", getClass().getName(),
         next().toString());
    }
 
+   @Override
    public TeXObjectList string(TeXParser parser)
      throws IOException
    {
@@ -110,19 +134,42 @@ public class DoubleParam implements ParameterToken,Expandable
       return list;
    }
 
+   @Override
+   public boolean process(TeXParser parser, TeXObjectList list, StackMarker marker)
+     throws IOException
+   {
+      list.push(param);
+      return false;
+   }
+
+   @Override
    public void process(TeXParser parser, TeXObjectList list)
      throws IOException
    {
       list.push(param);
    }
 
+   @Override
    public void process(TeXParser parser)
      throws IOException
    {
       parser.push(param);
    }
 
+   @Override
+   public boolean isPopStyleSkip(PopStyle popStyle)
+   {
+      return false;
+   }
+
+   @Override
    public boolean isPar()
+   {
+      return false;
+   }
+
+   @Override
+   public boolean isEmptyObject()
    {
       return false;
    }

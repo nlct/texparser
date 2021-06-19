@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -26,11 +26,13 @@ public class EmUnit extends TeXUnit
    {
    }
 
+   @Override
    public Object clone()
    {
       return new EmUnit();
    }
 
+   @Override
    public boolean equals(Object object)
    {
       if (this == object) return true;
@@ -41,6 +43,7 @@ public class EmUnit extends TeXUnit
    }
 
    // convert value in other unit to this unit
+   @Override
    public float toUnit(TeXParser parser, float value, 
      TeXUnit otherUnit)
    throws TeXSyntaxException
@@ -59,6 +62,7 @@ public class EmUnit extends TeXUnit
    }
 
    // convert value in this unit to other unit
+   @Override
    public float fromUnit(TeXParser parser, float value, 
      TeXUnit otherUnit)
    throws TeXSyntaxException
@@ -76,39 +80,46 @@ public class EmUnit extends TeXUnit
       return otherUnit.fromPt(parser, parser.getListener().emToPt(value));
    }
 
+   @Override
    public float toPt(TeXParser parser, float value)
       throws TeXSyntaxException
    {
       return parser.getListener().emToPt(value);
    }
 
+   @Override
    public float fromPt(TeXParser parser, float value)
       throws TeXSyntaxException
    {
       return value/parser.getListener().emToPt(1f);
    }
 
+   @Override
    public TeXObjectList string(TeXParser parser)
      throws IOException
    {
       return parser.string(toString());
    }
 
+   @Override
    public String toString(TeXParser parser)
    {
       return toString();
    }
 
+   @Override
    public String format()
    {
       return "em";
    }
 
+   @Override
    public void process(TeXParser parser) throws IOException
    {
       parser.getListener().getWriteable().write("em");
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack)
       throws IOException
    {

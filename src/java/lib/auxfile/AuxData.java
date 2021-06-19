@@ -140,9 +140,9 @@ public class AuxData
             {
                TeXObject params = data.getArg(1);
 
-               if (params instanceof TeXObjectList)
+               if (params instanceof AbstractTeXObjectList)
                {
-                  TeXObject ref = ((TeXObjectList)params).firstElement();
+                  TeXObject ref = ((AbstractTeXObjectList)params).firstElement();
 
                   if (ref instanceof Group)
                   {
@@ -204,10 +204,10 @@ public class AuxData
             {
                TeXObject params = data.getArg(1);
 
-               if (params instanceof TeXObjectList
-               && (((TeXObjectList)params).size() > 1))
+               if (params instanceof AbstractTeXObjectList
+               && (((AbstractTeXObjectList)params).size() > 1))
                {
-                  TeXObject ref = ((TeXObjectList)params).get(1);
+                  TeXObject ref = ((AbstractTeXObjectList)params).get(1);
 
                   if (ref instanceof Group)
                   {
@@ -269,10 +269,10 @@ public class AuxData
             {
                TeXObject params = data.getArg(1);
 
-               if (params instanceof TeXObjectList
+               if (params instanceof AbstractTeXObjectList
                && (((TeXObjectList)params).size() > 2))
                {
-                  TeXObject ref = ((TeXObjectList)params).get(2);
+                  TeXObject ref = ((AbstractTeXObjectList)params).get(2);
 
                   if (ref instanceof Group)
                   {
@@ -331,8 +331,8 @@ public class AuxData
             TeXObject arg = data.getArg(0);
             TeXObject params = data.getArg(1);
 
-            if (params instanceof TeXObjectList
-            && (((TeXObjectList)params).size() > 3))
+            if (params instanceof AbstractTeXObjectList
+            && (((AbstractTeXObjectList)params).size() > 3))
             {
                TeXObject ref = ((TeXObjectList)params).get(3);
 
@@ -401,8 +401,8 @@ public class AuxData
             {
                TeXObject params = data.getArg(1);
 
-               if (params instanceof TeXObjectList
-               && (((TeXObjectList)params).size() > 3))
+               if (params instanceof AbstractTeXObjectList
+               && (((AbstractTeXObjectList)params).size() > 3))
                {
                   TeXObject ref = ((TeXObjectList)params).get(3);
 

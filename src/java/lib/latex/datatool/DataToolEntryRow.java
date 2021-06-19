@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -25,7 +25,7 @@ import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.*;
 
 public class DataToolEntryRow extends Vector<DataToolEntry> 
- implements TeXObject
+ implements TeXObject,Expandable
 {
    public DataToolEntryRow(DataToolSty sty)
    {
@@ -46,6 +46,7 @@ public class DataToolEntryRow extends Vector<DataToolEntry>
       setRowIndex(rowIndex);
    }
 
+   @Override
    public Object clone()
    {
       DataToolEntryRow row = new DataToolEntryRow(rowIndex, sty, capacity());
@@ -77,21 +78,21 @@ public class DataToolEntryRow extends Vector<DataToolEntry>
      TeXObjectList stack, DataToolSty sty)
       throws IOException
    {
-      if (stack.peekStack(TeXObjectList.POP_IGNORE_LEADING_SPACE)
+      if (stack.peekStack(PopStyle.IGNORE_LEADING_SPACE)
             instanceof DataToolEntryRow)
       {
          return (DataToolEntryRow)stack.popToken(
-            TeXObjectList.POP_IGNORE_LEADING_SPACE);
+            PopStyle.IGNORE_LEADING_SPACE);
       }
 
       if (!stack.popCsMarker(parser, "db@row@elt@w", 
-            TeXObjectList.POP_IGNORE_LEADING_SPACE))
+            PopStyle.IGNORE_LEADING_SPACE))
       {
          return null;
       }
 
       if (!stack.popCsMarker(parser, "db@row@id@w", 
-            TeXObjectList.POP_IGNORE_LEADING_SPACE))
+            PopStyle.IGNORE_LEADING_SPACE))
       {
          return null;
       }
@@ -148,6 +149,7 @@ public class DataToolEntryRow extends Vector<DataToolEntry>
       return null;
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser)
       throws IOException
    {
@@ -161,16 +163,48 @@ public class DataToolEntryRow extends Vector<DataToolEntry>
       return list;
    }
 
+   @Override
+   public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
+      throws IOException
+   {
+      return expandonce(parser);
+   }
+
+   @Override
+   public TeXObjectList expandfully(TeXParser parser)
+      throws IOException
+   {
+      return expandonce(parser);
+   }
+
+   @Override
+   public TeXObjectList expandfully(TeXParser parser, TeXObjectList stack)
+      throws IOException
+   {
+      return expandonce(parser);
+   }
+
+   @Override
    public void process(TeXParser parser) throws IOException
    {
       parser.addAll(0, expandonce(parser));
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack) throws IOException
    {
-      process(parser);
+      stack.addAll(0, expandonce(parser, stack));
    }
 
+   @Override
+   public boolean process(TeXParser parser, TeXObjectList stack, StackMarker marker)
+      throws IOException
+   {
+      process(parser, stack);
+      return false;
+   }
+
+   @Override
    public String toString(TeXParser parser)
    {
       try
@@ -183,12 +217,14 @@ public class DataToolEntryRow extends Vector<DataToolEntry>
       }
    }
 
+   @Override
    public TeXObjectList string(TeXParser parser)
     throws IOException
    {
       return expandonce(parser).string(parser);
    }
 
+   @Override
    public String format()
    {
       try
@@ -201,7 +237,45 @@ public class DataToolEntryRow extends Vector<DataToolEntry>
       }
    }
 
+   @Override
+   public String stripToString(TeXParser parser)
+     throws IOException
+   {
+      StringBuilder builder = new StringBuilder();
+
+      for (int i = 0; i < size(); i++)
+      {
+         if (i > 0)
+         {
+            builder.append(' ');
+         }
+
+         builder.append(get(i).stripToString(parser));
+      }
+
+      return builder.toString();
+   }
+
+   @Override
+   public boolean isPopStyleSkip(PopStyle popStyle)
+   {
+      return false;
+   }
+
+   @Override
    public boolean isPar()
+   {
+      return false;
+   }
+
+   @Override
+   public int getTeXCategory()
+   {
+      return TYPE_OBJECT;
+   }
+
+   @Override
+   public boolean isEmptyObject()
    {
       return false;
    }

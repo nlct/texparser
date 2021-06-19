@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -34,63 +34,32 @@ public class Index extends ControlSequence
       super(name);
    }
 
+   @Override
    public Object clone()
    {
       return new Index(getName());
    }
 
+   @Override
    public void process(TeXParser parser) throws IOException
    {
-      byte popStyle = TeXObjectList.POP_SHORT;
-
-      TeXObject optArg = parser.popNextArg(popStyle, '[', ']');
-      String opt = null;
-
-      if (optArg != null)
-      {
-         if (optArg instanceof Expandable)
-         {
-            TeXObjectList expanded = ((Expandable)optArg).expandfully(parser);
-
-            if (expanded != null)
-            {
-               optArg = expanded;
-            }
-         }
-
-         opt = optArg.toString(parser);
-      }
-
-      TeXObject arg1 = parser.popNextArg(popStyle);
-
-      ((LaTeXParserListener)parser.getListener()).index(opt, arg1);
+      process(parser, parser);
    }
 
    public void process(TeXParser parser, TeXObjectList stack) throws IOException
    {
-      byte popStyle = TeXObjectList.POP_SHORT;
+      PopStyle popStyle = PopStyle.SHORT;
 
-      TeXObject optArg = stack.popArg(parser, popStyle, '[', ']');
+      TeXObject optArg = parser.popOptionalExpandFully(stack, popStyle);
 
       String opt = null;
 
       if (optArg != null)
       {
-         if (optArg instanceof Expandable)
-         {
-            TeXObjectList expanded = 
-               ((Expandable)optArg).expandfully(parser, stack);
-
-            if (expanded != null)
-            {
-               optArg = expanded;
-            }
-         }
-
          opt = optArg.toString(parser);
       }
 
-      TeXObject arg1 = stack.popArg(parser, popStyle);
+      TeXObject arg1 = parser.popRequired(stack, popStyle);
 
       ((LaTeXParserListener)parser.getListener()).index(opt, arg1);
    }

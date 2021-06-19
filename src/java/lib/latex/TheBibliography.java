@@ -23,11 +23,11 @@ import java.util.Vector;
 
 import com.dickimawbooks.texparserlib.*;
 
-public abstract class TheBibliography extends Declaration
+public class TheBibliography extends DocumentBlockDec
 {
    public TheBibliography()
    {
-      this("thebibliography");
+      this("thebibliography", "bibliography");
    }
 
    public TheBibliography(String name)
@@ -35,33 +35,45 @@ public abstract class TheBibliography extends Declaration
       super(name);
    }
 
-   public TeXObjectList expandonce(TeXParser parser, TeXObjectList list)
-      throws IOException
+   public TheBibliography(String name, String type)
    {
-      return null;
+      super(name, type);
    }
 
-   public TeXObjectList expandonce(TeXParser parser)
-      throws IOException
+   public Object clone()
    {
-      return null;
+      return new TheBibliography(getName(), getType());
    }
 
-   public TeXObjectList expandfully(TeXParser parser, TeXObjectList list)
-      throws IOException
+   public DocumentBlock createBlock(TeXParser parser)
    {
-      return null;
+      ControlSequence cs = parser.getControlSequence("chapter");
+
+      return new HierarchicalBlock(cs == null ? 1 : 0, getType());
    }
 
-   public TeXObjectList expandfully(TeXParser parser)
-      throws IOException
+   public void setBlockAttributes(DocumentBlock block,
+      TeXParser parser, TeXObjectList stack)
+     throws IOException
    {
-      return null;
+      ControlSequence cs = parser.getControlSequence("chapter");
+      ControlSequence bibname = null;
+
+      if (cs != null)
+      {
+         bibname = parser.getControlSequence("bibname");
+      }
+
+      if (bibname == null)
+      {
+         block.setAttribute("title", new TeXCsRef("refname"));
+      }
+      else
+      {
+         block.setAttribute("title", bibname);
+      }
    }
 
-   protected abstract void startBibliography(TeXParser parser, 
-     TeXObject widest)
-     throws IOException;
 
    public void process(TeXParser parser) throws IOException
    {
@@ -75,14 +87,12 @@ public abstract class TheBibliography extends Declaration
 
       listener.resetcounter("enumiv");
 
-      listener.getBibliographySection().process(parser);
-
-      startBibliography(parser, arg);
+      super.process(parser);
    }
 
-   public void process(TeXParser parser, TeXObjectList list) throws IOException
+   public void process(TeXParser parser, TeXObjectList stack) throws IOException
    {
-      TeXObject arg = list.popArg(parser);
+      TeXObject arg = stack.popArg(parser);
 
       LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
 
@@ -92,13 +102,6 @@ public abstract class TheBibliography extends Declaration
 
       listener.resetcounter("enumiv");
 
-      listener.getBibliographySection().process(parser);
-
-      startBibliography(parser, arg);
-   }
-
-   public boolean isModeSwitcher()
-   {
-      return false;
+      super.process(parser, stack);
    }
 }

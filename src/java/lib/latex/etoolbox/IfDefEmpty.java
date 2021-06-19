@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -23,7 +23,7 @@ import java.io.IOException;
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.*;
 
-public class IfDefEmpty extends ControlSequence implements Expandable
+public class IfDefEmpty extends Command
 {
    public IfDefEmpty()
    {
@@ -41,10 +41,20 @@ public class IfDefEmpty extends ControlSequence implements Expandable
       return new IfDefEmpty(getName(), isCsname);
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      TeXObject arg = (stack == parser ? parser.popNextArg():stack.popArg(parser));
+      TeXObject arg;
+
+      if (stack == parser || stack == null)
+      {
+         arg = parser.popNextArg();
+      }
+      else
+      {
+         arg = stack.popArg(parser);
+      }
 
       if (isCsname)
       {
@@ -52,7 +62,7 @@ public class IfDefEmpty extends ControlSequence implements Expandable
          {
             TeXObjectList expanded;
 
-            if (stack == parser)
+            if (stack == parser || stack == null)
             {
                expanded = ((Expandable)arg).expandfully(parser);
             }
@@ -88,7 +98,7 @@ public class IfDefEmpty extends ControlSequence implements Expandable
       {
          TeXObjectList expanded;
 
-         if (stack == parser)
+         if (stack == parser || stack == null)
          {
             expanded = ((Expandable)arg).expandfully(parser);
          }
@@ -105,8 +115,7 @@ public class IfDefEmpty extends ControlSequence implements Expandable
 
       if (arg.toString(parser).isEmpty())
       {
-         if (truePart instanceof TeXObjectList 
-              && !(truePart instanceof Group))
+         if (truePart instanceof TeXObjectList)
          {
             return (TeXObjectList)truePart;
          }
@@ -119,8 +128,7 @@ public class IfDefEmpty extends ControlSequence implements Expandable
       }
       else
       {
-         if (falsePart instanceof TeXObjectList 
-              && !(falsePart instanceof Group))
+         if (falsePart instanceof TeXObjectList)
          {
             return (TeXObjectList)falsePart;
          }
@@ -133,24 +141,28 @@ public class IfDefEmpty extends ControlSequence implements Expandable
       }
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser)
      throws IOException
    {
       return expandonce(parser, parser);
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
       return expandonce(parser, stack).expandfully(parser, stack);
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser)
      throws IOException
    {
       return expandonce(parser).expandfully(parser);
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
@@ -234,6 +246,7 @@ public class IfDefEmpty extends ControlSequence implements Expandable
       }
    }
 
+   @Override
    public void process(TeXParser parser)
      throws IOException
    {

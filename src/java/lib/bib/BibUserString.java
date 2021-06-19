@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -35,6 +35,7 @@ public class BibUserString implements BibValue
       this.string = string;
    }
 
+   @Override
    public TeXObject getContents()
    {
       return string;
@@ -84,13 +85,14 @@ public class BibUserString implements BibValue
          fieldDelimChange));
    }
 
+   @Override
    public String toString()
    {
       return String.format("%s[%s]", getClass().getSimpleName(), 
          string.format());
    }
 
-   private void convertAt(TeXObjectList list, TeXParser parser)
+   private void convertAt(AbstractTeXObjectList list, TeXParser parser)
       throws IOException
    {
       for (int i = 0; i < list.size(); i++)
@@ -101,9 +103,9 @@ public class BibUserString implements BibValue
          {
             list.set(i, parser.getListener().getOther('@'));
          }
-         else if (object instanceof TeXObjectList)
+         else if (object instanceof AbstractTeXObjectList)
          {
-            convertAt((TeXObjectList)object, parser);
+            convertAt((AbstractTeXObjectList)object, parser);
          }
       }
    }
@@ -149,10 +151,8 @@ public class BibUserString implements BibValue
       int firstIdx = 0;
       int lastIdx = stringList.size()-1;
 
-      if (first instanceof CharObject
-       && ((CharObject)first).getCharCode() == (int)'"'
-       && last instanceof CharObject
-       && ((CharObject)last).getCharCode() == (int)'"')
+      if (parser.isCharacter(first, '"')
+       && parser.isCharacter(last, '"'))
       {
          firstIdx++;
          lastIdx--;
@@ -167,18 +167,18 @@ public class BibUserString implements BibValue
    }
 
    protected int expand(TeXParser parser, 
-      TeXObjectList stringList, int i, TeXObjectList list)
+      AbstractTeXObjectList stringList, int i, AbstractTeXObjectList list)
    throws IOException
    {
       TeXObject obj = stringList.get(i);
 
-      if (obj instanceof TeXObjectList)
+      if (obj instanceof AbstractTeXObjectList)
       {
-         TeXObjectList subList = ((TeXObjectList)obj).createList();
+         AbstractTeXObjectList subList = ((AbstractTeXObjectList)obj).createList();
 
-         for (int j = 0; j < ((TeXObjectList)obj).size(); j++)
+         for (int j = 0; j < ((AbstractTeXObjectList)obj).size(); j++)
          {
-            j = expand(parser, (TeXObjectList)obj, j, subList);
+            j = expand(parser, (AbstractTeXObjectList)obj, j, subList);
          }
 
          list.add(subList);
@@ -248,6 +248,7 @@ public class BibUserString implements BibValue
       return i;
    }
 
+   @Override
    public Object clone()
    {
       return new BibUserString((TeXObject)string.clone());

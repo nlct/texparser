@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -37,26 +37,50 @@ public class Par implements TeXObject
       return name;
    }
 
+   @Override
    public Object clone()
    {
       return new Par(getName());
    }
 
+   @Override
+   public boolean isPopStyleSkip(PopStyle popStyle)
+   {
+      return popStyle.isIgnoreLeadingPar();
+   }
+
+   @Override
+   public int getTeXCategory()
+   {
+      return TYPE_OBJECT;
+   }
+
+   @Override
    public String toString(TeXParser parser)
    {
       return String.format("%n%n");
    }
 
+   @Override
    public String format()
    {
       return String.format("\\%s ", name);
    }
 
+   @Override
+   public String stripToString(TeXParser parser)
+     throws IOException
+   {
+      return toString(parser);
+   }
+
+   @Override
    public String toString()
    {
       return String.format("%s%n", getClass().getName());
    }
 
+   @Override
    public TeXObjectList string(TeXParser parser)
      throws IOException
    {
@@ -64,19 +88,35 @@ public class Par implements TeXObject
         new String(Character.toChars(parser.getEscChar())), name));
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList list)
       throws IOException
    {
    }
 
+   @Override
    public void process(TeXParser parser)
       throws IOException
    {
    }
 
+   @Override
+   public boolean process(TeXParser parser, TeXObjectList stack, StackMarker marker)
+      throws IOException
+   {
+      return false;
+   }
+
+   @Override
    public boolean isPar()
    {
       return true;
+   }
+
+   @Override
+   public boolean isEmptyObject()
+   {
+      return false;
    }
 
    private String name;

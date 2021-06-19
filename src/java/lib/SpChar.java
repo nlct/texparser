@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -31,9 +31,21 @@ public class SpChar extends Macro
       return new SpChar();
    }
 
+   public int getTeXCategory()
+   {
+      return TYPE_SP;
+   }
+
    public String format()
    {
       return "^";
+   }
+
+   @Override
+   public String stripToString(TeXParser parser)
+     throws IOException
+   {
+      return format();
    }
 
    public String toString(TeXParser parser)

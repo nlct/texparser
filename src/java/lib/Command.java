@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -57,14 +57,9 @@ public abstract class Command extends ControlSequence implements Expandable
       return result == null ? expanded : result;
    }
 
-   public TeXObjectList expandfully(TeXParser parser,
-        TeXObjectList stack) throws IOException
+   public TeXObjectList expandfully(TeXParser parser, TeXObjectList stack)
+      throws IOException
    {
-      if (stack == null)
-      {
-         return expandfully(parser);
-      }
-
       TeXObjectList expanded = expandonce(parser, stack);
 
       if (expanded == null)
@@ -72,37 +67,9 @@ public abstract class Command extends ControlSequence implements Expandable
          return null;
       }
 
-      stack.addAll(0, expanded);
+      TeXObjectList result = expanded.expandfully(parser, stack);
 
-      TeXObjectList list = new TeXObjectList();
-
-      while (stack.size() > 0)
-      {
-         TeXObject object = stack.remove(0);
-
-         if (object instanceof Ignoreable)
-         {
-         }
-         else if (object instanceof Expandable)
-         {
-            expanded = ((Expandable)object).expandfully(parser, stack);
-
-            if (expanded == null)
-            {
-               list.add(object);
-            }
-            else
-            {
-               list.addAll(expanded);
-            }
-         }
-         else
-         {
-            list.add(object);
-         }
-      }
-
-      return list;
+      return result == null ? expanded : result;
    }
 
    public void process(TeXParser parser, TeXObjectList stack)

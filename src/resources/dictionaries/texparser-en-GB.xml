@@ -116,6 +116,10 @@ There is NO WARRANTY, to the extent permitted by law.</entry>
 <entry key="tex.error.generic">{0}</entry>
 <entry key="tex.error.file.not.found">File ''{0}'' not found.</entry>
 <entry key="tex.error.unexpandable">Can''t expand ''{0}''</entry>
+<entry key="tex.error.parsing">Error parsing ''{0}''</entry>
+<entry key="tex.error.marker.found">Marker found: {0}</entry>
+<entry key="tex.error.lost.marker">Lost marker: {0}</entry>
+<entry key="tex.error.misplaced.noalign">Misplaced \noalign</entry>
 
 <!--  LaTeX Error Messages -->
 

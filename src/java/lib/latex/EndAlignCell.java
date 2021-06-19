@@ -18,31 +18,24 @@
 */
 package com.dickimawbooks.texparserlib.latex;
 
-public class HierarchicalUnit implements Comparable<HierarchicalUnit>
+import com.dickimawbooks.texparserlib.*;
+
+public class EndAlignCell extends AbstractInvisibleObject 
+  implements EndGroupObject
 {
-   public HierarchicalUnit(int level, String type)
+   public EndAlignCell()
    {
-      this.level = level;
-      this.type = type;
    }
 
-   public int compareTo(HierarchicalUnit other)
+   @Override
+   public Object clone()
    {
-      if (level > other.level) return 1;
-      if (level < other.level) return -1;
-      return 0;
+      return new EndAlignCell();
    }
 
-   public int getLevel()
+   public boolean matches(BeginGroupObject bg)
    {
-      return level;
+      return bg instanceof BeginAlignCell;
    }
-
-   public String getType()
-   {
-      return type;
-   }
-
-   private int level;
-   private String type;
 }
+

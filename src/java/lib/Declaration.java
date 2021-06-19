@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -25,6 +25,23 @@ public abstract class Declaration extends Command
    public Declaration(String name)
    {
       super(name);
+   }
+
+   /* Convenient method to push this Declaration to the current TeXSettings.
+    Actual declarations that don't have an explicit end (e.g. \em) need to
+    be pushed to the current settings so that the end can be called when
+    the current group closes. This allows L2HConverter to add
+    closing tags. Declarations that are actually environments that
+    are always used with \begin{decl name} and \end{decl name}
+    shouldn't usually be pushed. However, there are some declarations
+    that may either be used explicitly or called as an environment,
+    in which case, the process methods need to use pushEnd and end(TeXParser) will
+    need to remove this using TeXSettings.removeDeclaration(this) to prevent the
+    end being done twice. (See, for example, FontShapeDeclaration.)
+   */ 
+   protected void pushEnd(TeXParser parser)
+   {
+      parser.pushDeclaration(this);
    }
 
    public abstract void end(TeXParser parser) throws IOException;

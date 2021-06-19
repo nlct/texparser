@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -40,16 +40,7 @@ public abstract class NumericRegister extends Register implements Numerical
    protected TeXObject popValue(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
-      TeXObject object;
-
-      if (parser == stack)
-      {
-         object = parser.popNumerical();
-      }
-      else
-      {
-         object = stack.popNumerical(parser);
-      }
+      TeXObject object = parser.popRequiredNumerical(stack);
 
       return object;
    }
@@ -57,10 +48,7 @@ public abstract class NumericRegister extends Register implements Numerical
    public void setContents(TeXParser parser, TeXObject object)
     throws TeXSyntaxException
    {
-      if (object instanceof AssignedMacro)
-      {
-         object = ((AssignedMacro)object).getBaseUnderlying();
-      }
+      object = parser.resolveReference(object);
 
       if (!(object instanceof Numerical))
       {

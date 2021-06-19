@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -21,8 +21,9 @@ package com.dickimawbooks.texparserlib.latex;
 import java.io.IOException;
 
 import com.dickimawbooks.texparserlib.*;
+import com.dickimawbooks.texparserlib.primitives.EndCs;
 
-public class End extends ControlSequence
+public class End extends EndCs
 {
    public End()
    {
@@ -34,24 +35,19 @@ public class End extends ControlSequence
       super(name);
    }
 
+   @Override
    public Object clone()
    {
       return new End(getName());
    }
 
-   public void process(TeXParser parser, TeXObjectList list)
+   @Override
+   public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
       LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
 
-      TeXObject arg = list.expandedPopStack(parser, TeXObjectList.POP_SHORT);
-
-      if (arg instanceof Group)
-      {
-         arg = ((Group)arg).toList();
-      }
-
-      String name = arg.toString(parser);
+      String name = parser.popRequiredString(stack);
 
       if (name.equals("document"))
       {
@@ -67,15 +63,7 @@ public class End extends ControlSequence
             LaTeXSyntaxException.ERROR_EXTRA_END, name);
       }
 
-      if (currenv instanceof Expandable)
-      {
-         TeXObjectList expanded = ((Expandable)currenv).expandfully(parser);
-
-         if (expanded != null)
-         {
-            currenv = expanded;
-         }
-      }
+      currenv = parser.expandFully(currenv, stack);
 
       doEnd(parser, name);
 
@@ -88,63 +76,22 @@ public class End extends ControlSequence
       }
    }
 
+   @Override
    public void process(TeXParser parser)
      throws IOException
    {
-      LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
-
-      TeXObject arg = parser.expandedPopStack(TeXObjectList.POP_SHORT);
-
-      if (arg instanceof Group)
-      {
-         arg = ((Group)arg).toList();
-      }
-
-      String name = arg.toString(parser);
-
-      if (name.equals("document"))
-      {
-         listener.endDocument();
-         return;
-      }
-
-      TeXObject currenv = parser.getControlSequence("@currenvir");
-
-      if (currenv == null)
-      {
-         throw new LaTeXSyntaxException(parser, 
-             LaTeXSyntaxException.ERROR_EXTRA_END, name);
-      }
-
-      if (currenv instanceof Expandable)
-      {
-         TeXObjectList expanded = ((Expandable)currenv).expandfully(parser);
-
-         if (expanded != null)
-         {
-            currenv = expanded;
-         }
-      }
-
-      doEnd(parser, name);
-
-      parser.endGroup();
-
-      if (!name.equals(currenv.toString(parser)))
-      {
-         throw new LaTeXSyntaxException(parser, 
-             LaTeXSyntaxException.ERROR_EXTRA_END, name);
-      }
+      process(parser, parser);
    }
 
    protected void doEnd(TeXParser parser, String name)
       throws IOException
    {
-      ControlSequence cs = parser.getListener().getControlSequence(name);
+      TeXObject endObj = parser.resolveReference(
+         parser.getListener().getControlSequence(name));
 
-      if (cs instanceof Declaration)
+      if (endObj instanceof Declaration)
       {
-         ((Declaration)cs).end(parser);
+         ((Declaration)endObj).end(parser);
       }
    }
 }

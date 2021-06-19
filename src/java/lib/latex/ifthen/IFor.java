@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -27,7 +27,7 @@ public class IFor extends ControlSequence implements BinaryConditionalOperator
 {
    public IFor()
    {
-      this("or");
+      this("TE@or");
    }
 
    public IFor(String name)
@@ -35,21 +35,25 @@ public class IFor extends ControlSequence implements BinaryConditionalOperator
       super(name);
    }
 
+   @Override
    public Object clone()
    {
       return new IFor(getName());
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
    }
 
+   @Override
    public void process(TeXParser parser)
      throws IOException
    {
    }
 
+   @Override
    public boolean evaluate(boolean value1, boolean value2)
    {
       return value1 || value2;

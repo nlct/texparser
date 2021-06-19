@@ -140,8 +140,7 @@ public class BibValueList extends Vector<BibValue> implements BibValue
          list.add(obj);
       }
 
-      if (n == 0 && stripDelim && obj instanceof TeXObjectList
-          && !(obj instanceof Group))
+      if (n == 0 && stripDelim && obj instanceof TeXObjectList)
       {
          return stripDelim((TeXObjectList)list);
       }

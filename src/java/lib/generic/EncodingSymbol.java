@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -22,8 +22,8 @@ import java.io.IOException;
 
 import com.dickimawbooks.texparserlib.*;
 
-public class EncodingSymbol extends ControlSequence
-  implements Expandable,CaseChangeable
+public class EncodingSymbol extends Command
+  implements CaseChangeable
 {
    public EncodingSymbol(String name, int code, FontEncoding enc)
    {

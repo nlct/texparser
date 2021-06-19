@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -44,29 +44,21 @@ public class L2LMathGroup extends MathGroup
       this.closeDelim = closeDelim;
    }
 
-   public TeXObjectList createList()
+   @Override
+   public AbstractTeXObjectList createList()
    {
       return new L2LMathGroup(isInLine(), openDelim, closeDelim);
    }
 
-   public void process(TeXParser parser)
-      throws IOException
-   {
-      process(parser, parser);
-   }
-
-   public void process(TeXParser parser, TeXObjectList stack)
+   @Override
+   public void startGroup(TeXParser parser)
       throws IOException
    {
       parser.startGroup();
 
       Writeable writeable = parser.getListener().getWriteable();
-
       String delim = parser.getMathDelim(isInLine());
-
-      String endDelim;
-
-      int orgMode = parser.getSettings().getCurrentMode();
+      orgMode = parser.getSettings().getCurrentMode();
 
       if (isInLine())
       {
@@ -109,15 +101,127 @@ public class L2LMathGroup extends MathGroup
       }
 
       writeable.write(delim);
+   }
 
-      while (size() > 0)
+   @Override
+   public void endGroup(TeXParser parser)
+      throws IOException
+   {
+      Writeable writeable = parser.getListener().getWriteable();
+      parser.getSettings().setMode(orgMode);
+      writeable.write(endDelim);
+      parser.endGroup();
+   }
+
+   @Override
+   protected void processList(TeXParser parser, StackMarker marker)
+    throws IOException
+   {
+      LaTeX2LaTeX listener = (LaTeX2LaTeX)parser.getListener();
+      Writeable writeable = listener.getWriteable();
+      TeXObjectList subStack = toList();
+
+      while (subStack.size() > 0)
       {
-         TeXObject object = pop();
+         TeXObject object = subStack.remove(0);
 
-         if (object instanceof Obsolete
+         if (object instanceof TeXCsRef)
+         {
+            object = listener.getControlSequence(((TeXCsRef)object).getName());
+         }
+
+         if (object.equals(marker))
+         {
+            break;
+         }
+
+         if (object instanceof Group)
+         {
+            object = parseSubGroup(parser, (Group)object);
+
+            if (object.process(parser, subStack, marker))
+            {
+               break;
+            }
+         }
+         else if (object instanceof Obsolete
            && ((Obsolete)object).getOriginalCommand()
                    instanceof TeXFontDeclaration
             )
+         {
+            ControlSequence original = 
+               ((Obsolete)object).getOriginalCommand();
+
+            ControlSequence cs = listener.getControlSequence(
+               "math"+original.getName());
+
+            String replacement = cs.toString(parser);
+            listener.substituting(original.toString(parser), replacement);
+
+            Group grp = parser.getListener().createGroup();
+
+            while (subStack.size() > 0)
+            {
+               object = subStack.pop();
+
+               if (object.equals(marker)) break;
+
+               if (!(grp.isEmpty() && (object instanceof SkippedSpaces)))
+               {
+                  grp.add(object);
+               }
+            }
+
+            subStack.push(grp);
+
+            if (cs.process(parser, subStack, marker))
+            {
+               break;
+            }
+         }
+         else if (object instanceof Ignoreable
+               || object instanceof WhiteSpace)
+         {
+            writeable.write(object.toString(parser));
+         }
+         else
+         {
+            if (object.process(parser, subStack, marker))
+            {
+               break;
+            }
+         }
+      }
+
+      clear();
+
+      if (!subStack.isEmpty())
+      {
+         addAll(subStack);
+      }
+   }
+
+   protected TeXObject parseSubGroup(TeXParser parser, Group subGroup)
+      throws IOException
+   {
+      // get the first non-ignorable and test if its an obsolete
+      // font command
+
+      for (int i = 0; i < subGroup.size(); i++)
+      {
+         TeXObject object = subGroup.get(i);
+
+         if (object instanceof TeXCsRef)
+         {
+            object = parser.getListener().getControlSequence(
+                ((TeXCsRef)object).getName());
+         }
+
+         if (object instanceof Ignoreable) continue;
+
+         if (object instanceof Obsolete
+           && ((Obsolete)object).getOriginalCommand()
+                   instanceof TeXFontDeclaration)
          {
             ControlSequence original = 
                ((Obsolete)object).getOriginalCommand();
@@ -130,40 +234,41 @@ public class L2LMathGroup extends MathGroup
             String replacement = cs.toString(parser);
             listener.substituting(original.toString(parser), replacement);
 
-            Group grp = parser.getListener().createGroup();
+            subGroup.remove(i);
 
-            while (size() > 0)
+            TeXObjectList list = new TeXObjectList();
+            list.add(cs);
+
+            while (!subGroup.isEmpty())
             {
-               grp.add(pop());
+               object = subGroup.get(i);
+
+               if (object instanceof SkippedSpaces)
+               {
+                  list.add(object);
+                  subGroup.remove(i);
+               }
+               else
+               {
+                  break;
+               }
             }
 
-            cs.process(parser, grp);
-         }
-         else if (object instanceof Ignoreable
-               || object instanceof WhiteSpace)
-         {
-            writeable.write(object.toString(parser));
+            list.add(subGroup);
+
+            return list;
          }
          else
          {
-            if (stack != parser && size() == 0)
-            {
-               object.process(parser, stack);
-            }
-            else
-            {
-               object.process(parser, this);
-            }
+            return subGroup;
          }
       }
 
-      parser.getSettings().setMode(orgMode);
-
-      writeable.write(endDelim);
-
-      parser.endGroup();
+      return subGroup;
    }
 
+   private String endDelim;
+   private int orgMode = TeXSettings.MODE_TEXT;
    private String openDelim, closeDelim;
 }
 

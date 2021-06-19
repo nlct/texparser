@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -58,6 +58,7 @@ public class FixedUnit extends TeXUnit
       }
    }
 
+   @Override
    public Object clone()
    {
       return new FixedUnit(id);
@@ -68,17 +69,20 @@ public class FixedUnit extends TeXUnit
       return id;
    }
 
+   @Override
    public TeXObjectList string(TeXParser parser)
      throws IOException
    {
       return parser.string(toString());
    }
 
+   @Override
    public String toString(TeXParser parser)
    {
       return format();
    }
 
+   @Override
    public String format()
    {
       return UNIT_NAMES[id];
@@ -115,17 +119,20 @@ public class FixedUnit extends TeXUnit
       return otherUnit.toUnit(parser, value, this);
    }
 
+   @Override
    public void process(TeXParser parser) throws IOException
    {
       parser.getListener().getWriteable().write(UNIT_NAMES[id]);
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
       process(parser);
    }
 
+   @Override
    public boolean equals(Object object)
    {
       if (this == object) return true;

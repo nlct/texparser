@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -33,11 +33,11 @@ public class AuxIgnoreable extends ControlSequence
 
    public AuxIgnoreable(String name, boolean hasStarredForm, boolean[] margs)
    {
-      this(name, hasStarredForm, margs, TeXObjectList.POP_SHORT);
+      this(name, hasStarredForm, margs, PopStyle.SHORT);
    }
 
    public AuxIgnoreable(String name, boolean hasStarredForm, boolean[] margs,
-    byte popStyle)
+    PopStyle popStyle)
    {
       super(name);
       this.star = hasStarredForm;
@@ -45,11 +45,13 @@ public class AuxIgnoreable extends ControlSequence
       this.popStyle = popStyle;
    }
 
+   @Override
    public Object clone()
    {
       return new AuxIgnoreable(getName(), star, margs, popStyle);
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
@@ -57,14 +59,8 @@ public class AuxIgnoreable extends ControlSequence
 
       if (star)
       {
-         object = stack.peekStack(popStyle);
-
-         if (object instanceof CharObject
-             && ((CharObject)object).getCharCode() == (int)'*')
-         {
-            object = (stack == parser ? parser.popNextArg(popStyle) 
-              : stack.popArg(parser, popStyle));
-         }
+         // pop * if present
+         parser.isNextChar('*', stack);
       }
 
       if (margs == null)
@@ -76,18 +72,16 @@ public class AuxIgnoreable extends ControlSequence
       {
          if (isMandatoryArg)
          {
-            object = (stack == parser ?
-              parser.popNextArg(popStyle) : stack.popArg(parser, popStyle));
+            object = parser.popRequired(stack, popStyle);
          }
          else
          {
-            object = (stack == parser ?
-                       parser.popNextArg(popStyle, '[', ']')
-                       : stack.popArg(parser, popStyle, '[', ']'));
+            object = parser.popOptional(stack, popStyle);
          }
       }
    }
 
+   @Override
    public void process(TeXParser parser)
      throws IOException
    {
@@ -96,5 +90,5 @@ public class AuxIgnoreable extends ControlSequence
 
    private boolean star=false;
    private boolean[] margs = null;
-   private byte popStyle;
+   private PopStyle popStyle;
 }

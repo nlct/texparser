@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -34,6 +34,7 @@ public class Global extends Prefix
       super(name, Macro.PREFIX_GLOBAL);
    }
 
+   @Override
    public Object clone()
    {
       return new Global(getName());

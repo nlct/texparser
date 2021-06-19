@@ -39,24 +39,28 @@ public class NoBreakSpace extends Command
       return new NoBreakSpace(getName());
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList list)
      throws IOException
    {
       process(parser);
    }
 
+   @Override
    public void process(TeXParser parser)
      throws IOException
    {
       parser.getListener().getWriteable().writeCodePoint(0x00A0);
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList list)
      throws IOException
    {
       return expandonce(parser);
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser)
      throws IOException
    {
@@ -65,12 +69,14 @@ public class NoBreakSpace extends Command
       return list;
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser, TeXObjectList list)
      throws IOException
    {
       return expandfully(parser);
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser)
      throws IOException
    {

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -24,7 +24,7 @@ import java.util.Vector;
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.*;
 
-public class JmlrKeywords extends Declaration
+public class JmlrKeywords extends RobustDeclaration
 {
    public JmlrKeywords()
    {
@@ -36,80 +36,48 @@ public class JmlrKeywords extends Declaration
       super(name);
    }
 
+   @Override
    public Object clone()
    {
       return new JmlrKeywords(getName());
    }
 
-   public TeXObjectList expandonce(TeXParser parser, TeXObjectList list)
-      throws IOException
-   {
-      return null;
-   }
-
-   public TeXObjectList expandonce(TeXParser parser)
-      throws IOException
-   {
-      return null;
-   }
-
-   public TeXObjectList expandfully(TeXParser parser, TeXObjectList list)
-      throws IOException
-   {
-      return null;
-   }
-
-   public TeXObjectList expandfully(TeXParser parser)
-      throws IOException
-   {
-      return null;
-   }
-
+   @Override
    public void process(TeXParser parser) throws IOException
    {
-      Group grp = parser.getListener().createGroup("Keywords:");
-
-      parser.push(new TeXCsRef("ignorespaces"));
-      parser.push(parser.getListener().getSpace());
-      parser.push(grp);
-      parser.push(new TeXCsRef("textbf"));
-      parser.push(new TeXCsRef("small"));
+      process(parser, parser);
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack) throws IOException
    {
-      Group grp = parser.getListener().createGroup("Keywords:");
+      LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
+
+      block = new DocumentBlock("keywords");
+      listener.startBlock(block);
+
+      Group grp = listener.createGroup("Keywords:");
 
       stack.push(new TeXCsRef("ignorespaces"));
-      stack.push(parser.getListener().getSpace());
+      stack.push(listener.getSpace());
       stack.push(grp);
       stack.push(new TeXCsRef("textbf"));
-
-      (new TeXCsRef("small")).process(parser, stack);
+      stack.push(new TeXCsRef("small"));
    }
 
+   @Override
    public void end(TeXParser parser)
     throws IOException
    {
-      ControlSequence cs = parser.getControlSequence("endsmall");
-
-      if (cs == null)
-      {
-         cs = parser.getListener().getControlSequence("small");
-
-         if (cs instanceof Declaration)
-         {
-            ((Declaration)cs).end(parser);
-         }
-
-         return;
-      }
-
-      cs.process(parser);
+      LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
+      listener.endBlock(block);
    }
 
+   @Override
    public boolean isModeSwitcher()
    {
       return false;
    }
+
+   protected DocumentBlock block;
 }

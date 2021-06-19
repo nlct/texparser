@@ -31,13 +31,13 @@ import java.nio.charset.Charset;
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.primitives.Primitive;
 import com.dickimawbooks.texparserlib.generic.*;
-import com.dickimawbooks.texparserlib.latex.Input;
+import com.dickimawbooks.texparserlib.latex.*;
 
 /**
  * Parses aux files
  */
 
-public class AuxParser extends DefaultTeXParserListener
+public class AuxParser extends LaTeXParserListener
   implements Writeable
 {
    public AuxParser(TeXApp texApp)
@@ -58,6 +58,7 @@ public class AuxParser extends DefaultTeXParserListener
       auxData = new Vector<AuxData>();
    }
 
+   @Override
    public TeXApp getTeXApp()
    {
       return texApp;
@@ -84,9 +85,12 @@ public class AuxParser extends DefaultTeXParserListener
       parser.parse(auxFile);
       parser.setCatCode('@', code);
 
+      setIsInDocEnv(true);
+
       return parser;
    }
 
+   @Override
    protected void addPredefined()
    {
       super.addPredefined();
@@ -99,12 +103,17 @@ public class AuxParser extends DefaultTeXParserListener
       addAuxCommand("bibdata", 1);
       addAuxCommand("bibcite", 2);
 
-      putControlSequence(new AuxProvideCommand());
+      // Ignore these commands and their arguments
 
       putControlSequence(new AuxIgnoreable("@writefile", false, 
         new boolean[]{true, true}));
 
       putControlSequence(new AuxIgnoreable("selectlanguage", true, new boolean[]{true}));
+
+      putControlSequence(new AuxIgnoreable("AtBeginDocument", false,
+        new boolean[] { true }));
+      putControlSequence(new AuxIgnoreable("AtEndDocument", false,
+        new boolean[] { true }));
    }
 
    public void addAuxCommand(String name, int numArgs)
@@ -123,10 +132,11 @@ public class AuxParser extends DefaultTeXParserListener
               || cs instanceof AuxCommand 
               || cs instanceof AuxIgnoreable 
               || cs instanceof AssignedControlSequence
-              || cs instanceof AuxProvideCommand
+              || cs instanceof NewCommand
               || cs instanceof Primitive);
    }
 
+   @Override
    public ControlSequence getControlSequence(String name)
    {
       ControlSequence cs = getParser().getControlSequence(name);
@@ -134,42 +144,50 @@ public class AuxParser extends DefaultTeXParserListener
       return isAllowedAuxCommand(cs) ? cs : new AuxIgnoreable(name);
    }
 
+   @Override
    public ControlSequence createUndefinedCs(String name)
    {
       return new AuxIgnoreable(name);
    }
 
+   @Override
    public Writeable getWriteable()
    {
       return this;
    }
 
+   @Override
    public void write(String text)
      throws IOException
    {
    }
 
+   @Override
    public void writeln(String text)
      throws IOException
    {
    }
 
+   @Override
    public void write(char c)
      throws IOException
    {
    }
 
+   @Override
    public void writeCodePoint(int codePoint)
      throws IOException
    {
    }
 
+   @Override
    public void overwithdelims(TeXObject firstDelim,
      TeXObject secondDelim, TeXObject before, TeXObject after)
     throws IOException
    {
    }
 
+   @Override
    public void abovewithdelims(TeXObject firstDelim,
      TeXObject secondDelim, TeXDimension thickness, TeXObject before, 
      TeXObject after)
@@ -177,31 +195,49 @@ public class AuxParser extends DefaultTeXParserListener
    {
    }
 
+   @Override
    public void skipping(Ignoreable ignoreable)
       throws IOException
    {
    }
 
+   @Override
    public void href(String url, TeXObject text)
       throws IOException
    {
    }
 
+   @Override
    public void subscript(TeXObject arg)
      throws IOException
    {
    }
 
+   @Override
    public void superscript(TeXObject arg)
      throws IOException
    {
    }
 
+   @Override
+   public void substituting(String original, String replacement)
+     throws IOException
+   {
+   }
+
+   @Override
+   public void includegraphics(KeyValList options, String imgName)
+     throws IOException
+   {
+   }
+
+   @Override
    public void endParse(File file)
       throws IOException
    {
    }
 
+   @Override
    public void beginParse(File file, Charset encoding)
       throws IOException
    {
@@ -240,12 +276,14 @@ public class AuxParser extends DefaultTeXParserListener
       return auxData;
    }
 
+   @Override
    public Charset getCharSet()
    {
       return charset;
    }
 
    // shouldn't be needed in auxFile
+   @Override
    public float emToPt(float emValue)
    {
       getTeXApp().warning(getParser(),
@@ -255,6 +293,7 @@ public class AuxParser extends DefaultTeXParserListener
    }
 
    // shouldn't be needed in auxFile
+   @Override
    public float exToPt(float exValue)
    {
       getTeXApp().warning(getParser(),

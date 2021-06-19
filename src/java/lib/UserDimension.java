@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -74,22 +74,26 @@ public class UserDimension implements TeXDimension, Expandable
       unit = parser.getListener().createUnit(unitString);
    }
 
+   @Override
    public Object clone()
    {
       return new UserDimension(value, unit);
    }
 
+   @Override
    public int number(TeXParser parser)
      throws TeXSyntaxException
    {
       return (int)unit.toSp(parser, value);
    }
 
+   @Override
    public float getValue()
    {
       return value;
    }
 
+   @Override
    public TeXUnit getUnit()
    {
       return unit;
@@ -116,32 +120,45 @@ public class UserDimension implements TeXDimension, Expandable
       setDimension(parser, (TeXDimension)numerical);
    }
 
+   @Override
    public void setDimension(TeXParser parser, TeXDimension dimen)
    {
       setValue(dimen.getValue(), dimen.getUnit());
    }
 
+   @Override
    public String toString(TeXParser parser)
    {
       return String.format("%f%s", value, unit.toString(parser));
    }
 
+   @Override
    public String format()
    {
       return String.format("%f%s", value, unit.format());
    }
 
+   @Override
+   public String stripToString(TeXParser parser)
+     throws IOException
+   {
+      return format();
+   }
+
+   @Override
    public String toString()
    {
       return String.format("%s[value=%f,unit=%s]",
          getClass().getName(), value, unit.toString());
    }
 
+   @Override
    public TeXObjectList string(TeXParser parser) throws IOException
    {
       return parser.string(toString(parser));
    }
 
+   @Override
    public void advance(TeXParser parser, Numerical increment)
     throws TeXSyntaxException
    {
@@ -185,57 +202,93 @@ public class UserDimension implements TeXDimension, Expandable
       value += unit.toUnit(parser, dimen.getValue(), otherUnit);
    }
 
+   @Override
    public void divide(int divisor)
    {
       value /= divisor;
    }
 
+   @Override
    public void multiply(int factor)
    {
       value *= factor;
    }
 
+   @Override
    public void multiply(float factor)
    {
       value *= factor;
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
       return string(parser);
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser)
      throws IOException
    {
       return string(parser);
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser)
      throws IOException
    {
       return expandonce(parser);
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
       return expandonce(parser, stack);
    }
 
+   @Override
    public void process(TeXParser parser) throws IOException
    {
       parser.addAll(0, string(parser));
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
       stack.addAll(0, string(parser));
    }
 
+   @Override
+   public boolean process(TeXParser parser, TeXObjectList stack, StackMarker marker)
+      throws IOException
+   {
+      process(parser, stack);
+      return false;
+   }
+
+   @Override
+   public boolean isPopStyleSkip(PopStyle popStyle)
+   {
+      return false;
+   }
+
+   @Override
    public boolean isPar()
+   {
+      return false;
+   }
+
+   @Override
+   public int getTeXCategory()
+   {
+      return TYPE_OBJECT;
+   }
+
+   @Override
+   public boolean isEmptyObject()
    {
       return false;
    }

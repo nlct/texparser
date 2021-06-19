@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -58,17 +58,20 @@ public class JmlrTheorem extends Declaration
       this.styleName = name;
    }
 
+   @Override
    public Object clone()
    {
       return new JmlrTheorem(styleName, counter, (TeXObject)title.clone());
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser)
     throws IOException
    {
       return expandonce(parser, parser);
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
     throws IOException
    {
@@ -79,16 +82,7 @@ public class JmlrTheorem extends Declaration
          listener.stepcounter(counter);
       }
 
-      TeXObject arg;
-
-      if (parser == stack)
-      {
-         arg = parser.popNextArg('[', ']');
-      }
-      else
-      {
-         arg = stack.popArg(parser, '[', ']');
-      }
+      TeXObject arg = parser.popOptional(stack);
 
       ControlSequence bodyFont = listener.getControlSequence(
         String.format("jmlr@thm@%s@body@font", styleName));
@@ -140,46 +134,43 @@ public class JmlrTheorem extends Declaration
       return list;
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser)
     throws IOException
    {
       return expandonce(parser).expandfully(parser);
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser, TeXObjectList stack)
     throws IOException
    {
       return expandonce(parser, stack).expandfully(parser, stack);
    }
 
+   @Override
    public void process(TeXParser parser)
      throws IOException
    {
       process(parser, parser);
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
       ((LaTeXParserListener)parser.getListener()).startTheorem(styleName);
 
-      TeXObjectList list = expandonce(parser, stack);
-
-      if (parser == stack)
-      {
-         list.process(parser);
-      }
-      else
-      {
-         list.process(parser, stack);
-      }
+      parser.processObject(expandonce(parser, stack), stack);
    }
 
+   @Override
    public void end(TeXParser parser) throws IOException
    {
       ((LaTeXParserListener)parser.getListener()).endTheorem(styleName);
    }
 
+   @Override
    public boolean isModeSwitcher()
    {
       return false;

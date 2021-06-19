@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -62,11 +62,13 @@ public class FillUnit extends TeXUnit
       return strength;
    }
 
+   @Override
    public Object clone()
    {
       return new FillUnit(strength);
    }
 
+   @Override
    public boolean equals(Object object)
    {
       if (this == object) return true;
@@ -79,6 +81,7 @@ public class FillUnit extends TeXUnit
    }
 
    // convert value in other unit to this unit
+   @Override
    public float toUnit(TeXParser parser, float value, 
      TeXUnit otherUnit)
    throws TeXSyntaxException
@@ -87,6 +90,7 @@ public class FillUnit extends TeXUnit
    }
 
    // convert value in this unit to other unit
+   @Override
    public float fromUnit(TeXParser parser, float value, 
      TeXUnit otherUnit)
    throws TeXSyntaxException
@@ -94,29 +98,34 @@ public class FillUnit extends TeXUnit
       return value;
    }
 
+   @Override
    public float toPt(TeXParser parser, float value)
       throws TeXSyntaxException
    {
       return value;
    }
 
+   @Override
    public float fromPt(TeXParser parser, float value)
       throws TeXSyntaxException
    {
       return value;
    }
 
+   @Override
    public TeXObjectList string(TeXParser parser)
      throws IOException
    {
       return parser.string(toString());
    }
 
+   @Override
    public String toString(TeXParser parser)
    {
       return toString();
    }
 
+   @Override
    public String format()
    {
       String str = "fi";
@@ -129,11 +138,13 @@ public class FillUnit extends TeXUnit
       return str;
    }
 
+   @Override
    public void process(TeXParser parser) throws IOException
    {
       parser.getListener().getWriteable().write(toString());
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack)
       throws IOException
    {

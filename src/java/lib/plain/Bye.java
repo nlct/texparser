@@ -49,7 +49,7 @@ public class Bye extends ControlSequence
    public void process(TeXParser parser)
       throws IOException
    {
-      parser.processEndDeclarations(parser);
+      parser.getSettings().processEndDeclarations();
       throw new EOFException();
    }
 }

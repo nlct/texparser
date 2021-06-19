@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -23,7 +23,7 @@ import java.io.IOException;
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.primitives.If;
 
-public class LoopCs extends ControlSequence implements Expandable
+public class LoopCs extends Command
 {
    public LoopCs()
    {
@@ -35,11 +35,13 @@ public class LoopCs extends ControlSequence implements Expandable
       super(name);
    }
 
+   @Override
    public Object clone()
    {
       return new LoopCs(getName());
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
@@ -49,25 +51,15 @@ public class LoopCs extends ControlSequence implements Expandable
       If ifCs = null;
       TeXObjectList condition = null;
 
-      TeXObject object = stack.popToken();
+      TeXObject object = parser.popNextToken(stack);
 
-      while (!(object instanceof ControlSequence
-                && ((ControlSequence)object).getName().equals("repeat")))
+      while (!parser.isControlSequence(object, "repeat"))
       {
-         if (object instanceof TeXCsRef)
-         {
-            ControlSequence cs = parser.getListener().getControlSequence(
-              ((TeXCsRef)object).getName());
+         If objIf = parser.toIf(object);
 
-            if (cs instanceof If)
-            {
-               object = cs;
-            }
-         }
-
-         if (object instanceof If)
+         if (objIf != null)
          {
-            if (condition == null)
+            if (condition == null || ifCs == null)
             {
                condition = new TeXObjectList();
             }
@@ -78,7 +70,7 @@ public class LoopCs extends ControlSequence implements Expandable
                condition.clear();
             }
 
-            ifCs = (If)object;
+            ifCs = objIf;
          }
          else if (condition == null)
          {
@@ -89,7 +81,7 @@ public class LoopCs extends ControlSequence implements Expandable
             condition.add(object);
          }
 
-         object = stack.popToken();
+         object = parser.popNextToken(stack);
       }
 
       if (condition == null)
@@ -100,14 +92,7 @@ public class LoopCs extends ControlSequence implements Expandable
 
       while (true)
       {
-         if (parser == stack)
-         {
-            expandedList.addAll(loopBody.expandonce(parser));
-         }
-         else
-         {
-            expandedList.addAll(loopBody.expandonce(parser, stack));
-         }
+         expandedList.append(parser.expandOnce(loopBody, stack));
 
          if (!ifCs.istrue(parser, (TeXObjectList)condition.clone()))
          {
@@ -118,12 +103,14 @@ public class LoopCs extends ControlSequence implements Expandable
       return expandedList;
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser)
       throws IOException
    {
       return expandonce(parser, parser);
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
@@ -133,25 +120,15 @@ public class LoopCs extends ControlSequence implements Expandable
       If ifCs = null;
       TeXObjectList condition = null;
 
-      TeXObject object = stack.popToken();
+      TeXObject object = parser.popNextToken(stack);
 
-      while (!(object instanceof ControlSequence
-                && ((ControlSequence)object).getName().equals("repeat")))
+      while (!parser.isControlSequence(object, "repeat"))
       {
-         if (object instanceof TeXCsRef)
-         {
-            ControlSequence cs = parser.getListener().getControlSequence(
-              ((TeXCsRef)object).getName());
+         If objIf = parser.toIf(object);
 
-            if (cs instanceof If)
-            {
-               object = cs;
-            }
-         }
-
-         if (object instanceof If)
+         if (objIf != null)
          {
-            if (condition == null)
+            if (condition == null || ifCs == null)
             {
                condition = new TeXObjectList();
             }
@@ -162,7 +139,7 @@ public class LoopCs extends ControlSequence implements Expandable
                condition.clear();
             }
 
-            ifCs = (If)object;
+            ifCs = objIf;
          }
          else if (condition == null)
          {
@@ -173,7 +150,7 @@ public class LoopCs extends ControlSequence implements Expandable
             condition.add(object);
          }
 
-         object = stack.popToken();
+         object = parser.popNextToken(stack);
       }
 
       if (condition == null)
@@ -184,14 +161,7 @@ public class LoopCs extends ControlSequence implements Expandable
 
       while (true)
       {
-         if (parser == stack)
-         {
-            expandedList.addAll(loopBody.expandfully(parser));
-         }
-         else
-         {
-            expandedList.addAll(loopBody.expandfully(parser, stack));
-         }
+         expandedList.append(parser.expandFully(loopBody, stack));
 
          if (!ifCs.istrue(parser, (TeXObjectList)condition.clone()))
          {
@@ -202,12 +172,14 @@ public class LoopCs extends ControlSequence implements Expandable
       return expandedList;
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser)
       throws IOException
    {
       return expandfully(parser, parser);
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
@@ -215,25 +187,15 @@ public class LoopCs extends ControlSequence implements Expandable
       If ifCs = null;
       TeXObjectList condition = null;
 
-      TeXObject object = stack.popToken();
+      TeXObject object = parser.popNextToken(stack);
 
-      while (!(object instanceof ControlSequence
-                && ((ControlSequence)object).getName().equals("repeat")))
+      while (!parser.isControlSequence(object, "repeat"))
       {
-         if (object instanceof TeXCsRef)
-         {
-            ControlSequence cs = parser.getListener().getControlSequence(
-              ((TeXCsRef)object).getName());
+         If objIf = parser.toIf(object);
 
-            if (cs instanceof If)
-            {
-               object = cs;
-            }
-         }
-
-         if (object instanceof If)
+         if (objIf != null)
          {
-            if (condition == null)
+            if (condition == null || ifCs == null)
             {
                condition = new TeXObjectList();
             }
@@ -244,7 +206,7 @@ public class LoopCs extends ControlSequence implements Expandable
                condition.clear();
             }
 
-            ifCs = (If)object;
+            ifCs = objIf;
          }
          else if (condition == null)
          {
@@ -255,7 +217,8 @@ public class LoopCs extends ControlSequence implements Expandable
             condition.add(object);
          }
 
-         object = stack.popToken();
+         object = parser.popNextToken(stack);
+
       }
 
       if (condition == null)
@@ -268,14 +231,7 @@ public class LoopCs extends ControlSequence implements Expandable
       {
          TeXObjectList list = (TeXObjectList)loopBody.clone();
 
-         if (parser == stack)
-         {
-            list.process(parser);
-         }
-         else
-         {
-            list.process(parser, stack);
-         }
+         parser.processObject(list, stack);
 
          if (!ifCs.istrue(parser, (TeXObjectList)condition.clone()))
          {
@@ -284,6 +240,7 @@ public class LoopCs extends ControlSequence implements Expandable
       }
    }
 
+   @Override
    public void process(TeXParser parser)
       throws IOException
    {

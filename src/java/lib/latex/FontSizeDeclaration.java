@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -23,7 +23,7 @@ import java.util.Vector;
 
 import com.dickimawbooks.texparserlib.*;
 
-public class FontSizeDeclaration extends Declaration
+public class FontSizeDeclaration extends RobustDeclaration
 {
    public FontSizeDeclaration(String name, int size)
    {
@@ -37,32 +37,10 @@ public class FontSizeDeclaration extends Declaration
       return new FontSizeDeclaration(getName(), size);
    }
 
-   public TeXObjectList expandonce(TeXParser parser, TeXObjectList list)
-      throws IOException
-   {
-      return null;
-   }
-
-   public TeXObjectList expandonce(TeXParser parser)
-      throws IOException
-   {
-      return null;
-   }
-
-   public TeXObjectList expandfully(TeXParser parser, TeXObjectList list)
-      throws IOException
-   {
-      return null;
-   }
-
-   public TeXObjectList expandfully(TeXParser parser)
-      throws IOException
-   {
-      return null;
-   }
-
+   @Override
    public void process(TeXParser parser) throws IOException
    {
+      pushEnd(parser);
       TeXSettings settings = parser.getSettings();
 
       orgSize = settings.getCurrentFontSize();
@@ -70,17 +48,21 @@ public class FontSizeDeclaration extends Declaration
       settings.setFontSize(size);
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList list) throws IOException
    {
       process(parser);
    }
 
+   @Override
    public void end(TeXParser parser) throws IOException
    {
       TeXSettings settings = parser.getSettings();
       settings.setFontSize(orgSize);
+      settings.removeDeclaration(this);
    }
 
+   @Override
    public boolean isModeSwitcher()
    {
       return false;
@@ -89,6 +71,19 @@ public class FontSizeDeclaration extends Declaration
    public int getSize()
    {
       return size;
+   }
+
+   @Override
+   public boolean equals(Object object)
+   {
+      if (!(object instanceof FontSizeDeclaration) || !super.equals(object))
+      { 
+         return false;
+      }
+
+      FontSizeDeclaration dec = (FontSizeDeclaration)object;
+
+      return dec.size == size;
    }
 
    private int size, orgSize;

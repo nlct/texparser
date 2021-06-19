@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -93,6 +93,7 @@ public abstract class DefaultTeXParserListener extends TeXParserListener
       parser.putControlSequence(new OverWithDelims());
       parser.putControlSequence(new Accent("a"));
       parser.putControlSequence(new Relax());
+      parser.putControlSequence(new NoAlign());
       parser.putControlSequence(new Unexpanded());
       parser.putControlSequence(new DisplayStyle());
       parser.putControlSequence(new TextStyle());
@@ -227,6 +228,7 @@ public abstract class DefaultTeXParserListener extends TeXParserListener
       undefAction = action;
    }
 
+   @Override
    public ControlSequence createUndefinedCs(String name)
    {
       return new Undefined(name, undefAction);
@@ -302,6 +304,7 @@ public abstract class DefaultTeXParserListener extends TeXParserListener
    }
 
    // Gets active character identified by charCode.
+   @Override
    public ActiveChar getActiveChar(int charCode)
    {
       return getParser().getActiveChar(Integer.valueOf(charCode));
@@ -312,96 +315,115 @@ public abstract class DefaultTeXParserListener extends TeXParserListener
       getParser().putActiveChar(activeChar);
    }
 
+   @Override
    public BgChar getBgChar(int codePoint)
    {
       return new BgChar(codePoint);
    }
 
+   @Override
    public EgChar getEgChar(int codePoint)
    {
       return new EgChar(codePoint);
    }
 
+   @Override
    public Eol getEol()
    {
       return new Eol();
    }
 
+   @Override
    public Par getPar()
    {
       return new Par();
    }
 
+   @Override
    public Space getSpace()
    {
       return new Space();
    }
 
+   @Override
    public Param getParam(int digit)
    {
       return new Param(digit);
    }
 
+   @Override
    public DoubleParam getDoubleParam(ParameterToken param)
    {
       return new DoubleParam(param);
    }
 
+   @Override
    public Tab getTab()
    {
       return new Tab();
    }
 
+   @Override
    public Letter getLetter(int charCode)
    {
       return new Letter(charCode);
    }
 
+   @Override
    public Other getOther(int charCode)
    {
       return new Other(charCode);
    }
 
+   @Override
    public TeXObjectList createString(String string)
    {
       return new TeXObjectList(this, string);
    }
 
+   @Override
    public SkippedSpaces createSkippedSpaces()
    {
       return new SkippedSpaces();
    }
 
+   @Override
    public SkippedEols createSkippedEols()
    {
       return new SkippedEols();
    }
 
+   @Override
    public BinarySymbol createBinarySymbol(String name, int code)
    {
       return new BinarySymbol(name, code);
    }
 
+   @Override
    public Symbol createSymbol(String name, int code)
    {
       return new Symbol(name, code);
    }
 
+   @Override
    public ControlSequence createSymbol(String name, int code, FontEncoding enc)
    {
       return new EncodingSymbol(name, code, enc);
    }
 
+   @Override
    public GreekSymbol createGreekSymbol(String name, int code)
    {
       return new GreekSymbol(name, code);
    }
 
+   @Override
    public MathSymbol createMathSymbol(String name, int code)
    {
       return new MathSymbol(name, code);
    }
 
+   @Override
    public DelimiterSymbol createDelimiterSymbol(String name, int code)
    {
       return new DelimiterSymbol(name, code);
@@ -412,41 +434,49 @@ public abstract class DefaultTeXParserListener extends TeXParserListener
       return new BigOperator(name, code);
    }
 
+   @Override
    public BigOperator createBigOperator(String name, int code1, int code2)
    {
       return new BigOperator(name, code1, code2);
    }
 
+   @Override
    public Group createGroup()
    {
       return new Group();
    }
 
+   @Override
    public Group createGroup(String text)
    {
       return new Group(this, text);
    }
 
+   @Override
    public MathGroup createMathGroup()
    {
       return new MathGroup();
    }
 
+   @Override
    public SpChar createSpChar()
    {
       return new SpChar();
    }
 
+   @Override
    public SbChar createSbChar()
    {
       return new SbChar();
    }
 
+   @Override
    public Comment createComment()
    {
       return new Comment();
    }
 
+   @Override
    public boolean input(TeXPath path)
     throws IOException
    {
@@ -462,6 +492,7 @@ public abstract class DefaultTeXParserListener extends TeXParserListener
       return false;
    }
 
+   @Override
    public Writeable getWriteable()
    {
       return writeable;
@@ -490,6 +521,7 @@ public abstract class DefaultTeXParserListener extends TeXParserListener
       return false;
    }
 
+   @Override
    public void addFileReference(TeXPath texPath)
    {
       if (!referencedFiles.contains(texPath))
@@ -535,6 +567,7 @@ public abstract class DefaultTeXParserListener extends TeXParserListener
       return null;
    }
 
+   @Override
    public void verb(String name, boolean isStar, int delim, String text)
      throws IOException
    {
@@ -724,13 +757,36 @@ public abstract class DefaultTeXParserListener extends TeXParserListener
       }
    }
 
+   // Tests if cs equals IfTrue
+   // See also TeXParser.isControlSequenceTrue and TeXParser.isTrue
    public boolean isIfTrue(ControlSequence cs)
    {
+      if (cs instanceof TeXCsRef)
+      {
+         cs = getControlSequence(((TeXCsRef)cs).getName());
+      }
+
+      if (cs instanceof AssignedMacro)
+      {
+         return IFTRUE.equals(((AssignedMacro)cs).getBaseUnderlying());
+      }
+
       return IFTRUE.equals(cs);
    }
 
+   // Tests if cs equals IfFalse
    public boolean isIfFalse(ControlSequence cs)
    {
+      if (cs instanceof TeXCsRef)
+      {
+         cs = getControlSequence(((TeXCsRef)cs).getName());
+      }
+
+      if (cs instanceof AssignedMacro)
+      {
+         return IFFALSE.equals(((AssignedMacro)cs).getBaseUnderlying());
+      }
+
       return IFFALSE.equals(cs);
    }
 

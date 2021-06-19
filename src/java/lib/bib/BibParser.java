@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -74,6 +74,10 @@ public class BibParser extends DefaultTeXParserListener
    {
       return texApp;
    }
+
+   public int getOptionalStartDelim() { return '['; }
+
+   public int getOptionalEndDelim() { return ']'; }
 
    public TeXParser parseBibFile(File bibFile)
      throws IOException

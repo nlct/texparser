@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -20,7 +20,7 @@ package com.dickimawbooks.texparserlib;
 
 import java.io.IOException;
 
-public class MathEg extends EgChar implements Expandable
+public class MathEg extends AbstractEgChar implements Expandable
 {
    public MathEg(boolean isinline)
    {
@@ -43,14 +43,17 @@ public class MathEg extends EgChar implements Expandable
       return new MathEg(getCharCode(), isInLine());
    }
 
+   public int getTeXCategory()
+   {
+      return TYPE_MATH;
+   }
+
    public TeXObjectList expandonce(TeXParser parser) throws IOException
    {
-      TeXObjectList list = new TeXObjectList(1);
-      list.add(this);
       parser.getSettings().setMode(TeXSettings.INHERIT);
       parser.endGroup();
 
-      return list;
+      return null;
    }
 
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
@@ -115,10 +118,15 @@ public class MathEg extends EgChar implements Expandable
       return isinline;
    }
 
-   public boolean matches(BgChar bgChar)
+   public boolean matches(AbstractBgChar bgChar)
    {
-      return (bgChar instanceof MathBg
+      return (super.matches(bgChar)
            && (isInLine() == ((MathBg)bgChar).isInLine()));
+   }
+
+   public Class getBgClass()
+   {
+      return MathBg.class;
    }
 
    private boolean isinline = true;

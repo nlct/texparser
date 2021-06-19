@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -35,100 +35,76 @@ public class ExpandAfter extends Primitive implements Expandable
       super(name, true);
    }
 
+   @Override
    public Object clone()
    {
       return new ExpandAfter(getName());
    }
 
-   protected void pushTo(TeXParser parser, TeXObjectList stack,
-    TeXObjectList list)
+   protected void pushTo(TeXParser parser, TeXObjectList stack)
    throws IOException
    {
-      byte popStyle = TeXObjectList.POP_IGNORE_LEADING_SPACE;
+      PopStyle popStyle = PopStyle.DEFAULT;
 
-      TeXObject firstArg = stack.popToken(popStyle);
+      TeXObject firstArg = parser.popNextTokenResolveReference(stack, popStyle);
 
-      TeXObject secondArg = stack.popToken(popStyle);
-
-      if (secondArg instanceof TeXCsRef)
+      if (firstArg instanceof StackMarker)
       {
-         secondArg = parser.getControlSequence(
-           ((TeXCsRef)secondArg).getName());
+         ((StackMarker)firstArg).expandAfter(parser, stack);
+         return;
       }
 
-      if (secondArg instanceof Expandable)
-      {
-         TeXObjectList expanded;
+      TeXObject secondArg = parser.popNextTokenResolveReference(stack, popStyle);
 
-         if (parser == stack)
-         {
-            expanded = ((Expandable)secondArg).expandonce(parser);
-         }
-         else
-         {
-            expanded = ((Expandable)secondArg).expandonce(parser, stack);
-         }
+      secondArg = parser.expandOnce(secondArg, stack);
 
-         if (expanded != null)
-         {
-            secondArg = expanded;
-         }
-      }
-
-      if (secondArg instanceof TeXObjectList
-           && !(secondArg instanceof Group))
-      {
-         list.addAll(0, (TeXObjectList)secondArg);
-      }
-      else
-      {
-         list.push(secondArg);
-      }
-
-      list.push(firstArg);
+      stack.push(secondArg);
+      stack.push(firstArg);
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
    throws IOException
    {
-      TeXObjectList list = new TeXObjectList();
+      pushTo(parser, stack);
 
-      pushTo(parser, stack, list);
-
-      return list;
+      return new TeXObjectList();
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser)
    throws IOException
    {
-      TeXObjectList list = new TeXObjectList();
+      pushTo(parser, parser);
 
-      pushTo(parser, parser, list);
-
-      return list;
+      return new TeXObjectList();
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser)
    throws IOException
    {
-      return expandonce(parser).expandfully(parser);
+      return expandonce(parser);
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser, TeXObjectList stack)
    throws IOException
    {
-      return expandonce(parser, stack).expandfully(parser, stack);
+      return expandonce(parser, stack);
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
-      pushTo(parser, stack, stack);
+      pushTo(parser, stack);
    }
 
+   @Override
    public void process(TeXParser parser)
       throws IOException
    {
-      pushTo(parser, parser, parser);
+      pushTo(parser, parser);
    }
 }

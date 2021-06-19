@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -22,7 +22,7 @@ import java.io.IOException;
 
 import com.dickimawbooks.texparserlib.*;
 
-public class TrivListDec extends Declaration
+public class TrivListDec extends RobustDeclaration
 {
    public TrivListDec()
    {
@@ -39,36 +39,14 @@ public class TrivListDec extends Declaration
       return new TrivListDec(getName());
    }
 
-   public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
-     throws IOException
-   {
-      return null;
-   }
-
-   public TeXObjectList expandonce(TeXParser parser)
-     throws IOException
-   {
-      return null;
-   }
-
-   public TeXObjectList expandfully(TeXParser parser, TeXObjectList stack)
-     throws IOException
-   {
-      return null;
-   }
-
-   public TeXObjectList expandfully(TeXParser parser)
-     throws IOException
-   {
-      return null;
-   }
-
+   @Override
    public void process(TeXParser parser) throws IOException
    {
       setup(parser);
       ((LaTeXParserListener)parser.getListener()).startList(this);
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack) throws IOException
    {
       setup(parser);
@@ -81,12 +59,14 @@ public class TrivListDec extends Declaration
       parser.getListener().getControlSequence("@nmbrlistfalse").process(parser);
    }
 
+   @Override
    public void end(TeXParser parser)
     throws IOException
    {
       ((LaTeXParserListener)parser.getListener()).endList(this);
    }
 
+   @Override
    public boolean isModeSwitcher()
    {
       return false;

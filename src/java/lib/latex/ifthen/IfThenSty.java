@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -35,51 +35,46 @@ public class IfThenSty extends LaTeXSty
       super(options, "ifthen", listener, loadParentOptions);
    }
 
+   @Override
    public void addDefinitions()
    {
       registerControlSequence(new IfThenElse(this));
 
-      addConditionalControlSequence(new IFisodd());
-      addConditionalControlSequence(new IFand());
-      addConditionalControlSequence(new IFand("AND"));
-      addConditionalControlSequence(new IFor());
-      addConditionalControlSequence(new IFor("OR"));
-      addConditionalControlSequence(new IFnot());
-      addConditionalControlSequence(new IFnot("NOT"));
-      addConditionalControlSequence(new BeginConditionGroup());
-      addConditionalControlSequence(new EndConditionGroup());
+      addConditionalControlSequence(new IFisodd(), "isodd");
+      addConditionalControlSequence(new IFand(), "and", "AND");
+      addConditionalControlSequence(new IFor(), "or", "OR");
+      addConditionalControlSequence(new IFnot(), "not", "NOT");
+      addConditionalControlSequence(new BeginConditionGroup(), "(");
+      addConditionalControlSequence(new EndConditionGroup(), ")");
    }
 
-   public void addConditionalControlSequence(ControlSequence cs)
+   public void addConditionalControlSequence(ControlSequence cs, String... other)
    {
+      registerControlSequence(cs);
+
       if (localControlSequences == null)
       {
          localControlSequences = new Vector<ControlSequence>();
       }
 
-      localControlSequences.add(cs);
+      for (String name : other)
+      {
+         localControlSequences.add(new AssignedControlSequence(name, cs));
+      }
    }
 
-   protected TeXBoolean popNumericalCondition(TeXObjectList stack)
+   protected TeXBoolean popNumericalCondition(AbstractTeXObjectList stack)
      throws IOException
    {
-      byte popStyle = TeXObjectList.POP_IGNORE_LEADING_SPACE;
+      PopStyle popStyle = PopStyle.IGNORE_LEADING_SPACE;
 
       TeXParser parser = getListener().getParser();
 
       Numerical num1 = stack.popNumerical(parser);
       TeXObject signArg = stack.popToken(popStyle);
-
       Numerical num2 = stack.popNumerical(parser);
 
-      if (!(signArg instanceof CharObject))
-      {
-         throw new LaTeXSyntaxException(parser,
-              ERROR_INVALID_CONDITION, 
-               String.format("%s %s %s", num1, signArg, num2));
-      }
-
-      int cp = ((CharObject)signArg).getCharCode();
+      int cp = parser.toCodePoint(signArg);
 
       if (cp == '=')
       {
@@ -101,10 +96,10 @@ public class IfThenSty extends LaTeXSty
             String.format("%s %s %s", num1, signArg, num2));
    }
 
-   protected TeXObject popCondition(TeXObjectList stack)
+   protected TeXObject popCondition(AbstractTeXObjectList stack)
      throws IOException
    {
-      byte popStyle = TeXObjectList.POP_IGNORE_LEADING_SPACE;
+      PopStyle popStyle = PopStyle.IGNORE_LEADING_SPACE;
 
       TeXParser parser = getListener().getParser();
 
@@ -112,7 +107,16 @@ public class IfThenSty extends LaTeXSty
 
       if (obj == null) return null;
 
-      if (obj instanceof ConditionGroup || obj instanceof TeXBoolean)
+      BeginGroupObject bg = parser.toBeginGroup(obj);
+
+      if (bg != null)
+      {
+         stack.popToken(popStyle);
+         AbstractGroup group = bg.createGroup(parser);
+         stack.popRemainingGroup(parser, group, popStyle, bg);
+         return group;
+      }
+      else if (obj instanceof ConditionGroup || obj instanceof TeXBoolean)
       {
          return stack.popToken(popStyle);
       }
@@ -122,10 +126,10 @@ public class IfThenSty extends LaTeXSty
       }
    }
 
-   protected boolean parseCondition(TeXObjectList stack)
+   protected boolean parseCondition(AbstractTeXObjectList stack)
      throws IOException
    {
-      byte popStyle = TeXObjectList.POP_IGNORE_LEADING_SPACE;
+      PopStyle popStyle = PopStyle.IGNORE_LEADING_SPACE;
 
       TeXParser parser = getListener().getParser();
 
@@ -245,37 +249,64 @@ public class IfThenSty extends LaTeXSty
       return result;
    }
 
-   public boolean evaluate(TeXObject condition)
-     throws IOException
+   public void pushLocalControlSequences()
    {
       TeXParser parser = getListener().getParser();
-
-      parser.startGroup();
 
       for (ControlSequence cs : localControlSequences)
       {
          parser.putControlSequence(true, cs);
       }
+   }
 
-      if (condition instanceof Expandable)
+   public boolean evaluate(TeXObjectList stack, TeXObject condition)
+     throws IOException
+   {
+      TeXParser parser = getListener().getParser();
+
+      parser.startGroup();
+      pushLocalControlSequences();
+
+      boolean result;
+
+      try
       {
-         TeXObjectList expanded = ((Expandable)condition).expandfully(parser);
+         condition = parser.expandFully(condition, stack);
 
-         if (expanded != null)
-         {
-            condition = expanded;
-         }
+         result = evaluate(condition);
+      }
+      finally
+      {
+         parser.endGroup();
       }
 
-      parser.endGroup();
+      return result;
+   }
 
-      if (!(condition instanceof TeXObjectList))
+   protected boolean evaluate(TeXObject condition)
+     throws IOException
+   {
+      TeXParser parser = getListener().getParser();
+
+      boolean result;
+
+      TeXBoolean bool = parser.toBoolean(condition);
+
+      if (bool != null)
+      {
+         result = bool.booleanValue();
+      }
+      else if (condition instanceof AbstractTeXObjectList)
+      {
+         result = parseCondition((AbstractTeXObjectList)condition);
+      }
+      else
       {
          throw new LaTeXSyntaxException(parser,
               ERROR_INVALID_CONDITION, condition.toString(parser));
       }
 
-      return parseCondition((TeXObjectList)condition);
+      return result;
    }
 
    private Vector<ControlSequence> localControlSequences;

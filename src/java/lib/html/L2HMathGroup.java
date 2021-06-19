@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -35,43 +35,12 @@ public class L2HMathGroup extends MathGroup
       super(capacity);
    }
 
-   public TeXObjectList createList()
+   @Override
+   public AbstractTeXObjectList createList()
    {
-      L2HMathGroup math = new L2HMathGroup(capacity());
+      L2HMathGroup math = new L2HMathGroup();
       math.setInLine(isInLine());
       return math;
-   }
-
-   public void processList(TeXParser parser, StackMarker marker)
-    throws IOException
-   {
-      L2HConverter listener = (L2HConverter)parser.getListener();
-
-      while (size() > 0)
-      {
-         if (get(0).equals(marker))
-         {
-            remove(0);
-            break;
-         }
-
-         TeXObject object = expandedPopStack(parser);
-
-         if (object == null)
-         {
-            break;
-         }
-
-         if (listener.useMathJax() && object instanceof ControlSequence
-         && !listener.isStyControlSequence((ControlSequence)object))
-         {
-            listener.write(object.format());
-         }
-         else
-         {
-            object.process(parser, this);
-         }
-      }
    }
 
    public void startGroup(TeXParser parser)

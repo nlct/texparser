@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -23,7 +23,7 @@ import java.io.IOException;
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.*;
 
-public class ConditionGroup extends Group
+public class ConditionGroup extends AbstractGroup
 {
    public ConditionGroup()
    {
@@ -35,202 +35,27 @@ public class ConditionGroup extends Group
       super(capacity);
    }
 
-   public Object clone()
-   {
-      ConditionGroup grp = new ConditionGroup(capacity());
-
-      for (TeXObject obj : this)
-      {
-         grp.add((TeXObject)obj.clone());
-      }
-
-      return grp;
-   }
-
-   public TeXObjectList createList()
+   @Override
+   public AbstractTeXObjectList createList()
    {
       return new ConditionGroup(capacity());
    }
 
-   public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
-     throws IOException
+   @Override
+   public BeginGroupObject getBegin(TeXParser parser)
    {
-      TeXObjectList list = new TeXObjectList();
-
-      TeXObjectList grp = createList();
-      list.add(grp);
-
-      flatten();
-
-      TeXObjectList remaining = (TeXObjectList)clone();
-
-      StackMarker marker = null;
-
-      if (stack != null && stack != parser)
-      {
-         marker = new StackMarker();
-         remaining.add(marker);
-         remaining.addAll(stack);
-         stack.clear();
-      }
-
-      while (!remaining.isEmpty())
-      {
-         TeXObject object = remaining.remove(0);
-
-         if (object.equals(marker))
-         {
-            break;
-         }
-
-         TeXObjectList expanded = null;
-
-         if (object instanceof Expandable)
-         {
-            expanded = ((Expandable)object).expandonce(parser, remaining);
-         }
-         if (expanded == null)
-         {
-            grp.add(object);
-         }
-         else
-         {
-            grp.addAll(expanded);
-         }
-      }
-
-      if (!remaining.isEmpty())
-      {
-         stack.addAll(remaining);
-      }
-
-      return list;
+      return new BeginConditionGroup();
    }
 
-   public TeXObjectList expandonce(TeXParser parser)
-     throws IOException
+   @Override
+   public EndGroupObject getEnd(TeXParser parser)
    {
-      TeXObjectList list = new TeXObjectList();
-
-      TeXObjectList grp = createList();
-      list.add(grp);
-
-      flatten();
-
-      TeXObjectList remaining = (TeXObjectList)clone();
-
-      while (!remaining.isEmpty())
-      {
-         TeXObject object = remaining.remove(0);
-
-         TeXObjectList expanded = null;
-
-         if (object instanceof Expandable)
-         {
-            expanded = ((Expandable)object).expandonce(parser, remaining);
-         }
-
-         if (expanded == null)
-         {
-            grp.add(object);
-         }
-         else
-         {
-            grp.addAll(expanded);
-         }
-      }
-
-      return list;
+      return new EndConditionGroup();
    }
 
-   public TeXObjectList expandfully(TeXParser parser, TeXObjectList stack)
-     throws IOException
+   @Override
+   public boolean isEmptyObject()
    {
-      TeXObjectList list = new TeXObjectList();
-
-      TeXObjectList grp = createList();
-      list.add(grp);
-
-      flatten();
-
-      TeXObjectList remaining = (TeXObjectList)clone();
-
-      StackMarker marker = null;
-
-      if (stack != null && stack != parser)
-      {
-         marker = new StackMarker();
-         remaining.add(marker);
-         remaining.addAll(stack);
-         stack.clear();
-      }
-
-      while (!remaining.isEmpty())
-      {
-         TeXObject object = remaining.remove(0);
-
-         if (object.equals(marker))
-         {
-            break;
-         }
-
-         TeXObjectList expanded = null;
-
-         if (object instanceof Expandable)
-         {
-            expanded = ((Expandable)object).expandfully(parser, remaining);
-         }
-         if (expanded == null)
-         {
-            grp.add(object);
-         }
-         else
-         {
-            grp.addAll(expanded);
-         }
-      }
-
-      if (!remaining.isEmpty())
-      {
-         stack.addAll(remaining);
-      }
-
-      return list;
-   }
-
-   public TeXObjectList expandfully(TeXParser parser)
-     throws IOException
-   {
-      TeXObjectList list = new TeXObjectList();
-
-      TeXObjectList grp = createList();
-      list.add(grp);
-
-      flatten();
-
-      TeXObjectList remaining = (TeXObjectList)clone();
-
-      while (!remaining.isEmpty())
-      {
-         TeXObject object = remaining.remove(0);
-
-         TeXObjectList expanded = null;
-
-         if (object instanceof Expandable)
-         {
-            expanded = ((Expandable)object).expandfully(parser, remaining);
-         }
-
-         if (expanded == null)
-         {
-            grp.add(object);
-         }
-         else
-         {
-            grp.addAll(expanded);
-         }
-      }
-
-      return list;
+      return false;
    }
 }

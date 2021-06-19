@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2018 Nicola L.C. Talbot
+    Copyright (C) 2018-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -46,6 +46,7 @@ public class CapitaliseFmtWords extends CapitaliseWords
       return new CapitaliseFmtWords(sty, getName(), expansion);
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
      throws IOException
    {

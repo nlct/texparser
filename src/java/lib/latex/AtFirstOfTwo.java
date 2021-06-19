@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -40,6 +40,7 @@ public class AtFirstOfTwo extends Command
       return new AtFirstOfTwo(getName());
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser)
      throws IOException
    {
@@ -54,6 +55,7 @@ public class AtFirstOfTwo extends Command
       return list;
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
@@ -68,6 +70,7 @@ public class AtFirstOfTwo extends Command
       return list;
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser)
      throws IOException
    {
@@ -97,6 +100,7 @@ public class AtFirstOfTwo extends Command
       return list;
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
@@ -126,6 +130,7 @@ public class AtFirstOfTwo extends Command
       return list;
    }
 
+   @Override
    public void process(TeXParser parser) throws IOException
    {
       TeXObject arg = parser.popNextArg();
@@ -134,6 +139,7 @@ public class AtFirstOfTwo extends Command
       arg.process(parser);
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList list) throws IOException
    {
       TeXObject arg = list.popArg(parser);

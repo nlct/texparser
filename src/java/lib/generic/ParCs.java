@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -34,23 +34,33 @@ public class ParCs extends ControlSequence
       super(name);
    }
 
+   @Override
    public Object clone()
    {
       return new ParCs(getName());
    }
 
-   public void process(TeXParser parser, TeXObjectList list)
+   @Override
+   public void process(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
-      parser.getListener().getPar().process(parser, list);
+      parser.getListener().getPar().process(parser, stack);
    }
 
+   @Override
    public void process(TeXParser parser)
       throws IOException
    {
       parser.getListener().getPar().process(parser);
    }
 
+   @Override
+   public boolean isPopStyleSkip(PopStyle popStyle)
+   {
+      return popStyle.isIgnoreLeadingPar();
+   }
+
+   @Override
    public boolean isPar()
    {
       return true;

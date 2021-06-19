@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -45,11 +45,13 @@ public class L2LMathDeclaration extends MathDeclaration
       super(name, mode, numbered);
    }
 
+   @Override
    public Object clone()
    {
       return new L2LMathDeclaration(getName(), getMode(), isNumbered());
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
@@ -67,20 +69,13 @@ public class L2LMathDeclaration extends MathDeclaration
 
          writeable.write(getName());
 
-         TeXObject nextObj = stack.peekStack(TeXObjectList.POP_RETAIN_IGNOREABLES);
-
-         if (nextObj instanceof Ignoreable)
+         if (parser.isNextObject(Ignoreable.class, stack,
+                PopStyle.RETAIN_IGNOREABLES))
          {
-            writeable.write(nextObj.toString(parser));
+            TeXObject obj = parser.popNextToken(stack, 
+               PopStyle.RETAIN_IGNOREABLES);
 
-            if (parser == stack)
-            {
-               parser.popStack(TeXObjectList.POP_RETAIN_IGNOREABLES);
-            }
-            else
-            {
-               stack.popStack(parser, TeXObjectList.POP_RETAIN_IGNOREABLES);
-            }
+            writeable.write(obj.toString(parser));
          }
       }
       else
@@ -93,12 +88,14 @@ public class L2LMathDeclaration extends MathDeclaration
       }
    }
 
+   @Override
    public void process(TeXParser parser)
      throws IOException
    {
       process(parser, parser);
    }
 
+   @Override
    public void end(TeXParser parser) throws IOException
    {
       revertModeSwitch(parser);

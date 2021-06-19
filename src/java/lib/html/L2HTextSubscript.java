@@ -151,9 +151,9 @@ public class L2HTextSubscript extends ControlSequence
 
    private boolean hasUnicodeSupport(TeXObject arg)
    {
-      if (arg instanceof TeXObjectList && !(arg instanceof MathGroup))
+      if (arg instanceof TeXObjectList || arg instanceof Group)
       {
-         for (TeXObject obj : (TeXObjectList)arg)
+         for (TeXObject obj : (AbstractTeXObjectList)arg)
          {
             if (!hasUnicodeSupport(obj)) return false;
          }

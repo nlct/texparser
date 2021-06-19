@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2018 Nicola L.C. Talbot
+    Copyright (C) 2018-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -36,84 +36,22 @@ public class DTLformatlist extends Command
       super(name);
    }
 
+   @Override
    public Object clone()
    {
       return new DTLformatlist(getName());
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      TeXObject next = (parser == stack ? parser.popStack() : stack.pop());
+      boolean isStar=parser.isNextChar('*', stack);
 
-      boolean isStar=false;
-
-      if (next != null && next instanceof CharObject
-       && ((CharObject)next).getCharCode() == (int)'*')
-      {
-         isStar = true;
-      }
-      else
-      {
-         stack.push(next);
-      }
-
-      TeXObject list;
-
-      if (parser == stack)
-      {
-         list = parser.popNextArg();
-      }
-      else
-      {
-         list = stack.popArg(parser);
-      }
-
-      CsvList csvList = null;
-
-      if (list instanceof CsvList)
-      {
-         csvList = (CsvList)list;
-      }
-      else if (list instanceof TeXObjectList
-         && ((TeXObjectList)list).size() == 0
-         && ((TeXObjectList)list).firstElement() instanceof CsvList)
-      {
-         csvList = (CsvList)((TeXObjectList)list).firstElement();
-      }
-      else if (list instanceof Expandable)
-      {
-         TeXObjectList expanded;
-
-         if (parser == stack)
-         {
-            expanded = ((Expandable)list).expandonce(parser);
-         }
-         else
-         {
-            expanded = ((Expandable)list).expandonce(parser, stack);
-         }
-
-         if (expanded != null)
-         {
-            list = expanded;
-         }
-
-         if (list instanceof TeXObjectList
-            && ((TeXObjectList)list).size() == 0
-            && ((TeXObjectList)list).firstElement() instanceof CsvList)
-         {
-            csvList = (CsvList)((TeXObjectList)list).firstElement();
-         }
-      }
-
-      if (csvList == null)
-      {
-         csvList = CsvList.getList(parser, list);
-      }
+      CsvList csvList = CsvList.popCsvListFromStack(parser, stack, true);
 
       TeXObjectList expandedList = new TeXObjectList();
-      TeXObjectList expanded;
+      AbstractTeXObjectList expanded;
 
       if (isStar)
       {
@@ -125,8 +63,7 @@ public class DTLformatlist extends Command
          expandedList.add(expanded);
       }
 
-      ControlSequence ifCs = parser.getControlSequence("ifDTLlistskipempty");
-      boolean skipEmpty = (ifCs instanceof IfTrue);
+      boolean skipEmpty = parser.isControlSequenceTrue("ifDTLlistskipempty");
 
       int n;
 
@@ -138,8 +75,7 @@ public class DTLformatlist extends Command
          {
             TeXObject obj = csvList.getValue(i);
 
-            if (!(obj instanceof TeXObjectList 
-                   && ((TeXObjectList)obj).size() == 0))
+            if (!obj.isEmptyObject())
             {
                n++;
             }
@@ -156,8 +92,7 @@ public class DTLformatlist extends Command
       {
          TeXObject obj = csvList.getValue(i);
 
-         if (!skipEmpty || !(obj instanceof TeXObjectList 
-                && ((TeXObjectList)obj).size() == 0))
+         if (!skipEmpty || !obj.isEmptyObject())
          {
             if (j == 0)
             {// no sep
@@ -189,18 +124,21 @@ public class DTLformatlist extends Command
       return expandedList;
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser)
      throws IOException
    {
       return expandonce(parser, parser);
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
       return expandonce(parser, stack).expandfully(parser, stack);
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser)
      throws IOException
    {

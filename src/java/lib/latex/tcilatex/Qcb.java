@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -46,6 +46,7 @@ public class Qcb extends Command
       return new Qcb(getName());
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser)
      throws IOException
    {
@@ -58,24 +59,28 @@ public class Qcb extends Command
       return expanded;
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList list)
      throws IOException
    {
       return expandonce(parser);
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser)
      throws IOException
    {
       return expandonce(parser);
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser, TeXObjectList list)
      throws IOException
    {
       return expandonce(parser, list);
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
@@ -84,6 +89,7 @@ public class Qcb extends Command
       cs.process(parser, stack);
    }
 
+   @Override
    public void process(TeXParser parser)
       throws IOException
    {

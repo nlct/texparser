@@ -46,7 +46,7 @@ public class DoubleLetterAccent extends ControlSequence
    {
       TeXObject arg = parser.popNextArg();
 
-      if (!(arg instanceof TeXObjectList))
+      if (!(arg instanceof AbstractTeXObjectList))
       {
          parser.push(parser.getListener().getOther(combiningCodePt));
          parser.push(parser.getListener().getOther(0x00A0));
@@ -54,7 +54,7 @@ public class DoubleLetterAccent extends ControlSequence
          return;
       }
 
-      TeXObjectList list = (TeXObjectList)arg;
+      AbstractTeXObjectList list = (AbstractTeXObjectList)arg;
 
       if (list.isEmpty())
       {
@@ -81,7 +81,7 @@ public class DoubleLetterAccent extends ControlSequence
    {
       TeXObject arg = stack.popArg(parser);
 
-      if (!(arg instanceof TeXObjectList))
+      if (!(arg instanceof AbstractTeXObjectList))
       {
          stack.push(parser.getListener().getOther(combiningCodePt));
          stack.push(parser.getListener().getOther(0x00A0));
@@ -89,7 +89,7 @@ public class DoubleLetterAccent extends ControlSequence
          return;
       }
 
-      TeXObjectList list = (TeXObjectList)arg;
+      AbstractTeXObjectList list = (AbstractTeXObjectList)arg;
 
       if (list.isEmpty())
       {

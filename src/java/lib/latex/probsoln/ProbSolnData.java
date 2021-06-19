@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -24,7 +24,7 @@ import java.util.HashMap;
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.*;
 
-public class ProbSolnData
+public class ProbSolnData implements TeXObject
 {
    public ProbSolnData(String name, TeXObjectList contents)
    {
@@ -50,6 +50,15 @@ public class ProbSolnData
       this.defArgs = defArgs;
       this.contents = contents;
       this.dbLabel = dbLabel;
+   }
+
+   @Override
+   public Object clone()
+   {
+      return new ProbSolnData(name, numArgs, 
+        defArgs == null ? null : (TeXObjectList)defArgs.clone(),
+        contents == null ? null : (TeXObjectList)contents.clone(),
+        dbLabel);
    }
 
    public void setName(String name)
@@ -95,8 +104,7 @@ public class ProbSolnData
          {
             params[i] = (TeXObject)defArgs.get(i).clone();
 
-            if (params[i] instanceof Group 
-                && !(params[i] instanceof MathGroup))
+            if (params[i] instanceof Group)
             {
                params[i] = ((Group)params[i]).toList();
             }
@@ -125,8 +133,7 @@ public class ProbSolnData
          {
             params[i] = (TeXObject)defArgs.get(i).clone();
 
-            if (params[i] instanceof Group 
-                && !(params[i] instanceof MathGroup))
+            if (params[i] instanceof Group)
             {
                params[i] = ((Group)params[i]).toList();
             }
@@ -150,8 +157,8 @@ public class ProbSolnData
         false, false);
    }
 
-   private void getProblem(TeXParser parser, TeXObjectList stack,
-     TeXObjectList problem, boolean question, boolean stripSolutionEnv,
+   private void getProblem(TeXParser parser, AbstractTeXObjectList stack,
+     AbstractTeXObjectList problem, boolean question, boolean stripSolutionEnv,
      boolean initOnlyProblem, boolean initOnlySolution)
    throws IOException
    {
@@ -171,7 +178,7 @@ public class ProbSolnData
             object = listener.getControlSequence(((TeXCsRef)object).getName());
          }
 
-         if (object instanceof Group && !(object instanceof MathGroup))
+         if (object instanceof Group)
          {
             if (addObject)
             {
@@ -182,7 +189,7 @@ public class ProbSolnData
                   stripSolutionEnv, onlyProblem, onlySolution);
             }
          }
-         else if (object instanceof TeXObjectList && !(object instanceof Group))
+         else if (object instanceof TeXObjectList)
          {
             stack.addAll(0, (TeXObjectList)object);
          }
@@ -217,8 +224,18 @@ public class ProbSolnData
 
             if (envName instanceof Expandable)
             {
-               TeXObjectList expanded = ((Expandable)envName).expandfully(
-                 parser, stack);
+               TeXObjectList expanded;
+
+               if (stack instanceof TeXObjectList)
+               {
+                  expanded = ((Expandable)envName).expandfully(
+                    parser);
+               }
+               else
+               {
+                  expanded = ((Expandable)envName).expandfully(
+                    parser);
+               }
 
                if (expanded != null)
                {
@@ -261,8 +278,17 @@ public class ProbSolnData
 
             if (envName instanceof Expandable)
             {
-               TeXObjectList expanded = ((Expandable)envName).expandfully(
-                 parser, stack);
+               TeXObjectList expanded;
+
+               if (stack instanceof TeXObjectList)
+               {
+                  expanded = ((Expandable)envName).expandfully(
+                    parser, (TeXObjectList)stack);
+               }
+               else
+               {
+                  expanded = ((Expandable)envName).expandfully( parser);
+               }
 
                if (expanded != null)
                {
@@ -342,18 +368,38 @@ public class ProbSolnData
       getData(parser, params).process(parser, stack);
    }
 
+   public boolean process(TeXParser parser, TeXObjectList stack, StackMarker marker)
+     throws IOException
+   {
+      TeXObject[] params = null;
+
+      if (numArgs > 0)
+      {
+         params = new TeXObject[numArgs];
+
+         for (int i = 0; i < numArgs; i++)
+         {
+            params[i] = stack.popArg(parser);
+         }
+      }
+
+      return getData(parser, params).process(parser, stack, marker);
+   }
+
    private TeXObjectList getData(TeXParser parser, TeXObject[] params)
      throws IOException
    {
-      return getData(parser, params, contents);
+      TeXObjectList stack = new TeXObjectList();
+
+      getData(parser, params, contents, stack);
+
+      return stack;
    }
 
-   private TeXObjectList getData(TeXParser parser, TeXObject[] params,
-     TeXObjectList contentsList)
+   private void getData(TeXParser parser, TeXObject[] params,
+     AbstractTeXObjectList contentsList, AbstractTeXObjectList stack)
      throws IOException
    {
-      TeXObjectList list = contentsList.createList();
-
       for (TeXObject object : contentsList)
       {
          if (object instanceof Param)
@@ -367,25 +413,76 @@ public class ProbSolnData
                  object.toString(parser));
             }
 
-            list.add((TeXObject)params[idx].clone());
+            stack.add((TeXObject)params[idx].clone());
          }
          else if (object instanceof DoubleParam)
          {
-            list.add((TeXObject)((DoubleParam)object).next().clone());
+            stack.add((TeXObject)((DoubleParam)object).next().clone());
          }
-         else if (object instanceof TeXObjectList)
+         else if (object instanceof AbstractTeXObjectList)
          {
-            list.add(getData(parser, params, (TeXObjectList)object));
+            AbstractTeXObjectList list = contentsList.createList();
+            stack.add(list);
+
+            getData(parser, params, (AbstractTeXObjectList)object, list);
          }
          else
          {
-            list.add((TeXObject)object.clone());
+            stack.add((TeXObject)object.clone());
          }
       }
 
-      return list;
    }
 
+   @Override
+   public String toString(TeXParser parser)
+   {
+      return contents.toString(parser);
+   }
+
+   @Override
+   public String stripToString(TeXParser parser) throws IOException
+   {
+      return contents.stripToString(parser);
+   }
+
+   @Override
+   public TeXObjectList string(TeXParser parser) throws IOException
+   {
+      return contents.string(parser);
+   }
+
+   @Override
+   public String format()
+   {
+      return contents.format();
+   }
+
+   @Override
+   public boolean isPopStyleSkip(PopStyle popStyle)
+   {
+      return false;
+   }
+
+   @Override
+   public boolean isPar()
+   {
+      return false;
+   }
+
+   @Override
+   public boolean isEmptyObject()
+   {
+      return contents.isEmptyObject();
+   }
+
+   @Override
+   public int getTeXCategory()
+   {
+      return TYPE_OBJECT;
+   }
+
+   @Override
    public String toString()
    {
       return String.format("ProbSolnData[name=%s,db=%s,args=(n=%d,default=%s),contents=%s]",

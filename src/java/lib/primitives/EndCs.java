@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -24,7 +24,8 @@ import java.io.EOFException;
 import com.dickimawbooks.texparserlib.*;
 
 // This just behaves in a similar way to EndInput and doesn't
-// attempt to actually emulate \end
+// attempt to actually emulate \end. The LaTeX equivalent of \end
+// is provided by latex.End
 public class EndCs extends Primitive
 {
    public EndCs()
@@ -37,17 +38,20 @@ public class EndCs extends Primitive
       super(name);
    }
 
+   @Override
    public Object clone()
    {
       return new EndCs(getName());
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
       process(parser);
    }
 
+   @Override
    public void process(TeXParser parser)
       throws IOException
    {

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -25,44 +25,37 @@ import com.dickimawbooks.texparserlib.*;
 
 public class AtAlph extends Command
 {
-   public AtAlph(String name, byte state)
+   public AtAlph(String name, CharacterCase state)
    {
       super(name);
 
-      if (state != UPPER && state != LOWER)
+      if (state != CharacterCase.UPPER && state != CharacterCase.LOWER)
       {
          throw new IllegalArgumentException(String.format(
-         "Invalid state '%d' for AtAlph ", state));
+         "Invalid state '%s' for AtAlph ", state));
       }
 
       this.state = state;
    }
 
+   @Override
    public Object clone()
    {
       return new AtAlph(getName(), state);
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser)
    throws IOException
    {
-      TeXObject obj = getSymbol(parser, parser.popNumber());
-
-      if (obj instanceof TeXObjectList)
-      {
-         return (TeXObjectList)obj;
-      }
-
-      TeXObjectList list = new TeXObjectList();
-      list.add(obj);
-
-      return list;
+      return expandonce(parser, parser);
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
    throws IOException
    {
-      TeXObject obj = getSymbol(parser, stack.popNumber(parser));
+      TeXObject obj = getSymbol(parser, parser.popRequiredNumber(stack));
 
       if (obj instanceof TeXObjectList)
       {
@@ -81,7 +74,7 @@ public class AtAlph extends Command
       return getSymbol(parser, arg.number(parser), state);
    }
 
-   public static TeXObject getSymbol(TeXParser parser, int num, byte state)
+   public static TeXObject getSymbol(TeXParser parser, int num, CharacterCase state)
    throws IOException
    {
       TeXParserListener listener = parser.getListener();
@@ -96,9 +89,10 @@ public class AtAlph extends Command
          return new TeXCsRef("@ctrerr");
       }
 
-      return listener.getOther((state == UPPER ? 'A' : 'a')+num-1);
+      return listener.getLetter((state == CharacterCase.UPPER ? 'A' : 'a')+num-1);
    }
 
+   @Override
    public void process(TeXParser parser) throws IOException
    {
       TeXObject obj = getSymbol(parser, parser.popNumber());
@@ -106,6 +100,7 @@ public class AtAlph extends Command
       obj.process(parser);
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack) throws IOException
    {
       TeXObject obj = getSymbol(parser, stack.popNumber(parser));
@@ -113,8 +108,5 @@ public class AtAlph extends Command
       obj.process(parser, stack);
    }
 
-   private byte state;
-
-   public static final byte UPPER = 0;
-   public static final byte LOWER = 1;
+   private CharacterCase state;
 }

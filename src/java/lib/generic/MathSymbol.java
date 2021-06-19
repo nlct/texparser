@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -35,28 +35,60 @@ public class MathSymbol extends Symbol
       return new MathSymbol(getName(), getCharCode());
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser)
      throws IOException
    {
-      return null;
+      if (!parser.isMathMode())
+      {
+         throw new TeXSyntaxException(parser,
+           TeXSyntaxException.ERROR_NOT_MATH_MODE,
+           toString(parser));
+      }
+
+      return super.expandonce(parser);
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser,
       TeXObjectList stack)
      throws IOException
    {
-      return null;
+      if (!parser.isMathMode())
+      {
+         throw new TeXSyntaxException(parser,
+           TeXSyntaxException.ERROR_NOT_MATH_MODE,
+           toString(parser));
+      }
+
+      return super.expandonce(parser, stack);
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser) throws IOException
    {
-      return null;
+      if (!parser.isMathMode())
+      {
+         throw new TeXSyntaxException(parser,
+           TeXSyntaxException.ERROR_NOT_MATH_MODE,
+           toString(parser));
+      }
+
+      return super.expandfully(parser);
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser, TeXObjectList stack) 
       throws IOException
    {
-      return null;
+      if (!parser.isMathMode())
+      {
+         throw new TeXSyntaxException(parser,
+           TeXSyntaxException.ERROR_NOT_MATH_MODE,
+           toString(parser));
+      }
+
+      return super.expandfully(parser, stack);
    }
 
    public void write(TeXParser parser)

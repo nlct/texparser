@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -21,14 +21,12 @@ package com.dickimawbooks.texparserlib.latex.ifthen;
 import java.io.IOException;
 
 import com.dickimawbooks.texparserlib.*;
-import com.dickimawbooks.texparserlib.latex.*;
-import com.dickimawbooks.texparserlib.primitives.BeginGroup;
 
-public class BeginConditionGroup extends BeginGroup
+public class BeginConditionGroup extends Command implements BeginGroupObject
 {
    public BeginConditionGroup()
    {
-      this("(");
+      this("TE@lparen");
    }
 
    public BeginConditionGroup(String name)
@@ -36,15 +34,57 @@ public class BeginConditionGroup extends BeginGroup
       super(name);
    }
 
+   @Override
    public Object clone()
    {
       return new BeginConditionGroup(getName());
    }
 
    @Override
-   protected Group createGroup(TeXParser parser)
+   public AbstractGroup createGroup(TeXParser parser)
    {
       return new ConditionGroup();
    }
 
+   @Override
+   public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
+     throws IOException
+   {
+      TeXObjectList list = new TeXObjectList();
+
+      AbstractGroup group = createGroup(parser);
+      list.add(group);
+
+      stack.popRemainingGroup(parser, group, PopStyle.DEFAULT, this);
+
+      return list;
+   }
+
+   @Override
+   public TeXObjectList expandonce(TeXParser parser)
+     throws IOException
+   {
+      TeXObjectList list = new TeXObjectList();
+
+      AbstractGroup group = createGroup(parser);
+      list.add(group);
+
+      parser.popRemainingGroup(parser, group, PopStyle.DEFAULT, this);
+
+      return list;
+   }
+
+   @Override
+   public void process(TeXParser parser, TeXObjectList stack)
+      throws IOException
+   {
+      parser.startGroup();
+   }
+
+   @Override
+   public void process(TeXParser parser)
+      throws IOException
+   {
+      parser.startGroup();
+   }
 }

@@ -34,6 +34,7 @@ public class Begin extends ControlSequence
       super(name);
    }
 
+   @Override
    public Object clone()
    {
       return new Begin(getName());
@@ -49,30 +50,16 @@ public class Begin extends ControlSequence
    {
       ControlSequence cs = parser.getListener().getControlSequence(name);
 
-      if (stack == parser)
-      {
-         cs.process(parser);
-      }
-      else
-      {
-         cs.process(parser, stack);
-      }
+      parser.processObject(cs, stack);
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
       LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
 
-      TeXObject object = (parser == stack ? parser.expandedPopStack() 
-         : stack.expandedPopStack(parser));
-
-      if (object instanceof Group)
-      {
-         object = ((Group)object).toList();
-      }
-
-      String name = object.toString(parser);
+      String name = parser.popRequiredString(stack);
 
       beginHook(name, parser, stack);
 
@@ -94,7 +81,7 @@ public class Begin extends ControlSequence
 
          while (true)
          {
-            object = stack.popStack(parser, TeXObjectList.POP_RETAIN_IGNOREABLES);
+            TeXObject object = stack.popStack(parser, PopStyle.RETAIN_IGNOREABLES);
 
             if (object instanceof End
              || (object instanceof TeXCsRef
@@ -139,6 +126,7 @@ public class Begin extends ControlSequence
       }
    }
 
+   @Override
    public void process(TeXParser parser)
      throws IOException
    {

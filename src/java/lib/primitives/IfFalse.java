@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -35,16 +35,19 @@ public class IfFalse extends If implements TeXBoolean
       super(name);
    }
 
+   @Override
    public Object clone()
    {
       return new IfFalse(getName());
    }
 
+   @Override
    public boolean booleanValue()
    {
       return false;
    }
 
+   @Override
    public boolean istrue(TeXParser parser, TeXObjectList stack)
    throws IOException
    {

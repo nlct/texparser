@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -39,6 +39,7 @@ public class L2LActiveChar extends ActiveChar
       return charCode;
    }
 
+   @Override
    public String toString(TeXParser parser)
    {
       return new String(Character.toChars(charCode));
@@ -49,6 +50,7 @@ public class L2LActiveChar extends ActiveChar
       return new L2LActiveChar(charCode);
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
@@ -70,6 +72,7 @@ public class L2LActiveChar extends ActiveChar
       }
    }
 
+   @Override
    public void process(TeXParser parser)
      throws IOException
    {
@@ -91,22 +94,26 @@ public class L2LActiveChar extends ActiveChar
       }
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser) throws IOException
    {
       return null;
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList list)
       throws IOException
    {
       return null;
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser) throws IOException
    {
       return null;
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser, TeXObjectList list)
       throws IOException
    {

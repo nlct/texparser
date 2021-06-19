@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -31,11 +31,13 @@ public class JmlrSubFloatRef extends JmlrObjectTypeRef
             false);
    }
 
+   @Override
    public Object clone()
    {
       return new JmlrSubFloatRef(getName(), getTag());
    }
 
+   @Override
    protected void expandLabel(TeXParser parser, TeXObjectList expanded,
       TeXObject label)
        throws IOException
@@ -53,7 +55,7 @@ public class JmlrSubFloatRef extends JmlrObjectTypeRef
       }
 
       Group grp = null;
-      TeXObjectList list = expanded;
+      AbstractTeXObjectList list = expanded;
 
       if (listener.isStyLoaded("hyperref"))
       {

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -36,17 +36,20 @@ public class TipaEncoding extends Declaration
       super(name);
    }
 
+   @Override
    public Object clone()
    {
       return new TipaEncoding(getName());
    }
 
-   public TeXObjectList expandonce(TeXParser parser, TeXObjectList list)
+   @Override
+   public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
       return expandonce(parser);
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser)
       throws IOException
    {
@@ -58,27 +61,32 @@ public class TipaEncoding extends Declaration
       return expanded;
    }
 
-   public TeXObjectList expandfully(TeXParser parser, TeXObjectList list)
+   @Override
+   public TeXObjectList expandfully(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
       return expandonce(parser);
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser)
       throws IOException
    {
       return expandonce(parser);
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
       process(parser);
    }
 
+   @Override
    public void process(TeXParser parser)
      throws IOException
    {
+      pushEnd(parser);
       TeXSettings settings = parser.getSettings();
       orgEncoding = settings.getCurrentFontEncoding();
 
@@ -89,12 +97,14 @@ public class TipaEncoding extends Declaration
       settings.setFontEncoding(newEncoding);
    }
 
+   @Override
    public void end(TeXParser parser) throws IOException
    {
       TeXSettings settings = parser.getSettings();
       settings.setFontEncoding(orgEncoding);
    }
 
+   @Override
    public boolean isModeSwitcher()
    {
       return false;

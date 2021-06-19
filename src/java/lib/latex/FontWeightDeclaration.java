@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -23,7 +23,7 @@ import java.util.Vector;
 
 import com.dickimawbooks.texparserlib.*;
 
-public class FontWeightDeclaration extends Declaration
+public class FontWeightDeclaration extends RobustDeclaration
 {
    public FontWeightDeclaration(String name, int weight)
    {
@@ -32,37 +32,16 @@ public class FontWeightDeclaration extends Declaration
       this.orgWeight = TeXSettings.INHERIT;
    }
 
+   @Override
    public Object clone()
    {
       return new FontWeightDeclaration(getName(), weight);
    }
 
-   public TeXObjectList expandonce(TeXParser parser, TeXObjectList list)
-      throws IOException
-   {
-      return null;
-   }
-
-   public TeXObjectList expandonce(TeXParser parser)
-      throws IOException
-   {
-      return null;
-   }
-
-   public TeXObjectList expandfully(TeXParser parser, TeXObjectList list)
-      throws IOException
-   {
-      return null;
-   }
-
-   public TeXObjectList expandfully(TeXParser parser)
-      throws IOException
-   {
-      return null;
-   }
-
+   @Override
    public void process(TeXParser parser) throws IOException
    {
+      pushEnd(parser);
       TeXSettings settings = parser.getSettings();
 
       orgWeight = settings.getCurrentFontWeight();
@@ -70,17 +49,21 @@ public class FontWeightDeclaration extends Declaration
       settings.setFontWeight(weight);
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList list) throws IOException
    {
       process(parser);
    }
 
+   @Override
    public void end(TeXParser parser) throws IOException
    {
       TeXSettings settings = parser.getSettings();
       settings.setFontWeight(orgWeight);
+      settings.removeDeclaration(this);
    }
 
+   @Override
    public boolean isModeSwitcher()
    {
       return false;
@@ -89,6 +72,19 @@ public class FontWeightDeclaration extends Declaration
    public int getWeight()
    {
       return weight;
+   }
+
+   @Override
+   public boolean equals(Object object)
+   {
+      if (!(object instanceof FontWeightDeclaration) || !super.equals(object))
+      {
+         return false;
+      }
+
+      FontWeightDeclaration dec = (FontWeightDeclaration)object;
+
+      return dec.weight == weight;
    }
 
    private int weight, orgWeight;

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -35,71 +35,28 @@ public class DocumentClass extends ControlSequence
       this.loadParentOptions = loadParentOptions;
    }
 
+   @Override
    public Object clone()
    {
       return new DocumentClass(getName(), loadParentOptions);
    }
 
+   @Override
    public void process(TeXParser parser)
      throws IOException
    {
       process(parser, parser);
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      byte popStyle = TeXObjectList.POP_SHORT;
+      PopStyle popStyle = PopStyle.SHORT;
 
-      TeXObject options;
-      TeXObject cls;
-
-      if (parser == stack)
-      {
-         options = stack.popArg(parser, popStyle, '[', ']');
-         cls = stack.popArg(parser, popStyle);
-      }
-      else
-      {
-         options = parser.popNextArg(popStyle, '[', ']');
-         cls = parser.popNextArg(popStyle);
-      }
-
-      TeXObjectList expanded = null;
-
-      if (cls instanceof Expandable)
-      {
-         if (stack == parser)
-         {
-            expanded = ((Expandable)cls).expandfully(parser);
-         }
-         else
-         {
-            expanded = ((Expandable)cls).expandfully(parser, stack);
-         }
-      }
-
-      TeXObject version;
-
-      if (parser == stack)
-      {
-         version = stack.popArg(parser, popStyle, '[', ']');
-      }
-      else
-      {
-         version = parser.popNextArg(popStyle, '[', ']');
-      }
-
-      String clsName;
-
-      if (expanded == null)
-      {
-         clsName = cls.toString(parser);
-      }
-      else
-      {
-         clsName = expanded.toString(parser);
-      }
+      TeXObject options = parser.popOptional(stack, popStyle);
+      String clsName = parser.popRequiredString(stack, popStyle);
+      TeXObject version = parser.popOptional(stack, popStyle);
 
       KeyValList keyValList = null;
 

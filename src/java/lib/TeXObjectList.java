@@ -25,8 +25,7 @@ import java.util.ArrayDeque;
 import com.dickimawbooks.texparserlib.primitives.*;
 import com.dickimawbooks.texparserlib.generic.*;
 
-public class TeXObjectList extends Vector<TeXObject>
-  implements TeXObject,Expandable,CaseChangeable
+public class TeXObjectList extends AbstractTeXObjectList
 {
    public TeXObjectList()
    {
@@ -40,24 +39,45 @@ public class TeXObjectList extends Vector<TeXObject>
 
    public TeXObjectList(TeXParserListener listener, String text)
    {
-      this(text.length() > 0 ? text.length() : 10);
-
-      for (int i = 0, n = text.length(); i < n; )
-      {
-         int cp = text.codePointAt(i);
-         i += Character.charCount(cp);
-
-         add(listener.getOther(cp));
-      }
+      super(listener, text);
    }
 
+   @Override
+   public boolean isPopStyleSkip(PopStyle popStyle)
+   {
+      for (int i = 0; i < size(); i++)
+      {
+         if (!get(i).isPopStyleSkip(popStyle))
+         {
+            return false;
+         }
+      }
+
+      return true;
+   }
+
+   @Override
+   public AbstractTeXObjectList createList()
+   {
+      return new TeXObjectList(capacity());
+   }
+
+   @Override
+   public TeXObjectList toList()
+   {
+      return this;
+   }
+
+   @Override
    public TeXObject expandedPopStack(TeXParser parser)
      throws IOException
    {
-      return expandedPopStack(parser, (byte)0);
+      return expandedPopStack(parser, PopStyle.DEFAULT);
    }
 
-   public TeXObject expandedPopStack(TeXParser parser, byte popStyle)
+   @Override
+   public TeXObject expandedPopStack(TeXParser parser, PopStyle popStyle, 
+       boolean fully)
      throws IOException
    {
       if (size() == 0)
@@ -67,61 +87,29 @@ public class TeXObjectList extends Vector<TeXObject>
 
       flatten();
 
-      TeXObject object = popStack(parser, popStyle);
+      TeXObject object = parser.resolveReference(popToken(popStyle));
 
-      if (isIgnoreLeadingSpace(popStyle))
+      popStyle = popStyle.excludeLeadingStyles();
+
+      if (object instanceof EndCs)
       {
-         popStyle = (byte)(popStyle^POP_IGNORE_LEADING_SPACE);
+         return object;
       }
 
-      if (object instanceof AssignedMacro)
+      if (object instanceof AbstractGroup)
       {
-         object = ((AssignedMacro)object).getBaseUnderlying();
+         // most likely object has already been popped and pushed back
+         return (AbstractGroup)object;
       }
 
-      if (object instanceof TeXCsRef)
+      BeginGroupObject bg = parser.toBeginGroup(object);
+
+      if (bg != null)
       {
-         object = parser.getListener().getControlSequence(
-            ((TeXCsRef)object).getName());
-
-         if (object instanceof EndCs)
-         {
-            return object;
-         }
-      }
-
-      if (object instanceof Group)
-      {
-         Group group = (Group)object;
-
-         TeXObjectList expanded = group.expandfully(parser, this);
-         BgChar bgChar = parser.isBeginGroup(expanded.get(0));
-
-         if (bgChar != null)
-         {
-            expanded.pop();
-            group = bgChar.createGroup(parser);
-            expanded.popRemainingGroup(parser, group, popStyle, bgChar);
-
-            if (!expanded.isEmpty())
-            {
-               addAll(0, expanded);
-            }
-
-            return group;
-         }
-
-         addAll(0, expanded);
-         object = popStack(parser, popStyle);
-      }
-
-      BgChar bgChar = parser.isBeginGroup(object);
-
-      if (bgChar != null)
-      {
-         Group group = bgChar.createGroup(parser);
-         popRemainingGroup(parser, group, popStyle, bgChar);
-
+         AbstractGroup group = bg.createGroup(parser);
+         parser.startGroup();
+         popExpandedRemainingGroup(parser, group, popStyle, bg, fully);
+         parser.endGroup();
          return group;
       }
 
@@ -135,7 +123,16 @@ public class TeXObjectList extends Vector<TeXObject>
          return object;
       }
 
-      TeXObjectList expanded = ((Expandable)object).expandfully(parser, this);
+      TeXObjectList expanded;
+
+      if (fully)
+      {
+         expanded = ((Expandable)object).expandfully(parser, this);
+      }
+      else
+      {
+         expanded = ((Expandable)object).expandonce(parser, this);
+      }
 
       if (expanded == null)
       {
@@ -145,361 +142,96 @@ public class TeXObjectList extends Vector<TeXObject>
       return expanded;
    }
 
-   public TeXObject popStack(TeXParser parser)
+   public boolean popExpandedRemainingGroup(TeXParser parser, 
+      AbstractGroup group, PopStyle popStyle, BeginGroupObject bg)
      throws IOException
    {
-      return popStack(parser, (byte)0);
+      return popExpandedRemainingGroup(parser, group, popStyle, bg, true);
    }
 
-   public TeXObject popStack(TeXParser parser, byte popStyle)
+   public boolean popExpandedRemainingGroup(TeXParser parser, 
+      AbstractGroup group, PopStyle popStyle, BeginGroupObject bg, boolean fully)
      throws IOException
    {
-      boolean skipIgnoreables = !isRetainIgnoreables(popStyle);
-      boolean skipLeadingWhiteSpace = isIgnoreLeadingSpace(popStyle);
-
-      if (skipIgnoreables && skipLeadingWhiteSpace)
+      while (size() > 0)
       {
-         while (size() > 0)
-         {
-            TeXObject obj = get(0);
+         TeXObject obj = pop();
 
-            if (!((obj instanceof Ignoreable) || (obj instanceof WhiteSpace)))
+         EndGroupObject eg = parser.toEndGroup(obj);
+
+         if (eg != null)
+         {
+            if (!eg.matches(bg))
             {
-               break;
+               throw new TeXSyntaxException(parser,
+                 TeXSyntaxException.ERROR_EXTRA_OR_FORGOTTEN,
+                 eg.toString(parser), bg.toString(parser));
             }
 
-            pop();
+            return true;
          }
-      }
-      else if (skipIgnoreables)
-      {
-         while (size() > 0 && (get(0) instanceof Ignoreable))
-         {
-            pop();
-         }
-      }
-      else if (skipLeadingWhiteSpace)
-      {
-         while (size() > 0 && (get(0) instanceof WhiteSpace))
-         {
-            pop();
-         }
-      }
 
-      if (size() == 0)
-      {
-         return null;
-      }
+         BeginGroupObject bg2 = parser.toBeginGroup(obj);
 
-      if (isIgnoreLeadingSpace(popStyle))
-      {
-         popStyle = (byte)(popStyle^POP_IGNORE_LEADING_SPACE);
-      }
-
-      TeXObject obj = pop();
-
-      if (isShort(popStyle) && obj.isPar())
-      {
-         throw new TeXSyntaxException(parser,
-            TeXSyntaxException.ERROR_PAR_BEFORE_EG);
-      }
-
-      BgChar bgChar = null;
-
-      if (parser != null)
-      {
-         bgChar = parser.isBeginGroup(obj);
-      }
-
-      if (bgChar != null)
-      {
-         Group group = bgChar.createGroup(parser);
-         popRemainingGroup(parser, group, popStyle, bgChar);
-
-         return group;
-      }
-
-      return obj;
-   }
-
-   public TeXObject popToken()
-     throws IOException
-   {
-      return popToken((byte)0);
-   }
-
-   public TeXObject popToken(byte popStyle)
-     throws IOException
-   {
-      boolean retainIgnoreables = isRetainIgnoreables(popStyle);
-      boolean skipWhiteSpace = isIgnoreLeadingSpace(popStyle);
-
-      if (!retainIgnoreables && skipWhiteSpace)
-      {
-         while (size() > 0)
-         {
-            TeXObject obj = get(0);
-
-            if (!((obj instanceof Ignoreable) || (obj instanceof WhiteSpace)))
-            {
-               break;
-            }
-
-            pop();
-         }
-      }
-      else if (skipWhiteSpace)
-      {
-         while (size() > 0)
-         {
-            TeXObject obj = get(0);
-
-            if (!(obj instanceof WhiteSpace
-               || obj instanceof SkippedSpaces
-               || obj instanceof SkippedEols))
-            {
-               break;
-            }
-
-            pop();
-         }
-      }
-      else if (!retainIgnoreables)
-      {
-         while (size() > 0 && (get(0) instanceof Ignoreable))
-         {
-            pop();
-         }
-      }
-
-      if (size() == 0)
-      {
-         return null;
-      }
-
-      return pop();
-   }
-
-   public TeXObject pop()
-     throws IOException
-   {
-      if (isEmpty())
-      {
-         return null;
-      }
-
-      return remove(0);
-   }
-
-   public void popLeadingWhiteSpace()
-   {
-      if (isEmpty())
-      {
-         return;
-      }
-
-      TeXObject obj = get(0);
-
-      if (obj instanceof Ignoreable || obj instanceof WhiteSpace)
-      {
-         remove(0);
-         popLeadingWhiteSpace();
-      }
-   }
-
-   public TeXObjectList popToGroup(TeXParser parser, byte popStyle)
-     throws IOException
-   {
-      TeXObjectList list = new TeXObjectList();
-
-      while (true)
-      {
-         if (size() == 0)
+         if (popStyle.isShort() && obj.isPar())
          {
             throw new TeXSyntaxException(parser,
-              TeXSyntaxException.ERROR_SYNTAX,
-              toString(parser));
+               TeXSyntaxException.ERROR_PAR_BEFORE_EG);
          }
-
-         TeXObject obj = firstElement();
-
-         BgChar bgChar = parser.isBeginGroup(obj);
-
-         if (obj instanceof Group || bgChar != null)
+         else if (bg2 != null)
          {
-            break;
+            AbstractGroup subGrp = bg2.createGroup(parser);
+
+            if (!popExpandedRemainingGroup(parser, subGrp, popStyle, bg2, fully))
+            {
+               group.add(subGrp);
+
+               return false;
+            }
+
+            group.add(subGrp);
          }
-
-         obj = pop();
-
-         if (!isRetainIgnoreables(popStyle) && obj instanceof Ignoreable)
+         else if (obj instanceof Expandable)
          {
-            parser.getListener().skipping((Ignoreable)obj);
+            TeXObjectList expanded;
+
+            if (fully)
+            {
+               expanded = ((Expandable)obj).expandfully(parser, this);
+            }
+            else
+            {
+               expanded = ((Expandable)obj).expandonce(parser, this);
+            }
+
+            if (expanded != null)
+            {
+               group.add(obj);
+            }
+            else
+            {
+               group.addAll(expanded);
+            }
          }
          else
          {
-            list.add(obj);
+            group.add(obj);
          }
       }
 
-      return list;
-   }
-
-   public boolean popCsMarker(TeXParser parser, String name)
-    throws IOException
-   {
-      return popCsMarker(parser, name, (byte)0);
-   }
-
-   public boolean popCsMarker(TeXParser parser, String name, byte popStyle)
-    throws IOException
-   {
-      TeXObject token = popToken(popStyle);
-
-      if (token == null)
-      {
-         return false;
-      }
-
-      if (!(token instanceof ControlSequence && 
-             ((ControlSequence)token).getName().equals(name)))
-      {
-         throw new TeXSyntaxException(parser, 
-            TeXSyntaxException.ERROR_NOT_FOUND, 
-            String.format("%s%s", 
-              new String(Character.toChars(parser.getEscChar())), name));
-      }
-
-      return true;
-   }
-
-   public TeXObjectList popToCsMarker(TeXParser parser, String name)
-    throws IOException
-   {
-      return popToCsMarker(parser, name, (byte)0);
-   }
-
-   public TeXObjectList popToCsMarker(TeXParser parser,
-       String name, byte popStyle)
-    throws IOException
-   {
-      TeXObjectList list = new TeXObjectList();
-
-      TeXObject token = popToken(popStyle);
-
-      if (isIgnoreLeadingSpace(popStyle))
-      {
-         popStyle = (byte)(popStyle^POP_IGNORE_LEADING_SPACE);
-      }
-
-      while (token != null)
-      {
-         if ((token instanceof ControlSequence && 
-             ((ControlSequence)token).getName().equals(name)))
-         {
-            return list;
-         }
-
-         list.add(token);
-         token = popToken(popStyle);
-      }
-
-      throw new TeXSyntaxException(parser, 
-         TeXSyntaxException.ERROR_NOT_FOUND, 
-         String.format("%s%s", 
-          new String(Character.toChars(parser.getEscChar())), name));
-   }
-
-   public TeXUnit popUnit(TeXParser parser)
-    throws IOException
-   {
-      TeXObject object = expandedPopStack(parser, 
-       (byte)(POP_SHORT | POP_IGNORE_LEADING_SPACE));
-
-      if (object == null)
-      {
-         throw new TeXSyntaxException(parser,
-            TeXSyntaxException.ERROR_MISSING_UNIT);
-      }
-
-      if (object instanceof CharObject)
-      {
-         int c1 = ((CharObject)object).getCharCode();
-
-         TeXObject nextObj = expandedPopStack(parser);
-
-         if (nextObj == null || !(nextObj instanceof CharObject))
-         {
-            push(object);
-
-            throw new TeXSyntaxException(parser,
-               TeXSyntaxException.ERROR_MISSING_UNIT);
-         }
-
-         int c2 = ((CharObject)nextObj).getCharCode();
-
-         try
-         {
-            return parser.getListener().createUnit(String.format("%s%s",
-             new String(Character.toChars(c1)), 
-             new String(Character.toChars(c2))));
-         }
-         catch (TeXSyntaxException e)
-         {
-            if (c1 == 'f' && c2 == 'i')
-            {
-               TeXObject object3 = expandedPopStack(parser);
-
-               if (object3 == null
-               || !(object3 instanceof CharObject)
-               || (((CharObject)object3).getCharCode() != 'l'))
-               {
-                  push(object3);
-               }
-               else
-               {
-                  TeXObject object4 = expandedPopStack(parser);
-
-                  if (object4 == null
-                  || !(object4 instanceof CharObject)
-                  || ((CharObject)object4).getCharCode() != 'l')
-                  {
-                     push(object4);
-                     return TeXUnit.FIL;
-                  }
-
-                  TeXObject object5 = expandedPopStack(parser);
-
-                  if (object5 == null
-                  || (object5 instanceof CharObject)
-                  || ((CharObject)object5).getCharCode() != 'l')
-                  {
-                     push(object5);
-                     return TeXUnit.FILL;
-                  }
-
-                  return TeXUnit.FILLL;
-               }
-            }
-         }
-
-         push(nextObj);
-         push(object);
-
-         throw new TeXSyntaxException(parser,
-               TeXSyntaxException.ERROR_MISSING_UNIT);
-      }
-
-      push(object);
-
-      throw new TeXSyntaxException(parser,
-               TeXSyntaxException.ERROR_MISSING_UNIT);
+      return false;
    }
 
    public Register popRegister(TeXParser parser)
      throws IOException
    {
-      TeXObject object = popToken(POP_IGNORE_LEADING_SPACE);
+      return popRegister(parser, PopStyle.DEFAULT);
+   }
+
+   public Register popRegister(TeXParser parser, PopStyle popStyle)
+     throws IOException
+   {
+      TeXObject object = parser.popNextTokenResolveReference(this, popStyle);
 
       if (object == null)
       {
@@ -507,40 +239,9 @@ public class TeXObjectList extends Vector<TeXObject>
             TeXSyntaxException.ERROR_REGISTER_EXPECTED);
       }
 
-      if (object instanceof TeXCsRef)
-      {
-         object = parser.getListener().getControlSequence(
-          ((TeXCsRef)object).getName());
-      }
-
       if (object instanceof Register)
       {
          return (Register)object;
-      }
-
-      if (object instanceof Expandable)
-      {
-         TeXObjectList expanded;
-
-         if (this == parser)
-         {
-            expanded = ((Expandable)object).expandfully(parser);
-         }
-         else
-         {
-            expanded = ((Expandable)object).expandfully(parser,this);
-         }
-
-         if (expanded != null)
-         {
-            addAll(0, expanded);
-            object = popToken(POP_IGNORE_LEADING_SPACE);
-
-            if (object instanceof Register)
-            {
-               return (Register)object;
-            }
-         }
       }
 
       throw new TeXSyntaxException(parser,
@@ -548,711 +249,16 @@ public class TeXObjectList extends Vector<TeXObject>
           object.toString(parser));
    }
 
-   public Numerical popNumerical(TeXParser parser)
-   throws IOException
-   {
-      TeXObject object = peekStack(POP_IGNORE_LEADING_SPACE);
-
-      if (object instanceof CharObject)
-      {
-         int codePoint = ((CharObject)object).getCharCode();
-
-         if (codePoint == '"' || codePoint == '\'' || codePoint == '`'
-             || Character.isDigit(codePoint)
-             || codePoint == '-' || codePoint == '+')
-         {
-            return popNumber(parser);
-         }
-      }
-
-      object = expandedPopStack(parser, POP_SHORT);
-
-      if (object instanceof NumericRegister)
-      {
-         return (NumericRegister)object;
-      }
-
-      if (object instanceof TeXDimension)
-      {
-         return (TeXDimension)object;
-      }
-
-      push(object);
-
-      return popNumber(parser);
-   }
-
-   public TeXDimension popDimension(TeXParser parser)
-    throws IOException
-   {
-      TeXObject object = expandedPopStack(parser, 
-        (byte)(POP_SHORT | POP_IGNORE_LEADING_SPACE));
-
-      if (object instanceof TeXDimension)
-      {
-         return (TeXDimension)object;
-      }
-
-      push(object);
-
-      Float value = popFloat(parser);
-
-      object = expandedPopStack(parser);
-
-      if (object instanceof DimenRegister)
-      {
-         TeXDimension dimen = new TeXGlue(parser, (DimenRegister)object);
-         dimen.multiply(value.floatValue());
-         return dimen;
-      }
-
-      push(object);
-
-      TeXUnit unit = popUnit(parser);
-
-      TeXDimension dimen = new UserDimension(value, unit);
-
-      TeXDimension stretch = null;
-
-      TeXDimension shrink = null;
-
-      object = expandedPopStack(parser);
-      push(object);
-
-      if (!(object instanceof CharObject))
-      {
-         return dimen;
-      }
-
-      if (((CharObject)object).getCharCode() == 'p')
-      {
-         stretch = popStretch(parser);
-
-         if (stretch == null)
-         {
-            return dimen;
-         }
-
-         object = expandedPopStack(parser);
-         push(object);
-
-         if ((object instanceof CharObject)
-          && (((CharObject)object).getCharCode() == 'm'))
-         {
-            shrink = popShrink(parser);
-         }
-      }
-      else if (((CharObject)object).getCharCode() == 'm')
-      {
-         shrink = popShrink(parser);
-
-         if (shrink == null)
-         {
-            return dimen;
-         }
-      }
-      else
-      {
-         return dimen;
-      }
-
-      return new TeXGlue(parser, dimen, stretch, shrink);
-   }
-
-   private TeXDimension popStretch(TeXParser parser)
-     throws IOException
-   {
-      TeXObject object = expandedPopStack(parser, 
-        (byte)(POP_SHORT | POP_IGNORE_LEADING_SPACE));
-
-      if (!(object instanceof CharObject)
-       ||((CharObject)object).getCharCode() != 'p')
-      {
-         push(object);
-         return null;
-      }
-
-      TeXObject object2 = expandedPopStack(parser, POP_SHORT);
-
-      if (!(object2 instanceof CharObject)
-       ||((CharObject)object2).getCharCode() != 'l')
-      {
-         push(object2);
-         push(object);
-         return null;
-      }
-
-      TeXObject object3 = expandedPopStack(parser, POP_SHORT);
-
-      if (!(object3 instanceof CharObject)
-       ||((CharObject)object3).getCharCode() != 'u')
-      {
-         push(object3);
-         push(object2);
-         push(object);
-         return null;
-      }
-
-      TeXObject object4 = expandedPopStack(parser, POP_SHORT);
-
-      if (!(object4 instanceof CharObject)
-       ||((CharObject)object4).getCharCode() != 's')
-      {
-         push(object4);
-         push(object3);
-         push(object2);
-         push(object);
-         return null;
-      }
-
-      Float value = popFloat(parser);
-
-      object = expandedPopStack(parser, POP_SHORT);
-
-      if (object instanceof DimenRegister)
-      {
-         TeXDimension dimen = new UserDimension();
-         dimen.setDimension(parser, (DimenRegister)object);
-         dimen.multiply(value.floatValue());
-         return dimen;
-      }
-
-      push(object);
-
-      TeXUnit unit = popUnit(parser);
-      
-      return new UserDimension(value, unit);
-   }
-
-   private TeXDimension popShrink(TeXParser parser)
-     throws IOException
-   {
-      TeXObject object = expandedPopStack(parser, POP_SHORT);
-
-      if (!(object instanceof CharObject)
-       ||((CharObject)object).getCharCode() != 'm')
-      {
-         push(object);
-         return null;
-      }
-
-      TeXObject object2 = expandedPopStack(parser, POP_SHORT);
-
-      if (!(object2 instanceof CharObject)
-       ||((CharObject)object2).getCharCode() != 'i')
-      {
-         push(object2);
-         push(object);
-         return null;
-      }
-
-      TeXObject object3 = expandedPopStack(parser, POP_SHORT);
-
-      if (!(object3 instanceof CharObject)
-       ||((CharObject)object3).getCharCode() != 'n')
-      {
-         push(object3);
-         push(object2);
-         push(object);
-         return null;
-      }
-
-      TeXObject object4 = expandedPopStack(parser, POP_SHORT);
-
-      if (!(object4 instanceof CharObject)
-       ||((CharObject)object4).getCharCode() != 'u')
-      {
-         push(object4);
-         push(object3);
-         push(object2);
-         push(object);
-         return null;
-      }
-
-      TeXObject object5 = expandedPopStack(parser, POP_SHORT);
-
-      if (!(object5 instanceof CharObject)
-       ||((CharObject)object5).getCharCode() != 's')
-      {
-         push(object5);
-         push(object4);
-         push(object3);
-         push(object2);
-         push(object);
-         return null;
-      }
-
-      Float value = popFloat(parser);
-
-      object = expandedPopStack(parser, POP_SHORT);
-
-      if (object instanceof DimenRegister)
-      {
-         TeXDimension dimen = new UserDimension();
-         dimen.setDimension(parser, (DimenRegister)object);
-         dimen.multiply(value.floatValue());
-         return dimen;
-      }
-
-      push(object);
-
-      TeXUnit unit = popUnit(parser);
-      
-      return new UserDimension(value, unit);
-   }
-
-   public Float popFloat(TeXParser parser)
-    throws IOException
-   {
-      TeXObject object = expandedPopStack(parser);
-
-      StringBuilder builder = new StringBuilder();
-      
-      popFloat(parser, object, builder);
-
-      String str = builder.toString();
-
-      try
-      {
-         return Float.valueOf(str);
-      }
-      catch (NumberFormatException e)
-      {
-         throw new TeXSyntaxException(parser,
-                  TeXSyntaxException.ERROR_NUMBER_EXPECTED, str);
-      }
-   }
-
-   // object should be fully expanded
-   protected void popFloat(TeXParser parser, TeXObject object, 
-      StringBuilder builder)
-   throws IOException
-   {
-      if (object == null) return;
-
-      String str = object.toString(parser);
-
-      try
-      {
-         Float.parseFloat(builder.toString()+str+"0");
-      }
-      catch (NumberFormatException e)
-      {
-         push(object);
-         return;
-      }
-
-      builder.append(str);
-
-      popFloat(parser, expandedPopStack(parser), builder);
-   }
-
-   public TeXNumber popNumber(TeXParser parser)
-    throws IOException
-   {
-      TeXObject object = peekStack(POP_IGNORE_LEADING_SPACE);
-
-      int base = 10;
-
-      if (object instanceof CharObject)
-      {
-         int codePoint = ((CharObject)object).getCharCode();
-
-         if (codePoint == '"')
-         {
-            popStack(parser, POP_IGNORE_LEADING_SPACE);
-            base = 16;
-         }
-         else if (codePoint == '\'')
-         {
-            popStack(parser, POP_IGNORE_LEADING_SPACE);
-            base = 8;
-         }
-         else if (codePoint == '`')
-         {
-            popStack(parser, POP_IGNORE_LEADING_SPACE);
-
-            TeXObject nextObj = peek();
-
-            if (nextObj instanceof ControlSequence)
-            {
-               popStack(parser);
-
-               String name = ((ControlSequence)nextObj).getName();
-
-               codePoint = name.codePointAt(0);
-
-               if (Character.charCount(codePoint) != name.length())
-               {
-                  throw new TeXSyntaxException(parser,
-                    TeXSyntaxException.ERROR_IMPROPER_ALPHABETIC_CONSTANT,
-                    nextObj.toString(parser));
-               }
-
-               // skip trailing spaces
-
-               popLeadingWhiteSpace();
-
-               return new UserNumber(codePoint);
-            }
-            else if (nextObj instanceof CharObject)
-            {
-               codePoint = ((CharObject)nextObj).getCharCode();
-
-               popStack(parser, POP_IGNORE_LEADING_SPACE);
-
-               // skip trailing spaces
-
-               popLeadingWhiteSpace();
-
-               return new UserNumber(codePoint);
-            }
-            else
-            {
-               String str = nextObj.toString(parser);
-
-               codePoint = str.codePointAt(0);
-
-               if (Character.charCount(codePoint) != str.length())
-               {
-                  throw new TeXSyntaxException(parser,
-                    TeXSyntaxException.ERROR_IMPROPER_ALPHABETIC_CONSTANT,
-                    str);
-               }
-
-               return new UserNumber(codePoint);
-            }
-         }
-      }
-
-      return popNumber(parser, base);
-   }
-
-   public TeXNumber popNumber(TeXParser parser, int base)
-     throws IOException
-   {
-      popLeadingWhiteSpace();
-      TeXObject object = expandedPopStack(parser);
-
-      if (object instanceof TeXNumber)
-      {
-         return (TeXNumber)object;
-      }
-
-      if (object instanceof Group)
-      {
-         return ((Group)object).toList().popNumber(parser);
-      }
-
-      if (object instanceof ControlSequence)
-      {
-         throw new TeXSyntaxException(parser, 
-          TeXSyntaxException.ERROR_NUMBER_EXPECTED, object.toString(parser));
-      }
-
-      StringBuilder builder = new StringBuilder();
-
-      if (object instanceof CharObject && 
-          (((CharObject)object).getCharCode() == '+'
-            || ((CharObject)object).getCharCode() == '-'))
-      {
-         builder.appendCodePoint(((CharObject)object).getCharCode());
-         object = expandedPopStack(parser);
-      }
-      
-      popNumber(parser, object, builder, base);
-
-      // skip trailing spaces
-
-      popLeadingWhiteSpace();
-
-      if (builder.length() == 0)
-      {
-         throw new TeXSyntaxException(parser,
-          TeXSyntaxException.ERROR_NUMBER_EXPECTED, 
-          object.toString(parser));
-      }
-
-      return new UserNumber(parser, builder.toString(), base);
-   }
-
-   // object should be fully expanded
-   protected void popNumber(TeXParser parser, TeXObject object,
-     StringBuilder builder, int base)
-   throws IOException
-   {
-      if (object == null) return;
-
-      String str;
-
-      if (object instanceof CharObject)
-      {
-         // don't allow font encoding etc to convert the character
-         str = new String(Character.toChars(((CharObject)object).getCharCode()));
-      }
-      else
-      {
-         str = object.toString(parser);
-      }
-
-      try
-      {
-         Integer.parseInt(builder.toString()+str, base);
-      }
-      catch (NumberFormatException e)
-      {
-         push(object);
-         return;
-      }
-
-      builder.append(str);
-
-      popNumber(parser, expandedPopStack(parser), builder, base);
-   }
-
-   public ControlSequence popControlSequence(TeXParser parser)
-    throws IOException
-   {
-      TeXObject obj = popArg(parser);
-
-      if (obj instanceof TeXObjectList)
-      {
-         TeXObjectList list = (TeXObjectList)obj;
-
-         obj = list.popToken();
-
-         if (obj == null || list.peekStack() != null)
-         {
-            throw new TeXSyntaxException(parser,
-               TeXSyntaxException.ERROR_CS_EXPECTED,
-                obj == null ? list.toString(parser) :
-                 String.format("%s%s", obj.toString(parser),
-                 list.toString(parser)),
-                obj.getClass().getSimpleName());
-         }
-      }
-
-      if (!(obj instanceof ControlSequence))
-      {
-         throw new TeXSyntaxException(parser,
-            TeXSyntaxException.ERROR_CS_EXPECTED, obj.toString(parser),
-                obj.getClass().getSimpleName());
-      }
-
-      return (ControlSequence)obj;
-   }
-
-   public void push(TeXObject object)
-   {
-      if (object == this)
-      {
-         throw new IllegalArgumentException(
-           "Can't add list to itself");
-      }
-
-      if (object != null)
-      {
-         add(0, object);
-      }
-   }
-
-   public void add(int index, TeXObject object)
-   {
-      if (object == null)
-      {
-         throw new NullPointerException();
-      }
-
-      super.add(index, object);
-   }
-
-   public boolean add(TeXObject object)
-   {
-      if (object == null)
-      {
-         throw new NullPointerException();
-      }
-
-      if (object == this)
-      {
-         throw new IllegalArgumentException(
-           "Can't add a list to itself");
-      }
-
-      return super.add(object);
-   }
-
-   public TeXObject peek()
-   {
-      return size() == 0 ? null : firstElement();
-   }
-
-   public TeXObject peekLast()
-   {
-      return size() == 0 ? null : lastElement();
-   }
-
-   public TeXObject peekStack()
-    throws IOException
-   {
-      return peekStack((byte)0);
-   }
-
-   public TeXObject peekStack(byte popStyle)
-    throws IOException
-   {
-      if (size() == 0)
-      {
-         return null;
-      }
-
-      if (isIgnoreLeadingSpace(popStyle))
-      {
-         for (int i = 0, n = size(); i < n; i++)
-         {
-            TeXObject obj = get(i);
-
-            if (!((obj instanceof Ignoreable) || (obj instanceof WhiteSpace)))
-            {
-               return obj;
-            }
-         }
-      }
-      else
-      {
-         for (int i = 0, n = size(); i < n; i++)
-         {
-            TeXObject obj = get(i);
-
-            if (!(obj instanceof Ignoreable))
-            {
-               return obj;
-            }
-         }
-      }
-
-      return null;
-   }
-
-   public static boolean isShort(byte popStyle)
-   {
-      return (popStyle & POP_SHORT) == POP_SHORT;
-   }
-
-   public static boolean isRetainIgnoreables(byte popStyle)
-   {
-      return (popStyle & POP_RETAIN_IGNOREABLES) == POP_RETAIN_IGNOREABLES;
-   }
-
-   public static boolean isIgnoreLeadingSpace(byte popStyle)
-   {
-      return (popStyle & POP_IGNORE_LEADING_SPACE) == POP_IGNORE_LEADING_SPACE;
-   }
-
-   // Pops an argument off the stack. Removes any top level
-   // grouping. Ignore leading white space.
-   public TeXObject popArg(TeXParser parser)
-    throws IOException
-   {
-      return popArg(parser, POP_IGNORE_LEADING_SPACE);
-   }
-
-   public TeXObject popArg(TeXParser parser, byte popStyle)
-    throws IOException
-   {
-      TeXObject object = popStack(parser, popStyle);
-
-      if (object == null && !(this instanceof TeXParser))
-      {
-         object = parser.popNextArg(popStyle);
-      }
-
-      if (object instanceof Group
-       && !(object instanceof MathGroup))
-      {
-         return ((Group)object).toList();
-      }
-
-      return object;
-   }
-
-   // Pops delimited argument off the stack. If the stack doesn't
-   // start with the specified open delimiter, returns null, so can
-   // be used to get an optional argument
-   public TeXObject popArg(TeXParser parser, int openDelim, int closeDelim)
-     throws IOException
-   {
-      return popArg(parser, POP_IGNORE_LEADING_SPACE, openDelim, closeDelim);
-   }
-
-   public TeXObject popArg(TeXParser parser, byte popStyle, 
-     int openDelim, int closeDelim)
-   throws IOException
-   {
-      TeXObject object = popStack(parser, popStyle);
-
-      if (object == null && !(this instanceof TeXParser))
-      {
-         object = parser.popStack(popStyle);
-      }
-
-      if (!(object instanceof CharObject))
-      {
-         push(object);
-         return null;
-      }
-
-      CharObject charObj = (CharObject)object;
-
-      if (charObj.getCharCode() != openDelim)
-      {
-         push(object);
-         return null;
-      }
-
-      TeXObjectList list = new TeXObjectList();
-      boolean isShort = isShort(popStyle);
-
-      while (true)
-      {
-         object = pop();
-
-         if (object == null) break;
-
-         BgChar bgChar = parser.isBeginGroup(object);
-
-         if (object instanceof CharObject)
-         {
-            charObj = (CharObject)object;
-
-            if (charObj.getCharCode() == closeDelim)
-            {
-               return list;
-            }
-         }
-         else if (bgChar != null)
-         {
-            Group group = parser.getListener().createGroup();
-            popRemainingGroup(parser, group, popStyle, bgChar);
-            object = group;
-         }
-         else if (isShort && object.isPar())
-         {
-            break;
-         }
-
-         list.add(object);
-      }
-
-      throw new TeXSyntaxException(parser,
-               TeXSyntaxException.ERROR_MISSING_CLOSING,
-               closeDelim);
-   }
-
    public Numerical popNumericalArg(TeXParser parser)
      throws IOException
    {
-      TeXObject obj = popArg(parser, POP_SHORT);
+      return popNumericalArg(parser, PopStyle.SHORT_IGNORE_LEADING_SPACE);
+   }
+
+   public Numerical popNumericalArg(TeXParser parser, PopStyle popStyle)
+     throws IOException
+   {
+      TeXObject obj = popArg(parser, popStyle);
 
       if (obj == null) return null;
 
@@ -1273,7 +279,10 @@ public class TeXObjectList extends Vector<TeXObject>
 
       if (obj instanceof TeXObjectList)
       {
-         return ((TeXObjectList)obj).popNumerical(parser);
+         TeXObjectList subList = ((TeXObjectList)obj);
+         Numerical num = subList.popNumerical(parser);
+         addAll(0, subList);
+         return num;
       }
 
       return new UserNumber(parser, obj.toString(parser));
@@ -1282,7 +291,7 @@ public class TeXObjectList extends Vector<TeXObject>
    public Numerical popNumericalArg(TeXParser parser, int openDelim, int closeDelim)
      throws IOException
    {
-      TeXObject obj = popArg(parser, POP_SHORT, openDelim, closeDelim);
+      TeXObject obj = popArg(parser, PopStyle.SHORT, openDelim, closeDelim);
 
       if (obj == null) return null;
 
@@ -1309,301 +318,21 @@ public class TeXObjectList extends Vector<TeXObject>
       return new UserNumber(parser, obj.toString(parser));
    }
 
-   public TeXObjectList toLowerCase(TeXParser parser)
-   {
-      TeXObjectList list = createList();
-
-      for (TeXObject object : this)
-      {
-         if (object instanceof TeXCsRef)
-         {
-            object = parser.getListener().getControlSequence(
-              ((TeXCsRef)object).getName());
-         }
-
-         if (object instanceof CaseChangeable)
-         {
-            list.add(((CaseChangeable)object).toLowerCase(parser));
-         }
-         else if (object instanceof ControlSequence)
-         {
-            if (object instanceof Primitive
-             || object instanceof MathSymbol)
-            {
-               list.add(object);
-            }
-            else
-            {
-               list.add(new TeXCsRef(
-                 ((ControlSequence)object).getName().toLowerCase()));
-            }
-         }
-         else
-         {
-            list.add(object);
-         }
-      }
-
-      return list;
-   }
-
-   public TeXObjectList toUpperCase(TeXParser parser)
-   {
-      TeXObjectList list = createList();
-
-      for (TeXObject object : this)
-      {
-         if (object instanceof TeXCsRef)
-         {
-            object = parser.getListener().getControlSequence(
-              ((TeXCsRef)object).getName());
-         }
-
-         if (object instanceof CaseChangeable)
-         {
-            list.add(((CaseChangeable)object).toUpperCase(parser));
-         }
-         else if (object instanceof ControlSequence)
-         {
-            if (object instanceof Primitive
-             || object instanceof MathSymbol)
-            {
-               list.add(object);
-            }
-            else
-            {
-               list.add(new TeXCsRef(
-                ((ControlSequence)object).getName().toUpperCase()));
-            }
-         }
-         else
-         {
-            list.add(object);
-         }
-      }
-
-      return list;
-   }
-
-   public TeXObjectList createList()
-   {
-      return new TeXObjectList(capacity());
-   }
-
-   public Object clone()
-   {
-      TeXObjectList list = createList();
-
-      for (TeXObject object : this)
-      {
-         list.add((TeXObject)object.clone());
-      }
-
-      for (Declaration dec : declarations)
-      {
-         list.declarations.add((Declaration)dec.clone());
-      }
-
-      return list;
-   }
-
-   protected void flatten()
-   {
-      for (int i = size()-1; i >= 0; i--)
-      {
-         TeXObject obj = get(i);
-
-         if (obj instanceof TeXObjectList)
-         {
-            ((TeXObjectList)obj).flatten();
-
-            if (!(obj instanceof Group))
-            {
-               remove(i);
-               addAll(i, (TeXObjectList)obj);
-            }
-         }
-      }
-   }
-
-   public TeXObjectList expandonce(TeXParser parser)
+   @Override
+   public TeXObjectList deconstruct(TeXParser parser)
      throws IOException
    {
       flatten();
-
-      TeXObjectList list = new TeXObjectList(size());
-      TeXObjectList remaining = (TeXObjectList)clone();
-
-      while (!remaining.isEmpty())
-      {
-         TeXObject object = remaining.pop();
-
-         TeXObjectList expanded = null;
-
-         if (object instanceof Expandable)
-         {
-            expanded = ((Expandable)object).expandonce(parser, remaining);
-         }
-
-         if (expanded == null)
-         {
-            list.add(object);
-         }
-         else
-         {
-            list.addAll(expanded);
-         }
-      }
-
-      return list;
+      return this;
    }
 
-   public TeXObjectList expandonce(TeXParser parser, 
-        TeXObjectList stack)
-     throws IOException
+   @Override
+   public StackMarker createStackMarker()
    {
-      flatten();
-
-      TeXObjectList list = new TeXObjectList(size());
-      TeXObjectList remaining = (TeXObjectList)clone();
-
-      StackMarker marker = null;
-
-      if (stack != null && stack != parser)
-      {
-         marker = new StackMarker();
-         remaining.add(marker);
-         remaining.addAll(stack);
-         stack.clear();
-      }
-
-      while (!remaining.isEmpty())
-      {
-         TeXObject object = remaining.pop();
-
-         if (object.equals(marker))
-         {
-            break;
-         }
-
-         TeXObjectList expanded = null;
-
-         if (object instanceof Expandable)
-         {
-            expanded = ((Expandable)object).expandonce(parser, remaining);
-         }
-
-         if (expanded == null)
-         {
-            list.add(object);
-         }
-         else
-         {
-            list.addAll(expanded);
-         }
-      }
-
-      if (!remaining.isEmpty())
-      {
-         stack.addAll(remaining);
-      }
-
-      return list;
+      return new InvisibleMarker();
    }
 
-   public TeXObjectList expandfully(TeXParser parser) throws IOException
-   {
-      flatten();
-
-      TeXObjectList list = new TeXObjectList(size());
-      TeXObjectList remaining = (TeXObjectList)clone();
-
-      while (!remaining.isEmpty())
-      {
-         TeXObject object = remaining.pop();
-
-         if (object instanceof Ignoreable)
-         {
-            continue;
-         }
-
-         TeXObjectList expanded = null;
-
-         if (object instanceof Expandable)
-         {
-            expanded = ((Expandable)object).expandfully(parser, remaining);
-         }
-
-         if (expanded == null)
-         {
-            list.add(object);
-         }
-         else
-         {
-            list.addAll(expanded);
-         }
-      }
-
-      return list;
-   }
-
-   public TeXObjectList expandfully(TeXParser parser,
-        TeXObjectList stack) throws IOException
-   {
-      flatten();
-
-      TeXObjectList list = new TeXObjectList(size());
-      TeXObjectList remaining = (TeXObjectList)clone();
-
-      StackMarker marker = null;
-
-      if (stack != null && stack != parser)
-      {
-         marker = new StackMarker();
-         remaining.add(marker);
-         remaining.addAll(stack);
-         stack.clear();
-      }
-
-      while (!remaining.isEmpty())
-      {
-         TeXObject object = remaining.pop();
-
-         if (object.equals(marker))
-         {
-            break;
-         }
-
-         if (object instanceof Ignoreable)
-         {
-            continue;
-         }
-
-         TeXObjectList expanded = null;
-
-         if (object instanceof Expandable)
-         {
-            expanded = ((Expandable)object).expandfully(parser, remaining);
-         }
-
-         if (expanded == null)
-         {
-            list.add(object);
-         }
-         else
-         {
-            list.addAll(expanded);
-         }
-      }
-
-      if (!remaining.isEmpty())
-      {
-         stack.addAll(remaining);
-      }
-
-      return list;
-   }
-
+   @Override
    public void process(TeXParser parser)
       throws IOException
    {
@@ -1617,18 +346,11 @@ public class TeXObjectList extends Vector<TeXObject>
                ((TeXCsRef)object).getName());
          }
 
-         if (object instanceof Declaration)
-         {
-            pushDeclaration((Declaration)object);
-         }
-
-         if (!(object instanceof Ignoreable))
-         {
-            object.process(parser, this);
-         }
+         object.process(parser, this);
       }
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
@@ -1636,7 +358,7 @@ public class TeXObjectList extends Vector<TeXObject>
 
       if (stack != parser && stack != null)
       {
-         marker = new StackMarker();
+         marker = createStackMarker();
          add(marker);
 
          addAll(stack);
@@ -1658,14 +380,9 @@ public class TeXObjectList extends Vector<TeXObject>
                ((TeXCsRef)object).getName());
          }
 
-         if (object instanceof Declaration)
+         if (object.process(parser, this, marker))
          {
-            pushDeclaration((Declaration)object);
-         }
-
-         if (!(object instanceof Ignoreable))
-         {
-            object.process(parser, this);
+            break;
          }
       }
 
@@ -1676,135 +393,46 @@ public class TeXObjectList extends Vector<TeXObject>
       }
    }
 
-   public String toString()
+   @Override
+   public boolean process(TeXParser parser, TeXObjectList stack, StackMarker marker)
+      throws IOException
    {
-      StringBuilder builder = new StringBuilder();
-      builder.append('[');
+      int index = indexOfMarker(marker);
 
-      for (int i = 0, n = size(); i < n; i++)
+      if (index == -1)
       {
-         TeXObject object = get(i);
+         process(parser, stack);
+         return false;
+      }
 
-         if (i > 0)
+      while (size() > 0)
+      {
+         TeXObject object = remove(0);
+
+         if (object.equals(marker))
          {
-            builder.append(", ");
+            break;
          }
 
-         if (object instanceof CharObject)
+         if (object instanceof TeXCsRef)
          {
-            builder.append('\'');
-            builder.append(object.toString());
-            builder.append('\'');
+            object = parser.getListener().getControlSequence(
+               ((TeXCsRef)object).getName());
          }
-         else
+
+         if (object.process(parser, this, marker))
          {
-            builder.append(object.toString());
+            break;
          }
       }
 
-      builder.append(']');
-
-      return builder.toString();
-   }
-
-   public String format()
-   {
-      StringBuilder builder = new StringBuilder();
-
-      for (int i = 0, n = size(); i < n; i++)
+      if (!isEmpty())
       {
-         TeXObject object = get(i);
-
-         builder.append(object.format());
+         stack.addAll(this);
+         clear();
       }
 
-      return builder.toString();
-   }
-
-   public String toString(TeXParser parser)
-   {
-      StringBuilder builder = new StringBuilder();
-
-      for (int i = 0, n = size(); i < n; i++)
-      {
-         TeXObject object = get(i);
-
-         builder.append(object.toString(parser));
-
-         if (object instanceof ControlSequence
-         && ((ControlSequence)object).isControlWord(parser)
-         && i < n-1)
-         {
-            object = get(i+1);
-           
-            if (object instanceof Letter)
-            {
-               builder.append(" ");
-            }
-            else if (object instanceof TeXObjectList
-                && !(object instanceof Group))
-            {
-               i++;
-               String str = ((TeXObjectList)object).toString(parser);
-               if (str.isEmpty())
-               {
-                  continue;
-               }
-
-               if (parser.isLetter(str.charAt(0)))
-               {
-                  builder.append(" ");
-               }
-
-               builder.append(str);
-            }
-         }
-      }
-
-      return builder.toString();
-   }
-
-   public String substring(TeXParser parser, int startIdx, int endIdx)
-   {
-      StringBuilder builder = new StringBuilder();
-
-      for (int i = startIdx; i < endIdx; i++)
-      {
-         TeXObject object = get(i);
-
-         builder.append(object.toString(parser));
-
-         if (object instanceof ControlSequence
-         && ((ControlSequence)object).isControlWord(parser)
-         && i < endIdx-1)
-         {
-            object = get(i+1);
-           
-            if (object instanceof Letter)
-            {
-               builder.append(" ");
-            }
-            else if (object instanceof TeXObjectList
-                && !(object instanceof Group))
-            {
-               i++;
-               String str = ((TeXObjectList)object).toString(parser);
-               if (str.isEmpty())
-               {
-                  continue;
-               }
-
-               if (parser.isLetter(str.charAt(0)))
-               {
-                  builder.append(" ");
-               }
-
-               builder.append(str);
-            }
-         }
-      }
-
-      return builder.toString();
+      return true;
    }
 
    public TeXObjectList string(TeXParser parser)
@@ -1822,133 +450,57 @@ public class TeXObjectList extends Vector<TeXObject>
       return this;
    }
 
-   public void pushDeclaration(Declaration decl)
-   {
-      declarations.add(decl);
-   }
-
-   public void processEndDeclarations(TeXParser parser)
-     throws IOException
-   {
-      while (declarations.size() > 0)
-      {
-         declarations.pollLast().end(parser);
-      }
-   }
-
+   @Override
    public boolean isPar()
    {
       return size() == 1 && firstElement().isPar();
    }
 
-   public boolean popRemainingGroup(TeXParser parser, 
-      Group group, byte popStyle, BgChar bgChar)
-     throws IOException
+   @Override
+   public boolean isEmptyObject()
    {
-      while (size() > 0)
-      {
-         TeXObject obj = pop();
+      int total = 0;
 
-         EgChar egChar = parser.isEndGroup(obj);
-
-         if (egChar != null)
-         {
-            if (!egChar.matches(bgChar))
-            {
-               throw new TeXSyntaxException(parser,
-                 TeXSyntaxException.ERROR_EXTRA_OR_FORGOTTEN,
-                 egChar.toString(parser), bgChar.toString(parser));
-            }
-
-            return true;
-         }
-
-         BgChar bgChar2 = parser.isBeginGroup(obj);
-
-         if (isShort(popStyle) && obj.isPar())
-         {
-            throw new TeXSyntaxException(parser,
-               TeXSyntaxException.ERROR_PAR_BEFORE_EG);
-         }
-         else if (bgChar2 != null)
-         {
-            Group subGrp = bgChar2.createGroup(parser);
-
-            if (!popRemainingGroup(parser, subGrp, popStyle, bgChar2))
-            {
-               group.add(subGrp);
-
-               return false;
-            }
-
-            group.add(subGrp);
-         }
-         else
-         {
-            group.add(obj);
-         }
-      }
-
-      return false;
-   }
-
-   public boolean containsVerbatimCommand(TeXParser parser)
-   {
-      for (int i = 0; i < size(); i++)
+      for (int i = 0, n = size(); i < n; i++)
       {
          TeXObject obj = get(i);
 
-         if (obj instanceof ControlSequence)
+         if (!(obj instanceof Ignoreable))
          {
-            ControlSequence cs = (ControlSequence)obj;
+            total++;
 
-            if (parser.isVerbCommand(cs.getName()))
-            {
-               return true;
-            }
-         }
-         else if (obj instanceof TeXObjectList)
-         {
-            if (((TeXObjectList)obj).containsVerbatimCommand(parser))
-            {
-               return true;
-            }
+            if (total > 1 || !obj.isEmptyObject()) return false;
          }
       }
 
-      return false;
+      return total <= 1;
    }
 
-   public TeXObjectList trim()
+   /* If this list only contains one non-ignoreable object that has
+    * the same type as the given object, return that element otherwise
+    * return null.
+    */
+   public TeXObject toObject(Class classObject)
    {
-      // strip redundant white space and grouping
+      TeXObject object = null;
 
-      while (size() > 0
-             && (firstElement() instanceof WhiteSpace
-                  || firstElement() instanceof Ignoreable))
+      for (int i = 0; i < size(); i++)
       {
-         remove(0);
+         TeXObject o = get(i);
+
+         if (o instanceof Ignoreable) continue;
+
+         if (object != null)
+         {
+            return null;
+         }
+
+         if (o.getClass().equals(classObject))
+         {
+            object = o;
+         }
       }
 
-      while (size() > 0
-             && (lastElement() instanceof WhiteSpace
-                  || lastElement() instanceof Ignoreable))
-      {
-         remove(size()-1);
-      }
-
-      if (size() == 1 && (get(0) instanceof Group))
-      {
-         return ((Group)get(0)).toList();
-      }
-
-      return this;
+      return object;
    }
-
-   private ArrayDeque<Declaration> declarations
-     = new ArrayDeque<Declaration>();
-
-   public static byte POP_SHORT=1;
-   public static byte POP_RETAIN_IGNOREABLES=2;
-   public static byte POP_IGNORE_LEADING_SPACE=4;
 }

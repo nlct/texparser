@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -23,7 +23,7 @@ import java.util.*;
 
 import com.dickimawbooks.texparserlib.*;
 
-public class AlignRow extends TeXObjectList
+public class AlignRow extends Vector<AlignCell>
 {
    public AlignRow()
    {
@@ -35,183 +35,74 @@ public class AlignRow extends TeXObjectList
       super(capacity);
    }
 
-   public AlignRow(TeXParser parser, TeXObjectList stack)
-     throws IOException
+   protected void updateNoAlign(TeXSettings settings)
    {
-      this();
-      parse(parser, stack);
+      if (!settings.anyNoAlign())
+      {
+         return;
+      }
+
+      if (startRow == null)
+      {
+         startRow = new Vector<TeXObject>();
+      }
+
+      startRow.addAll(settings.getNoAlign());
+      settings.clearNoAlign();
    }
 
-   public TeXObjectList createList()
+   protected void updateEndRow()
    {
-      return new AlignRow(capacity());
    }
 
-   protected void parse(TeXParser parser, TeXObjectList stack)
+   public void parse(TeXParser parser, TeXObjectList stack, String envName)
      throws IOException
    {
+      clear();
+      TeXSettings settings = parser.getSettings();
       TeXParserListener listener = parser.getListener();
 
-      alignSpanList = new TeXObjectList();
+      settings.startRow();
+
+      AlignCell cell = listener.createAlignCell();
 
       while (true)
       {
-         TeXObject span = stack.expandedPopStack(parser);
+         TeXObject object = parser.expandFully(
+             parser.popNextTokenResolveReference(stack), stack);
 
-         if (span instanceof WhiteSpace)
+         if (object == null) break;
+
+         if (object instanceof WhiteSpace)
          {
             continue;
          }
 
-         if (!(span instanceof AlignSpan))
+         if (object instanceof NoAlign || object instanceof AlignSpan)
          {
-            stack.push(span);
-            break;
+            parser.processObject(object, stack);
+            updateNoAlign(settings);
          }
-
-         if (span instanceof TeXObjectList)
+         else if (object instanceof Tab)
          {
-            alignSpanList.addAll((TeXObjectList)span);
+            add(cell);
+            cell = listener.createAlignCell();
+            settings.startColumn();
          }
-         else
+         else if (object instanceof Cr)
          {
-            alignSpanList.add(span);
-         }
-      }
-
-      Group group = null;
-
-      ArrayDeque<String> envs = new ArrayDeque<String>();
-
-      while (true)
-      {
-         TeXObject obj = stack.expandedPopStack(parser);
-
-         if (obj instanceof Tab)
-         {
-            if (group == null)
-            {
-               add(listener.createGroup());
-            }
-            else
-            {
-               add(group);
-               group = null;
-            }
-         }
-         else if (obj instanceof Cr)
-         {
-            if (group == null)
-            {
-               add(listener.createGroup());
-            }
-            else
-            {
-               add(group);
-               group = null;
-            }
-
-            add(obj instanceof TabularNewline ? obj :
-              listener.getControlSequence("tabularnewline"));
-
-            break;
-         }
-         else if (obj instanceof Begin)
-         {
-            TeXObject arg = (stack == parser ? 
-              parser.popNextArg() : stack.popArg(parser));
-
-            if (arg instanceof Expandable)
-            {
-               TeXObjectList expanded = (stack == parser ?
-                 ((Expandable)arg).expandfully(parser) : 
-                 ((Expandable)arg).expandfully(parser, stack));
-
-               if (expanded != null)
-               {
-                  arg = expanded;
-               }
-            }
-
-            String envname = arg.toString(parser);
-
-            envs.push(envname);
-
-            add(obj);
-            add(listener.createGroup(envname));
-         }
-         else if (obj instanceof End)
-         {
-            TeXObject arg = (stack == parser ? 
-              parser.popNextArg() : stack.popArg(parser));
-
-            if (arg instanceof Expandable)
-            {
-               TeXObjectList expanded = (stack == parser ?
-                 ((Expandable)arg).expandfully(parser) : 
-                 ((Expandable)arg).expandfully(parser, stack));
-
-               if (expanded != null)
-               {
-                  arg = expanded;
-               }
-            }
-
-            String envname = arg.toString(parser);
-
-            if (envs.size() == 0)
-            {
-               stack.push(listener.createGroup(envname));
-               stack.push(obj);
-               break;
-            }
-
-            envs.pop();
-            add(obj);
-            add(listener.createGroup(envname));
-         }
-         else if (obj instanceof MultiCell)
-         {
-            TeXObjectList expanded = ((MultiCell)obj).expandonce(parser, stack);
-
-            if (group == null)
-            {
-               group = listener.createGroup();
-            }
-
-            if (expanded == null)
-            {
-               group.add(obj);
-            }
-            else
-            {
-               group.addAll(expanded);
-            }
+            add(cell);
+            cell = listener.createAlignCell();
          }
          else
          {
-            if (group == null)
-            {
-               group = listener.createGroup();
-            }
-
-            group.add(obj);
+            cell.add(object);
          }
       }
 
-      if (group != null)
-      {
-         add(group);
-      }
    }
 
-   public void process(TeXParser parser)
-    throws IOException
-   {
-      process(parser, parser);
-   }
-
-   public void process(TeXParser parser, TeXObjectList stack)
+   public void process(TeXParser parser, TeXObjectList stack, String envName)
     throws IOException
    {
       TeXSettings settings = parser.getSettings();
@@ -240,14 +131,7 @@ public class AlignRow extends TeXObjectList
 
             doEnd = false;
 
-            if (stack == null || stack == parser)
-            {
-               obj.process(parser);
-            }
-            else
-            {
-               obj.process(parser, stack);
-            }
+            parser.processObject(obj, stack);
          }
          else
          {
@@ -301,10 +185,10 @@ public class AlignRow extends TeXObjectList
    {
    }
 
-   protected void processCell(TeXParser parser, TeXCellAlign alignCell, Group cellContents)
+   protected void processCell(TeXParser parser, TeXCellAlign alignCell, AlignCell cellContents)
      throws IOException
    {
-      cellContents.process(parser, this);
+      cellContents.process(parser);
    }
 
    public TeXObjectList getAlignSpanList()
@@ -313,4 +197,6 @@ public class AlignRow extends TeXObjectList
    }
 
    private TeXObjectList alignSpanList;
+
+   private Vector<TeXObject> startRow, endRow;
 }

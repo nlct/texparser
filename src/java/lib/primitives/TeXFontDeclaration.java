@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -22,38 +22,14 @@ import java.io.IOException;
 
 import com.dickimawbooks.texparserlib.*;
 
-public abstract class TeXFontDeclaration extends Declaration
+public abstract class TeXFontDeclaration extends RobustDeclaration
 {
    public TeXFontDeclaration(String name)
    {
       super(name);
    }
 
-   public TeXObjectList expandonce(TeXParser parser)
-     throws IOException
-   {
-      return null;
-   }
-
-   public TeXObjectList expandonce(TeXParser parser,
-      TeXObjectList stack)
-     throws IOException
-   {
-      return null;
-   }
-
-   public TeXObjectList expandfully(TeXParser parser) throws IOException
-   {
-      return null;
-   }
-
-   public TeXObjectList expandfully(TeXParser parser,
-      TeXObjectList stack)
-     throws IOException
-   {
-      return null;
-   }
-
+   @Override
    public boolean isModeSwitcher()
    {
       return false;

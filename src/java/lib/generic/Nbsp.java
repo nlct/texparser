@@ -66,12 +66,14 @@ public class Nbsp extends ActiveChar
       parser.getListener().getWriteable().writeCodePoint(0x00A0);
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList list)
      throws IOException
    {
       return expandonce(parser);
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser)
      throws IOException
    {
@@ -80,12 +82,14 @@ public class Nbsp extends ActiveChar
       return list;
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser, TeXObjectList list)
      throws IOException
    {
       return expandfully(parser);
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser)
      throws IOException
    {

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -23,7 +23,7 @@ import java.util.Vector;
 
 import com.dickimawbooks.texparserlib.*;
 
-public class AbstractDec extends Declaration
+public class AbstractDec extends DocumentBlockDec
 {
    public AbstractDec()
    {
@@ -39,68 +39,19 @@ public class AbstractDec extends Declaration
    {
       return new AbstractDec(getName());
    }
-
-   public TeXObjectList expandonce(TeXParser parser, TeXObjectList list)
-      throws IOException
-   {
-      return null;
-   }
-
-   public TeXObjectList expandonce(TeXParser parser)
-      throws IOException
-   {
-      return null;
-   }
-
-   public TeXObjectList expandfully(TeXParser parser, TeXObjectList list)
-      throws IOException
-   {
-      return null;
-   }
-
-   public TeXObjectList expandfully(TeXParser parser)
-      throws IOException
-   {
-      return null;
-   }
-
-   public void process(TeXParser parser) throws IOException
+      
+   public DocumentBlock createBlock(TeXParser parser)
    {
       ControlSequence cs = parser.getControlSequence("chapter");
 
-      if (cs == null)
-      {
-         cs = new TeXCsRef("section");
-      }
-
-      parser.push(new TeXCsRef("abstractname"));
-      parser.push(parser.getListener().getOther('*'));
-
-      cs.process(parser);
+      return new HierarchicalBlock(cs == null ? 1 : 0, type);
    }
 
-   public void process(TeXParser parser, TeXObjectList stack) throws IOException
+   public void setBlockAttributes(DocumentBlock block,
+      TeXParser parser, TeXObjectList stack)
+     throws IOException
    {
-      ControlSequence cs = parser.getControlSequence("chapter");
-
-      if (cs == null)
-      {
-         cs = new TeXCsRef("section");
-      }
-
-      stack.push(new TeXCsRef("abstractname"));
-      stack.push(parser.getListener().getOther('*'));
-
-      cs.process(parser, stack);
+      block.setAttribute("title", new TeXCsRef("abstractname"));
    }
 
-   public void end(TeXParser parser)
-    throws IOException
-   {
-   }
-
-   public boolean isModeSwitcher()
-   {
-      return false;
-   }
 }

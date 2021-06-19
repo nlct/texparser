@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -36,6 +36,7 @@ public class AtFor extends Command
       super(name);
    }
 
+   @Override
    public Object clone()
    {
       return new AtFor(getName());
@@ -45,10 +46,11 @@ public class AtFor extends Command
      GenericCommand cs, CsvList csvList, TeXObject code)
      throws IOException
    {
+      LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
+
       TeXObjectList list = new TeXObjectList();
 
-      boolean xfor = ((LaTeXParserListener)parser.getListener()).isStyLoaded(
-        "xfor");
+      boolean xfor = listener.isStyLoaded("xfor");
 
       for (int i = 0; i < csvList.size(); i++)
       {
@@ -62,7 +64,7 @@ public class AtFor extends Command
             if (i == csvList.size())
             {
                parser.putControlSequence(true, 
-                 parser.getListener().createUndefinedCs("@nnil"));
+                 listener.createUndefinedCs("@nnil"));
             }
             else
             {
@@ -72,29 +74,9 @@ public class AtFor extends Command
             }
          }
 
-         TeXObject loopBody = (TeXObject)code.clone();
+         TeXObject loopBody = parser.expandOnce((TeXObject)code.clone(), stack);
 
-         if (loopBody instanceof Expandable)
-         {
-            TeXObjectList expanded;
-
-            if (parser == stack)
-            {
-               expanded = ((Expandable)loopBody).expandonce(parser);
-            }
-            else
-            {
-               expanded = ((Expandable)loopBody).expandonce(parser, stack);
-            }
-
-            if (expanded != null)
-            {
-               loopBody = expanded;
-            }
-         }
-
-         if (loopBody instanceof TeXObjectList 
-               && !(loopBody instanceof Group))
+         if (loopBody instanceof TeXObjectList)
          {
             list.addAll((TeXObjectList)loopBody);
          }
@@ -105,11 +87,9 @@ public class AtFor extends Command
 
          if (xfor)
          {
-            ControlSequence ifCs = parser.getControlSequence("if@endfor");
-
-            if (ifCs instanceof IfTrue)
+            if (parser.isControlSequenceTrue("if@endfor"))
             {
-               CsvList remainder = new CsvList();
+               CsvList remainder = listener.createCsvList();
 
                for (int j = i+1; j < csvList.size(); j++)
                {
@@ -131,10 +111,11 @@ public class AtFor extends Command
      GenericCommand cs, CsvList csvList, TeXObject code)
      throws IOException
    {
+      LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
+
       TeXObjectList list = new TeXObjectList();
 
-      boolean xfor = ((LaTeXParserListener)parser.getListener()).isStyLoaded(
-        "xfor");
+      boolean xfor = listener.isStyLoaded("xfor");
 
       for (int i = 0; i < csvList.size(); i++)
       {
@@ -148,7 +129,7 @@ public class AtFor extends Command
             if (i == csvList.size())
             {
                parser.putControlSequence(true, 
-                 parser.getListener().createUndefinedCs("@nnil"));
+                 listener.createUndefinedCs("@nnil"));
             }
             else
             {
@@ -158,29 +139,9 @@ public class AtFor extends Command
             }
          }
 
-         TeXObject loopBody = (TeXObject)code.clone();
+         TeXObject loopBody = parser.expandFully((TeXObject)code.clone(), stack);
 
-         if (loopBody instanceof Expandable)
-         {
-            TeXObjectList expanded;
-
-            if (parser == stack)
-            {
-               expanded = ((Expandable)loopBody).expandfully(parser);
-            }
-            else
-            {
-               expanded = ((Expandable)loopBody).expandfully(parser, stack);
-            }
-
-            if (expanded != null)
-            {
-               loopBody = expanded;
-            }
-         }
-
-         if (loopBody instanceof TeXObjectList 
-               && !(loopBody instanceof Group))
+         if (loopBody instanceof TeXObjectList)
          {
             list.addAll((TeXObjectList)loopBody);
          }
@@ -191,11 +152,9 @@ public class AtFor extends Command
 
          if (xfor)
          {
-            ControlSequence ifCs = parser.getControlSequence("if@endfor");
-
-            if (ifCs instanceof IfTrue)
+            if (parser.isControlSequenceTrue("if@endfor"))
             {
-               CsvList remainder = new CsvList();
+               CsvList remainder = listener.createCsvList();
 
                for (int j = i+1; j < csvList.size(); j++)
                {
@@ -217,8 +176,9 @@ public class AtFor extends Command
      GenericCommand cs, CsvList csvList, TeXObject code)
      throws IOException
    {
-      boolean xfor = ((LaTeXParserListener)parser.getListener()).isStyLoaded(
-        "xfor");
+      LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
+
+      boolean xfor = listener.isStyLoaded("xfor");
 
       for (int i = 0; i < csvList.size(); i++)
       {
@@ -232,7 +192,7 @@ public class AtFor extends Command
             if (i == csvList.size())
             {
                parser.putControlSequence(true, 
-                 parser.getListener().createUndefinedCs("@nnil"));
+                 listener.createUndefinedCs("@nnil"));
             }
             else
             {
@@ -242,43 +202,15 @@ public class AtFor extends Command
             }
          }
 
-         TeXObject loopBody = (TeXObject)code.clone();
+         TeXObject loopBody = parser.expandOnce((TeXObject)code.clone(), stack);
 
-         if (loopBody instanceof Expandable)
-         {
-            TeXObjectList expanded;
-
-            if (parser == stack)
-            {
-               expanded = ((Expandable)loopBody).expandonce(parser);
-            }
-            else
-            {
-               expanded = ((Expandable)loopBody).expandonce(parser, stack);
-            }
-
-            if (expanded != null)
-            {
-               loopBody = expanded;
-            }
-         }
-
-         if (parser == stack)
-         {
-            loopBody.process(parser);
-         }
-         else
-         {
-            loopBody.process(parser, stack);
-         }
+         parser.processObject(loopBody, stack);
 
          if (xfor)
          {
-            ControlSequence ifCs = parser.getControlSequence("if@endfor");
-
-            if (ifCs instanceof IfTrue)
+            if (parser.isControlSequenceTrue("if@endfor"))
             {
-               CsvList remainder = new CsvList();
+               CsvList remainder = listener.createCsvList();
 
                for (int j = i+1; j < csvList.size(); j++)
                {
@@ -295,25 +227,18 @@ public class AtFor extends Command
 
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser)
      throws IOException
    {
       return expandonce(parser, parser);
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      TeXObject arg;
-
-      if (parser == stack)
-      {
-         arg = parser.popNextArg();
-      }
-      else
-      {
-         arg = stack.popArg(parser);
-      }
+      TeXObject arg = parser.popRequired(stack);
 
       if (!(arg instanceof ControlSequence))
       {
@@ -325,19 +250,7 @@ public class AtFor extends Command
       GenericCommand cs = new GenericCommand(((ControlSequence)arg).getName());
       parser.putControlSequence(true, cs);
 
-      arg = stack.popToken(TeXObjectList.POP_IGNORE_LEADING_SPACE);
-
-      if (!(arg instanceof CharObject
-             && ((CharObject)arg).getCharCode() == ':'))
-      {
-         throw new LaTeXSyntaxException(parser, 
-           TeXSyntaxException.ERROR_SYNTAX, getName());
-      }
-
-      arg = stack.popToken(TeXObjectList.POP_IGNORE_LEADING_SPACE);
-
-      if (!(arg instanceof CharObject
-             && ((CharObject)arg).getCharCode() == '='))
+      if (!parser.isNextWord(":=", stack, PopStyle.IGNORE_LEADING_SPACE))
       {
          throw new LaTeXSyntaxException(parser, 
            TeXSyntaxException.ERROR_SYNTAX, getName());
@@ -366,27 +279,13 @@ public class AtFor extends Command
       {
          csvList = (CsvList)arg;
       }
-      else if (arg instanceof GenericCommand
-                 && ((GenericCommand)arg).getDefinition() instanceof CsvList)
-      {
-         csvList = (CsvList)((GenericCommand)arg).getDefinition();
-      }
       else if (arg instanceof Expandable)
       {
-         TeXObjectList expanded;
+         arg = parser.expandOnce(arg, stack);
 
-         if (parser == stack)
+         if (arg instanceof CsvList)
          {
-            expanded = ((Expandable)arg).expandonce(parser);
-         }
-         else
-         {
-            expanded = ((Expandable)arg).expandonce(parser, stack);
-         }
-
-         if (expanded != null)
-         {
-            arg = expanded;
+            csvList = (CsvList)arg;
          }
       }
 
@@ -395,39 +294,23 @@ public class AtFor extends Command
          csvList = CsvList.getList(parser, arg);
       }
 
-      TeXObject code;
-
-      if (parser == stack)
-      {
-         code = parser.popNextArg();
-      }
-      else
-      {
-         code = stack.popArg(parser);
-      }
+      TeXObject code = parser.popRequired(stack);
 
       return expandLoop(parser, stack, cs, csvList, code);
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser)
      throws IOException
    {
       return expandfully(parser, parser);
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      TeXObject arg;
-
-      if (parser == stack)
-      {
-         arg = parser.popNextArg();
-      }
-      else
-      {
-         arg = stack.popArg(parser);
-      }
+      TeXObject arg = parser.popRequired(stack);
 
       if (!(arg instanceof ControlSequence))
       {
@@ -439,19 +322,7 @@ public class AtFor extends Command
       GenericCommand cs = new GenericCommand(((ControlSequence)arg).getName());
       parser.putControlSequence(true, cs);
 
-      arg = stack.popToken(TeXObjectList.POP_IGNORE_LEADING_SPACE);
-
-      if (!(arg instanceof CharObject
-             && ((CharObject)arg).getCharCode() == ':'))
-      {
-         throw new LaTeXSyntaxException(parser, 
-           TeXSyntaxException.ERROR_SYNTAX, getName());
-      }
-
-      arg = stack.popToken(TeXObjectList.POP_IGNORE_LEADING_SPACE);
-
-      if (!(arg instanceof CharObject
-             && ((CharObject)arg).getCharCode() == '='))
+      if (!parser.isNextWord(":=", stack, PopStyle.IGNORE_LEADING_SPACE))
       {
          throw new LaTeXSyntaxException(parser, 
            TeXSyntaxException.ERROR_SYNTAX, getName());
@@ -480,27 +351,13 @@ public class AtFor extends Command
       {
          csvList = (CsvList)arg;
       }
-      else if (arg instanceof GenericCommand
-                 && ((GenericCommand)arg).getDefinition() instanceof CsvList)
-      {
-         csvList = (CsvList)((GenericCommand)arg).getDefinition();
-      }
       else if (arg instanceof Expandable)
       {
-         TeXObjectList expanded;
+         arg = parser.expandOnce(arg, stack);
 
-         if (parser == stack)
+         if (arg instanceof CsvList)
          {
-            expanded = ((Expandable)arg).expandonce(parser);
-         }
-         else
-         {
-            expanded = ((Expandable)arg).expandonce(parser, stack);
-         }
-
-         if (expanded != null)
-         {
-            arg = expanded;
+            csvList = (CsvList)arg;
          }
       }
 
@@ -509,37 +366,21 @@ public class AtFor extends Command
          csvList = CsvList.getList(parser, arg);
       }
 
-      TeXObject code;
-
-      if (parser == stack)
-      {
-         code = parser.popNextArg();
-      }
-      else
-      {
-         code = stack.popArg(parser);
-      }
+      TeXObject code = parser.popRequired(stack);
 
       return fullyExpandLoop(parser, stack, cs, csvList, code);
    }
 
+   @Override
    public void process(TeXParser parser) throws IOException
    {
       process(parser, parser);
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack) throws IOException
    {
-      TeXObject arg;
-
-      if (parser == stack)
-      {
-         arg = parser.popNextArg();
-      }
-      else
-      {
-         arg = stack.popArg(parser);
-      }
+      TeXObject arg = parser.popRequired(stack);
 
       if (!(arg instanceof ControlSequence))
       {
@@ -551,19 +392,7 @@ public class AtFor extends Command
       GenericCommand cs = new GenericCommand(((ControlSequence)arg).getName());
       parser.putControlSequence(true, cs);
 
-      arg = stack.popToken(TeXObjectList.POP_IGNORE_LEADING_SPACE);
-
-      if (!(arg instanceof CharObject
-             && ((CharObject)arg).getCharCode() == ':'))
-      {
-         throw new LaTeXSyntaxException(parser, 
-           TeXSyntaxException.ERROR_SYNTAX, getName());
-      }
-
-      arg = stack.popToken(TeXObjectList.POP_IGNORE_LEADING_SPACE);
-
-      if (!(arg instanceof CharObject
-             && ((CharObject)arg).getCharCode() == '='))
+      if (!parser.isNextWord(":=", stack, PopStyle.IGNORE_LEADING_SPACE))
       {
          throw new LaTeXSyntaxException(parser, 
            TeXSyntaxException.ERROR_SYNTAX, getName());
@@ -592,27 +421,13 @@ public class AtFor extends Command
       {
          csvList = (CsvList)arg;
       }
-      else if (arg instanceof GenericCommand
-                 && ((GenericCommand)arg).getDefinition() instanceof CsvList)
-      {
-         csvList = (CsvList)((GenericCommand)arg).getDefinition();
-      }
       else if (arg instanceof Expandable)
       {
-         TeXObjectList expanded;
+         arg = parser.expandOnce(arg, stack);
 
-         if (parser == stack)
+         if (arg instanceof CsvList)
          {
-            expanded = ((Expandable)arg).expandonce(parser);
-         }
-         else
-         {
-            expanded = ((Expandable)arg).expandonce(parser, stack);
-         }
-
-         if (expanded != null)
-         {
-            arg = expanded;
+            csvList = (CsvList)arg;
          }
       }
 
@@ -621,16 +436,7 @@ public class AtFor extends Command
          csvList = CsvList.getList(parser, arg);
       }
 
-      TeXObject code;
-
-      if (parser == stack)
-      {
-         code = parser.popNextArg();
-      }
-      else
-      {
-         code = stack.popArg(parser);
-      }
+      TeXObject code = parser.popRequired(stack);
 
       processLoop(parser, stack, cs, csvList, code);
    }

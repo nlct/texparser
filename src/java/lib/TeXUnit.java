@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -17,6 +17,8 @@
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 package com.dickimawbooks.texparserlib;
+
+import java.io.IOException;
 
 public abstract class TeXUnit implements TeXObject
 {
@@ -56,7 +58,34 @@ public abstract class TeXUnit implements TeXObject
       return fromUnit(parser, value, FixedUnit.SP);
    }
 
+   @Override
+   public boolean process(TeXParser parser, TeXObjectList stack, StackMarker marker)
+      throws IOException
+   {
+      process(parser, stack);
+      return false;
+   }
+
+   @Override
+   public boolean isPopStyleSkip(PopStyle popStyle)
+   {
+      return false;
+   }
+
+   @Override
    public boolean isPar()
+   {
+      return false;
+   }
+
+   @Override
+   public int getTeXCategory()
+   {
+      return TYPE_OBJECT;
+   }
+
+   @Override
+   public boolean isEmptyObject()
    {
       return false;
    }
@@ -71,10 +100,18 @@ public abstract class TeXUnit implements TeXObject
      return 18f*emValue;
    }
 
+   @Override
    public String toString()
    {
       return String.format("%s[unit=%s]", getClass().getSimpleName(),
         format());
+   }
+
+   @Override
+   public String stripToString(TeXParser parser)
+     throws IOException
+   {
+      return format();
    }
 
    public static final FixedUnit PT = new FixedUnit(FixedUnit.UNIT_PT);

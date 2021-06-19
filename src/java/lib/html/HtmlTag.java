@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -32,41 +32,69 @@ public class HtmlTag implements TeXObject
       this.tag = tag;
    }
 
+   @Override
    public Object clone()
    {
       return new HtmlTag(getTag());
    }
 
+   @Override
+   public int getTeXCategory()
+   {
+      return TYPE_OBJECT;
+   }
+
+   @Override
    public TeXObjectList string(TeXParser parser)
    {
       return parser.getListener().createString(getTag());
    }
 
+   @Override
    public String toString()
    {
       return String.format("%s[tag=%s]", 
         getClass().getName(), getTag());
    }
 
+   @Override
    public String format()
    {
       return getTag();
    }
 
+   @Override
+   public String stripToString(TeXParser parser)
+     throws IOException
+   {
+      return "";
+   }
+
+   @Override
    public String toString(TeXParser parser)
    {
       return getTag();
    }
 
+   @Override
    public void process(TeXParser parser)
       throws IOException
    {
       parser.getListener().getWriteable().write(tag);
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList list) throws IOException
    {
       process(parser);
+   }
+
+   @Override
+   public boolean process(TeXParser parser, TeXObjectList stack, StackMarker marker)
+      throws IOException
+   {
+      process(parser, stack);
+      return false;
    }
 
    public String getTag()
@@ -74,7 +102,20 @@ public class HtmlTag implements TeXObject
       return tag;
    }
 
+   @Override
+   public boolean isPopStyleSkip(PopStyle popStyle)
+   {
+      return false;
+   }
+
+   @Override
    public boolean isPar()
+   {
+      return false;
+   }
+
+   @Override
+   public boolean isEmptyObject()
    {
       return false;
    }

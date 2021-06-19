@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -40,11 +40,13 @@ public class BibComment extends BibData
       this.entryType = entryType;
    }
 
+   @Override
    public String getEntryType()
    {
       return entryType;
    }
 
+   @Override
    public Object clone()
    {
       BibComment obj = new BibComment(getEntryType());
@@ -62,8 +64,9 @@ public class BibComment extends BibData
       return contents;
    }
 
+   @Override
    public void parseContents(TeXParser parser, 
-    TeXObjectList stack, TeXObject endGroupChar)
+    AbstractTeXObjectList stack, TeXObject endGroupChar)
      throws IOException
    {
       contents = new TeXObjectList();
@@ -74,7 +77,8 @@ public class BibComment extends BibData
       }
    }
 
-   public String format(byte caseChange, char openDelim, char closeDelim,
+   @Override
+   public String format(CaseChange caseChange, char openDelim, char closeDelim,
      byte fieldDelimChange)
    {
       return String.format("@%s%c%s%c", 
@@ -83,6 +87,7 @@ public class BibComment extends BibData
          closeDelim);
    }
 
+   @Override
    public String toString()
    {
       return String.format("%s[type=%s,contents=%s]",

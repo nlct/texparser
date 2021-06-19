@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -40,6 +40,7 @@ public class L2HNoBreakSpace extends Command
       return new L2HNoBreakSpace(getName());
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser) throws IOException
    {
       TeXObjectList list = new TeXObjectList(1);
@@ -47,24 +48,28 @@ public class L2HNoBreakSpace extends Command
       return list;
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList List)
       throws IOException
    {
       return expandonce(parser);
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser)
       throws IOException
    {
       return expandonce(parser);
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser, TeXObjectList List)
       throws IOException
    {
       return expandfully(parser);
    }
 
+   @Override
    public void process(TeXParser parser) throws IOException
    {
       if (((L2HConverter)parser.getListener()).isInDocEnv())
@@ -73,6 +78,7 @@ public class L2HNoBreakSpace extends Command
       }
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList list) throws IOException
    {
       process(parser);

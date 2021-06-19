@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -23,7 +23,7 @@ import java.io.EOFException;
 
 import com.dickimawbooks.texparserlib.*;
 
-public class BeginGroup extends Primitive implements Expandable
+public class BeginGroup extends Primitive implements BeginGroupObject,Expandable
 {
    public BeginGroup()
    {
@@ -35,97 +35,78 @@ public class BeginGroup extends Primitive implements Expandable
       super(name);
    }
 
+   @Override
    public Object clone()
    {
       return new BeginGroup(getName());
    }
 
-   protected Group createGroup(TeXParser parser)
+   @Override
+   public AbstractGroup createGroup(TeXParser parser)
    {
       return parser.getListener().createGroup();
    }
 
-   protected void popRemainingGroup(Group group, TeXParser parser, 
-     TeXObjectList stack)
-   throws IOException
-   {
-      TeXObject object = stack.popStack(parser);
-
-      if (object == null)
-      {
-         throw new TeXSyntaxException(parser, TeXSyntaxException.ERROR_NO_EG);
-      }
-
-      if (object instanceof TeXCsRef)
-      {
-         object = parser.getListener().getControlSequence(
-            ((TeXCsRef)object).getName());
-      }
-
-      if (object instanceof EndGroup || object instanceof EgChar)
-      {
-         return;
-      }
-
-      if (object instanceof BeginGroup)
-      {
-         Group subGroup = createGroup(parser);
-         group.add(subGroup);
-
-         popRemainingGroup(subGroup, parser, stack);
-      }
-      else
-      {
-         group.add(object);
-      }
-
-      popRemainingGroup(group, parser, stack); 
-   }
-
-   public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
-     throws IOException
-   {
-      TeXObjectList list = new TeXObjectList();
-
-      Group group = createGroup(parser);
-      list.add(group);
-
-      popRemainingGroup(group, parser, stack);
-
-      return list;
-   }
-
+   @Override
    public TeXObjectList expandonce(TeXParser parser)
-     throws IOException
+    throws IOException
    {
-      TeXObjectList list = new TeXObjectList();
-
-      Group group = createGroup(parser);
-      list.add(group);
-
-      popRemainingGroup(group, parser, parser);
-
-      return list;
+      parser.startGroup();
+      AbstractGroup group = createGroup(parser);
+      parser.popExpandedRemainingGroup(parser, group, PopStyle.DEFAULT, this, false);
+      parser.endGroup();
+      TeXObjectList expanded = new TeXObjectList();
+      expanded.add(group);
+      return expanded;
    }
 
-   public TeXObjectList expandfully(TeXParser parser, TeXObjectList stack)
-     throws IOException
+   @Override
+   public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
+    throws IOException
    {
-      return expandonce(parser, stack).expandfully(parser, stack);
+      parser.startGroup();
+      AbstractGroup group = createGroup(parser);
+      stack.popExpandedRemainingGroup(parser, group, PopStyle.DEFAULT, this, false);
+      parser.endGroup();
+      TeXObjectList expanded = new TeXObjectList();
+      expanded.add(group);
+      return expanded;
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser)
-     throws IOException
+    throws IOException
    {
-      return expandonce(parser).expandfully(parser);
+      parser.startGroup();
+      AbstractGroup group = createGroup(parser);
+      parser.popExpandedRemainingGroup(parser, group, PopStyle.DEFAULT, this, true);
+      parser.endGroup();
+      TeXObjectList expanded = new TeXObjectList();
+      expanded.add(group);
+      return expanded;
    }
 
+   @Override
+   public TeXObjectList expandfully(TeXParser parser, TeXObjectList stack)
+    throws IOException
+   {
+      parser.startGroup();
+      AbstractGroup group = createGroup(parser);
+      stack.popExpandedRemainingGroup(parser, group, PopStyle.DEFAULT, this, true);
+      parser.endGroup();
+      TeXObjectList expanded = new TeXObjectList();
+      expanded.add(group);
+      return expanded;
+   }
+
+   @Override
    public void process(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
       parser.startGroup();
    }
 
+   @Override
    public void process(TeXParser parser)
       throws IOException
    {

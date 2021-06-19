@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -29,6 +29,7 @@ public class L2LComment extends Comment
       super();
    }
 
+   @Override
    public Object clone()
    {
       Comment obj = new L2LComment();
@@ -37,34 +38,31 @@ public class L2LComment extends Comment
       return obj;
    }
 
+   @Override
    public void process(TeXParser parser)
       throws IOException
    {
-      String comment = toString(parser);
-
-      int n = comment.length();
-
-      if (n == 0)
-      {
-         comment = String.format("%n");
-      }
-      else
-      {
-         char c = comment.charAt(n-1);
-
-         if (c != '\n' && c != '\r')
-         {
-            comment = String.format("%s%n", comment);
-         }
-      }
-
-      parser.getListener().getWriteable().write(comment);
+      process(parser, parser);
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack) 
       throws IOException
    {
-      process(parser);
+      Writeable writeable = parser.getListener().getWriteable();
+
+      writeable.write(toString(parser));
+
+      PopStyle popStyle = PopStyle.IGNORE_LEADING_SPACE_RETAIN_IGNOREABLES;
+
+      if (stack.peekStack(popStyle) instanceof Par)
+      {
+         // One newline already written at the end of the comment,
+         // so only one needed for the paragraph break.
+
+         parser.popNextToken(stack, popStyle);
+         writeable.write(String.format("%n"));
+      }
    }
 }
 

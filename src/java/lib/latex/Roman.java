@@ -27,47 +27,37 @@ public class Roman extends Command
 {
    public Roman()
    {
-      this("Roman", AtRoman.UPPER);
+      this("Roman", CharacterCase.UPPER);
    }
 
-   public Roman(String name, byte state)
+   public Roman(String name, CharacterCase state)
    {
       super(name);
 
-      if (state != AtRoman.UPPER && state != AtRoman.LOWER)
+      if (state != CharacterCase.UPPER && state != CharacterCase.LOWER)
       {
          throw new IllegalArgumentException(String.format(
-          "Invalid state '%d' for Roman ", state));
+          "Invalid state '%s' for Roman ", state));
       }
 
       this.state = state;
    }
 
+   @Override
    public Object clone()
    {
       return new Roman(getName(), state);
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
     throws IOException
    {
-      TeXObject counter = stack.popArg(parser);
-
-      if (counter instanceof Expandable)
-      {
-         TeXObjectList expanded = ((Expandable)counter).expandfully(parser, stack);
-
-         if (expanded != null)
-         {
-            counter = expanded;
-         }
-      }
-
-      String name = counter.toString(parser);
+      String name = parser.popRequiredString(stack);
 
       TeXObjectList list = new TeXObjectList();
 
-      if (state == AtRoman.UPPER)
+      if (state == CharacterCase.UPPER)
       {
          list.add(new TeXCsRef("@Roman"));
       }
@@ -81,63 +71,26 @@ public class Roman extends Command
       return list;
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser)
     throws IOException
    {
-      TeXObject counter = parser.popNextArg();
-
-      if (counter instanceof Expandable)
-      {
-         TeXObjectList expanded = ((Expandable)counter).expandfully(parser);
-
-         if (expanded != null)
-         {
-            counter = expanded;
-         }
-      }
-
-      String name = counter.toString(parser);
-
-      TeXObjectList list = new TeXObjectList();
-
-      if (state == AtRoman.UPPER)
-      {
-         list.add(new TeXCsRef("@Roman"));
-      }
-      else
-      {
-         list.add(new TeXCsRef("@roman"));
-      }
-
-      list.add(new TeXCsRef("c@"+name));
-
-      return list;
+      return expandonce(parser, parser);
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser, TeXObjectList stack)
     throws IOException
    {
-      TeXObject counter = stack.popArg(parser);
-
-      if (counter instanceof Expandable)
-      {
-         TeXObjectList expanded = ((Expandable)counter).expandfully(parser, stack);
-
-         if (expanded != null)
-         {
-            counter = expanded;
-         }
-      }
-
-      String name = counter.toString(parser);
+      String name = parser.popRequiredString(stack);
 
       LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
 
-      int value = listener.getcountervalue(counter.toString(parser));
+      int value = listener.getcountervalue(name);
 
       String strValue = RomanNumeral.romannumeral(value);
 
-      if (state == AtRoman.UPPER)
+      if (state == CharacterCase.UPPER)
       {
          strValue = strValue.toUpperCase();
       }
@@ -145,59 +98,25 @@ public class Roman extends Command
       return listener.createString(strValue);
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser)
     throws IOException
    {
-      TeXObject counter = parser.popNextArg();
-
-      if (counter instanceof Expandable)
-      {
-         TeXObjectList expanded = ((Expandable)counter).expandfully(parser);
-
-         if (expanded != null)
-         {
-            counter = expanded;
-         }
-      }
-
-      String name = counter.toString(parser);
-
-      LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
-
-      int value = listener.getcountervalue(counter.toString(parser));
-
-      String strValue = RomanNumeral.romannumeral(value);
-
-      if (state == AtRoman.UPPER)
-      {
-         strValue = strValue.toUpperCase();
-      }
-
-      return listener.createString(strValue);
+      return expandfully(parser, parser);
    }
 
-   public void process(TeXParser parser, TeXObjectList list)
+   @Override
+   public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      TeXObject counter = list.popArg(parser);
-
-      if (counter instanceof Expandable)
-      {
-         TeXObjectList expanded = ((Expandable)counter).expandfully(parser, list);
-
-         if (expanded != null)
-         {
-            counter = expanded;
-         }
-      }
-
+      String name = parser.popRequiredString(stack);
       LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
 
-      int value = listener.getcountervalue(counter.toString(parser));
+      int value = listener.getcountervalue(name);
 
       String strValue = RomanNumeral.romannumeral(value);
 
-      if (state == AtRoman.UPPER)
+      if (state == CharacterCase.UPPER)
       {
          strValue = strValue.toUpperCase();
       }
@@ -205,34 +124,12 @@ public class Roman extends Command
       listener.getWriteable().write(strValue);
    }
 
+   @Override
    public void process(TeXParser parser)
      throws IOException
    {
-      TeXObject counter = parser.popNextArg();
-
-      if (counter instanceof Expandable)
-      {
-         TeXObjectList expanded = ((Expandable)counter).expandfully(parser);
-
-         if (expanded != null)
-         {
-            counter = expanded;
-         }
-      }
-
-      LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
-
-      int value = listener.getcountervalue(counter.toString(parser));
-
-      String strValue = RomanNumeral.romannumeral(value);
-
-      if (state == AtRoman.UPPER)
-      {
-         strValue = strValue.toUpperCase();
-      }
-
-      listener.getWriteable().write(strValue);
+      process(parser, parser);
    }
 
-   private byte state = AtRoman.UPPER;
+   private CharacterCase state = CharacterCase.UPPER;
 }

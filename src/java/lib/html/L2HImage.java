@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -24,7 +24,7 @@ import java.nio.file.Path;
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.*;
 
-public class L2HImage implements Expandable
+public class L2HImage implements TeXObject,Expandable
 {
    public L2HImage(Path path)
    {
@@ -59,10 +59,17 @@ public class L2HImage implements Expandable
       }
    }
 
+   @Override
    public Object clone()
    {
       return new L2HImage(path, mimetype, width, height, 
        name, alt == null ? null : (TeXObject)alt.clone());
+   }
+
+   @Override
+   public int getTeXCategory()
+   {
+      return TYPE_OBJECT;
    }
 
    protected void updateMimeType()
@@ -107,6 +114,13 @@ public class L2HImage implements Expandable
       return mimetype;
    }
 
+   @Override
+   public String toString(TeXParser parser)
+   {
+      return alt == null ? "" : alt.toString(parser);
+   }
+
+   @Override
    public String toString()
    {
       return String.format(
@@ -115,27 +129,51 @@ public class L2HImage implements Expandable
         name, alt);
    }
 
+   @Override
+   public boolean isPopStyleSkip(PopStyle popStyle)
+   {
+      return false;
+   }
+
+   @Override
    public boolean isPar()
    {
       return false;
    }
 
-   public TeXObjectList string(TeXParser parser) throws IOException
+   @Override
+   public boolean isEmptyObject()
    {
-      return alt.string(parser);
+      return false;
    }
 
+   @Override
+   public TeXObjectList string(TeXParser parser) throws IOException
+   {
+      return alt == null ? new TeXObjectList() : alt.string(parser);
+   }
+
+   @Override
    public String format()
    {
       return alt == null ? "" : alt.format();
    }
 
+   @Override
+   public String stripToString(TeXParser parser)
+     throws IOException
+   {
+      return format();
+   }
+
+   @Override
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
     throws IOException
    {
       return expandonce(parser);
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser)
     throws IOException
    {
@@ -179,12 +217,14 @@ public class L2HImage implements Expandable
       return list;
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser)
     throws IOException
    {
       return expandfully(parser, parser);
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser, TeXObjectList stack)
     throws IOException
    {
@@ -253,12 +293,6 @@ public class L2HImage implements Expandable
       return list;
    }
 
-   public void process(TeXParser parser)
-    throws IOException
-   {
-      process(parser, parser);
-   }
-
    public Path getPath()
    {
       return path;
@@ -287,6 +321,14 @@ public class L2HImage implements Expandable
       return builder.toString();
    }
 
+   @Override
+   public void process(TeXParser parser)
+    throws IOException
+   {
+      process(parser, parser);
+   }
+
+   @Override
    public void process(TeXParser parser, TeXObjectList stack)
     throws IOException
    {
@@ -331,6 +373,49 @@ public class L2HImage implements Expandable
       }
 
       writer.write("</object>");
+   }
+
+   public boolean process(TeXParser parser, TeXObjectList stack, StackMarker marker)
+    throws IOException
+   {
+      boolean foundMarker = false;
+
+      TeXObjectList list = new TeXObjectList();
+
+      Writeable writer = parser.getListener().getWriteable();
+
+      writer.write(String.format("<object data=\"%s\"", getData()));
+
+      if (width != 0)
+      {
+         writer.write(String.format(" width=\"%d\"", width));
+      }
+
+      if (height != 0)
+      {
+         writer.write(String.format(" height=\"%d\"", height));
+      }
+
+      if (mimetype != null)
+      {
+         writer.write(String.format(" type=\"%s\"", mimetype));
+      }
+
+      if (name != null)
+      {
+         writer.write(String.format(" name=\"%s\"", name));
+      }
+
+      writer.write(">");
+
+      if (alt != null)
+      {
+         foundMarker = alt.process(parser, stack, marker);
+      }
+
+      writer.write("</object>");
+
+      return foundMarker;
    }
 
    private Path path;

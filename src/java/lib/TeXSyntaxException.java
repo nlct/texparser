@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -186,4 +186,12 @@ public class TeXSyntaxException extends IOException
       "tex.error.generic";
    public static final String ERROR_UNEXPANDABLE =
       "tex.error.unexpandable";
+   public static final String ERROR_PARSING =
+      "tex.error.parsing";
+   public static final String ERROR_MARKER_FOUND =
+      "tex.error.marker.found";
+   public static final String ERROR_LOST_MARKER =
+      "tex.error.lost.marker";
+   public static final String ERROR_MISPLACED_NOALIGN =
+      "tex.error.misplaced.noalign";
 }

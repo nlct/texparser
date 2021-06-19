@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -43,7 +43,9 @@ public class L2HMathAlignRow extends L2HAlignRow
    throws IOException
    {
       this(isNumbered);
+System.out.println("MARK(2)");
       parse(parser, stack);
+System.out.println("MARK(3)");
    }
 
    protected void processCell(TeXParser parser, TeXCellAlign alignCell,

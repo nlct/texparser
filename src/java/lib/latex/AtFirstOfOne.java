@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -40,6 +40,7 @@ public class AtFirstOfOne extends Command
       return new AtFirstOfOne(getName());
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser)
      throws IOException
    {
@@ -53,6 +54,7 @@ public class AtFirstOfOne extends Command
       return list;
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
@@ -66,62 +68,7 @@ public class AtFirstOfOne extends Command
       return list;
    }
 
-   public TeXObjectList expandfully(TeXParser parser)
-     throws IOException
-   {
-      TeXObject arg1 = parser.popNextArg();
-
-      TeXObjectList list;
-
-      if (arg1 instanceof Expandable)
-      {
-         list = ((Expandable)arg1).expandfully(parser);
-
-         if (list != null)
-         {
-            return list;
-         }
-
-         if (arg1 instanceof TeXObjectList)
-         {
-            return (TeXObjectList)arg1;
-         }
-      }
-
-      list = new TeXObjectList();
-      list.add(arg1);
-
-      return list;
-   }
-
-   public TeXObjectList expandfully(TeXParser parser, TeXObjectList stack)
-     throws IOException
-   {
-      TeXObject arg1 = stack.popArg(parser);
-
-      TeXObjectList list;
-
-      if (arg1 instanceof Expandable)
-      {
-         list = ((Expandable)arg1).expandfully(parser, stack);
-
-         if (list != null)
-         {
-            return list;
-         }
-
-         if (arg1 instanceof TeXObjectList)
-         {
-            return (TeXObjectList)arg1;
-         }
-      }
-
-      list = new TeXObjectList();
-      list.add(arg1);
-
-      return list;
-   }
-
+   @Override
    public void process(TeXParser parser) throws IOException
    {
       TeXObject arg1 = parser.popNextArg();
@@ -129,6 +76,7 @@ public class AtFirstOfOne extends Command
       arg1.process(parser);
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList list) throws IOException
    {
       TeXObject arg1 = list.popArg(parser);

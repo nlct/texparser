@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2018 Nicola L.C. Talbot
+    Copyright (C) 2018-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -23,7 +23,7 @@ import java.io.IOException;
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.*;
 
-public class MakeFirstUc extends ControlSequence implements Expandable
+public class MakeFirstUc extends Command
 {
    public MakeFirstUc()
    {
@@ -57,18 +57,20 @@ public class MakeFirstUc extends ControlSequence implements Expandable
       return new MakeFirstUc(getName(), expansion);
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser)
      throws IOException
    {
       return expandonce(parser, parser);
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
       TeXObject arg;
 
-      if (stack == parser)
+      if (stack == parser || stack == null)
       {
          arg = parser.popNextArg();
       }
@@ -83,7 +85,7 @@ public class MakeFirstUc extends ControlSequence implements Expandable
          {
             TeXObjectList list;
 
-            if (parser == stack)
+            if (parser == stack || stack == null)
             {
                list = ((Expandable)arg).expandonce(parser);
             }
@@ -104,7 +106,7 @@ public class MakeFirstUc extends ControlSequence implements Expandable
          {
             TeXObjectList list;
 
-            if (parser == stack)
+            if (parser == stack || stack == null)
             {
                list = ((Expandable)arg).expandfully(parser);
             }
@@ -201,24 +203,28 @@ public class MakeFirstUc extends ControlSequence implements Expandable
       return expanded;
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser)
      throws IOException
    {
       return expandonce(parser).expandfully(parser);
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
       return expandonce(parser, stack).expandfully(parser, stack);
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
       expandonce(parser, stack).process(parser, stack);
    }
 
+   @Override
    public void process(TeXParser parser)
      throws IOException
    {

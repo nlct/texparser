@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -23,7 +23,7 @@ import java.util.Vector;
 
 import com.dickimawbooks.texparserlib.*;
 
-public class FontShapeDeclaration extends Declaration
+public class FontShapeDeclaration extends RobustDeclaration
 {
    public FontShapeDeclaration(String name, int shape)
    {
@@ -37,32 +37,11 @@ public class FontShapeDeclaration extends Declaration
       return new FontShapeDeclaration(getName(), shape);
    }
 
-   public TeXObjectList expandonce(TeXParser parser, TeXObjectList list)
-      throws IOException
-   {
-      return null;
-   }
-
-   public TeXObjectList expandonce(TeXParser parser)
-      throws IOException
-   {
-      return null;
-   }
-
-   public TeXObjectList expandfully(TeXParser parser, TeXObjectList list)
-      throws IOException
-   {
-      return null;
-   }
-
-   public TeXObjectList expandfully(TeXParser parser)
-      throws IOException
-   {
-      return null;
-   }
-
+   @Override
    public void process(TeXParser parser) throws IOException
    {
+      pushEnd(parser);
+
       TeXSettings settings = parser.getSettings();
 
       orgShape = settings.getCurrentFontShape();
@@ -70,17 +49,21 @@ public class FontShapeDeclaration extends Declaration
       settings.setFontShape(shape);
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList list) throws IOException
    {
       process(parser);
    }
 
+   @Override
    public void end(TeXParser parser) throws IOException
    {
       TeXSettings settings = parser.getSettings();
       settings.setFontShape(orgShape);
+      settings.removeDeclaration(this);
    }
 
+   @Override
    public boolean isModeSwitcher()
    {
       return false;
@@ -89,6 +72,18 @@ public class FontShapeDeclaration extends Declaration
    public int getShape()
    {
       return shape;
+   }
+
+   public boolean equals(Object object)
+   {
+      if (!(object instanceof FontShapeDeclaration) || !super.equals(object))
+      { 
+         return false;
+      }
+
+      FontShapeDeclaration dec = (FontShapeDeclaration)object;
+
+      return dec.shape == shape;
    }
 
    private String name;

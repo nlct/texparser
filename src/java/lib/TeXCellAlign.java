@@ -91,8 +91,7 @@ public class TeXCellAlign
          return;
       }
 
-      if (!(before instanceof TeXObjectList) 
-        || before instanceof Group)
+      if (!(before instanceof TeXObjectList))
       {
          TeXObjectList list = new TeXObjectList();
          list.add(before);
@@ -110,8 +109,7 @@ public class TeXCellAlign
          return;
       }
 
-      if (!(after instanceof TeXObjectList) 
-        || after instanceof Group)
+      if (!(after instanceof TeXObjectList))
       {
          TeXObjectList list = new TeXObjectList();
          list.add(after);
@@ -129,8 +127,7 @@ public class TeXCellAlign
          return;
       }
 
-      if (!(preShift instanceof TeXObjectList) 
-        || preShift instanceof Group)
+      if (!(preShift instanceof TeXObjectList))
       {
          TeXObjectList list = new TeXObjectList();
          list.add(preShift);
@@ -148,8 +145,7 @@ public class TeXCellAlign
          return;
       }
 
-      if (!(postShift instanceof TeXObjectList) 
-        || postShift instanceof Group)
+      if (!(postShift instanceof TeXObjectList))
       {
          TeXObjectList list = new TeXObjectList();
          list.add(postShift);

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -47,60 +47,12 @@ public class DTLforeach extends ControlSequence
    public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      TeXObject object = stack.peekStack(
-         TeXObjectList.POP_IGNORE_LEADING_SPACE);
+      boolean isStar = parser.isNextChar('*', stack);
 
-      boolean isStar = false;
-
-      if (object instanceof CharObject
-        && ((CharObject)object).getCharCode() == (int)'*')
-      {
-         isStar = true;
-         object = stack.popToken(TeXObjectList.POP_IGNORE_LEADING_SPACE);
-      }
-
-      TeXObject condition;
-      TeXObject dbArg;
-      TeXObject assign;
-      TeXObject body;
-
-      if (stack == parser)
-      {
-         condition = parser.popNextArg('[', ']');
-         dbArg = parser.popNextArg();
-
-         if (dbArg instanceof Expandable)
-         {
-            TeXObjectList expanded = ((Expandable)dbArg).expandfully(parser);
-
-            if (expanded != null)
-            {
-               dbArg = expanded;
-            }
-         }
-
-         assign = parser.popNextArg();
-         body = parser.popNextArg();
-      }
-      else
-      {
-         condition = stack.popArg(parser, '[', ']');
-         dbArg = stack.popArg(parser);
-
-         if (dbArg instanceof Expandable)
-         {
-            TeXObjectList expanded = ((Expandable)dbArg).expandfully(parser,
-               stack);
-
-            if (expanded != null)
-            {
-               dbArg = expanded;
-            }
-         }
-
-         assign = stack.popArg(parser);
-         body = stack.popArg(parser);
-      }
+      TeXObject condition = parser.popOptional(stack);
+      TeXObject dbArg = parser.popRequiredExpandFully(stack);
+      CsvList csvList = CsvList.popCsvListFromStack(parser, stack, true);
+      TeXObject body = parser.popRequired(stack);
 
       String dbName = dbArg.toString(parser);
 
@@ -112,8 +64,6 @@ public class DTLforeach extends ControlSequence
            DataToolSty.ERROR_DB_DOESNT_EXIST, dbName);
       }
 
-      CsvList csvList = CsvList.getList(parser, assign);
-
       HashMap<String,DataToolHeader> map = new HashMap<String,DataToolHeader>();
 
       for (TeXObject element : csvList)
@@ -124,8 +74,10 @@ public class DTLforeach extends ControlSequence
                TeXSyntaxException.ERROR_SYNTAX, getName());
          }
 
-         object = ((TeXObjectList)element).popToken(
-           TeXObjectList.POP_IGNORE_LEADING_SPACE);
+         TeXObjectList elementList = (TeXObjectList)element;
+
+         TeXObject object = elementList.popToken(
+           PopStyle.IGNORE_LEADING_SPACE);
 
          if (!(object instanceof ControlSequence))
          {
@@ -135,17 +87,16 @@ public class DTLforeach extends ControlSequence
 
          String csName = ((ControlSequence)object).getName();
 
-         object = ((TeXObjectList)element).popToken(
-           TeXObjectList.POP_IGNORE_LEADING_SPACE);
+         object = elementList.popToken(
+           PopStyle.IGNORE_LEADING_SPACE);
 
-         if (!(object instanceof CharObject
-                && ((CharObject)object).getCharCode() == '='))
+         if (!parser.isCharacter(object, '='))
          {
             throw new TeXSyntaxException(parser, 
                TeXSyntaxException.ERROR_SYNTAX, getName());
          }
 
-         TeXObjectList expanded = ((TeXObjectList)element).expandfully(parser);
+         TeXObjectList expanded = elementList.expandfully(parser);
 
          if (expanded != null)
          {
@@ -181,7 +132,7 @@ public class DTLforeach extends ControlSequence
          {
             IfThenSty ifThenSty = sty.getIfThenSty();
 
-            if (!ifThenSty.evaluate((TeXObject)condition.clone()))
+            if (!ifThenSty.evaluate(stack, (TeXObject)condition.clone()))
             {
                continue;
             }
@@ -236,7 +187,7 @@ public class DTLforeach extends ControlSequence
 
          // TODO add \dtlbreak etc
 
-         object = (TeXObject)body.clone();
+         TeXObject object = (TeXObject)body.clone();
 
          if (parser == stack)
          {

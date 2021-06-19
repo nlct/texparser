@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -22,7 +22,7 @@ import java.io.IOException;
 
 import com.dickimawbooks.texparserlib.*;
 
-public class NewCommand extends Command
+public class NewCommand extends ControlSequence
 {
    public NewCommand()
    {
@@ -40,78 +40,24 @@ public class NewCommand extends Command
       return new NewCommand(getName(), getOverwrite());
    }
 
-   public TeXObjectList expandonce(TeXParser parser, TeXObjectList list)
-     throws IOException
-   {
-      return null;
-   }
-
-   public TeXObjectList expandonce(TeXParser parser)
-     throws IOException
-   {
-      return null;
-   }
-
-   public TeXObjectList expandfully(TeXParser parser, TeXObjectList list)
-     throws IOException
-   {
-      return null;
-   }
-
-   public TeXObjectList expandfully(TeXParser parser)
-     throws IOException
-   {
-      return null;
-   }
-
+   @Override
    public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      byte popStyle = TeXObjectList.POP_SHORT;
+      PopStyle popStyle = PopStyle.SHORT;
 
-      TeXObject object = (stack == parser ? 
-        parser.popNextArg(popStyle) : stack.popArg(parser, popStyle));
+      boolean isStar = parser.isNextChar('*', stack, popStyle);
 
-      boolean isStar = false;
-
-      if (object instanceof CharObject
-       && ((CharObject)object).getCharCode() == (int)'*')
-      {
-         isStar = true;
-         object = (stack == parser ?
-            parser.popNextArg(popStyle) : stack.popArg(parser, popStyle));
-      }
-
-      if (object instanceof TeXObjectList)
-      {
-         // Use popArg in case there are spaces before or after the
-         // control sequence.
-
-         object = ((TeXObjectList)object).popArg(parser, popStyle);
-      }
+      ControlSequence cs = parser.popRequiredControlSequence(stack);
 
       if (!isStar)
       {
-         popStyle = 0;
+         popStyle = PopStyle.DEFAULT;
       }
 
-      String csName;
+      String csName = cs.getName();
 
-      if (object instanceof ControlSequence)
-      {
-         csName = ((ControlSequence)object).getName();
-      }
-      else
-      {
-         throw new TeXSyntaxException(
-            parser,
-            TeXSyntaxException.ERROR_CS_EXPECTED,
-            object.format(), object.getClass().getSimpleName());
-      }
-
-      object = (stack == parser ?
-           parser.popNextArg(popStyle, '[', ']')
-         : stack.popArg(parser, popStyle, '[', ']'));
+      TeXObject object = parser.popOptionalExpandFully(stack);
 
       int numParams = 0;
       TeXObject defValue = null;
@@ -124,23 +70,9 @@ public class NewCommand extends Command
          }
          else
          {
-            TeXObjectList expanded = null;
-
-            if (object instanceof Expandable)
-            {
-               expanded = ((Expandable)object).expandfully(parser, stack);
-            }
-
             try
             {
-               if (expanded == null)
-               {
-                  numParams = Integer.parseInt(object.toString(parser));
-               }
-               else
-               {
-                  numParams = Integer.parseInt(expanded.toString(parser));
-               }
+               numParams = Integer.parseInt(object.toString(parser));
             }
             catch (NumberFormatException e)
             {
@@ -151,18 +83,16 @@ public class NewCommand extends Command
             }
          }
 
-         defValue = (stack == parser ?
-              parser.popNextArg(popStyle, '[', ']')
-            : stack.popArg(parser, popStyle, '[', ']'));
+         defValue = parser.popOptional(stack);
       }
 
-      TeXObject definition = (stack == parser ?
-             parser.popNextArg(popStyle) : stack.popArg(parser, popStyle));
+      TeXObject definition = parser.popRequired(stack, popStyle);
 
       ((LaTeXParserListener)parser.getListener()).newcommand(
          overwrite, name, csName, isStar, numParams, defValue, definition);
    }
 
+   @Override
    public void process(TeXParser parser)
      throws IOException
    {

@@ -53,9 +53,9 @@ public class EnsureMath extends ControlSequence
          MathGroup mgrp = parser.getListener().createMathGroup();
          mgrp.setInLine(true);
 
-         if (arg instanceof TeXObjectList)
+         if (arg instanceof AbstractTeXObjectList)
          {
-            mgrp.addAll((TeXObjectList)arg);
+            mgrp.addAll((AbstractTeXObjectList)arg);
          }
          else
          {
@@ -79,9 +79,9 @@ public class EnsureMath extends ControlSequence
          MathGroup mgrp = parser.getListener().createMathGroup();
          mgrp.setInLine(true);
 
-         if (arg instanceof TeXObjectList)
+         if (arg instanceof AbstractTeXObjectList)
          {
-            mgrp.addAll((TeXObjectList)arg);
+            mgrp.addAll((AbstractTeXObjectList)arg);
          }
          else
          {

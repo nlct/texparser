@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -23,7 +23,7 @@ import java.util.Vector;
 
 import com.dickimawbooks.texparserlib.*;
 
-public class FontFamilyDeclaration extends Declaration
+public class FontFamilyDeclaration extends RobustDeclaration
 {
    public FontFamilyDeclaration(String name, int family)
    {
@@ -32,37 +32,16 @@ public class FontFamilyDeclaration extends Declaration
       this.orgFamily = TeXSettings.INHERIT;
    }
 
+   @Override
    public Object clone()
    {
       return new FontFamilyDeclaration(getName(), family);
    }
 
-   public TeXObjectList expandonce(TeXParser parser, TeXObjectList list)
-      throws IOException
-   {
-      return null;
-   }
-
-   public TeXObjectList expandonce(TeXParser parser)
-      throws IOException
-   {
-      return null;
-   }
-
-   public TeXObjectList expandfully(TeXParser parser, TeXObjectList list)
-      throws IOException
-   {
-      return null;
-   }
-
-   public TeXObjectList expandfully(TeXParser parser)
-      throws IOException
-   {
-      return null;
-   }
-
+   @Override
    public void process(TeXParser parser) throws IOException
    {
+      pushEnd(parser);
       TeXSettings settings = parser.getSettings();
 
       orgFamily = settings.getCurrentFontFamily();
@@ -70,17 +49,21 @@ public class FontFamilyDeclaration extends Declaration
       settings.setFontFamily(family);
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList list) throws IOException
    {
       process(parser);
    }
 
+   @Override
    public void end(TeXParser parser) throws IOException
    {
       TeXSettings settings = parser.getSettings();
       settings.setFontFamily(orgFamily);
+      settings.removeDeclaration(this);
    }
 
+   @Override
    public boolean isModeSwitcher()
    {
       return false;
@@ -89,6 +72,18 @@ public class FontFamilyDeclaration extends Declaration
    public int getFamily()
    {
       return family;
+   }
+
+   public boolean equals(Object object)
+   {
+      if (!(object instanceof FontFamilyDeclaration) || !super.equals(object))
+      { 
+         return false;
+      }
+
+      FontFamilyDeclaration dec = (FontFamilyDeclaration)object;
+
+      return dec.family == family;
    }
 
    private int family, orgFamily;

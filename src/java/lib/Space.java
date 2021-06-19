@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -37,6 +37,12 @@ public class Space extends WhiteSpace
       setSpace(spaceCodePoint);
    }
 
+   @Override
+   public int getTeXCategory()
+   {
+      return TYPE_SPACE;
+   }
+
    public void setSpace(int spaceCodePoint)
    {
       charCode = spaceCodePoint;
@@ -47,27 +53,33 @@ public class Space extends WhiteSpace
       return charCode;
    }
 
+   @Override
    public String toString(TeXParser parser)
    {
-      return format();
+      return new String(Character.toChars(charCode));
    }
 
+   @Override
    public TeXObjectList string(TeXParser parser)
     throws IOException
    {
       return parser.string(" ");
    }
 
+   @Override
    public String format()
    {
       return new String(Character.toChars(charCode));
    }
 
+   @Override
    public String toString()
    {
-      return String.format("%s%s", getClass().getSimpleName(), format());
+      return String.format("%s%s", getClass().getSimpleName(), 
+        new String(Character.toChars(charCode)));
    }
 
+   @Override
    public Object clone()
    {
       return new Space(charCode);

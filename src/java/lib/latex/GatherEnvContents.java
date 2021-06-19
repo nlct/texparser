@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -23,35 +23,11 @@ import java.io.EOFException;
 
 import com.dickimawbooks.texparserlib.*;
 
-public abstract class GatherEnvContents extends Declaration
+public abstract class GatherEnvContents extends RobustDeclaration
 {
    public GatherEnvContents(String name)
    {
       super(name);
-   }
-
-   public TeXObjectList expandonce(TeXParser parser, TeXObjectList list)
-      throws IOException
-   {
-      return null;
-   }
-
-   public TeXObjectList expandonce(TeXParser parser)
-      throws IOException
-   {
-      return null;
-   }
-
-   public TeXObjectList expandfully(TeXParser parser, TeXObjectList list)
-      throws IOException
-   {
-      return null;
-   }
-
-   public TeXObjectList expandfully(TeXParser parser)
-      throws IOException
-   {
-      return null;
    }
 
    public TeXObjectList popContents(TeXParser parser, TeXObjectList stack)
@@ -99,6 +75,7 @@ public abstract class GatherEnvContents extends Declaration
       return contents;
    }
 
+   @Override
    public boolean isModeSwitcher()
    {
       return false;

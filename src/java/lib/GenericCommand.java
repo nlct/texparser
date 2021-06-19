@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -45,8 +45,7 @@ public class GenericCommand extends Command
       super(name);
       this.isShort = isShort;
 
-      if (def instanceof TeXObjectList
-      && !(def instanceof Group))
+      if (def instanceof TeXObjectList)
       {
          this.definition = (TeXObjectList)def;
       }
@@ -101,12 +100,14 @@ public class GenericCommand extends Command
       }
    }
 
+   @Override
    public Object clone()
    {
       return new GenericCommand(isShort, getName(), syntax, definition,
         isDelimited, numArgs);
    }
 
+   @Override
    public boolean equals(Object obj)
    {
       if (obj == null || !(obj instanceof GenericCommand)) return false;
@@ -129,42 +130,46 @@ public class GenericCommand extends Command
       return syntax.equals(cs.syntax);
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList list)
      throws IOException
    {
       return getReplacement(parser, list);
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser)
      throws IOException
    {
       return getReplacement(parser);
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser, TeXObjectList list)
      throws IOException
    {
       return getReplacement(parser, list).expandfully(parser, list);
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser)
      throws IOException
    {
       return getReplacement(parser).expandfully(parser);
    }
 
-   private TeXObjectList getReplacement(TeXParser parser,
-     TeXObjectList remainingStack)
+   protected TeXObjectList getReplacement(TeXParser parser,
+     AbstractTeXObjectList remainingStack)
      throws IOException
    {
       TeXObject[] args = (numArgs == 0 ? null : new TeXObject[numArgs]);
 
       int n = 0;
 
+      PopStyle popStyle = isShort ? PopStyle.SHORT : PopStyle.DEFAULT;
+
       if (syntax != null)
       {
-         byte popStyle = isShort ? TeXObjectList.POP_SHORT : 0;
-
          for (TeXObject obj : syntax)
          {
             if (obj instanceof Param)
@@ -196,6 +201,13 @@ public class GenericCommand extends Command
             }
          }
       }
+      else if (args != null)
+      {
+         for (int i = 0; i < numArgs; i++, n++)
+         {
+            args[i] = remainingStack.popStack(parser, popStyle);
+         }
+      }
 
       TeXObjectList stack = new TeXObjectList(definition.size());
 
@@ -216,9 +228,9 @@ public class GenericCommand extends Command
          {
             stack.add(((DoubleParam)obj).next());
          }
-         else if (obj instanceof TeXObjectList)
+         else if (obj instanceof AbstractTeXObjectList)
          {
-            stack.add(replaceList(parser, ((TeXObjectList)obj), args));
+            stack.add(replaceList(parser, ((AbstractTeXObjectList)obj), args));
          }
          else
          {
@@ -229,7 +241,7 @@ public class GenericCommand extends Command
       return stack;
    }
 
-   private TeXObjectList getReplacement(TeXParser parser)
+   protected TeXObjectList getReplacement(TeXParser parser)
      throws IOException
    {
       TeXObject[] args = (numArgs == 0 ? null : new TeXObject[numArgs]);
@@ -238,7 +250,7 @@ public class GenericCommand extends Command
 
       if (syntax != null)
       {
-         byte popStyle = isShort ? TeXObjectList.POP_SHORT : 0;
+         PopStyle popStyle = isShort ? PopStyle.SHORT : PopStyle.DEFAULT;
 
          for (TeXObject obj : syntax)
          {
@@ -297,9 +309,9 @@ public class GenericCommand extends Command
          {
             stack.add(((DoubleParam)obj).next());
          }
-         else if (obj instanceof TeXObjectList)
+         else if (obj instanceof AbstractTeXObjectList)
          {
-            stack.add(replaceList(parser, ((TeXObjectList)obj), args));
+            stack.add(replaceList(parser, ((AbstractTeXObjectList)obj), args));
          }
          else
          {
@@ -311,9 +323,9 @@ public class GenericCommand extends Command
    }
 
    private TeXObject replaceList(TeXParser parser,
-     TeXObjectList list, TeXObject[] args)
+     AbstractTeXObjectList list, TeXObject[] args)
    {
-      TeXObjectList stack = list.createList();
+      AbstractTeXObjectList stack = list.createList();
 
       for (TeXObject obj : list)
       {
@@ -325,9 +337,9 @@ public class GenericCommand extends Command
          {
             stack.add(((DoubleParam)obj).next());
          }
-         else if (obj instanceof TeXObjectList)
+         else if (obj instanceof AbstractTeXObjectList)
          {
-            stack.add(replaceList(parser, ((TeXObjectList)obj), args));
+            stack.add(replaceList(parser, ((AbstractTeXObjectList)obj), args));
          }
          else
          {
@@ -338,16 +350,25 @@ public class GenericCommand extends Command
       return stack;
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
       getReplacement(parser, stack).process(parser, stack);
    }
 
+   @Override
    public void process(TeXParser parser)
      throws IOException
    {
       getReplacement(parser).process(parser);
+   }
+
+   @Override
+   public boolean process(TeXParser parser, TeXObjectList stack, StackMarker marker)
+      throws IOException
+   {
+      return getReplacement(parser, stack).process(parser, stack, marker);
    }
 
    public boolean isEmpty()
@@ -406,6 +427,7 @@ public class GenericCommand extends Command
       return definition;
    }
 
+   @Override
    public String toString()
    {
       return String.format("%s[name=%s,prefix=%d,syntax=%s,definition=%s]",

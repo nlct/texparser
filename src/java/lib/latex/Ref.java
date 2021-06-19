@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -40,6 +40,7 @@ public class Ref extends Command
       return new Ref(getName());
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser)
       throws IOException
    {
@@ -58,6 +59,7 @@ public class Ref extends Command
       return expandref(parser, arg);
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
@@ -144,6 +146,7 @@ public class Ref extends Command
       return list;
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
@@ -155,6 +158,7 @@ public class Ref extends Command
       }
    }
 
+   @Override
    public void process(TeXParser parser)
       throws IOException
    {

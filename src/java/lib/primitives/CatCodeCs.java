@@ -44,7 +44,7 @@ public class CatCodeCs extends Primitive
    public TeXNumber expandToNumber(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      Numerical arg = stack.popNumerical(parser);
+      Numerical arg = parser.popRequiredNumerical(stack);
 
       return new UserNumber(parser.getCatCode(arg.number(parser)));
    }

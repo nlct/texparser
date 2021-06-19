@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -26,44 +26,37 @@ import com.dickimawbooks.texparserlib.primitives.RomanNumeral;
 
 public class AtRoman extends Command
 {
-   public AtRoman(String name, byte state)
+   public AtRoman(String name, CharacterCase state)
    {
       super(name);
 
-      if (state != UPPER && state != LOWER)
+      if (state != CharacterCase.UPPER && state != CharacterCase.LOWER)
       {
          throw new IllegalArgumentException(String.format(
-          "Invalid state '%d' for AtRoman ", state));
+          "Invalid state '%s' for AtRoman ", state));
       }
 
       this.state = state;
    }
 
+   @Override
    public Object clone()
    {
       return new AtRoman(getName(), state);
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser)
    throws IOException
    {
-      TeXObject obj = getSymbol(parser, parser.popNumber());
-
-      if (obj instanceof TeXObjectList)
-      {
-         return (TeXObjectList)obj;
-      }
-
-      TeXObjectList list = new TeXObjectList();
-      list.add(obj);
-
-      return list;
+      return expandonce(parser, parser);
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
    throws IOException
    {
-      TeXObject obj = getSymbol(parser, stack.popNumber(parser));
+      TeXObject obj = getSymbol(parser, parser.popRequiredNumber(stack));
 
       if (obj instanceof TeXObjectList)
       {
@@ -83,10 +76,11 @@ public class AtRoman extends Command
 
       String roman = RomanNumeral.romannumeral(arg.number(parser));
 
-      return parser.getListener().createString(state == UPPER ?
+      return parser.getListener().createString(state == CharacterCase.UPPER ?
         roman.toUpperCase() : roman);
    }
 
+   @Override
    public void process(TeXParser parser) throws IOException
    {
       TeXObject obj = getSymbol(parser, parser.popNumber());
@@ -94,6 +88,7 @@ public class AtRoman extends Command
       obj.process(parser);
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack) throws IOException
    {
       TeXObject obj = getSymbol(parser, stack.popNumber(parser));
@@ -101,8 +96,5 @@ public class AtRoman extends Command
       obj.process(parser, stack);
    }
 
-   private byte state;
-
-   public static final byte UPPER = 0;
-   public static final byte LOWER = 1;
+   private CharacterCase state;
 }

@@ -39,6 +39,7 @@ public class FnSymbol extends Command
       return new FnSymbol(getName());
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
     throws IOException
    {
@@ -65,6 +66,7 @@ public class FnSymbol extends Command
       return list;
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser)
     throws IOException
    {
@@ -91,6 +93,7 @@ public class FnSymbol extends Command
       return list;
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser, TeXObjectList stack)
     throws IOException
    {
@@ -119,6 +122,7 @@ public class FnSymbol extends Command
       return list;
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser)
     throws IOException
    {
@@ -147,6 +151,7 @@ public class FnSymbol extends Command
       return list;
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
@@ -169,6 +174,7 @@ public class FnSymbol extends Command
       AtFnSymbol.getSymbol(parser, value).process(parser, stack);
    }
 
+   @Override
    public void process(TeXParser parser)
      throws IOException
    {

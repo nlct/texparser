@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -36,17 +36,20 @@ public class Undefined extends Primitive
       setAction(action);
    }
 
+   @Override
    public Object clone()
    {
       return new Undefined(getName(), action);
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
       process(parser);
    }
 
+   @Override
    public void process(TeXParser parser)
       throws IOException
    {

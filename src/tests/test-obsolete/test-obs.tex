@@ -1,3 +1,5 @@
+% arara: pdflatex: { interaction: nonstopmode }
+% arara: pdflatex: { interaction: nonstopmode }
 % This is a test file
 \documentclass[12pt,a4paper]{article}
 
@@ -47,6 +49,8 @@ $${\bf x}; {\cal Y} {\it z}$$
 {\bf x}; {\cal Y} {\it z}
 \end{equation}
 
+%Ambiguous subscript that will trigger an error: $x_i_j$.
+
 \boldstuff{Bold text} and $\boldstuff{bold math}$.
 
 \begin{table}
@@ -56,5 +60,6 @@ $${\bf x}; {\cal Y} {\it z}$$
  \end{tabular}
 }
 \end{table}
+
 
 \end{document}

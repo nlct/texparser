@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -41,6 +41,7 @@ public class L2HHypertarget extends Command
       return new L2HHypertarget(getName());
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser)
       throws IOException
    {
@@ -77,6 +78,7 @@ public class L2HHypertarget extends Command
       return list;
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
@@ -113,6 +115,7 @@ public class L2HHypertarget extends Command
       return list;
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
@@ -143,6 +146,7 @@ public class L2HHypertarget extends Command
       listener.write("</a>");
    }
 
+   @Override
    public void process(TeXParser parser)
       throws IOException
    {

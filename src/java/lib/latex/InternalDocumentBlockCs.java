@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2020 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -16,48 +16,48 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
-package com.dickimawbooks.texparserlib.html;
+package com.dickimawbooks.texparserlib.latex;
 
 import java.io.IOException;
-import java.util.Vector;
 
 import com.dickimawbooks.texparserlib.*;
-import com.dickimawbooks.texparserlib.latex.*;
 
-public class L2HAbstract extends AbstractDec
+public class InternalDocumentBlockCs extends ControlSequence
 {
-   public L2HAbstract()
+   public InternalDocumentBlockCs(DocumentBlock block)
    {
-      this("abstract");
+      this("texparser@internaldocumentblock@"+block.getType(), block);
    }
 
-   public L2HAbstract(String name)
+   public InternalDocumentBlockCs(String name, DocumentBlock block)
    {
       super(name);
+      this.block = block;
    }
 
+   @Override
    public Object clone()
    {
-      return new L2HAbstract(getName());
+      return new InternalDocumentBlockCs(getName(), block);
    }
 
+   @Override
    public void process(TeXParser parser) throws IOException
    {
-      parser.getListener().getWriteable().write("<div class=\"abstract\">");
-
-      super.process(parser);
+      process(parser, parser);
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack) throws IOException
    {
-      parser.getListener().getWriteable().write("<div class=\"abstract\">");
+      ((LaTeXParserListener)parser.getListener()).startBlock(block);
 
-      super.process(parser, stack);
+      TeXObject arg = parser.popRequired(stack);
+
+      parser.processObject(arg, stack);
+
+      ((LaTeXParserListener)parser.getListener()).endBlock(block);
    }
 
-   public void end(TeXParser parser)
-    throws IOException
-   {
-      parser.getListener().getWriteable().write("</div>");
-   }
+   private DocumentBlock block;
 }

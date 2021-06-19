@@ -29,11 +29,11 @@ Column count: \DTLcolumncount{\mydata}.
 \newcommand{\testdata}{test2}
 About to create new database `\testdata'.
 
-Data
+Database
 \DTLifdbexists{\testdata}{exists}{doesn't exist}.
 
 \DTLnewdb{\testdata}
-Data
+Database
 \DTLifdbexists{\testdata}{exists}{doesn't exist}.
 
 New row.\DTLnewrow{\testdata}
@@ -87,6 +87,8 @@ Is armadillo in list? \DTLifinlist{armadillo}{\mylist}{true}{false}.
 
 Clearing list.\def\mylist{}
 
+Alphabetical insertion.
+
 Inserting `zebra' into list.\dtlinsertinto{zebra}{\mylist}{\dtlcompare}
 Updated list: \mylist.
 
@@ -108,4 +110,3 @@ Updated list: \mylist.
 Inserting `zygote' into list.\dtlinsertinto{zygote}{\mylist}{\dtlcompare}
 Updated list: \mylist.
 
-\end{document}

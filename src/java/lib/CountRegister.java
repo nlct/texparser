@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -39,17 +39,20 @@ public class CountRegister extends NumericRegister implements TeXNumber
       this.value = value;
    }
 
+   @Override
    public void setValue(TeXParser parser, Numerical numerical)
     throws TeXSyntaxException
    {
       setValue(numerical.number(parser));
    }
 
+   @Override
    public int getValue()
    {
       return value;
    }
 
+   @Override
    public int number(TeXParser parser) throws TeXSyntaxException
    {
       return value;
@@ -65,22 +68,26 @@ public class CountRegister extends NumericRegister implements TeXNumber
       value++;
    }
 
+   @Override
    public void advance(TeXParser parser, Numerical increment)
     throws TeXSyntaxException
    {
       value += increment.number(parser);
    }
 
+   @Override
    public void divide(int divisor)
    {
       value /= divisor;
    }
 
+   @Override
    public void multiply(int factor)
    {
       value *= factor;
    }
 
+   @Override
    public Object clone()
    {
       CountRegister reg = new CountRegister(getName(), value);
@@ -90,12 +97,14 @@ public class CountRegister extends NumericRegister implements TeXNumber
       return reg;
    }
 
+   @Override
    public String toString()
    {
       return String.format("%s[name=%s,value=%d]",
        getClass().getSimpleName(), getName(), value);
    }
 
+   @Override
    public String format()
    {
       return ""+value;

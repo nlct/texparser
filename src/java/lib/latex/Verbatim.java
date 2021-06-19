@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -22,7 +22,7 @@ import java.io.IOException;
 
 import com.dickimawbooks.texparserlib.*;
 
-public class Verbatim extends Declaration
+public class Verbatim extends RobustDeclaration
 {
    public Verbatim()
    {
@@ -39,33 +39,13 @@ public class Verbatim extends Declaration
       return new Verbatim(getName());
    }
 
-   public TeXObjectList expandonce(TeXParser parser) throws IOException
-   {
-      return null;
-   }
-
-   public TeXObjectList expandfully(TeXParser parser) throws IOException
-   {
-      return null;
-   }
-
-   public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
-   throws IOException
-   {
-      return null;
-   }
-
-   public TeXObjectList expandfully(TeXParser parser, TeXObjectList stack)
-   throws IOException
-   {
-      return null;
-   }
-
+   @Override
    public void process(TeXParser parser)
     throws IOException
    {
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList list)
     throws IOException
    {
@@ -90,12 +70,14 @@ public class Verbatim extends Declaration
       }
    }
 
+   @Override
    public void end(TeXParser parser) throws IOException
    {
       TeXSettings settings = parser.getSettings();
       settings.setFontFamily(orgFamily);
    }
 
+   @Override
    public boolean isModeSwitcher()
    {
       return false;

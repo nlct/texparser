@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -35,38 +35,31 @@ public class JmlrObjectRef extends Command
       super(name);
    }
 
+   @Override
    public Object clone()
    {
       return new JmlrObjectRef(getName());
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser) throws IOException
    {
       return expandonce(parser, parser);
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
-      TeXObject labels = (stack == parser ?
-          parser.popNextArg() :
-          stack.popArg(parser));
+      TeXObject labels = parser.popRequired(stack);
 
-      TeXObject singulartag = (stack == parser ?
-          parser.popNextArg() :
-          stack.popArg(parser));
+      TeXObject singulartag = parser.popRequired(stack);
 
-      TeXObject pluraltag = (stack == parser ?
-          parser.popNextArg() :
-          stack.popArg(parser));
+      TeXObject pluraltag = parser.popRequired(stack);
 
-      TeXObject pre = (stack == parser ?
-          parser.popNextArg() :
-          stack.popArg(parser));
+      TeXObject pre = parser.popRequired(stack);
 
-      TeXObject post = (stack == parser ?
-          parser.popNextArg() :
-          stack.popArg(parser));
+      TeXObject post = parser.popRequired(stack);
 
       return expand(parser, labels, singulartag, pluraltag, pre, post);
     }
@@ -79,7 +72,7 @@ public class JmlrObjectRef extends Command
 
       expanded.add(new TeXCsRef("ref"));
 
-      if (label instanceof Group || !(label instanceof TeXObjectList))
+      if (label instanceof Group)
       {
          expanded.add(label);
       }
@@ -135,6 +128,7 @@ public class JmlrObjectRef extends Command
       return expanded;
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
@@ -143,6 +137,7 @@ public class JmlrObjectRef extends Command
       stack.addAll(0, expanded);
    }
 
+   @Override
    public void process(TeXParser parser)
       throws IOException
    {

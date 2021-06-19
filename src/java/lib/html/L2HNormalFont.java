@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -24,7 +24,7 @@ import java.util.Vector;
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.*;
 
-public class L2HNormalFont extends Declaration 
+public class L2HNormalFont extends RobustDeclaration 
 {
    public L2HNormalFont()
    {
@@ -36,47 +36,34 @@ public class L2HNormalFont extends Declaration
       super(name);
    }
 
+   @Override
    public Object clone()
    {
       return new L2HNormalFont(getName());
    }
 
-   public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
-     throws IOException
-   {
-      return null;
-   }
-
-   public TeXObjectList expandonce(TeXParser parser)
-     throws IOException
-   {
-      return null;
-   }
-
-   public TeXObjectList expandfully(TeXParser parser, TeXObjectList stack)
-     throws IOException
-   {
-      return null;
-   }
-
-   public TeXObjectList expandfully(TeXParser parser)
-     throws IOException
-   {
-      return null;
-   }
-
+   @Override
    public void process(TeXParser parser) throws IOException
    {
-      super.process(parser);
-
+      pushEnd(parser);
       parser.getListener().getWriteable().write("<span style=\"font: normal;\">");
    }
 
+   @Override
+   public void process(TeXParser parser, TeXObjectList stack)
+     throws IOException
+   {
+      process(parser);
+   }
+
+   @Override
    public void end(TeXParser parser) throws IOException
    {
       parser.getListener().getWriteable().write("</span>");
+      parser.getSettings().removeDeclaration(this);
    }
 
+   @Override
    public boolean isModeSwitcher()
    {
       return false;

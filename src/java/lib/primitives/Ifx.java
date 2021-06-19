@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -35,19 +35,21 @@ public class Ifx extends If
       super(name);
    }
 
+   @Override
    public Object clone()
    {
       return new Ifx(getName());
    }
 
+   @Override
    public boolean istrue(TeXParser parser, TeXObjectList stack)
    throws IOException
    {
-      byte popStyle = TeXObjectList.POP_IGNORE_LEADING_SPACE;
+      PopStyle popStyle = PopStyle.IGNORE_LEADING_SPACE;
 
-      TeXObject firstArg = parser.popToken(popStyle);
+      TeXObject firstArg = parser.popNextToken(stack, popStyle);
 
-      TeXObject secondArg = parser.popToken(popStyle);
+      TeXObject secondArg = parser.popNextToken(stack, popStyle);
 
       if (firstArg instanceof ControlSequence 
           && secondArg instanceof ControlSequence
@@ -63,63 +65,24 @@ public class Ifx extends If
             ((TeXCsRef)firstArg).getName());
       }
 
+      if (firstArg instanceof AssignedMacro)
+      {
+         firstArg = ((AssignedMacro)firstArg).getBaseUnderlying();
+      }
+
       if (secondArg instanceof TeXCsRef)
       {
          secondArg = parser.getListener().getControlSequence(
             ((TeXCsRef)secondArg).getName());
       }
 
-      if (firstArg instanceof Expandable)
+      if (secondArg instanceof AssignedMacro)
       {
-         TeXObjectList expanded;
-
-         if (parser == stack)
-         {
-            expanded = ((Expandable)firstArg).expandonce(parser);
-         }
-         else
-         {
-            expanded = ((Expandable)firstArg).expandonce(parser, stack);
-         }
-
-         if (expanded != null)
-         {
-            if (!(expanded instanceof Group) && expanded.size() == 1)
-            {
-               firstArg = expanded.firstElement();
-            }
-            else
-            {
-               firstArg = expanded;
-            }
-         }
+         secondArg = ((AssignedMacro)secondArg).getBaseUnderlying();
       }
 
-      if (secondArg instanceof Expandable)
-      {
-         TeXObjectList expanded;
-
-         if (parser == stack)
-         {
-            expanded = ((Expandable)secondArg).expandonce(parser);
-         }
-         else
-         {
-            expanded = ((Expandable)secondArg).expandonce(parser, stack);
-         }
-
-         if (expanded != null)
-         {
-            if (!(expanded instanceof Group) && expanded.size() == 1)
-            {
-               secondArg = expanded.firstElement();
-            }
-            else
-            {
-               secondArg = expanded;
-            }
-         }
-      }
+      firstArg = parser.expandOnce(firstArg, stack);
+      secondArg = parser.expandOnce(secondArg, stack);
 
       return firstArg.equals(secondArg);
    }

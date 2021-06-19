@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -25,7 +25,7 @@ import java.awt.Color;
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.*;
 
-public class ColorDeclaration extends Declaration
+public class ColorDeclaration extends RobustDeclaration
 {
    public ColorDeclaration(ColorSty sty)
    {
@@ -42,106 +42,42 @@ public class ColorDeclaration extends Declaration
       this.orgColor = null;
    }
 
+   @Override
    public Object clone()
    {
       return new ColorDeclaration(sty, getName(), isFg);
    }
 
-   public TeXObjectList expandonce(TeXParser parser, TeXObjectList list)
-      throws IOException
+   protected Color popColor(String modelName, TeXParser parser, TeXObjectList stack)
+    throws IOException
    {
-      return null;
+      String value = parser.popRequiredString(stack).trim();
+
+      return sty.getColor(parser, modelName, value);
    }
 
-   public TeXObjectList expandonce(TeXParser parser)
-      throws IOException
-   {
-      return null;
-   }
-
-   public TeXObjectList expandfully(TeXParser parser, TeXObjectList list)
-      throws IOException
-   {
-      return null;
-   }
-
-   public TeXObjectList expandfully(TeXParser parser)
-      throws IOException
-   {
-      return null;
-   }
-
+   @Override
    public void process(TeXParser parser) throws IOException
    {
       process(parser, parser);
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack) throws IOException
    {
-      TeXObject model = null;
-      TeXObject arg;
+      pushEnd(parser);
+      String modelName = parser.popOptionalString(stack);
 
-      if (parser == stack)
+      if (modelName == null)
       {
-         model = parser.popNextArg('[', ']');
-
-         if (model != null && model instanceof Expandable)
-         {
-            TeXObjectList expanded = ((Expandable)model).expandfully(parser);
-
-            if (expanded != null)
-            {
-               model = expanded;
-            }
-         }
-
-         arg = parser.popNextArg();
-
-         if (arg != null && arg instanceof Expandable)
-         {
-            TeXObjectList expanded = ((Expandable)arg).expandfully(parser);
-
-            if (expanded != null)
-            {
-               arg = expanded;
-            }
-         }
+         modelName = "named";
       }
       else
       {
-         model = stack.popArg(parser, '[', ']');
-
-         if (model != null && model instanceof Expandable)
-         {
-            TeXObjectList expanded = ((Expandable)model).expandfully(parser,
-              stack);
-
-            if (expanded != null)
-            {
-               model = expanded;
-            }
-         }
-
-         arg = stack.popArg(parser);
-
-         if (arg != null && arg instanceof Expandable)
-         {
-            TeXObjectList expanded = ((Expandable)arg).expandfully(parser, 
-               stack);
-
-            if (expanded != null)
-            {
-               arg = expanded;
-            }
-         }
+         modelName = modelName.trim();
       }
 
-      String modelName = (model == null ? "named" : 
-        model.toString(parser).trim());
-
-      String value = arg.toString(parser).trim();
-
-      Color color = sty.getColor(parser, modelName, value);
+      Color color = popColor(modelName, parser, stack);
 
       TeXSettings settings = parser.getSettings();
 
@@ -159,6 +95,7 @@ public class ColorDeclaration extends Declaration
       ((LaTeXParserListener)parser.getListener()).startColor(color, isFg);
    }
 
+   @Override
    public void end(TeXParser parser) throws IOException
    {
       ((LaTeXParserListener)parser.getListener()).endColor(isFg);
@@ -173,11 +110,27 @@ public class ColorDeclaration extends Declaration
       {
          settings.setBgColor(orgColor);
       }
+
+      settings.removeDeclaration(this);
    }
 
+   @Override
    public boolean isModeSwitcher()
    {
       return false;
+   }
+
+   @Override
+   public boolean equals(Object object)
+   {
+      if (!(object instanceof ColorDeclaration) || !super.equals(object))
+      {
+         return false;
+      }
+
+      ColorDeclaration dec = (ColorDeclaration)object;
+
+      return dec.isFg == isFg;
    }
 
    private ColorSty sty;

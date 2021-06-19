@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -35,6 +35,7 @@ public class L2HEqnarray extends L2HMathDeclaration
       super(name, TeXSettings.MODE_DISPLAY_MATH, numbered);
    }
 
+   @Override
    public Object clone()
    {
       return new L2HEqnarray(getName(), isNumbered());
@@ -57,6 +58,7 @@ public class L2HEqnarray extends L2HMathDeclaration
       settings.startAlignment();
    }   
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
@@ -66,35 +68,27 @@ public class L2HEqnarray extends L2HMathDeclaration
 
       doModeSwitch(parser);
 
+      listener.htmlcomment("start "+getName());
       listener.write("<div class=\"displaymath\">");
 
       startTabular(parser);
+System.out.println("MARK(1)");
 
-      AlignRow row = listener.createMathAlignRow(parser, isNumbered());
+      AlignRow row = listener.createMathAlignRow(stack, isNumbered());
+System.out.println("ROW: "+row.toString(parser));
+System.out.println("STACK: "+stack);
 
-      row.process(parser);
+      parser.processObject(row, stack);
    }
 
+   @Override
    public void process(TeXParser parser)
      throws IOException
    {
-      L2HConverter listener = (L2HConverter)parser.getListener();
-
-      parser.startGroup();
-
-      listener.putControlSequence(new L2HMathAlignNewline(isNumbered()));
-
-      doModeSwitch(parser);
-
-      listener.write("<div class=\"displaymath\">");
-
-      startTabular(parser);
-
-      AlignRow row = listener.createMathAlignRow(parser, isNumbered());
-
-      row.process(parser);
+      process(parser, parser);
    }
 
+   @Override
    public void end(TeXParser parser) throws IOException
    {
       L2HConverter listener = (L2HConverter)parser.getListener();
@@ -102,6 +96,7 @@ public class L2HEqnarray extends L2HMathDeclaration
       listener.writeln("</table>");
 
       listener.writeln("</div>");
+      listener.htmlcomment("end "+getName());
 
       revertModeSwitch(parser);
 

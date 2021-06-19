@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -23,7 +23,7 @@ import java.util.Vector;
 
 import com.dickimawbooks.texparserlib.*;
 
-public class Tabular extends Declaration
+public class Tabular extends RobustDeclaration
 {
    public Tabular()
    {
@@ -35,33 +35,10 @@ public class Tabular extends Declaration
       super(name);
    }
 
+   @Override
    public Object clone()
    {
       return new Tabular(getName());
-   }
-
-   public TeXObjectList expandonce(TeXParser parser, TeXObjectList list)
-      throws IOException
-   {
-      return null;
-   }
-
-   public TeXObjectList expandonce(TeXParser parser)
-      throws IOException
-   {
-      return null;
-   }
-
-   public TeXObjectList expandfully(TeXParser parser, TeXObjectList list)
-      throws IOException
-   {
-      return null;
-   }
-
-   public TeXObjectList expandfully(TeXParser parser)
-      throws IOException
-   {
-      return null;
    }
 
    protected void startTabular(TeXParser parser, 
@@ -74,106 +51,53 @@ public class Tabular extends Declaration
 
       listener.putControlSequence(new TabularNewline());
 
-
       settings.setAlignmentList(listener.createTeXCellAlignList(columnSpecs));
       settings.startAlignment();
    }
 
+   @Override
    public void process(TeXParser parser) throws IOException
    {
-      TeXObject vertAlignArg = parser.popNextArg('[', ']');
-
-      int vertAlign = -1;
-
-      if (vertAlignArg != null)
-      {
-         if (vertAlignArg instanceof Expandable)
-         {
-            TeXObjectList list = ((Expandable)vertAlignArg).expandfully(parser);
-
-            if (list != null)
-            {
-               vertAlignArg = list;
-            }
-         }
-
-         String arg = vertAlignArg.toString(parser).trim();
-
-         if (!arg.isEmpty())
-         {
-            vertAlign = arg.charAt(0);
-         }
-      }
-
-      TeXObject columnSpecs = parser.popNextArg();
-
-      if (columnSpecs instanceof Expandable)
-      {
-         TeXObjectList expanded = ((Expandable)columnSpecs).expandfully(parser);
-
-         if (expanded != null)
-         {
-            columnSpecs = expanded;
-         }
-      }
-
-      startTabular(parser, vertAlign, columnSpecs);
-
-      AlignRow row = ((LaTeXParserListener)parser.getListener()).createAlignRow(parser);
-
-      row.process(parser);
+      process(parser, parser);
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack) throws IOException
    {
-      TeXObject vertAlignArg = stack.popArg(parser, '[', ']');
+      String vertAlignArg = parser.popOptionalString(stack);
       int vertAlign = -1;
 
       if (vertAlignArg != null)
       {
-         if (vertAlignArg instanceof Expandable)
+         vertAlignArg = vertAlignArg.trim();
+
+         if (!vertAlignArg.isEmpty())
          {
-            TeXObjectList list = ((Expandable)vertAlignArg).expandfully(parser, stack);
-
-            if (list != null)
-            {
-               vertAlignArg = list;
-            }
-         }
-
-         String arg = vertAlignArg.toString(parser).trim();
-
-         if (!arg.isEmpty())
-         {
-            vertAlign = arg.charAt(0);
+            vertAlign = vertAlignArg.codePointAt(0);
          }
       }
 
-      TeXObject columnSpecs = stack.popArg(parser);
-
-      if (columnSpecs instanceof Expandable)
-      {
-         TeXObjectList expanded =
-            ((Expandable)columnSpecs).expandfully(parser, stack);
-
-         if (expanded != null)
-         {
-            columnSpecs = expanded;
-         }
-      }
+      TeXObject columnSpecs = parser.popRequiredExpandFully(stack);
 
       startTabular(parser, vertAlign, columnSpecs);
 
-      AlignRow row = ((LaTeXParserListener)parser.getListener()).createAlignRow(stack);
+      TeXSettings settings = parser.getSettings();
 
-      row.process(parser, stack);
+      AlignRow row = ((LaTeXParserListener)parser.getListener()).createAlignRow();
+
+      while (!row.parse(parser, stack, getName()))
+      {
+         row.process(parser, stack);
+      }
    }
 
+   @Override
    public void end(TeXParser parser) throws IOException
    {
       parser.getSettings().endAlignment();
    }
 
+   @Override
    public boolean isModeSwitcher()
    {
       return false;

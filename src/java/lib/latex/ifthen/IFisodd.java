@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -27,7 +27,7 @@ public class IFisodd extends Command
 {
    public IFisodd()
    {
-      this("isodd");
+      this("TE@odd");
    }
 
    public IFisodd(String name)
@@ -35,103 +35,42 @@ public class IFisodd extends Command
       super(name);
    }
 
+   @Override
    public Object clone()
    {
       return new IFisodd(getName());
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
       TeXObjectList list = new TeXObjectList();
 
-      TeXObject arg = stack.popArg(parser);
+      Numerical arg = parser.popRequiredNumerical(stack);
 
-      if (arg instanceof Expandable)
-      {
-         TeXObjectList expanded = ((Expandable)arg).expandfully(parser, stack);
-
-         if (expanded != null)
-         {
-            arg = expanded;
-         }
-      }
-
-      int number;
-
-      if (arg instanceof Numerical)
-      {
-         number = ((Numerical)arg).number(parser);
-      }
-      else
-      {
-         String str = arg.toString(parser);
-
-         try
-         {
-            number = Integer.parseInt(str);
-         }
-         catch (NumberFormatException e)
-         {
-            throw new TeXSyntaxException(e, parser, 
-             TeXSyntaxException.ERROR_NUMBER_EXPECTED, str);
-         }
-      }
+      int number = arg.number(parser);
 
       list.add(new UserBoolean(number%2 == 1));
 
       return list;
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser)
      throws IOException
    {
-      TeXObjectList list = new TeXObjectList();
-
-      TeXObject arg = parser.popNextArg();
-
-      if (arg instanceof Expandable)
-      {
-         TeXObjectList expanded = ((Expandable)arg).expandfully(parser);
-
-         if (expanded != null)
-         {
-            arg = expanded;
-         }
-      }
-
-      int number;
-
-      if (arg instanceof Numerical)
-      {
-         number = ((Numerical)arg).number(parser);
-      }
-      else
-      {
-         String str = arg.toString(parser);
-
-         try
-         {
-            number = Integer.parseInt(str);
-         }
-         catch (NumberFormatException e)
-         {
-            throw new TeXSyntaxException(e, parser, 
-             TeXSyntaxException.ERROR_NUMBER_EXPECTED, str);
-         }
-      }
-
-      list.add(new UserBoolean(number%2 == 1));
-
-      return list;
+      return expandonce(parser, parser);
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
       expandonce(parser, stack).process(parser, stack);
    }
 
+   @Override
    public void process(TeXParser parser)
      throws IOException
    {

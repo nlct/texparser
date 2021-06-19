@@ -30,18 +30,6 @@ public class Accent extends ControlSequence
       super(name);
    }
 
-   public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
-     throws IOException
-   {
-      return null;
-   }
-
-   public TeXObjectList expandfully(TeXParser parser, TeXObjectList stack)
-     throws IOException
-   {
-      return null;
-   }
-
    public void process(TeXParser parser) throws IOException
    {
       TeXObject object = parser.popNextArg();

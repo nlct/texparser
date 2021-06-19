@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -23,56 +23,23 @@ import java.io.EOFException;
 
 import com.dickimawbooks.texparserlib.*;
 
-public abstract class SkipEnvContents extends Declaration
+public abstract class SkipEnvContents extends RobustDeclaration
 {
    public SkipEnvContents(String name)
    {
       super(name);
    }
 
-   public TeXObjectList expandonce(TeXParser parser, TeXObjectList list)
-      throws IOException
-   {
-      return null;
-   }
-
-   public TeXObjectList expandonce(TeXParser parser)
-      throws IOException
-   {
-      return null;
-   }
-
-   public TeXObjectList expandfully(TeXParser parser, TeXObjectList list)
-      throws IOException
-   {
-      return null;
-   }
-
-   public TeXObjectList expandfully(TeXParser parser)
-      throws IOException
-   {
-      return null;
-   }
-
    public void popContents(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      TeXObject object = stack.pop();
+      TeXObject object = parser.popNextTokenResolveReference(stack);
 
       while (object != null)
       {
-         if (object instanceof TeXCsRef)
-         {
-            object = parser.getListener().getControlSequence(
-              ((TeXCsRef)object).getName());
-         }
-
          if (object instanceof End)
          {
-            TeXObject nextObj = 
-               stack == parser ? parser.popNextArg() : stack.popArg(parser);
-
-            String envName = nextObj.toString(parser);
+            String envName = parser.popRequiredString(stack);
 
             Group grp = parser.getListener().createGroup(envName);
 
@@ -85,10 +52,11 @@ public abstract class SkipEnvContents extends Declaration
 
          }
 
-         object = stack.pop();
+         object = parser.popNextTokenResolveReference(stack);
       }
    }
 
+   @Override
    public boolean isModeSwitcher()
    {
       return false;

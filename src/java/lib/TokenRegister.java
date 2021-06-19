@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -33,38 +33,31 @@ public class TokenRegister extends Register
       this.contents = contents;
    }
 
+   @Override
    public Object clone()
    {
       return new TokenRegister(getName(), (TeXObject)contents.clone());
    }
 
+   @Override
    public void setContents(TeXParser parser, TeXObject object)
     throws TeXSyntaxException
    {
       contents = object;
    }
 
+   @Override
    public TeXObject getContents(TeXParser parser)
     throws TeXSyntaxException
    {
       return contents;
    }
 
+   @Override
    protected TeXObject popValue(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
-      TeXObject object;
-
-      if (parser == stack)
-      {
-         object = parser.popNextArg(TeXObjectList.POP_IGNORE_LEADING_SPACE);
-      }
-      else
-      {
-         object = stack.popArg(parser, TeXObjectList.POP_IGNORE_LEADING_SPACE);
-      }
-
-      return object;
+      return parser.popRequired(stack, PopStyle.IGNORE_LEADING_SPACE);
    }
 
    private TeXObject contents;

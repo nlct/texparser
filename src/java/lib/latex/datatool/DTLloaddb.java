@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -45,6 +45,7 @@ public class DTLloaddb extends ControlSequence
       this.mapChars = mapChars;
    }
 
+   @Override
    public Object clone()
    {
       return new DTLloaddb(getName(), mapChars, sty);
@@ -353,70 +354,24 @@ public class DTLloaddb extends ControlSequence
       }
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      TeXObject options = stack.popArg(parser, '[', ']');
+      TeXObject options = parser.popOptional(stack);
 
-      TeXObject dbArg = stack.popArg(parser);
+      TeXObject dbArg = parser.popRequiredExpandFully(stack);
 
-      if (dbArg instanceof Expandable)
-      {
-         TeXObjectList expanded = ((Expandable)dbArg).expandfully(parser, 
-            stack);
-
-         if (expanded != null)
-         {
-            dbArg = expanded;
-         }
-      }
-
-      TeXObject csvArg = stack.popArg(parser);
-
-      if (csvArg instanceof Expandable)
-      {
-         TeXObjectList expanded = ((Expandable)csvArg).expandfully(parser, 
-            stack);
-
-         if (expanded != null)
-         {
-            csvArg = expanded;
-         }
-      }
+      TeXObject csvArg = parser.popRequiredExpandFully(stack);
 
       readData(parser, options, dbArg, csvArg);
    }
 
+   @Override
    public void process(TeXParser parser)
      throws IOException
    {
-      TeXObject options = parser.popNextArg('[', ']');
-
-      TeXObject dbArg = parser.popNextArg();
-
-      if (dbArg instanceof Expandable)
-      {
-         TeXObjectList expanded = ((Expandable)dbArg).expandfully(parser);
-
-         if (expanded != null)
-         {
-            dbArg = expanded;
-         }
-      }
-
-      TeXObject csvArg = parser.popNextArg();
-
-      if (csvArg instanceof Expandable)
-      {
-         TeXObjectList expanded = ((Expandable)csvArg).expandfully(parser);
-
-         if (expanded != null)
-         {
-            csvArg = expanded;
-         }
-      }
-
-      readData(parser, options, dbArg, csvArg);
+      process(parser, parser);
    }
 
    protected DataToolSty sty;

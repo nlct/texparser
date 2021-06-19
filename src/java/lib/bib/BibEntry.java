@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -38,6 +38,7 @@ public class BibEntry extends BibData
       this.fields = new HashMap<String,BibValueList>();
    }
 
+   @Override
    public String getEntryType()
    {
       return entryType;
@@ -150,8 +151,9 @@ public class BibEntry extends BibData
       return true;
    }
 
+   @Override
    public void parseContents(TeXParser parser, 
-    TeXObjectList contents, TeXObject endGroupChar)
+    AbstractTeXObjectList contents, TeXObject endGroupChar)
      throws IOException
    {
       TeXObjectList idList = null;
@@ -198,8 +200,7 @@ public class BibEntry extends BibData
          return;
       }
 
-      if (!(object instanceof CharObject 
-          && ((CharObject)object).getCharCode() == (int)','))
+      if (!parser.isCharacter(object, ','))
       {
          throw new BibTeXSyntaxException(parser, 
            BibTeXSyntaxException.ERROR_EXPECTING_OR,
@@ -215,12 +216,7 @@ public class BibEntry extends BibData
             break;
          }
 
-         object = contents.popStack(parser);
-
-         while (object != null && object instanceof WhiteSpace)
-         {
-            object = contents.popStack(parser);
-         }
+         object = contents.popStack(parser, PopStyle.IGNORE_LEADING_SPACE);
 
          if (object == null)
          {
@@ -229,8 +225,7 @@ public class BibEntry extends BibData
               endGroupChar.format());
          }
 
-         if (!(object instanceof CharObject
-               && ((CharObject)object).getCharCode() == (int)'='))
+         if (!parser.isCharacter(object, '='))
          {
             throw new BibTeXSyntaxException(parser, 
               BibTeXSyntaxException.ERROR_IMMEDIATELY_FOLLOWS_FIELD_NAME,
@@ -239,7 +234,7 @@ public class BibEntry extends BibData
 
          value = new BibValueList();
 
-         readValue(parser, (TeXObjectList)contents, value, endGroupChar);
+         readValue(parser, contents, value, endGroupChar);
 
          if (value.isEmpty())
          {
@@ -254,7 +249,8 @@ public class BibEntry extends BibData
       }
    }
 
-   public String format(byte caseChange, char openDelim, char closeDelim,
+   @Override
+   public String format(CaseChange caseChange, char openDelim, char closeDelim,
      byte fieldDelimChange)
    {
       StringBuilder builder = new StringBuilder();
@@ -280,6 +276,7 @@ public class BibEntry extends BibData
       return builder.toString();
    }
 
+   @Override
    public String toString()
    {
       return String.format("%s[type=%s,id=%s]",
@@ -329,78 +326,39 @@ public class BibEntry extends BibData
             }
          }
 
-         TeXObject object = list.pop();
-
          if (word == null)
          {
-            if (object instanceof CharObject)
+            if (parser.isNextWord("and", list))
             {
-               if (((CharObject)object).getCharCode() == (int)'a')
-               {
-                  if (list.size() > 3)
-                  {
-                     TeXObject nextObj = list.pop();
-                     TeXObject nextObj2 = list.pop();
-                     TeXObject nextObj3 = list.pop();
-
-                     if (nextObj instanceof CharObject
-                      && ((CharObject)nextObj).getCharCode() == (int)'n'
-                      && nextObj2 instanceof CharObject
-                      && ((CharObject)nextObj2).getCharCode() == (int)'d'
-                      && nextObj3 instanceof WhiteSpace)
-                     {
-                        contributors.add(parseContributor(parser, current));
-                        current = new Vector<TeXObjectList>();
-                        continue;
-                     }
-
-                     word = new TeXObjectList();
-                     word.add(object);
-                     word.add(nextObj);
-                     word.add(nextObj2);
-                     word.add(nextObj3);
-                  }
-                  else
-                  {
-                     word = new TeXObjectList();
-                     word.add(object);
-                  }
-               }
-               else
-               {
-                  word = new TeXObjectList();
-                  word.add(object);
-
-                  if (((CharObject)object).getCharCode() == (int)',')
-                  {
-                     current.add(word);
-                     word = null;
-                  }
-               }
+               contributors.add(parseContributor(parser, current));
+               current = new Vector<TeXObjectList>();
             }
             else
             {
                word = new TeXObjectList();
-               word.add(object);
             }
-         }
-         else if (object instanceof CharObject
-              && ((CharObject)object).getCharCode() == (int)',')
-         {
-            current.add(word);
-            word = new TeXObjectList();
-            word.add(object);
-            current.add(word);
-            word = null;
-         }
-         else if (object instanceof WhiteSpace)
-         {
-            current.add(word);
-            word = null;
          }
          else
          {
-            word.add(object);
+            TeXObject object = list.pop();
+
+            if (parser.isCharacter(object, ','))
+            {
+               current.add(word);
+               word = new TeXObjectList();
+               word.add(object);
+               current.add(word);
+               word = null;
+            }
+            else if (object instanceof WhiteSpace)
+            {
+               current.add(word);
+               word = null;
+            }
+            else
+            {
+               word.add(object);
+            }
          }
       }
 
@@ -430,8 +388,7 @@ public class BibEntry extends BibData
          {
             TeXObject object = word.firstElement();
 
-            if (object instanceof CharObject 
-             && ((CharObject)object).getCharCode() == (int)',')
+            if (parser.isCharacter(object, ','))
             {
                commaCount++;
                buffer.append(",");
@@ -591,8 +548,7 @@ public class BibEntry extends BibData
       {
          TeXObjectList nameList;
 
-         if (name instanceof TeXObjectList 
-            && !(name instanceof Group))
+         if (name instanceof TeXObjectList)
          {
             nameList = (TeXObjectList)name;
          }
@@ -616,23 +572,19 @@ public class BibEntry extends BibData
 
    private static boolean isComma(TeXObjectList word)
    {
-      if (word.size() == 1)
-      {
-         TeXObject object = word.firstElement();
+      CharObject chObj = (CharObject)word.toObject(CharObject.class);
 
-         return (object instanceof CharObject
-                 && ((CharObject)object).getCharCode() == (int)',');
-      }
+      if (chObj == null) return false;
 
-      return false;
+      return chObj.getCharCode() == ',';
    }
 
-   protected static boolean startsWithLower(TeXObjectList word)
+   protected static boolean startsWithLower(AbstractTeXObjectList word)
    {
-      return getInitialCase(word) == CASE_LOWER;
+      return getInitialCase(word) == CharacterCase.LOWER;
    }
 
-   private static byte getInitialCase(TeXObjectList word)
+   private static CharacterCase getInitialCase(AbstractTeXObjectList word)
    {
       for (TeXObject object : word)
       {
@@ -640,24 +592,25 @@ public class BibEntry extends BibData
          {
             int code = ((CharObject)object).getCharCode();
 
-            if (Character.isLowerCase(code)) return CASE_LOWER;
+            if (Character.isLowerCase(code)) return CharacterCase.LOWER;
 
-            if (Character.isUpperCase(code)) return CASE_UPPER;
+            if (Character.isUpperCase(code)) return CharacterCase.UPPER;
          }
-         else if (object instanceof TeXObjectList)
+         else if (object instanceof AbstractTeXObjectList)
          {
-            byte result = getInitialCase((TeXObjectList)object);
+            CharacterCase result = getInitialCase((AbstractTeXObjectList)object);
 
-            if (result != CASE_NA)
+            if (result != CharacterCase.NA)
             {
                return result;
             }
          }
       }
 
-      return CASE_NA;
+      return CharacterCase.NA;
    }
 
+   @Override
    public Object clone()
    {
       BibEntry obj = new BibEntry(getEntryType());
@@ -684,6 +637,4 @@ public class BibEntry extends BibData
    private String entryType;
    private String id;
    private BibValueList idValue;
-
-   private static final byte CASE_LOWER=0, CASE_UPPER=1, CASE_NA=2;
 }

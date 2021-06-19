@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -25,27 +25,125 @@ import java.util.Iterator;
 
 import com.dickimawbooks.texparserlib.*;
 
-public class CsvList extends TeXObjectList
+public class CsvList extends AbstractTeXObjectList
 {
-   public CsvList()
+   public CsvList(TeXObject listSep)
+   {
+      super();
+      this.listSep = listSep;
+   }
+
+   public CsvList(TeXObject listSep, int capacity)
+   {
+      super(capacity);
+      this.listSep = listSep;
+   }
+
+   private CsvList()
    {
       super();
    }
 
-   public CsvList(int capacity)
+   private CsvList(int capacity)
    {
       super(capacity);
    }
 
-   public TeXObjectList createList()
+   @Override
+   public AbstractTeXObjectList createList()
    {
-      return new CsvList(capacity());
+      return new CsvList(listSep, capacity());
+   }
+
+   @Override
+   public StackMarker createStackMarker()
+   {
+      return new InvisibleMarker();
+   }
+
+   @Override
+   public TeXObjectList toList()
+   {
+      TeXObjectList list = new TeXObjectList(capacity());
+
+      for (int i = 0; i < size(); i++)
+      {
+         if (i > 0)
+         {
+            list.add((TeXObject)listSep.clone());
+         }
+
+         list.add((TeXObject)get(i).clone());
+      }
+
+      return list;
+   }
+
+   @Override
+   public TeXObjectList deconstruct(TeXParser parser)
+     throws IOException
+   {
+      return expandonce(parser);
+   }
+
+   public static CsvList popCsvListFromStack(TeXParser parser, 
+      TeXObjectList stack, boolean expandOnce)
+     throws IOException
+   {
+      TeXObject obj = parser.popRequired(stack);
+
+      if (obj instanceof CsvList) return (CsvList)obj;
+
+      if (obj instanceof TeXCsRef)
+      {
+         obj = parser.getListener().getControlSequence(((TeXCsRef)obj).getName());
+      }
+
+      if (obj instanceof AssignedMacro)
+      {
+         obj = ((AssignedMacro)obj).getBaseUnderlying();
+      }
+
+      if (expandOnce && (obj instanceof Expandable))
+      {
+         TeXObjectList expanded; 
+
+         if (parser == stack)
+         {
+            expanded = ((Expandable)obj).expandonce(parser);
+         }
+         else
+         {
+            expanded = ((Expandable)obj).expandonce(parser, stack);
+         }
+
+         if (expanded != null)
+         {
+            obj = expanded;
+         }
+      }
+
+      CsvList csvList = null;
+
+      if (obj instanceof TeXObjectList)
+      {
+         csvList = (CsvList)((TeXObjectList)obj).toObject(CsvList.class);
+      }
+
+      if (csvList == null)
+      {
+         csvList = getList(parser, obj);
+      }
+
+      return csvList;
    }
 
    public static CsvList getList(TeXParser parser, TeXObject object)
      throws IOException
    {
-      CsvList csvList = new CsvList();
+      LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
+
+      CsvList csvList = listener.createCsvList();
 
       if (object instanceof TeXObjectList)
       {
@@ -55,7 +153,7 @@ public class CsvList extends TeXObjectList
 
          for (TeXObject obj : (TeXObjectList)object)
          {
-            if (isComma(obj))
+            if (csvList.isListSeparator(obj))
             {
                csvList.add(list);
                list = new TeXObjectList();
@@ -71,7 +169,7 @@ public class CsvList extends TeXObjectList
       }
       else
       {
-         if (!isComma(object))
+         if (!csvList.isListSeparator(object))
          {
             csvList.add(object);
          }
@@ -80,6 +178,18 @@ public class CsvList extends TeXObjectList
       return csvList;
    }
 
+   public boolean isListSeparator(TeXObject object)
+   {
+      return listSep.equals(object);
+   }
+
+   public TeXObject getListSeparator()
+   {
+      return listSep;
+   }
+
+   /* Use parser.isCharacter() or CsvList.isListSeparator() instead */
+   @Deprecated
    public static boolean isComma(TeXObject obj)
    {
       if (obj instanceof CharObject)
@@ -87,8 +197,7 @@ public class CsvList extends TeXObjectList
          return ((CharObject)obj).getCharCode() == (int)',';
       }
 
-      if (obj instanceof TeXObjectList
-      && !(obj instanceof Group))
+      if (obj instanceof TeXObjectList)
       {
          TeXObjectList list = (TeXObjectList)obj;
 
@@ -105,6 +214,11 @@ public class CsvList extends TeXObjectList
    {
       TeXObject value = get(index);
 
+      if (value instanceof Group)
+      {
+         return ((Group)value).toList();
+      }
+
       if (!(value instanceof TeXObjectList))
       {
          return value;
@@ -120,8 +234,7 @@ public class CsvList extends TeXObjectList
       {
          value = list.get(0);
 
-         if (value instanceof Group
-           &&!(value instanceof MathGroup))
+         if (value instanceof Group)
          {
             return ((Group)value).toList();
          }
@@ -160,8 +273,7 @@ public class CsvList extends TeXObjectList
       {
          value = list.get(start);
 
-         if (value instanceof Group
-          &&!(value instanceof MathGroup))
+         if (value instanceof Group)
          {
             return ((Group)value).toList();
          }
@@ -181,126 +293,61 @@ public class CsvList extends TeXObjectList
       return valList;
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
     throws IOException
    {
       return expandonce(parser);
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser)
     throws IOException
    {
-      TeXObjectList list = new TeXObjectList(capacity());
-
-      for (int i = 0; i < size(); i++)
-      {
-         if (i > 0)
-         {
-            list.add(parser.getListener().getOther(','));
-         }
-
-         list.add((TeXObject)get(i).clone());
-      }
-
-      return list;
+      return toList();
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser, TeXObjectList stack)
     throws IOException
    {
       return expandonce(parser, stack).expandfully(parser, stack);
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser)
     throws IOException
    {
       return expandonce(parser).expandfully(parser);
    }
 
+   @Override
+   public boolean process(TeXParser parser, TeXObjectList stack, StackMarker marker)
+      throws IOException
+   {
+      TeXObjectList list = toList();
+      boolean foundMarker = list.process(parser, stack, marker);
+      clear();
+      return foundMarker;
+   }
+
+   @Override
    public void process(TeXParser parser, TeXObjectList stack)
     throws IOException
    {
-      boolean isFirst = true;
-
-      StackMarker marker = null;
-
-      if (stack != parser && stack != null)
-      {
-         marker = new StackMarker();
-         add(marker);
-
-         addAll(stack);
-         stack.clear();
-      }
-
-      while (size() > 0)
-      {
-         TeXObject object = remove(0);
-
-         if (object.equals(marker))
-         {
-            break;
-         }
-
-         if (object instanceof TeXCsRef)
-         {
-            object = parser.getListener().getControlSequence(
-               ((TeXCsRef)object).getName());
-         }
-
-         if (!(object instanceof Ignoreable))
-         {
-            if (isFirst)
-            {
-               isFirst = false;
-            }
-            else
-            {
-               parser.getListener().getOther(',').process(parser, stack);
-            }
-
-            object.process(parser, this);
-         }
-      }
-
-      if (!isEmpty())
-      {
-         stack.addAll(this);
-         clear();
-      }
+      toList().process(parser, stack);
+      clear();
    }
 
+   @Override
    public void process(TeXParser parser)
     throws IOException
    {
-      boolean isFirst = true;
-
-      while (size() > 0)
-      {
-         TeXObject object = remove(0);
-
-         if (object instanceof TeXCsRef)
-         {
-            object = parser.getListener().getControlSequence(
-               ((TeXCsRef)object).getName());
-         }
-
-         if (!(object instanceof Ignoreable))
-         {
-            if (isFirst)
-            {
-               isFirst = false;
-            }
-            else
-            {
-               parser.getListener().getOther(',').process(parser);
-            }
-
-            object.process(parser, this);
-         }
-      }
+      toList().process(parser);
+      clear();
    }
 
+   @Override
    public String toString(TeXParser parser)
    {
       StringBuilder builder = new StringBuilder();
@@ -316,7 +363,7 @@ public class CsvList extends TeXObjectList
             }
             else
             {
-               builder.append(',');
+               builder.append(listSep.toString(parser));
             }
          }
 
@@ -325,4 +372,18 @@ public class CsvList extends TeXObjectList
 
       return builder.toString();
    }
+
+   @Override
+   public boolean isPar()
+   {
+      return false;
+   }
+
+   @Override
+   public boolean isEmptyObject()
+   {
+      return isEmpty();
+   }
+
+   private TeXObject listSep;
 }

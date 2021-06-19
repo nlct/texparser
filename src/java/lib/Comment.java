@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -47,6 +47,7 @@ public class Comment extends Ignoreable
       return builder.length() == 0;
    }
 
+   @Override
    public Object clone()
    {
       Comment obj = new Comment();
@@ -55,6 +56,7 @@ public class Comment extends Ignoreable
       return obj;
    }
 
+   @Override
    public String toString(TeXParser parser)
    {
       return String.format("%s%s%n",
@@ -62,17 +64,20 @@ public class Comment extends Ignoreable
          builder.toString());
    }
 
+   @Override
    public String toString()
    {
-      return String.format("%s[comment=%s]%n", getClass().getName(),
+      return String.format("%s[comment=%s]", getClass().getSimpleName(),
          builder.toString());
    }
 
+   @Override
    public String format()
    {
-      return String.format("%c%s%n", '%', builder.toString());
+      return String.format("%%%s%n", builder.toString());
    }
 
+   @Override
    public TeXObjectList string(TeXParser parser)
      throws IOException
    {
@@ -85,6 +90,6 @@ public class Comment extends Ignoreable
       return list; 
    }
 
-   private StringBuilder builder;
+   private StringBuilder builder;// doesn't include EOL
 }
 

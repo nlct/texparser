@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2018 Nicola L.C. Talbot
+    Copyright (C) 2018-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -29,41 +29,55 @@ public class MissingValue implements TeXObject,Expandable
       super();
    }
 
+   @Override
    public Object clone()
    {
       return new MissingValue();
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
    throws IOException
    {
       return new TeXObjectList();
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser)
    throws IOException
    {
       return new TeXObjectList();
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser, TeXObjectList stack)
    throws IOException
    {
       return new TeXObjectList();
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser)
    throws IOException
    {
       return new TeXObjectList();
    }
 
+   @Override
    public void process(TeXParser parser) throws IOException
    {
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack) throws IOException
    {
+   }
+
+   @Override
+   public boolean process(TeXParser parser, TeXObjectList stack, StackMarker marker)
+      throws IOException
+   {
+      return false;
    }
 
    public String toString(TeXParser parser)
@@ -82,8 +96,32 @@ public class MissingValue implements TeXObject,Expandable
       return "";
    }
 
+   @Override
+   public String stripToString(TeXParser parser)
+     throws IOException
+   {
+      return "";
+   }
+
+   @Override
+   public boolean isPopStyleSkip(PopStyle popStyle)
+   {
+      return false;
+   }
+
    public boolean isPar()
    {
       return false;
+   }
+
+   @Override
+   public boolean isEmptyObject()
+   {
+      return true;
+   }
+
+   public int getTeXCategory()
+   {
+      return TYPE_OBJECT;
    }
 }

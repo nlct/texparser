@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -23,7 +23,7 @@ import java.util.Hashtable;
 
 import com.dickimawbooks.texparserlib.*;
 
-public class ParAlign extends Declaration
+public class ParAlign extends RobustDeclaration
 {
    public ParAlign(String name, int align)
    {
@@ -53,15 +53,19 @@ public class ParAlign extends Declaration
       return name;
    }
 
-   public void process(TeXParser parser, TeXObjectList list)
+   @Override
+   public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
       process(parser);
    }
 
+   @Override
    public void process(TeXParser parser)
      throws IOException
    {
+       pushEnd(parser);
+
        TeXSettings settings = parser.getSettings();
 
        orgAlign = settings.getCurrentParAlign();
@@ -69,41 +73,21 @@ public class ParAlign extends Declaration
        settings.setParAlign(align);
    }
 
+   @Override
    public void end(TeXParser parser) throws IOException
    {
       TeXSettings settings = parser.getSettings();
       settings.setParAlign(orgAlign);
+      settings.removeDeclaration(this);
    }
 
+   @Override
    public Object clone()
    {
       return new ParAlign(getName(), align);
    }
 
-   public TeXObjectList expandonce(TeXParser parser, TeXObjectList list)
-      throws IOException
-   {
-      return null;
-   }
-
-   public TeXObjectList expandonce(TeXParser parser)
-      throws IOException
-   {
-      return null;
-   }
-
-   public TeXObjectList expandfully(TeXParser parser, TeXObjectList list)
-      throws IOException
-   {
-      return null;
-   }
-
-   public TeXObjectList expandfully(TeXParser parser)
-      throws IOException
-   {
-      return null;
-   }
-
+   @Override
    public boolean isModeSwitcher()
    {
       return false;

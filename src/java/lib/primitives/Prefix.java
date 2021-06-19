@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -30,6 +30,7 @@ public class Prefix extends Primitive
       this.prefix = prefix;
    }
 
+   @Override
    public Object clone()
    {
       return new Prefix(getName(), prefix);
@@ -40,29 +41,20 @@ public class Prefix extends Primitive
       return prefix;
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
-      TeXObject object = stack.popToken(TeXObjectList.POP_IGNORE_LEADING_SPACE);
-
-      if (object instanceof TeXCsRef)
-      {
-         object = parser.getListener().getControlSequence(
-           ((TeXCsRef)object).getName());
-      }
+      TeXObject object = parser.popNextTokenResolveReference(
+        stack, PopStyle.IGNORE_LEADING_SPACE);
 
       int currentPrefix = getPrefix();
 
       while (object instanceof Prefix)
       {
          currentPrefix = currentPrefix | (int)((Prefix)object).getPrefix();
-         object = stack.popToken(TeXObjectList.POP_IGNORE_LEADING_SPACE);
-
-         if (object instanceof TeXCsRef)
-         {
-            object = parser.getListener().getControlSequence(
-              ((TeXCsRef)object).getName());
-         }
+         object = parser.popNextTokenResolveReference(stack,
+            PopStyle.IGNORE_LEADING_SPACE);
       }
 
       if (object instanceof Macro)
@@ -86,6 +78,7 @@ public class Prefix extends Primitive
       }
    }
 
+   @Override
    public void process(TeXParser parser)
       throws IOException
    {

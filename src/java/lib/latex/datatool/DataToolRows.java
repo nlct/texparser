@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -26,7 +26,7 @@ import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.*;
 
 public class DataToolRows extends Vector<DataToolEntryRow> 
- implements TeXObject
+ implements TeXObject,Expandable
 {
    public DataToolRows(DataToolSty sty)
    {
@@ -40,6 +40,7 @@ public class DataToolRows extends Vector<DataToolEntryRow>
       this.sty = sty;
    }
 
+   @Override
    public Object clone()
    {
       DataToolRows rows = new DataToolRows(sty, capacity());
@@ -212,6 +213,7 @@ public class DataToolRows extends Vector<DataToolEntryRow>
       return null;
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser)
       throws IOException
    {
@@ -225,16 +227,48 @@ public class DataToolRows extends Vector<DataToolEntryRow>
       return list;
    }
 
+   @Override
+   public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
+      throws IOException
+   {
+      return expandonce(parser);
+   }
+
+   @Override
+   public TeXObjectList expandfully(TeXParser parser)
+      throws IOException
+   {
+      return expandonce(parser);
+   }
+
+   @Override
+   public TeXObjectList expandfully(TeXParser parser, TeXObjectList stack)
+      throws IOException
+   {
+      return expandonce(parser);
+   }
+
+   @Override
    public void process(TeXParser parser) throws IOException
    {
       parser.addAll(0, expandonce(parser));
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack) throws IOException
    {
-      process(parser);
+      stack.addAll(0, expandonce(parser, stack));
    }
 
+   @Override
+   public boolean process(TeXParser parser, TeXObjectList stack, StackMarker marker)
+      throws IOException
+   {
+      process(parser, stack);
+      return false;
+   }
+
+   @Override
    public String toString(TeXParser parser)
    {
       try
@@ -247,12 +281,14 @@ public class DataToolRows extends Vector<DataToolEntryRow>
       }
    }
 
+   @Override
    public TeXObjectList string(TeXParser parser)
     throws IOException
    {
       return expandonce(parser).string(parser);
    }
 
+   @Override
    public String format()
    {
       try
@@ -265,7 +301,45 @@ public class DataToolRows extends Vector<DataToolEntryRow>
       }
    }
 
+   @Override
+   public String stripToString(TeXParser parser)
+     throws IOException
+   {
+      StringBuilder builder = new StringBuilder();
+
+      for (int i = 0; i < size(); i++)
+      {
+         if (i > 0)
+         {
+            builder.append(' ');
+         }
+
+         builder.append(get(i).stripToString(parser));
+      }
+
+      return builder.toString();
+   }
+
+   @Override
+   public boolean isPopStyleSkip(PopStyle popStyle)
+   {
+      return false;
+   }
+
+   @Override
    public boolean isPar()
+   {
+      return false;
+   }
+
+   @Override
+   public int getTeXCategory()
+   {
+      return TYPE_OBJECT;
+   }
+
+   @Override
+   public boolean isEmptyObject()
    {
       return false;
    }

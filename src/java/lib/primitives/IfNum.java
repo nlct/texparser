@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -35,18 +35,20 @@ public class IfNum extends If
       super(name);
    }
 
+   @Override
    public Object clone()
    {
       return new IfNum(getName());
    }
 
+   @Override
    public boolean istrue(TeXParser parser, TeXObjectList stack)
    throws IOException
    {
-      Numerical firstArg = stack.popNumerical(parser);
+      Numerical firstArg = parser.popRequiredNumerical(stack);
 
-      TeXObject comparison = stack.popToken(
-        TeXObjectList.POP_IGNORE_LEADING_SPACE);
+      TeXObject comparison = parser.popNextToken(stack,
+        PopStyle.IGNORE_LEADING_SPACE);
 
       if (!(comparison instanceof CharObject))
       {

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -40,13 +40,15 @@ public class BibString extends BibData
       this.entryType = entryType;
    }
 
+   @Override
    public String getEntryType()
    {
       return entryType;
    }
 
+   @Override
    public void parseContents(TeXParser parser, 
-    TeXObjectList contents, TeXObject endGroupChar)
+    AbstractTeXObjectList contents, TeXObject endGroupChar)
      throws IOException
    {
       key = readKey(parser, contents);
@@ -81,7 +83,7 @@ public class BibString extends BibData
 
       value = new BibValueList();
 
-      readValue(parser, (TeXObjectList)contents, value, endGroupChar);
+      readValue(parser, contents, value, endGroupChar);
 
       if (value.isEmpty())
       {
@@ -100,7 +102,8 @@ public class BibString extends BibData
       return value;
    }
 
-   public String format(byte caseChange, char openDelim, char closeDelim,
+   @Override
+   public String format(CaseChange caseChange, char openDelim, char closeDelim,
      byte fieldDelimChange)
    {
       return String.format("@%s%c%s = %s%c%n", 
@@ -109,12 +112,14 @@ public class BibString extends BibData
          closeDelim);
    }
 
+   @Override
    public String toString()
    {
       return String.format("%s[type=%s,key=%s]",
          getClass().getSimpleName(), entryType, key);
    }
 
+   @Override
    public Object clone()
    {
       BibString obj = new BibString(getEntryType());

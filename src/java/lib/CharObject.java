@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -27,6 +27,7 @@ public abstract class CharObject implements TeXObject
       setCharCode(charCode);
    }
 
+   @Override
    public boolean equals(Object obj)
    {
       if (this == obj) return true;
@@ -37,22 +38,33 @@ public abstract class CharObject implements TeXObject
 
    public abstract Object clone();
 
+   @Override
    public String toString(TeXParser parser)
    {
       return parser.getSettings().getCharString(charCode);
    }
 
+   @Override
    public String toString()
    {
       return String.format("%s[%s]", getClass().getSimpleName(), 
         format());
    }
 
+   @Override
    public String format()
    {
       return new String(Character.toChars(getCharCode()));
    }
 
+   @Override
+   public String stripToString(TeXParser parser)
+     throws IOException
+   {
+      return format();
+   }
+
+   @Override
    public TeXObjectList string(TeXParser parser)
      throws IOException
    {
@@ -71,18 +83,42 @@ public abstract class CharObject implements TeXObject
       this.charCode = charCode;
    }
 
+   @Override
    public void process(TeXParser parser) throws IOException
    {
       parser.getListener().getWriteable().write(toString(parser));
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
       process(parser);
    }
 
+   @Override
+   public boolean process(TeXParser parser, TeXObjectList stack, StackMarker marker)
+      throws IOException
+   {
+      process(parser, stack);
+      return false;
+   }
+
+   @Override
+   public boolean isPopStyleSkip(PopStyle popStyle)
+   {
+      return Character.isWhitespace(charCode)
+               && popStyle.isIgnoreLeadingSpace();
+   }
+
+   @Override
    public boolean isPar()
+   {
+      return false;
+   }
+
+   @Override
+   public boolean isEmptyObject()
    {
       return false;
    }

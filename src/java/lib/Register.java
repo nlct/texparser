@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -47,39 +47,24 @@ public abstract class Register extends ControlSequence
    protected abstract TeXObject popValue(TeXParser parser, TeXObjectList stack)
       throws IOException;
 
+   @Override
    public void process(TeXParser parser)
       throws IOException
    {
       process(parser, parser);
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
-      TeXObject object = stack.popToken(TeXObjectList.POP_IGNORE_LEADING_SPACE);
+      PopStyle popStyle = PopStyle.IGNORE_LEADING_SPACE;
 
-      if (object instanceof CharObject
-       && ((CharObject)object).getCharCode() == '=')
-      {
-         object = stack.popToken(TeXObjectList.POP_IGNORE_LEADING_SPACE);
-      }
+      parser.isNextChar('=', stack, popStyle);
 
-      if (object instanceof TeXCsRef)
-      {
-         ControlSequence cs = parser.getControlSequence(
-          ((TeXCsRef)object).getName());
+      TeXObject object = parser.popNextTokenResolveReference(stack);
 
-         if (cs instanceof Register)
-         {
-            object = cs;
-         }
-         else
-         {
-            stack.push(object);
-            object = popValue(parser, stack);
-         }
-      }
-      else if (!(object instanceof Register))
+      if (!(object instanceof Register))
       {
          stack.push(object);
          object = popValue(parser, stack);

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -48,7 +48,7 @@ public class At extends ActiveChar
      TeXObject contents, TeXObject eg)
      throws IOException
    {
-      if (!(contents instanceof TeXObjectList))
+      if (!(contents instanceof AbstractTeXObjectList))
       {
          throw new BibTeXSyntaxException(parser,
            BibTeXSyntaxException.ERROR_EXPECTING_OR, "{", "(");
@@ -60,7 +60,7 @@ public class At extends ActiveChar
 
       BibData data = BibData.createBibData(entryType);
 
-      data.parseContents(parser, (TeXObjectList)contents, eg);
+      data.parseContents(parser, (AbstractTeXObjectList)contents, eg);
 
       if (data instanceof BibEntry)
       {

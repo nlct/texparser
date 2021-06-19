@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -33,17 +33,19 @@ public class Obsolete extends ControlSequence
       this.replacementCommand = replacementCommand;
    }
 
+   @Override
    public Object clone()
    {
       return new Obsolete((ControlSequence)orgCommand.clone(),
         (ControlSequence)replacementCommand.clone());
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
       LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
-      byte popStyle = TeXObjectList.POP_RETAIN_IGNOREABLES;
+      PopStyle popStyle = PopStyle.RETAIN_IGNOREABLES;
 
       if (parser.isMathMode() && orgCommand instanceof TeXFontDeclaration)
       {
@@ -58,36 +60,20 @@ public class Obsolete extends ControlSequence
             repl.add(cs);
 
             Group grp = listener.createGroup();
-            repl.add(grp);
 
             StringBuilder builder = new StringBuilder();
             builder.append(orgCommand.toString(parser));
 
-            TeXObject obj;
-
-            if (stack == parser)
-            {
-               obj = parser.popStack(popStyle);
-            }
-            else
-            {
-               obj = stack.popStack(parser, popStyle);
-            }
+            TeXObject obj = parser.popNextToken(stack, popStyle);
 
             while (obj instanceof Ignoreable)
             {
-               repl.add(obj);
                builder.append(obj.toString(parser));
 
-               if (stack == parser)
-               {
-                  obj = parser.popStack(popStyle);
-               }
-               else
-               {
-                  obj = stack.popStack(parser, popStyle);
-               }
+               obj = parser.popNextToken(stack, popStyle);
             }
+
+            repl.add(grp);
 
             while (obj != null)
             {
@@ -109,14 +95,7 @@ public class Obsolete extends ControlSequence
                builder.append(obj.toString(parser));
                grp.add(obj);
 
-               if (stack == parser)
-               {
-                  obj = parser.popStack(popStyle);
-               }
-               else
-               {
-                  obj = stack.popStack(parser, popStyle);
-               }
+               obj = parser.popNextToken(stack, popStyle);
             }
 
             if (obj != null)
@@ -163,6 +142,7 @@ public class Obsolete extends ControlSequence
       }
    }
 
+   @Override
    public void process(TeXParser parser)
       throws IOException
    {
@@ -179,11 +159,13 @@ public class Obsolete extends ControlSequence
       return replacementCommand;
    }
 
+   @Override
    public String toString()
    {
       return orgCommand.toString();
    }
 
+   @Override
    public String toString(TeXParser parser)
    {
       return orgCommand.toString(parser);

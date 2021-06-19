@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -35,16 +35,19 @@ public class Proof extends Declaration
       super(name);
    }
 
+   @Override
    public Object clone()
    {
       return new Proof(getName());
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser) throws IOException
    {
       return expandonce(parser, parser);
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
@@ -65,22 +68,26 @@ public class Proof extends Declaration
       return list;
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser) throws IOException
    {
       return expandonce(parser).expandfully(parser);
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
       return expandonce(parser, stack).expandfully(parser, stack);
    }
 
+   @Override
    public void process(TeXParser parser) throws IOException
    {
       process(parser, parser);
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack) throws IOException
    {
       TeXObjectList list = expandonce(parser, stack);
@@ -95,6 +102,7 @@ public class Proof extends Declaration
       }
    }
 
+   @Override
    public void end(TeXParser parser)
     throws IOException
    {
@@ -103,6 +111,7 @@ public class Proof extends Declaration
       cs.process(parser);
    }
 
+   @Override
    public boolean isModeSwitcher()
    {
       return false;

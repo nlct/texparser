@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -51,6 +51,7 @@ public class JmlrObjectTypeRef extends JmlrObjectRef
       this.prefixName = prefixName;
    }
 
+   @Override
    public Object clone()
    {
       return new JmlrObjectTypeRef(getTag(), getName(),
@@ -78,6 +79,7 @@ public class JmlrObjectTypeRef extends JmlrObjectRef
       return prefixName;
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
       throws IOException
    {

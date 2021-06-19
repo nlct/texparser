@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -160,12 +160,56 @@ public abstract class Macro implements TeXObject
       return syntax.equals(list);
    }
 
+   @Override
+   public boolean isPopStyleSkip(PopStyle popStyle)
+   {
+      return false;
+   }
+
+   @Override
    public boolean isPar()
    {
       return false;
    }
 
    public abstract Object clone();
+
+   @Override
+   public boolean process(TeXParser parser, TeXObjectList stack, StackMarker marker)
+      throws IOException
+   {
+      process(parser, stack);
+      return false;
+   }
+
+   @Override
+   public String toString()
+   {
+      return String.format("%s[prefix=%d,syntax=%s]",
+       getClass().getSimpleName(), getPrefix(), syntax);
+   }
+
+   @Override
+   public String stripToString(TeXParser parser)
+     throws IOException
+   {
+      if (this instanceof Expandable)
+      {
+         TeXObjectList expanded = ((Expandable)this).expandfully(parser);
+
+         if (expanded == null) return "";
+
+         return expanded.stripToString(parser);
+      }
+
+      return "";
+   }
+
+   @Override
+   public boolean isEmptyObject()
+   {
+      return false;
+   }
 
    // Is this a short macro?
 
@@ -174,12 +218,6 @@ public abstract class Macro implements TeXObject
    // Is this macro allowed a prefix?
 
    protected boolean allowsPrefix = false;
-
-   public String toString()
-   {
-      return String.format("%s[prefix=%d,syntax=%s]",
-       getClass().getSimpleName(), getPrefix(), syntax);
-   }
 
    public static final byte PREFIX_NONE = (byte)0;
    public static final byte PREFIX_LONG = (byte)1;

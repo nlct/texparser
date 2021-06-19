@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -20,61 +20,110 @@ package com.dickimawbooks.texparserlib;
 
 import java.io.IOException;
 
-public class StackMarker extends Ignoreable
+public abstract class StackMarker implements TeXObject
 {
    public StackMarker()
    {
-      index = ++lastIndex;
+      index = ++LAST_INDEX;
    }
 
-   private StackMarker(long index)
+   protected StackMarker(long index)
    {
       this.index = index;
-      this.lastIndex = index;
    }
 
-   // Does nothing
+   public long getMarkerIndex()
+   {
+      return index;
+   }
+
+   public abstract TeXObject expandMarker(TeXParser parser, TeXObjectList stack)
+      throws IOException;
+
+   public abstract void expandAfter(TeXParser parser, TeXObjectList stack)
+      throws IOException;
+
+   // markers shouldn't be processed
+   @Override
    public void process(TeXParser parser)
       throws IOException
    {
+      throw new TeXSyntaxException(parser, TeXSyntaxException.ERROR_MARKER_FOUND,
+        toString());
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack) 
       throws IOException
    {
+      throw new TeXSyntaxException(parser, TeXSyntaxException.ERROR_MARKER_FOUND,
+        toString());
    }
 
+   @Override
+   public boolean process(TeXParser parser, TeXObjectList stack, StackMarker marker)
+      throws IOException
+   {
+      return this.equals(marker);
+   }
+
+   @Override
    public TeXObjectList string(TeXParser parser) throws IOException
    {
       return new TeXObjectList();
    } 
 
+   @Override
+   public boolean isPopStyleSkip(PopStyle popStyle)
+   {
+      return false;
+   }
+
+   @Override
    public boolean isPar()
    {
       return false;
    }
 
+   @Override
+   public String stripToString(TeXParser parser)
+     throws IOException
+   {
+      return "";
+   }
+
+   @Override
+   public boolean isEmptyObject()
+   {
+      return false;
+   }
+
+   @Override
+   public int getTeXCategory()
+   {
+      return TYPE_OBJECT;
+   }
+
+   @Override
    public String toString(TeXParser parser)
    {
       return "";
    }
 
+   @Override
    public String format()
    {
       return "";
    }
 
+   @Override
    public String toString()
    {
       return String.format("%s[index=%d]",
         getClass().getSimpleName(), index);
    }
 
-   public Object clone()
-   {
-      return new StackMarker(index);
-   }
-
+   @Override
    public boolean equals(Object object)
    {
       if (object == null || !(object instanceof StackMarker))
@@ -85,7 +134,10 @@ public class StackMarker extends Ignoreable
       return index == ((StackMarker)object).index;
    }
 
+   @Override
+   public abstract Object clone();
+
    private long index=-1;
-   private static long lastIndex=-1;
+   private static long LAST_INDEX=-1;
 }
 

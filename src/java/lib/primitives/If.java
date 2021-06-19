@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -35,11 +35,13 @@ public class If extends Primitive implements Expandable
       super(name, true);
    }
 
+   @Override
    public Object clone()
    {
       return new If(getName());
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
@@ -57,6 +59,7 @@ public class If extends Primitive implements Expandable
       return list;
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser)
       throws IOException
    {
@@ -74,18 +77,21 @@ public class If extends Primitive implements Expandable
       return list;
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser, TeXObjectList stack)
    throws IOException
    {
       return expandonce(parser, stack).expandfully(parser, stack);
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser)
    throws IOException
    {
       return expandonce(parser).expandfully(parser);
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
@@ -99,6 +105,7 @@ public class If extends Primitive implements Expandable
       }
    }
 
+   @Override
    public void process(TeXParser parser)
       throws IOException
    {
@@ -115,7 +122,7 @@ public class If extends Primitive implements Expandable
    public boolean istrue(TeXParser parser, TeXObjectList stack)
    throws IOException
    {
-      byte popStyle = TeXObjectList.POP_IGNORE_LEADING_SPACE;
+      PopStyle popStyle = PopStyle.IGNORE_LEADING_SPACE;
 
       TeXObject firstArg = parser.popToken(popStyle);
 
@@ -174,14 +181,7 @@ public class If extends Primitive implements Expandable
       {
          if (list == null)
          {
-            if (parser == stack)
-            {
-               obj.process(parser);
-            }
-            else
-            {
-               obj.process(parser, stack);
-            }
+            parser.processObject(obj, stack);
          }
          else
          {
@@ -273,14 +273,7 @@ public class If extends Primitive implements Expandable
       {
          if (list == null)
          {
-            if (parser == stack)
-            {
-               obj.process(parser);
-            }
-            else
-            {
-               obj.process(parser, stack);
-            }
+            parser.processObject(obj, stack);
          }
          else
          {
@@ -291,6 +284,7 @@ public class If extends Primitive implements Expandable
       }
    }
 
+   @Override
    public boolean equals(Object obj)
    {
       if (obj == this) return true;

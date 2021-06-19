@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -30,11 +30,13 @@ public class L2LControlSequence extends ControlSequence
       super(name);
    }
 
+   @Override
    public Object clone()
    {
       return new L2LControlSequence(getName());
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
@@ -43,38 +45,17 @@ public class L2LControlSequence extends ControlSequence
       writeable.writeCodePoint(parser.getEscChar());
       writeable.write(getName());
 
-      if (parser.isLetter(getName().codePointAt(0)))
+      if (isControlWord(parser) && parser.isNextObject(Letter.class, stack, 
+            PopStyle.RETAIN_IGNOREABLES))
       {
-         TeXObject nextObj = stack.peek();
-
-         if (nextObj instanceof Letter)
-         {
-            writeable.write(" ");
-         }
+         writeable.write(" ");
       }
    }
 
+   @Override
    public void process(TeXParser parser)
       throws IOException
    {
-      Writeable writeable = parser.getListener().getWriteable();
-
-      writeable.writeCodePoint(parser.getEscChar());
-      writeable.write(getName());
-
-      if (parser.isLetter(getName().codePointAt(0)))
-      {
-         if (parser.size() == 0)
-         {
-            parser.fetchNext();
-         }
-
-         TeXObject nextObj = parser.firstElement();
-
-         if (nextObj instanceof Letter)
-         {
-            writeable.write(" ");
-         }
-      }
+      process(parser, parser);
    }
 }

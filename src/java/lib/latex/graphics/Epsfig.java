@@ -59,19 +59,10 @@ public class Epsfig extends ControlSequence
 
       replacement.add(gcs);
 
-      TeXObject arg = list.popStack(parser);
+      TeXObject arg = parser.popRequired(list);
 
-      Group grp;
-
-      if (arg instanceof Group)
-      {
-         grp = (Group)arg;
-      }
-      else
-      {
-         grp = parser.getListener().createGroup();
-         grp.add(arg);
-      }
+      Group grp = parser.getListener().createGroup();
+      grp.add(arg);
 
       original.add(grp);
 

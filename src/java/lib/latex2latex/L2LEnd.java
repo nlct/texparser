@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -35,11 +35,13 @@ public class L2LEnd extends End
       super(name);
    }
 
+   @Override
    public Object clone()
    {
       return new L2LEnd(getName());
    }
 
+   @Override
    protected void doEnd(TeXParser parser, String name)
      throws IOException
    {

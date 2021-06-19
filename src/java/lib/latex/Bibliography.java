@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -35,54 +35,32 @@ public class Bibliography extends ControlSequence
       super(name);
    }
 
+   @Override
    public Object clone()
    {
       return new Bibliography(getName());
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
-      TeXObject arg = stack.popArg(parser);
+      doBibliography(parser, parser.popRequiredExpandFully(stack));
+   }
 
-      if (arg instanceof Expandable)
-      {
-         TeXObjectList expanded = ((Expandable)arg).expandfully(parser, stack);
-
-         if (expanded != null)
-         {
-            arg = expanded;
-         }
-      }
-
-      doBibliography(parser, arg);
-    }
-
+   @Override
    public void process(TeXParser parser)
       throws IOException
    {
-      TeXObject arg = parser.popNextArg();
-
-      if (arg instanceof Expandable)
-      {
-         TeXObjectList expanded = ((Expandable)arg).expandfully(parser);
-
-         if (expanded != null)
-         {
-            arg = expanded;
-         }
-      }
-
-      doBibliography(parser, arg);
+      doBibliography(parser, parser.popRequiredExpandFully());
    }
 
    protected boolean doBibliography(TeXParser parser, TeXObject arg)
        throws IOException
    {
-
       LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
 
-      String[] bibList = arg.toString(parser).split(",");
+      String[] bibList = arg.toString(parser).split(" *, *");
 
       TeXPath[] bibPaths = new TeXPath[bibList.length];
 

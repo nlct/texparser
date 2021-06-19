@@ -129,8 +129,7 @@ public class ForEachProblem extends ControlSequence
 
                   for (int i = 0; i < numArgs; i++)
                   {
-                     useproblem.add(list.popStack(parser, 
-                       TeXObjectList.POP_SHORT));
+                     useproblem.add(list.popStack(parser, PopStyle.SHORT));
                   }
                }
             }

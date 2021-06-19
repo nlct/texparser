@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -46,6 +46,14 @@ public abstract class TeXParserListener
    }
 
    public abstract ControlSequence createUndefinedCs(String name);
+
+   // Used by TeXParser.popOptArg()
+   // Returns the codepoint of the start delimiter (e.g. '[' for LaTeX)
+   public abstract int getOptionalStartDelim();
+
+   // Used by TeXParser.popOptArg()
+   // Returns the codepoint of the start delimiter (e.g. ']' for LaTeX)
+   public abstract int getOptionalEndDelim();
 
    // Gets active character identified by charCode.
    public abstract ActiveChar getActiveChar(int charCode);

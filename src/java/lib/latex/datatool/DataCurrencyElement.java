@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -63,6 +63,7 @@ public class DataCurrencyElement extends DataRealElement
       return String.format("%s%s", symbol.toString(parser), format());
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser) throws IOException
    {
       TeXObjectList list = super.expandonce(parser);
@@ -88,6 +89,7 @@ public class DataCurrencyElement extends DataRealElement
       return list;
    }
 
+   @Override
    public void process(TeXParser parser) throws IOException
    {
       symbol.process(parser);

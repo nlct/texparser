@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -23,7 +23,7 @@ import java.io.IOException;
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.*;
 
-public class DataToolHeader implements TeXObject
+public class DataToolHeader implements TeXObject,Expandable
 {
    public DataToolHeader(DataToolSty sty, int column, String key)
    {
@@ -40,6 +40,7 @@ public class DataToolHeader implements TeXObject
       setTitle(title);
    }
 
+   @Override
    public Object clone()
    {
       return new DataToolHeader(sty, column, key, type, 
@@ -131,7 +132,7 @@ public class DataToolHeader implements TeXObject
      DataToolSty sty)
       throws IOException
    {
-      TeXObject token = stack.peekStack(TeXObjectList.POP_IGNORE_LEADING_SPACE);
+      TeXObject token = stack.peekStack(PopStyle.IGNORE_LEADING_SPACE);
 
       if (token == null)
       {
@@ -141,7 +142,7 @@ public class DataToolHeader implements TeXObject
       if (token instanceof DataToolHeader)
       {
          return (DataToolHeader)stack.popToken(
-            TeXObjectList.POP_IGNORE_LEADING_SPACE);
+            PopStyle.IGNORE_LEADING_SPACE);
       }
 
       if (!stack.popCsMarker(parser, "db@plist@elt@w"))
@@ -222,6 +223,7 @@ public class DataToolHeader implements TeXObject
       }
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser)
       throws IOException
    {
@@ -268,22 +270,48 @@ public class DataToolHeader implements TeXObject
       return list;
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
       return expandonce(parser);
    }
 
+   @Override
+   public TeXObjectList expandfully(TeXParser parser)
+      throws IOException
+   {
+      return expandonce(parser);
+   }
+
+   @Override
+   public TeXObjectList expandfully(TeXParser parser, TeXObjectList stack)
+      throws IOException
+   {
+      return expandonce(parser, stack);
+   }
+
+   @Override
    public void process(TeXParser parser) throws IOException
    {
       parser.addAll(0, expandonce(parser));
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack) throws IOException
    {
       stack.addAll(0, expandonce(parser, stack));
    }
 
+   @Override
+   public boolean process(TeXParser parser, TeXObjectList stack, StackMarker marker)
+      throws IOException
+   {
+      process(parser, stack);
+      return false;
+   }
+
+   @Override
    public String toString(TeXParser parser)
    {
       try
@@ -296,12 +324,14 @@ public class DataToolHeader implements TeXObject
       }
    }
 
+   @Override
    public TeXObjectList string(TeXParser parser)
     throws IOException
    {
       return expandonce(parser).string(parser);
    }
 
+   @Override
    public String format()
    {
       try
@@ -314,11 +344,38 @@ public class DataToolHeader implements TeXObject
       }
    }
 
+   @Override
+   public String stripToString(TeXParser parser)
+     throws IOException
+   {
+      return title.stripToString(parser);
+   }
+
+   @Override
+   public boolean isPopStyleSkip(PopStyle popStyle)
+   {
+      return false;
+   }
+
+   @Override
    public boolean isPar()
    {
       return false;
    }
 
+   @Override
+   public int getTeXCategory()
+   {
+      return TYPE_OBJECT;
+   }
+
+   @Override
+   public boolean isEmptyObject()
+   {
+      return false;
+   }
+
+   @Override
    public boolean equals(Object obj)
    {
       if (obj == null || !(obj instanceof DataToolHeader))

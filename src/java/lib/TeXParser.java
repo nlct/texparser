@@ -31,6 +31,7 @@ import java.nio.charset.IllegalCharsetNameException;
 import java.nio.file.Files;
 
 import com.dickimawbooks.texparserlib.latex.LaTeXSyntaxException;
+import com.dickimawbooks.texparserlib.primitives.If;
 
 public class TeXParser extends TeXObjectList
 {
@@ -58,6 +59,7 @@ public class TeXParser extends TeXObjectList
    {
    }
 
+   @Override
    public TeXObjectList createList()
    {
       return new TeXParser(listener);
@@ -333,7 +335,7 @@ public class TeXParser extends TeXObjectList
       reader.closeAll(listener.getTeXApp());
    }
 
-   public void scan(String text, TeXObjectList list)
+   public void scan(String text, AbstractTeXObjectList list)
      throws IOException
    {
       TeXReader strReader = new TeXReader(reader, text);
@@ -484,13 +486,13 @@ public class TeXParser extends TeXObjectList
       return verbatim.contains(csname);
    }
 
-   private boolean parseEOL(int c, TeXObjectList list)
+   private boolean parseEOL(int c, AbstractTeXObjectList list)
      throws IOException
    {
       return parseEOL(c, list, false);
    }
 
-   private boolean parseEOL(int c, TeXObjectList list,
+   private boolean parseEOL(int c, AbstractTeXObjectList list,
      boolean followsControlWord)
      throws IOException
    {
@@ -675,7 +677,7 @@ public class TeXParser extends TeXObjectList
       return skipNextSpaces(list);
    }
 
-   private boolean skipNextEols(TeXObjectList list)
+   private boolean skipNextEols(AbstractTeXObjectList list)
      throws IOException
    {
       int c = -1;
@@ -712,7 +714,7 @@ public class TeXParser extends TeXObjectList
       return c != -1;
    }
 
-   private boolean skipNextSpaces(TeXObjectList list)
+   private boolean skipNextSpaces(AbstractTeXObjectList list)
      throws IOException
    {
       int c = -1;
@@ -754,7 +756,7 @@ public class TeXParser extends TeXObjectList
       return c != -1;
    }
 
-   private void eolFound(TeXObjectList list, boolean followsControlWord)
+   private void eolFound(AbstractTeXObjectList list, boolean followsControlWord)
      throws IOException
    {
       if (followsControlWord)
@@ -770,7 +772,7 @@ public class TeXParser extends TeXObjectList
       }
    }
 
-   private void parFound(TeXObjectList list)
+   private void parFound(AbstractTeXObjectList list)
      throws IOException
    {
       list.add(listener.getPar());
@@ -781,7 +783,7 @@ public class TeXParser extends TeXObjectList
       return obj != null && obj.isPar();
    }
 
-   private boolean readComment(TeXObjectList list)
+   private boolean readComment(AbstractTeXObjectList list)
      throws IOException
    {
       Comment comment = listener.createComment();
@@ -946,7 +948,7 @@ public class TeXParser extends TeXObjectList
       return c != -1;
    }
 
-   private boolean readParam(TeXObjectList list, ParameterToken paramToken)
+   private boolean readParam(AbstractTeXObjectList list, ParameterToken paramToken)
      throws IOException
    {
       mark(1);
@@ -986,7 +988,7 @@ public class TeXParser extends TeXObjectList
       return true;
    }
 
-   private boolean readParam(TeXObjectList list)
+   private boolean readParam(AbstractTeXObjectList list)
      throws IOException
    {
       mark(1);
@@ -1020,77 +1022,128 @@ public class TeXParser extends TeXObjectList
       return true;
    }
 
-   public CatCodeChanger isCatCodeChanger(TeXObject obj)
+   public CatCodeChanger toCatCodeChanger(TeXObject obj)
    {
+      if (obj instanceof TeXCsRef)
+      {
+         obj = getControlSequence(((TeXCsRef)obj).getName());
+      }
+
+      if (obj instanceof AssignedMacro)
+      {
+         obj = ((AssignedMacro)obj).getBaseUnderlying();
+      }
+
       if (obj instanceof CatCodeChanger)
       {
          return (CatCodeChanger)obj;
       }
 
-      if (obj instanceof TeXCsRef)
-      {
-         return isCatCodeChanger(getControlSequence(
-          ((TeXCsRef)obj).getName()));
-      }
-
-      if (obj instanceof AssignedMacro)
-      {
-         return isCatCodeChanger(((AssignedMacro)obj).getUnderlying());
-      }
-
       return null;
    }
 
-   public EgChar isEndGroup(TeXObject obj)
+   public EndGroupObject toEndGroup(TeXObject obj)
    {
-      if (obj instanceof EgChar)
+      if (obj instanceof TeXCsRef)
       {
-         return (EgChar)obj;
+         obj = getControlSequence(((TeXCsRef)obj).getName());
       }
 
       if (obj instanceof AssignedMacro)
       {
-         return isEndGroup(((AssignedMacro)obj).getUnderlying());
+         obj = ((AssignedMacro)obj).getBaseUnderlying();
       }
 
-      if (obj instanceof TeXCsRef)
+      if (obj instanceof EndGroupObject)
       {
-         return isEndGroup(getControlSequence(
-          ((TeXCsRef)obj).getName()));
+         return (EndGroupObject)obj;
       }
 
       return null;
    }
 
-   public BgChar isBeginGroup(TeXObject obj)
+   public BeginGroupObject toBeginGroup(TeXObject obj)
    {
-      if (obj instanceof BgChar)
+      if (obj instanceof TeXCsRef)
       {
-         return (BgChar)obj;
+         obj = getControlSequence(((TeXCsRef)obj).getName());
       }
 
       if (obj instanceof AssignedMacro)
       {
-         return isBeginGroup(((AssignedMacro)obj).getUnderlying());
+         obj = ((AssignedMacro)obj).getBaseUnderlying();
       }
 
-      if (obj instanceof TeXCsRef)
+      if (obj instanceof BeginGroupObject)
       {
-         return isBeginGroup(getControlSequence(
-          ((TeXCsRef)obj).getName()));
+         return (BeginGroupObject)obj;
       }
 
       return null;
    }
 
-   public boolean popRemainingGroup(TeXParser parser, Group group, 
-      byte popStyle, BgChar bgChar)
+   public TeXBoolean toBoolean(TeXObject obj)
+   {
+      if (obj instanceof TeXCsRef)
+      {
+         obj = getControlSequence(((TeXCsRef)obj).getName());
+      }
+
+      if (obj instanceof AssignedMacro)
+      {
+         obj = ((AssignedMacro)obj).getBaseUnderlying();
+      }
+
+      if (obj instanceof AbstractTeXObjectList
+           && ((AbstractTeXObjectList)obj).countNonIgnoreables(false) == 1)
+      {
+         try
+         {
+            obj = ((AbstractTeXObjectList)obj).peekStack();
+         }
+         catch (IOException e)
+         {// shouldn't happen
+            return null;
+         }
+      }
+
+      if (obj instanceof TeXBoolean)
+      {
+         return (TeXBoolean)obj;
+      }
+
+      return null;
+   }
+
+   public If toIf(TeXObject obj)
+   {
+      if (obj instanceof TeXCsRef)
+      {
+         obj = getControlSequence(((TeXCsRef)obj).getName());
+      }
+
+      if (obj instanceof AssignedMacro)
+      {
+         obj = ((AssignedMacro)obj).getBaseUnderlying();
+      }
+
+      if (obj instanceof If)
+      {
+         return (If)obj;
+      }
+
+      return null;
+   }
+
+   public boolean popRemainingGroup(TeXParser parser, AbstractGroup group, 
+      PopStyle popStyle, BeginGroupObject bgChar)
       throws IOException
    {
       return popRemainingGroup(group, popStyle, bgChar);
    }
 
-   public boolean popRemainingGroup(Group group, byte popStyle, BgChar bgChar)
+   public boolean popRemainingGroup(AbstractGroup group, PopStyle popStyle, 
+      BeginGroupObject bgChar)
       throws IOException
    {
       startGroup();
@@ -1101,7 +1154,7 @@ public class TeXParser extends TeXObjectList
          {
             if (isEmpty())
             {
-               if (!fetchNext(isShort(popStyle)))
+               if (!fetchNext(popStyle.isShort()))
                {
                   return false;
                }
@@ -1109,39 +1162,39 @@ public class TeXParser extends TeXObjectList
 
             TeXObject obj = remove(0);
 
-            CatCodeChanger catCodeChanger = isCatCodeChanger(obj);
+            CatCodeChanger catCodeChanger = toCatCodeChanger(obj);
 
             if (catCodeChanger != null)
             {
                catCodeChanger.applyCatCodeChange(this);
             }
 
-            EgChar egChar = isEndGroup(obj);
+            EndGroupObject eg = toEndGroup(obj);
 
-            if (egChar != null)
+            if (eg != null)
             {
-               if (!egChar.matches(bgChar))
+               if (!eg.matches(bgChar))
                {
                   throw new TeXSyntaxException(this,
                     TeXSyntaxException.ERROR_EXTRA_OR_FORGOTTEN,
-                    egChar.toString(this), bgChar.toString(this));
+                    eg.toString(this), bgChar.toString(this));
                }
 
                return true;
             }
 
-            bgChar = isBeginGroup(obj);
+            BeginGroupObject bgChar2 = toBeginGroup(obj);
 
-            if (isShort(popStyle) && obj.isPar())
+            if (popStyle.isShort() && obj.isPar())
             {
                throw new TeXSyntaxException(this,
                   TeXSyntaxException.ERROR_PAR_BEFORE_EG);
             }
-            else if (bgChar != null)
+            else if (bgChar2 != null)
             {
-               Group subGrp = bgChar.createGroup(this);
+               AbstractGroup subGrp = bgChar2.createGroup(this);
 
-               if (!popRemainingGroup(subGrp, popStyle, bgChar))
+               if (!popRemainingGroup(subGrp, popStyle, bgChar2))
                {
                   group.add(subGrp);
 
@@ -1162,7 +1215,7 @@ public class TeXParser extends TeXObjectList
       }
    }
 
-   private boolean readGroup(Group group, boolean isShort)
+   private boolean readGroup(AbstractGroup group, boolean isShort)
      throws IOException
    {
       int c;
@@ -1201,16 +1254,16 @@ public class TeXParser extends TeXObjectList
 
             TeXObject obj = group.lastElement();
 
-            CatCodeChanger catCodeChanger = isCatCodeChanger(obj);
+            CatCodeChanger catCodeChanger = toCatCodeChanger(obj);
 
             if (catCodeChanger != null)
             {
                catCodeChanger.applyCatCodeChange(this);
             }
 
-            EgChar egChar = isEndGroup(obj);
+            EndGroupObject eg = toEndGroup(obj);
 
-            if (egChar != null)
+            if (eg != null)
             {
                group.remove(group.size()-1);
             }
@@ -1285,7 +1338,7 @@ public class TeXParser extends TeXObjectList
 
             TeXObject obj = math.lastElement();
 
-            CatCodeChanger catCodeChanger = isCatCodeChanger(obj);
+            CatCodeChanger catCodeChanger = toCatCodeChanger(obj);
 
             if (catCodeChanger != null)
             {
@@ -1342,7 +1395,7 @@ public class TeXParser extends TeXObjectList
 
             TeXObject obj = math.lastElement();
 
-            CatCodeChanger catCodeChanger = isCatCodeChanger(obj);
+            CatCodeChanger catCodeChanger = toCatCodeChanger(obj);
 
             if (catCodeChanger != null)
             {
@@ -1360,7 +1413,7 @@ public class TeXParser extends TeXObjectList
       throw new EOFException();
    }
 
-   public void readTo(String terminator, TeXObjectList list)
+   public void readTo(String terminator, AbstractTeXObjectList list)
      throws IOException
    {
       int n = terminator.length();
@@ -1369,7 +1422,7 @@ public class TeXParser extends TeXObjectList
       readTo(terminator, list, n, 0);
    }
 
-   private void readTo(String terminator, TeXObjectList list,
+   private void readTo(String terminator, AbstractTeXObjectList list,
      int n, int idx)
      throws IOException
    {
@@ -1443,7 +1496,7 @@ public class TeXParser extends TeXObjectList
       return charList;
    }
 
-   private int readVerb(int delim, TeXObjectList charList)
+   private int readVerb(int delim, AbstractTeXObjectList charList)
     throws IOException
    {
       int c;
@@ -1461,13 +1514,13 @@ public class TeXParser extends TeXObjectList
       return -1;
    }
 
-   private boolean readControlSequence(TeXObjectList list)
+   private boolean readControlSequence(AbstractTeXObjectList list)
      throws IOException
    {
       return readControlSequence(list, false);
    }
 
-   private boolean readControlSequence(TeXObjectList list, boolean doingString)
+   private boolean readControlSequence(AbstractTeXObjectList list, boolean doingString)
      throws IOException
    {
       StringBuilder macro = new StringBuilder();
@@ -1625,13 +1678,13 @@ public class TeXParser extends TeXObjectList
       return fetchNext(this, isShort);
    }
 
-   public boolean fetchNext(TeXObjectList list)
+   public boolean fetchNext(AbstractTeXObjectList list)
      throws IOException
    {
       return fetchNext(list, false);
    }
 
-   public boolean fetchNext(TeXObjectList list, boolean isShort)
+   public boolean fetchNext(AbstractTeXObjectList list, boolean isShort)
      throws IOException
    {
       if (reader == null)
@@ -1926,77 +1979,1154 @@ public class TeXParser extends TeXObjectList
       return remove(0);
    }
 
+   public void processObject(TeXObject object, TeXObjectList stack) throws IOException
+   {
+      if (stack == this || stack == null)
+      {
+         object.process(this);
+      }
+      else
+      {
+         object.process(this, stack);
+      }
+   } 
+
+   // Provide convenient methods for popping arguments off the
+   // parser or local stack.
+
+   /* Pops next token from the stack. Returns null if no more
+      tokens.
+    */
+   public TeXObject popNextToken(TeXObjectList stack)
+    throws IOException
+   {
+      return popNextToken(stack, PopStyle.DEFAULT);
+   }
+
+   public TeXObject popNextToken(TeXObjectList stack, PopStyle popStyle)
+    throws IOException
+   {
+      if (stack == this || stack == null || stack.isEmpty())
+      {
+         return popNextToken(popStyle);
+      }
+      else
+      {
+         return stack.popToken(popStyle);
+      }
+   }
+
+   /* Pops next token from the parser */
+   public TeXObject popNextToken()
+    throws IOException
+   {
+      return popNextToken(PopStyle.DEFAULT);
+   }
+
+   public TeXObject popNextToken(PopStyle popStyle)
+    throws IOException
+   {
+      return popToken(popStyle);
+   }
+
+   // If obj is a reference or assigned macro, return the underlying
+   // object other return the given object.
+   public TeXObject resolveReference(TeXObject obj)
+   {
+      if (obj == null) return null;
+
+      if (obj instanceof TeXCsRef)
+      {
+         obj = getListener().getControlSequence(((TeXCsRef)obj).getName());
+      }
+
+      if (obj instanceof AssignedMacro)
+      {
+         obj = ((AssignedMacro)obj).getBaseUnderlying();
+      }
+
+      return obj;
+   }
+
+   public TeXObject popNextTokenResolveReference(TeXObjectList stack)
+    throws IOException
+   {
+      return popNextTokenResolveReference(stack, PopStyle.DEFAULT);
+   }
+
+   public TeXObject popNextTokenResolveReference(TeXObjectList stack, PopStyle popStyle)
+    throws IOException
+   {
+      return resolveReference(popNextToken(stack, popStyle));
+   }
+
+   public TeXObject popNextTokenResolveReference()
+    throws IOException
+   {
+      return popNextTokenResolveReference(PopStyle.DEFAULT);
+   }
+
+   public TeXObject popNextTokenResolveReference(PopStyle popStyle)
+    throws IOException
+   {
+      return resolveReference(popNextToken(popStyle));
+   }
+
+   public TeXObject popNextTokenExpandOnce()
+    throws IOException
+   {
+      return popNextTokenExpandOnce(PopStyle.DEFAULT);
+   }
+
+   public TeXObject popNextTokenExpandOnce(PopStyle popStyle)
+    throws IOException
+   {
+      TeXObject object = popToken(popStyle);
+
+      if (object == null)
+      {
+         return null;
+      }
+
+      TeXObject expanded = expandOnce(object, this);
+
+      if (!(expanded instanceof TeXObjectList))
+      {
+         return expanded;
+      }
+
+      object = ((TeXObjectList)expanded).popToken();
+
+      addAll(((TeXObjectList)expanded));
+
+      return object;
+   }
+
+   public TeXObject popNextTokenExpandOnce(TeXObjectList stack)
+    throws IOException
+   {
+      return popNextTokenExpandOnce(stack, PopStyle.DEFAULT);
+   }
+
+   public TeXObject popNextTokenExpandOnce(TeXObjectList stack, PopStyle popStyle)
+    throws IOException
+   {
+      TeXObject object = popToken(popStyle);
+
+      if (object == null)
+      {
+         return null;
+      }
+
+      TeXObject expanded = expandOnce(object, stack);
+
+      if (!(expanded instanceof TeXObjectList))
+      {
+         return expanded;
+      }
+
+      object = ((TeXObjectList)expanded).popToken();
+
+      stack.addAll(((TeXObjectList)expanded));
+
+      return object;
+   }
+
+   public TeXObject popNextTokenExpandFully()
+    throws IOException
+   {
+      return popNextTokenExpandFully(PopStyle.DEFAULT);
+   }
+
+   public TeXObject popNextTokenExpandFully(PopStyle popStyle)
+    throws IOException
+   {
+      TeXObject object = popToken(popStyle);
+
+      if (object == null)
+      {
+         return null;
+      }
+
+      TeXObject expanded = expandFully(object, this);
+
+      if (!(expanded instanceof TeXObjectList))
+      {
+         return expanded;
+      }
+
+      object = ((TeXObjectList)expanded).popToken();
+
+      addAll(((TeXObjectList)expanded));
+
+      return object;
+   }
+
+   public TeXObject popNextTokenExpandFully(TeXObjectList stack)
+    throws IOException
+   {
+      return popNextTokenExpandFully(stack, PopStyle.IGNORE_LEADING_SPACE);
+   }
+
+   public TeXObject popNextTokenExpandFully(TeXObjectList stack, PopStyle popStyle)
+    throws IOException
+   {
+      TeXObject object = popToken(popStyle);
+
+      if (object == null)
+      {
+         return null;
+      }
+
+      TeXObject expanded = expandFully(object, stack);
+
+      if (!(expanded instanceof TeXObjectList))
+      {
+         return expanded;
+      }
+
+      object = ((TeXObjectList)expanded).popToken();
+
+      stack.addAll(((TeXObjectList)expanded));
+
+      return object;
+   }
+
+   // Pops first argument in the stack (or this if the stack is null
+   // or empty). Any grouping is removed from the argument.
+   public TeXObject popRequired(TeXObjectList stack)
+    throws IOException
+   {
+      return popRequired(stack, PopStyle.IGNORE_LEADING_SPACE);
+   }
+
+   public TeXObject popRequired(TeXObjectList stack, PopStyle popStyle)
+    throws IOException
+   {
+      if (this == stack || stack == null || stack.isEmpty())
+      {
+         return popNextArg(popStyle);
+      }
+      else
+      {
+         return stack.popArg(this, popStyle);
+      }
+   }
+
+   public TeXObject popRequired()
+    throws IOException
+   {
+      return popRequired(PopStyle.IGNORE_LEADING_SPACE);
+   }
+
+   // added for consistent naming
+   public TeXObject popRequired(PopStyle popStyle)
+    throws IOException
+   {
+      return popNextArg(popStyle);
+   }
+
+   // Pops optional argument (according to the listener's delimiters)
+   public TeXObject popOptional(TeXObjectList stack)
+    throws IOException
+   {
+      return popOptional(stack, PopStyle.IGNORE_LEADING_SPACE);
+   }
+
+   public TeXObject popOptional(TeXObjectList stack, PopStyle popStyle)
+    throws IOException
+   {
+      if (this == stack || stack == null || stack.isEmpty())
+      {
+         return popNextArg(popStyle, listener.getOptionalStartDelim(), 
+           listener.getOptionalEndDelim());
+      }
+      else
+      {
+         return stack.popArg(this, popStyle, listener.getOptionalStartDelim(), 
+           listener.getOptionalEndDelim());
+      }
+   }
+
+   public TeXObject popOptional()
+    throws IOException
+   {
+      return popOptional(PopStyle.IGNORE_LEADING_SPACE);
+   }
+
+   public TeXObject popOptional(PopStyle popStyle)
+    throws IOException
+   {
+      return popNextArg(popStyle, listener.getOptionalStartDelim(), 
+        listener.getOptionalEndDelim());
+   }
+
+   // is object a control sequence with the given name?
+   // Used for control sequence markers such as \repeat
+   public boolean isControlSequence(TeXObject object, String csname)
+   {
+      return (object instanceof ControlSequence)
+               && ((ControlSequence)object).getName().equals(csname);
+   }
+
+   public boolean isControlSequenceTrue(String csname)
+   {
+      return isTrue(getControlSequence(csname));
+   }
+
+   public boolean isTrue(TeXObject object)
+   {
+      if (object == null) return false;
+
+      if (object instanceof TeXBoolean)
+      {
+         return ((TeXBoolean)object).booleanValue();
+      }
+
+      if (object instanceof AssignedMacro)
+      {
+         return isTrue(((AssignedMacro)object).getBaseUnderlying());
+      }
+
+      return false;
+   }
+
+   // Returns the character code point if object represents a
+   // character otherwise returns -1
+   public int toCodePoint(TeXObject object)
+   {
+      if (object instanceof CharObject)
+      {
+         return ((CharObject)object).getCharCode();
+      }
+
+      if ((object instanceof AbstractTeXObjectList)
+          && ((AbstractTeXObjectList)object).size() == 1)
+      {
+         return toCodePoint(((AbstractTeXObjectList)object).firstElement());
+      }
+
+      return -1;
+   }
+
+   public boolean isCharacter(TeXObject object, int... codePoints)
+   {
+      if (object instanceof CharObject)
+      {
+         int objCP = ((CharObject)object).getCharCode();
+
+         for (int cp : codePoints)
+         {
+            if (cp == objCP)
+            {
+               return true;
+            }
+         }
+
+         return false;
+      }
+
+      if ((object instanceof TeXObjectList || object instanceof Group)
+          && ((AbstractTeXObjectList)object).size() == 1)
+      {
+         return isCharacter(((AbstractTeXObjectList)object).firstElement(), 
+           codePoints);
+      }
+
+      return false;
+   }
+
+   // Is the next token a character with the given codepoint?
+   // If it is, pop it off.
+   public boolean isNextChar(int codePoint)
+    throws IOException
+   {
+      return isNextChar(codePoint, PopStyle.IGNORE_LEADING_SPACE);
+   }
+
+   public boolean isNextChar(int codePoint, PopStyle popStyle)
+    throws IOException
+   {
+      TeXObject object = peekStack(popStyle);
+
+      if (object == null)
+      {
+         return false;
+      }
+
+      if ((object instanceof CharObject) 
+            && ((CharObject)object).getCharCode() == codePoint)
+      {
+         popRequired(popStyle);
+         return true;
+      }
+
+      if (object instanceof AbstractTeXObjectList)
+      {
+         AbstractTeXObjectList list = (AbstractTeXObjectList)object;
+
+         if (list.size() == 1)
+         {
+            object = list.firstElement();
+
+            if ((object instanceof CharObject) 
+                  && ((CharObject)object).getCharCode() == codePoint)
+            {
+               popRequired(popStyle);
+               return true;
+            }
+         }
+      }
+
+      return false;
+   }
+
+   // Is the next token a character with the given codepoint?
+   // If it is, pop it off.
+   public boolean isNextChar(int codePoint, TeXObjectList stack)
+   throws IOException
+   {
+      return isNextChar(codePoint, stack, PopStyle.SHORT_IGNORE_LEADING_SPACE);
+   }
+
+   public boolean isNextChar(int codePoint, TeXObjectList stack, PopStyle popStyle)
+   throws IOException
+   {
+      if (stack == this || stack == null)
+      {
+         return isNextChar(codePoint, popStyle);
+      }
+
+      TeXObject object = stack.peekStack(popStyle);
+
+      if (object == null)
+      {
+         return false;
+      }
+
+      if ((object instanceof CharObject) 
+            && ((CharObject)object).getCharCode() == codePoint)
+      {
+         popRequired(stack, popStyle);
+         return true;
+      }
+
+      if (object instanceof AbstractTeXObjectList)
+      {
+         AbstractTeXObjectList list = (AbstractTeXObjectList)object;
+
+         if (list.size() == 1)
+         {
+            object = list.firstElement();
+
+            if ((object instanceof CharObject) 
+                  && ((CharObject)object).getCharCode() == codePoint)
+            {
+               popRequired(stack, popStyle);
+               return true;
+            }
+         }
+      }
+
+      return false;
+   }
+
+   // Similar to the above by checks for a sequence of characters.
+   // If found, returns true and pops them off the stack.
+   public boolean isNextWord(String word)
+   throws IOException
+   {
+      return isNextWord(word, PopStyle.SHORT_IGNORE_LEADING_SPACE);
+   }
+
+   public boolean isNextWord(String word, PopStyle popStyle)
+   throws IOException
+   {
+      TeXObject object = popToken(popStyle);
+
+      if (object instanceof TeXObjectList)
+      {
+         TeXObjectList list = ((TeXObjectList)object);
+         list.flatten();
+         object = list.popToken(popStyle);
+         push(list);
+      }
+
+      popStyle = popStyle.excludeLeadingStyles();
+
+      TeXObjectList popped = new TeXObjectList();
+
+      for (int i = 0; i < word.length(); )
+      {
+         int cp = word.codePointAt(i);
+         i += Character.charCount(cp);
+
+         popped.push(object);
+
+         if (!(isCharacter(object, cp)))
+         {
+            push(popped);
+            return false;
+         }
+
+         object = popStack(popStyle);
+
+         if (object instanceof TeXObjectList)
+         {
+            TeXObjectList list = ((TeXObjectList)object);
+            list.flatten();
+            object = list.popToken(popStyle);
+            push(list);
+         }
+      }
+
+      return true;
+   }
+
+   public boolean isNextWord(String word, TeXObjectList stack)
+   throws IOException
+   {
+      return isNextWord(word, stack, PopStyle.SHORT_IGNORE_LEADING_SPACE);
+   }
+
+   public boolean isNextWord(String word, TeXObjectList stack, PopStyle popStyle)
+   throws IOException
+   {
+      if (stack == this || stack == null)
+      {
+         return isNextWord(word, popStyle);
+      }
+
+      TeXObject object = stack.popToken(popStyle);
+
+      if (object instanceof TeXObjectList)
+      {
+         TeXObjectList list = ((TeXObjectList)object);
+         list.flatten();
+         object = list.popToken(popStyle);
+         stack.push(list);
+      }
+
+      popStyle = popStyle.excludeLeadingStyles();
+
+      TeXObjectList popped = new TeXObjectList();
+
+      for (int i = 0; i < word.length(); )
+      {
+         int cp = word.codePointAt(i);
+         i += Character.charCount(cp);
+
+         popped.push(object);
+
+         if (!(isCharacter(object, cp)))
+         {
+            stack.push(popped);
+            return false;
+         }
+
+         object = stack.popStack(this, popStyle);
+
+         if (object instanceof TeXObjectList)
+         {
+            TeXObjectList list = ((TeXObjectList)object);
+            list.flatten();
+            object = list.popToken(popStyle);
+            stack.push(list);
+         }
+      }
+
+      return true;
+   }
+
+   // Is the next object the given type? Not popped.
+   public boolean isNextObject(Class objCls)
+   throws IOException
+   {
+      return isNextObject(objCls, PopStyle.DEFAULT);
+   }
+
+   public boolean isNextObject(Class objCls, PopStyle popStyle)
+   throws IOException
+   {
+      TeXObject object = peekStack(popStyle);
+
+      if (object == null)
+      {
+         return false;
+      }
+
+      if (object.getClass().equals(objCls))
+      {
+         return true;
+      }
+
+      if (object instanceof TeXObjectList)
+      {
+         TeXObjectList list = (TeXObjectList)object;
+
+         return (list.toObject(objCls) != null);
+      }
+
+      return false;
+   }
+
+   public boolean isNextObject(Class objCls, TeXObjectList stack)
+   throws IOException
+   {
+      return isNextObject(objCls, stack, PopStyle.IGNORE_LEADING_SPACE);
+   }
+
+   public boolean isNextObject(Class objCls, TeXObjectList stack, PopStyle popStyle)
+   throws IOException
+   {
+      if (stack == this || stack == null)
+      {
+         return isNextObject(objCls, popStyle);
+      }
+
+      TeXObject object = stack.peekStack(popStyle);
+
+      if (object == null)
+      {
+         return false;
+      }
+
+      if (object.getClass().equals(objCls))
+      {
+         return true;
+      }
+
+      if (object instanceof TeXObjectList)
+      {
+         TeXObjectList list = (TeXObjectList)object;
+
+         return (list.toObject(objCls) != null);
+      }
+
+      return false;
+   }
+
+   public Numerical popRequiredNumerical(TeXObjectList stack)
+    throws IOException
+   {
+      return popRequiredNumerical(stack, PopStyle.SHORT_IGNORE_LEADING_SPACE);
+   }
+
+   public Numerical popRequiredNumerical(TeXObjectList stack, PopStyle popStyle)
+    throws IOException
+   {
+      if (stack == this || stack == null || stack.isEmpty())
+      {
+         return popRequiredNumerical(popStyle);
+      }
+      else
+      {
+         return stack.popNumericalArg(this, popStyle);
+      }
+   }
+
+   public Numerical popRequiredNumerical()
+    throws IOException
+   {
+      return popNumericalArg();
+   }
+
+   public Numerical popRequiredNumerical(PopStyle popStyle)
+    throws IOException
+   {
+      return popNumericalArg(popStyle);
+   }
+
+   public Register popRequiredRegister(TeXObjectList stack)
+    throws IOException
+   {
+      return popRequiredRegister(stack, PopStyle.SHORT_IGNORE_LEADING_SPACE);
+   }
+
+   public Register popRequiredRegister(TeXObjectList stack, PopStyle popStyle)
+    throws IOException
+   {
+      if (stack == this || stack == null || stack.isEmpty())
+      {
+         return popRequiredRegister(popStyle);
+      }
+      else
+      {
+         return stack.popRegister(this, popStyle);
+      }
+   }
+
+   public Register popRequiredRegister()
+    throws IOException
+   {
+      return popRequiredRegister(PopStyle.SHORT_IGNORE_LEADING_SPACE);
+   }
+
+   public Register popRequiredRegister(PopStyle popStyle)
+    throws IOException
+   {
+      return popRegister(this, popStyle);
+   }
+
+   public TeXDimension popRequiredDimension(TeXObjectList stack)
+    throws IOException
+   {
+      return popRequiredDimension(stack, PopStyle.SHORT_IGNORE_LEADING_SPACE);
+   }
+
+   public TeXDimension popRequiredDimension(TeXObjectList stack, PopStyle popStyle)
+    throws IOException
+   {
+      if (stack == this || stack == null || stack.isEmpty())
+      {
+         return popRequiredDimension(popStyle);
+      }
+      else
+      {
+         return stack.popDimension(this, popStyle);
+      }
+   }
+
+   public TeXDimension popRequiredDimension()
+    throws IOException
+   {
+      return popRequiredDimension(PopStyle.SHORT_IGNORE_LEADING_SPACE);
+   }
+
+   public TeXDimension popRequiredDimension(PopStyle popStyle)
+    throws IOException
+   {
+      return popDimension(this, popStyle);
+   }
+
+   public Float popRequiredFloat(TeXObjectList stack)
+    throws IOException
+   {
+      return popRequiredFloat(stack, PopStyle.SHORT_IGNORE_LEADING_SPACE);
+   }
+
+   public Float popRequiredFloat(TeXObjectList stack, PopStyle popStyle)
+    throws IOException
+   {
+      if (stack == this || stack == null || stack.isEmpty())
+      {
+         return popRequiredFloat(popStyle);
+      }
+      else
+      {
+         return stack.popFloat(this, popStyle);
+      }
+   }
+
+   public Float popRequiredFloat()
+    throws IOException
+   {
+      return popFloat(this);
+   }
+
+   public Float popRequiredFloat(PopStyle popStyle)
+    throws IOException
+   {
+      return popFloat(this, popStyle);
+   }
+
+   public TeXNumber popRequiredNumber(TeXObjectList stack)
+    throws IOException
+   {
+      return popRequiredNumber(stack, PopStyle.SHORT_IGNORE_LEADING_SPACE);
+   }
+
+   public TeXNumber popRequiredNumber(TeXObjectList stack, PopStyle popStyle)
+    throws IOException
+   {
+      if (stack == this || stack == null || stack.isEmpty())
+      {
+         return popRequiredNumber(popStyle);
+      }
+      else
+      {
+         return stack.popNumber(this, popStyle);
+      }
+   }
+
+   public TeXNumber popRequiredNumber()
+    throws IOException
+   {
+      return popNumber(this);
+   }
+
+   public TeXNumber popRequiredNumber(PopStyle popStyle)
+    throws IOException
+   {
+      return popNumber(this, popStyle);
+   }
+
+   public ControlSequence popRequiredControlSequence(TeXObjectList stack)
+    throws IOException
+   {
+      return popRequiredControlSequence(stack, false, 
+        PopStyle.SHORT_IGNORE_LEADING_SPACE);
+   }
+
+   public ControlSequence popRequiredControlSequence(TeXObjectList stack, 
+      PopStyle popStyle)
+    throws IOException
+   {
+      return popRequiredControlSequence(stack, false, popStyle);
+   }
+
+   public ControlSequence popRequiredControlSequence(TeXObjectList stack, 
+      boolean resolve)
+    throws IOException
+   {
+      return popRequiredControlSequence(stack, resolve, 
+         PopStyle.SHORT_IGNORE_LEADING_SPACE);
+   }
+
+   public ControlSequence popRequiredControlSequence(TeXObjectList stack, 
+       boolean resolve, PopStyle popStyle)
+    throws IOException
+   {
+      if (stack == this || stack == null || stack.isEmpty())
+      {
+         return popRequiredControlSequence(resolve, popStyle);
+      }
+
+      ControlSequence cs = stack.popControlSequence(this, popStyle);
+
+      if (cs instanceof TeXCsRef)
+      {
+         cs = listener.getControlSequence(((TeXCsRef)cs).getName());
+      }
+
+      if (cs instanceof AssignedMacro)
+      {
+         TeXObject base = ((AssignedMacro)cs).getBaseUnderlying();
+
+         if (base instanceof ControlSequence)
+         {
+            cs = (ControlSequence)base;
+         }
+      }
+
+      return cs;
+   }
+
+   public ControlSequence popRequiredControlSequence()
+    throws IOException
+   {
+      return popRequiredControlSequence(false);
+   }
+
+   public ControlSequence popRequiredControlSequence(PopStyle popStyle)
+    throws IOException
+   {
+      return popRequiredControlSequence(false, popStyle);
+   }
+
+   public ControlSequence popRequiredControlSequence(boolean resolve)
+    throws IOException
+   {
+      return popRequiredControlSequence(resolve, 
+        PopStyle.SHORT_IGNORE_LEADING_SPACE);
+   }
+
+   public ControlSequence popRequiredControlSequence(boolean resolve, PopStyle popStyle)
+    throws IOException
+   {
+      ControlSequence cs = popControlSequence(this, popStyle);
+
+      if (cs instanceof TeXCsRef)
+      {
+         cs = listener.getControlSequence(((TeXCsRef)cs).getName());
+      }
+
+      if (cs instanceof AssignedMacro)
+      {
+         TeXObject base = ((AssignedMacro)cs).getBaseUnderlying();
+
+         if (base instanceof ControlSequence)
+         {
+            cs = (ControlSequence)base;
+         }
+      }
+
+      return cs;
+   }
+
+   // Pops argument and expands it once (if it can be expanded)
+   public TeXObject popRequiredExpandOnce(TeXObjectList stack)
+    throws IOException
+   {
+      return expandOnce(popRequired(stack), stack);
+   }
+
+   public TeXObject popRequiredExpandOnce(TeXObjectList stack, PopStyle popStyle)
+    throws IOException
+   {
+      return expandOnce(popRequired(stack, popStyle), stack);
+   }
+
+   // Pops argument and expands it once (if it can be expanded)
+   public TeXObject popRequiredExpandOnce()
+    throws IOException
+   {
+      return expandOnce(popRequired(), this);
+   }
+
+   public TeXObject popRequiredExpandOnce(PopStyle popStyle)
+    throws IOException
+   {
+      return expandOnce(popRequired(popStyle), this);
+   }
+
+   // Pops argument and expands it fully (if it can be expanded)
+   public TeXObject popRequiredExpandFully(TeXObjectList stack)
+    throws IOException
+   {
+      return expandFully(popRequired(stack), stack);
+   }
+
+   public TeXObject popRequiredExpandFully(TeXObjectList stack, PopStyle popStyle)
+    throws IOException
+   {
+      return expandFully(popRequired(stack, popStyle), stack);
+   }
+
+   // Pops argument and expands it once (if it can be expanded)
+   public TeXObject popRequiredExpandFully()
+    throws IOException
+   {
+      return expandFully(popRequired(), this);
+   }
+
+   public TeXObject popRequiredExpandFully(PopStyle popStyle)
+    throws IOException
+   {
+      return expandFully(popRequired(popStyle), this);
+   }
+
+   // Pops optional argument and expands it once (if it can be expanded)
+   public TeXObject popOptionalExpandOnce(TeXObjectList stack)
+    throws IOException
+   {
+      TeXObject arg = popOptional(stack);
+
+      if (arg == null) return arg;
+
+      return expandOnce(arg, stack);
+   }
+
+   public TeXObject popOptionalExpandOnce(TeXObjectList stack, PopStyle popStyle)
+    throws IOException
+   {
+      TeXObject arg = popOptional(stack, popStyle);
+
+      if (arg == null) return arg;
+
+      return expandOnce(arg, stack);
+   }
+
+   // Pops optional argument and expands it once (if it can be expanded)
+   public TeXObject popOptionalExpandOnce()
+    throws IOException
+   {
+      TeXObject arg = popOptional();
+
+      if (arg == null) return arg;
+
+      return expandOnce(arg, this);
+   }
+
+   public TeXObject popOptionalExpandOnce(PopStyle popStyle)
+    throws IOException
+   {
+      TeXObject arg = popOptional(popStyle);
+
+      if (arg == null) return arg;
+
+      return expandOnce(arg, this);
+   }
+
+   // Pops optional argument and expands it fully (if it can be expanded)
+   public TeXObject popOptionalExpandFully(TeXObjectList stack)
+    throws IOException
+   {
+      TeXObject arg = popOptional(stack);
+
+      if (arg == null) return arg;
+
+      return expandFully(arg, stack);
+   }
+
+   public TeXObject popOptionalExpandFully(TeXObjectList stack, PopStyle popStyle)
+    throws IOException
+   {
+      TeXObject arg = popOptional(stack, popStyle);
+
+      if (arg == null) return arg;
+
+      return expandFully(arg, stack);
+   }
+
+   // Pops optional argument and expands it once (if it can be expanded)
+   public TeXObject popOptionalExpandFully()
+    throws IOException
+   {
+      TeXObject arg = popOptional();
+
+      if (arg == null) return arg;
+
+      return expandFully(arg, this);
+   }
+
+   public TeXObject popOptionalExpandFully(PopStyle popStyle)
+    throws IOException
+   {
+      TeXObject arg = popOptional(popStyle);
+
+      if (arg == null) return arg;
+
+      return expandFully(arg, this);
+   }
+
+   public String popRequiredString(TeXObjectList stack)
+    throws IOException
+   {
+      return popRequiredString(stack, PopStyle.SHORT_IGNORE_LEADING_SPACE);
+   }
+
+   public String popRequiredString(TeXObjectList stack, PopStyle popStyle)
+    throws IOException
+   {
+      return popRequiredExpandFully(stack, popStyle).stripToString(this);
+   }
+
+   public String popRequiredString()
+    throws IOException
+   {
+      return popRequiredString(PopStyle.SHORT_IGNORE_LEADING_SPACE);
+   }
+
+   public String popRequiredString(PopStyle popStyle)
+    throws IOException
+   {
+      return popRequiredExpandFully(popStyle).stripToString(this);
+   }
+
+   public String popOptionalString(TeXObjectList stack)
+    throws IOException
+   {
+      return popOptionalString(stack, PopStyle.SHORT_IGNORE_LEADING_SPACE);
+   }
+
+   public String popOptionalString(TeXObjectList stack, PopStyle popStyle)
+    throws IOException
+   {
+      TeXObject obj = popOptionalExpandFully(stack, popStyle);
+
+      return obj == null ? null : obj.stripToString(this);
+   }
+
+   public String popOptionalString()
+    throws IOException
+   {
+      return popOptionalString(PopStyle.SHORT_IGNORE_LEADING_SPACE);
+   }
+
+   public String popOptionalString(PopStyle popStyle)
+    throws IOException
+   {
+      TeXObject obj = popOptionalExpandFully(popStyle);
+
+      return obj == null ? null : obj.stripToString(this);
+   }
+
+   // Expands the given argument once (if it can be expanded) and
+   // returns either the expansion or the original.
+   // There's no equivalent method without a local stack as it's too easy
+   // to forget the first argument.
+   public TeXObject expandOnce(TeXObject arg, TeXObjectList stack)
+    throws IOException
+   {
+      if (arg == null) return null;
+
+      if (arg instanceof Expandable)
+      {
+         TeXObjectList expanded;
+
+         if (stack == this || stack == null)
+         {
+            expanded  = ((Expandable)arg).expandonce(this);
+         }
+         else
+         {
+            expanded  = ((Expandable)arg).expandonce(this, stack);
+         }
+
+         if (expanded != null)
+         {
+            arg = expanded;
+         }
+      }
+
+      return arg;
+   }
+
+   // Expands the given argument fully (if it can be expanded) and
+   // returns either the expansion or the original.
+   public TeXObject expandFully(TeXObject arg, TeXObjectList stack)
+    throws IOException
+   {
+      if (arg == null) return null;
+
+      if (arg instanceof Expandable)
+      {
+         TeXObjectList expanded;
+
+         if (stack == this || stack == null)
+         {
+            expanded = ((Expandable)arg).expandfully(this);
+         }
+         else
+         {
+            expanded = ((Expandable)arg).expandfully(this, stack);
+         }
+
+         if (expanded != null)
+         {
+            arg = expanded;
+         }
+      }
+
+      return arg;
+   }
+
+   // Pops next argument off the parser. If none pending, read more in
    public TeXObject popNextArg()
      throws IOException
    {
-      return popNextArg(POP_IGNORE_LEADING_SPACE);
+      return popNextArg(PopStyle.IGNORE_LEADING_SPACE);
    }
 
-   public TeXObject popNextArg(byte popStyle)
+   public TeXObject popNextArg(PopStyle popStyle)
      throws IOException
    {
-      boolean skipIgnoreables = !isRetainIgnoreables(popStyle);
-      boolean skipLeadingWhiteSpace = isIgnoreLeadingSpace(popStyle);
-
-      if (skipIgnoreables && skipLeadingWhiteSpace)
+      while (size() == 0)
       {
-         while (size() == 0)
-         {
-            if (!fetchNext(isShort(popStyle)))
-            {
-               throw new EOFException();
-            }
-
-            TeXObject obj = get(0);
-
-            if (!((obj instanceof Ignoreable) || (obj instanceof WhiteSpace)))
-            {
-               break;
-            }
-
-            pop();
-         }
-      }
-      else if (skipIgnoreables)
-      {
-         while (size() == 0)
-         {
-            if (!fetchNext(isShort(popStyle)))
-            {
-               throw new EOFException();
-            }
-
-            if (!(get(0) instanceof Ignoreable))
-            {
-               break;
-            }
-
-            pop();
-         }
-      }
-      else if (skipLeadingWhiteSpace)
-      {
-         while (size() == 0)
-         {
-            if (!fetchNext(isShort(popStyle)))
-            {
-               throw new EOFException();
-            }
-
-            if (!(get(0) instanceof WhiteSpace))
-            {
-               break;
-            }
-
-            pop();
-         }
-      }
-      else if (size() == 0)
-      {
-         if (!fetchNext(isShort(popStyle)))
+         if (!fetchNext(popStyle.isShort()))
          {
             throw new EOFException();
          }
+
+         TeXObject obj = get(0);
+
+         if (!obj.isPopStyleSkip(popStyle))
+         {
+            break;
+         }
+
+         pop();
       }
 
       return popArg(popStyle);
@@ -2005,15 +3135,18 @@ public class TeXParser extends TeXObjectList
    public TeXObject popNextArg(int openDelim, int closeDelim)
      throws IOException
    {
-      return popNextArg(POP_IGNORE_LEADING_SPACE, openDelim, closeDelim);
+      return popNextArg(PopStyle.IGNORE_LEADING_SPACE, openDelim, closeDelim);
    }
 
-   public TeXObject popNextArg(byte popStyle, int openDelim, int closeDelim)
+   public TeXObject popNextArg(PopStyle popStyle, int openDelim, int closeDelim)
      throws IOException
    {
       if (size() == 0)
       {
-         fetchNext(isShort(popStyle));
+         if (!fetchNext(popStyle.isShort()))
+         {
+            throw new EOFException();
+         }
       }
 
       return popArg(popStyle, openDelim, closeDelim);
@@ -2022,7 +3155,7 @@ public class TeXParser extends TeXObjectList
    public Numerical popNumericalArg(int openDelim, int closeDelim)
      throws IOException
    {
-      TeXObject obj = popNextArg(POP_SHORT, openDelim, closeDelim);
+      TeXObject obj = popNextArg(PopStyle.SHORT, openDelim, closeDelim);
 
       if (obj == null) return null;
 
@@ -2052,7 +3185,13 @@ public class TeXParser extends TeXObjectList
    public Numerical popNumericalArg()
      throws IOException
    {
-      TeXObject obj = popNextArg(POP_SHORT);
+      return popNumericalArg(PopStyle.SHORT_IGNORE_LEADING_SPACE);
+   }
+
+   public Numerical popNumericalArg(PopStyle popStyle)
+     throws IOException
+   {
+      TeXObject obj = popNextArg(popStyle);
 
       if (obj == null) return null;
 
@@ -2073,7 +3212,10 @@ public class TeXParser extends TeXObjectList
 
       if (obj instanceof TeXObjectList)
       {
-         return ((TeXObjectList)obj).popNumerical(this);
+         TeXObjectList list = ((TeXObjectList)obj);
+         Numerical num = list.popNumerical(this);
+         addAll(0, list);
+         return num;
       }
 
       return new UserNumber(this, obj.toString(this));
@@ -2086,13 +3228,13 @@ public class TeXParser extends TeXObjectList
       return super.popArg(this);
    }
 
-   public TeXObject popArg(byte popStyle)
+   public TeXObject popArg(PopStyle popStyle)
     throws IOException
    {
       return super.popArg(this, popStyle);
    }
 
-   public TeXObject popArg(byte popStyle, int openDelim, int closeDelim)
+   public TeXObject popArg(PopStyle popStyle, int openDelim, int closeDelim)
    throws IOException
    {
       return super.popArg(this, popStyle, openDelim, closeDelim);
@@ -2103,7 +3245,7 @@ public class TeXParser extends TeXObjectList
       return parser.expandedPopStack();
    }
 
-   public TeXObject expandedPopStack(TeXParser parser, byte popStyle)
+   public TeXObject expandedPopStack(TeXParser parser, PopStyle popStyle)
       throws IOException
    {
       return parser.expandedPopStack(popStyle);
@@ -2111,10 +3253,10 @@ public class TeXParser extends TeXObjectList
 
    public TeXObject expandedPopStack() throws IOException
    {
-      return expandedPopStack((byte)0);
+      return expandedPopStack(PopStyle.DEFAULT);
    }
 
-   public TeXObject expandedPopStack(byte popStyle) throws IOException
+   public TeXObject expandedPopStack(PopStyle popStyle) throws IOException
    {
       TeXObject object = popStack(popStyle);
 
@@ -2124,12 +3266,12 @@ public class TeXParser extends TeXObjectList
             ((TeXCsRef)object).getName());
       }
 
-      BgChar bgChar = isBeginGroup(object);
+      BeginGroupObject bg = toBeginGroup(object);
 
-      if (bgChar != null)
+      if (bg != null)
       {
-         Group group = bgChar.createGroup(this);
-         popRemainingGroup(group, popStyle, bgChar);
+         AbstractGroup group = bg.createGroup(this);
+         popRemainingGroup(group, popStyle, bg);
 
          return group;
       }
@@ -2150,12 +3292,12 @@ public class TeXParser extends TeXObjectList
 
          object = expanded.remove(0);
 
-         bgChar = isBeginGroup(object);
+         bg = toBeginGroup(object);
 
-         if (bgChar != null)
+         if (bg != null)
          {
-            Group grp = bgChar.createGroup(this);
-            expanded.popRemainingGroup(this, grp, popStyle, bgChar);
+            AbstractGroup grp = bg.createGroup(this);
+            expanded.popRemainingGroup(this, grp, popStyle, bg);
             addAll(0, expanded);
 
             return grp;
@@ -2173,7 +3315,7 @@ public class TeXParser extends TeXObjectList
       return popStack();
    }
 
-   public TeXObject popStack(TeXParser parser, byte popStyle)
+   public TeXObject popStack(TeXParser parser, PopStyle popStyle)
       throws IOException
    {
       return popStack(popStyle);
@@ -2181,37 +3323,35 @@ public class TeXParser extends TeXObjectList
 
    public TeXObject popStack() throws IOException
    {
-      return popStack((byte)0);
+      return popStack(PopStyle.DEFAULT);
    }
 
-   public TeXObject popStack(byte popStyle)
+   public TeXObject popStack(PopStyle popStyle)
      throws IOException
    {
       if (size() == 0)
       {
-         fetchNext(isShort(popStyle));
-      }
-
-      if (size() == 0)
-      {
-         throw new EOFException();
+         if (!fetchNext(popStyle.isShort()))
+         {
+            throw new EOFException();
+         }
       }
 
       TeXObject object = remove(0);
 
-      if (object instanceof Ignoreable && !isRetainIgnoreables(popStyle))
+      if (object instanceof Ignoreable && !popStyle.isRetainIgnoreables())
       {
          listener.skipping((Ignoreable)object);
 
          return popStack(popStyle);
       }
 
-      BgChar bgChar = isBeginGroup(object);
+      BeginGroupObject bg = toBeginGroup(object);
 
-      if (bgChar != null)
+      if (bg != null)
       {
-         Group group = bgChar.createGroup(this);
-         popRemainingGroup(group, popStyle, bgChar);
+         AbstractGroup group = bg.createGroup(this);
+         popRemainingGroup(group, popStyle, bg);
          return group;
       }
 
@@ -2221,29 +3361,27 @@ public class TeXParser extends TeXObjectList
    public TeXObject popToken()
      throws IOException
    {
-      return popToken((byte)0);
+      return popToken(PopStyle.DEFAULT);
    }
 
-   public TeXObject popToken(byte popStyle)
+   public TeXObject popToken(PopStyle popStyle)
      throws IOException
    {
       if (size() == 0)
       {
-         fetchNext(isShort(popStyle));
-      }
-
-      if (size() == 0)
-      {
-         throw new EOFException();
+         if (!fetchNext(popStyle.isShort()))
+         {
+            throw new EOFException();
+         }
       }
 
       TeXObject object = remove(0);
 
-      if (object instanceof WhiteSpace && isIgnoreLeadingSpace(popStyle))
+      if (object instanceof WhiteSpace && popStyle.isIgnoreLeadingSpace())
       {
          return popToken(popStyle);
       }
-      else if (object instanceof Ignoreable && !isRetainIgnoreables(popStyle))
+      else if (object instanceof Ignoreable && !popStyle.isRetainIgnoreables())
       {
          listener.skipping((Ignoreable)object);
 
@@ -2253,7 +3391,7 @@ public class TeXParser extends TeXObjectList
       return object;
    }
 
-   public TeXObjectList popToGroup(byte popStyle)
+   public TeXObjectList popToGroup(PopStyle popStyle)
      throws IOException
    {
       TeXObjectList list = new TeXObjectList();
@@ -2262,17 +3400,15 @@ public class TeXParser extends TeXObjectList
       {
          if (size() == 0)
          {
-            fetchNext(isShort(popStyle));
-         }
-
-         if (size() == 0)
-         {
-            throw new EOFException();
+            if (!fetchNext(popStyle.isShort()))
+            {
+               throw new EOFException();
+            }
          }
 
          TeXObject obj = firstElement();
 
-         BgChar bgChar = isBeginGroup(obj);
+         BeginGroupObject bgChar = toBeginGroup(obj);
 
          if (obj instanceof Group || bgChar != null)
          {
@@ -2281,7 +3417,7 @@ public class TeXParser extends TeXObjectList
 
          obj = remove(0);
 
-         if (obj instanceof Ignoreable && !isRetainIgnoreables(popStyle))
+         if (obj instanceof Ignoreable && !popStyle.isRetainIgnoreables())
          {
             listener.skipping((Ignoreable)obj);
          }
@@ -2318,46 +3454,35 @@ public class TeXParser extends TeXObjectList
       return popRegister(this);
    }
 
-   public TeXObject peekStack(byte popStyle)
+   @Override
+   public TeXObject peekStack(PopStyle popStyle)
      throws IOException
    {
       int idx = 0;
 
       if (size() == 0)
       {
-         fetchNext();
+         if (!fetchNext(popStyle.isShort()))
+         {
+            return null;
+         }
       }
 
       TeXObject obj = firstElement();
 
-      if (isIgnoreLeadingSpace(popStyle))
+      while (obj.isPopStyleSkip(popStyle))
       {
-         while (obj instanceof Ignoreable 
-             || obj instanceof WhiteSpace)
+         idx++;
+
+         if (size() == idx)
          {
-            idx++;
-
-            if (size() == idx)
+            if (!fetchNext(popStyle.isShort()))
             {
-               fetchNext();
+               return null;
             }
-
-            obj = get(idx);
          }
-      }
-      else
-      {
-         while (obj instanceof Ignoreable)
-         {
-            idx++;
 
-            if (size() == idx)
-            {
-               fetchNext();
-            }
-
-            obj = get(idx);
-         }
+         obj = get(idx);
       }
 
       return obj;
@@ -2532,13 +3657,19 @@ public class TeXParser extends TeXObjectList
       return activeTable.get(intCode);
    }
 
+   public void pushDeclaration(Declaration declaration)
+   {
+      settings.addDeclaration(declaration);
+   }
+
    public void startGroup()
    {
       settings = new TeXSettings(settings, this);
    }
 
-   public void endGroup()
+   public void endGroup() throws IOException
    {
+      settings.processEndDeclarations();
       TeXObjectList afterGroup = settings.getAfterGroup();
       settings = settings.getParent();
 
@@ -2842,11 +3973,6 @@ public class TeXParser extends TeXObjectList
    private TeXReader reader;
 
    private TeXParserListener listener;
-
-   public static final int TYPE_ESC = 0, TYPE_BG=1, TYPE_EG=2,
-     TYPE_MATH=3, TYPE_TAB=4, TYPE_EOL=5, TYPE_PARAM=6, TYPE_SP=7,
-     TYPE_SB=8, TYPE_IGNORE=9, TYPE_SPACE=10, TYPE_LETTER=11,
-     TYPE_OTHER=12, TYPE_ACTIVE=13, TYPE_COMMENT=14, TYPE_INVALID=15;
 
    private CatCodeList[] catcodes;
 

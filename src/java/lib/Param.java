@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -27,6 +27,7 @@ public class Param implements ParameterToken
       setDigit(digit);
    }
 
+   @Override
    public Object clone()
    {
       return new Param(digit);
@@ -42,32 +43,71 @@ public class Param implements ParameterToken
       this.digit = digit;
    }
 
+   @Override
+   public int getTeXCategory()
+   {
+      return TYPE_PARAM;
+   }
+
+   @Override
    public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      if (digit <= 0)
+      if (digit == 0)
       {
-         TeXObject nextToken = stack.peek();
+         TeXObject nextToken = parser.popNextToken(stack, PopStyle.DEFAULT);
 
-         throw new TeXSyntaxException(parser,
-            TeXSyntaxException.ERROR_BAD_PARAM,
-            nextToken == null ? "" : nextToken.toString(parser));
+         if (parser.toBeginGroup(nextToken) != null || (nextToken instanceof Group))
+         {
+            digit = -1;
+            stack.push(nextToken);
+         }
+         else
+         {
+            try
+            {
+               digit = Integer.parseInt(nextToken.format());
+
+               if (digit < 1 || digit > 9)
+               {
+                  digit = 0;
+
+                  throw new TeXSyntaxException(parser,
+                     TeXSyntaxException.ERROR_BAD_PARAM,
+                     nextToken.toString(parser));
+               }
+            }
+            catch (NumberFormatException | NullPointerException e)
+            {
+               digit = 0;
+
+               throw new TeXSyntaxException(e, parser,
+                  TeXSyntaxException.ERROR_BAD_PARAM,
+                  nextToken == null ? "" : nextToken.toString(parser));
+            }
+         }
       }
    }
 
+   @Override
    public void process(TeXParser parser)
      throws IOException
    {
-      if (digit <= 0)
-      {
-         TeXObject nextToken = parser.peekStack();
-
-         throw new TeXSyntaxException(parser,
-            TeXSyntaxException.ERROR_BAD_PARAM,
-            nextToken == null ? "" : nextToken.toString(parser));
-      }
+      process(parser, parser);
    }
 
+   @Override
+   public boolean process(TeXParser parser, TeXObjectList stack, StackMarker marker)
+      throws IOException
+   {
+      StackMarker m = stack.peekMarker();
+
+      process(parser, stack);
+
+      return marker.equals(m);
+   }
+
+   @Override
    public String toString(TeXParser parser)
    {
       String charStr = new String(Character.toChars(parser.getParamChar()));
@@ -76,11 +116,20 @@ public class Param implements ParameterToken
                          : String.format("%s%d", charStr, digit);
    }
 
+   @Override
    public String format()
    {
       return (digit <= 0 ? "#" : "#"+digit);
    }
 
+   @Override
+   public String stripToString(TeXParser parser)
+     throws IOException
+   {
+      return format();
+   }
+
+   @Override
    public String toString()
    {
       return String.format("%s[%s]", 
@@ -88,6 +137,7 @@ public class Param implements ParameterToken
         (digit <= 0 ? "#" : "#"+digit));
    }
 
+   @Override
    public TeXObjectList string(TeXParser parser)
      throws IOException
    {
@@ -102,16 +152,31 @@ public class Param implements ParameterToken
       return list;
    }
 
+   @Override
+   public boolean isPopStyleSkip(PopStyle popStyle)
+   {
+      return false;
+   }
+
+   @Override
    public boolean isPar()
    {
       return false;
    }
 
+   @Override
+   public boolean isEmptyObject()
+   {
+      return false;
+   }
+
+   @Override
    public ParameterToken next()
    {
       return null;
    }
 
+   @Override
    public Param tail()
    {
       return this;

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -37,39 +37,29 @@ public class DTLinsertinto extends ControlSequence
       this.expandElement = expandElement;
    }
 
+   @Override
    public Object clone()
    {
       return new DTLinsertinto(getName(), expandElement, sty);
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      TeXObject element = stack.popArg(parser);
+      TeXObject element;
 
-      if (expandElement && element instanceof Expandable)
+      if (expandElement)
       {
-         TeXObjectList expanded = ((Expandable)element).expandonce(parser, 
-           stack);
-
-         if (expanded != null)
-         {
-            element = expanded;
-         }
+         element = parser.popRequiredExpandOnce(stack);
+      }
+      else
+      {
+         element = parser.popRequired(stack);
       }
 
-      ControlSequence cs = stack.popControlSequence(parser);
-      ControlSequence criteria = stack.popControlSequence(parser);
-
-      if (cs instanceof TeXCsRef)
-      {
-         cs = parser.getListener().getControlSequence(cs.getName());
-      }
-
-      if (criteria instanceof TeXCsRef)
-      {
-         criteria = parser.getListener().getControlSequence(criteria.getName());
-      }
+      ControlSequence cs = parser.popRequiredControlSequence(stack, true);
+      ControlSequence criteria = parser.popRequiredControlSequence(stack, true);
 
       TeXObjectList list;
       CsvList csvList = null;
@@ -78,23 +68,18 @@ public class DTLinsertinto extends ControlSequence
       {
          list = ((GenericCommand)cs).getDefinition();
 
-         if (list.size() == 1 
-             && list.firstElement() instanceof CsvList)
-         {
-            csvList = (CsvList)list.firstElement();
-         }
+         csvList = (CsvList)list.toObject(CsvList.class);
       }
 
       if (csvList == null)
       {
-         list = null;
+         TeXObject expanded = parser.expandOnce(cs, stack);
 
-         if (cs instanceof Expandable)
+         if (expanded instanceof TeXObjectList)
          {
-            list = ((Expandable)cs).expandonce(parser, stack);
+            list = (TeXObjectList)expanded;
          }
-
-         if (list == null)
+         else
          {
             list = new TeXObjectList();
          }
@@ -119,7 +104,14 @@ public class DTLinsertinto extends ControlSequence
          list.add(obj);
          list.add(element);
 
-         list.process(parser, stack);
+         if (parser == stack)
+         {
+            list.process(parser);
+         }
+         else
+         {
+            list.process(parser, stack);
+         }
 
          if (reg.number(parser) > 0)
          {
@@ -131,92 +123,11 @@ public class DTLinsertinto extends ControlSequence
       csvList.add(element);
    }
 
+   @Override
    public void process(TeXParser parser)
      throws IOException
    {
-      TeXObject element = parser.popNextArg();
-
-      if (expandElement && element instanceof Expandable)
-      {
-         TeXObjectList expanded = ((Expandable)element).expandonce(parser);
-
-         if (expanded != null)
-         {
-            element = expanded;
-         }
-      }
-
-      ControlSequence cs = parser.popControlSequence(parser);
-      ControlSequence criteria = parser.popControlSequence(parser);
-
-      if (cs instanceof TeXCsRef)
-      {
-         cs = parser.getListener().getControlSequence(cs.getName());
-      }
-
-      if (criteria instanceof TeXCsRef)
-      {
-         criteria = parser.getListener().getControlSequence(criteria.getName());
-      }
-
-      TeXObjectList list;
-      CsvList csvList = null;
-
-      if (cs instanceof GenericCommand)
-      {
-         list = ((GenericCommand)cs).getDefinition();
-
-         if (list.size() == 1 
-             && list.firstElement() instanceof CsvList)
-         {
-            csvList = (CsvList)list.firstElement();
-         }
-      }
-
-      if (csvList == null)
-      {
-         list = null;
-
-         if (cs instanceof Expandable)
-         {
-            list = ((Expandable)cs).expandonce(parser);
-         }
-
-         if (list == null)
-         {
-            list = new TeXObjectList();
-         }
-
-         csvList = CsvList.getList(parser, list);
-         list = new TeXObjectList();
-         list.add(csvList);
-
-         cs = new GenericCommand(true, cs.getName(), null, list);
-         parser.putControlSequence(true, cs);
-      }
-
-      CountRegister reg = sty.getSortCountRegister();
-
-      for (int i = 0; i < csvList.size(); i++)
-      {
-         TeXObject obj = csvList.getValue(i);
-
-         list = new TeXObjectList(4);
-         list.add(criteria);
-         list.add(reg);
-         list.add(obj);
-         list.add(element);
-
-         list.process(parser);
-
-         if (reg.number(parser) > 0)
-         {
-            csvList.insertElementAt(element, i);
-            return;
-         }
-      }
-
-      csvList.add(element);
+      process(parser, parser);
    }
 
    protected DataToolBaseSty sty;

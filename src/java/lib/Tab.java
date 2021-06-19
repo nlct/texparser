@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -26,26 +26,44 @@ public class Tab implements TeXObject
    {
    }
 
+   @Override
    public Object clone()
    {
       return new Tab();
    }
 
+   @Override
+   public int getTeXCategory()
+   {
+      return TYPE_TAB;
+   }
+
+   @Override
    public String toString(TeXParser parser)
    {
       return new String(Character.toChars(parser.getTabChar()));
    }
 
+   @Override
    public String toString()
    {
-      return getClass().getName();
+      return getClass().getSimpleName();
    }
 
+   @Override
    public String format()
    {
       return "&";
    }
 
+   @Override
+   public String stripToString(TeXParser parser)
+     throws IOException
+   {
+      return format();
+   }
+
+   @Override
    public TeXObjectList string(TeXParser parser)
      throws IOException
    {
@@ -55,12 +73,22 @@ public class Tab implements TeXObject
       return list;
    }
 
+   @Override
+   public boolean process(TeXParser parser, TeXObjectList stack, StackMarker marker)
+      throws IOException
+   {
+      process(parser, stack);
+      return false;
+   }
+
+   @Override
    public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
       process(parser);
    }
 
+   @Override
    public void process(TeXParser parser)
      throws IOException
    {
@@ -69,7 +97,20 @@ public class Tab implements TeXObject
       settings.startColumn();
    }
 
+   @Override
+   public boolean isPopStyleSkip(PopStyle popStyle)
+   {
+      return false;
+   }
+
+   @Override
    public boolean isPar()
+   {
+      return false;
+   }
+
+   @Override
+   public boolean isEmptyObject()
    {
       return false;
    }

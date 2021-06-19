@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -20,7 +20,7 @@ package com.dickimawbooks.texparserlib;
 
 import java.io.IOException;
 
-public class BgChar extends Macro
+public class BgChar extends AbstractBgChar
 {
    public BgChar()
    {
@@ -29,17 +29,17 @@ public class BgChar extends Macro
 
    public BgChar(int code)
    {
-      charCode = code;
+      super(code);
    }
 
    public Object clone()
    {
-      return new BgChar(charCode);
+      return new BgChar(getCharCode());
    }
 
-   public String format()
+   public int getTeXCategory()
    {
-      return new String(Character.toChars(charCode));
+      return TYPE_BG;
    }
 
    public String toString(TeXParser parser)
@@ -47,53 +47,16 @@ public class BgChar extends Macro
       return new String(Character.toChars(parser.getBgChar()));
    }
 
-   public TeXObjectList string(TeXParser parser)
-     throws IOException
-   {
-      TeXObjectList list = new TeXObjectList();
-      list.add(parser.getListener().getOther(charCode));
-
-      return list;
-   }
-
-   public void process(TeXParser parser, TeXObjectList stack)
-     throws IOException
-   {
-      Group group = createGroup(parser);
-
-      stack.popRemainingGroup(parser, group, (byte)0, this);
-
-      stack.push(group);
-   }
-
-   public void process(TeXParser parser)
-     throws IOException
-   {
-      Group group = createGroup(parser);
-
-      parser.popRemainingGroup(group, (byte)0, this);
-
-      parser.push(group);
-   }
-
-
    public String show(TeXParser parser)
     throws IOException
    {
       return String.format("begin-group character %s", 
-        new String(Character.toChars(charCode)));
+        new String(Character.toChars(getCharCode())));
    }
 
-   public int getCharCode()
-   {
-      return charCode;
-   }
-
-   public Group createGroup(TeXParser parser)
+   public AbstractGroup createGroup(TeXParser parser)
    {
       return parser.getListener().createGroup();
    }
-
-   private int charCode;
 }
 

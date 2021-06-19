@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -34,33 +34,20 @@ public class ProcessOptions extends ControlSequence
       super(name);
    }
 
+   @Override
    public Object clone()
    {
       return new ProcessOptions(getName());
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      boolean isStar = false;
-      byte popStyle = TeXObjectList.POP_IGNORE_LEADING_SPACE;
+      PopStyle popStyle = PopStyle.IGNORE_LEADING_SPACE;
 
-      TeXObject arg = stack.peekStack(popStyle);
-
-      if (arg instanceof CharObject
-           && ((CharObject)arg).getCharCode() == (int)'*')
-      {
-         if (parser == stack)
-         {
-            arg = parser.popStack(popStyle);
-         }
-         else
-         {
-            arg = stack.popStack(parser, popStyle);
-         }
-
-         isStar = true;// not implemented
-      }
+      // star form not implemented but need to pop '*'
+      boolean isStar = parser.isNextChar('*', stack, popStyle);
 
       LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
 
@@ -69,6 +56,7 @@ public class ProcessOptions extends ControlSequence
       sty.processOptions();
    }
 
+   @Override
    public void process(TeXParser parser)
      throws IOException
    {

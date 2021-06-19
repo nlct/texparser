@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -67,18 +67,21 @@ public class Cline extends AlignSpan implements Expandable
       this.lastCol = lastCol;
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
     throws IOException
    {
       return expandfully(parser, stack);
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser)
     throws IOException
    {
       return expandfully(parser);
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser, TeXObjectList stack)
     throws IOException
    {
@@ -141,12 +144,14 @@ public class Cline extends AlignSpan implements Expandable
       return list;
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser)
     throws IOException
    {
       return expandfully(parser, parser);
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack)
    throws IOException
    {
@@ -154,6 +159,7 @@ public class Cline extends AlignSpan implements Expandable
         TeXSyntaxException.ERROR_MISPLACED_OMIT);
    }
 
+   @Override
    public void process(TeXParser parser)
    throws IOException
    {

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -23,62 +23,24 @@ import java.util.Vector;
 
 import com.dickimawbooks.texparserlib.*;
 
-public abstract class LaTeXFloat extends Declaration
+public abstract class LaTeXFloat extends RobustDeclaration
 {
    public LaTeXFloat(String name)
    {
       super(name);
    }
 
-   public TeXObjectList expandonce(TeXParser parser, TeXObjectList list)
-      throws IOException
-   {
-      return null;
-   }
-
-   public TeXObjectList expandonce(TeXParser parser)
-      throws IOException
-   {
-      return null;
-   }
-
-   public TeXObjectList expandfully(TeXParser parser, TeXObjectList list)
-      throws IOException
-   {
-      return null;
-   }
-
-   public TeXObjectList expandfully(TeXParser parser)
-      throws IOException
-   {
-      return null;
-   }
-
+   @Override
    public boolean isModeSwitcher()
    {
       return false;
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack)
    throws IOException
    {
-      TeXObject arg = stack.popArg(parser, '[', ']');
-      String placement = null;
-
-      if (arg != null)
-      {
-         if (arg instanceof Expandable)
-         {
-            TeXObjectList expanded = ((Expandable)arg).expandfully(parser, stack);
-
-            if (expanded != null)
-            {
-               arg = expanded;
-            }
-         }
-
-         placement = arg.toString(parser);
-      }
+      String placement = parser.popOptionalString(stack);
 
       parser.putControlSequence(true, 
          new GenericCommand("@captype", null, 
@@ -87,26 +49,11 @@ public abstract class LaTeXFloat extends Declaration
       startFloat(placement, parser, stack);
    }
 
+   @Override
    public void process(TeXParser parser)
    throws IOException
    {
-      TeXObject arg = parser.popNextArg('[', ']');
-      String placement = null;
-
-      if (arg != null)
-      {
-         if (arg instanceof Expandable)
-         {
-            TeXObjectList expanded = ((Expandable)arg).expandfully(parser);
-
-            if (expanded != null)
-            {
-               arg = expanded;
-            }
-         }
-
-         placement = arg.toString(parser);
-      }
+      String placement = parser.popOptionalString();
 
       parser.putControlSequence(true, 
          new GenericCommand("@captype", null, 

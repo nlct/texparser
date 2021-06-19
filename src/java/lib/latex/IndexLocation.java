@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -42,12 +42,19 @@ public class IndexLocation implements TeXObject
       setType(type);
    }
 
+   @Override
    public Object clone()
    {
       return new IndexLocation(
         format == null ? null : (TeXObject)format.clone(),
         (TeXObject)location.clone(),
         type);
+   }
+
+   @Override
+   public int getTeXCategory()
+   {
+      return TYPE_OBJECT;
    }
 
    public void setType(byte type)
@@ -80,6 +87,7 @@ public class IndexLocation implements TeXObject
       return location;
    }
 
+   @Override
    public boolean equals(Object object)
    {
       if (object == null || !(object instanceof IndexLocation))
@@ -109,6 +117,7 @@ public class IndexLocation implements TeXObject
       return location.equals(indexLoc.location);
    }
 
+   @Override
    public void process(TeXParser parser) throws IOException
    {
       if (format == null)
@@ -117,8 +126,7 @@ public class IndexLocation implements TeXObject
          return;
       }
 
-      if (location instanceof TeXObjectList
-      && !(location instanceof Group))
+      if (location instanceof TeXObjectList)
       {
          Group group = parser.getListener().createGroup();
 
@@ -134,6 +142,7 @@ public class IndexLocation implements TeXObject
       format.process(parser);
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
@@ -143,8 +152,7 @@ public class IndexLocation implements TeXObject
          return;
       }
 
-      if (location instanceof TeXObjectList
-      && !(location instanceof Group))
+      if (location instanceof TeXObjectList)
       {
          Group group = parser.getListener().createGroup();
 
@@ -160,11 +168,50 @@ public class IndexLocation implements TeXObject
       format.process(parser, stack);
    }
 
+   @Override
+   public boolean process(TeXParser parser, TeXObjectList stack, StackMarker marker)
+     throws IOException
+   {
+      if (format == null)
+      {
+         return location.process(parser, stack, marker);
+      }
+
+      if (location instanceof TeXObjectList)
+      {
+         Group group = parser.getListener().createGroup();
+
+         group.addAll((TeXObjectList)location);
+
+         stack.push(group);
+      }
+      else
+      {
+         stack.push(location);
+      }
+
+      return format.process(parser, stack, marker);
+   }
+
+   @Override
+   public boolean isPopStyleSkip(PopStyle popStyle)
+   {
+      return false;
+   }
+
+   @Override
    public boolean isPar()
    {
       return false;
    }
 
+   @Override
+   public boolean isEmptyObject()
+   {
+      return false;
+   }
+
+   @Override
    public TeXObjectList string(TeXParser parser) throws IOException
    {
       if (format == null)
@@ -180,6 +227,7 @@ public class IndexLocation implements TeXObject
       return list;
    }
 
+   @Override
    public String toString(TeXParser parser)
    {
       if (format == null)
@@ -194,12 +242,14 @@ public class IndexLocation implements TeXObject
         new String(Character.toChars(parser.getEgChar())));
    }
 
+   @Override
    public String toString()
    {
       return String.format("IndexLocation[type=%d,format=%s,location=%s]",
         type, format.toString(), location.toString());
    }
 
+   @Override
    public String format()
    {
       if (format == null)
@@ -210,6 +260,13 @@ public class IndexLocation implements TeXObject
       return String.format("%s{%s}",
         format.format(),
         location.format());
+   }
+
+   @Override
+   public String stripToString(TeXParser parser)
+     throws IOException
+   {
+      return "";
    }
 
    private byte type = NORMAL;

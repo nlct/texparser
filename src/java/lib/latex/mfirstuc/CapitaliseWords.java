@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2018 Nicola L.C. Talbot
+    Copyright (C) 2018-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -24,7 +24,7 @@ import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.primitives.IfTrue;
 import com.dickimawbooks.texparserlib.latex.*;
 
-public class CapitaliseWords extends ControlSequence implements Expandable
+public class CapitaliseWords extends Command
 {
    public CapitaliseWords(MfirstucSty sty)
    {
@@ -55,6 +55,7 @@ public class CapitaliseWords extends ControlSequence implements Expandable
       this.sty = sty;
    }
 
+   @Override
    public Object clone()
    {
       return new CapitaliseWords(sty, getName(), expansion);
@@ -62,11 +63,8 @@ public class CapitaliseWords extends ControlSequence implements Expandable
 
    public boolean isWordBoundary(TeXParser parser, TeXObject object)
    {
-      ControlSequence cs = parser.getControlSequence("ifMFUhyphen");
-
-      if (cs instanceof IfTrue 
-           && object instanceof CharObject
-           && ((CharObject)object).getCharCode() == '-')
+      if (parser.isControlSequenceTrue("ifMFUhyphen") 
+           && parser.isCharacter(object, '-'))
       {
          return true;
       }
@@ -80,67 +78,26 @@ public class CapitaliseWords extends ControlSequence implements Expandable
        && !Character.isAlphabetic(((CharObject)object).getCharCode());
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser)
      throws IOException
    {
       return expandonce(parser, parser);
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      TeXObject arg;
-
-      if (stack == parser)
-      {
-         arg = parser.popNextArg();
-      }
-      else
-      {
-         arg = stack.popArg(parser);
-      }
+      TeXObject arg = parser.popRequired(stack);
 
       if (expansion == MakeFirstUc.EXPANSION_ONCE)
       {
-         if (arg instanceof Expandable)
-         {
-            TeXObjectList list;
-
-            if (parser == stack)
-            {
-               list = ((Expandable)arg).expandonce(parser);
-            }
-            else
-            {
-               list = ((Expandable)arg).expandonce(parser, stack);
-            }
-
-            if (list != null)
-            {
-               arg = list;
-            }
-         }
+         arg = parser.expandOnce(arg, stack);
       }
       else if (expansion == MakeFirstUc.EXPANSION_FULL)
       {
-         if (arg instanceof Expandable)
-         {
-            TeXObjectList list;
-
-            if (parser == stack)
-            {
-               list = ((Expandable)arg).expandfully(parser);
-            }
-            else
-            {
-               list = ((Expandable)arg).expandfully(parser, stack);
-            }
-
-            if (list != null)
-            {
-               arg = list;
-            }
-         }
+         arg = parser.expandFully(arg, stack);
       }
 
       TeXObjectList expanded = new TeXObjectList();
@@ -154,8 +111,7 @@ public class CapitaliseWords extends ControlSequence implements Expandable
          expanded.add(new TeXCsRef("MFUcapword"));
          expanded.add(arg);
       }
-      else if (arg instanceof TeXObjectList 
-                && ((TeXObjectList)arg).size() > 0)
+      else if (arg instanceof TeXObjectList && !arg.isEmptyObject())
       {
          TeXObjectList list = (TeXObjectList)arg;
 
@@ -219,24 +175,28 @@ public class CapitaliseWords extends ControlSequence implements Expandable
       return expanded;
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser)
      throws IOException
    {
       return expandonce(parser).expandfully(parser);
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
       return expandonce(parser, stack).expandfully(parser, stack);
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
       expandonce(parser, stack).process(parser, stack);
    }
 
+   @Override
    public void process(TeXParser parser)
      throws IOException
    {

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -40,6 +40,7 @@ public class AtFnSymbol extends Command
       return new AtFnSymbol(getName());
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser)
    throws IOException
    {
@@ -56,6 +57,7 @@ public class AtFnSymbol extends Command
       return list;
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
    throws IOException
    {
@@ -101,6 +103,7 @@ public class AtFnSymbol extends Command
          LaTeXSyntaxException.ERROR_COUNTER_OUT_OF_RANGE, num, "0-9");
    }
 
+   @Override
    public void process(TeXParser parser) throws IOException
    {
       TeXObject obj = getSymbol(parser, parser.popNumber());
@@ -108,6 +111,7 @@ public class AtFnSymbol extends Command
       obj.process(parser);
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack) throws IOException
    {
       TeXObject obj = getSymbol(parser, stack.popNumber(parser));

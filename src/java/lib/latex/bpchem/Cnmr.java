@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -36,17 +36,19 @@ public class Cnmr extends ControlSequence
       super(name);
    }
 
+   @Override
    public Object clone()
    {
       return new Cnmr(getName());
    }
 
-
+   @Override
    public void process(TeXParser parser) throws IOException
    {
       process(parser, parser);
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList list) throws IOException
    {
       TeXParserListener listener = parser.getListener();

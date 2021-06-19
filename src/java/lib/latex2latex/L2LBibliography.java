@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -23,7 +23,9 @@ import java.io.Writer;
 
 import com.dickimawbooks.texparserlib.*;
 
-public class L2LBibliography extends L2LControlSequence
+import com.dickimawbooks.texparserlib.latex.Bibliography;
+
+public class L2LBibliography extends Bibliography
 {
    public L2LBibliography()
    {
@@ -35,13 +37,15 @@ public class L2LBibliography extends L2LControlSequence
       super(name);
    }
 
+   @Override
    public Object clone()
    {
       return new L2LBibliography(getName());
    }
 
-   private void processBib(TeXParser parser, TeXObject arg)
-      throws IOException
+   @Override
+   protected boolean doBibliography(TeXParser parser, TeXObject arg)
+       throws IOException
    {
       LaTeX2LaTeX listener = (LaTeX2LaTeX)parser.getListener();
 
@@ -54,28 +58,6 @@ public class L2LBibliography extends L2LControlSequence
       writeable.write(bibStr);
       writeable.writeCodePoint(parser.getEgChar());
 
-      String[] bibList = bibStr.split(" *, *");
-
-      TeXPath[] bibPaths = new TeXPath[bibList.length];
-
-      for (int i = 0; i < bibList.length; i++)
-      {
-         bibPaths[i] = new TeXPath(parser, bibList[i].trim(), "bib");
-      }
-
-      listener.bibliography(bibPaths);
+      return super.doBibliography(parser, arg);
    }
-
-   public void process(TeXParser parser, TeXObjectList stack)
-      throws IOException
-   {
-      processBib(parser, stack.popArg(parser));
-   }
-
-   public void process(TeXParser parser)
-      throws IOException
-   {
-      processBib(parser, parser.popNextArg());
-   }
-
 }

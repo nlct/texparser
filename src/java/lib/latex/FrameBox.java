@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -62,6 +62,7 @@ public class FrameBox extends ControlSequence
       currentInnerMargin = innerMargin;
    }
 
+   @Override
    public Object clone()
    {
       return new FrameBox(getName(), style, halign, valign, 
@@ -195,76 +196,20 @@ public class FrameBox extends ControlSequence
    protected void popSettings(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      TeXObject width = null;
-
-      if (parser == stack)
-      {
-         width = parser.popNextArg('[', ']');
-      }
-      else
-      {
-         width = stack.popArg(parser, '[', ']');
-      }
+      TeXObject width = parser.popOptionalExpandFully(stack);
 
       if (width != null)
       {
-         if (width instanceof Expandable)
-         {
-            TeXObjectList expanded;
-
-            if (parser == stack)
-            {
-               expanded = ((Expandable)width).expandfully(parser);
-            }
-            else
-            {
-               expanded = ((Expandable)width).expandfully(parser, stack);
-            }
-
-            if (expanded != null)
-            {
-               width = expanded;
-            }
-         }
-
          if (width instanceof TeXObjectList)
          {
             width = ((TeXObjectList)width).popDimension(parser);
          }
 
-         TeXObject pos = null;
-
-         if (parser == stack)
-         {
-            pos = parser.popNextArg('[', ']');
-         }
-         else
-         {
-            pos = stack.popArg(parser, '[', ']');
-         }
+         String pos = parser.popOptionalString(stack);
 
          if (pos != null)
          {
-            if (pos instanceof Expandable)
-            {
-               TeXObjectList expanded;
-
-               if (parser == stack)
-               {
-                  expanded = ((Expandable)pos).expandfully(parser);
-               }
-               else
-               {
-                  expanded = ((Expandable)pos).expandfully(parser, stack);
-               }
-
-               if (expanded != null)
-               {
-                  pos = expanded;
-               }
-            }
-
-            String val = pos.toString(parser).trim();
+            String val = pos.trim();
 
             if (val.equals("c"))
             {
@@ -298,21 +243,16 @@ public class FrameBox extends ControlSequence
    protected TeXObject popContents(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      if (parser == stack)
-      {
-         return parser.popNextArg();
-      }
-      else
-      {
-         return stack.popArg(parser);
-      }
+      return parser.popRequired(stack);
    }
 
+   @Override
    public void process(TeXParser parser) throws IOException
    {
       process(parser, parser);
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack) throws IOException
    {
       TeXDimension orgWidth = currentWidth;
@@ -336,7 +276,7 @@ public class FrameBox extends ControlSequence
 
       try
       {
-         arg.process(parser, stack);
+         parser.processObject(arg, stack);
       }
       finally
       {

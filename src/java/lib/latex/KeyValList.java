@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -35,6 +35,13 @@ public class KeyValList extends HashMap<String,TeXObject>
       keyList = new Vector<String>();
    }
 
+   @Override
+   public int getTeXCategory()
+   {
+      return TYPE_OBJECT;
+   }
+
+   @Override
    public TeXObject put(String key, TeXObject value)
    {
       TeXObject oldValue = super.put(key, value);
@@ -217,6 +224,11 @@ public class KeyValList extends HashMap<String,TeXObject>
    {
       TeXObject value = get(key);
 
+      if (value instanceof Group)
+      {
+         return ((Group)value).toList();
+      }
+
       if (value == null || value instanceof MissingValue
           || !(value instanceof TeXObjectList))
       {
@@ -233,8 +245,7 @@ public class KeyValList extends HashMap<String,TeXObject>
       {
          value = list.get(0);
 
-         if (value instanceof Group
-           &&!(value instanceof MathGroup))
+         if (value instanceof Group)
          {
             return ((Group)value).toList();
          }
@@ -273,8 +284,7 @@ public class KeyValList extends HashMap<String,TeXObject>
       {
          value = list.get(start);
 
-         if (value instanceof Group
-          &&!(value instanceof MathGroup))
+         if (value instanceof Group)
          {
             return ((Group)value).toList();
          }
@@ -294,17 +304,28 @@ public class KeyValList extends HashMap<String,TeXObject>
       return valList;
    }
 
+   @Override
    public TeXObjectList string(TeXParser parser) throws IOException
    {
       return new TeXObjectList();
    }
 
+   @Override
+   public boolean process(TeXParser parser, TeXObjectList stack, StackMarker marker)
+      throws IOException
+   {
+      process(parser, stack);
+      return false;
+   }
+
+   @Override
    public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
       process(parser);
    }
 
+   @Override
    public void process(TeXParser parser)
      throws IOException
    {
@@ -336,6 +357,7 @@ public class KeyValList extends HashMap<String,TeXObject>
       }
    }
 
+   @Override
    public String toString(TeXParser parser)
    {
       StringBuilder builder = new StringBuilder();
@@ -378,6 +400,7 @@ public class KeyValList extends HashMap<String,TeXObject>
       return builder.toString();
    }
 
+   @Override
    public String format()
    {
       StringBuilder builder = new StringBuilder();
@@ -418,7 +441,27 @@ public class KeyValList extends HashMap<String,TeXObject>
       return builder.toString();
    }
 
+   @Override
+   public String stripToString(TeXParser parser)
+     throws IOException
+   {
+      return "";
+   }
+
+   @Override
+   public boolean isPopStyleSkip(PopStyle popStyle)
+   {
+      return false;
+   }
+
+   @Override
    public boolean isPar()
+   {
+      return false;
+   }
+
+   @Override
+   public boolean isEmptyObject()
    {
       return false;
    }

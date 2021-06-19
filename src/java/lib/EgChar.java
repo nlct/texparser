@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -20,7 +20,7 @@ package com.dickimawbooks.texparserlib;
 
 import java.io.IOException;
 
-public class EgChar extends Macro
+public class EgChar extends AbstractEgChar
 {
    public EgChar()
    {
@@ -29,22 +29,17 @@ public class EgChar extends Macro
 
    public EgChar(int code)
    {
-      charCode = code;
+      super(code);
    }
 
    public Object clone()
    {
-      return new EgChar(charCode);
+      return new EgChar(getCharCode());
    }
 
-   public int getCharCode()
+   public int getTeXCategory()
    {
-      return charCode;
-   }
-
-   public String format()
-   {
-      return new String(Character.toChars(charCode));
+      return TYPE_EG;
    }
 
    public String toString(TeXParser parser)
@@ -52,42 +47,17 @@ public class EgChar extends Macro
       return new String(Character.toChars(parser.getEgChar()));
    }
 
-   public TeXObjectList string(TeXParser parser)
-     throws IOException
-   {
-      TeXObjectList list = new TeXObjectList();
-      list.add(parser.getListener().getOther(charCode));
-
-      return list;
-   }
-
-   public void process(TeXParser parser, TeXObjectList stack)
-     throws IOException
-   {
-      throw new TeXSyntaxException(parser,
-         TeXSyntaxException.ERROR_UNEXPECTED_EG);
-   }
-
-   public void process(TeXParser parser)
-     throws IOException
-   {
-      throw new TeXSyntaxException(parser,
-         TeXSyntaxException.ERROR_UNEXPECTED_EG);
-   }
-
 
    public String show(TeXParser parser)
     throws IOException
    {
       return String.format("end-group character %s", 
-       new String(Character.toChars(charCode)));
+       new String(Character.toChars(getCharCode())));
    }
 
-   public boolean matches(BgChar bgChar)
+   public Class getBgClass()
    {
-      return !(bgChar instanceof MathBg);
+      return BgChar.class;
    }
-
-   private int charCode;
 }
 

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -35,11 +35,13 @@ public class AtSecondOfTwo extends Command
       super(name);
    }
 
+   @Override
    public Object clone()
    {
       return new AtSecondOfTwo(getName());
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser)
      throws IOException
    {
@@ -54,6 +56,7 @@ public class AtSecondOfTwo extends Command
       return list;
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
@@ -68,6 +71,7 @@ public class AtSecondOfTwo extends Command
       return list;
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser)
      throws IOException
    {
@@ -97,6 +101,7 @@ public class AtSecondOfTwo extends Command
       return list;
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
@@ -126,6 +131,7 @@ public class AtSecondOfTwo extends Command
       return list;
    }
 
+   @Override
    public void process(TeXParser parser) throws IOException
    {
       TeXObject ignore = parser.popNextArg();
@@ -134,6 +140,7 @@ public class AtSecondOfTwo extends Command
       arg.process(parser);
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList list) throws IOException
    {
       TeXObject ignore = list.popArg(parser);

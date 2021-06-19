@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -31,11 +31,13 @@ public class L2LMathFontCommand extends MathFontCommand
       super(name, style);
    }
 
+   @Override
    public Object clone()
    {
       return new L2LMathFontCommand(getName(), getStyle());
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
@@ -44,21 +46,13 @@ public class L2LMathFontCommand extends MathFontCommand
       writeable.writeCodePoint(parser.getEscChar());
       writeable.write(getName());
 
-      TeXObject nextObj = stack.peekStack(
-        TeXObjectList.POP_RETAIN_IGNOREABLES);
-
-      if (nextObj instanceof Ignoreable)
+      if (parser.isNextObject(Ignoreable.class, stack,
+             PopStyle.RETAIN_IGNOREABLES))
       {
-         writeable.write(nextObj.toString(parser));
+         TeXObject obj = parser.popNextToken(stack,
+            PopStyle.RETAIN_IGNOREABLES);
 
-         if (parser == stack)
-         {
-            parser.popStack(TeXObjectList.POP_RETAIN_IGNOREABLES);
-         }
-         else
-         {
-            stack.popStack(parser, TeXObjectList.POP_RETAIN_IGNOREABLES);
-         }
+         writeable.write(obj.toString(parser));
       }
    }
 

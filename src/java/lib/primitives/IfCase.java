@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -35,11 +35,13 @@ public class IfCase extends If
       super(name);
    }
 
+   @Override
    public Object clone()
    {
       return new IfCase(getName());
    }
 
+   @Override
    public boolean istrue(TeXParser parser, TeXObjectList stack)
    throws IOException
    {
@@ -48,6 +50,7 @@ public class IfCase extends If
       return arg.number(parser) == 0;
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
    throws IOException
    {
@@ -78,7 +81,7 @@ public class IfCase extends If
       TeXObjectList list)
    throws IOException
    {
-      TeXObject obj = stack.popToken();
+      TeXObject obj = parser.popNextToken(stack);
 
       if (obj instanceof Expandable)
       {
@@ -179,12 +182,14 @@ public class IfCase extends If
       }
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
       stack.add(0, expandonce(parser, stack));
    }
 
+   @Override
    public void process(TeXParser parser)
       throws IOException
    {

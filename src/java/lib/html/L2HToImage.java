@@ -107,7 +107,7 @@ public class L2HToImage extends ControlSequence
 
       if (preAlt != null)
       {
-         if (alt instanceof TeXObjectList && !(alt instanceof Group))
+         if (alt instanceof TeXObjectList)
          {
             ((TeXObjectList)alt).push(preAlt);
          }
@@ -122,7 +122,7 @@ public class L2HToImage extends ControlSequence
 
       if (postAlt != null)
       {
-         if (alt instanceof TeXObjectList && !(alt instanceof Group))
+         if (alt instanceof TeXObjectList)
          {
             ((TeXObjectList)alt).add(postAlt);
          }

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -36,6 +36,12 @@ public abstract class ControlSequence extends Macro
 
    public abstract Object clone();
 
+   @Override
+   public int getTeXCategory()
+   {
+      return TYPE_OBJECT;
+   }
+
    public String getName()
    {
       return name;
@@ -46,12 +52,14 @@ public abstract class ControlSequence extends Macro
       this.name = name;
    }
 
+   @Override
    public String toString()
    {
       return String.format("%s[name=%s,prefix=%d,syntax=%s]",
        getClass().getSimpleName(), getName(), getPrefix(), getSyntax());
    }
 
+   @Override
    public String format()
    {
       String name = getName();
@@ -67,18 +75,21 @@ public abstract class ControlSequence extends Macro
       return "\\"+name;
    }
 
+   @Override
    public String toString(TeXParser parser)
    {
       return String.format("%s%s", 
         new String(Character.toChars(parser.getEscChar())), getName());
    }
 
+   @Override
    public TeXObjectList string(TeXParser parser)
      throws IOException
    {
       return parser.string(toString(parser));
    }
 
+   @Override
    public boolean equals(Object obj)
    {
       if (this == obj) return true;
@@ -94,7 +105,7 @@ public abstract class ControlSequence extends Macro
 
    public boolean isControlWord(TeXParser parser)
    {
-      return parser.isLetter(name.charAt(0));
+      return parser.isLetter(name.codePointAt(0));
    }
 
    // control sequence name without initial backslash

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -39,17 +39,26 @@ public class AssignedControlSequence extends Command
       }
    }
 
+   @Override
    public Object clone()
    {
       return new AssignedControlSequence(getName(), 
         (TeXObject)underlying.clone());
    }
 
+   @Override
+   public boolean isPopStyleSkip(PopStyle popStyle)
+   {
+      return underlying.isPopStyleSkip(popStyle);
+   }
+
+   @Override
    public boolean isPar()
    {
       return underlying.isPar();
    }
 
+   @Override
    public void setPrefix(byte prefix)
    {
       if (underlying instanceof Macro)
@@ -59,6 +68,7 @@ public class AssignedControlSequence extends Command
       }
    }
 
+   @Override
    public void clearPrefix()
    {
       if (underlying instanceof Macro)
@@ -68,6 +78,7 @@ public class AssignedControlSequence extends Command
       }
    }
 
+   @Override
    public boolean equals(Object obj)
    {
       if (obj == null || !(obj instanceof TeXObject))
@@ -83,67 +94,83 @@ public class AssignedControlSequence extends Command
       return underlying.equals(obj);
    }
 
+   @Override
    public void process(TeXParser parser)
       throws IOException
    {
       underlying.process(parser);
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
       underlying.process(parser, stack);
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser)
       throws IOException
    {
-      if (!(underlying instanceof Expandable))
+      TeXObject base = getBaseUnderlying();
+
+      if (!(base instanceof Expandable))
       {
          return null;
       }
 
-      return ((Expandable)underlying).expandonce(parser);
+      return ((Expandable)base).expandonce(parser);
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
-      if (!(underlying instanceof Expandable))
+      TeXObject base = getBaseUnderlying();
+
+      if (!(base instanceof Expandable))
       {
          return null;
       }
 
-      return ((Expandable)underlying).expandonce(parser, stack);
+      return ((Expandable)base).expandonce(parser, stack);
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser)
       throws IOException
    {
-      if (!(underlying instanceof Expandable))
+      TeXObject base = getBaseUnderlying();
+
+      if (!(base instanceof Expandable))
       {
          return null;
       }
 
-      return ((Expandable)underlying).expandfully(parser);
+      return ((Expandable)base).expandfully(parser);
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
-      if (!(underlying instanceof Expandable))
+      TeXObject base = getBaseUnderlying();
+
+      if (!(base instanceof Expandable))
       {
          return null;
       }
 
-      return ((Expandable)underlying).expandfully(parser, stack);
+      return ((Expandable)base).expandfully(parser, stack);
    }
 
+   @Override
    public TeXObject getUnderlying()
    {
       return underlying;
    }
 
+   @Override
    public TeXObject getBaseUnderlying()
    {
       if (underlying instanceof AssignedMacro)

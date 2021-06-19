@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -35,11 +35,13 @@ public class Advance extends Primitive
       super(name);
    }
 
+   @Override
    public Object clone()
    {
       return new Advance(getName());
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
@@ -51,35 +53,14 @@ public class Advance extends Primitive
            TeXSyntaxException.ERROR_REGISTER_NOT_NUMERIC);
       }
 
-      TeXObject object = stack.popToken(TeXObjectList.POP_IGNORE_LEADING_SPACE);
-
-      if (object instanceof CharObject
-           && ((CharObject)object).getCharCode() == 'b')
-      {
-         TeXObject prevObject = object;
-         object = stack.popToken();
-
-         if (!(object instanceof CharObject
-               && ((CharObject)object).getCharCode() == 'y'))
-         {
-            stack.push(object);
-            stack.push(prevObject);
-
-            throw new TeXSyntaxException(parser, 
-             TeXSyntaxException.ERROR_NUMBER_EXPECTED,
-              'b');
-         }
-      }
-      else
-      {
-         stack.push(object);
-      }
+      parser.isNextWord("by", stack);
 
       Numerical num = stack.popNumerical(parser);
 
       ((NumericRegister)reg).advance(parser, num);
    }
 
+   @Override
    public void process(TeXParser parser)
       throws IOException
    {

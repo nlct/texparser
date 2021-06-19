@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -36,76 +36,25 @@ public class DTLnumitemsinlist extends ControlSequence
       super(name);
    }
 
+   @Override
    public Object clone()
    {
       return new DTLnumitemsinlist(getName());
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      TeXObject list;
+      CsvList csvList = CsvList.popCsvListFromStack(parser, stack, true);
 
-      if (parser == stack)
-      {
-         list = parser.popNextArg();
-      }
-      else
-      {
-         list = stack.popArg(parser);
-      }
-
-      CsvList csvList = null;
-
-      if (list instanceof CsvList)
-      {
-         csvList = (CsvList)list;
-      }
-      else if (list instanceof TeXObjectList
-         && ((TeXObjectList)list).size() == 0
-         && ((TeXObjectList)list).firstElement() instanceof CsvList)
-      {
-         csvList = (CsvList)((TeXObjectList)list).firstElement();
-      }
-      else if (list instanceof Expandable)
-      {
-         TeXObjectList expanded;
-
-         if (parser == stack)
-         {
-            expanded = ((Expandable)list).expandonce(parser);
-         }
-         else
-         {
-            expanded = ((Expandable)list).expandonce(parser, stack);
-         }
-
-         if (expanded != null)
-         {
-            list = expanded;
-         }
-
-         if (list instanceof TeXObjectList
-            && ((TeXObjectList)list).size() == 0
-            && ((TeXObjectList)list).firstElement() instanceof CsvList)
-         {
-            csvList = (CsvList)((TeXObjectList)list).firstElement();
-         }
-      }
-
-      ControlSequence cmd = stack.popControlSequence(parser);
+      ControlSequence cmd = parser.popRequiredControlSequence(stack, true);
 
       String csName = cmd.getName();
 
-      if (csvList == null)
-      {
-         csvList = CsvList.getList(parser, list);
-      }
-
       int n = 0;
 
-      ControlSequence ifCs = parser.getControlSequence("ifDTLlistskipempty");
-      boolean skipEmpty = (ifCs instanceof IfTrue);
+      boolean skipEmpty = parser.isControlSequenceTrue("ifDTLlistskipempty");
 
       for (int i = 0; i < csvList.size(); i++)
       {
@@ -122,6 +71,7 @@ public class DTLnumitemsinlist extends ControlSequence
          csName, null, new UserNumber(n)));
    }
 
+   @Override
    public void process(TeXParser parser)
      throws IOException
    {

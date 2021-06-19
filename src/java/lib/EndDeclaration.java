@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -45,6 +45,7 @@ public class EndDeclaration extends ControlSequence
       }
    }
 
+   @Override
    public Object clone()
    {
       EndDeclaration dec = new EndDeclaration(getName());
@@ -53,12 +54,14 @@ public class EndDeclaration extends ControlSequence
       return dec;
    }
 
-   public void process(TeXParser parser, TeXObjectList list)
+   @Override
+   public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
       doEnd(parser);
    }
 
+   @Override
    public void process(TeXParser parser)
      throws IOException
    {
@@ -68,6 +71,7 @@ public class EndDeclaration extends ControlSequence
    protected void doEnd(TeXParser parser)
       throws IOException
    {
+System.out.println("--->>END DEC: "+toString());
       Declaration decl = getDeclaration(parser);
 
       if (decl != null)
@@ -78,11 +82,12 @@ public class EndDeclaration extends ControlSequence
 
    public Declaration getDeclaration(TeXParser parser)
    {
-      ControlSequence cs = parser.getListener().getControlSequence(declName);
+      TeXObject dec = parser.resolveReference(
+         parser.getListener().getControlSequence(declName));
 
-      if (cs instanceof Declaration)
+      if (dec instanceof Declaration)
       {
-         return (Declaration)cs;
+         return (Declaration)dec;
       }
 
       return null;
@@ -108,6 +113,13 @@ public class EndDeclaration extends ControlSequence
    public String getDeclarationName()
    {
       return declName;
+   }
+
+   @Override
+   public String toString()
+   {
+      return String.format("%s[name=%s,declaration=%s]",
+        getClass().getSimpleName(), getName(), declName);
    }
 
    private String declName;

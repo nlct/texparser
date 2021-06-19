@@ -26,47 +26,37 @@ public class Alph extends Command
 {
    public Alph()
    {
-      this("Alph", AtAlph.UPPER);
+      this("Alph", CharacterCase.UPPER);
    }
 
-   public Alph(String name, byte state)
+   public Alph(String name, CharacterCase state)
    {
       super(name);
 
-      if (state != AtAlph.UPPER && state != AtAlph.LOWER)
+      if (state != CharacterCase.UPPER && state != CharacterCase.LOWER)
       {
          throw new IllegalArgumentException(String.format(
-          "Invalid state '%d' for Alph ", state));
+          "Invalid state '%s' for Alph ", state));
       }
 
       this.state = state;
    }
 
+   @Override
    public Object clone()
    {
       return new Alph(getName(), state);
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
     throws IOException
    {
-      TeXObject counter = stack.popArg(parser);
-
-      if (counter instanceof Expandable)
-      {
-         TeXObjectList expanded = ((Expandable)counter).expandfully(parser, stack);
-
-         if (expanded != null)
-         {
-            counter = expanded;
-         }
-      }
-
-      String name = counter.toString(parser);
+      String name = parser.popRequiredString(stack);
 
       TeXObjectList list = new TeXObjectList();
 
-      if (state == AtAlph.UPPER)
+      if (state == CharacterCase.UPPER)
       {
          list.add(new TeXCsRef("@Alph"));
       }
@@ -80,59 +70,22 @@ public class Alph extends Command
       return list;
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser)
     throws IOException
    {
-      TeXObject counter = parser.popNextArg();
-
-      if (counter instanceof Expandable)
-      {
-         TeXObjectList expanded = ((Expandable)counter).expandfully(parser);
-
-         if (expanded != null)
-         {
-            counter = expanded;
-         }
-      }
-
-      String name = counter.toString(parser);
-
-      TeXObjectList list = new TeXObjectList();
-
-      if (state == AtAlph.UPPER)
-      {
-         list.add(new TeXCsRef("@Alph"));
-      }
-      else
-      {
-         list.add(new TeXCsRef("@alph"));
-      }
-
-      list.add(new TeXCsRef("c@"+name));
-
-      return list;
+      return expandonce(parser, parser);
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser, TeXObjectList stack)
     throws IOException
    {
-      TeXObject counter = stack.popArg(parser);
-
-      if (counter instanceof Expandable)
-      {
-         TeXObjectList expanded = ((Expandable)counter).expandfully(parser, stack);
-
-         if (expanded != null)
-         {
-            counter = expanded;
-         }
-      }
-
-      String name = counter.toString(parser);
+      String name = parser.popRequiredString(stack);
 
       LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
 
-      int value = listener.getcountervalue(counter.toString(parser));
+      int value = listener.getcountervalue(name);
 
       TeXObjectList list = new TeXObjectList();
 
@@ -141,77 +94,32 @@ public class Alph extends Command
       return list;
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser)
     throws IOException
    {
-      TeXObject counter = parser.popNextArg();
-
-      if (counter instanceof Expandable)
-      {
-         TeXObjectList expanded = ((Expandable)counter).expandfully(parser);
-
-         if (expanded != null)
-         {
-            counter = expanded;
-         }
-      }
-
-      String name = counter.toString(parser);
-
-      LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
-
-      int value = listener.getcountervalue(counter.toString(parser));
-
-      TeXObjectList list = new TeXObjectList();
-
-      list.add(AtAlph.getSymbol(parser, value, state));
-
-      return list;
+      return expandfully(parser, parser);
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      TeXObject counter = stack.popArg(parser);
-
-      if (counter instanceof Expandable)
-      {
-         TeXObjectList expanded = ((Expandable)counter).expandfully(parser, stack);
-
-         if (expanded != null)
-         {
-            counter = expanded;
-         }
-      }
+      String name = parser.popRequiredString(stack);
 
       LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
 
-      int value = listener.getcountervalue(counter.toString(parser));
+      int value = listener.getcountervalue(name);
 
-      AtAlph.getSymbol(parser, value, state).process(parser, stack);
+      parser.processObject(AtAlph.getSymbol(parser, value, state), stack);
    }
 
+   @Override
    public void process(TeXParser parser)
      throws IOException
    {
-      TeXObject counter = parser.popNextArg();
-
-      if (counter instanceof Expandable)
-      {
-         TeXObjectList expanded = ((Expandable)counter).expandfully(parser);
-
-         if (expanded != null)
-         {
-            counter = expanded;
-         }
-      }
-
-      LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
-
-      int value = listener.getcountervalue(counter.toString(parser));
-
-      AtAlph.getSymbol(parser, value, state).process(parser);
+      process(parser, parser);
    }
 
-   private byte state = AtAlph.UPPER;
+   private CharacterCase state = CharacterCase.UPPER;
 }

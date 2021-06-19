@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -61,26 +61,31 @@ public class VerbChar extends ActiveChar
       return new String(Character.toChars(codePoint));
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser)
    {
       return null;
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser)
    {
       return null;
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
    {
       return null;
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser, TeXObjectList stack)
    {
       return null;
    }
 
+   @Override
    public void process(TeXParser parser) throws IOException
    {
       TeXObjectList list = parser.popRemainingVerb(codePoint);
@@ -89,6 +94,7 @@ public class VerbChar extends ActiveChar
         list.toString(parser));
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack) throws IOException
    {
       if (stack == null || stack == parser)

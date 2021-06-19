@@ -39,6 +39,7 @@ public class GobbleOpt extends Command
       this.modifiers = modifiers;
    }
 
+   @Override
    public Object clone()
    {
       return new GobbleOpt(getName(), getNumOptional(), getNumMandatory(), getModifiers());
@@ -59,6 +60,7 @@ public class GobbleOpt extends Command
       return modifiers;
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser)
      throws IOException
    {
@@ -66,6 +68,7 @@ public class GobbleOpt extends Command
       return new TeXObjectList();
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
@@ -73,12 +76,14 @@ public class GobbleOpt extends Command
       return new TeXObjectList();
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser)
      throws IOException
    {
       return expandonce(parser);
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
@@ -98,6 +103,7 @@ public class GobbleOpt extends Command
       return false;
    }
 
+   @Override
    public void process(TeXParser parser) throws IOException
    {
       if (modifiers != null && modifiers.length > 0)
@@ -126,6 +132,7 @@ public class GobbleOpt extends Command
       }
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList list) throws IOException
    {
       if (modifiers != null && modifiers.length > 0)

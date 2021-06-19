@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -23,6 +23,11 @@ public class Letter extends CharObject implements CaseChangeable
    public Letter(int charCode)
    {
       super(charCode);
+   }
+
+   public int getTeXCategory()
+   {
+      return TYPE_LETTER;
    }
 
    public TeXObject toLowerCase(TeXParser parser)

@@ -23,7 +23,7 @@ import java.util.Hashtable;
 
 import com.dickimawbooks.texparserlib.*;
 
-public class Symbol extends ControlSequence implements Expandable,CaseChangeable
+public class Symbol extends Command implements CaseChangeable
 {
    public Symbol(String name, int codePoint)
    {
@@ -66,6 +66,7 @@ public class Symbol extends ControlSequence implements Expandable,CaseChangeable
       return parser.getListener().getOther(Character.toUpperCase(codePoint));
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser)
      throws IOException
    {
@@ -77,6 +78,7 @@ public class Symbol extends ControlSequence implements Expandable,CaseChangeable
       return list;
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser,
       TeXObjectList stack)
      throws IOException
@@ -84,12 +86,14 @@ public class Symbol extends ControlSequence implements Expandable,CaseChangeable
       return expandonce(parser);
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser)
      throws IOException
    {
       return expandonce(parser);
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser,
       TeXObjectList stack)
      throws IOException
@@ -108,11 +112,13 @@ public class Symbol extends ControlSequence implements Expandable,CaseChangeable
       listener.getWriteable().writeCodePoint(c == -1 ? codePoint : c);
    }
 
+   @Override
    public void process(TeXParser parser) throws IOException
    {
       write(parser);
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack) throws IOException
    {
       process(parser);

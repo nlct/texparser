@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -44,35 +44,37 @@ public class IfThenElse extends ControlSequence
    public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      TeXObject test = stack.popArg(parser);
-      TeXObject thenClause = stack.popArg(parser);
-      TeXObject elseClause = stack.popArg(parser);
+      TeXObject test = parser.popRequired(stack);
 
-      if (sty.evaluate(test))
+      boolean condition = sty.evaluate(stack, test);
+
+      TeXObject thenClause = parser.popRequired(stack);
+      TeXObject elseClause = parser.popRequired(stack);
+      TeXObject obj;
+
+      if (condition)
       {
-         thenClause.process(parser, stack);
+         obj = thenClause;
       }
       else
       {
-         elseClause.process(parser, stack);
+         obj = elseClause;
+      }
+
+      if (parser == stack)
+      {
+         obj.process(parser);
+      }
+      else
+      {
+         obj.process(parser, stack);
       }
    }
 
    public void process(TeXParser parser)
      throws IOException
    {
-      TeXObject test = parser.popNextArg();
-      TeXObject thenClause = parser.popNextArg();
-      TeXObject elseClause = parser.popNextArg();
-
-      if (sty.evaluate(test))
-      {
-         thenClause.process(parser);
-      }
-      else
-      {
-         elseClause.process(parser);
-      }
+      process(parser, parser);
    }
 
    protected IfThenSty sty;

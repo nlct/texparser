@@ -39,6 +39,7 @@ public class Value extends Command
       return new Value(getName());
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
     throws IOException
    {
@@ -71,6 +72,7 @@ public class Value extends Command
       return list;
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser)
     throws IOException
    {
@@ -103,6 +105,7 @@ public class Value extends Command
       return list;
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser, TeXObjectList stack)
     throws IOException
    {
@@ -135,6 +138,7 @@ public class Value extends Command
       return list;
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser)
     throws IOException
    {
@@ -167,6 +171,7 @@ public class Value extends Command
       return list;
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList list)
      throws IOException
    {
@@ -189,6 +194,7 @@ public class Value extends Command
       listener.getWriteable().write(""+value);
    }
 
+   @Override
    public void process(TeXParser parser)
      throws IOException
    {

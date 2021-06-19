@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-20 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -35,6 +35,7 @@ public class Maketitle extends ControlSequence
       super(name);
    }
 
+   @Override
    public Object clone()
    {
       return new Maketitle(getName());
@@ -67,56 +68,34 @@ public class Maketitle extends ControlSequence
       TeXObjectList list = new TeXObjectList();
 
       list.add(listener.getControlSequence("begin"));
-      list.add(listener.createGroup("center"));
+      list.add(listener.createGroup("titlepage"));
 
-      Group grp = listener.createGroup();
-      grp.add(listener.getControlSequence("LARGE"));
-      grp.add(listener.getControlSequence("@title"));
-      grp.add(listener.getControlSequence("par"));
-
-      list.add(grp);
-
-      grp = listener.createGroup();
-      grp.add(listener.getControlSequence("large"));
-      grp.add(listener.getControlSequence("begin"));
-      grp.add(listener.createGroup("tabular"));
-      grp.add(listener.createString("[t]"));
-      grp.add(listener.createGroup("c"));
-      grp.add(listener.getControlSequence("@author"));
-      grp.add(listener.getControlSequence("end"));
-      grp.add(listener.createGroup("tabular"));
-      grp.add(listener.getControlSequence("par"));
-
-      list.add(grp);
-
-      grp = listener.createGroup();
-      grp.add(listener.getControlSequence("large"));
-      grp.add(listener.getControlSequence("@date"));
-
-      list.add(grp);
+      list.add(listener.getControlSequence("@title"));
+      list.add(listener.getControlSequence("@author"));
+      list.add(listener.getControlSequence("@date"));
 
       list.add(listener.getControlSequence("end"));
-      list.add(listener.createGroup("center"));
+      list.add(listener.createGroup("titlepage"));
 
       return list;
    }
 
+   @Override
    public void process(TeXParser parser)
    throws IOException
    {
-      preProcess(parser);
-
-      createTitle(parser).process(parser);
-
-      postProcess(parser);
+      process(parser, parser);
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack)
    throws IOException
    {
       preProcess(parser);
 
-      createTitle(parser).process(parser, stack);
+      TeXObjectList list = createTitle(parser);
+
+      parser.processObject(list, stack);
 
       postProcess(parser);
    }

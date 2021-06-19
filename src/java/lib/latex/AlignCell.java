@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2020 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -16,45 +16,47 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
-package com.dickimawbooks.texparserlib.html;
+package com.dickimawbooks.texparserlib.latex;
 
 import java.io.IOException;
-import java.util.Vector;
+import java.util.*;
 
 import com.dickimawbooks.texparserlib.*;
-import com.dickimawbooks.texparserlib.latex.*;
 
-public class L2HTheBibliography extends TheBibliography
+public class AlignCell extends AbstractGroup
 {
-   public L2HTheBibliography()
+   public AlignCell()
    {
-      this("thebibliography");
+      super();
    }
 
-   public L2HTheBibliography(String name)
+   public AlignRow(int capacity)
    {
-      super(name);
+      super(capacity);
    }
 
-   public Object clone()
+   @Override
+   public AbstractTeXObjectList createList()
    {
-      return new L2HTheBibliography(getName());
+      return new AlignCell();
    }
 
-   protected void startBibliography(TeXParser parser, 
-     TeXObject widest)
-     throws IOException
+   @Override
+   public BeginGroupObject getBegin(TeXParser parser)
    {
-      L2HConverter listener = (L2HConverter)parser.getListener();
-
-      listener.write("<div class=\"bibliography\"><div>");
+      return new BeginAlignCell();
    }
 
-   public void end(TeXParser parser)
-   throws IOException
+   @Override
+   public EndGroupObject getEnd(TeXParser parser)
    {
-      L2HConverter listener = (L2HConverter)parser.getListener();
-
-      listener.write("</div></div>");
+      return new EndAlignCell();
    }
+
+   @Override
+   public boolean equals(Object o)
+   {
+      return ((o instanceof AlignCell) && super.equals(o));
+   }
+
 }
