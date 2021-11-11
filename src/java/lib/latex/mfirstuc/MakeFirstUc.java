@@ -156,6 +156,20 @@ public class MakeFirstUc extends ControlSequence implements Expandable
             }
          }
 
+         if (object instanceof MFUskippunc)
+         {
+            object = list.popArg(parser);
+
+            expanded.add(object);
+
+            object = list.popStack(parser);
+
+            if (object instanceof TeXCsRef)
+            {
+               object = listener.getControlSequence(((TeXCsRef)object).getName());
+            }
+         }
+
          if (object instanceof CaseChangeable)
          {
             expanded.add(((CaseChangeable)object).toUpperCase(parser));

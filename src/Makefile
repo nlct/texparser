@@ -65,11 +65,7 @@ test-mkimages : app tests/output
 	rm -f -r tests/output/test-mkimages
 	bin/texparsertest --debug --in tests/test-mkimages/test-mkimages.tex --output tests/output/test-mkimages --html
 
-test-search	: lib/testsearch.jar
-		java -jar lib/testsearch.jar -c partial -c marginpar -c '.*count.*' tests/test-article/test-article.tex
-		java -jar lib/testsearch.jar -c 'page.*' -u '.*id=\d+' query tests/test-input/test-input-main.tex
-
-app     : lib lib/texparserlib.jar lib/texparsertest.jar lib/testsearch.jar \
+app     : lib lib/texparserlib.jar lib/texparsertest.jar \
 	  lib/resources lib/texparser-splash.png \
 	  bin/texparsertest lib/icons \
 	  resources/helpsets/texparser-en/Map.jhm \
@@ -90,19 +86,6 @@ lib/texparserlib.jar      : lib classes/com/dickimawbooks/texparserlib/TeXParser
 	com/dickimawbooks/texparserlib/*.class \
 	com/dickimawbooks/texparserlib/*/*.class \
 	com/dickimawbooks/texparserlib/*/*/*.class 
-
-lib/testsearch.jar	: lib/texparserlib.jar java/testsearch/Manifest.txt \
-			classes/com/dickimawbooks/texparsertestsearch/TestSearch.class
-	cd classes; \
-	jar cmf ../java/testsearch/Manifest.txt ../lib/testsearch.jar \
-	com/dickimawbooks/texparsertestsearch/*.class
-
-classes/com/dickimawbooks/texparsertestsearch/TestSearch.class	: java/testsearch/*.java
-	cd java/testsearch; \
-	javac -d ../../classes \
-	 -Xlint:unchecked -Xlint:deprecation \
-	-cp ../../lib/texparserlib.jar \
-	*.java
 
 lib/texparsertest.jar      : java/test/Manifest.txt \
 			classes/com/dickimawbooks/texparsertest/TeXParserApp.class 

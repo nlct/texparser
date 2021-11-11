@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013-2020 Nicola L.C. Talbot
+    Copyright (C) 2013-2021 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -2854,6 +2854,6 @@ public class TeXParser extends TeXObjectList
 
    private String jobname = null;
 
-   public static final String VERSION = "0.9.2.5b";
-   public static final String VERSION_DATE = "2020-07-11";
+   public static final String VERSION = "0.9.2.6b";
+   public static final String VERSION_DATE = "2021-11-11";
 }

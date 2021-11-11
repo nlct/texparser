@@ -22,6 +22,7 @@ import java.io.IOException;
 
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.primitives.NewIf;
+import com.dickimawbooks.texparserlib.primitives.Uppercase;
 import com.dickimawbooks.texparserlib.latex.*;
 
 public class MfirstucSty extends LaTeXSty
@@ -54,6 +55,21 @@ public class MfirstucSty extends LaTeXSty
       registerControlSequence(new MakeFirstUc("MFUcapword"));
       registerControlSequence(new MFUnocap(this));
       registerControlSequence(new MFUnocap(this, "gMFUnocap", true));
+      registerControlSequence(new MFUskippunc());
+      registerControlSequence(new MFUwordbreak());
+
+      // not used but implement in case it's used explicitly
+
+      if (listener.isStyLoaded("textcase") || listener.isStyLoaded("glossaries"))
+      {
+         registerControlSequence(new GenericCommand(true,
+            "mfirstucMakeUppercase", null,
+             new TeXObject[] { new TeXCsRef("MakeTextUppercase") }));
+      }
+      else
+      {
+         registerControlSequence(new Uppercase("mfirstucMakeUppercase"));
+      }
    }
 
    public void addException(String word)

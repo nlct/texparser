@@ -60,6 +60,12 @@ public class CapitaliseWords extends ControlSequence implements Expandable
       return new CapitaliseWords(sty, getName(), expansion);
    }
 
+   public boolean isWordBreakCs(TeXObject object)
+   {
+      return ((object instanceof ControlSequence) 
+              && ((ControlSequence)object).getName().equals("MFUwordbreak"));
+   }
+
    public boolean isWordBoundary(TeXParser parser, TeXObject object)
    {
       ControlSequence cs = parser.getControlSequence("ifMFUhyphen");
@@ -71,7 +77,7 @@ public class CapitaliseWords extends ControlSequence implements Expandable
          return true;
       }
 
-      return object instanceof Space;
+      return (object instanceof Space || isWordBreakCs(object));
    }
 
    public boolean isPunctuation(TeXObject object)
@@ -173,7 +179,14 @@ public class CapitaliseWords extends ControlSequence implements Expandable
                     (isPunctuation(object) || isWordBoundary(parser, object)))
             {
                object = list.popStack(parser);
+
+               if (isWordBreakCs(object))
+               {
+                  object = list.popArg(parser);
+               }
+
                expanded.add(object);
+
                object = list.peekStack();
             }
 
