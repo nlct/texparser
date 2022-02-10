@@ -37,37 +37,39 @@ import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.primitives.*;
 import com.dickimawbooks.texparserlib.generic.*;
 import com.dickimawbooks.texparserlib.auxfile.*;
-import com.dickimawbooks.texparserlib.latex.graphics.*;
+
 import com.dickimawbooks.texparserlib.latex.amsmath.*;
-import com.dickimawbooks.texparserlib.latex.tcilatex.*;
-import com.dickimawbooks.texparserlib.latex.lipsum.*;
-import com.dickimawbooks.texparserlib.latex.jmlr.*;
-import com.dickimawbooks.texparserlib.latex.etoolbox.*;
-import com.dickimawbooks.texparserlib.latex.hyperref.*;
-import com.dickimawbooks.texparserlib.latex.natbib.*;
-import com.dickimawbooks.texparserlib.latex.inputenc.*;
-import com.dickimawbooks.texparserlib.latex.wasysym.*;
-import com.dickimawbooks.texparserlib.latex.pifont.*;
 import com.dickimawbooks.texparserlib.latex.booktabs.*;
-import com.dickimawbooks.texparserlib.latex.textcase.*;
-import com.dickimawbooks.texparserlib.latex.shortvrb.*;
-import com.dickimawbooks.texparserlib.latex.probsoln.*;
 import com.dickimawbooks.texparserlib.latex.bpchem.*;
-import com.dickimawbooks.texparserlib.latex.xspace.*;
-import com.dickimawbooks.texparserlib.latex.xfor.*;
-import com.dickimawbooks.texparserlib.latex.siunitx.*;
-import com.dickimawbooks.texparserlib.latex.mhchem.*;
-import com.dickimawbooks.texparserlib.latex.stix.*;
-import com.dickimawbooks.texparserlib.latex.textcomp.*;
-import com.dickimawbooks.texparserlib.latex.mnsymbol.*;
-import com.dickimawbooks.texparserlib.latex.fourier.*;
+import com.dickimawbooks.texparserlib.latex.color.*;
+import com.dickimawbooks.texparserlib.latex.datatool.*;
+import com.dickimawbooks.texparserlib.latex.etoolbox.*;
 import com.dickimawbooks.texparserlib.latex.fontenc.*;
+import com.dickimawbooks.texparserlib.latex.fourier.*;
+import com.dickimawbooks.texparserlib.latex.glossaries.*;
+import com.dickimawbooks.texparserlib.latex.graphics.*;
+import com.dickimawbooks.texparserlib.latex.hyperref.*;
+import com.dickimawbooks.texparserlib.latex.ifthen.*;
+import com.dickimawbooks.texparserlib.latex.inputenc.*;
+import com.dickimawbooks.texparserlib.latex.jmlr.*;
+import com.dickimawbooks.texparserlib.latex.lipsum.*;
+import com.dickimawbooks.texparserlib.latex.mfirstuc.*;
+import com.dickimawbooks.texparserlib.latex.mhchem.*;
+import com.dickimawbooks.texparserlib.latex.mnsymbol.*;
+import com.dickimawbooks.texparserlib.latex.natbib.*;
+import com.dickimawbooks.texparserlib.latex.pifont.*;
+import com.dickimawbooks.texparserlib.latex.probsoln.*;
+import com.dickimawbooks.texparserlib.latex.shortvrb.*;
+import com.dickimawbooks.texparserlib.latex.siunitx.*;
+import com.dickimawbooks.texparserlib.latex.stix.*;
+import com.dickimawbooks.texparserlib.latex.tcilatex.*;
+import com.dickimawbooks.texparserlib.latex.textcase.*;
+import com.dickimawbooks.texparserlib.latex.textcomp.*;
 import com.dickimawbooks.texparserlib.latex.tipa.*;
 import com.dickimawbooks.texparserlib.latex.upgreek.*;
-import com.dickimawbooks.texparserlib.latex.datatool.*;
-import com.dickimawbooks.texparserlib.latex.ifthen.*;
-import com.dickimawbooks.texparserlib.latex.color.*;
-import com.dickimawbooks.texparserlib.latex.mfirstuc.*;
+import com.dickimawbooks.texparserlib.latex.wasysym.*;
+import com.dickimawbooks.texparserlib.latex.xfor.*;
+import com.dickimawbooks.texparserlib.latex.xspace.*;
 
 public abstract class LaTeXParserListener extends DefaultTeXParserListener
 {
@@ -1221,70 +1223,9 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
          return new AmsSymbSty(options, this, loadParentOptions);
       }
 
-      if (styName.equals("lipsum"))
-      {
-         return new LipsumSty(options, this, loadParentOptions);
-      }
-
-      if (styName.equals("etoolbox"))
-      {
-         return new EtoolboxSty(options, this, loadParentOptions);
-      }
-
-      if (styName.equals("hyperref"))
-      {
-         return new HyperrefSty(options, this, loadParentOptions);
-      }
-
-      if (styName.equals("inputenc"))
-      {
-         return new InputEncSty(options, this, loadParentOptions);
-      }
-
-      if (styName.equals("fontenc"))
-      {
-         fontEncSty = new FontEncSty(options, this, loadParentOptions);
-         return fontEncSty;
-      }
-
-      if (styName.equals("natbib"))
-      {
-         return new NatbibSty(options, this, loadParentOptions);
-      }
-
-      if (styName.equals("wasysym"))
-      {
-         return new WasysymSty(options, this, loadParentOptions);
-      }
-
-      if (styName.equals("pifont"))
-      {
-         return new PifontSty(options, this, loadParentOptions);
-      }
-
       if (styName.equals("booktabs"))
       {
          return new BooktabsSty(options, this, loadParentOptions);
-      }
-
-      if (styName.equals("textcase"))
-      {
-         return new TextCaseSty(options, this, loadParentOptions);
-      }
-
-      if (styName.equals("shortvrb"))
-      {
-         return new ShortVrbSty(options, this, loadParentOptions);
-      }
-
-      if (styName.equals("doc"))
-      {
-         return new DocSty(options, this, loadParentOptions);
-      }
-
-      if (styName.equals("probsoln"))
-      {
-         return new ProbSolnSty(options, this, loadParentOptions);
       }
 
       if (styName.equals("bpchem"))
@@ -1292,44 +1233,9 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
          return new BpChemSty(options, this, loadParentOptions);
       }
 
-      if (styName.equals("siunitx"))
+      if (styName.equals("color") || styName.equals("xcolor"))
       {
-         return new SIunitxSty(options, this, loadParentOptions);
-      }
-
-      if (styName.equals("mhchem"))
-      {
-         return new MhchemSty(options, this, loadParentOptions);
-      }
-
-      if (styName.equals("stix"))
-      {
-         return new StixSty(options, this, loadParentOptions);
-      }
-
-      if (styName.toLowerCase().equals("mnsymbol"))
-      {
-         return new MnSymbolSty(options, this, loadParentOptions);
-      }
-
-      if (styName.equals("textcomp"))
-      {
-         return new TextCompSty(options, this, loadParentOptions);
-      }
-
-      if (styName.equals("fourier"))
-      {
-         return new FourierSty(options, this, loadParentOptions);
-      }
-
-      if (styName.equals("upgreek"))
-      {
-         return new UpGreekSty(options, this, loadParentOptions);
-      }
-
-      if (styName.equals("tipa"))
-      {
-         return new TipaSty(options, this, loadParentOptions);
+         return new ColorSty(options, styName, this, loadParentOptions);
       }
 
       if (styName.equals("datatool"))
@@ -1342,14 +1248,35 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
          return new DataToolBaseSty(options, this, loadParentOptions);
       }
 
-      if (styName.equals("mfirstuc"))
+      if (styName.equals("doc"))
       {
-         return new MfirstucSty(options, this, loadParentOptions);
+         return new DocSty(options, this, loadParentOptions);
       }
 
-      if (styName.equals("mfirstuc-english"))
+      if (styName.equals("etoolbox"))
       {
-         return new MfirstucEnglishSty(options, this, loadParentOptions);
+         return new EtoolboxSty(options, this, loadParentOptions);
+      }
+
+      if (styName.equals("fontenc"))
+      {
+         fontEncSty = new FontEncSty(options, this, loadParentOptions);
+         return fontEncSty;
+      }
+
+      if (styName.equals("fourier"))
+      {
+         return new FourierSty(options, this, loadParentOptions);
+      }
+
+      if (styName.equals("glossaries"))
+      {
+         return new GlossariesSty(options, this, loadParentOptions);
+      }
+
+      if (styName.equals("hyperref"))
+      {
+         return new HyperrefSty(options, this, loadParentOptions);
       }
 
       if (styName.equals("ifthen"))
@@ -1357,19 +1284,9 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
          return new IfThenSty(options, this, loadParentOptions);
       }
 
-      if (styName.equals("xspace"))
+      if (styName.equals("inputenc"))
       {
-         return new XspaceSty(options, this, loadParentOptions);
-      }
-
-      if (styName.equals("xfor"))
-      {
-         return new XforSty(options, this, loadParentOptions);
-      }
-
-      if (styName.equals("color") || styName.equals("xcolor"))
-      {
-         return new ColorSty(options, styName, this, loadParentOptions);
+         return new InputEncSty(options, this, loadParentOptions);
       }
 
       if (styName.equals("jmlrutils"))
@@ -1380,6 +1297,96 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       if (styName.equals("jmlr2e"))
       {
          return new Jmlr2eSty(options, this, loadParentOptions);
+      }
+
+      if (styName.equals("lipsum"))
+      {
+         return new LipsumSty(options, this, loadParentOptions);
+      }
+
+      if (styName.equals("mfirstuc"))
+      {
+         return new MfirstucSty(options, this, loadParentOptions);
+      }
+
+      if (styName.equals("mfirstuc-english"))
+      {
+         return new MfirstucEnglishSty(options, this, loadParentOptions);
+      }
+
+      if (styName.equals("mhchem"))
+      {
+         return new MhchemSty(options, this, loadParentOptions);
+      }
+
+      if (styName.toLowerCase().equals("mnsymbol"))
+      {
+         return new MnSymbolSty(options, this, loadParentOptions);
+      }
+
+      if (styName.equals("natbib"))
+      {
+         return new NatbibSty(options, this, loadParentOptions);
+      }
+
+      if (styName.equals("pifont"))
+      {
+         return new PifontSty(options, this, loadParentOptions);
+      }
+
+      if (styName.equals("probsoln"))
+      {
+         return new ProbSolnSty(options, this, loadParentOptions);
+      }
+
+      if (styName.equals("shortvrb"))
+      {
+         return new ShortVrbSty(options, this, loadParentOptions);
+      }
+
+      if (styName.equals("siunitx"))
+      {
+         return new SIunitxSty(options, this, loadParentOptions);
+      }
+
+      if (styName.equals("stix"))
+      {
+         return new StixSty(options, this, loadParentOptions);
+      }
+
+      if (styName.equals("textcase"))
+      {
+         return new TextCaseSty(options, this, loadParentOptions);
+      }
+
+      if (styName.equals("textcomp"))
+      {
+         return new TextCompSty(options, this, loadParentOptions);
+      }
+
+      if (styName.equals("tipa"))
+      {
+         return new TipaSty(options, this, loadParentOptions);
+      }
+
+      if (styName.equals("upgreek"))
+      {
+         return new UpGreekSty(options, this, loadParentOptions);
+      }
+
+      if (styName.equals("wasysym"))
+      {
+         return new WasysymSty(options, this, loadParentOptions);
+      }
+
+      if (styName.equals("xfor"))
+      {
+         return new XforSty(options, this, loadParentOptions);
+      }
+
+      if (styName.equals("xspace"))
+      {
+         return new XspaceSty(options, this, loadParentOptions);
       }
 
       return new UnknownSty(options, styName, this, loadParentOptions);
