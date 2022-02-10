@@ -75,7 +75,7 @@ public class NewIf extends Primitive
        list.add(new TeXCsRef("if"+conditional));
        list.add(new TeXCsRef("iffalse"));
 
-       parser.putControlSequence(new GenericCommand(true, conditional+"false",
+       parser.putControlSequence(isLocal, new GenericCommand(true, conditional+"false",
          null, list));
 
        list = new TeXObjectList();
@@ -84,7 +84,7 @@ public class NewIf extends Primitive
        list.add(new TeXCsRef("if"+conditional));
        list.add(new TeXCsRef("iftrue"));
 
-       parser.putControlSequence(new GenericCommand(true, conditional+"true",
+       parser.putControlSequence(isLocal, new GenericCommand(true, conditional+"true",
          null, list));
    }
 
