@@ -179,6 +179,9 @@ public abstract class TeXParserListener
    public abstract TeXObjectList special(String param)
      throws IOException;
 
+   public abstract TeXObjectList directlua(String luacode)
+     throws IOException;
+
    public abstract void verb(String name, boolean isStar, int delim,
      String text)
      throws IOException;

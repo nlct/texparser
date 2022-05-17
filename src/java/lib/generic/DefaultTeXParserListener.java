@@ -535,6 +535,15 @@ public abstract class DefaultTeXParserListener extends TeXParserListener
       return null;
    }
 
+   public TeXObjectList directlua(String luacode)
+     throws IOException
+   {
+      getTeXApp().warning(getParser(), 
+       getTeXApp().getMessage("warning.unsupported.generic", "\\directlua"));
+
+      return null;
+   }
+
    public void verb(String name, boolean isStar, int delim, String text)
      throws IOException
    {
