@@ -2646,6 +2646,31 @@ public class TeXParser extends TeXObjectList
       return builder.toString();
    }
 
+   public String expandToString(TeXObject object, TeXObjectList stack)
+    throws IOException
+   {
+      if (object instanceof Expandable)
+      {
+         TeXObjectList expanded;
+
+         if (this == stack || stack == null)
+         {
+            expanded = ((Expandable)object).expandfully(this);
+         }
+         else
+         {
+            expanded = ((Expandable)object).expandfully(this, stack);
+         }
+
+         if (expanded != null)
+         {
+            object = expanded;
+         }
+      }
+
+      return object.toString(this);
+   }
+
    /*
     * Allocation of registers.
     * 255 and 0 to 9 are always free for scratch purposes. 
