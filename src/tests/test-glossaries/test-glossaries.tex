@@ -1,0 +1,22 @@
+% arara: pdflatex
+\documentclass{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[colorlinks]{hyperref}
+\usepackage{glossaries}
+
+\newglossaryentry{sample}{name={sample},description={an example}}
+
+\begin{document}
+Name value: \glsentryname{sample}.
+Text value: \glsentrytext{sample}.
+Description value: \glsentrydesc{sample}.
+
+Sentence case: \Glsentryname{sample}.
+
+Is used? \ifglsused{sample}{true}{false}.
+A \gls{sample}.
+Is used? \ifglsused{sample}{true}{false}.
+Next use: \gls{sample}.
+
+\end{document}

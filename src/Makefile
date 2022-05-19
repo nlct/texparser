@@ -9,7 +9,7 @@ endif
 
 test	: test-obs test-abs test-article test-nested test-doc \
 	  test-probsoln test-lists test-datatool test-mkimages \
-	  test-jmlrutils 
+	  test-jmlrutils test-glossaries
 
 tests/output	:
 	mkdir -p tests/output
@@ -36,6 +36,13 @@ test-article : app tests/test-article/test-article.pdf tests/output
 
 tests/test-article/test-article.pdf	: tests/test-article/test-article.tex
 					cd tests/test-article; arara test-article
+
+test-glossaries : app tests/test-glossaries/test-glossaries.pdf tests/output
+	rm -f -r tests/output/test-glossaries
+	bin/texparsertest --debug --in tests/test-glossaries/test-glossaries.tex --output tests/output/test-glossaries --html
+
+tests/test-glossaries/test-glossaries.pdf	: tests/test-glossaries/test-glossaries.tex
+					cd tests/test-glossaries; arara test-glossaries
 
 test-jmlrutils : app tests/output
 	rm -f -r tests/output/test-jmlrutils

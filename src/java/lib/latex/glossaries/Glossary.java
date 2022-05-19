@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -24,10 +24,33 @@ import com.dickimawbooks.texparserlib.*;
 
 public class Glossary extends Vector<String>
 {
+   public Glossary(String type)
+   {
+      this(type, null, null, null, null, null, true);
+   }
+ 
    public Glossary(String type, TeXObject title)
+   {
+      this(type, title, null, null, null, null, false);
+   }
+ 
+   public Glossary(String type, TeXObject title, String counter,
+     String glg, String gls, String glo, boolean ignored)
+   {
+      this(type, title, counter, glg, gls, glo, ignored, false);
+   }
+
+   public Glossary(String type, TeXObject title, String counter,
+     String glg, String gls, String glo, boolean ignored, boolean nohyper)
    {
       this.type = type;
       this.title = title;
+      this.counter = counter;
+      this.glg = glg;
+      this.gls = gls;
+      this.glo = glo;
+      this.ignored = ignored;
+      this.nohyper = nohyper;
    }
 
    public String getType()
@@ -40,6 +63,38 @@ public class Glossary extends Vector<String>
       return title;
    }
 
+   public String getCounter()
+   {
+      return counter;
+   }
+
+   public boolean isIgnored()
+   {
+      return true;
+   }
+
+   public String getGlg()
+   {
+      return glg;
+   }
+
+   public String getGls()
+   {
+      return gls;
+   }
+
+   public String getGlo()
+   {
+      return glo;
+   }
+
+   public boolean isHyperSuppressed()
+   {
+      return nohyper;
+   }
+
    private String type;
    private TeXObject title;
+   private String counter, glg, gls, glo;
+   private boolean ignored, nohyper;
 }

@@ -23,7 +23,7 @@ import java.io.IOException;
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.*;
 
-public class NewGlossaryEntry extends ControlSequence
+public class NewGlossaryEntry extends AbstractGlsCommand
 {
    public NewGlossaryEntry(GlossariesSty sty)
    {
@@ -32,8 +32,7 @@ public class NewGlossaryEntry extends ControlSequence
 
    public NewGlossaryEntry(String name, byte overwrite, GlossariesSty sty)
    {
-      super(name);
-      this.sty = sty;
+      super(name, sty);
       this.overwrite = overwrite;
    }
 
@@ -42,55 +41,130 @@ public class NewGlossaryEntry extends ControlSequence
       return new NewGlossaryEntry(getName(), overwrite, getSty());
    }
 
-   public void process(TeXParser parser, TeXObjectList stack)
+   protected void defineEntry(String label, KeyValList keyValList, 
+    TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      TeXObject labelArg;
+      TeXObject name = keyValList.get("name");
 
-      if (parser == stack)
+      if (name == null)
       {
-         labelArg = parser.popNextArg();
-      }
-      else
-      {
-         labelArg = stack.popArg(parser);
-      }
+         TeXObject parent = keyValList.getExpandedValue("parent", parser, stack);
 
-      if (labelArg instanceof Expandable)
-      {
-         TeXObjectList expanded;
-
-         if (parser == stack)
+         if (parent != null)
          {
-            expanded = ((Expandable)labelArg).expandfully(parser);
+            String parentLabel = parent.toString(parser);
+
+            GlossaryEntry entry = getEntry(parentLabel);
+
+            if (entry != null)
+            {
+               TeXObject parentName = entry.get("name");
+
+               if (parentName != null)
+               {
+                  name = (TeXObject)parentName.clone();
+               }
+            }
+         }
+
+         if (name == null)
+         {
+            keyValList.put("name", new MissingValue());
          }
          else
          {
-            expanded = ((Expandable)labelArg).expandfully(parser, stack);
+            keyValList.put("name", name);
          }
+      }
 
-         if (expanded != null)
+      TeXObject text = keyValList.get("text");
+
+      if (text == null)
+      {
+         text = (TeXObject)name.clone();
+         keyValList.put("text", text);
+      }
+
+      TeXObject plural = keyValList.get("plural");
+
+      if (plural == null)
+      {
+         plural = (TeXObject)text.clone();
+
+         if (plural instanceof TeXObjectList)
          {
-            labelArg = expanded;
+            ((TeXObjectList)plural).add(new TeXCsRef("glspluralsuffix"));
+         }
+         else
+         {
+            TeXObjectList list = new TeXObjectList();
+            list.add(plural);
+            list.add(new TeXCsRef("glspluralsuffix"));
+            plural = list;
+         }
+
+         keyValList.put("plural", plural);
+      }
+
+      TeXObject first = keyValList.get("first");
+      TeXObject firstplural = keyValList.get("firstplural");
+
+      if (first == null)
+      {
+         first = (TeXObject)text.clone();
+         keyValList.put("first", first);
+
+         if (firstplural == null)
+         {
+            firstplural = (TeXObject)plural.clone();
+            keyValList.put("first", firstplural);
+         }
+      }
+      else if (firstplural == null)
+      {
+         firstplural = (TeXObject)first.clone();
+
+         if (firstplural instanceof TeXObjectList)
+         {
+            ((TeXObjectList)firstplural).add(new TeXCsRef("glspluralsuffix"));
+         }
+         else
+         {
+            TeXObjectList list = new TeXObjectList();
+            list.add(firstplural);
+            list.add(new TeXCsRef("glspluralsuffix"));
+            firstplural = list;
+         }
+
+         keyValList.put("firstplural", firstplural);
+      }
+
+      TeXObject symbol = keyValList.get("symbol");
+
+      if (symbol != null)
+      {
+         TeXObject symbolplural = keyValList.get("symbolplural");
+
+         if (symbolplural == null)
+         {
+            keyValList.put("symbolplural", (TeXObject)symbol.clone());
          }
       }
 
-      String label = labelArg.toString(parser);
+      sty.addEntry(overwrite, new GlossaryEntry(sty, label, keyValList));
+   }
 
-      TeXObject options;
+   public void process(TeXParser parser, TeXObjectList stack)
+     throws IOException
+   {
+      String label = popLabelString(parser, stack);
 
-      if (parser == stack)
-      {
-         options = parser.popNextArg();
-      }
-      else
-      {
-         options = stack.popArg(parser);
-      }
+      TeXObject options = popArg(parser, stack);
 
       KeyValList keyValList = KeyValList.getList(parser, options);
 
-      sty.addEntry(overwrite, new GlossaryEntry(sty, label, keyValList));
+      defineEntry(label, keyValList, parser, stack);
    }
 
    public void process(TeXParser parser)
@@ -99,11 +173,5 @@ public class NewGlossaryEntry extends ControlSequence
       process(parser, parser);
    }
 
-   public GlossariesSty getSty()
-   {
-      return sty;
-   }
-
-   private GlossariesSty sty;
-   private byte overwrite;
+   protected byte overwrite;
 }

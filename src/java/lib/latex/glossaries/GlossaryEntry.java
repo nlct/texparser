@@ -23,16 +23,20 @@ import java.util.Iterator;
 import java.io.IOException;
 
 import com.dickimawbooks.texparserlib.*;
+import com.dickimawbooks.texparserlib.primitives.NewIf;
+import com.dickimawbooks.texparserlib.primitives.IfTrue;
+import com.dickimawbooks.texparserlib.primitives.IfFalse;
 import com.dickimawbooks.texparserlib.latex.KeyValList;
 
 public class GlossaryEntry extends HashMap<String,TeXObject>
 {
-   public GlossaryEntry(GlossariesSty sty,
+   public GlossaryEntry(GlossariesSty sty, 
      String label, KeyValList options)
    throws IOException
    {
       super();
       this.label = label;
+      this.sty = sty;
       TeXParser parser = sty.getParser();
 
       TeXObject typeVal = null;
@@ -72,6 +76,8 @@ public class GlossaryEntry extends HashMap<String,TeXObject>
       }
 
       type = typeVal.toString(parser);
+
+      NewIf.createConditional(false, parser, "ifglo@"+label+"@flag");
    }
 
    public String getType()
@@ -84,7 +90,31 @@ public class GlossaryEntry extends HashMap<String,TeXObject>
       return label;
    }
 
+   // mark as used.
+   public void unset(boolean local)
+   {
+      TeXParser parser = sty.getParser();
+      parser.putControlSequence(local, new IfTrue("ifglo@"+label+"@flag"));
+   }
+
+   // mark as unused.
+   public void reset(boolean local)
+   {
+      TeXParser parser = sty.getParser();
+      parser.putControlSequence(local, new IfFalse("ifglo@"+label+"@flag"));
+   }
+
+   // has this entry been marked as used?
+   public boolean isUnset()
+   {
+      TeXParser parser = sty.getParser();
+
+      ControlSequence cs = parser.getControlSequence("ifglo@"+label+"@flag");
+
+      return (cs instanceof TeXBoolean && ((TeXBoolean)cs).booleanValue());
+   }
+
    private String label;
    private String type;
-
+   private GlossariesSty sty;
 }
