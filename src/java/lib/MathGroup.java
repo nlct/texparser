@@ -33,6 +33,11 @@ public class MathGroup extends Group
       super(capacity);
    }
 
+   public boolean isMathGroup()
+   {
+      return true; 
+   }
+
    public boolean isInLine()
    {
       return isinline;

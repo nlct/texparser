@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013-2022 Nicola L.C. Talbot
+    Copyright (C) 2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -16,47 +16,44 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
-package com.dickimawbooks.texparserlib.latex.datatool;
+package com.dickimawbooks.texparserlib;
 
 import java.io.IOException;
 import java.util.Vector;
+import java.util.ArrayDeque;
 
-import com.dickimawbooks.texparserlib.*;
-import com.dickimawbooks.texparserlib.latex.*;
+import com.dickimawbooks.texparserlib.primitives.*;
+import com.dickimawbooks.texparserlib.generic.*;
 
-public class DataStringElement extends DataObjectList implements DataElement
+/**
+ * For lists of objects that should be treated as a single unit.
+ */
+
+public class DataObjectList extends TeXObjectList
 {
-   public DataStringElement()
+   public DataObjectList()
    {
       super();
    }
 
-   public DataStringElement(int capacity)
+   public DataObjectList(int capacity)
    {
       super(capacity);
    }
 
-   public DataStringElement(TeXObjectList list)
+   public DataObjectList(TeXParserListener listener, String text)
    {
-      super(list.capacity());
-      addAll(list);
+      super(listener, text);
    }
 
-   public Object clone()
+   public boolean isStack()
    {
-      DataStringElement element = new DataStringElement(capacity());
-
-      for (TeXObject obj : this)
-      {
-         element.add((TeXObject)obj.clone());
-      }
-
-      return element;
+      return false;
    }
 
-   public byte getDataType()
+   public TeXObjectList createList()
    {
-      return DataToolHeader.TYPE_STRING;
+      return new DataObjectList(capacity());
    }
 
 }

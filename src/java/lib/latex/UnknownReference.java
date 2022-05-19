@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -22,7 +22,7 @@ import java.io.IOException;
 
 import com.dickimawbooks.texparserlib.*;
 
-public class UnknownReference extends TeXObjectList
+public class UnknownReference extends DataObjectList
 {
    public UnknownReference(TeXParserListener listener, TeXObject labelObj)
    {
@@ -47,11 +47,6 @@ public class UnknownReference extends TeXObjectList
       super();
       this.labelObject = labelObj;
       this.label = label;
-   }
-
-   public boolean isStack()
-   {
-      return false;
    }
 
    public TeXObjectList createList()

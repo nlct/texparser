@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -23,7 +23,7 @@ import java.util.*;
 
 import com.dickimawbooks.texparserlib.*;
 
-public class AlignRow extends TeXObjectList
+public class AlignRow extends DataObjectList
 {
    public AlignRow()
    {
@@ -40,11 +40,6 @@ public class AlignRow extends TeXObjectList
    {
       this();
       parse(parser, stack);
-   }
-
-   public boolean isStack()
-   {
-      return false;
    }
 
    public TeXObjectList createList()

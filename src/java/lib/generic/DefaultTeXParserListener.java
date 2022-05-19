@@ -367,6 +367,21 @@ public abstract class DefaultTeXParserListener extends TeXParserListener
       return new TeXObjectList(this, string);
    }
 
+   public TeXObjectList createStack()
+   {
+      return new TeXObjectList();
+   }
+
+   public DataObjectList createDataList()
+   {
+      return new DataObjectList();
+   }
+
+   public DataObjectList createDataList(String string)
+   {
+      return new DataObjectList(this, string);
+   }
+
    public SkippedSpaces createSkippedSpaces()
    {
       return new SkippedSpaces();

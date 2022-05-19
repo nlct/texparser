@@ -43,6 +43,11 @@ public class Group extends TeXObjectList
       return false;
    }
 
+   public boolean isMathGroup()
+   {
+      return false;
+   }
+
    public TeXObjectList toList()
    {
       TeXObjectList list = new TeXObjectList(size());

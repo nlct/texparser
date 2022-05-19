@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -25,7 +25,7 @@ import java.util.Iterator;
 
 import com.dickimawbooks.texparserlib.*;
 
-public class CsvList extends TeXObjectList
+public class CsvList extends DataObjectList
 {
    public CsvList()
    {
@@ -35,11 +35,6 @@ public class CsvList extends TeXObjectList
    public CsvList(int capacity)
    {
       super(capacity);
-   }
-
-   public boolean isStack()
-   {
-      return false;
    }
 
    public TeXObjectList createList()

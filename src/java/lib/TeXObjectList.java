@@ -1042,6 +1042,8 @@ public class TeXObjectList extends Vector<TeXObject>
       return (ControlSequence)obj;
    }
 
+   // TODO separate TeXObjectList and Group into sibling classes
+   // (requires some refactoring).
    public boolean isStack()
    {
       return true;
