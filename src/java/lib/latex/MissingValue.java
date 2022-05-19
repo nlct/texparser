@@ -86,4 +86,10 @@ public class MissingValue implements TeXObject,Expandable
    {
       return false;
    }
+
+   public boolean isEmpty()
+   {
+      return false;
+   }
+
 }

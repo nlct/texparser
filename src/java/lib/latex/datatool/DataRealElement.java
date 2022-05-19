@@ -150,6 +150,11 @@ public class DataRealElement implements DataNumericElement,Expandable
       return false;
    }
 
+   public boolean isEmpty()
+   {
+      return false;
+   }
+
    private double value;
    protected DataToolSty sty;
 }

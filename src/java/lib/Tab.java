@@ -74,5 +74,10 @@ public class Tab implements TeXObject
       return false;
    }
 
+   public boolean isEmpty()
+   {
+      return false;
+   }
+
 }
 

@@ -54,6 +54,11 @@ public class StackMarker extends Ignoreable
       return false;
    }
 
+   public boolean isEmpty()
+   {
+      return false;
+   }
+
    public String toString(TeXParser parser)
    {
       return "";

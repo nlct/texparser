@@ -87,5 +87,10 @@ public abstract class CharObject implements TeXObject
       return false;
    }
 
+   public boolean isEmpty()
+   {
+      return false;
+   }
+
    protected int charCode;
 }

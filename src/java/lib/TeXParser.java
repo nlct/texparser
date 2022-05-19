@@ -1545,7 +1545,7 @@ public class TeXParser extends TeXObjectList
 
                TeXObjectList charList = new TeXObjectList();
 
-               list.add(charList);
+               list.add(charList, false);
 
                charList.add(listener.getOther(c));
 
@@ -2649,6 +2649,16 @@ public class TeXParser extends TeXObjectList
    public String expandToString(TeXObject object, TeXObjectList stack)
     throws IOException
    {
+      if (object.isEmpty())
+      {
+         return "";
+      }
+
+      if (object instanceof TextualContentCommand)
+      {
+         return ((TextualContentCommand)object).getText();
+      }
+
       if (object instanceof Expandable)
       {
          TeXObjectList expanded;

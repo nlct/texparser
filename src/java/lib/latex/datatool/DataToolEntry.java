@@ -243,6 +243,11 @@ public class DataToolEntry implements TeXObject
       return false;
    }
 
+   public boolean isEmpty()
+   {
+      return false;
+   }
+
    public boolean equals(Object obj)
    {
       if (obj == null || !(obj instanceof DataToolEntry))

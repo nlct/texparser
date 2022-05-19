@@ -79,6 +79,11 @@ public class HtmlTag implements TeXObject
       return false;
    }
 
+   public boolean isEmpty()
+   {
+      return false;
+   }
+
    public static String getUriFragment(String label)
    {
       try

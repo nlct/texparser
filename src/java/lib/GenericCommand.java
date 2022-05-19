@@ -350,9 +350,10 @@ public class GenericCommand extends Command
       getReplacement(parser).process(parser);
    }
 
+   @Override
    public boolean isEmpty()
    {
-      return definition.isEmpty();
+      return definition.isEmpty() && hasNoSyntax();
    }
 
    public String show(TeXParser parser)
@@ -406,6 +407,7 @@ public class GenericCommand extends Command
       return definition;
    }
 
+   @Override
    public String toString()
    {
       return String.format("%s[name=%s,prefix=%d,syntax=%s,definition=%s]",

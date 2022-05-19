@@ -49,6 +49,11 @@ public class UnknownReference extends TeXObjectList
       this.label = label;
    }
 
+   public boolean isStack()
+   {
+      return false;
+   }
+
    public TeXObjectList createList()
    {
       return new UnknownReference(getLabelObject(), getLabel());

@@ -61,6 +61,11 @@ public abstract class TeXUnit implements TeXObject
       return false;
    }
 
+   public boolean isEmpty()
+   {
+      return false;
+   }
+
    public static float muToEm(float muValue)
    {
       return muValue/18f;

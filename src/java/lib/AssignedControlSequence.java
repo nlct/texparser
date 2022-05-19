@@ -50,6 +50,11 @@ public class AssignedControlSequence extends Command
       return underlying.isPar();
    }
 
+   public boolean isEmpty()
+   {
+      return underlying.isEmpty();
+   }
+
    public void setPrefix(byte prefix)
    {
       if (underlying instanceof Macro)

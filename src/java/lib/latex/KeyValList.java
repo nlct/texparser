@@ -180,7 +180,7 @@ public class KeyValList extends HashMap<String,TeXObject>
 
       TeXObjectList expanded;
 
-      if (parser == stack)
+      if (parser == stack || stack == null)
       {
          expanded = ((Expandable)value).expandfully(parser);
       }

@@ -390,6 +390,9 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       parser.putControlSequence(new AtFirstOfTwo());
       parser.putControlSequence(new AtSecondOfTwo());
       parser.putControlSequence(new AtFirstOfOne());
+      parser.putControlSequence(new AtNumberOfNumber("@firstofthree", 1, 3));
+      parser.putControlSequence(new AtNumberOfNumber("@secondofthree", 2, 3));
+      parser.putControlSequence(new AtNumberOfNumber("@thirdofthree", 3, 3));
       parser.putControlSequence(new AtGobble());
       parser.putControlSequence(new AtGobble("@gobbletwo", 2));
       parser.putControlSequence(new AtGobble("@gobblethree", 3));
@@ -1269,9 +1272,9 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
          return new FourierSty(options, this, loadParentOptions);
       }
 
-      if (styName.equals("glossaries"))
+      if (styName.equals("glossaries") || styName.equals("glossaries-extra"))
       {
-         return new GlossariesSty(options, this, loadParentOptions);
+         return new GlossariesSty(options, styName, this, loadParentOptions);
       }
 
       if (styName.equals("hyperref"))

@@ -107,6 +107,11 @@ public class Param implements ParameterToken
       return false;
    }
 
+   public boolean isEmpty()
+   {
+      return false;
+   }
+
    public ParameterToken next()
    {
       return null;

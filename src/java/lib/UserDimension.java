@@ -240,6 +240,11 @@ public class UserDimension implements TeXDimension, Expandable
       return false;
    }
 
+   public boolean isEmpty()
+   {
+      return false;
+   }
+
    private float value;
 
    private TeXUnit unit;

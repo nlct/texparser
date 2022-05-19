@@ -147,6 +147,8 @@ public abstract class Macro implements TeXObject
       }
    }
 
+   // returns true if this has the same syntax as the other macro
+   // (definition may be different)
    public boolean hasSyntax(Macro macro)
    {
       if (numArgs != macro.numArgs) return false;
@@ -160,12 +162,83 @@ public abstract class Macro implements TeXObject
       return syntax.equals(list);
    }
 
+   public boolean hasNoSyntax()
+   {
+      return numArgs == 0 && (syntax == null || syntax.isEmpty());
+   }
+
+   @Override
    public boolean isPar()
    {
       return false;
    }
 
+   @Override
+   public boolean isEmpty()
+   {
+      return false;
+   }
+
+   // pops an argument that should be a label that needs to be fully
+   // expanded
+   protected String popLabelString(TeXParser parser, TeXObjectList stack)
+     throws IOException
+   {
+      return parser.expandToString(popArg(parser, stack), stack);
+   }
+
+   // pops an optional argument that should be a label that needs to be fully
+   // expanded
+   protected String popOptLabelString(TeXParser parser, TeXObjectList stack)
+     throws IOException
+   {
+      TeXObject arg = popOptArg(parser, stack);
+
+      if (arg == null)
+      {
+         return null;
+      }
+
+      return parser.expandToString(arg, stack);
+   }
+
+   // pops a mandatory argument
+   protected TeXObject popArg(TeXParser parser, TeXObjectList stack)
+     throws IOException
+   {
+      if (parser == stack || stack == null)
+      {
+         return parser.popNextArg();
+      }
+      else
+      {
+         return stack.popArg(parser);
+      }
+   }
+
+   // pops an optional argument
+   // returns null if not present
+   protected TeXObject popOptArg(TeXParser parser, TeXObjectList stack)
+     throws IOException
+   {
+      if (parser == stack || stack == null)
+      {
+         return parser.popNextArg('[', ']');
+      }
+      else
+      {
+         return stack.popArg(parser, '[', ']');
+      }
+   }
+
    public abstract Object clone();
+
+   @Override
+   public String toString()
+   {
+      return String.format("%s[prefix=%d,syntax=%s]",
+       getClass().getSimpleName(), getPrefix(), syntax);
+   }
 
    // Is this a short macro?
 
@@ -174,12 +247,6 @@ public abstract class Macro implements TeXObject
    // Is this macro allowed a prefix?
 
    protected boolean allowsPrefix = false;
-
-   public String toString()
-   {
-      return String.format("%s[prefix=%d,syntax=%s]",
-       getClass().getSimpleName(), getPrefix(), syntax);
-   }
 
    public static final byte PREFIX_NONE = (byte)0;
    public static final byte PREFIX_LONG = (byte)1;

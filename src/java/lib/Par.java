@@ -74,9 +74,16 @@ public class Par implements TeXObject
    {
    }
 
+   @Override
    public boolean isPar()
    {
       return true;
+   }
+
+   @Override
+   public boolean isEmpty()
+   {
+      return false;
    }
 
    private String name;

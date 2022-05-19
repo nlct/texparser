@@ -82,5 +82,10 @@ public class UserBoolean implements TeXBoolean
       return false;
    }
 
+   public boolean isEmpty()
+   {
+      return false;
+   }
+
    private boolean value;
 }

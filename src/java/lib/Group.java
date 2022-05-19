@@ -38,6 +38,11 @@ public class Group extends TeXObjectList
       super(listener, text);
    }
 
+   public boolean isStack()
+   {
+      return false;
+   }
+
    public TeXObjectList toList()
    {
       TeXObjectList list = new TeXObjectList(size());

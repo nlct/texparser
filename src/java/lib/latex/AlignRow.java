@@ -42,6 +42,11 @@ public class AlignRow extends TeXObjectList
       parse(parser, stack);
    }
 
+   public boolean isStack()
+   {
+      return false;
+   }
+
    public TeXObjectList createList()
    {
       return new AlignRow(capacity());

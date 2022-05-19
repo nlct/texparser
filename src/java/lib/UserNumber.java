@@ -138,5 +138,10 @@ public class UserNumber implements TeXNumber
       return false;
    }
 
+   public boolean isEmpty()
+   {
+      return false;
+   }
+
    private int value;
 }

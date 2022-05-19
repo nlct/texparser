@@ -165,6 +165,11 @@ public class IndexLocation implements TeXObject
       return false;
    }
 
+   public boolean isEmpty()
+   {
+      return false;
+   }
+
    public TeXObjectList string(TeXParser parser) throws IOException
    {
       if (format == null)

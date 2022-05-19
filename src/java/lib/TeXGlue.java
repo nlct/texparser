@@ -318,6 +318,11 @@ public class TeXGlue implements TeXDimension, Expandable
       return false;
    }
 
+   public boolean isEmpty()
+   {
+      return false;
+   }
+
    public TeXDimension getStretch()
    {
       return stretch;

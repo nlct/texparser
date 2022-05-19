@@ -127,6 +127,11 @@ public class DoubleParam implements ParameterToken,Expandable
       return false;
    }
 
+   public boolean isEmpty()
+   {
+      return false;
+   }
+
    private ParameterToken param;
 }
 

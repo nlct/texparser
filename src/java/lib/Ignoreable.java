@@ -43,6 +43,11 @@ public abstract class Ignoreable implements TeXObject
       return false;
    }
 
+   public boolean isEmpty()
+   {
+      return false;
+   }
+
    public String toString()
    {
       return getClass().getName();

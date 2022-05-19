@@ -1042,7 +1042,17 @@ public class TeXObjectList extends Vector<TeXObject>
       return (ControlSequence)obj;
    }
 
+   public boolean isStack()
+   {
+      return true;
+   }
+
    public void push(TeXObject object)
+   {
+      push(object, false);
+   }
+
+   public void push(TeXObject object, boolean flattenStacks)
    {
       if (object == this)
       {
@@ -1052,7 +1062,20 @@ public class TeXObjectList extends Vector<TeXObject>
 
       if (object != null)
       {
-         add(0, object);
+         if (flattenStacks && (object instanceof TeXObjectList)
+              && ((TeXObjectList)object).isStack())
+         {
+            TeXObjectList list = (TeXObjectList)object;
+
+            for (int i = list.size()-1; i >= 0; i--)
+            {
+               push(list.get(i), flattenStacks);
+            }
+         }
+         else
+         {
+            add(0, object);
+         }
       }
    }
 
@@ -1068,6 +1091,11 @@ public class TeXObjectList extends Vector<TeXObject>
 
    public boolean add(TeXObject object)
    {
+      return add(object, false);
+   }
+
+   public boolean add(TeXObject object, boolean flattenStacks)
+   {
       if (object == null)
       {
          throw new NullPointerException();
@@ -1079,7 +1107,24 @@ public class TeXObjectList extends Vector<TeXObject>
            "Can't add a list to itself");
       }
 
-      return super.add(object);
+      if (flattenStacks && (object instanceof TeXObjectList)
+              && ((TeXObjectList)object).isStack())
+      {
+         TeXObjectList list = (TeXObjectList)object;
+
+         boolean changed = false;
+
+         for (int i = 0; i < list.size(); i++)
+         {
+            changed = add(list.get(i), flattenStacks) || changed;
+         }
+
+         return changed;
+      }
+      else
+      {
+         return super.add(object);
+      }
    }
 
    public TeXObject peek()

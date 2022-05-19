@@ -54,6 +54,11 @@ public class AssignedActiveChar extends ActiveChar implements AssignedMacro
       return underlying.isPar();
    }
 
+   public boolean isEmpty()
+   {
+      return underlying.isEmpty();
+   }
+
    public void setPrefix(byte prefix)
    {
       if (underlying instanceof Macro)

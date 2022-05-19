@@ -37,6 +37,11 @@ public class CsvList extends TeXObjectList
       super(capacity);
    }
 
+   public boolean isStack()
+   {
+      return false;
+   }
+
    public TeXObjectList createList()
    {
       return new CsvList(capacity());

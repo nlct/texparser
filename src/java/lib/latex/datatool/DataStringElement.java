@@ -58,4 +58,10 @@ public class DataStringElement extends TeXObjectList implements DataElement
    {
       return DataToolHeader.TYPE_STRING;
    }
+
+   public boolean isStack()
+   {
+      return false;
+   }
+
 }
