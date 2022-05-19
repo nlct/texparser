@@ -123,6 +123,7 @@ public class GlossariesSty extends LaTeXSty
       registerControlSequence(new GenericCommand("glslinkpostsetkeys"));
       registerControlSequence(new GenericCommand("@gls@setdefault@glslink@opts"));
       registerControlSequence(new AtGlsAtAtLink(this));
+      registerControlSequence(new AtGlsAtAtLink("glslink", this, true));
       registerControlSequence(new AtGlsAtLink(this));
       registerControlSequence(new GlsEntryFmt(this));
       registerControlSequence(new GlsGenEntryFmt(this));
@@ -176,6 +177,11 @@ public class GlossariesSty extends LaTeXSty
         "symbol", CaseChange.SENTENCE, this));
       registerControlSequence(new GlsEntryField("Glsentrysymbolplural",
         "symbolplural", CaseChange.SENTENCE, this));
+
+      TeXParserListener listener = getParser().getListener();
+
+      setModifier(listener.getOther('*'), "hyper", new UserBoolean(true));
+      setModifier(listener.getOther('+'), "hyper", new UserBoolean(false));
 
       if (extra)
       {
@@ -513,6 +519,33 @@ public class GlossariesSty extends LaTeXSty
       return knownFields.contains(field);
    }
 
+   public void setModifier(CharObject token, String key, TeXObject value)
+   {
+      KeyValList options = new KeyValList();
+      options.put(key, value);
+      setModifier(token, options);
+   }
+
+   public void setModifier(CharObject token, KeyValList options)
+   {
+      if (modifierOptions == null)
+      {
+         modifierOptions = new HashMap<CharObject,KeyValList>();
+      }
+
+      modifierOptions.put(token, options);
+   }
+
+   public KeyValList getModifierOptions(CharObject token)
+   {
+      if (modifierOptions == null)
+      {
+         return null;
+      }
+
+      return modifierOptions.get(token);
+   }
+
    private HashMap<String,GlossaryEntry> entries;
 
    private HashMap<String,Glossary> glossaries;
@@ -534,6 +567,8 @@ public class GlossariesSty extends LaTeXSty
 
    private HashMap<String,String> fieldMap;
    private HashMap<String,TeXObject> fieldDefaultValues;
+
+   private HashMap<CharObject,KeyValList> modifierOptions;
 
    public static final String GLOSSARY_NOT_DEFINED 
     = "glossaries.glossary.not.defined";

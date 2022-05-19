@@ -52,41 +52,34 @@ public class Gls extends AbstractGlsCommand
    {
       boolean localUnset = false;
 
-      TeXObject options = popOptArg(parser, stack);
+      KeyValList keyValList = popOptKeyValList(parser, stack, true);
 
-      KeyValList keyValList = null;
-
-      if (options != null)
-      {
-         keyValList = KeyValList.getList(parser, options);
-      }
-      else
+      if (keyValList == null)
       {
          keyValList = new KeyValList();
       }
 
-      String label = popLabelString(parser, stack);
+      GlsLabel glslabel = popEntryLabel(parser, stack);
 
       TeXObject insert = popOptArg(parser, stack);
 
-      GlossaryEntry entry = getEntry(label);
+      GlossaryEntry entry = glslabel.getEntry();
 
       LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
 
       if (entry == null)
       {
          sty.undefWarnOrError(parser, stack, 
-           GlossariesSty.ENTRY_NOT_DEFINED, label);
+           GlossariesSty.ENTRY_NOT_DEFINED, glslabel.getLabel());
       }
       else
       {
          boolean isUnset = entry.isUnset();
 
-         String type = entry.getType();
+         Glossary glossary = entry.getGlossary();
+         String type = glossary.getType();
 
-         ControlSequence glslabel = new GlsLabel(label, entry);
-
-         listener.putControlSequence(true, glslabel);
+         listener.putControlSequence(true, glslabel.duplicate("glslabel"));
 
          listener.putControlSequence(true, new GenericCommand("glscustomtext"));
 

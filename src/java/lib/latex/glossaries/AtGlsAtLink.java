@@ -28,17 +28,18 @@ public class AtGlsAtLink extends AbstractGlsCommand
 {
    public AtGlsAtLink(GlossariesSty sty)
    {
-      this("@gls@link", sty);
+      this("@gls@link", sty, false);
    }
 
-   public AtGlsAtLink(String name, GlossariesSty sty)
+   public AtGlsAtLink(String name, GlossariesSty sty, boolean checkModifier)
    {
       super(name, sty);
+      this.checkModifier = checkModifier;
    }
 
    public Object clone()
    {
-      return new AtGlsAtLink(getName(), getSty());
+      return new AtGlsAtLink(getName(), getSty(), checkModifier);
    }
 
    // leave indexing/recording to TeX
@@ -47,57 +48,26 @@ public class AtGlsAtLink extends AbstractGlsCommand
    {
       LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
 
-      KeyValList options = null;
+      KeyValList options = popOptKeyValList(parser, stack, checkModifier);
 
-      TeXObject arg = stack.peek();
+      GlsLabel glslabel = popEntryLabel(parser, stack);
+      GlossaryEntry entry = glslabel.getEntry();
 
-      if (arg instanceof KeyValList)
-      {
-         stack.pop();
-         options = (KeyValList)arg;
-      }
-      else
-      {
-         arg = popOptArg(parser, stack);
-
-         if (arg != null)
-         {
-            options = KeyValList.getList(parser, arg);
-         }
-      }
-
-      GlossaryEntry entry = null;
-      String label;
-      arg = stack.peek();
-
-      if (arg instanceof GlsLabel)
-      {
-         stack.pop();
-         label = ((GlsLabel)arg).getLabel();
-         entry = ((GlsLabel)arg).getEntry();
-      }
-      else
-      {
-         label = popLabelString(parser, stack);
-
-         entry = sty.getEntry(label);
-         parser.putControlSequence(true, new GlsLabel("glslabel", label, entry));
-      }
+      parser.putControlSequence(true, glslabel.duplicate("glslabel"));
 
       TeXObject linkText = popArg(parser, stack);
 
-      parser.putControlSequence(true, 
-         new GlsLabel("@gls@link@label", label, entry));
+      parser.putControlSequence(true, glslabel.duplicate("@gls@link@label"));
 
       // ignore indexing stuff (location counter and format)
    
       if (entry == null)
       {
-         parser.putControlSequence(true, new GlsType("glstype", label));
+         parser.putControlSequence(true, new GlsType("glstype", "main"));
       }
       else
       {
-         parser.putControlSequence(true, new GlsType(entry));
+         parser.putControlSequence(true, new GlsType(entry.getGlossary()));
       }
 
       TeXObjectList list = new TeXObjectList();
@@ -150,4 +120,6 @@ public class AtGlsAtLink extends AbstractGlsCommand
    {
       process(parser, parser);
    }
+
+   protected boolean checkModifier = false;
 }

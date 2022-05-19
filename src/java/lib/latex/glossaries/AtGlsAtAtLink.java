@@ -24,17 +24,17 @@ import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.primitives.Relax;
 import com.dickimawbooks.texparserlib.latex.*;
 
-public class AtGlsAtAtLink extends ControlSequence
+public class AtGlsAtAtLink extends AbstractGlsCommand
 {
    public AtGlsAtAtLink(GlossariesSty sty)
    {
-      this("@gls@@link", sty);
+      this("@gls@@link", sty, false);
    }
 
-   public AtGlsAtAtLink(String name, GlossariesSty sty)
+   public AtGlsAtAtLink(String name, GlossariesSty sty, boolean checkModifier)
    {
-      super(name);
-      this.sty = sty;
+      super(name, sty);
+      this.checkModifier = checkModifier;
    }
 
    public Object clone()
@@ -48,61 +48,18 @@ public class AtGlsAtAtLink extends ControlSequence
    {
       LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
 
-      TeXObject options;
+      KeyValList options = popOptKeyValList(parser, stack, checkModifier);
 
-      if (parser == stack)
+      GlsLabel glslabel = popEntryLabel(parser, stack);
+
+      TeXObject linkText = popArg(parser, stack);
+
+      if (glslabel.getEntry() == null)
       {
-         options = parser.popNextArg('[', ']');
+         sty.undefWarnOrError(parser, stack, GlossariesSty.ENTRY_NOT_DEFINED, 
+           glslabel.getLabel());
       }
       else
-      {
-         options = stack.popArg(parser, '[', ']');
-      }
-
-      TeXObject labelArg;
-
-      if (parser == stack)
-      {
-         labelArg = parser.popNextArg();
-      }
-      else
-      {
-         labelArg = stack.popArg(parser);
-      }
-
-      if (labelArg instanceof Expandable)
-      {
-         TeXObjectList expanded;
-
-         if (parser == stack)
-         {
-            expanded = ((Expandable)labelArg).expandfully(parser);
-         }
-         else
-         {
-            expanded = ((Expandable)labelArg).expandfully(parser, stack);
-         }
-
-         if (expanded != null)
-         {
-            labelArg = expanded;
-         }
-      }
-
-      String label = labelArg.toString(parser);
-
-      TeXObject linkText;
-
-      if (parser == stack)
-      {
-         linkText = parser.popNextArg();
-      }
-      else
-      {
-         linkText = stack.popArg(parser);
-      }
-
-      if (sty.isEntryDefined(label))
       {
          // \let\do@gls@link@checkfirsthyper\relax
          parser.putControlSequence(true, 
@@ -111,7 +68,8 @@ public class AtGlsAtAtLink extends ControlSequence
          if (sty.isExtra())
          {
             parser.putControlSequence(true,
-              new GenericCommand(true, "glscustomtext", null, linkText));
+              new GenericCommand(true, "glscustomtext", null, 
+                    (TeXObject)linkText.clone()));
 
             stack.push(listener.getControlSequence("@glsxtr@field@linkdefs"));
          }
@@ -119,22 +77,10 @@ public class AtGlsAtAtLink extends ControlSequence
          Group grp = listener.createGroup();
          grp.add(linkText);
 
-         stack.push(grp);
-         stack.push(listener.createGroup(label));
-         stack.push(listener.getOther(']'));
-
-         if (options != null)
-         {
-            stack.push(options);
-         }
-
-         stack.push(listener.getOther('['));
+         stack.push(glslabel);
+         stack.push(options);
 
          stack.push(listener.getControlSequence("@gls@link"));
-      }
-      else
-      {
-         sty.undefWarnOrError(parser, stack, GlossariesSty.ENTRY_NOT_DEFINED, label);
       }
 
       stack.push(new TeXCsRef("glspostlinkhook"));
@@ -146,10 +92,5 @@ public class AtGlsAtAtLink extends ControlSequence
       process(parser, parser);
    }
 
-   public GlossariesSty getSty()
-   {
-      return sty;
-   }
-
-   private GlossariesSty sty;
+   protected boolean checkModifier;
 }
