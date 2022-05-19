@@ -23,7 +23,7 @@ import java.io.IOException;
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.*;
 
-public class GlsGenEntryFmt extends Command
+public class GlsGenEntryFmt extends AbstractGlsCommand
 {
    public GlsGenEntryFmt(GlossariesSty sty)
    {
@@ -32,8 +32,7 @@ public class GlsGenEntryFmt extends Command
 
    public GlsGenEntryFmt(String name, GlossariesSty sty)
    {
-      super(name);
-      this.sty = sty;
+      super(name, sty);
    }
 
    public Object clone()
@@ -41,13 +40,8 @@ public class GlsGenEntryFmt extends Command
       return new GlsGenEntryFmt(getName(), getSty());
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
-     throws IOException
-   {
-      return expandonce(parser);
-   }
-
-   public TeXObjectList expandonce(TeXParser parser)
      throws IOException
    {
       TeXParserListener listener = parser.getListener();
@@ -236,11 +230,4 @@ public class GlsGenEntryFmt extends Command
 
       return list;
    }
-
-   public GlossariesSty getSty()
-   {
-      return sty;
-   }
-
-   private GlossariesSty sty;
 }

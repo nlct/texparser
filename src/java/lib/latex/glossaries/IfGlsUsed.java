@@ -40,6 +40,40 @@ public class IfGlsUsed extends AbstractGlsCommand
       return new IfGlsUsed(getName(), getSty());
    }
 
+   @Override
+   public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
+     throws IOException
+   {
+      TeXObjectList list = parser.getListener().createStack();
+
+      GlsLabel glslabel = popEntryLabel(parser, stack);
+
+      GlossaryEntry entry = glslabel.getEntry();
+
+      TeXObject trueArg = popArg(parser, stack);
+
+      TeXObject falseArg = popArg(parser, stack);
+
+      if (entry == null)
+      {
+         sty.undefWarnOrError(parser, list, 
+           GlossariesSty.ENTRY_NOT_DEFINED, glslabel.getLabel());
+      }
+      else
+      {
+         if (entry.isUnset())
+         {
+            list.push(trueArg);
+         }
+         else
+         {
+            list.push(falseArg);
+         }
+      }
+
+      return list;
+   }
+
    public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {

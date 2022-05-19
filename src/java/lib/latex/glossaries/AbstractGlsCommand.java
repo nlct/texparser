@@ -24,7 +24,7 @@ import java.util.Iterator;
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.*;
 
-public abstract class AbstractGlsCommand extends ControlSequence
+public abstract class AbstractGlsCommand extends Command
 {
    public AbstractGlsCommand(String name, GlossariesSty sty)
    {

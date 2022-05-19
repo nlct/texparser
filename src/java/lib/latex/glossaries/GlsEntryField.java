@@ -23,7 +23,7 @@ import java.io.IOException;
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.*;
 
-public class GlsEntryField extends AbstractGlsCommand implements Expandable
+public class GlsEntryField extends AbstractGlsCommand
 {
    public GlsEntryField(String name, String field, GlossariesSty sty)
    {

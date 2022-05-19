@@ -41,6 +41,13 @@ public class NewGlossaryEntry extends AbstractGlsCommand
       return new NewGlossaryEntry(getName(), overwrite, getSty());
    }
 
+   @Override
+   public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
+     throws IOException
+   {
+      return null;
+   }
+
    protected void defineEntry(String label, KeyValList keyValList, 
     TeXParser parser, TeXObjectList stack)
      throws IOException

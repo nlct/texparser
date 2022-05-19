@@ -40,6 +40,14 @@ public class DoAtGlsDisableHyperInList extends AbstractGlsCommand
       return new DoAtGlsDisableHyperInList(getName(), getSty());
    }
 
+   @Override
+   public TeXObjectList expandonce(TeXParser parser,
+      TeXObjectList stack)
+     throws IOException
+   {
+      return null;
+   }
+
    public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {

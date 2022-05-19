@@ -47,6 +47,13 @@ public class Gls extends AbstractGlsCommand
       return new Gls(getName(), getCaseChange(), isPlural(), getSty());
    }
 
+   @Override
+   public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
+     throws IOException
+   {
+      return null;
+   }
+
    public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {

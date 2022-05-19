@@ -42,6 +42,14 @@ public class AtGlsAtLink extends AbstractGlsCommand
       return new AtGlsAtLink(getName(), getSty(), checkModifier);
    }
 
+   @Override
+   public TeXObjectList expandonce(TeXParser parser,
+      TeXObjectList stack)
+     throws IOException
+   {
+      return null;
+   }
+
    // leave indexing/recording to TeX
    public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
