@@ -27,6 +27,7 @@ import com.dickimawbooks.texparserlib.primitives.NewIf;
 import com.dickimawbooks.texparserlib.primitives.IfTrue;
 import com.dickimawbooks.texparserlib.primitives.IfFalse;
 import com.dickimawbooks.texparserlib.latex.KeyValList;
+import com.dickimawbooks.texparserlib.latex.LaTeXSyntaxException;
 
 public class GlossaryEntry extends HashMap<String,TeXObject>
 {
@@ -39,45 +40,107 @@ public class GlossaryEntry extends HashMap<String,TeXObject>
       this.sty = sty;
       TeXParser parser = sty.getParser();
 
-      TeXObject typeVal = null;
-
       for (Iterator<String> it = options.keySet().iterator();
            it.hasNext(); )
       {
          String key = it.next();
+         TeXObject value;
 
-         if (key.equals("type"))
+         if (sty.isFieldExpansionOn(key))
          {
-            typeVal = options.getExpandedValue(key, parser, parser);
-         }
-         else if (sty.isFieldExpansionOn(key))
-         {
-            put(key, options.getExpandedValue(key, parser, parser));
+            value = options.getExpandedValue(key, parser, parser);
          }
          else
          {
-            put(key, options.getValue(key));
+            value = options.getValue(key);
          }
+
+         setField(key, value);
       }
 
-      if (typeVal == null)
+      NewIf.createConditional(false, parser, "ifglo@"+label+"@flag");
+
+      sty.addDefaultFieldValues(this);
+   }
+
+   public TeXObject setField(String key, TeXObject value)
+     throws IOException
+   {
+      if (key.equals("type"))
       {
-         typeVal = sty.getListener().getControlSequence("glsdefaulttype");
+         TeXObject typeVal = (TeXObject)value.clone();
 
          if (typeVal instanceof Expandable)
          {
-            TeXObjectList expanded = ((Expandable)typeVal).expandfully(parser);
+            TeXObjectList expanded = ((Expandable)typeVal).expandfully(sty.getParser());
 
             if (expanded != null)
             {
                typeVal = expanded;
             }
          }
+
+         type = typeVal.toString(sty.getParser());
+      }
+      else if (key.equals("category"))
+      {
+         TeXObject categoryVal = (TeXObject)value.clone();
+
+         if (categoryVal instanceof Expandable)
+         {
+            TeXObjectList expanded =
+              ((Expandable)categoryVal).expandfully(sty.getParser());
+
+            if (expanded != null)
+            {
+               categoryVal = expanded;
+            }
+         }
+
+         category = categoryVal.toString(sty.getParser());
+      }
+      else if (key.equals("parent"))
+      {
+         TeXObject parentVal = (TeXObject)value.clone();
+
+         if (parentVal instanceof Expandable)
+         {
+            TeXObjectList expanded = ((Expandable)parentVal).expandfully(sty.getParser());
+
+            if (expanded != null)
+            {
+               parentVal = expanded;
+            }
+         }
+
+         parent = parentVal.toString(sty.getParser());
+
+         if (parent.isEmpty())
+         {
+            parent = null;
+            level = 0;
+            return remove(parent);
+         }
+
+         GlossaryEntry parentEntry = sty.getEntry(parent);
+
+         if (parentEntry == null)
+         {
+            throw new LaTeXSyntaxException(sty.getParser(),
+               GlossariesSty.ENTRY_NOT_DEFINED, parent);
+         }
+
+         level = parentEntry.getLevel()+1;
+
+         value = new GlsLabel("@@parent@label", parentEntry);
       }
 
-      type = typeVal.toString(parser);
+      return put(key, value);
+   }
 
-      NewIf.createConditional(false, parser, "ifglo@"+label+"@flag");
+   public int getLevel()
+   {
+      return level;
    }
 
    public String getType()
@@ -116,5 +179,8 @@ public class GlossaryEntry extends HashMap<String,TeXObject>
 
    private String label;
    private String type;
+   private String category;
+   private String parent;
+   private int level=0;
    private GlossariesSty sty;
 }

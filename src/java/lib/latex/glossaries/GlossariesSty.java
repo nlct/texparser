@@ -21,6 +21,7 @@ package com.dickimawbooks.texparserlib.latex.glossaries;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Vector;
+import java.util.Iterator;
 
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.primitives.NewIf;
@@ -84,7 +85,7 @@ public class GlossariesSty extends LaTeXSty
       addField("sort", "sortvalue");
       addField("counter");
       addField("level");
-      addField("type");
+      addField("type", new TeXCsRef("glsdefaulttype"));
       addField("user1", "useri");
       addField("user2", "userii");
       addField("user3", "useriii");
@@ -104,7 +105,7 @@ public class GlossariesSty extends LaTeXSty
 
    protected void extraInit() throws IOException
    {
-      addField("category");
+      addField("category", getListener().createString("general"));
    }
 
    @Override
@@ -112,6 +113,7 @@ public class GlossariesSty extends LaTeXSty
    {
       registerControlSequence(new TextualContentCommand("glsdefaulttype", "main"));
       registerControlSequence(new TextualContentCommand("glossaryname", "Glossary"));
+      registerControlSequence(new TextualContentCommand("acronymname", "Acronyms"));
 
       registerControlSequence(new NewGlossaryEntry(this));
 
@@ -192,6 +194,9 @@ public class GlossariesSty extends LaTeXSty
          CaseChange.TO_UPPER, this));
 
       registerControlSequence(new TextualContentCommand("glsxtrundeftag", "??"));
+
+      registerControlSequence(new TextualContentCommand(
+         "abbreviationname", "Abbreviations"));
    }
 
    @Override
@@ -411,10 +416,21 @@ public class GlossariesSty extends LaTeXSty
 
    public void addField(String fieldName)
    {
-      addField(fieldName, null);
+      addField(fieldName, null, null);
+   }
+
+   public void addField(String fieldName, TeXObject defValue)
+   {
+      addField(fieldName, null, defValue);
    }
 
    public void addField(String fieldName, String internalFieldName)
+   {
+      addField(fieldName, internalFieldName, null);
+   }
+
+   public void addField(String fieldName, String internalFieldName, 
+      TeXObject defValue)
    {
       knownFields.add(fieldName);
 
@@ -426,6 +442,48 @@ public class GlossariesSty extends LaTeXSty
          }
 
          fieldMap.put(internalFieldName, fieldName);
+      }
+
+      if (defValue != null)
+      {
+         if (fieldDefaultValues == null)
+         {
+            fieldDefaultValues = new HashMap<String,TeXObject>();
+         }
+
+         fieldDefaultValues.put(fieldName, defValue);
+      }
+   }
+
+   public void addDefaultFieldValues(GlossaryEntry entry)
+     throws IOException
+   {
+      if (fieldDefaultValues != null)
+      {
+         for (Iterator<String> it=fieldDefaultValues.keySet().iterator(); 
+               it.hasNext(); )
+         {
+            String field = it.next();
+
+            TeXObject val = entry.get(field);
+
+            if (val == null)
+            {
+               val = (TeXObject)fieldDefaultValues.get(field).clone();
+
+               if (isFieldExpansionOn(field) && val instanceof Expandable)
+               {
+                  TeXObjectList expanded = ((Expandable)val).expandfully(getParser());
+
+                  if (expanded != null)
+                  {
+                     val = expanded;
+                  }
+               }
+
+               entry.setField(field, val);
+            }
+         }
       }
    }
 
