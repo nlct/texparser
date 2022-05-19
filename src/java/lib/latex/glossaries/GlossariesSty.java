@@ -118,6 +118,8 @@ public class GlossariesSty extends LaTeXSty
       registerControlSequence(new NewGlossaryEntry(this));
       registerControlSequence(new LoadGlsEntries());
 
+      registerControlSequence(new TextualContentCommand("glsautoprefix", ""));
+
       registerControlSequence(new GenericCommand("glspostlinkhook"));
       registerControlSequence(new GenericCommand("glslinkcheckfirsthyperhook"));
       registerControlSequence(new GenericCommand("glslinkpostsetkeys"));
@@ -223,6 +225,11 @@ public class GlossariesSty extends LaTeXSty
       getListener().requirepackage(null, "ifthen", false);
       getListener().requirepackage(null, "keyval", false);
       getListener().requirepackage(null, "datatool-base", true);
+
+      if (getParser().getControlSequence("chapter") != null)
+      {
+         section = "chapter";
+      }
    }
 
    @Override
@@ -233,7 +240,11 @@ public class GlossariesSty extends LaTeXSty
       if (createMain)
       {
          createGlossary("main", new TeXCsRef("glossaryname"));
+         createMain = false;
       }
+
+      getListener().putControlSequence(true, 
+        new GlossarySection(section, isNumberedSection, isAutoLabel));
 
       if (extra)
       {
@@ -252,6 +263,50 @@ public class GlossariesSty extends LaTeXSty
       if (option.equals("nomain"))
       {
          createMain = false;
+      }
+      else if (option.equals("section"))
+      {
+         if (value == null || value.isEmpty())
+         {
+            section = "section";
+         }
+         else
+         {
+            section = getParser().expandToString(value, null);
+         }
+      }
+      else if (option.equals("numberedsection"))
+      {
+         if (value == null || value.isEmpty())
+         {
+            isNumberedSection = true;
+            isAutoLabel = false;
+         }
+         else
+         {
+            String valStr = getParser().expandToString(value, null);
+
+            if (valStr.equals("nolabel"))
+            {
+               isNumberedSection = true;
+               isAutoLabel = false;
+            }
+            else if (valStr.equals("false"))
+            {
+               isNumberedSection = false;
+               isAutoLabel = false;
+            }
+            else if (valStr.equals("autolabel"))
+            {
+               isNumberedSection = true;
+               isAutoLabel = true;
+            }
+            else
+            {
+               isNumberedSection = false;
+               isAutoLabel = true;
+            }
+         }
       }
       else if (extra && option.equals("record"))
       {
@@ -294,6 +349,12 @@ public class GlossariesSty extends LaTeXSty
       }
 
       extraPostOptions();
+   }
+
+   public void setup(KeyValList options) throws IOException
+   {
+      processOptions(options);
+      postOptions();
    }
 
    public void undefWarnOrError(TeXParser parser, TeXObjectList stack,
@@ -730,6 +791,12 @@ public class GlossariesSty extends LaTeXSty
    private HashMap<CharObject,KeyValList> modifierOptions;
 
    private Vector<String> nohyperlist;
+
+   private String section = "section";
+
+   private boolean isNumberedSection = false;
+
+   private boolean isAutoLabel = false;
 
    public static final String GLOSSARY_NOT_DEFINED 
     = "glossaries.glossary.not.defined";
