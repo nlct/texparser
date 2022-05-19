@@ -574,9 +574,133 @@ public class GlossariesSty extends LaTeXSty
       nohyperlist.add(type);
    }
 
+   public boolean isRegular(GlossaryEntry entry)
+   {
+      return isAttributeTrue(entry, "regular");
+   }
+
+   public boolean isRegular(GlsLabel glslabel)
+   {
+      return isAttributeTrue(glslabel, "regular");
+   }
+
+   public boolean isNotRegular(GlossaryEntry entry)
+   {
+      return isAttributeFalse(entry, "regular");
+   }
+
+   public boolean isNotRegular(GlsLabel glslabel)
+   {
+      return isAttributeFalse(glslabel, "regular");
+   }
+
+   public Category getCategory(GlsLabel glslabel)
+   {
+      return getCategory(glslabel.getEntry());
+   }
+
+   public Category getCategory(GlossaryEntry entry)
+   {
+      if (entry == null) return null;
+
+      return getCategory(entry.getCategory());
+   }
+
+   public Category getCategory(String categoryLabel)
+   {
+      if (categories == null || categoryLabel == null) return null;
+
+      return categories.get(categoryLabel);
+   }
+
+   public boolean isAttributeTrue(GlossaryEntry entry, String attr)
+   {
+      Category category = getCategory(entry);
+
+      return category != null && category.isAttributeTrue(attr);
+   }
+
    public boolean isAttributeTrue(GlsLabel glslabel, String attr)
-   {// TODO
-      return false;
+   {
+      Category category = getCategory(glslabel);
+
+      return category != null && category.isAttributeTrue(attr);
+   }
+
+   public boolean isAttributeTrue(String categoryLabel, String attr)
+   {
+      Category category = getCategory(categoryLabel);
+
+      return category != null && category.isAttributeTrue(attr);
+   }
+
+   public boolean isAttributeFalse(GlossaryEntry entry, String attr)
+   {
+      Category category = getCategory(entry);
+
+      return category != null && category.isAttributeFalse(attr);
+   }
+
+   public boolean isAttributeFalse(GlsLabel glslabel, String attr)
+   {
+      Category category = getCategory(glslabel);
+
+      return category != null && category.isAttributeFalse(attr);
+   }
+
+   public boolean isAttributeFalse(String categoryLabel, String attr)
+   {
+      Category category = getCategory(categoryLabel);
+
+      return category != null && category.isAttributeFalse(attr);
+   }
+
+   public boolean isAttributeValue(GlossaryEntry entry, 
+       String attrName, String attrValue)
+   {
+      Category category = getCategory(entry);
+
+      return category != null && category.isAttribute(attrName, attrValue);
+   }
+
+   public boolean isAttributeValue(GlsLabel glslabel, 
+       String attrName, String attrValue)
+   {
+      Category category = getCategory(glslabel);
+
+      return category != null && category.isAttribute(attrName, attrValue);
+   }
+
+   public boolean isAttributeValue(String categoryLabel, 
+       String attrName, String attrValue)
+   {
+      Category category = getCategory(categoryLabel);
+
+      return category != null && category.isAttribute(attrName, attrValue);
+   }
+
+   public void setAttribute(String categoryLabel, String attrName, String attrVal)
+   {
+      Category category;
+
+      if (categories == null)
+      {
+         categories = new HashMap<String,Category>();
+         category = new Category(categoryLabel);
+         categories.put(categoryLabel, category);
+      }
+      else
+      {
+         category = categories.get(categoryLabel);
+
+         if (category == null)
+         {
+            category = new Category(categoryLabel);
+            categories.put(categoryLabel, category);
+         }
+      }
+
+      category.setAttribute(attrName, attrVal);
    }
 
    private HashMap<String,GlossaryEntry> entries;
@@ -585,6 +709,8 @@ public class GlossariesSty extends LaTeXSty
 
    private Vector<String> glossaryTypes;
    private Vector<String> ignoredGlossaryTypes;
+
+   private HashMap<String,Category> categories;
 
    private boolean createMain = true;
 
