@@ -83,7 +83,7 @@ public class GlossarySection extends ControlSequence
    public void process(TeXParser parser)
      throws IOException
    {
-      process(parser);
+      process(parser, parser);
    }
 
    private String section;
