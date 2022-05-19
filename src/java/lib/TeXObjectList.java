@@ -1049,6 +1049,36 @@ public class TeXObjectList extends Vector<TeXObject>
       return true;
    }
 
+   public boolean equals(String text)
+   {
+      if (!(this instanceof Group))
+      {
+         int n = text.length();
+         int i = 0;
+
+         for (int j = 0; j < size(); j++)
+         {
+            TeXObject object = get(j);
+
+            if (object instanceof Ignoreable) continue;
+
+            if (!(object instanceof CharObject)) return false;
+
+            if (i >= n) return false;
+
+            int codepoint = ((CharObject)object).getCharCode();
+
+            if (codepoint != text.codePointAt(i)) return false;
+
+            i += Character.charCount(codepoint);
+         }
+
+         if (i == n) return true;
+      }
+
+      return false;
+   }
+
    public void push(TeXObject object)
    {
       push(object, false);
