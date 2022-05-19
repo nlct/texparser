@@ -57,7 +57,15 @@ public class NewGlossaryEntry extends AbstractGlsCommand
 
             GlossaryEntry entry = getEntry(parentLabel);
 
-            if (entry != null)
+            if (entry == null)
+            {
+               parser.getListener().getTeXApp().warning(parser, 
+                parser.getListener().getTeXApp().getMessage(
+                  GlossariesSty.ENTRY_NOT_DEFINED, parentLabel));
+
+               keyValList.remove("parent");
+            }
+            else
             {
                TeXObject parentName = entry.get("name");
 
@@ -65,6 +73,8 @@ public class NewGlossaryEntry extends AbstractGlsCommand
                {
                   name = (TeXObject)parentName.clone();
                }
+
+               keyValList.put("parent", new GlsLabel("@@parent@label", entry));
             }
          }
 

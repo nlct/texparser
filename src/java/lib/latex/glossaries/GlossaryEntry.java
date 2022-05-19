@@ -68,19 +68,24 @@ public class GlossaryEntry extends HashMap<String,TeXObject>
    {
       if (key.equals("type"))
       {
-         TeXObject typeVal = (TeXObject)value.clone();
-
-         if (typeVal instanceof Expandable)
+         if (!(value instanceof GlsType))
          {
-            TeXObjectList expanded = ((Expandable)typeVal).expandfully(sty.getParser());
+            TeXObject typeVal = (TeXObject)value.clone();
 
-            if (expanded != null)
+            if (typeVal instanceof Expandable)
             {
-               typeVal = expanded;
-            }
-         }
+               TeXObjectList expanded = ((Expandable)typeVal).expandfully(sty.getParser());
 
-         type = typeVal.toString(sty.getParser());
+               if (expanded != null)
+               {
+                  typeVal = expanded;
+               }
+            }
+
+            String type = typeVal.toString(sty.getParser());
+
+            value = new GlsType("@@glstype", type, sty.getGlossary(type));
+         }
       }
       else if (key.equals("category"))
       {
@@ -101,38 +106,56 @@ public class GlossaryEntry extends HashMap<String,TeXObject>
       }
       else if (key.equals("parent"))
       {
-         TeXObject parentVal = (TeXObject)value.clone();
-
-         if (parentVal instanceof Expandable)
+         if (value == null || value.isEmpty())
          {
-            TeXObjectList expanded = ((Expandable)parentVal).expandfully(sty.getParser());
-
-            if (expanded != null)
-            {
-               parentVal = expanded;
-            }
-         }
-
-         parent = parentVal.toString(sty.getParser());
-
-         if (parent.isEmpty())
-         {
-            parent = null;
             level = 0;
-            return remove(parent);
+            return remove("parent");
          }
 
-         GlossaryEntry parentEntry = sty.getEntry(parent);
-
-         if (parentEntry == null)
+         if (value instanceof GlsLabel)
          {
-            throw new LaTeXSyntaxException(sty.getParser(),
-               GlossariesSty.ENTRY_NOT_DEFINED, parent);
+            GlossaryEntry parentEntry = ((GlsLabel)value).getEntry();
+
+            level = parentEntry.getLevel()+1;
          }
+         else
+         {
+            TeXObject parentVal = (TeXObject)value.clone();
 
-         level = parentEntry.getLevel()+1;
+            if (parentVal instanceof Expandable)
+            {
+               TeXObjectList expanded = ((Expandable)parentVal).expandfully(sty.getParser());
 
-         value = new GlsLabel("@@parent@label", parentEntry);
+               if (expanded != null)
+               {
+                  parentVal = expanded;
+               }
+            }
+
+            String parent = parentVal.toString(sty.getParser());
+
+            if (parent.isEmpty())
+            {
+               level = 0;
+               return remove(parent);
+            }
+
+            GlossaryEntry parentEntry = sty.getEntry(parent);
+
+            if (parentEntry == null)
+            {
+               throw new LaTeXSyntaxException(sty.getParser(),
+                  GlossariesSty.ENTRY_NOT_DEFINED, parent);
+            }
+
+            level = parentEntry.getLevel()+1;
+
+            value = new GlsLabel("@@parent@label", parentEntry);
+         }
+      }
+      else if (value == null)
+      {
+         return remove(key);
       }
 
       return put(key, value);
@@ -143,14 +166,138 @@ public class GlossaryEntry extends HashMap<String,TeXObject>
       return level;
    }
 
+   public String getCategory()
+   {
+      return category;
+   }
+
    public String getType()
    {
-      return type;
+      TeXObject val = get("type");
+
+      if (val != null && val instanceof TextualContentCommand)
+      {
+         return ((TextualContentCommand)val).getText();
+      }
+
+      return "main";
+   }
+
+   public Glossary getGlossary() throws IOException
+   {
+      TeXObject val = get("type");
+
+      if (val instanceof GlsType)
+      {
+         Glossary glossary = ((GlsType)val).getGlossary();
+
+         if (glossary == null)
+         {
+            ((GlsType)val).refresh(sty);
+            glossary = ((GlsType)val).getGlossary();
+
+            if (glossary == null)
+            {
+               throw new LaTeXSyntaxException(sty.getParser(),
+                  GlossariesSty.GLOSSARY_NOT_DEFINED, ((GlsType)val).getLabel());
+            }
+         }
+
+         return glossary;
+      }
+
+      String type;
+
+      if (val == null)
+      {
+         val = new TeXCsRef("glsdefaulttype");
+      }
+
+      if (val instanceof TextualContentCommand)
+      {
+         type = ((TextualContentCommand)val).getText();
+      }
+      else 
+      {
+         if (val instanceof Expandable)
+         {
+            TeXObjectList expanded = ((Expandable)val).expandfully(sty.getParser());
+
+            if (expanded != null)
+            {
+               val = expanded;
+            }
+         }
+
+         type = val.toString(sty.getParser());
+      }
+
+      Glossary glossary = sty.getGlossary(type);
+
+      if (glossary == null)
+      {
+         throw new LaTeXSyntaxException(sty.getParser(),
+            GlossariesSty.GLOSSARY_NOT_DEFINED, type);
+      }
+
+      GlsType glstype = new GlsType("@@glstype", type, glossary);
+      put("type", glstype);
+
+      return glossary;
    }
 
    public String getLabel()
    {
       return label;
+   }
+
+   public GlossaryEntry getParent() throws IOException
+   {
+      TeXObject val = get("parent");
+
+      if (val == null || val.isEmpty()) return null;
+
+      if (val instanceof GlsLabel)
+      {
+         GlossaryEntry entry = ((GlsLabel)val).getEntry();
+
+         if (entry == null)
+         {
+            ((GlsLabel)val).refresh(sty);
+
+            entry = ((GlsLabel)val).getEntry();
+
+            if (entry == null)
+            {
+               remove("parent");
+               level = 0;
+
+               throw new LaTeXSyntaxException(sty.getParser(),
+                  GlossariesSty.ENTRY_NOT_DEFINED, ((GlsLabel)val).getLabel());
+            }
+
+            level = entry.getLevel()+1;
+         }
+
+         return entry;
+      }
+
+      String parent = val.toString(sty.getParser());
+      GlossaryEntry entry = sty.getEntry(parent);
+
+      if (entry == null)
+      {
+         remove("parent");
+         level = 0;
+
+         throw new LaTeXSyntaxException(sty.getParser(),
+            GlossariesSty.ENTRY_NOT_DEFINED, parent);
+      }
+
+      level = entry.getLevel()+1;
+      put("parent", new GlsLabel("@@parent@label", entry));
+
+      return entry;
    }
 
    // mark as used.
@@ -178,9 +325,7 @@ public class GlossaryEntry extends HashMap<String,TeXObject>
    }
 
    private String label;
-   private String type;
    private String category;
-   private String parent;
    private int level=0;
    private GlossariesSty sty;
 }
