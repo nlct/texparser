@@ -45,89 +45,20 @@ public abstract class AbstractGlsCommand extends Command
    protected KeyValList popModifier(TeXParser parser, TeXObjectList stack)
     throws IOException
    {
-      TeXObject object;
-
-      if (stack == null)
-      {
-         object = parser.peekStack();
-      }
-      else
-      {
-         object = stack.peekStack();
-      }
-
-      if (object instanceof CharObject)
-      {
-         KeyValList options = sty.getModifierOptions((CharObject)object);
-
-         if (options != null)
-         {
-            if (parser == stack || stack == null)
-            {
-               parser.popStack();
-            }
-            else
-            {
-               stack.popStack(parser);
-            }
-         }
-
-         return options;
-      }
-
-      return null;
+      return sty.popModifier(parser, stack);
    }
 
    protected KeyValList popOptKeyValList(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      return popOptKeyValList(parser, stack, false);
+      return sty.popOptKeyValList(parser, stack);
    }
 
    protected KeyValList popOptKeyValList(TeXParser parser, TeXObjectList stack,
      boolean checkModifier)
      throws IOException
    {
-      KeyValList modOptions = null;
-
-      if (checkModifier)
-      {
-         modOptions = popModifier(parser, stack);
-      }
-
-      KeyValList options = null;
-
-      TeXObject arg = stack.peek();
-
-      if (arg instanceof KeyValList)
-      {
-         stack.pop();
-         options = (KeyValList)arg;
-      }
-      else
-      {
-         arg = popOptArg(parser, stack);
-
-         if (arg != null)
-         {
-            options = KeyValList.getList(parser, arg);
-         }
-      }
-
-      if (options == null)
-      {
-         options = modOptions;
-      }
-      else if (modOptions != null)
-      {
-         for (Iterator<String> it = modOptions.keySet().iterator(); it.hasNext(); )
-         {
-            String key = it.next();
-            options.putIfAbsent(key, modOptions.get(key));
-         }
-      }
-
-      return options;
+      return sty.popOptKeyValList(parser, stack, checkModifier);
    }
 
    protected GlsLabel popEntryLabel(TeXParser parser, TeXObjectList stack)

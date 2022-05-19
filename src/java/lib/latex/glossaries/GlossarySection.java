@@ -48,11 +48,11 @@ public class GlossarySection extends ControlSequence
    public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
+      TeXObject tocTitle = popOptArg(parser, stack);
+      TeXObject title = popArg(parser, stack);
+
       if (isAutoLabel)
       {
-         TeXObject tocTitle = popOptArg(parser, stack);
-         TeXObject title = popArg(parser, stack);
-
          Group grp = parser.getListener().createGroup();
          grp.add(parser.getListener().getControlSequence("glsautoprefix"));
          grp.add(parser.getListener().getControlSequence("@glo@type"));
@@ -60,21 +60,21 @@ public class GlossarySection extends ControlSequence
          stack.push(grp);
          stack.push(parser.getListener().getControlSequence("label"));
 
-         grp = parser.getListener().createGroup();
-         grp.add(title);
-         stack.push(grp);
-
-         if (tocTitle != null)
-         {
-            stack.push(parser.getListener().getOther(']'));
-            stack.push(tocTitle);
-            stack.push(parser.getListener().getOther('['));
-         }
       }
+
+      Group grp = parser.getListener().createGroup();
+      grp.add(title);
+      stack.push(grp);
 
       if (!isNumbered)
       {
          stack.push(parser.getListener().getOther('*'));
+      }
+      else if (tocTitle != null)
+      {
+         stack.push(parser.getListener().getOther(']'));
+         stack.push(tocTitle);
+         stack.push(parser.getListener().getOther('['));
       }
 
       stack.push(parser.getListener().getControlSequence(section));

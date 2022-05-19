@@ -115,6 +115,20 @@ public class GlossariesSty extends LaTeXSty
       registerControlSequence(new TextualContentCommand("glossaryname", "Glossary"));
       registerControlSequence(new TextualContentCommand("acronymname", "Acronyms"));
 
+
+      registerControlSequence(new PrintGlossary(this));
+      registerControlSequence(new PrintGlossaries(this));
+      registerControlSequence(new TextualContentCommand("glsresetentrylist", ""));
+      registerControlSequence(new AtGobble("glsgroupheading"));
+      registerControlSequence(new AtFirstOfOne("glossaryentrynumbers"));
+      registerControlSequence(new TextualContentCommand("glossarytitle", ""));
+      registerControlSequence(new TextualContentCommand("glossarytoctitle", ""));
+      registerControlSequence(new TextualContentCommand("glossaryheader", ""));
+      registerControlSequence(new TextualContentCommand("glossarypreamble", ""));
+      registerControlSequence(new TextualContentCommand("glossarypostamble", ""));
+      registerControlSequence(new DescriptionDec("theglossary"));
+      registerControlSequence(new GlossEntry(this));
+
       registerControlSequence(new NewGlossaryEntry(this));
       registerControlSequence(new LoadGlsEntries());
 
@@ -186,6 +200,8 @@ public class GlossariesSty extends LaTeXSty
       setModifier(listener.getOther('*'), "hyper", new UserBoolean(true));
       setModifier(listener.getOther('+'), "hyper", new UserBoolean(false));
 
+      registerControlSequence(new GobbleOpt("makeglossaries", 1, 0));
+
       if (extra)
       {
          addExtraDefinitions();
@@ -239,7 +255,8 @@ public class GlossariesSty extends LaTeXSty
 
       if (createMain)
       {
-         createGlossary("main", new TeXCsRef("glossaryname"));
+         createGlossary("main", new TeXCsRef("glossaryname"), null,
+           "glg", "gls", "glo");
          createMain = false;
       }
 
@@ -357,6 +374,108 @@ public class GlossariesSty extends LaTeXSty
       postOptions();
    }
 
+   public TeXObject popOptArg(TeXParser parser, TeXObjectList stack)
+     throws IOException
+   {
+      if (parser == stack || stack == null)
+      {
+         return parser.popNextArg('[', ']');
+      }
+      else
+      {
+         return stack.popArg(parser, '[', ']');
+      }
+   }
+
+   public KeyValList popModifier(TeXParser parser, TeXObjectList stack)
+    throws IOException
+   {
+      TeXObject object;
+
+      if (stack == null)
+      {
+         object = parser.peekStack();
+      }
+      else
+      {
+         object = stack.peekStack();
+      }
+
+      if (object instanceof CharObject)
+      {
+         KeyValList options = getModifierOptions((CharObject)object);
+
+         if (options != null)
+         {
+            if (parser == stack || stack == null)
+            {
+               parser.popStack();
+            }
+            else
+            {
+               stack.popStack(parser);
+            }
+         }
+
+         return options;
+      }
+
+      return null;
+   }
+
+   public KeyValList popOptKeyValList(TeXParser parser, TeXObjectList stack)
+     throws IOException
+   {
+      return popOptKeyValList(parser, stack, false);
+   }
+
+   public KeyValList popOptKeyValList(TeXParser parser, TeXObjectList stack,
+     boolean checkModifier)
+     throws IOException
+   {
+      KeyValList modOptions = null;
+
+      if (checkModifier)
+      {
+         modOptions = popModifier(parser, stack);
+      }
+
+      KeyValList options = null;
+
+      TeXObject arg = stack.peek();
+
+      if (arg instanceof KeyValList)
+      {
+         stack.pop();
+         options = (KeyValList)arg;
+      }
+      else
+      {
+         arg = popOptArg(parser, stack);
+
+         if (arg != null)
+         {
+            options = KeyValList.getList(parser, arg);
+         }
+      }
+
+      if (options == null)
+      {
+         options = modOptions;
+      }
+      else if (modOptions != null)
+      {
+         for (Iterator<String> it = modOptions.keySet().iterator(); it.hasNext(); )
+         {
+            String key = it.next();
+            options.putIfAbsent(key, modOptions.get(key));
+         }
+      }
+
+      return options;
+   }
+
+
    public void undefWarnOrError(TeXParser parser, TeXObjectList stack,
      String messageTag, Object... params)
      throws IOException
@@ -417,6 +536,14 @@ public class GlossariesSty extends LaTeXSty
    }
 
    public void createGlossary(String label, TeXObject title,
+    String counter, String glg, String gls, String glo)
+     throws TeXSyntaxException
+   {
+      createGlossary(label, title, counter, glg, gls, glo, false, false,
+        NewCommand.OVERWRITE_FORBID);
+   }
+
+   public void createGlossary(String label, TeXObject title,
     String counter, String glg, String gls, String glo, boolean isIgnored,
     boolean noHyper, byte overwrite)
      throws TeXSyntaxException
@@ -452,6 +579,11 @@ public class GlossariesSty extends LaTeXSty
       {
          glossaryTypes.add(label);
       }
+   }
+
+   public Vector<String> getNonIgnoredGlossaries()
+   {
+      return glossaryTypes;
    }
 
    public void addEntry(byte overwrite, GlossaryEntry entry)

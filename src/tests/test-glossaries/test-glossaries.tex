@@ -1,9 +1,13 @@
 % arara: pdflatex
+% arara: makeglossaries
+% arara: pdflatex
 \documentclass{article}
 
 \usepackage[T1]{fontenc}
 \usepackage[colorlinks]{hyperref}
 \usepackage{glossaries}
+
+\makeglossaries
 
 \newglossaryentry{sample}{name={sample},description={an example}}
 
@@ -19,4 +23,5 @@ A \gls{sample}.
 Is used? \ifglsused{sample}{true}{false}.
 Next use: \gls{sample}.
 
+\printglossaries
 \end{document}

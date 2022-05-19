@@ -7,4 +7,7 @@ output
 *.toc
 test*.pdf
 *.glo
+*.gls
+*.glg
 *.idx
+*.ist
