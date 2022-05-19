@@ -144,4 +144,6 @@ public class UserNumber implements TeXNumber
    }
 
    private int value;
+
+   public static final UserNumber ONE = new UserNumber(1);
 }
