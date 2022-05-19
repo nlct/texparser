@@ -106,6 +106,21 @@ public class LaTeXFile extends TeXPath
       }
    }
 
+   protected void addOptions(KeyValList extraOptions)
+   {
+      if (extraOptions != null)
+      {
+         if (options == null)
+         {
+            options = extraOptions;
+         }
+         else
+         {
+            options.putAll(extraOptions);
+         }
+      }
+   }
+
    public LaTeXParserListener getListener()
    {
       return listener;
@@ -116,7 +131,7 @@ public class LaTeXFile extends TeXPath
       return listener.getParser();
    }
 
-   public void processOptions() throws IOException
+   protected void loadParentOptions() throws IOException
    {
       if (loadParentOptions && prevSty != null)
       {
@@ -149,6 +164,11 @@ public class LaTeXFile extends TeXPath
          }
 
       }
+   }
+
+   public void processOptions() throws IOException
+   {
+      loadParentOptions();
 
       KeyValList options = getOptions();
 
@@ -322,7 +342,34 @@ public class LaTeXFile extends TeXPath
       }
    }
 
+   protected void updateName(String name)
+   {
+      if (name.equals(baseName))
+      {
+         return;
+      }
+
+      if (knownNames == null)
+      {
+         knownNames = new Vector<String>();
+         knownNames.add(baseName);
+      }
+      else if (!knownNames.contains(baseName))
+      {
+         knownNames.add(baseName);
+      }
+
+      baseName = name;
+   }
+
+   public boolean isName(String name)
+   {
+      return baseName.equals(name) 
+              || (knownNames != null && knownNames.contains(name));
+   }
+
    private String baseName;
+   private Vector<String> knownNames;
    private KeyValList options;
    private String ext;
 

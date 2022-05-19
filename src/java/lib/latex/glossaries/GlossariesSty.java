@@ -27,10 +27,14 @@ import com.dickimawbooks.texparserlib.primitives.NewIf;
 import com.dickimawbooks.texparserlib.latex.*;
 
 /**
- * Limited support the glossaries and glossaries-extra packages. They are
+ * Limited support for the glossaries and glossaries-extra packages. They are
  * both far to large to comprehensively emulate. The aim is to
  * simply gather basic information and provide some limited
- * formatting support.
+ * formatting support. 
+ *
+ * Note that texparserlib.latex.glossaries.* isn't used with bib2gls, which
+ * uses texparserlib.bib.* to parse bib files. The glossary entries
+ * in that case are sub-classes of BibEntry.
  */
 
 public class GlossariesSty extends LaTeXSty
@@ -66,6 +70,41 @@ public class GlossariesSty extends LaTeXSty
       expandField.put("symbol", Boolean.FALSE);
       expandField.put("symbolplural", Boolean.FALSE);
       expandField.put("sort", Boolean.FALSE);
+
+      knownFields = new Vector<String>();
+      addField("name");
+      addField("text");
+      addField("plural");
+      addField("first");
+      addField("firstplural");
+      addField("symbol");
+      addField("symbolplural");
+      addField("description", "desc");
+      addField("descriptionplural", "descplural");
+      addField("sort", "sortvalue");
+      addField("counter");
+      addField("level");
+      addField("type");
+      addField("user1", "useri");
+      addField("user2", "userii");
+      addField("user3", "useriii");
+      addField("user4", "useriv");
+      addField("user5", "userv");
+      addField("user6", "uservi");
+      addField("short");
+      addField("shortplural", "shortpl");
+      addField("long");
+      addField("longplural", "longpl");
+
+      if (extra)
+      {
+         extraInit();
+      }
+   }
+
+   protected void extraInit() throws IOException
+   {
+      addField("category");
    }
 
    @Override
@@ -137,17 +176,22 @@ public class GlossariesSty extends LaTeXSty
 
       if (extra)
       {
-         registerControlSequence(new GenericCommand("glsxtrfieldtitlecasecs", null,
-            new TeXCsRef("glscapitalisewords")));
-
-         registerControlSequence(new GlsEntryField("glsxtrusefield", null, this));
-         registerControlSequence(new GlsEntryField("Glsxtrusefield", null,
-            CaseChange.SENTENCE, this));
-         registerControlSequence(new GlsEntryField("GLSxtrusefield", null,
-            CaseChange.TO_UPPER, this));
-
-         registerControlSequence(new TextualContentCommand("glsxtrundeftag", "??"));
+         addExtraDefinitions();
       }
+   }
+
+   protected void addExtraDefinitions()
+   {
+      registerControlSequence(new GenericCommand("glsxtrfieldtitlecasecs", null,
+         new TeXCsRef("glscapitalisewords")));
+
+      registerControlSequence(new GlsEntryField("glsxtrusefield", null, this));
+      registerControlSequence(new GlsEntryField("Glsxtrusefield", null,
+         CaseChange.SENTENCE, this));
+      registerControlSequence(new GlsEntryField("GLSxtrusefield", null,
+         CaseChange.TO_UPPER, this));
+
+      registerControlSequence(new TextualContentCommand("glsxtrundeftag", "??"));
    }
 
    @Override
@@ -169,6 +213,15 @@ public class GlossariesSty extends LaTeXSty
       {
          createGlossary("main", new TeXCsRef("glossaryname"));
       }
+
+      if (extra)
+      {
+         extraPostOptions();
+      }
+   }
+
+   protected void extraPostOptions() throws IOException
+   {
    }
 
    @Override
@@ -179,11 +232,47 @@ public class GlossariesSty extends LaTeXSty
       {
          createMain = false;
       }
+      else if (extra && option.equals("record"))
+      {
+         if (value == null || !value.equals("off"))
+         {
+            addField("group");
+            addField("location");
+         }
+      }
    }
 
    public boolean isExtra()
    {
       return extra;
+   }
+
+   // in case both glossaries and glossaries-extra explicitly loaded
+   public void addExtra(String styName, KeyValList extraOptions)
+    throws IOException
+   {
+      if (extra)
+      {
+         // already set up
+         return;
+      }
+
+      updateName(styName);
+
+      loadParentOptions();
+
+      extra = true;
+
+      extraInit();
+      addExtraDefinitions();
+
+      if (extraOptions != null)
+      {
+         processOptions(extraOptions);
+         addOptions(extraOptions);
+      }
+
+      extraPostOptions();
    }
 
    public void undefWarnOrError(TeXParser parser, TeXObjectList stack,
@@ -320,6 +409,43 @@ public class GlossariesSty extends LaTeXSty
       return expandFields;
    }
 
+   public void addField(String fieldName)
+   {
+      addField(fieldName, null);
+   }
+
+   public void addField(String fieldName, String internalFieldName)
+   {
+      knownFields.add(fieldName);
+
+      if (internalFieldName != null && !fieldName.equals(internalFieldName))
+      {
+         if (fieldMap == null)
+         {
+            fieldMap = new HashMap<String,String>();
+         }
+
+         fieldMap.put(internalFieldName, fieldName);
+      }
+   }
+
+   public String getFieldName(String internalFieldName)
+   {
+      if (fieldMap == null)
+      {
+         return internalFieldName;
+      }
+
+      String val = fieldMap.get(internalFieldName);
+
+      return val == null ? internalFieldName : val;
+   }
+
+   public boolean isKnownField(String field)
+   {
+      return knownFields.contains(field);
+   }
+
    private HashMap<String,GlossaryEntry> entries;
 
    private HashMap<String,Glossary> glossaries;
@@ -336,6 +462,11 @@ public class GlossariesSty extends LaTeXSty
    private boolean extra = false;
 
    private HashMap<String,Boolean> expandField;
+
+   private Vector<String> knownFields;
+
+   private HashMap<String,String> fieldMap;
+   private HashMap<String,TeXObject> fieldDefaultValues;
 
    public static final String GLOSSARY_NOT_DEFINED 
     = "glossaries.glossary.not.defined";

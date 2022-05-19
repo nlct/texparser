@@ -52,6 +52,7 @@ import com.dickimawbooks.texparserlib.latex.hyperref.*;
 import com.dickimawbooks.texparserlib.latex.ifthen.*;
 import com.dickimawbooks.texparserlib.latex.inputenc.*;
 import com.dickimawbooks.texparserlib.latex.jmlr.*;
+import com.dickimawbooks.texparserlib.latex.keyval.*;
 import com.dickimawbooks.texparserlib.latex.lipsum.*;
 import com.dickimawbooks.texparserlib.latex.mfirstuc.*;
 import com.dickimawbooks.texparserlib.latex.mhchem.*;
@@ -1181,7 +1182,7 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
          {
             LaTeXSty sty = (LaTeXSty)lfile;
 
-            if (sty.getName().equals(styName))
+            if (sty.isName(styName))
             {
                return sty;
             }
@@ -1261,6 +1262,11 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
          return new EtoolboxSty(options, this, loadParentOptions);
       }
 
+      if (styName.equals("keyval") || styName.equals("xkeyval"))
+      {
+         return new KeyValSty(options, styName, this, loadParentOptions);
+      }
+
       if (styName.equals("fontenc"))
       {
          fontEncSty = new FontEncSty(options, this, loadParentOptions);
@@ -1272,9 +1278,23 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
          return new FourierSty(options, this, loadParentOptions);
       }
 
-      if (styName.equals("glossaries") || styName.equals("glossaries-extra"))
+      if (styName.equals("glossaries"))
       {
          return new GlossariesSty(options, styName, this, loadParentOptions);
+      }
+
+      if (styName.equals("glossaries-extra"))
+      {
+         LaTeXSty sty = getLoadedPackage("glossaries");
+
+         if (sty == null || !(sty instanceof GlossariesSty))
+         {
+            return new GlossariesSty(options, styName, this, loadParentOptions);
+         }
+         else
+         {
+            ((GlossariesSty)sty).addExtra(styName, options);
+         }
       }
 
       if (styName.equals("hyperref"))
