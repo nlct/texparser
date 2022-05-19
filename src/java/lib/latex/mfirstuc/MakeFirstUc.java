@@ -66,16 +66,7 @@ public class MakeFirstUc extends ControlSequence implements Expandable
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      TeXObject arg;
-
-      if (stack == parser)
-      {
-         arg = parser.popNextArg();
-      }
-      else
-      {
-         arg = stack.popArg(parser);
-      }
+      TeXObject arg = popArg(parser, stack);
 
       if (expansion == EXPANSION_ONCE)
       {
