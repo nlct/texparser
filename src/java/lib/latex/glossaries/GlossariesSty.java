@@ -122,6 +122,7 @@ public class GlossariesSty extends LaTeXSty
       registerControlSequence(new GenericCommand("glslinkcheckfirsthyperhook"));
       registerControlSequence(new GenericCommand("glslinkpostsetkeys"));
       registerControlSequence(new GenericCommand("@gls@setdefault@glslink@opts"));
+      registerControlSequence(new DoAtGlsDisableHyperInList(this));
       registerControlSequence(new AtGlsAtAtLink(this));
       registerControlSequence(new AtGlsAtAtLink("glslink", this, true));
       registerControlSequence(new AtGlsAtLink(this));
@@ -377,6 +378,11 @@ public class GlossariesSty extends LaTeXSty
 
       glossaries.put(label, glossary);
 
+      if (noHyper)
+      {
+         declareNoHyperList(label);
+      }
+
       if (isIgnored)
       {
          ignoredGlossaryTypes.add(label);
@@ -546,6 +552,33 @@ public class GlossariesSty extends LaTeXSty
       return modifierOptions.get(token);
    }
 
+   public boolean isNoHyperGlossary(GlsType type)
+   {
+      return isNoHyperGlossary(type.getLabel());
+   }
+
+   public boolean isNoHyperGlossary(String type)
+   {
+      if (nohyperlist == null) return false;
+
+      return nohyperlist.contains(type);
+   }
+
+   public void declareNoHyperList(String type)
+   {
+      if (nohyperlist == null)
+      {
+         nohyperlist = new Vector<String>();
+      }
+
+      nohyperlist.add(type);
+   }
+
+   public boolean isAttributeTrue(GlsLabel glslabel, String attr)
+   {// TODO
+      return false;
+   }
+
    private HashMap<String,GlossaryEntry> entries;
 
    private HashMap<String,Glossary> glossaries;
@@ -569,6 +602,8 @@ public class GlossariesSty extends LaTeXSty
    private HashMap<String,TeXObject> fieldDefaultValues;
 
    private HashMap<CharObject,KeyValList> modifierOptions;
+
+   private Vector<String> nohyperlist;
 
    public static final String GLOSSARY_NOT_DEFINED 
     = "glossaries.glossary.not.defined";

@@ -71,11 +71,9 @@ public class AtGlsAtLink extends AbstractGlsCommand
       }
 
       TeXObjectList list = new TeXObjectList();
-/*
-      list.add(listener.getControlSequence("@gls@setdefault@glslink@opts"));
+      //list.add(listener.getControlSequence("@gls@setdefault@glslink@opts"));
       list.add(listener.getControlSequence("do@glsdisablehyperinlist"));
-      list.add(listener.getControlSequence("do@gls@link@checkfirsthyper"));
-*/
+      //list.add(listener.getControlSequence("do@gls@link@checkfirsthyper"));
 
       if (options != null && !options.isEmpty())
       {

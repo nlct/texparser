@@ -70,26 +70,10 @@ public class NewGlossary extends ControlSequence
 
       if (!isStar && !ignored)
       {
-         optArg = stack.popArg(parser, '[', ']');
-
-         if (optArg != null)
-         {
-            gls = parser.expandToString(optArg, stack);
-         }
+         gls = popOptLabelString(parser, stack);
       }
 
-      TeXObject arg;
-
-      if (parser == stack)
-      {
-         arg = parser.popNextArg();
-      }
-      else
-      {
-         arg = stack.popArg(parser);
-      }
-
-      String label = parser.expandToString(arg, stack);
+      String label = popLabelString(parser, stack);
 
       String counter = null;
 
@@ -99,44 +83,13 @@ public class NewGlossary extends ControlSequence
       {
          if (!isStar)
          {
-            if (parser == stack)
-            {
-               arg = parser.popNextArg();
-            }
-            else
-            {
-               arg = stack.popArg(parser);
-            }
-
-            gls = parser.expandToString(arg, stack);
-
-            if (parser == stack)
-            {
-               arg = parser.popNextArg();
-            }
-            else
-            {
-               arg = stack.popArg(parser);
-            }
-
-            glo = parser.expandToString(arg, stack);
+            gls = popLabelString(parser, stack);
+            glo = popLabelString(parser, stack);
          }
 
-         if (parser == stack)
-         {
-            title = parser.popNextArg();
-         }
-         else
-         {
-            title = stack.popArg(parser);
-         }
+         title = popArg(parser, stack);
 
-         optArg = stack.popArg(parser, '[', ']');
-
-         if (optArg != null)
-         {
-            counter = parser.expandToString(optArg, stack);
-         }
+         counter = popOptLabelString(parser, stack);
       }
 
       sty.createGlossary(label, title, counter, glg, gls, glo, ignored,

@@ -39,7 +39,7 @@ public class AtGlsAtAtLink extends AbstractGlsCommand
 
    public Object clone()
    {
-      return new AtGlsAtAtLink(getName(), getSty());
+      return new AtGlsAtAtLink(getName(), getSty(), checkModifier);
    }
 
    // leave indexing/recording to TeX
