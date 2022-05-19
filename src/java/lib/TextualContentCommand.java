@@ -54,6 +54,13 @@ public class TextualContentCommand extends ControlSequence implements Expandable
       return new TextualContentCommand(getName(), getText(), getData());
    }
 
+   public TextualContentCommand duplicate(String newcsname)
+   {
+      TextualContentCommand copy = (TextualContentCommand)clone();
+      copy.name = newcsname;
+      return copy;
+   }
+
    @Override
    public TeXObjectList expandonce(TeXParser parser)
      throws IOException
