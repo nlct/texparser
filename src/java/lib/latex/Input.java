@@ -79,7 +79,7 @@ public class Input extends ControlSequence
                arg.toString(parser));
          }
       }
-    }
+   }
 
    public void process(TeXParser parser)
       throws IOException
@@ -116,12 +116,24 @@ public class Input extends ControlSequence
       }
    }
 
+   protected String getDefaultExtension()
+   {
+      return "tex";
+   }
+
+   protected String toBasename(TeXParser parser, TeXObject arg)
+       throws IOException
+   {
+      return arg.toString(parser);
+   }
+
    protected boolean doInput(TeXParser parser, TeXObject arg)
        throws IOException
    {
       TeXParserListener listener = parser.getListener();
 
-      TeXPath texPath = new TeXPath(parser, arg.toString(parser));
+      TeXPath texPath = new TeXPath(parser, toBasename(parser, arg),
+        getDefaultExtension());
 
       if (!listener.input(texPath)) return false;
 

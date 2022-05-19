@@ -116,6 +116,7 @@ public class GlossariesSty extends LaTeXSty
       registerControlSequence(new TextualContentCommand("acronymname", "Acronyms"));
 
       registerControlSequence(new NewGlossaryEntry(this));
+      registerControlSequence(new LoadGlsEntries());
 
       registerControlSequence(new GenericCommand("glspostlinkhook"));
       registerControlSequence(new GenericCommand("glslinkcheckfirsthyperhook"));
@@ -184,6 +185,14 @@ public class GlossariesSty extends LaTeXSty
 
    protected void addExtraDefinitions()
    {
+      registerControlSequence(
+        new TextualContentCommand("GlsXtrDefaultResourceOptions", ""));
+
+      getParser().getSettings().newcount("glsxtrresourcecount");
+
+      registerControlSequence(new GlsXtrResourceFile());
+      registerControlSequence(new GlsXtrLoadResources());
+
       registerControlSequence(new GenericCommand("glsxtrfieldtitlecasecs", null,
          new TeXCsRef("glscapitalisewords")));
 
