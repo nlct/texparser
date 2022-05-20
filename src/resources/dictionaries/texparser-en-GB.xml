@@ -81,6 +81,7 @@ There is NO WARRANTY, to the extent permitted by law.</entry>
 <!--  TeX Error Messages -->
 
 <entry key="tex.error.bad_param">Parameter digit 1 to 9 expected. Found ''{0}''</entry>
+<entry key="tex.error.illegal_param">Illegal parameter number ''{0}'' in definition of {1}</entry>
 <entry key="tex.error.no_eg">Missing end group</entry>
 <entry key="tex.error.par_before_eg">Paragraph break found before end group</entry>
 <entry key="tex.error.unexpected_eg">Unexpected end group found</entry>
@@ -195,6 +196,7 @@ There is NO WARRANTY, to the extent permitted by law.</entry>
 <entry key="glossaries.entry.not.defined">Entry ''{0}'' not defined</entry>
 <entry key="glossaries.glossary.exists">Glossary ''{0}'' already exists</entry>
 <entry key="glossaries.entry.exists">Entry ''{0}'' already exists</entry>
+<entry key="glossaries.glossary.style.not.defined">Glossary style ''{0}'' not defined</entry>
 
 <!--  Image drawing messages -->
 

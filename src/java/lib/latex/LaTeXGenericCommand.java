@@ -281,18 +281,27 @@ public class LaTeXGenericCommand extends GenericCommand
 
    private void addReplacements(TeXParser parser, TeXObjectList replacement, 
      TeXObject[] args, TeXObjectList list)
+   throws TeXSyntaxException
    {
       for (TeXObject object : list)
       {
          if (object instanceof Param)
          {
-            int idx = ((Param)object).getDigit()-1;
+            int idx = ((Param)object).getDigit();
+
+            if (args == null || idx > args.length)
+            {
+               throw new TeXSyntaxException(parser,
+                TeXSyntaxException.ERROR_ILLEGAL_PARAM, idx, toString(parser));
+            }
+
+            idx--;
 
             replacement.add((TeXObject)args[idx].clone());
          }
          else if (object instanceof DoubleParam)
          {
-            replacement.add(((DoubleParam)object).next());
+            replacement.add((TeXObject)((DoubleParam)object).next().clone());
          }
          else if (object instanceof TeXObjectList)
          {

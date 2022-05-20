@@ -131,6 +131,7 @@ public class TeXSyntaxException extends IOException
    private TeXParser parser=null;
 
    public static final String ERROR_BAD_PARAM = "tex.error.bad_param";
+   public static final String ERROR_ILLEGAL_PARAM = "tex.error.illegal_param";
    public static final String ERROR_NO_EG = "tex.error.no_eg";
    public static final String ERROR_PAR_BEFORE_EG = "tex.error.par_before_eg";
    public static final String ERROR_UNEXPECTED_EG = "tex.error.unexpected_eg";

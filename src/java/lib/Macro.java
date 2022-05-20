@@ -179,6 +179,41 @@ public abstract class Macro implements TeXObject
       return false;
    }
 
+   // pops a token but only if it's a CharObject and matches the
+   // given char code. Returns true if token was popped.
+   protected boolean popModifier(int charCode,
+      TeXParser parser, TeXObjectList stack)
+   throws IOException
+   {
+      TeXObject object;
+
+      if (parser == stack || stack == null)
+      {
+         object = parser.peekStack();
+      }
+      else
+      {
+         object = stack.peekStack();
+      }
+
+      if (object instanceof CharObject 
+           && ((CharObject)object).getCharCode() == charCode)
+      {
+         if (parser == stack || stack == null)
+         {
+            parser.popStack();
+         }
+         else
+         {
+            stack.popStack(parser);
+         }
+
+         return true;
+      }
+
+      return false;
+   }
+
    // pops an argument that should be a label that needs to be fully
    // expanded
    protected String popLabelString(TeXParser parser, TeXObjectList stack)
@@ -228,6 +263,64 @@ public abstract class Macro implements TeXObject
       else
       {
          return stack.popArg(parser, '[', ']');
+      }
+   }
+
+   // pops an argument that should be a numerical value
+   protected Numerical popNumericalArg(TeXParser parser, TeXObjectList stack)
+     throws IOException
+   {
+      if (parser == stack || stack == null)
+      {
+         return parser.popNumericalArg();
+      }
+      else
+      {
+         return stack.popNumericalArg(parser);
+      }
+   }
+
+   protected NumericRegister popNumericRegister(TeXParser parser, TeXObjectList stack)
+     throws IOException
+   {
+      TeXObject obj = popArg(parser, stack);
+      NumericRegister reg = null;
+
+      if (obj instanceof ControlSequence)
+      {
+         reg = parser.getSettings().getNumericRegister(((ControlSequence)obj).getName());
+      }
+
+      if (reg == null)
+      {
+         throw new TeXSyntaxException(parser, 
+           TeXSyntaxException.ERROR_REGISTER_NOT_NUMERIC, obj.toString(parser));
+      }
+
+      return reg;
+   }
+
+   protected TeXDimension popDimensionArg(TeXParser parser, TeXObjectList stack)
+     throws IOException
+   {
+      TeXObject obj = popArg(parser, stack);
+
+      if (obj instanceof TeXDimension)
+      {
+         return (TeXDimension)obj;
+      }
+
+      if (stack == null)
+      {
+         parser.push(obj);
+
+         return parser.popDimension();
+      }
+      else
+      {
+         stack.push(obj);
+
+         return stack.popDimension(parser);
       }
    }
 

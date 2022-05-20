@@ -364,6 +364,10 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       parser.putControlSequence(new NewCommand("DeclareRobustCommand",
         NewCommand.OVERWRITE_SKIP));
 
+      parser.putControlSequence(new NewEnvironment());
+      parser.putControlSequence(new NewEnvironment("renewenvironment",
+        NewCommand.OVERWRITE_FORCE));
+
       parser.putControlSequence(new Label());
       parser.putControlSequence(new Ref());
       parser.putControlSequence(new PageRef());
@@ -413,6 +417,7 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       parser.putControlSequence(new AddToCounter());
       parser.putControlSequence(new StepCounter());
       parser.putControlSequence(new StepCounter("refstepcounter"));
+      parser.putControlSequence(new SetCounter());
       parser.putControlSequence(new Value());
       parser.putControlSequence(new Value("arabic"));
       parser.putControlSequence(new NumberCs("@arabic"));
@@ -421,6 +426,9 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       parser.putControlSequence(new Alph());
       parser.putControlSequence(new Alph("alph", AtAlph.LOWER));
       parser.putControlSequence(new FnSymbol());
+
+      parser.putControlSequence(new NewLength());
+      parser.putControlSequence(new SetLength());
 
       parser.putControlSequence(new Verbatim());
       parser.putControlSequence(new Verbatim("verbatim*"));
@@ -753,6 +761,95 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       }
    }
 
+   public void newenvironment(byte overwrite, String type, String envName, 
+     int numParams, TeXObject defValue, TeXObject definition, TeXObject endDefinition)
+   throws IOException
+   {
+      ControlSequence cs = getControlSequence(envName);
+
+      if (cs instanceof Undefined)
+      {
+         if (overwrite == NewCommand.OVERWRITE_FORCE)
+         {
+            throw new TeXSyntaxException(parser,
+             TeXSyntaxException.ERROR_UNDEFINED,
+             String.format("%s%s", 
+              new String(Character.toChars(parser.getEscChar())), envName));
+         }
+      }
+      else
+      {
+         if (overwrite == NewCommand.OVERWRITE_FORBID)
+         {
+            throw new LaTeXSyntaxException(parser,
+             LaTeXSyntaxException.ERROR_DEFINED,
+             cs.toString(parser));
+         }
+         else if (overwrite == NewCommand.OVERWRITE_SKIP)
+         {
+            return;
+         }
+      }
+
+      addLaTeXEnvironment(envName, numParams, defValue, definition,
+       endDefinition);
+   }
+
+   public void addLaTeXEnvironment(String name, int numParams,
+     TeXObject defValue, TeXObject definition, TeXObject endDefinition)
+     throws IOException
+   {
+      if (numParams == 0)
+      {
+         putControlSequence(true,// local
+           new LaTeXGenericEnvironment(name, definition, endDefinition));
+         return;
+      }
+
+      TeXObjectList defList;
+
+      if (definition instanceof TeXObjectList)
+      {
+         defList = (TeXObjectList)definition;
+      }
+      else
+      {
+         defList = new TeXObjectList(1);
+         defList.add(definition);
+      }
+
+      char[] syntax = new char[numParams];
+
+      if (defValue == null)
+      {
+         syntax[0] = LaTeXGenericCommand.SYNTAX_MANDATORY;
+      }
+      else
+      {
+         syntax[0] = LaTeXGenericCommand.SYNTAX_OPTIONAL;
+      }
+
+      for (int i = 1; i < numParams; i++)
+      {
+         syntax[i] = LaTeXGenericCommand.SYNTAX_MANDATORY;
+      }
+
+      ControlSequence cs;
+
+      if (defValue == null)
+      {
+         cs = new LaTeXGenericCommand(false, "\\"+name, syntax, defList);
+      }
+      else
+      {
+         cs = new LaTeXGenericCommand(false, "\\"+name, syntax, defList,
+             new TeXObject[]{defValue});
+      }
+
+      putControlSequence(true,// local
+        new LaTeXGenericEnvironment(name, cs, endDefinition));
+   }
+
    private void addFontWeightDeclaration(
        String declName, String textblockName, int weight)
    {
@@ -1076,6 +1173,38 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
    throws IOException
    {
       return requirepackage(null, name, false);
+   }
+
+   public LaTeXSty loadpackage(KeyValList options, String name,
+    boolean loadParentOptions, boolean enforceParse)
+   throws IOException
+   {
+      LaTeXSty sty = getLoadedPackage(name);
+
+      if (sty != null)
+      {
+         return sty;
+      }
+
+      sty = getLaTeXSty(options, name, loadParentOptions);
+
+      addFileReference(sty);
+      loadedPackages.add(sty);
+
+      if (enforceParse)
+      {// if it's known that the file is fairly simple
+         sty.parseFile();
+      }
+      else if (sty instanceof UnknownSty)
+      {
+         parsePackageFile(sty);
+      }
+      else
+      {
+         sty.processOptions();
+      }
+
+      return sty;
    }
 
    // returns file if already loaded
