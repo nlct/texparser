@@ -329,6 +329,9 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
          parser.putControlSequence(new DeclareOption());
          parser.putControlSequence(new ProcessOptions());
          parser.putControlSequence(new ExecuteOptions());
+         parser.putControlSequence(new GobbleOpt("DeclareRelease", 0, 3));
+         parser.putControlSequence(new GobbleOpt("DeclareCurrentRelease", 0, 2));
+         parser.putControlSequence(new GobbleOptMandOpt("NeedsTeXFormat", 0, 1, 1));
 
          parser.putControlSequence(new AddToHook("AtBeginDocument",
            "@begindocumenthook"));
