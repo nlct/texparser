@@ -23,59 +23,38 @@ import java.io.IOException;
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.*;
 
-public class GlossEntry extends AbstractGlsCommand
+public class GlsXtrPostDescription extends AbstractGlsCommand
 {
-   public GlossEntry(GlossariesSty sty)
+   public GlsXtrPostDescription(GlossariesSty sty)
    {
-      this("glossentry", sty);
+      this("glsxtrpostdescription", sty);
    }
 
-   public GlossEntry(String name, GlossariesSty sty)
+   public GlsXtrPostDescription(String name, GlossariesSty sty)
    {
       super(name, sty);
    }
 
    public Object clone()
    {
-      return new GlossEntry(getName(), getSty());
+      return new GlsXtrPostDescription(getName(), getSty());
    }
 
    @Override
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
-      TeXObjectList list = listener.createStack();
+      TeXObjectList list = parser.getListener().createStack();
 
-      GlsLabel glslabel = popEntryLabel(parser, stack);
+      String label = parser.expandToString(
+         parser.getListener().getControlSequence("glscurrententrylabel"), stack);
 
-      TeXObject locationList = popArg(parser, stack);
+      Category category = sty.getCategory(sty.getEntry(label));
 
-      list.add(new TeXCsRef("item"));
-      list.add(listener.getOther('['));
-
-      GlossaryEntry entry = glslabel.getEntry();
-
-      if (entry != null)
+      if (category != null)
       {
-         TeXObject name = entry.get("name");
-
-         if (name != null)
-         {
-            list.add((TeXObject)name.clone());
-         }
-      }
-
-      list.add(listener.getOther(']'));
-
-      if (entry != null)
-      {
-         TeXObject desc = entry.get("description");
-
-         if (desc != null)
-         {
-            list.add((TeXObject)desc.clone());
-         }
+         ControlSequence cs = parser.getControlSequence("glsxtrpostdesc"
+           + category.getLabel());
       }
 
       return list;

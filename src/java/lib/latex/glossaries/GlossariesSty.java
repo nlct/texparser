@@ -116,6 +116,20 @@ public class GlossariesSty extends LaTeXSty
       registerControlSequence(new TextualContentCommand("acronymname", "Acronyms"));
 
 
+      registerControlSequence(new NewGlossaryStyle());
+      registerControlSequence(new SetGlossaryStyle());
+      registerControlSequence(new GlossEntryField("glossentryname",
+         "name", this));
+      registerControlSequence(new GlossEntryField("glossentrydesc",
+         "description", this));
+      registerControlSequence(new GlossEntryField("glossentrysymbol",
+         "symbol", this));
+
+      registerControlSequence(new GlossEntryField("Glossentryname",
+         "name", CaseChange.SENTENCE, this));
+      registerControlSequence(new GlossEntryField("Glossentrydesc",
+         "description", CaseChange.SENTENCE, this));
+
       registerControlSequence(new PrintGlossary(this));
       registerControlSequence(new PrintGlossaries(this));
       registerControlSequence(new TextualContentCommand("glsresetentrylist", ""));
@@ -128,6 +142,11 @@ public class GlossariesSty extends LaTeXSty
       registerControlSequence(new TextualContentCommand("glossarypostamble", ""));
       registerControlSequence(new DescriptionDec("theglossary"));
       registerControlSequence(new GlossEntry(this));
+      registerControlSequence(new SubGlossEntry(this));
+      registerControlSequence(new AtSecondOfTwo("glstarget"));
+      registerControlSequence(new AtGobble("glsentryitem"));
+      registerControlSequence(new AtGobble("glssubentryitem"));
+      registerControlSequence(new GlsPostDescription(this));
 
       registerControlSequence(new NewGlossaryEntry(this));
       registerControlSequence(new LoadGlsEntries());
@@ -152,12 +171,17 @@ public class GlossariesSty extends LaTeXSty
       registerControlSequence(new GenericCommand("glscapitalisewords", null,
          new TeXCsRef("capitalisewords")));
 
-      NewIf.createConditional(true, getParser(), "ifKV@glslink@hyper");
+      NewIf.createConditional(true, getParser(), "ifKV@glslink@hyper",
+       listener.isStyLoaded("hyperref"));
 
       registerControlSequence(new GenericCommand(true, "glsifhyperon", null,
            new TeXObject[]{new TeXCsRef("ifKV@glslink@hyper"), 
              getListener().getParam(1), new TeXCsRef("else"),
              getListener().getParam(2), new TeXCsRef("fi")}));
+
+      NewIf.createConditional(true, getParser(), "ifglsnogroupskip", false);
+
+      NewIf.createConditional(true, getParser(), "ifglsnopostdot", isExtra());
 
       registerControlSequence(new Gls(this));
       registerControlSequence(new IfGlsUsed(this));
@@ -218,6 +242,8 @@ public class GlossariesSty extends LaTeXSty
       registerControlSequence(new GlsXtrResourceFile());
       registerControlSequence(new GlsXtrLoadResources());
 
+      registerControlSequence(new GlsXtrPostDescription(this));
+
       registerControlSequence(new GenericCommand("glsxtrfieldtitlecasecs", null,
          new TeXCsRef("glscapitalisewords")));
 
@@ -231,6 +257,8 @@ public class GlossariesSty extends LaTeXSty
 
       registerControlSequence(new TextualContentCommand(
          "abbreviationname", "Abbreviations"));
+
+      registerControlSequence(new GlossEntryField("glossentrynameother", this));
    }
 
    @Override
@@ -263,9 +291,34 @@ public class GlossariesSty extends LaTeXSty
       getListener().putControlSequence(true, 
         new GlossarySection(section, isNumberedSection, isAutoLabel));
 
+      if (loadList)
+      {
+         getListener().loadpackage(null, "glossary-list", false, true);
+
+         loadList = false;
+      }
+
+      if (loadTree)
+      {
+         getListener().loadpackage(null, "glossary-tree", false, true);
+
+         loadTree = false;
+      }
+
       if (extra)
       {
          extraPostOptions();
+      }
+
+      if (initialStyle != null)
+      {
+         ControlSequence cs = getParser().getControlSequence(
+           "@glsstyle@"+initialStyle);
+
+         if (cs != null)
+         {
+            cs.process(getParser());
+         }
       }
    }
 
@@ -277,9 +330,38 @@ public class GlossariesSty extends LaTeXSty
    public void processOption(String option, TeXObject value)
     throws IOException
    {
+      TeXParser parser = getParser();
+
       if (option.equals("nomain"))
       {
          createMain = false;
+      }
+      else if (option.equals("nolist"))
+      {
+         loadList = false;
+      }
+      else if (option.equals("notree"))
+      {
+         loadTree = false;
+      }
+      else if (option.equals("nolong"))
+      {
+         loadLong = false;
+      }
+      else if (option.equals("nosuper"))
+      {
+         loadSuper = false;
+      }
+      else if (option.equals("nostyles"))
+      {
+         loadList = false;
+         loadTree = false;
+         loadLong = false;
+         loadSuper = false;
+      }
+      else if (option.equals("style"))
+      {
+         initialStyle = getParser().expandToString(value, null);
       }
       else if (option.equals("section"))
       {
@@ -332,6 +414,51 @@ public class GlossariesSty extends LaTeXSty
             addField("group");
             addField("location");
          }
+      }
+      else if (option.equals("postdot"))
+      {
+         ControlSequence cs = listener.getControlSequence("glsnopostdotfalse");
+         cs.process(parser);
+         registerControlSequence(new GlsPostDescription(this));
+      }
+      else if (option.equals("nopostdot"))
+      {
+         String valStr = "true";
+
+         if (value != null)
+         {
+            valStr = parser.expandToString(value, parser);
+         }
+
+         ControlSequence cs = listener.getControlSequence("glsnopostdot"+valStr);
+         cs.process(parser);
+         registerControlSequence(new GlsPostDescription(this));
+      }
+      else if (extra && option.equals("postpunc"))
+      {
+         String valStr = "";
+
+         if (value != null)
+         {
+            valStr = parser.expandToString(value, parser);
+         }
+
+         if (valStr.equals("none"))
+         {
+            ControlSequence cs = listener.getControlSequence("glsnopostdottrue");
+            cs.process(parser);
+            value = null;
+         }
+         else if (valStr.equals("dot"))
+         {
+            value = listener.createDataList(". ");
+         }
+         else if (valStr.equals("comma"))
+         {
+            value = listener.createDataList(", ");
+         }
+
+         registerControlSequence(new GlsPostDescription(value, this));
       }
    }
 
@@ -476,10 +603,12 @@ public class GlossariesSty extends LaTeXSty
    }
 
 
-   public void undefWarnOrError(TeXParser parser, TeXObjectList stack,
+   public void undefWarnOrError(TeXObjectList stack,
      String messageTag, Object... params)
      throws IOException
    {
+      TeXParser parser = getParser();
+
       if (undefWarn)
       {
          TeXApp texApp = parser.getListener().getTeXApp();
@@ -872,6 +1001,33 @@ public class GlossariesSty extends LaTeXSty
       return category != null && category.isAttribute(attrName, attrValue);
    }
 
+   public String getAttribute(GlossaryEntry entry, String attrName)
+   {
+      Category category = getCategory(entry);
+
+      if (category == null) return null;
+
+      return getAttribute(category.getLabel(), attrName);
+   }
+
+   public String getAttribute(GlsLabel glslabel, String attrName)
+   {
+      Category category = getCategory(glslabel);
+
+      if (category == null) return null;
+
+      return getAttribute(category.getLabel(), attrName);
+   }
+
+   public String getAttribute(String categoryLabel, String attrName)
+   {
+      Category category = getCategory(categoryLabel);
+
+      if (category == null) return null;
+
+      return category.getAttribute(attrName);
+   }
+
    public void setAttribute(String categoryLabel, String attrName, String attrVal)
    {
       Category category;
@@ -894,6 +1050,101 @@ public class GlossariesSty extends LaTeXSty
       }
 
       category.setAttribute(attrName, attrVal);
+   }
+
+   public Glossary initPrintGloss(KeyValList options, 
+     TeXObjectList stack) throws IOException
+   {
+      TeXParser parser = getParser();
+
+      TeXObject typeObj = null;
+      TeXObject title = null;
+      TeXObject styleObj = null;
+
+      if (options != null)
+      {
+         typeObj = options.getExpandedValue("type", parser, stack);
+
+         title = options.getExpandedValue("title", parser, stack);
+
+         styleObj = options.getExpandedValue("style", parser, stack);
+      }
+
+      String type = "main";
+
+      if (typeObj == null)
+      {
+         type = parser.expandToString(getListener().getControlSequence(
+            "glsdefaulttype"), stack);
+      }
+      else
+      {
+         type = typeObj.toString(parser);
+      }
+
+      Glossary glossary = getGlossary(type);
+
+      if (glossary == null)
+      {
+         throw new LaTeXSyntaxException(parser, GLOSSARY_NOT_DEFINED, type);
+      }
+
+      getListener().putControlSequence(true, 
+         new GlsType("currentglossary", "type", glossary));
+
+      if (title == null)
+      {
+         title = glossary.getTitle();
+
+         if (title == null)
+         {
+            title = getListener().getControlSequence("glossarytitle");
+         }
+      }
+
+      if (title != null)
+      {
+         getListener().putControlSequence(true, 
+            new GenericCommand("glossarytitle", null, (TeXObject)title.clone()));
+      }
+
+      TeXObjectList substack = getListener().createStack();
+
+      if (styleObj != null)
+      {
+         String style = parser.expandToString(styleObj, stack);
+
+         ControlSequence cs = parser.getControlSequence("@glsstyle@"+style);
+
+         if (cs == null)
+         {
+            TeXApp texApp = parser.getListener().getTeXApp();
+            texApp.warning(parser, 
+              texApp.getMessage(GLOSSARY_STYLE_NOT_DEFINED, style));
+         }
+         else
+         {
+            substack.add(cs);
+         }
+      }
+
+      substack.add(getListener().getControlSequence("let"));
+      substack.add(new TeXCsRef("gls@org@glossaryentryfield"));
+      substack.add(getListener().getControlSequence("glossentry"));
+
+      substack.add(getListener().getControlSequence("let"));
+      substack.add(new TeXCsRef("gls@org@glossarysubentryfield"));
+      substack.add(getListener().getControlSequence("subglossentry"));
+
+      substack.process(parser);
+
+      getListener().putControlSequence(true,
+        new GlossEntryWithLabel(this));
+
+      getListener().putControlSequence(true,
+        new SubGlossEntryWithLabel(this));
+
+      return glossary;
    }
 
    private HashMap<String,GlossaryEntry> entries;
@@ -930,6 +1181,12 @@ public class GlossariesSty extends LaTeXSty
 
    private boolean isAutoLabel = false;
 
+   private String initialStyle = "list";
+   private boolean loadList = true;
+   private boolean loadTree = true;
+   private boolean loadLong = true;
+   private boolean loadSuper = true;
+
    public static final String GLOSSARY_NOT_DEFINED 
     = "glossaries.glossary.not.defined";
    public static final String ENTRY_NOT_DEFINED 
@@ -938,4 +1195,6 @@ public class GlossariesSty extends LaTeXSty
     = "glossaries.glossary.exists";
    public static final String ENTRY_EXISTS 
     = "glossaries.entry.exists";
+   public static final String GLOSSARY_STYLE_NOT_DEFINED 
+    = "glossaries.glossary.style.not.defined";
 }

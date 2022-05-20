@@ -60,18 +60,10 @@ public class GlsEntryField extends AbstractGlsCommand
       return value;
    }
 
-   public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
-     throws IOException
+   protected TeXObjectList expand(GlsLabel glslabel, String fieldLabel,
+     CaseChange caseChange, TeXParser parser, TeXObjectList stack)
+   throws IOException
    {
-      GlsLabel glslabel = popEntryLabel(parser, stack);
-
-      String fieldLabel = field;
-
-      if (field == null)
-      {
-         fieldLabel = popLabelString(parser, stack);
-      }
-
       TeXObject value = getFieldValue(glslabel, fieldLabel);
 
       TeXObjectList list = new TeXObjectList();
@@ -104,6 +96,21 @@ public class GlsEntryField extends AbstractGlsCommand
       }
 
       return list;
+   }
+
+   public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
+     throws IOException
+   {
+      GlsLabel glslabel = popEntryLabel(parser, stack);
+
+      String fieldLabel = field;
+
+      if (field == null)
+      {
+         fieldLabel = sty.getFieldName(popLabelString(parser, stack));
+      }
+
+      return expand(glslabel, fieldLabel, caseChange, parser, stack);
    }
 
    public TeXObjectList expandonce(TeXParser parser) throws IOException

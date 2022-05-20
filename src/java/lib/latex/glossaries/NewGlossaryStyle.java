@@ -23,74 +23,46 @@ import java.io.IOException;
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.*;
 
-public class PrintGlossary extends Input
+public class NewGlossaryStyle extends ControlSequence
 {
-   public PrintGlossary(GlossariesSty sty)
+   public NewGlossaryStyle()
    {
-      this("printglossary", sty);
+      this("newglossarystyle");
    }
 
-   public PrintGlossary(String name, GlossariesSty sty)
+   public NewGlossaryStyle(String name)
+   {
+      this(name, NewCommand.OVERWRITE_FORBID);
+   }
+
+   public NewGlossaryStyle(String name, byte overwrite)
    {
       super(name);
-      this.sty = sty;
+      this.overwrite = overwrite;
    }
 
+   @Override
    public Object clone()
    {
-      return new PrintGlossary(getName(), sty);
+      return new NewGlossaryStyle(getName(), overwrite);
    }
 
-   @Override
-   protected String getDefaultExtension()
-   {
-      return ext;
-   }
-
-   protected void initOptions(TeXParser parser, TeXObjectList stack)
-     throws IOException
-   {
-      KeyValList options = sty.popOptKeyValList(parser, stack);
-
-      Glossary glossary = sty.initPrintGloss(options, stack);
-
-      ext = glossary.getGls();
-
-      if (ext == null)
-      {
-         throw new NullPointerException();
-      }
-
-      stack.push(parser.getListener().getControlSequence("jobname"));
-   }
-
-   @Override
    public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      parser.startGroup();
+      String styleName = popLabelString(parser, stack);
 
-      initOptions(parser, stack);
+      TeXObject defn = popArg(parser, stack);
 
-      super.process(parser, stack);
-
-      parser.endGroup();
+      ((LaTeXParserListener)parser.getListener()).newcommand(
+         overwrite, name, "@glsstyle@"+styleName, true, 0, null, defn);
    }
 
-   @Override
    public void process(TeXParser parser)
      throws IOException
    {
-      parser.startGroup();
-
-      initOptions(parser, parser);
-
-      super.process(parser);
-
-      parser.endGroup();
+      process(parser, parser);
    }
 
-   private String ext = "gls";
-
-   private GlossariesSty sty;
+   private byte overwrite;
 }

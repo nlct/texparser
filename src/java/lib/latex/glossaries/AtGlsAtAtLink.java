@@ -64,7 +64,7 @@ public class AtGlsAtAtLink extends AbstractGlsCommand
 
       if (glslabel.getEntry() == null)
       {
-         sty.undefWarnOrError(parser, stack, GlossariesSty.ENTRY_NOT_DEFINED, 
+         sty.undefWarnOrError(stack, GlossariesSty.ENTRY_NOT_DEFINED, 
            glslabel.getLabel());
       }
       else

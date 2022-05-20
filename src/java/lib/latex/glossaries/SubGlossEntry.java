@@ -23,21 +23,21 @@ import java.io.IOException;
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.*;
 
-public class GlossEntry extends AbstractGlsCommand
+public class SubGlossEntry extends AbstractGlsCommand
 {
-   public GlossEntry(GlossariesSty sty)
+   public SubGlossEntry(GlossariesSty sty)
    {
-      this("glossentry", sty);
+      this("subglossentry", sty);
    }
 
-   public GlossEntry(String name, GlossariesSty sty)
+   public SubGlossEntry(String name, GlossariesSty sty)
    {
       super(name, sty);
    }
 
    public Object clone()
    {
-      return new GlossEntry(getName(), getSty());
+      return new SubGlossEntry(getName(), getSty());
    }
 
    @Override
@@ -47,26 +47,13 @@ public class GlossEntry extends AbstractGlsCommand
       LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
       TeXObjectList list = listener.createStack();
 
+      Numerical level = popNumericalArg(parser, stack);
+
       GlsLabel glslabel = popEntryLabel(parser, stack);
 
       TeXObject locationList = popArg(parser, stack);
 
-      list.add(new TeXCsRef("item"));
-      list.add(listener.getOther('['));
-
       GlossaryEntry entry = glslabel.getEntry();
-
-      if (entry != null)
-      {
-         TeXObject name = entry.get("name");
-
-         if (name != null)
-         {
-            list.add((TeXObject)name.clone());
-         }
-      }
-
-      list.add(listener.getOther(']'));
 
       if (entry != null)
       {

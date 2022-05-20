@@ -23,74 +23,45 @@ import java.io.IOException;
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.*;
 
-public class PrintGlossary extends Input
+public class SetGlossaryStyle extends ControlSequence
 {
-   public PrintGlossary(GlossariesSty sty)
+   public SetGlossaryStyle()
    {
-      this("printglossary", sty);
+      this("setglossarystyle");
    }
 
-   public PrintGlossary(String name, GlossariesSty sty)
+   public SetGlossaryStyle(String name)
    {
       super(name);
-      this.sty = sty;
    }
 
+   @Override
    public Object clone()
    {
-      return new PrintGlossary(getName(), sty);
+      return new SetGlossaryStyle(getName());
    }
 
-   @Override
-   protected String getDefaultExtension()
-   {
-      return ext;
-   }
-
-   protected void initOptions(TeXParser parser, TeXObjectList stack)
-     throws IOException
-   {
-      KeyValList options = sty.popOptKeyValList(parser, stack);
-
-      Glossary glossary = sty.initPrintGloss(options, stack);
-
-      ext = glossary.getGls();
-
-      if (ext == null)
-      {
-         throw new NullPointerException();
-      }
-
-      stack.push(parser.getListener().getControlSequence("jobname"));
-   }
-
-   @Override
    public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      parser.startGroup();
+      String styleName = popLabelString(parser, stack);
 
-      initOptions(parser, stack);
+      ControlSequence cs = parser.getControlSequence("@glsstyle@"+styleName);
 
-      super.process(parser, stack);
+      if (cs == null)
+      {
+         throw new LaTeXSyntaxException(parser, 
+            GlossariesSty.GLOSSARY_STYLE_NOT_DEFINED, styleName);
+      }
 
-      parser.endGroup();
+      stack.push(cs);
    }
 
-   @Override
    public void process(TeXParser parser)
      throws IOException
    {
-      parser.startGroup();
-
-      initOptions(parser, parser);
-
-      super.process(parser);
-
-      parser.endGroup();
+      process(parser, parser);
    }
 
-   private String ext = "gls";
-
-   private GlossariesSty sty;
+   private byte overwrite;
 }

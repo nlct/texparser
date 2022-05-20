@@ -76,7 +76,7 @@ public class Gls extends AbstractGlsCommand
 
       if (entry == null)
       {
-         sty.undefWarnOrError(parser, stack, 
+         sty.undefWarnOrError(stack, 
            GlossariesSty.ENTRY_NOT_DEFINED, glslabel.getLabel());
       }
       else

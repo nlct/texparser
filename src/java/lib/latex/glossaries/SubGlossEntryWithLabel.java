@@ -23,86 +23,48 @@ import java.io.IOException;
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.*;
 
-public class IfGlsUsed extends AbstractGlsCommand
+public class SubGlossEntryWithLabel extends AbstractGlsCommand
 {
-   public IfGlsUsed(GlossariesSty sty)
+   public SubGlossEntryWithLabel(GlossariesSty sty)
    {
-      this("ifglsused", sty);
+      this("subglossentry", sty);
    }
 
-   public IfGlsUsed(String name, GlossariesSty sty)
+   public SubGlossEntryWithLabel(String name, GlossariesSty sty)
    {
       super(name, sty);
    }
 
    public Object clone()
    {
-      return new IfGlsUsed(getName(), getSty());
+      return new SubGlossEntryWithLabel(getName(), getSty());
    }
 
    @Override
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      TeXObjectList list = parser.getListener().createStack();
-
-      GlsLabel glslabel = popEntryLabel(parser, stack);
-
-      GlossaryEntry entry = glslabel.getEntry();
-
-      TeXObject trueArg = popArg(parser, stack);
-
-      TeXObject falseArg = popArg(parser, stack);
-
-      if (entry == null)
-      {
-         sty.undefWarnOrError(list, 
-           GlossariesSty.ENTRY_NOT_DEFINED, glslabel.getLabel());
-      }
-      else
-      {
-         if (entry.isUnset())
-         {
-            list.push(trueArg);
-         }
-         else
-         {
-            list.push(falseArg);
-         }
-      }
-
-      return list;
+      return null;
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
+      LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
+
+      Numerical level = popNumericalArg(parser, stack);
+
       GlsLabel glslabel = popEntryLabel(parser, stack);
 
-      GlossaryEntry entry = glslabel.getEntry();
+      listener.putControlSequence(glslabel.duplicate("glscurrententrylabel"));
 
-      TeXObject trueArg = popArg(parser, stack);
-
-      TeXObject falseArg = popArg(parser, stack);
-
-      if (entry == null)
-      {
-         sty.undefWarnOrError(stack, 
-           GlossariesSty.ENTRY_NOT_DEFINED, glslabel.getLabel());
-      }
-      else
-      {
-         if (entry.isUnset())
-         {
-            stack.push(trueArg);
-         }
-         else
-         {
-            stack.push(falseArg);
-         }
-      }
+      stack.push(glslabel);
+      stack.push(level);
+      stack.push(listener.getControlSequence("gls@org@glossarysubentryfield"));
    }
 
+   @Override
    public void process(TeXParser parser)
      throws IOException
    {
