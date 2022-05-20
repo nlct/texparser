@@ -946,7 +946,7 @@ public class TeXParser extends TeXObjectList
       return c != -1;
    }
 
-   private boolean readParam(TeXObjectList list, ParameterToken paramToken)
+   private boolean readParam(TeXObjectList list, DoubleParam paramToken)
      throws IOException
    {
       mark(1);
@@ -1000,7 +1000,7 @@ public class TeXParser extends TeXObjectList
 
       if (isCatCode(TYPE_PARAM, c))
       {
-         return readParam(list, listener.getParam(0));
+         return readParam(list, listener.getDoubleParam(listener.getParam(0)));
       }
       else if (c > '0' && c <= '9')
       {
