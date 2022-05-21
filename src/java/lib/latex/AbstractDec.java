@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -35,50 +35,47 @@ public class AbstractDec extends Declaration
       super(name);
    }
 
+   @Override
    public Object clone()
    {
       return new AbstractDec(getName());
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList list)
       throws IOException
    {
       return null;
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser)
       throws IOException
    {
       return null;
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser, TeXObjectList list)
       throws IOException
    {
       return null;
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser)
       throws IOException
    {
       return null;
    }
 
+   @Override
    public void process(TeXParser parser) throws IOException
    {
-      ControlSequence cs = parser.getControlSequence("chapter");
-
-      if (cs == null)
-      {
-         cs = new TeXCsRef("section");
-      }
-
-      parser.push(new TeXCsRef("abstractname"));
-      parser.push(parser.getListener().getOther('*'));
-
-      cs.process(parser);
+      process(parser, parser);
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack) throws IOException
    {
       ControlSequence cs = parser.getControlSequence("chapter");
@@ -91,14 +88,23 @@ public class AbstractDec extends Declaration
       stack.push(new TeXCsRef("abstractname"));
       stack.push(parser.getListener().getOther('*'));
 
-      cs.process(parser, stack);
+      if (parser == stack || stack == null)
+      {
+         cs.process(parser);
+      }
+      else
+      {
+         cs.process(parser, stack);
+      }
    }
 
-   public void end(TeXParser parser)
+   @Override
+   public void end(TeXParser parser, TeXObjectList stack)
     throws IOException
    {
    }
 
+   @Override
    public boolean isModeSwitcher()
    {
       return false;

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -386,6 +386,7 @@ public class ProbSolnData
       return list;
    }
 
+   @Override
    public String toString()
    {
       return String.format("ProbSolnData[name=%s,db=%s,args=(n=%d,default=%s),contents=%s]",

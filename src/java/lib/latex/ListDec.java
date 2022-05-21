@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -35,17 +35,20 @@ public class ListDec extends TrivListDec
       super(name);
    }
 
+   @Override
    public Object clone()
    {
       return new ListDec(getName());
    }
 
+   @Override
    public void process(TeXParser parser) throws IOException
    {
       parser.getListener().getControlSequence("@nmbrlistfalse").process(parser);
       setup(parser, parser.popNextArg(), parser.popNextArg());
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack) throws IOException
    {
       parser.getListener().getControlSequence("@nmbrlistfalse").process(parser);
@@ -77,7 +80,8 @@ public class ListDec extends TrivListDec
       ((LaTeXParserListener)parser.getListener()).startList(this);
    }
 
-   public void end(TeXParser parser)
+   @Override
+   public void end(TeXParser parser, TeXObjectList stack)
     throws IOException
    {
       TeXSettings settings = parser.getSettings();
@@ -85,6 +89,6 @@ public class ListDec extends TrivListDec
       Register listdepth = settings.globalAdvanceRegister("@listdepth",
          LaTeXParserListener.MINUS_ONE);
 
-      super.end(parser);
+      super.end(parser, stack);
    }
 }

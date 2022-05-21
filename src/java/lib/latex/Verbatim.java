@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -34,39 +34,48 @@ public class Verbatim extends Declaration
       super(name);
    }
 
+   @Override
    public Object clone()
    {
       return new Verbatim(getName());
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser) throws IOException
    {
       return null;
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser) throws IOException
    {
       return null;
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
    throws IOException
    {
       return null;
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser, TeXObjectList stack)
    throws IOException
    {
       return null;
    }
 
+   @Override
    public void process(TeXParser parser)
     throws IOException
    {
+      // Do nothing (Begin checks for Verbatim and creates a
+      // substack) so this method shouldn't be called.
    }
 
-   public void process(TeXParser parser, TeXObjectList list)
+   @Override
+   public void process(TeXParser parser, TeXObjectList stack)
     throws IOException
    {
       TeXSettings settings = parser.getSettings();
@@ -77,7 +86,7 @@ public class Verbatim extends Declaration
 
       boolean isStar = (getName().endsWith("*"));
 
-      for (TeXObject object : list)
+      for (TeXObject object : stack)
       {
          if (isStar && (object instanceof Space))
          {
@@ -90,12 +99,14 @@ public class Verbatim extends Declaration
       }
    }
 
-   public void end(TeXParser parser) throws IOException
+   @Override
+   public void end(TeXParser parser, TeXObjectList stack) throws IOException
    {
       TeXSettings settings = parser.getSettings();
       settings.setFontFamily(orgFamily);
    }
 
+   @Override
    public boolean isModeSwitcher()
    {
       return false;

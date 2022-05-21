@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -48,17 +48,20 @@ public class ParAlign extends Declaration
          new ParAlign("flushleft", TeXSettings.PAR_ALIGN_LEFT));
    }
 
+   @Override
    public String getName()
    {
       return name;
    }
 
-   public void process(TeXParser parser, TeXObjectList list)
+   @Override
+   public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
       process(parser);
    }
 
+   @Override
    public void process(TeXParser parser)
      throws IOException
    {
@@ -69,41 +72,48 @@ public class ParAlign extends Declaration
        settings.setParAlign(align);
    }
 
-   public void end(TeXParser parser) throws IOException
+   @Override
+   public void end(TeXParser parser, TeXObjectList stack) throws IOException
    {
       TeXSettings settings = parser.getSettings();
       settings.setParAlign(orgAlign);
    }
 
+   @Override
    public Object clone()
    {
       return new ParAlign(getName(), align);
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList list)
       throws IOException
    {
       return null;
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser)
       throws IOException
    {
       return null;
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser, TeXObjectList list)
       throws IOException
    {
       return null;
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser)
       throws IOException
    {
       return null;
    }
 
+   @Override
    public boolean isModeSwitcher()
    {
       return false;

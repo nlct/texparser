@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -91,20 +91,11 @@ public abstract class MakeTextChangeCase extends ControlSequence
       return newList;
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      TeXObject arg = stack.popArg(parser);
-
-      if (arg instanceof Expandable)
-      {
-         TeXObjectList expanded = ((Expandable)arg).expandfully(parser, stack);
-
-         if (expanded != null)
-         {
-            arg = expanded;
-         }
-      }
+      TeXObject arg = popArgExpandFully(parser, stack);
 
       if (arg instanceof TeXObjectList)
       {
@@ -115,33 +106,20 @@ public abstract class MakeTextChangeCase extends ControlSequence
          arg = doChangeCase((CaseChangeable)arg, parser);
       }
 
-      arg.process(parser, stack);
+      if (stack == null || stack == parser)
+      {
+         arg.process(parser);
+      }
+      else
+      {
+         arg.process(parser, stack);
+      }
    }
 
+   @Override
    public void process(TeXParser parser)
      throws IOException
    {
-      TeXObject arg = parser.popNextArg();
-
-      if (arg instanceof Expandable)
-      {
-         TeXObjectList expanded = ((Expandable)arg).expandfully(parser);
-
-         if (expanded != null)
-         {
-            arg = expanded;
-         }
-      }
-
-      if (arg instanceof TeXObjectList)
-      {
-         arg = changecase((TeXObjectList)arg, parser);
-      }
-      else if (arg instanceof CaseChangeable)
-      {
-         arg = doChangeCase((CaseChangeable)arg, parser);
-      }
-
-      arg.process(parser);
+      process(parser, parser);
    }
 }

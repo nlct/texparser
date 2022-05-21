@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -45,11 +45,13 @@ public class L2HMathDeclaration extends MathDeclaration
       super(name, mode, numbered);
    }
 
+   @Override
    public Object clone()
    {
       return new L2HMathDeclaration(getName(), getMode(), isNumbered());
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
@@ -159,6 +161,7 @@ public class L2HMathDeclaration extends MathDeclaration
       }
    }
 
+   @Override
    public void process(TeXParser parser)
      throws IOException
    {
@@ -272,9 +275,10 @@ public class L2HMathDeclaration extends MathDeclaration
       }
    }
 
-   public void end(TeXParser parser) throws IOException
+   @Override
+   public void end(TeXParser parser, TeXObjectList stack) throws IOException
    {
-      super.end(parser);
+      super.end(parser, stack);
 
       L2HConverter listener = (L2HConverter)parser.getListener();
 

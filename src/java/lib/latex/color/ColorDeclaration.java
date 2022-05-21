@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -42,104 +42,61 @@ public class ColorDeclaration extends Declaration
       this.orgColor = null;
    }
 
+   @Override
    public Object clone()
    {
       return new ColorDeclaration(sty, getName(), isFg);
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList list)
       throws IOException
    {
       return null;
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser)
       throws IOException
    {
       return null;
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser, TeXObjectList list)
       throws IOException
    {
       return null;
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser)
       throws IOException
    {
       return null;
    }
 
+   @Override
    public void process(TeXParser parser) throws IOException
    {
       process(parser, parser);
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack) throws IOException
    {
-      TeXObject model = null;
-      TeXObject arg;
+      String modelName = popOptLabelString(parser, stack);
 
-      if (parser == stack)
+      if (modelName == null)
       {
-         model = parser.popNextArg('[', ']');
-
-         if (model != null && model instanceof Expandable)
-         {
-            TeXObjectList expanded = ((Expandable)model).expandfully(parser);
-
-            if (expanded != null)
-            {
-               model = expanded;
-            }
-         }
-
-         arg = parser.popNextArg();
-
-         if (arg != null && arg instanceof Expandable)
-         {
-            TeXObjectList expanded = ((Expandable)arg).expandfully(parser);
-
-            if (expanded != null)
-            {
-               arg = expanded;
-            }
-         }
+         modelName = "named";
       }
       else
       {
-         model = stack.popArg(parser, '[', ']');
-
-         if (model != null && model instanceof Expandable)
-         {
-            TeXObjectList expanded = ((Expandable)model).expandfully(parser,
-              stack);
-
-            if (expanded != null)
-            {
-               model = expanded;
-            }
-         }
-
-         arg = stack.popArg(parser);
-
-         if (arg != null && arg instanceof Expandable)
-         {
-            TeXObjectList expanded = ((Expandable)arg).expandfully(parser, 
-               stack);
-
-            if (expanded != null)
-            {
-               arg = expanded;
-            }
-         }
+         modelName = modelName.trim();
       }
 
-      String modelName = (model == null ? "named" : 
-        model.toString(parser).trim());
-
-      String value = arg.toString(parser).trim();
+      String value = popLabelString(parser, stack).trim();
 
       Color color = sty.getColor(parser, modelName, value);
 
@@ -159,7 +116,8 @@ public class ColorDeclaration extends Declaration
       ((LaTeXParserListener)parser.getListener()).startColor(color, isFg);
    }
 
-   public void end(TeXParser parser) throws IOException
+   @Override
+   public void end(TeXParser parser, TeXObjectList stack) throws IOException
    {
       ((LaTeXParserListener)parser.getListener()).endColor(isFg);
 
@@ -175,6 +133,7 @@ public class ColorDeclaration extends Declaration
       }
    }
 
+   @Override
    public boolean isModeSwitcher()
    {
       return false;

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013-2020 Nicola L.C. Talbot
+    Copyright (C) 2013-2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -2010,7 +2010,7 @@ public class TeXObjectList extends Vector<TeXObject>
    {
       while (declarations.size() > 0)
       {
-         declarations.pollLast().end(parser);
+         declarations.pollLast().end(parser, this);
       }
    }
 

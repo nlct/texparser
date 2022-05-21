@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -36,11 +36,13 @@ public class L2HTabular extends Tabular
       super(name);
    }
 
+   @Override
    public Object clone()
    {
       return new L2HTabular(getName());
    }
 
+   @Override
    protected void startTabular(TeXParser parser, 
      int verticalAlignment, TeXObject columnSpecs)
      throws IOException
@@ -74,7 +76,8 @@ public class L2HTabular extends Tabular
       writeable.writeln(String.format("<table class=\"%s\">", cls));
    }
 
-   public void end(TeXParser parser) throws IOException
+   @Override
+   public void end(TeXParser parser, TeXObjectList stack) throws IOException
    {
       Writeable writeable = parser.getListener().getWriteable();
 
@@ -83,6 +86,6 @@ public class L2HTabular extends Tabular
 
       writeable.writeln("</table>");
 
-      super.end(parser);
+      super.end(parser, stack);
    }
 }

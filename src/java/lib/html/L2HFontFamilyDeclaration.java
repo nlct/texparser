@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -31,11 +31,13 @@ public class L2HFontFamilyDeclaration extends FontFamilyDeclaration
       super(name, family);
    }
 
+   @Override
    public Object clone()
    {
       return new L2HFontFamilyDeclaration(getName(), getFamily());
    }
 
+   @Override
    public void process(TeXParser parser) throws IOException
    {
       super.process(parser);
@@ -58,10 +60,11 @@ public class L2HFontFamilyDeclaration extends FontFamilyDeclaration
       parser.getListener().getWriteable().write("<span style=\""+spec+"\">");
    }
 
-   public void end(TeXParser parser) throws IOException
+   @Override
+   public void end(TeXParser parser, TeXObjectList stack) throws IOException
    {
       parser.getListener().getWriteable().write("</span>");
-      super.end(parser);
+      super.end(parser, stack);
    }
 
 }

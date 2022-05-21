@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -29,12 +29,14 @@ public abstract class TeXFontDeclaration extends Declaration
       super(name);
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser)
      throws IOException
    {
       return null;
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser,
       TeXObjectList stack)
      throws IOException
@@ -42,11 +44,13 @@ public abstract class TeXFontDeclaration extends Declaration
       return null;
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser) throws IOException
    {
       return null;
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser,
       TeXObjectList stack)
      throws IOException
@@ -54,6 +58,7 @@ public abstract class TeXFontDeclaration extends Declaration
       return null;
    }
 
+   @Override
    public boolean isModeSwitcher()
    {
       return false;

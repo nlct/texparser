@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -20,6 +20,11 @@ package com.dickimawbooks.texparserlib;
 
 import java.io.IOException;
 
+/**
+ * Objects that implement Expandable may be able to expand. If they
+ * can't these methods should return null, otherwise they should
+ * return the expansion as a stack.
+ */
 public interface Expandable
 {
    // Use parser.popNextArg() if arguments required

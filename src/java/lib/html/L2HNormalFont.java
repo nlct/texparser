@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -36,35 +36,41 @@ public class L2HNormalFont extends Declaration
       super(name);
    }
 
+   @Override
    public Object clone()
    {
       return new L2HNormalFont(getName());
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
       return null;
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser)
      throws IOException
    {
       return null;
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
       return null;
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser)
      throws IOException
    {
       return null;
    }
 
+   @Override
    public void process(TeXParser parser) throws IOException
    {
       super.process(parser);
@@ -72,11 +78,13 @@ public class L2HNormalFont extends Declaration
       parser.getListener().getWriteable().write("<span style=\"font: normal;\">");
    }
 
-   public void end(TeXParser parser) throws IOException
+   @Override
+   public void end(TeXParser parser, TeXObjectList stack) throws IOException
    {
       parser.getListener().getWriteable().write("</span>");
    }
 
+   @Override
    public boolean isModeSwitcher()
    {
       return false;

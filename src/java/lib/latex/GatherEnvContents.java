@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -30,24 +30,28 @@ public abstract class GatherEnvContents extends Declaration
       super(name);
    }
 
-   public TeXObjectList expandonce(TeXParser parser, TeXObjectList list)
+   @Override
+   public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
       return null;
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser)
       throws IOException
    {
       return null;
    }
 
-   public TeXObjectList expandfully(TeXParser parser, TeXObjectList list)
+   @Override
+   public TeXObjectList expandfully(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
       return null;
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser)
       throws IOException
    {
@@ -59,7 +63,7 @@ public abstract class GatherEnvContents extends Declaration
    {
       TeXObject object = stack.pop();
 
-      TeXObjectList contents = new TeXObjectList();
+      TeXObjectList contents = parser.getListener().createStack();
 
       while (object != null)
       {
@@ -71,10 +75,7 @@ public abstract class GatherEnvContents extends Declaration
 
          if (object instanceof End)
          {
-            TeXObject nextObj = 
-               stack == parser ? parser.popNextArg() : stack.popArg(parser);
-
-            String envName = nextObj.toString(parser);
+            String envName = popLabelString(parser, stack);
 
             Group grp = parser.getListener().createGroup(envName);
 
@@ -99,6 +100,7 @@ public abstract class GatherEnvContents extends Declaration
       return contents;
    }
 
+   @Override
    public boolean isModeSwitcher()
    {
       return false;

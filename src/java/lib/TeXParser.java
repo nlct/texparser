@@ -381,6 +381,12 @@ public class TeXParser extends TeXObjectList
       return reader == null ? -1 : reader.getLineNumber()+1;
    }
 
+   public boolean isStack(Object obj)
+   {
+      return (obj != null && obj instanceof TeXObjectList
+        && ((TeXObjectList)obj).isStack());
+   }
+
    public boolean isLetter(int c)
    {
       if (isCatCode(TYPE_LETTER, c)

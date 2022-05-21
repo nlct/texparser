@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -35,24 +35,28 @@ public abstract class TheBibliography extends Declaration
       super(name);
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList list)
       throws IOException
    {
       return null;
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser)
       throws IOException
    {
       return null;
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser, TeXObjectList list)
       throws IOException
    {
       return null;
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser)
       throws IOException
    {
@@ -63,6 +67,7 @@ public abstract class TheBibliography extends Declaration
      TeXObject widest)
      throws IOException;
 
+   @Override
    public void process(TeXParser parser) throws IOException
    {
       TeXObject arg = parser.popNextArg();
@@ -80,9 +85,10 @@ public abstract class TheBibliography extends Declaration
       startBibliography(parser, arg);
    }
 
-   public void process(TeXParser parser, TeXObjectList list) throws IOException
+   @Override
+   public void process(TeXParser parser, TeXObjectList stack) throws IOException
    {
-      TeXObject arg = list.popArg(parser);
+      TeXObject arg = stack.popArg(parser);
 
       LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
 
@@ -92,11 +98,12 @@ public abstract class TheBibliography extends Declaration
 
       listener.resetcounter("enumiv");
 
-      listener.getBibliographySection().process(parser);
+      listener.getBibliographySection().process(parser, stack);
 
       startBibliography(parser, arg);
    }
 
+   @Override
    public boolean isModeSwitcher()
    {
       return false;

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -35,21 +35,25 @@ public class ItemizeDec extends ListDec
       super(name);
    }
 
+   @Override
    public Object clone()
    {
       return new ItemizeDec(getName());
    }
 
+   @Override
    public void process(TeXParser parser) throws IOException
    {
       setup(parser);
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack) throws IOException
    {
       setup(parser);
    }
 
+   @Override
    public void setup(TeXParser parser) throws IOException
    {
       super.setup(parser);
@@ -79,7 +83,8 @@ public class ItemizeDec extends ListDec
       setup(parser, labelCs, listsettings);
    }
 
-   public void end(TeXParser parser)
+   @Override
+   public void end(TeXParser parser, TeXObjectList stack)
     throws IOException
    {
       TeXSettings settings = parser.getSettings();
@@ -87,7 +92,7 @@ public class ItemizeDec extends ListDec
       Register enumdepth = settings.globalAdvanceRegister("@itemdepth",
          LaTeXParserListener.MINUS_ONE);
 
-      super.end(parser);
+      super.end(parser, stack);
    }
 
 }

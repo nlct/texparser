@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -35,32 +35,23 @@ public class ObsoleteFontCs extends Declaration
       super(name);
    }
 
+   @Override
    public Object clone()
    {
       return new ObsoleteFontCs(getName());
    }
 
+   @Override
    public boolean isModeSwitcher()
    {
       return false;
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
-      TeXObject arg = stack.popArg(parser);
-
-      if (arg instanceof Expandable)
-      {
-         TeXObjectList expanded = ((Expandable)arg).expandfully(parser, stack);
-
-         if (expanded != null)
-         {
-            arg = expanded;
-         }
-      }
-
-      String obsname = arg.toString(parser);
+      String obsname = popLabelString(parser, stack);
 
       TeXObjectList list = new TeXObjectList();
 
@@ -72,43 +63,13 @@ public class ObsoleteFontCs extends Declaration
    public TeXObjectList expandonce(TeXParser parser)
       throws IOException
    {
-      TeXObject arg = parser.popNextArg();
-
-      if (arg instanceof Expandable)
-      {
-         TeXObjectList expanded = ((Expandable)arg).expandfully(parser);
-
-         if (expanded != null)
-         {
-            arg = expanded;
-         }
-      }
-
-      String obsname = arg.toString(parser);
-
-      TeXObjectList list = new TeXObjectList();
-
-      list.add(parser.getListener().getControlSequence(obsname));
-
-      return list;
+      return expandonce(parser, parser);
    }
 
    public TeXObjectList expandfully(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
-      TeXObject arg = stack.popArg(parser);
-
-      if (arg instanceof Expandable)
-      {
-         TeXObjectList expanded = ((Expandable)arg).expandfully(parser, stack);
-
-         if (expanded != null)
-         {
-            arg = expanded;
-         }
-      }
-
-      String obsname = arg.toString(parser);
+      String obsname = popLabelString(parser, stack);
 
       TeXObjectList list = null;
 
@@ -128,22 +89,11 @@ public class ObsoleteFontCs extends Declaration
       return list;
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser)
       throws IOException
    {
-      TeXObject arg = parser.popNextArg();
-
-      if (arg instanceof Expandable)
-      {
-         TeXObjectList expanded = ((Expandable)arg).expandfully(parser);
-
-         if (expanded != null)
-         {
-            arg = expanded;
-         }
-      }
-
-      String obsname = arg.toString(parser);
+      String obsname = popLabelString(parser, parser);
 
       TeXObjectList list = null;
 
@@ -163,51 +113,26 @@ public class ObsoleteFontCs extends Declaration
       return list;
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
-      TeXObject arg = stack.popArg(parser);
-
-      if (arg instanceof Expandable)
-      {
-         TeXObjectList expanded = ((Expandable)arg).expandfully(parser, stack);
-
-         if (expanded != null)
-         {
-            arg = expanded;
-         }
-      }
-
-      String obsname = arg.toString(parser);
+      String obsname = popLabelString(parser, stack);
 
       ControlSequence cs = parser.getListener().getControlSequence(obsname);
 
       stack.push(cs);
    }
 
+   @Override
    public void process(TeXParser parser)
       throws IOException
    {
-      TeXObject arg = parser.popNextArg();
-
-      if (arg instanceof Expandable)
-      {
-         TeXObjectList expanded = ((Expandable)arg).expandfully(parser);
-
-         if (expanded != null)
-         {
-            arg = expanded;
-         }
-      }
-
-      String obsname = arg.toString(parser);
-
-      ControlSequence cs = parser.getListener().getControlSequence(obsname);
-
-      parser.push(cs);
+      process(parser, parser);
    }
 
-   public void end(TeXParser parser)
+   @Override
+   public void end(TeXParser parser, TeXObjectList stack)
     throws IOException
    {
    }

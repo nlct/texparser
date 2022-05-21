@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -36,6 +36,7 @@ public class L2HList extends ListDec
       super(name);
    }
 
+   @Override
    public Object clone()
    {
       return new L2HList(getName());
@@ -52,11 +53,12 @@ public class L2HList extends ListDec
            isInLine() ? "inlinelist" : "displaylist"));
    }
 
-   public void end(TeXParser parser)
+   @Override
+   public void end(TeXParser parser, TeXObjectList stack)
     throws IOException
    {
       parser.getListener().getWriteable().write("</ul>");
 
-      super.end(parser);
+      super.end(parser, stack);
    }
 }

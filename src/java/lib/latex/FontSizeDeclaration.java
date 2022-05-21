@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -32,35 +32,41 @@ public class FontSizeDeclaration extends Declaration
       this.orgSize = TeXSettings.INHERIT;
    }
 
+   @Override
    public Object clone()
    {
       return new FontSizeDeclaration(getName(), size);
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList list)
       throws IOException
    {
       return null;
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser)
       throws IOException
    {
       return null;
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser, TeXObjectList list)
       throws IOException
    {
       return null;
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser)
       throws IOException
    {
       return null;
    }
 
+   @Override
    public void process(TeXParser parser) throws IOException
    {
       TeXSettings settings = parser.getSettings();
@@ -70,17 +76,20 @@ public class FontSizeDeclaration extends Declaration
       settings.setFontSize(size);
    }
 
-   public void process(TeXParser parser, TeXObjectList list) throws IOException
+   @Override
+   public void process(TeXParser parser, TeXObjectList stack) throws IOException
    {
       process(parser);
    }
 
-   public void end(TeXParser parser) throws IOException
+   @Override
+   public void end(TeXParser parser, TeXObjectList stack) throws IOException
    {
       TeXSettings settings = parser.getSettings();
       settings.setFontSize(orgSize);
    }
 
+   @Override
    public boolean isModeSwitcher()
    {
       return false;

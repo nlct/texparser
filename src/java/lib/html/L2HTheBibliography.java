@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -36,11 +36,13 @@ public class L2HTheBibliography extends TheBibliography
       super(name);
    }
 
+   @Override
    public Object clone()
    {
       return new L2HTheBibliography(getName());
    }
 
+   @Override
    protected void startBibliography(TeXParser parser, 
      TeXObject widest)
      throws IOException
@@ -50,7 +52,8 @@ public class L2HTheBibliography extends TheBibliography
       listener.write("<div class=\"bibliography\"><div>");
    }
 
-   public void end(TeXParser parser)
+   @Override
+   public void end(TeXParser parser, TeXObjectList stack)
    throws IOException
    {
       L2HConverter listener = (L2HConverter)parser.getListener();

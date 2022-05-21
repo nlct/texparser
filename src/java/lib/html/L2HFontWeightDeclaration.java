@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -30,11 +30,13 @@ public class L2HFontWeightDeclaration extends FontWeightDeclaration
       super(name, weight);
    }
 
+   @Override
    public Object clone()
    {
       return new L2HFontWeightDeclaration(getName(), getWeight());
    }
 
+   @Override
    public void process(TeXParser parser) throws IOException
    {
       super.process(parser);
@@ -54,9 +56,10 @@ public class L2HFontWeightDeclaration extends FontWeightDeclaration
       parser.getListener().getWriteable().write("<span style=\""+style+"\">");
    }
 
-   public void end(TeXParser parser) throws IOException
+   @Override
+   public void end(TeXParser parser, TeXObjectList stack) throws IOException
    {
       parser.getListener().getWriteable().write("</span>");
-      super.end(parser);
+      super.end(parser, stack);
    }
 }

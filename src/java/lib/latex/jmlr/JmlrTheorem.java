@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -58,17 +58,20 @@ public class JmlrTheorem extends Declaration
       this.styleName = name;
    }
 
+   @Override
    public Object clone()
    {
       return new JmlrTheorem(styleName, counter, (TeXObject)title.clone());
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser)
     throws IOException
    {
       return expandonce(parser, parser);
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
     throws IOException
    {
@@ -140,24 +143,28 @@ public class JmlrTheorem extends Declaration
       return list;
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser)
     throws IOException
    {
       return expandonce(parser).expandfully(parser);
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser, TeXObjectList stack)
     throws IOException
    {
       return expandonce(parser, stack).expandfully(parser, stack);
    }
 
+   @Override
    public void process(TeXParser parser)
      throws IOException
    {
       process(parser, parser);
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
@@ -175,16 +182,19 @@ public class JmlrTheorem extends Declaration
       }
    }
 
-   public void end(TeXParser parser) throws IOException
+   @Override
+   public void end(TeXParser parser, TeXObjectList stack) throws IOException
    {
       ((LaTeXParserListener)parser.getListener()).endTheorem(styleName);
    }
 
+   @Override
    public boolean isModeSwitcher()
    {
       return false;
    }
 
+   @Override
    public String toString()
    {
       return String.format("%s[name=%s,style=%s,counter=%s,title=%s]", getClass().getSimpleName(),

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -46,30 +46,35 @@ public class MathDeclaration extends Declaration
       this.numbered = numbered;
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser)
      throws IOException
    {
       return null;
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
       return null;
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser)
      throws IOException
    {
       return null;
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
       return null;
    }
 
+   @Override
    public Object clone()
    {
       return new MathDeclaration(getName(), mode, numbered);
@@ -88,6 +93,7 @@ public class MathDeclaration extends Declaration
       settings.setMode(orgMode);
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
@@ -99,6 +105,7 @@ public class MathDeclaration extends Declaration
       }
    }
 
+   @Override
    public void process(TeXParser parser)
      throws IOException
    {
@@ -110,7 +117,8 @@ public class MathDeclaration extends Declaration
       }
    }
 
-   public void end(TeXParser parser) throws IOException
+   @Override
+   public void end(TeXParser parser, TeXObjectList stack) throws IOException
    {
       revertModeSwitch(parser);
    }
@@ -125,6 +133,7 @@ public class MathDeclaration extends Declaration
       return numbered;
    }
 
+   @Override
    public boolean isModeSwitcher()
    {
       return true;

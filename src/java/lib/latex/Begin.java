@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013-2020 Nicola L.C. Talbot
+    Copyright (C) 2013-2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -22,6 +22,31 @@ import java.io.IOException;
 
 import com.dickimawbooks.texparserlib.*;
 
+/**
+ * LaTeX environments are actually declarations that may or may
+ * not have a corresponding end command. For example, the itemize
+ * environment is comprised of the commands <code>\\itemize</code> and
+ * <code>\\enditemize</code>, but those commands aren't used
+ * explicitly. Instead <code>\\begin{itemize}</code> is used to
+ * start the environment. This starts a local scope, defines
+ * <code>\\@currenvir</code> to the environment name
+ * (<code>itemize</code>) and then does <code>\\itemize</code>.
+ * The environment is ended with <code>\\end{itemize}</code>, which
+ * does <code>\\enditemize</code> and then ends the scope.
+ *
+ * Not all declarations have a corresponding end command. For
+ * example, <code>\\begin{bfseries}text\\end{bfseries}</code>
+ * is essentially equivalent to
+ * <code>{\\def\\@currenvir{bfseries}\\bfseries text}</code>.
+ * In this case <code>\\end{bfseries}</code> simply ends the local
+ * scope as the command <code>endbfseries</code> doesn't exist.
+ *
+ * (This is why <code>\\newcommand</code> doesn't allow command names that
+ * start with "end", in case the substring after "end" happens to
+ * match a declaration, as it will then be used at the end of the
+ * environment, whenever that declaration name is used as an
+ * environment.)
+ */ 
 public class Begin extends ControlSequence
 {
    public Begin()
@@ -34,6 +59,7 @@ public class Begin extends ControlSequence
       super(name);
    }
 
+   @Override
    public Object clone()
    {
       return new Begin(getName());
@@ -59,20 +85,18 @@ public class Begin extends ControlSequence
       }
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
       LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
 
-      TeXObject object = (parser == stack ? parser.expandedPopStack() 
-         : stack.expandedPopStack(parser));
+      String name = popLabelString(parser, stack);
 
-      if (object instanceof Group)
+      if (parser.getDebugLevel() > 0)
       {
-         object = ((Group)object).toList();
+         parser.logMessage("BEGIN ENV: "+name);
       }
-
-      String name = object.toString(parser);
 
       beginHook(name, parser, stack);
 
@@ -94,7 +118,7 @@ public class Begin extends ControlSequence
 
          while (true)
          {
-            object = stack.popStack(parser, TeXObjectList.POP_RETAIN_IGNOREABLES);
+            TeXObject object = stack.popStack(parser, TeXObjectList.POP_RETAIN_IGNOREABLES);
 
             if (object instanceof End
              || (object instanceof TeXCsRef

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -35,29 +35,34 @@ public class Tabular extends Declaration
       super(name);
    }
 
+   @Override
    public Object clone()
    {
       return new Tabular(getName());
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList list)
       throws IOException
    {
       return null;
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser)
       throws IOException
    {
       return null;
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser, TeXObjectList list)
       throws IOException
    {
       return null;
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser)
       throws IOException
    {
@@ -79,101 +84,52 @@ public class Tabular extends Declaration
       settings.startAlignment();
    }
 
+   @Override
    public void process(TeXParser parser) throws IOException
    {
-      TeXObject vertAlignArg = parser.popNextArg('[', ']');
-
-      int vertAlign = -1;
-
-      if (vertAlignArg != null)
-      {
-         if (vertAlignArg instanceof Expandable)
-         {
-            TeXObjectList list = ((Expandable)vertAlignArg).expandfully(parser);
-
-            if (list != null)
-            {
-               vertAlignArg = list;
-            }
-         }
-
-         String arg = vertAlignArg.toString(parser).trim();
-
-         if (!arg.isEmpty())
-         {
-            vertAlign = arg.charAt(0);
-         }
-      }
-
-      TeXObject columnSpecs = parser.popNextArg();
-
-      if (columnSpecs instanceof Expandable)
-      {
-         TeXObjectList expanded = ((Expandable)columnSpecs).expandfully(parser);
-
-         if (expanded != null)
-         {
-            columnSpecs = expanded;
-         }
-      }
-
-      startTabular(parser, vertAlign, columnSpecs);
-
-      AlignRow row = ((LaTeXParserListener)parser.getListener()).createAlignRow(parser);
-
-      row.process(parser);
+      process(parser, parser);
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack) throws IOException
    {
-      TeXObject vertAlignArg = stack.popArg(parser, '[', ']');
+      String vertAlignArg = popOptLabelString(parser, stack);
+
       int vertAlign = -1;
 
       if (vertAlignArg != null)
       {
-         if (vertAlignArg instanceof Expandable)
+         vertAlignArg = vertAlignArg.trim();
+
+         if (!vertAlignArg.isEmpty())
          {
-            TeXObjectList list = ((Expandable)vertAlignArg).expandfully(parser, stack);
-
-            if (list != null)
-            {
-               vertAlignArg = list;
-            }
-         }
-
-         String arg = vertAlignArg.toString(parser).trim();
-
-         if (!arg.isEmpty())
-         {
-            vertAlign = arg.charAt(0);
+            vertAlign = vertAlignArg.charAt(0);
          }
       }
 
-      TeXObject columnSpecs = stack.popArg(parser);
-
-      if (columnSpecs instanceof Expandable)
-      {
-         TeXObjectList expanded =
-            ((Expandable)columnSpecs).expandfully(parser, stack);
-
-         if (expanded != null)
-         {
-            columnSpecs = expanded;
-         }
-      }
+      TeXObject columnSpecs = popArgExpandFully(parser, stack);
 
       startTabular(parser, vertAlign, columnSpecs);
 
       AlignRow row = ((LaTeXParserListener)parser.getListener()).createAlignRow(stack);
 
-      row.process(parser, stack);
+      if (parser == stack || stack == null)
+      {
+         row.process(parser);
+      }
+      else
+      {
+         row.process(parser, stack);
+      }
    }
 
-   public void end(TeXParser parser) throws IOException
+   @Override
+   public void end(TeXParser parser, TeXObjectList stack) throws IOException
    {
       parser.getSettings().endAlignment();
    }
 
+   @Override
    public boolean isModeSwitcher()
    {
       return false;

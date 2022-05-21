@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -42,12 +42,14 @@ public class LaTeXGenericEnvironment extends Declaration
       this.isModeSwitcher = isModeSwitcher;
    }
 
+   @Override
    public Object clone()
    {
       return new LaTeXGenericEnvironment(getName(),  
         (TeXObject)beginCode.clone(), (TeXObject)endCode.clone());
    }
 
+   @Override
    public boolean equals(Object obj)
    {
       if (obj == null || !(obj instanceof LaTeXGenericEnvironment)) return false;
@@ -61,6 +63,7 @@ public class LaTeXGenericEnvironment extends Declaration
         && isModeSwitcher == env.isModeSwitcher;
    }
 
+   @Override
    public String toString()
    {
       return String.format("%s[name=%s,begin=%s,end=%s]",
@@ -70,25 +73,96 @@ public class LaTeXGenericEnvironment extends Declaration
 
    @Override
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
+    throws IOException
    {
-      return null;
+      TeXObject obj = (TeXObject)beginCode.clone();
+
+      if (parser.isStack(obj))
+      {
+         return (TeXObjectList)obj;
+      }
+
+      TeXObjectList expanded = parser.getListener().createStack();
+
+      expanded.add(obj);
+
+      return expanded;
    }
 
+   @Override
+   public TeXObjectList expandonce(TeXParser parser)
+    throws IOException
+   {
+      return expandonce(parser, parser);
+   }
+
+   @Override
+   public TeXObjectList expandfully(TeXParser parser, TeXObjectList stack)
+    throws IOException
+   {
+      TeXObject obj = (TeXObject)beginCode.clone();
+
+      TeXObjectList expanded ;
+
+      if (obj instanceof Expandable)
+      {
+         if (parser == stack || stack == null)
+         {
+            expanded = ((Expandable)obj).expandfully(parser);
+         }
+         else
+         {
+            expanded = ((Expandable)obj).expandfully(parser, stack);
+         }
+
+         if (expanded != null)
+         {
+            return expanded;
+         }
+      }
+
+      expanded = parser.getListener().createStack();
+
+      expanded.add(obj);
+
+      return expanded;
+   }
+
+   @Override
+   public TeXObjectList expandfully(TeXParser parser)
+    throws IOException
+   {
+      return expandfully(parser, parser);
+   }
+
+   @Override
    public void process(TeXParser parser) throws IOException
    {
       parser.push((TeXObject)beginCode.clone(), true);
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack) throws IOException
    {
       stack.push((TeXObject)beginCode.clone(), true);
    }
 
-   public void end(TeXParser parser) throws IOException
+   @Override
+   public void end(TeXParser parser, TeXObjectList stack) throws IOException
    {
-      parser.push((TeXObject)endCode.clone(), true);
+      TeXObject obj = (TeXObject)endCode.clone();
+
+      if (stack == null || stack == parser)
+      {
+         obj.process(parser);
+      }
+      else
+      {
+         obj.process(parser, stack);
+      }
    }
 
+   @Override
    public boolean isModeSwitcher()
    {
       return isModeSwitcher;

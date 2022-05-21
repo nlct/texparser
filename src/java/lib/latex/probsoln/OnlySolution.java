@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -37,16 +37,19 @@ public class OnlySolution extends SkipEnvContents
       super(name);
    }
 
+   @Override
    public Object clone()
    {
       return new OnlySolution(getName());
    }
 
+   @Override
    public void process(TeXParser parser) throws IOException
    {
       process(parser, parser);
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack) throws IOException
    {
       ControlSequence cs = parser.getListener().getControlSequence(
@@ -58,7 +61,8 @@ public class OnlySolution extends SkipEnvContents
       }
    }
 
-   public void end(TeXParser parser)
+   @Override
+   public void end(TeXParser parser, TeXObjectList stack)
     throws IOException
    {
    }

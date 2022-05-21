@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -27,7 +27,8 @@ public abstract class Declaration extends Command
       super(name);
    }
 
-   public abstract void end(TeXParser parser) throws IOException;
+   public abstract void end(TeXParser parser, TeXObjectList stack)
+      throws IOException;
 
    public abstract boolean isModeSwitcher();
 

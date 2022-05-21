@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -34,16 +34,19 @@ public class DingList extends ListDec
       super(name);
    }
 
+   @Override
    public Object clone()
    {
       return new DingList(getName());
    }
 
+   @Override
    public void process(TeXParser parser) throws IOException
    {
       setup(parser, parser.popStack());
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack) throws IOException
    {
       setup(parser, stack.popStack(parser));
@@ -63,10 +66,11 @@ public class DingList extends ListDec
       setup(parser, label, listsettings);
    }
 
-   public void end(TeXParser parser)
+   @Override
+   public void end(TeXParser parser, TeXObjectList stack)
     throws IOException
    {
-      super.end(parser);
+      super.end(parser, stack);
    }
 
 }

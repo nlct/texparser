@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -36,6 +36,7 @@ public class FontEncodingCs extends Declaration
       this.sty = sty;
    }
 
+   @Override
    public Object clone()
    {
       return new FontEncodingCs(getSty(), getName());
@@ -46,82 +47,63 @@ public class FontEncodingCs extends Declaration
       return sty;
    }
 
-   public TeXObjectList expandonce(TeXParser parser, TeXObjectList list)
+   @Override
+   public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
       return null;
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser)
       throws IOException
    {
       return null;
    }
 
-   public TeXObjectList expandfully(TeXParser parser, TeXObjectList list)
+   @Override
+   public TeXObjectList expandfully(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
       return null;
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser)
       throws IOException
    {
       return null;
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
       TeXSettings settings = parser.getSettings();
       orgEncoding = settings.getCurrentFontEncoding();
 
-      TeXObject arg = stack.popArg(parser);
+      String encName = popLabelString(parser, stack);
 
-      if (arg instanceof Expandable)
-      {
-         TeXObjectList expanded = ((Expandable)arg).expandfully(parser, stack);
-
-         if (expanded != null)
-         {
-            arg = expanded;
-         }
-      }
-
-      FontEncoding newEncoding = sty.getEncoding(arg.toString(parser));
+      FontEncoding newEncoding = sty.getEncoding(encName);
 
       settings.setFontEncoding(newEncoding);
    }
 
+   @Override
    public void process(TeXParser parser)
      throws IOException
    {
-      TeXSettings settings = parser.getSettings();
-      orgEncoding = settings.getCurrentFontEncoding();
-
-      TeXObject arg = parser.popNextArg();
-
-      if (arg instanceof Expandable)
-      {
-         TeXObjectList expanded = ((Expandable)arg).expandfully(parser);
-
-         if (expanded != null)
-         {
-            arg = expanded;
-         }
-      }
-
-      FontEncoding newEncoding = sty.getEncoding(arg.toString(parser));
-
-      settings.setFontEncoding(newEncoding);
+      process(parser, parser);
    }
 
-   public void end(TeXParser parser) throws IOException
+   @Override
+   public void end(TeXParser parser, TeXObjectList stack) throws IOException
    {
       TeXSettings settings = parser.getSettings();
       settings.setFontEncoding(orgEncoding);
    }
 
+   @Override
    public boolean isModeSwitcher()
    {
       return false;

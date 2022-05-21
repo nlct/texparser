@@ -45,6 +45,7 @@ public class EndDeclaration extends ControlSequence
       }
    }
 
+   @Override
    public Object clone()
    {
       EndDeclaration dec = new EndDeclaration(getName());
@@ -53,26 +54,28 @@ public class EndDeclaration extends ControlSequence
       return dec;
    }
 
-   public void process(TeXParser parser, TeXObjectList list)
+   @Override
+   public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      doEnd(parser);
+      doEnd(parser, stack);
    }
 
+   @Override
    public void process(TeXParser parser)
      throws IOException
    {
-      doEnd(parser);
+      doEnd(parser, parser);
    }
 
-   protected void doEnd(TeXParser parser)
+   protected void doEnd(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
       Declaration decl = getDeclaration(parser);
 
       if (decl != null)
       {
-         decl.end(parser);
+         decl.end(parser, stack);
       }
    }
 

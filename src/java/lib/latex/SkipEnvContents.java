@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -30,24 +30,28 @@ public abstract class SkipEnvContents extends Declaration
       super(name);
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList list)
       throws IOException
    {
       return null;
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser)
       throws IOException
    {
       return null;
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser, TeXObjectList list)
       throws IOException
    {
       return null;
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser)
       throws IOException
    {
@@ -69,10 +73,7 @@ public abstract class SkipEnvContents extends Declaration
 
          if (object instanceof End)
          {
-            TeXObject nextObj = 
-               stack == parser ? parser.popNextArg() : stack.popArg(parser);
-
-            String envName = nextObj.toString(parser);
+            String envName = popLabelString(parser, stack);
 
             Group grp = parser.getListener().createGroup(envName);
 
@@ -89,6 +90,7 @@ public abstract class SkipEnvContents extends Declaration
       }
    }
 
+   @Override
    public boolean isModeSwitcher()
    {
       return false;

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -34,11 +34,13 @@ public class TeXFontWeightDeclaration extends TeXFontDeclaration
       this.orgShape = TeXSettings.INHERIT;
    }
 
+   @Override
    public Object clone()
    {
       return new TeXFontWeightDeclaration(getName(), weight);
    }
 
+   @Override
    public void process(TeXParser parser) throws IOException
    {
       TeXSettings settings = parser.getSettings();
@@ -52,12 +54,14 @@ public class TeXFontWeightDeclaration extends TeXFontDeclaration
       settings.setFontFamily(TeXSettings.FAMILY_RM);
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList list) throws IOException
    {
       process(parser);
    }
 
-   public void end(TeXParser parser) throws IOException
+   @Override
+   public void end(TeXParser parser, TeXObjectList stack) throws IOException
    {
       TeXSettings settings = parser.getSettings();
       settings.setFontWeight(orgWeight);

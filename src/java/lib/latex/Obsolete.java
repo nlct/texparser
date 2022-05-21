@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -33,12 +33,14 @@ public class Obsolete extends ControlSequence
       this.replacementCommand = replacementCommand;
    }
 
+   @Override
    public Object clone()
    {
       return new Obsolete((ControlSequence)orgCommand.clone(),
         (ControlSequence)replacementCommand.clone());
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
@@ -163,6 +165,7 @@ public class Obsolete extends ControlSequence
       }
    }
 
+   @Override
    public void process(TeXParser parser)
       throws IOException
    {
@@ -179,11 +182,13 @@ public class Obsolete extends ControlSequence
       return replacementCommand;
    }
 
+   @Override
    public String toString()
    {
       return orgCommand.toString();
    }
 
+   @Override
    public String toString(TeXParser parser)
    {
       return orgCommand.toString(parser);
