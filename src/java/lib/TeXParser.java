@@ -32,6 +32,62 @@ import java.nio.file.Files;
 
 import com.dickimawbooks.texparserlib.latex.LaTeXSyntaxException;
 
+/**
+ * The principle class in this library that deals with reading input
+ * from a reader (file or string). It doesn't parse in quite the
+ * same way as TeX but does recognise catcodes. The characters read
+ * from the reader are converted into objects of type TeXObject.
+ * These are either processed directly or are pushed onto the stack
+ * to be processed after some action. Sometimes sub-stacks are
+ * formed that need to be processed before returning to the main
+ * parser stack.
+ * 
+ * Each stack is a TeXObjectList with the TeXParser as the main
+ * stack. When the TeXParser stack runs out, more characters are
+ * read from the reader until EOF. When sub-stacks run out they are
+ * discarded and the main processing returns to the TeXParser stack.
+ *
+ * The principle TeXObject sub-classes are:
+ *
+ * Macro: corresponds to a macro, which may be ActiveChar (an active
+ * character) or a ControlSequence (a control sequence). Some macros
+ * may implement Expandable, which means they may be able to expand.
+ * If they can expand, their expansion will be returned as a stack
+ * otherwise null is returned. They may well expand differently to
+ * the corresponding TeX macros. For example, they may not expand
+ * even though their TeX definition may be expandable. Conversely,
+ * they may expand, even though their TeX definition may be robust
+ * (such as case-changing commands).
+ *
+ * CharObject: corresponds to a character, which may be a Letter or
+ * Other.
+ *
+ * WhiteSpace: corresponds to a space character, which may be Space
+ * or Eol.
+ *
+ * Par: corresponds to a paragraph break (multiple blank lines)
+ *
+ * ParameterToken: corresponds to a parameter marker, which may be
+ * Param (e.g #1) or DoubleParam (e.g. ##1, ###1, ####1).
+ *
+ * Group: a form of stack that is treated as a single unit and
+ * causes a new TeXSettings object to be created that represents the
+ * local scope. The TeXSettings object is discarded when the group
+ * ends.
+ *
+ * MathGroup: a sub-class of Group that switches to math-mode
+ *
+ * Special characters (SbChar, SpChar and Tab)
+ *
+ * Ignoreable: comments, spaces following control words. These
+ * aren't automatically discarded to allow the latex2latex library
+ * to retain comments in the output files. They are discarded when
+ * popping arguments off the stack.
+ *
+ * Some information isn't available, such as where TeX breaks lines
+ * and pages or font information.
+ * 
+ */
 public class TeXParser extends TeXObjectList
 {
    public TeXParser(TeXParserListener listener)
@@ -558,11 +614,23 @@ public class TeXParser extends TeXObjectList
       return list;
    }
 
+   /**
+    * Identifies the given control sequence name as a verbatim
+    * command.
+    * @param csname the control sequence name (such as "verb")
+    */ 
    public void addVerbCommand(String csname)
    {
       verbatim.add(csname);
    }
 
+   /**
+    * Tests whether or not the given control sequence name has been
+    * identified as a verbatim command.
+    * @param csname the control sequence name (such as "verb")
+    * @return true if the control sequence name has been identified
+    * as a verbatim command
+    */ 
    public boolean isVerbCommand(String csname)
    {
       return verbatim.contains(csname);
