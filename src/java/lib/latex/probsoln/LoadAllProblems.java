@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -36,81 +36,42 @@ public class LoadAllProblems extends ControlSequence
       this.sty = sty;
    }
 
+   @Override
    public Object clone()
    {
       return new LoadAllProblems(getName(), sty);
    }
 
+   @Override
    public void process(TeXParser parser)
      throws IOException
    {
       process(parser, parser);
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      TeXObject optArg = (stack==parser? parser.popNextArg('[', ']') 
-        : stack.popArg(parser, '[', ']'));
+      String dbName = popOptLabelString(parser, stack);
 
-      String dbName = "default";
-
-      if (optArg != null)
+      if (dbName == null)
       {
-         if (optArg instanceof Expandable)
-         {
-            TeXObjectList expanded = null;
-
-            if (stack == parser)
-            {
-               expanded = ((Expandable)optArg).expandfully(parser);
-            }
-            else
-            {
-               expanded = ((Expandable)optArg).expandfully(parser, stack);
-            }
-
-            if (expanded != null)
-            {
-               optArg = expanded;
-            }
-         }
-
-         dbName = optArg.toString(parser);
+         dbName = "default";
       }
 
-      TeXObject fileName = (stack==parser? parser.popNextArg()
-        : stack.popArg(parser));
+      String fileName = popLabelString(parser, stack);
 
-      if (fileName instanceof Expandable)
-      {
-         TeXObjectList expanded = null;
+      Group grp = parser.getListener().createGroup();
 
-         if (stack == parser)
-         {
-            expanded = ((Expandable)fileName).expandfully(parser);
-         }
-         else
-         {
-            expanded = ((Expandable)fileName).expandfully(parser, stack);
-         }
+      grp.add(parser.getListener().getControlSequence("def"));
+      grp.add(new TeXCsRef("prob@currentdb"));
+      grp.add(parser.getListener().createDataList(dbName));
 
-         if (expanded != null)
-         {
-            fileName = expanded;
-         }
-      }
+      grp.add(parser.getListener().getControlSequence("input"));
+      grp.add(new TeXPathObject(new TeXPath(parser, fileName)));
 
-      parser.startGroup();
-
-      parser.putControlSequence(true,// local
-        new GenericCommand(true, "prob@currentdb", null,
-           parser.getListener().createString(dbName)));
-
-      parser.getListener().input(new TeXPath(parser, 
-        fileName.toString(parser)));
-
-      parser.endGroup();
+      stack.push(grp);
    }
 
 

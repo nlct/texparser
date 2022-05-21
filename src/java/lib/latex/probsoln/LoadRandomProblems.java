@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -39,6 +39,7 @@ public class LoadRandomProblems extends ControlSequence
       this.sty = sty;
    }
 
+   @Override
    public Object clone()
    {
       return new LoadRandomProblems(getName(), sty);
@@ -50,62 +51,20 @@ public class LoadRandomProblems extends ControlSequence
       process(parser, parser);
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      TeXObject optArg = (stack==parser? parser.popNextArg('[', ']') 
-        : stack.popArg(parser, '[', ']'));
+      String dbName = popOptLabelString(parser, stack);
 
-      String dbName = "default";
-
-      if (optArg != null)
+      if (dbName == null)
       {
-         if (optArg instanceof Expandable)
-         {
-            TeXObjectList expanded = null;
-
-            if (stack == parser)
-            {
-               expanded = ((Expandable)optArg).expandfully(parser);
-            }
-            else
-            {
-               expanded = ((Expandable)optArg).expandfully(parser, stack);
-            }
-
-            if (expanded != null)
-            {
-               optArg = expanded;
-            }
-         }
-
-         dbName = optArg.toString(parser);
+         dbName = "default";
       }
 
-      TeXNumber number = (stack==parser? parser.popNumber() 
-        : stack.popNumber(parser));
+      int number = popInt(parser, stack);
 
-      TeXObject fileNames = (stack==parser? parser.popNextArg()
-        : stack.popArg(parser));
-
-      if (fileNames instanceof Expandable)
-      {
-         TeXObjectList expanded = null;
-
-         if (stack == parser)
-         {
-            expanded = ((Expandable)fileNames).expandfully(parser);
-         }
-         else
-         {
-            expanded = ((Expandable)fileNames).expandfully(parser, stack);
-         }
-
-         if (expanded != null)
-         {
-            fileNames = expanded;
-         }
-      }
+      TeXObject fileNames = popArgExpandFully(parser, stack);
 
       parser.startGroup();
 
@@ -120,7 +79,7 @@ public class LoadRandomProblems extends ControlSequence
       for (int i = 0, n = csvList.size(); i < n; i++)
       {
          parser.getListener().input(new TeXPath(parser, 
-           csvList.getValue(i).toString(parser)));
+           csvList.getValue(i).toString(parser)), stack);
       }
 
       parser.putControlSequence(true,// local
@@ -149,7 +108,7 @@ public class LoadRandomProblems extends ControlSequence
 
          Collections.shuffle(labels, sty.getRandom());
 
-         int max = Integer.min(db.size(), number.getValue());
+         int max = Integer.min(db.size(), number);
 
          for (int i = 0; i < max; i++)
          {

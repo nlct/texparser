@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013-2022 Nicola L.C. Talbot
+    Copyright (C) 2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -16,27 +16,12 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
-package com.dickimawbooks.texparserlib.latex.amsmath;
+package com.dickimawbooks.texparserlib;
 
-import java.util.Hashtable;
 import java.io.IOException;
 
-import com.dickimawbooks.texparserlib.*;
-import com.dickimawbooks.texparserlib.latex.*;
-
-public class AmsmathSty extends LaTeXSty
+public interface InternalQuantity extends TeXObject
 {
-   public AmsmathSty(KeyValList options, 
-      LaTeXParserListener listener, boolean loadParentOptions)
-   throws IOException
-   {
-      super(options, "amsmath", listener, loadParentOptions);
-   }
-
-   @Override
-   public void addDefinitions()
-   {
-      registerControlSequence(new Align());
-      registerControlSequence(new Align("align*", false));
-   }
+   public TeXObject getQuantity(TeXParser parser, TeXObjectList stack)
+    throws IOException;
 }

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -35,11 +35,13 @@ public class Bibliography extends ControlSequence
       super(name);
    }
 
+   @Override
    public Object clone()
    {
       return new Bibliography(getName());
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
@@ -55,7 +57,7 @@ public class Bibliography extends ControlSequence
          }
       }
 
-      doBibliography(parser, arg);
+      doBibliography(parser, arg, stack);
     }
 
    public void process(TeXParser parser)
@@ -73,10 +75,10 @@ public class Bibliography extends ControlSequence
          }
       }
 
-      doBibliography(parser, arg);
+      doBibliography(parser, arg, null);
    }
 
-   protected boolean doBibliography(TeXParser parser, TeXObject arg)
+   protected boolean doBibliography(TeXParser parser, TeXObject arg, TeXObjectList stack)
        throws IOException
    {
 
@@ -96,7 +98,7 @@ public class Bibliography extends ControlSequence
 
       listener.addFileReference(texPath);
 
-      return listener.bibliography(bibPaths, texPath);
+      return listener.bibliography(bibPaths, texPath, stack);
   }
 
 }

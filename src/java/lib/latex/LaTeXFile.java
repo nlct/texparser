@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -166,7 +166,7 @@ public class LaTeXFile extends TeXPath
       }
    }
 
-   public void processOptions() throws IOException
+   public void processOptions(TeXObjectList stack) throws IOException
    {
       loadParentOptions();
 
@@ -176,12 +176,12 @@ public class LaTeXFile extends TeXPath
       {
          if (options != null)
          {
-            load(options);
+            load(options, stack);
          }
          else
          {
-            preOptions();
-            postOptions();
+            preOptions(stack);
+            postOptions(stack);
          }
       }
       finally
@@ -190,10 +190,16 @@ public class LaTeXFile extends TeXPath
       }
    }
 
-   public void load(KeyValList options)
+   public void load(KeyValList options, TeXObjectList stack)
    throws IOException
    {
-      preOptions();
+      TeXObjectList substack = getListener().createStack();
+      preOptions(substack);
+
+      if (!substack.isEmpty())
+      {
+         substack.process(getParser(), stack);
+      }
 
       KeyValList clsOptions = listener.getDocumentClassOptions();
 
@@ -203,14 +209,21 @@ public class LaTeXFile extends TeXPath
       }
 
       processOptions(options);
-      postOptions();
+
+      postOptions(substack);
+
+      if (!substack.isEmpty())
+      {
+         substack.process(getParser(), stack);
+         stack.push(substack, true);
+      }
    }
 
-   protected void preOptions() throws IOException
+   protected void preOptions(TeXObjectList stack) throws IOException
    {
    }
 
-   protected void postOptions() throws IOException
+   protected void postOptions(TeXObjectList stack) throws IOException
    {
    }
 

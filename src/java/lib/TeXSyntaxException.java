@@ -175,6 +175,10 @@ public class TeXSyntaxException extends IOException
       "tex.error.register_expected";
    public static final String ERROR_REGISTER_EXPECTED_BUT_FOUND =
       "tex.error.register_expected_but_found";
+   public static final String ERROR_INTERNAL_QUANTITY_EXPECTED =
+      "tex.error.internal_quantity_expected";
+   public static final String ERROR_INTERNAL_QUANTITY_EXPECTED_BUT_FOUND =
+      "tex.error.internal_quantity_expected_but_found";
    public static final String ERROR_NUMERIC_REGISTER_EXPECTED =
       "tex.error.numeric_register_expected";
    public static final String ERROR_REGISTER_NOT_NUMERIC =

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -43,30 +43,13 @@ public class DocumentStyle extends ControlSequence
       return new DocumentClass();
    }
 
-   public void process(TeXParser parser, TeXObjectList list)
+   @Override
+   public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      TeXObject options = list.popArg(parser, '[', ']');
+      TeXObject options = popOptArg(parser, stack);
 
-      TeXObject cls = list.popArg(parser);
-
-      TeXObjectList expanded = null;
-
-      if (cls instanceof Expandable)
-      {
-         expanded = ((Expandable)cls).expandfully(parser, list);
-      }
-
-      String clsName;
-
-      if (expanded == null)
-      {
-         clsName = cls.toString(parser);
-      }
-      else
-      {
-         clsName = expanded.toString(parser);
-      }
+      String clsName = popLabelString(parser, stack);
 
       KeyValList keyValList = null;
 
@@ -75,45 +58,18 @@ public class DocumentStyle extends ControlSequence
          keyValList = KeyValList.getList(parser, options);
       }
 
-      process(parser, keyValList, clsName);
+      process(parser, keyValList, clsName, stack);
    }
 
+   @Override
    public void process(TeXParser parser)
      throws IOException
    {
-      TeXObject options = parser.popNextArg('[', ']');
-
-      TeXObject cls = parser.popNextArg();
-
-      TeXObjectList expanded = null;
-
-      if (cls instanceof Expandable)
-      {
-         expanded = ((Expandable)cls).expandfully(parser);
-      }
-
-      String clsName;
-
-      if (expanded == null)
-      {
-         clsName = cls.toString(parser);
-      }
-      else
-      {
-         clsName = expanded.toString(parser);
-      }
-
-      KeyValList keyValList = null;
-
-      if (options != null)
-      {
-         keyValList = KeyValList.getList(parser, options);
-      }
-
-      process(parser, keyValList, clsName);
+      process(parser, parser);
    }
 
-   public void process(TeXParser parser, KeyValList keyValList, String clsName)
+   public void process(TeXParser parser, KeyValList keyValList, String clsName,
+    TeXObjectList stack)
      throws IOException
    {
       LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
@@ -142,11 +98,11 @@ public class DocumentStyle extends ControlSequence
       }
 
       listener.substituting(toString(parser), (new DocumentClass()).toString(parser));
-      listener.documentclass(keyValList, clsName, false);
+      listener.documentclass(keyValList, clsName, false, stack);
 
       for (String sty : styList)
       {
-         listener.usepackage(null, sty, false);
+         listener.usepackage(null, sty, false, stack);
       }
    }
 }

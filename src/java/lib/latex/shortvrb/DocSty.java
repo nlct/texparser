@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -32,6 +32,7 @@ public class DocSty extends LaTeXSty
       super(options, "doc", listener, loadParentOptions);
    }
 
+   @Override
    public void addDefinitions()
    {
       registerControlSequence(
@@ -39,10 +40,11 @@ public class DocSty extends LaTeXSty
 
    }
 
-   protected void preOptions()
+   @Override
+   protected void preOptions(TeXObjectList stack)
      throws IOException
    {
-      ((LaTeXParserListener)getListener()).requirepackage("shortvrb");
+      ((LaTeXParserListener)getListener()).requirepackage("shortvrb", stack);
    }
 
 }

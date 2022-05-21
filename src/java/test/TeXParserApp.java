@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013-2020 Nicola L.C. Talbot
+    Copyright (C) 2013-2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -177,7 +177,25 @@ public class TeXParserApp implements TeXApp
 
       TeXParser parser = new TeXParser(listener);
 
-      parser.parse(inFileName);
+      PrintWriter logWriter = null;
+
+      if (logFile != null)
+      {
+         logWriter = new PrintWriter(logFile);
+         parser.setDebugLevel(1, logWriter);
+      }
+
+      try
+      {
+         parser.parse(inFileName);
+      }
+      finally
+      {
+         if (logWriter != null)
+         {
+            logWriter.close();
+         }
+      }
    }
 
    public void latex2html(File inFileName, File outDir)
@@ -232,6 +250,14 @@ public class TeXParserApp implements TeXApp
 
       TeXParser parser = new TeXParser(listener);
 
+      PrintWriter logWriter = null;
+
+      if (logFile != null)
+      {
+         logWriter = new PrintWriter(logFile);
+         parser.setDebugLevel(1, logWriter);
+      }
+
       try
       {
          parser.parse(inFileName);
@@ -239,6 +265,11 @@ public class TeXParserApp implements TeXApp
       finally
       {
          deleteTempDir();
+
+         if (logWriter != null)
+         {
+            logWriter.close();
+         }
       }
    }
 
@@ -996,6 +1027,8 @@ public class TeXParserApp implements TeXApp
       System.out.println(getMessage("syntax.timeout", "--timeout"));
       System.out.println(getMessage("syntax.debug", "--debug"));
       System.out.println(getMessage("syntax.nodebug", "--nodebug"));
+      System.out.println(getMessage("syntax.log", "--log"));
+      System.out.println(getMessage("syntax.nolog", "--nolog"));
       System.out.println();
       System.out.println(getMessage("syntax.version", "--version", "-v"));
       System.out.println(getMessage("syntax.help", "--help", "-h"));
@@ -1289,6 +1322,28 @@ public class TeXParserApp implements TeXApp
             outDir = new File(args[i]);
 
          }
+         else if (args[i].equals("--log"))
+         {
+            if (logFile != null)
+            {
+               throw new InvalidSyntaxException(
+                 getMessage("error.syntax.only_one", args[i]));
+            }
+
+            i++;
+
+            if (i == args.length)
+            {
+               throw new InvalidSyntaxException(
+                 getMessage("error.syntax.missing_filename", args[i-1]));
+            }
+
+            logFile = new File(args[i]);
+         }
+         else if (args[i].equals("--nolog"))
+         {
+            logFile = null;
+         }
          else if (args[i].equals("--gui") || args[i].equals("-g"))
          {
             guiMode = true;
@@ -1489,6 +1544,8 @@ public class TeXParserApp implements TeXApp
    private String extraHead=null;
 
    private File tmpDir=null;
+
+   private File logFile = null;
 
    public static final Pattern PNG_INFO =
     Pattern.compile(".*: PNG image data, (\\d+) x (\\d+),.*");

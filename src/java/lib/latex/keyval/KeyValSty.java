@@ -41,6 +41,7 @@ public class KeyValSty extends LaTeXSty
       super(options, name, listener, loadParentOptions);
    }
 
+   @Override
    public void addDefinitions()
    {
       registerControlSequence(new SetKeys());

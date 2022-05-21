@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -118,6 +118,7 @@ public class L2HConverter extends LaTeXParserListener
         "gif", "GIF", "pdf", "PDF");
    }
 
+   @Override
    protected void addPredefined()
    {
       super.addPredefined();
@@ -268,7 +269,7 @@ public class L2HConverter extends LaTeXParserListener
 
       try
       {
-         LaTeXSty sty = requirepackage("hyperref");
+         LaTeXSty sty = requirepackage("hyperref", getParser());
       }
       catch (IOException e)
       {
@@ -323,41 +324,49 @@ public class L2HConverter extends LaTeXParserListener
       return null;
    }
 
+   @Override
    public BigOperator createBigOperator(String name, int code1, int code2)
    {
       return new L2HBigOperator(name, code1, code2);
    }
 
+   @Override
    public BigOperator createBigOperator(String name, int code)
    {
       return new L2HBigOperator(name, code);
    }
 
+   @Override
    public MathSymbol createMathSymbol(String name, int code)
    {
       return new L2HMathSymbol(name, code);
    }
 
+   @Override
    public Letter getLetter(int charCode)
    {
       return new L2HLetter(charCode);
    }
 
+   @Override
    public Other getOther(int charCode)
    {
       return new L2HOther(charCode);
    }
 
+   @Override
    public Par getPar()
    {
       return new L2HPar();
    }
 
+   @Override
    public MathGroup createMathGroup()
    {
       return new L2HMathGroup();
    }
 
+   @Override
    public AlignRow createAlignRow(TeXObjectList stack)
      throws IOException
    {
@@ -370,6 +379,7 @@ public class L2HConverter extends LaTeXParserListener
       return new L2HMathAlignRow(getParser(), stack, isNumbered);
    }
 
+   @Override
    public void cr(boolean isStar, TeXObject optArg)
      throws IOException
    {
@@ -384,7 +394,6 @@ public class L2HConverter extends LaTeXParserListener
          writeln("<br>\n");
       }
    }
-
 
    public void setWriter(Writer writer)
    {
@@ -486,26 +495,31 @@ public class L2HConverter extends LaTeXParserListener
       return style;
    }
 
+   @Override
    public FontWeightDeclaration getFontWeightDeclaration(String name, int weight)
    {
       return new L2HFontWeightDeclaration(name, weight);
    }
 
+   @Override
    public FontSizeDeclaration getFontSizeDeclaration(String name, int size)
    {
       return new L2HFontSizeDeclaration(name, size);
    }
 
+   @Override
    public FontShapeDeclaration getFontShapeDeclaration(String name, int shape)
    {
       return new L2HFontShapeDeclaration(name, shape);
    }
 
+   @Override
    public FontFamilyDeclaration getFontFamilyDeclaration(String name, int family)
    {
       return new L2HFontFamilyDeclaration(name, family);
    }
 
+   @Override
    public void writeCodePoint(int codePoint)
      throws IOException
    {
@@ -522,6 +536,7 @@ public class L2HConverter extends LaTeXParserListener
 
    }
 
+   @Override
    public void write(String str)
      throws IOException
    {
@@ -546,6 +561,7 @@ public class L2HConverter extends LaTeXParserListener
 */
    }
 
+   @Override
    public void write(char c)
      throws IOException
    {
@@ -554,6 +570,7 @@ public class L2HConverter extends LaTeXParserListener
       write(String.format("%c", c));
    }
 
+   @Override
    public void writeln(String str)
      throws IOException
    {
@@ -563,6 +580,7 @@ public class L2HConverter extends LaTeXParserListener
       writer.flush();
    }
 
+   @Override
    public void href(String url, TeXObject text)
      throws IOException
    {
@@ -575,11 +593,13 @@ public class L2HConverter extends LaTeXParserListener
       writer.write("</a>");
    }
 
+   @Override
    public void substituting(String original, String replacement)
    {
       texApp.substituting(parser, original, replacement);
    }
 
+   @Override
    public void skipping(Ignoreable ignoreable)
      throws IOException
    {
@@ -777,11 +797,12 @@ public class L2HConverter extends LaTeXParserListener
       extraHead.add(content);
    }
 
+   @Override
    public void documentclass(KeyValList options, String clsName, 
-      boolean loadParentOptions)
+      boolean loadParentOptions, TeXObjectList stack)
      throws IOException
    {
-      super.documentclass(options, clsName, loadParentOptions);
+      super.documentclass(options, clsName, loadParentOptions, stack);
 
       writeable.writeln("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 3.2 Final//EN\">");
       writeable.writeln("<html>");
@@ -811,6 +832,7 @@ public class L2HConverter extends LaTeXParserListener
       }
    }
 
+   @Override
    public void beginDocument()
      throws IOException
    {
@@ -859,6 +881,7 @@ public class L2HConverter extends LaTeXParserListener
       getParser().getSettings().setCharMapMode(TeXSettings.CHAR_MAP_ON);
    }
 
+   @Override
    public void endDocument()
      throws IOException
    {
@@ -893,6 +916,7 @@ public class L2HConverter extends LaTeXParserListener
       throw new EOFException();
    }
 
+   @Override
    public void overwithdelims(TeXObject firstDelim,
      TeXObject secondDelim, TeXObject before, TeXObject after)
     throws IOException
@@ -938,6 +962,7 @@ public class L2HConverter extends LaTeXParserListener
       }
    }
 
+   @Override
    public void abovewithdelims(TeXObject firstDelim,
      TeXObject secondDelim, TeXDimension thickness,
      TeXObject before, TeXObject after)
@@ -974,6 +999,7 @@ public class L2HConverter extends LaTeXParserListener
       }
    }
 
+   @Override
    public void subscript(TeXObject arg)
     throws IOException
    {
@@ -991,6 +1017,7 @@ public class L2HConverter extends LaTeXParserListener
       }
    }
 
+   @Override
    public void superscript(TeXObject arg)
     throws IOException
    {
@@ -1118,6 +1145,7 @@ public class L2HConverter extends LaTeXParserListener
       return null;
    }
 
+   @Override
    public void includegraphics(KeyValList options, String filename)
      throws IOException
    {
@@ -1391,16 +1419,19 @@ public class L2HConverter extends LaTeXParserListener
       write("</div>");
    }
 
+   @Override
    public TeXApp getTeXApp()
    {
       return texApp;
    }
 
+   @Override
    public void endParse(File file)
     throws IOException
    {
    }
 
+   @Override
    public void beginParse(File file, Charset encoding)
     throws IOException
    {
@@ -1457,6 +1488,7 @@ public class L2HConverter extends LaTeXParserListener
       return suffix;
    }
 
+   @Override
    public ControlSequence createUndefinedCs(String name)
    {
       return new L2HUndefined(name, getUndefinedAction());
@@ -1504,6 +1536,7 @@ public class L2HConverter extends LaTeXParserListener
         String.format("<a ref=\"#%s\">%d</a>", anchor, indexLoc)));
    }
 
+   @Override
    public void registerControlSequence(LaTeXSty sty, ControlSequence cs)
    {
       styCs.add(cs.getName());

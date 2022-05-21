@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -51,55 +51,9 @@ public class DocumentClass extends ControlSequence
    {
       byte popStyle = TeXObjectList.POP_SHORT;
 
-      TeXObject options;
-      TeXObject cls;
-
-      if (parser == stack)
-      {
-         options = stack.popArg(parser, popStyle, '[', ']');
-         cls = stack.popArg(parser, popStyle);
-      }
-      else
-      {
-         options = parser.popNextArg(popStyle, '[', ']');
-         cls = parser.popNextArg(popStyle);
-      }
-
-      TeXObjectList expanded = null;
-
-      if (cls instanceof Expandable)
-      {
-         if (stack == parser)
-         {
-            expanded = ((Expandable)cls).expandfully(parser);
-         }
-         else
-         {
-            expanded = ((Expandable)cls).expandfully(parser, stack);
-         }
-      }
-
-      TeXObject version;
-
-      if (parser == stack)
-      {
-         version = stack.popArg(parser, popStyle, '[', ']');
-      }
-      else
-      {
-         version = parser.popNextArg(popStyle, '[', ']');
-      }
-
-      String clsName;
-
-      if (expanded == null)
-      {
-         clsName = cls.toString(parser);
-      }
-      else
-      {
-         clsName = expanded.toString(parser);
-      }
+      TeXObject options = popOptArg(parser, stack);
+      String clsName = popLabelString(parser, stack);
+      TeXObject version = popOptArg(parser, stack);
 
       KeyValList keyValList = null;
 
@@ -110,14 +64,14 @@ public class DocumentClass extends ControlSequence
 
       LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
 
-      loadDocumentClass(listener, keyValList, clsName);
+      loadDocumentClass(listener, keyValList, clsName, stack);
    }
 
    protected void loadDocumentClass(LaTeXParserListener listener,
-       KeyValList options, String clsName)
+       KeyValList options, String clsName, TeXObjectList stack)
     throws IOException
    {
-      listener.documentclass(options, clsName, loadParentOptions);
+      listener.documentclass(options, clsName, loadParentOptions, stack);
    }
 
    protected boolean loadParentOptions;

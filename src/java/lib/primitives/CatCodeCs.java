@@ -24,7 +24,7 @@ import java.io.EOFException;
 import com.dickimawbooks.texparserlib.*;
 
 public class CatCodeCs extends Primitive 
-   implements CatCodeChanger,NumericExpansion
+   implements CatCodeChanger,NumericExpansion,InternalQuantity
 {
    public CatCodeCs()
    {
@@ -39,6 +39,12 @@ public class CatCodeCs extends Primitive
    public Object clone()
    {
       return new CatCodeCs(getName());
+   }
+
+   public TeXObject getQuantity(TeXParser parser, TeXObjectList stack)
+     throws IOException
+   {
+      return expandToNumber(parser, stack);
    }
 
    public TeXNumber expandToNumber(TeXParser parser, TeXObjectList stack)

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -35,6 +35,7 @@ public class IfThenSty extends LaTeXSty
       super(options, "ifthen", listener, loadParentOptions);
    }
 
+   @Override
    public void addDefinitions()
    {
       registerControlSequence(new IfThenElse(this));

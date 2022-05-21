@@ -44,6 +44,7 @@ public class GlossEntry extends AbstractGlsCommand
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
+System.out.println("FALLBACK!!");
       LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
       TeXObjectList list = listener.createStack();
 

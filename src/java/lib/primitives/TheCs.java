@@ -43,11 +43,12 @@ public class TheCs extends Primitive implements Expandable
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
    throws IOException
    {
-      Register reg = stack.popRegister(parser);
+      InternalQuantity quantity = stack.popInternalQuantity(parser);
 
-      TeXObject contents = (TeXObject)reg.getContents(parser).clone();
+      TeXObject contents = quantity.getQuantity(parser, stack);
 
-      if (contents instanceof TeXObjectList && !(contents instanceof Group))
+      if (contents instanceof TeXObjectList 
+           && ((TeXObjectList)contents).isStack())
       {
          return (TeXObjectList)contents;
       }
@@ -62,20 +63,7 @@ public class TheCs extends Primitive implements Expandable
    public TeXObjectList expandonce(TeXParser parser)
    throws IOException
    {
-      Register reg = parser.popRegister();
-
-      TeXObject contents = (TeXObject)reg.getContents(parser).clone();
-
-      if (contents instanceof TeXObjectList && !(contents instanceof Group))
-      {
-         return (TeXObjectList)contents;
-      }
-
-      TeXObjectList list = new TeXObjectList();
-
-      list.add(contents);
-
-      return list;
+      return expandonce(parser, parser);
    }
 
    public TeXObjectList expandfully(TeXParser parser, TeXObjectList stack)

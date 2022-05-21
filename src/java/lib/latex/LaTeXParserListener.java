@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -1092,12 +1092,12 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
    }
 
    public void loadclass(KeyValList options,
-     String clsName, boolean loadParentOptions)
+     String clsName, boolean loadParentOptions, TeXObjectList stack)
      throws IOException
    {
       if (docCls == null)
       {
-         documentclass(options, clsName, loadParentOptions);
+         documentclass(options, clsName, loadParentOptions, stack);
          return;
       }
 
@@ -1114,16 +1114,16 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
 
       if (cls instanceof UnknownCls)
       {
-         parsePackageFile(cls);
+         parsePackageFile(cls, stack);
       }
       else
       {
-         cls.processOptions();
+         cls.processOptions(stack);
       }
    }
 
    public void documentclass(KeyValList options,
-     String clsName, boolean loadParentOptions)
+     String clsName, boolean loadParentOptions, TeXObjectList stack)
      throws IOException
    {
       if (docCls != null)
@@ -1138,11 +1138,11 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
 
       if (docCls instanceof UnknownCls)
       {
-         parsePackageFile(docCls);
+         parsePackageFile(docCls, stack);
       }
       else
       {
-         docCls.processOptions();
+         docCls.processOptions(stack);
       }
    }
 
@@ -1169,14 +1169,14 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       loadedPackages.remove(sty);
    }
 
-   public LaTeXSty requirepackage(String name)
+   public LaTeXSty requirepackage(String name, TeXObjectList stack)
    throws IOException
    {
-      return requirepackage(null, name, false);
+      return requirepackage(null, name, false, stack);
    }
 
    public LaTeXSty loadpackage(KeyValList options, String name,
-    boolean loadParentOptions, boolean enforceParse)
+    boolean loadParentOptions, boolean enforceParse, TeXObjectList stack)
    throws IOException
    {
       LaTeXSty sty = getLoadedPackage(name);
@@ -1186,22 +1186,22 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
          return sty;
       }
 
-      sty = getLaTeXSty(options, name, loadParentOptions);
+      sty = getLaTeXSty(options, name, loadParentOptions, stack);
 
       addFileReference(sty);
       loadedPackages.add(sty);
 
       if (enforceParse)
       {// if it's known that the file is fairly simple
-         sty.parseFile();
+         sty.parseFile(stack);
       }
       else if (sty instanceof UnknownSty)
       {
-         parsePackageFile(sty);
+         parsePackageFile(sty, stack);
       }
       else
       {
-         sty.processOptions();
+         sty.processOptions(stack);
       }
 
       return sty;
@@ -1209,7 +1209,7 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
 
    // returns file if already loaded
    public LaTeXSty requirepackage(KeyValList options, 
-     String name, boolean loadParentOptions)
+     String name, boolean loadParentOptions, TeXObjectList stack)
    throws IOException
    {
       LaTeXSty sty = getLoadedPackage(name);
@@ -1219,18 +1219,18 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
          return sty;
       }
 
-      sty = getLaTeXSty(options, name, loadParentOptions);
+      sty = getLaTeXSty(options, name, loadParentOptions, stack);
 
       addFileReference(sty);
       loadedPackages.add(sty);
 
       if (sty instanceof UnknownSty)
       {
-         parsePackageFile(sty);
+         parsePackageFile(sty, stack);
       }
       else
       {
-         sty.processOptions();
+         sty.processOptions(stack);
       }
 
       return sty;
@@ -1262,7 +1262,7 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       parsePackages = on;
    }
 
-   public void parsePackageFile(LaTeXSty sty) throws IOException
+   public void parsePackageFile(LaTeXSty sty, TeXObjectList stack) throws IOException
    {
       // If not found by kpsewhich then possibly a custom package/class
       // which might be simple enough to parse.
@@ -1270,7 +1270,7 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
 
       if (parsePackages && !sty.wasFoundByKpsewhich())
       {
-         sty.parseFile();
+         sty.parseFile(stack);
       }
    }
 
@@ -1279,20 +1279,27 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
      boolean loadParentOptions)
    throws IOException
    {
+      return usepackage(options, styName, loadParentOptions, getParser());
+   }
+
+   public LaTeXSty usepackage(KeyValList options, String styName, 
+     boolean loadParentOptions, TeXObjectList stack)
+   throws IOException
+   {
       if (!isStyLoaded(styName))
       {
-         LaTeXSty sty = getLaTeXSty(options, styName, loadParentOptions);
+         LaTeXSty sty = getLaTeXSty(options, styName, loadParentOptions, stack);
 
          addFileReference(sty);
          loadedPackages.add(sty);
 
          if (sty instanceof UnknownSty)
          {
-            parsePackageFile(sty);
+            parsePackageFile(sty, stack);
          }
          else
          {
-            sty.processOptions();
+            sty.processOptions(stack);
          }
 
          return sty;
@@ -1330,7 +1337,7 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
    }
 
    protected LaTeXSty getLaTeXSty(KeyValList options, String styName, 
-      boolean loadParentOptions)
+      boolean loadParentOptions, TeXObjectList stack)
    throws IOException
    {
       if (styName.equals("graphics")
@@ -1425,7 +1432,7 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
          }
          else
          {
-            ((GlossariesSty)sty).addExtra(styName, options);
+            ((GlossariesSty)sty).addExtra(styName, options, stack);
          }
       }
 
@@ -1573,13 +1580,14 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       return loadedPackages;
    }
 
-   public boolean input(TeXPath path)
+   @Override
+   public boolean input(TeXPath path, TeXObjectList stack)
      throws IOException
    {
       if (path.toString().endsWith("tcilatex.tex"))
       {
-         usepackage(null, "amsmath", false);
-         usepackage(null, "graphicx", false);
+         usepackage(null, "amsmath", false, stack);
+         usepackage(null, "graphicx", false, stack);
          addSpecialListener(new SWSpecialListener());
 
          parser.putControlSequence(new SWFrame());
@@ -1602,13 +1610,13 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
          return true;
       }
 
-      return super.input(path);
+      return super.input(path, stack);
    }
 
-   public boolean bibliography(TeXPath[] bibPaths, TeXPath bblPath)
+   public boolean bibliography(TeXPath[] bibPaths, TeXPath bblPath, TeXObjectList stack)
     throws IOException
    {
-      return (bblPath.exists() ? super.input(bblPath) : false);
+      return (bblPath.exists() ? super.input(bblPath, stack) : false);
    }
 
    public Charset getCharSet()

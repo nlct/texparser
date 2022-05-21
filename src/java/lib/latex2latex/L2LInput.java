@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -41,10 +41,11 @@ public class L2LInput extends Input
       return new L2LInput(getName());
    }
 
-   protected boolean doInput(TeXParser parser, TeXObject arg)
+   @Override
+   protected boolean doInput(TeXParser parser, TeXObject arg, TeXObjectList stack)
      throws IOException
    {
-      boolean done = super.doInput(parser, arg);
+      boolean done = super.doInput(parser, arg, stack);
 
       if (!done)
       {

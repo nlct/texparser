@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -42,6 +42,7 @@ public class JmlrCls extends LaTeXCls
       super(options, name, listener, loadParentOptions);
    }
 
+   @Override
    public void addDefinitions()
    {
       LaTeXParserListener listener = getListener();
@@ -76,17 +77,17 @@ public class JmlrCls extends LaTeXCls
 
    }
 
-   protected void loadPreHyperrefPackages()
+   protected void loadPreHyperrefPackages(TeXObjectList stack)
      throws IOException
    {
       LaTeXParserListener listener = getListener();
 
-      listener.requirepackage("xkeyval");
-      listener.requirepackage("calc");
-      listener.requirepackage("jmlrutils");
+      listener.requirepackage("xkeyval", stack);
+      listener.requirepackage("calc", stack);
+      listener.requirepackage("jmlrutils", stack);
 
-      listener.requirepackage("amssymb");
-      LaTeXSty sty = listener.requirepackage("natbib");
+      listener.requirepackage("amssymb", stack);
+      LaTeXSty sty = listener.requirepackage("natbib", stack);
 
       if (sty == null)
       {
@@ -98,27 +99,28 @@ public class JmlrCls extends LaTeXCls
          sty.processOption("round", null);
       }
 
-      listener.requirepackage("graphicx");
-      listener.requirepackage("url");
+      listener.requirepackage("graphicx", stack);
+      listener.requirepackage("url", stack);
 
       KeyValList opts = new KeyValList();
       opts.put("x11names", new GenericCommand("empty"));
-      listener.requirepackage(opts, "xcolor", false);
+      listener.requirepackage(opts, "xcolor", false, stack);
 
       opts = new KeyValList();
       opts.put("algo2e", new GenericCommand("empty"));
       opts.put("ruled", new GenericCommand("empty"));
-      listener.requirepackage(opts, "algorithm2e", false);
+      listener.requirepackage(opts, "algorithm2e", false, stack);
 
    }
 
-   protected void preOptions()
+   @Override
+   protected void preOptions(TeXObjectList stack)
      throws IOException
    {
       LaTeXParserListener listener = getListener();
       TeXParser parser = listener.getParser();
 
-      loadPreHyperrefPackages();
+      loadPreHyperrefPackages(stack);
 
       ControlSequence cs = parser.getControlSequence("jmlrprehyperref");
 
@@ -128,11 +130,11 @@ public class JmlrCls extends LaTeXCls
       }
       else
       {
-         cs.process(parser);
+         cs.process(parser, stack);
       }
 
-      listener.requirepackage(null, "hyperref", false);
-      listener.requirepackage(null, "nameref", false);
+      listener.requirepackage(null, "hyperref", false, stack);
+      listener.requirepackage(null, "nameref", false, stack);
 
       registerControlSequence(new GenericCommand("@jmlrproceedings",
        null, listener.createString("Journal of Machine Learning Research")));
@@ -159,6 +161,7 @@ public class JmlrCls extends LaTeXCls
       registerControlSequence(new AtSecondOfTwo("ifprint"));
    }
 
+   @Override
    public void processOption(String option, TeXObject value)
      throws IOException
    {

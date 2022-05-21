@@ -112,6 +112,7 @@ public abstract class DefaultTeXParserListener extends TeXParserListener
       parser.putControlSequence(new RomanNumeral());
       parser.putControlSequence(new TheCs());
       parser.putControlSequence(new CharCs());
+      parser.putControlSequence(new CatCodeCs());
       parser.putControlSequence(new ExpandAfter());
       parser.putControlSequence(new AfterGroup());
       parser.putControlSequence(new Csname());
@@ -143,6 +144,7 @@ public abstract class DefaultTeXParserListener extends TeXParserListener
       parser.putControlSequence(new Divide());
       parser.putControlSequence(new IfNum());
       parser.putControlSequence(new IfDim());
+      parser.putControlSequence(new TeXParserSetUndefAction());
 
       parser.putControlSequence(new MathAccent("vec", 8407));
       parser.putControlSequence(new MathAccent("hat", 0x0302, 0x02C6));
@@ -369,7 +371,14 @@ public abstract class DefaultTeXParserListener extends TeXParserListener
 
    public TeXObjectList createStack()
    {
-      return new TeXObjectList();
+      TeXObjectList stack = new TeXObjectList();
+
+      if (getParser().getDebugLevel() > 0)
+      {
+         getParser().logMessage("CREATED STACK "+stack);
+      }
+
+      return stack;
    }
 
    public DataObjectList createDataList()
@@ -462,14 +471,14 @@ public abstract class DefaultTeXParserListener extends TeXParserListener
       return new Comment();
    }
 
-   public boolean input(TeXPath path)
+   public boolean input(TeXPath path, TeXObjectList stack)
     throws IOException
    {
       if (path != null && Files.exists(path.getPath()))
       {
          Charset charset = getCharSet();
 
-         getParser().parse(path, charset);
+         getParser().parse(path, charset, stack==getParser() ? null : stack);
 
          return true;
       }

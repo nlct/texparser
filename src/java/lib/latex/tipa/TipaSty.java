@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -35,6 +35,7 @@ public class TipaSty extends LaTeXSty
       super(options, "tipa", listener, loadParentOptions);
    }
 
+   @Override
    public void addDefinitions()
    {
       TipaEncoding declaration = new TipaEncoding();
@@ -53,7 +54,8 @@ public class TipaSty extends LaTeXSty
 
    }
 
-   protected void preOptions() throws IOException
+   @Override
+   protected void preOptions(TeXObjectList stack) throws IOException
    {
       LaTeXParserListener listener = getListener();
 
@@ -61,7 +63,7 @@ public class TipaSty extends LaTeXSty
 
       if (fontEncSty == null)
       {
-         fontEncSty = (FontEncSty)listener.requirepackage("fontenc");
+         fontEncSty = (FontEncSty)listener.requirepackage("fontenc", stack);
       }
 
       t3Encoding = new T3Encoding();

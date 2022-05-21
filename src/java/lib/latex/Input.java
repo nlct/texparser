@@ -61,7 +61,7 @@ public class Input extends ControlSequence
          }
       }
 
-      if (!doInput(parser, arg))
+      if (!doInput(parser, arg, stack))
       {
          switch (notFoundAction)
          {
@@ -96,7 +96,7 @@ public class Input extends ControlSequence
          }
       }
 
-      if (!doInput(parser, arg))
+      if (!doInput(parser, arg, null))
       {
          switch (notFoundAction)
          {
@@ -127,19 +127,26 @@ public class Input extends ControlSequence
       return arg.toString(parser);
    }
 
-   protected boolean doInput(TeXParser parser, TeXObject arg)
+   protected boolean doInput(TeXParser parser, TeXObject arg, TeXObjectList stack)
        throws IOException
    {
       TeXParserListener listener = parser.getListener();
 
-      TeXPath texPath = new TeXPath(parser, toBasename(parser, arg),
-        getDefaultExtension());
+      TeXPath texPath;
 
-      if (!listener.input(texPath)) return false;
+      if (arg instanceof TeXPathObject)
+      {
+         texPath = ((TeXPathObject)arg).getTeXPath();
+      }
+      else
+      {
+         texPath = new TeXPath(parser, toBasename(parser, arg),
+           getDefaultExtension());
+      }
 
       listener.addFileReference(texPath);
 
-      return true;
+      return listener.input(texPath, stack);
   }
 
   private byte notFoundAction=NOT_FOUND_ACTION_ERROR;

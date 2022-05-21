@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -25,6 +25,7 @@ import java.util.Vector;
 
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.primitives.Undefined;
+import com.dickimawbooks.texparserlib.generic.TeXParserSetUndefAction;
 
 public abstract class LaTeXSty extends LaTeXFile
 {
@@ -42,7 +43,7 @@ public abstract class LaTeXSty extends LaTeXFile
       super(listener.getParser(), options, name, ext, loadParentOptions);
    }
 
-   public void parseFile() throws IOException
+   public void parseFile(TeXObjectList stack) throws IOException
    {
       if (getFile().exists())
       {
@@ -50,10 +51,69 @@ public abstract class LaTeXSty extends LaTeXFile
          // complicated.
 
          byte orgAction = listener.getUndefinedAction();
-         listener.setUndefinedAction(Undefined.ACTION_WARN);
-
          int orgCatCode = getParser().getCatCode('@');
 
+         ControlSequence orgCurrNameCs = getParser().getControlSequence(
+           "@currname");
+         ControlSequence orgCurrExtCs = getParser().getControlSequence(
+           "@currext");
+
+         String orgCurrName = null;
+         String orgCurrExt = null;
+
+         if (orgCurrName != null)
+         {
+            orgCurrName = getParser().expandToString(orgCurrNameCs, getParser());
+         }
+
+         if (orgCurrExt != null)
+         {
+            orgCurrExt = getParser().expandToString(orgCurrExtCs, getParser());
+         }
+
+         stack.push(new TeXParserSetUndefAction(orgAction));
+
+         if (orgCatCode != TeXParser.TYPE_LETTER)
+         {
+            stack.push(new UserNumber(orgCatCode));
+            stack.push(listener.getOther('='));
+            stack.push(new UserNumber((int)'@'));
+            stack.push(listener.getControlSequence("catcode"));
+         }
+
+         if (orgCurrExt != null)
+         {
+            stack.push(listener.createGroup(orgCurrExt));
+            stack.push(new TeXCsRef("@currext"));
+            stack.push(listener.getControlSequence("def"));
+         }
+
+         if (orgCurrName != null)
+         {
+            stack.push(listener.createGroup(orgCurrName));
+            stack.push(new TeXCsRef("@currname"));
+            stack.push(listener.getControlSequence("def"));
+         }
+
+         stack.push(new TeXPathObject(this));
+         stack.push(listener.getControlSequence("input"));
+         stack.push(listener.createGroup(getExtension()));
+         stack.push(new TeXCsRef("@currext"));
+         stack.push(listener.getControlSequence("def"));
+         stack.push(listener.createGroup(getName()));
+         stack.push(new TeXCsRef("@currname"));
+         stack.push(listener.getControlSequence("def"));
+
+         if (orgCatCode != TeXParser.TYPE_LETTER)
+         {
+            stack.push(listener.getControlSequence("makeatletter"));
+         }
+
+         stack.push(new TeXParserSetUndefAction(Undefined.ACTION_WARN));
+
+
+
+/*
          ControlSequence orgCurrName = getParser().getControlSequence(
            "@currname");
          ControlSequence orgCurrExt = getParser().getControlSequence(
@@ -98,12 +158,14 @@ public abstract class LaTeXSty extends LaTeXFile
          getParser().setCatCode(true, '@', orgCatCode);
 
          listener.setUndefinedAction(orgAction);
+*/
       }
    }
 
    public abstract void addDefinitions();
 
-   protected void postOptions() throws IOException
+   @Override
+   protected void postOptions(TeXObjectList stack) throws IOException
    {
       addDefinitions();
    }

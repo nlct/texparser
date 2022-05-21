@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2018 Nicola L.C. Talbot
+    Copyright (C) 2018-2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -32,12 +32,14 @@ public class MfirstucEnglishSty extends LaTeXSty
       super(options, "mfirstuc-english", listener, loadParentOptions);
    }
 
-   protected void preOptions() throws IOException
+   @Override
+   protected void preOptions(TeXObjectList stack) throws IOException
    {
       mfirstucSty = (MfirstucSty)getListener().requirepackage(
-         null, "mfirstuc", true);
+         null, "mfirstuc", true, stack);
    }
 
+   @Override
    public void addDefinitions()
    {
       mfirstucSty.addException("a");

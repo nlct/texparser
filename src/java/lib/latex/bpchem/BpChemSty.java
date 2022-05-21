@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -34,6 +34,7 @@ public class BpChemSty extends LaTeXSty
       super(options, "bpchem", listener, loadParentOptions);
    }
 
+   @Override
    public void addDefinitions()
    {
       getListener().newcounter("BPCno");
@@ -61,9 +62,10 @@ public class BpChemSty extends LaTeXSty
       registerControlSequence(new TheBPCnoa());
    }
 
-   protected void preOptions() throws IOException
+   @Override
+   protected void preOptions(TeXObjectList stack) throws IOException
    {
-      getListener().requirepackage(null, "xspace", false);
+      getListener().requirepackage(null, "xspace", false, stack);
    }
 
 }

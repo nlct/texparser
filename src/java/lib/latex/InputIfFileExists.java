@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -35,39 +35,31 @@ public class InputIfFileExists extends ControlSequence
       super(name);
    }
 
+   @Override
    public Object clone()
    {
       return new InputIfFileExists(getName());
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
-      TeXObject arg = stack.popArg(parser);
-
-      if (arg instanceof Expandable)
-      {
-         TeXObjectList expanded = ((Expandable)arg).expandfully(parser, stack);
-
-         if (expanded != null)
-         {
-            arg = expanded;
-         }
-      }
+      String filename = popLabelString(parser, stack);
 
       TeXParserListener listener = parser.getListener();
 
-      TeXObject truePart = stack.popArg(parser);
-      TeXObject falsePart = stack.popArg(parser);
+      TeXObject truePart = popArg(parser, stack);
+      TeXObject falsePart = popArg(parser, stack);
 
-      TeXPath texPath = new TeXPath(parser, arg.toString(parser));
+      TeXPath texPath = new TeXPath(parser, filename);
 
       listener.addFileReference(texPath);
 
       if (texPath.exists())
       {
          truePart.process(parser, stack);
-         listener.input(texPath);
+         listener.input(texPath, stack);
       }
       else
       {
@@ -78,31 +70,21 @@ public class InputIfFileExists extends ControlSequence
    public void process(TeXParser parser)
       throws IOException
    {
-      TeXObject arg = parser.popNextArg();
-
-      if (arg instanceof Expandable)
-      {
-         TeXObjectList expanded = ((Expandable)arg).expandfully(parser);
-
-         if (expanded != null)
-         {
-            arg = expanded;
-         }
-      }
+      String filename = popLabelString(parser, parser);
 
       TeXParserListener listener = parser.getListener();
 
       TeXObject truePart = parser.popNextArg();
       TeXObject falsePart = parser.popNextArg();
 
-      TeXPath texPath = new TeXPath(parser, arg.toString(parser));
+      TeXPath texPath = new TeXPath(parser, filename);
 
       listener.addFileReference(texPath);
 
       if (texPath.exists())
       {
          truePart.process(parser);
-         listener.input(texPath);
+         listener.input(texPath, null);
       }
       else
       {

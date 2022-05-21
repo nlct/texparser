@@ -226,13 +226,14 @@ public class JmlrUtilsSty extends LaTeXSty
 
    }
 
-   protected void postOptions() throws IOException
+   @Override
+   protected void postOptions(TeXObjectList stack) throws IOException
    {
-      getListener().requirepackage(null, "etoolbox", false);
+      getListener().requirepackage(null, "etoolbox", false, stack);
 
       if (supportMaths)
       {
-         getListener().requirepackage(null, "amsmath", false);
+         getListener().requirepackage(null, "amsmath", false, stack);
       }
 
       addDefinitions();

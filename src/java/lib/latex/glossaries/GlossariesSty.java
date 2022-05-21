@@ -133,16 +133,23 @@ public class GlossariesSty extends LaTeXSty
       registerControlSequence(new PrintGlossary(this));
       registerControlSequence(new PrintGlossaries(this));
       registerControlSequence(new TextualContentCommand("glsresetentrylist", ""));
-      registerControlSequence(new AtGobble("glsgroupheading"));
       registerControlSequence(new AtFirstOfOne("glossaryentrynumbers"));
+      registerControlSequence(new GobbleOpt("setentrycounter", 1, 1));
+      registerControlSequence(new AtFirstOfOne("glsnumberformat"));
       registerControlSequence(new TextualContentCommand("glossarytitle", ""));
       registerControlSequence(new TextualContentCommand("glossarytoctitle", ""));
-      registerControlSequence(new TextualContentCommand("glossaryheader", ""));
       registerControlSequence(new TextualContentCommand("glossarypreamble", ""));
       registerControlSequence(new TextualContentCommand("glossarypostamble", ""));
-      registerControlSequence(new DescriptionDec("theglossary"));
-      registerControlSequence(new GlossEntry(this));
-      registerControlSequence(new SubGlossEntry(this));
+
+      if (getParser().getControlSequence("glossentry") == null)
+      {
+         registerControlSequence(new TextualContentCommand("glossaryheader", ""));
+         registerControlSequence(new AtGobble("glsgroupheading"));
+         registerControlSequence(new DescriptionDec("theglossary"));
+         registerControlSequence(new GlossEntry(this));
+         registerControlSequence(new SubGlossEntry(this));
+      }
+
       registerControlSequence(new AtSecondOfTwo("glstarget"));
       registerControlSequence(new AtGobble("glsentryitem"));
       registerControlSequence(new AtGobble("glssubentryitem"));
@@ -180,6 +187,7 @@ public class GlossariesSty extends LaTeXSty
              getListener().getParam(2), new TeXCsRef("fi")}));
 
       NewIf.createConditional(true, getParser(), "ifglsnogroupskip", false);
+      registerControlSequence(new TextualContentCommand("glsgroupskip", ""));
 
       NewIf.createConditional(true, getParser(), "ifglsnopostdot", isExtra());
 
@@ -262,13 +270,13 @@ public class GlossariesSty extends LaTeXSty
    }
 
    @Override
-   protected void preOptions() throws IOException
+   protected void preOptions(TeXObjectList stack) throws IOException
    {
-      getListener().requirepackage(null, "etoolbox", false);
-      getListener().requirepackage(null, "mfirstuc", false);
-      getListener().requirepackage(null, "ifthen", false);
-      getListener().requirepackage(null, "keyval", false);
-      getListener().requirepackage(null, "datatool-base", true);
+      getListener().requirepackage(null, "etoolbox", false, stack);
+      getListener().requirepackage(null, "mfirstuc", false, stack);
+      getListener().requirepackage(null, "ifthen", false, stack);
+      getListener().requirepackage(null, "keyval", false, stack);
+      getListener().requirepackage(null, "datatool-base", true, stack);
 
       if (getParser().getControlSequence("chapter") != null)
       {
@@ -277,9 +285,11 @@ public class GlossariesSty extends LaTeXSty
    }
 
    @Override
-   protected void postOptions() throws IOException
+   protected void postOptions(TeXObjectList stack) throws IOException
    {
-      super.postOptions();
+      super.postOptions(stack);
+
+      TeXObjectList substack = getListener().createStack();
 
       if (createMain)
       {
@@ -293,36 +303,35 @@ public class GlossariesSty extends LaTeXSty
 
       if (loadList)
       {
-         getListener().loadpackage(null, "glossary-list", false, true);
+         getListener().loadpackage(null, "glossary-list", false, true, substack);
 
          loadList = false;
       }
 
       if (loadTree)
       {
-         getListener().loadpackage(null, "glossary-tree", false, true);
+         getListener().loadpackage(null, "glossary-tree", false, true, substack);
 
          loadTree = false;
       }
 
       if (extra)
       {
-         extraPostOptions();
+         extraPostOptions(stack);
       }
 
       if (initialStyle != null)
       {
-         ControlSequence cs = getParser().getControlSequence(
-           "@glsstyle@"+initialStyle);
+         substack.add(new TeXCsRef("@glsstyle@"+initialStyle));
+      }
 
-         if (cs != null)
-         {
-            cs.process(getParser());
-         }
+      if (!substack.isEmpty())
+      {
+         substack.process(getParser(), stack);
       }
    }
 
-   protected void extraPostOptions() throws IOException
+   protected void extraPostOptions(TeXObjectList stack) throws IOException
    {
    }
 
@@ -468,7 +477,7 @@ public class GlossariesSty extends LaTeXSty
    }
 
    // in case both glossaries and glossaries-extra explicitly loaded
-   public void addExtra(String styName, KeyValList extraOptions)
+   public void addExtra(String styName, KeyValList extraOptions, TeXObjectList stack)
     throws IOException
    {
       if (extra)
@@ -492,13 +501,13 @@ public class GlossariesSty extends LaTeXSty
          addOptions(extraOptions);
       }
 
-      extraPostOptions();
+      extraPostOptions(stack);
    }
 
-   public void setup(KeyValList options) throws IOException
+   public void setup(KeyValList options, TeXObjectList stack) throws IOException
    {
       processOptions(options);
-      postOptions();
+      postOptions(stack);
    }
 
    public TeXObject popOptArg(TeXParser parser, TeXObjectList stack)

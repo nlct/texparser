@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013-2022 Nicola L.C. Talbot
+    Copyright (C) 2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -16,62 +16,56 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
-package com.dickimawbooks.texparserlib.latex;
+package com.dickimawbooks.texparserlib.generic;
 
 import java.io.IOException;
 
 import com.dickimawbooks.texparserlib.*;
 
-public class ProcessOptions extends ControlSequence
+public class TeXParserSetUndefAction extends ControlSequence
 {
-   public ProcessOptions()
+   public TeXParserSetUndefAction()
    {
-      this("ProcessOptions");
+      this(-1);
    }
 
-   public ProcessOptions(String name)
+   public TeXParserSetUndefAction(int action)
+   {
+      this("TeXParserSetUndefAction", action);
+   }
+
+   public TeXParserSetUndefAction(String name, int action)
    {
       super(name);
+      this.action = action;
    }
 
    public Object clone()
    {
-      return new ProcessOptions(getName());
+      return new TeXParserSetUndefAction(getName(), action);
    }
 
    public void process(TeXParser parser, TeXObjectList stack)
-     throws IOException
+      throws IOException
    {
-      boolean isStar = false;
-      byte popStyle = TeXObjectList.POP_IGNORE_LEADING_SPACE;
+      byte currentAction = (byte)action;
 
-      TeXObject arg = stack.peekStack(popStyle);
-
-      if (arg instanceof CharObject
-           && ((CharObject)arg).getCharCode() == (int)'*')
+      if (action == -1)
       {
-         if (parser == stack)
-         {
-            arg = parser.popStack(popStyle);
-         }
-         else
-         {
-            arg = stack.popStack(parser, popStyle);
-         }
+         Numerical num = popNumericalArg(parser, stack);
 
-         isStar = true;// not implemented
+         currentAction = (byte)num.number(parser);
       }
 
-      LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
-
-      LaTeXFile sty = listener.getCurrentSty();
-
-      sty.processOptions(stack);
+      ((DefaultTeXParserListener)parser.getListener()).setUndefinedAction(currentAction);
    }
 
    public void process(TeXParser parser)
-     throws IOException
+      throws IOException
    {
       process(parser, parser);
    }
+
+   private int action=-1;
 }
+

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -41,89 +41,29 @@ public class LoadSelectedProblems extends ControlSequence
       return new LoadSelectedProblems(getName(), sty);
    }
 
+   @Override
    public void process(TeXParser parser)
      throws IOException
    {
       process(parser, parser);
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      TeXObject optArg = (stack==parser? parser.popNextArg('[', ']') 
-        : stack.popArg(parser, '[', ']'));
+      String dbName = popOptLabelString(parser, stack);
 
-      String dbName = "default";
-
-      if (optArg != null)
+      if (dbName == null)
       {
-         if (optArg instanceof Expandable)
-         {
-            TeXObjectList expanded = null;
-
-            if (stack == parser)
-            {
-               expanded = ((Expandable)optArg).expandfully(parser);
-            }
-            else
-            {
-               expanded = ((Expandable)optArg).expandfully(parser, stack);
-            }
-
-            if (expanded != null)
-            {
-               optArg = expanded;
-            }
-         }
-
-         dbName = optArg.toString(parser);
+         dbName = "default";
       }
 
-      TeXObject labelList = (stack==parser? parser.popNextArg()
-        : stack.popArg(parser));
-
-      if (labelList instanceof Expandable)
-      {
-         TeXObjectList expanded = null;
-
-         if (stack == parser)
-         {
-            expanded = ((Expandable)labelList).expandfully(parser);
-         }
-         else
-         {
-            expanded = ((Expandable)labelList).expandfully(parser, stack);
-         }
-
-         if (expanded != null)
-         {
-            labelList = expanded;
-         }
-      }
+      TeXObject labelList = popArgExpandFully(parser, stack);
 
       CsvList csvList = CsvList.getList(parser, labelList);
 
-      TeXObject fileName = (stack==parser? parser.popNextArg()
-        : stack.popArg(parser));
-
-      if (fileName instanceof Expandable)
-      {
-         TeXObjectList expanded = null;
-
-         if (stack == parser)
-         {
-            expanded = ((Expandable)fileName).expandfully(parser);
-         }
-         else
-         {
-            expanded = ((Expandable)fileName).expandfully(parser, stack);
-         }
-
-         if (expanded != null)
-         {
-            fileName = expanded;
-         }
-      }
+      String fileName = popLabelString(parser, stack);
 
       parser.startGroup();
 
@@ -133,8 +73,7 @@ public class LoadSelectedProblems extends ControlSequence
         new GenericCommand(true, "prob@currentdb", null,
            parser.getListener().createString(tmpDb.getName())));
 
-      parser.getListener().input(new TeXPath(parser, 
-        fileName.toString(parser)));
+      parser.getListener().input(new TeXPath(parser, fileName), stack);
 
       parser.putControlSequence(true,// local
         new GenericCommand(true, "prob@currentdb", null,

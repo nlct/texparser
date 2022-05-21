@@ -49,55 +49,10 @@ public class UsePackage extends ControlSequence
    public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      TeXObject options;
-      TeXObject sty;
+      TeXObject options = popOptArg(parser, stack);
+      String styNameList = popLabelString(parser, stack);
 
-      if (parser == stack)
-      {
-         options = parser.popNextArg('[', ']');
-         sty = parser.popNextArg();
-      }
-      else
-      {
-         options = stack.popArg(parser, '[', ']');
-         sty = stack.popArg(parser);
-      }
-
-      TeXObjectList expanded = null;
-
-      if (sty instanceof Expandable)
-      {
-         if (parser == stack)
-         {
-            expanded = ((Expandable)sty).expandfully(parser);
-         }
-         else
-         {
-            expanded = ((Expandable)sty).expandfully(parser, stack);
-         }
-      }
-
-      String styNameList;
-
-      if (expanded == null)
-      {
-         styNameList = sty.toString(parser);
-      }
-      else
-      {
-         styNameList = expanded.toString(parser);
-      }
-
-      TeXObject version;
-
-      if (parser == stack)
-      {
-         version = parser.popNextArg('[', ']');
-      }
-      else
-      {
-         version = stack.popArg(parser, '[', ']');
-      }
+      TeXObject version = popOptArg(parser, stack);
 
       KeyValList keyValList = null;
 
@@ -121,7 +76,7 @@ public class UsePackage extends ControlSequence
             styName = "MnSymbol";
          }
 
-         listener.usepackage(keyValList, split[i].trim(), loadParentOptions);
+         listener.usepackage(keyValList, split[i].trim(), loadParentOptions, stack);
       }
    }
 

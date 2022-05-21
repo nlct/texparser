@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -33,12 +33,14 @@ public class JmlrBookCls extends JmlrCls
       super(options, "jmlrbook", listener, loadParentOptions);
    }
 
-   protected void preOptions() throws IOException
+   @Override
+   protected void preOptions(TeXObjectList stack) throws IOException
    {
-      getListener().requirepackage("setspace");
-      super.preOptions();
+      getListener().requirepackage("setspace", stack);
+      super.preOptions(stack);
    }
 
+   @Override
    public void addDefinitions()
    {
       super.addDefinitions();

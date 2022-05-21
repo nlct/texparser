@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -83,6 +83,7 @@ public class LaTeX2LaTeX extends LaTeXParserListener
       return replaceGraphicsPath;
    }
 
+   @Override
    protected void addPredefined()
    {
       super.addPredefined();
@@ -122,11 +123,13 @@ public class LaTeX2LaTeX extends LaTeXParserListener
       putControlSequence(new Input("include"));
    }
 
+   @Override
    protected void addMathFontCommand(String name, int style)
    {
       parser.putControlSequence(new L2LMathFontCommand(name, style));
    }
 
+   @Override
    public ControlSequence getControlSequence(String name)
    {
       if (isSkipCmd(name))
@@ -142,111 +145,133 @@ public class LaTeX2LaTeX extends LaTeXParserListener
       return new L2LControlSequence(name);
    }
 
+   @Override
    public ControlSequence createUndefinedCs(String name)
    {
       return new L2LControlSequence(name);
    }
 
+   @Override
    public Comment createComment()
    {
       return new L2LComment();
    }
 
+   @Override
    public SkippedSpaces createSkippedSpaces()
    {
       return new L2LSkippedSpaces();
    }
 
+   @Override
    public SkippedEols createSkippedEols()
    {
       return new L2LSkippedEols();
    }
 
+   @Override
    public Eol getEol()
    {
       return new L2LEol();
    }
 
+   @Override
    public Space getSpace()
    {
       return new L2LSpace();
    }
 
+   @Override
    public ActiveChar getActiveChar(int charCode)
    {
       return new L2LActiveChar(charCode);
    }
 
+   @Override
    public Param getParam(int digit)
    {
       return new L2LParam(digit);
    }
 
+   @Override
    public DoubleParam getDoubleParam(ParameterToken param)
    {
       return new L2LDoubleParam(param);
    }
 
+   @Override
    public Other getOther(int charCode)
    {
       return new L2LOther(charCode);
    }
 
+   @Override
    public Par getPar()
    {
       return new L2LPar();
    }
 
+   @Override
    public Tab getTab()
    {
       return new L2LTab();
    }
 
+   @Override
    public BigOperator createBigOperator(String name, int code1, int code2)
    {
       return new L2LBigOperator(name, code1, code2);
    }
 
+   @Override
    public Symbol createSymbol(String name, int code)
    {
       return new L2LSymbol(name, code);
    }
 
+   @Override
    public ControlSequence createSymbol(String name, int code, FontEncoding enc)
    {
       return new L2LSymbol(name, code);
    }
 
+   @Override
    public GreekSymbol createGreekSymbol(String name, int code)
    {
       return new L2LGreekSymbol(name, code);
    }
 
+   @Override
    public BinarySymbol createBinarySymbol(String name, int code)
    {
       return new L2LBinarySymbol(name, code);
    }
 
+   @Override
    public MathSymbol createMathSymbol(String name, int code)
    {
       return new L2LMathSymbol(name, code);
    }
 
+   @Override
    public Group createGroup()
    {
       return new L2LGroup();
    }
 
+   @Override
    public Group createGroup(String text)
    {
       return new L2LGroup(this, text);
    }
 
+   @Override
    public MathGroup createMathGroup()
    {
       return new L2LMathGroup();
    }
 
+   @Override
    public void beginDocument()
      throws IOException
    {
@@ -259,6 +284,7 @@ public class LaTeX2LaTeX extends LaTeXParserListener
       writeCodePoint(parser.getEgChar());
    }
 
+   @Override
    public void endDocument()
      throws IOException
    {
@@ -283,8 +309,9 @@ public class LaTeX2LaTeX extends LaTeXParserListener
       }
    }
 
+   @Override
    public void documentclass(KeyValList options, String clsName, 
-     boolean loadParentOptions)
+     boolean loadParentOptions, TeXObjectList stack)
      throws IOException
    {
       if (docCls != null)
@@ -312,11 +339,12 @@ public class LaTeX2LaTeX extends LaTeXParserListener
       writeCodePoint(parser.getEgChar());
    }
 
+   @Override
    public LaTeXSty requirepackage(KeyValList options, String styName, 
-     boolean loadParentOptions)
+     boolean loadParentOptions, TeXObjectList stack)
      throws IOException
    {
-      LaTeXSty sty = getLaTeXSty(options, styName, loadParentOptions);;
+      LaTeXSty sty = getLaTeXSty(options, styName, loadParentOptions, stack);
       addFileReference(sty);
       loadedPackages.add(sty);
 
@@ -337,8 +365,9 @@ public class LaTeX2LaTeX extends LaTeXParserListener
       return sty;
    }
 
+   @Override
    public LaTeXSty usepackage(KeyValList options, String styName, 
-     boolean loadParentOptions)
+     boolean loadParentOptions, TeXObjectList stack)
      throws IOException
    {
       if (isStyLoaded(styName))
@@ -376,7 +405,7 @@ public class LaTeX2LaTeX extends LaTeXParserListener
          graphicsSty.registerControlSequence(new IncludeGraphics(graphicsSty));
       }
 
-      LaTeXSty sty = getLaTeXSty(options, styName, loadParentOptions);;
+      LaTeXSty sty = getLaTeXSty(options, styName, loadParentOptions, stack);
       addFileReference(sty);
       loadedPackages.add(sty);
 
@@ -427,6 +456,7 @@ public class LaTeX2LaTeX extends LaTeXParserListener
       return sty;
    }
 
+   @Override
    public void substituting(String original, String replacement)
      throws IOException
    {
@@ -506,6 +536,7 @@ public class LaTeX2LaTeX extends LaTeXParserListener
       return null;
    }
 
+   @Override
    public void includegraphics(KeyValList options, String imgName)
      throws IOException
    {
@@ -654,6 +685,7 @@ public class LaTeX2LaTeX extends LaTeXParserListener
       }
    }
 
+   @Override
    public void writeCodePoint(int charCode) throws IOException
    {
       if (writer != null)
@@ -676,6 +708,7 @@ public class LaTeX2LaTeX extends LaTeXParserListener
       }
    }
 
+   @Override
    public void write(char c) throws IOException
    {
       if (writer != null)
@@ -688,6 +721,7 @@ public class LaTeX2LaTeX extends LaTeXParserListener
       }
    }
 
+   @Override
    public void write(String string) throws IOException
    {
       if (writer != null)
@@ -700,6 +734,7 @@ public class LaTeX2LaTeX extends LaTeXParserListener
       }
    }
 
+   @Override
    public void writeln(String string) throws IOException
    {
       if (writer != null)
@@ -736,6 +771,7 @@ public class LaTeX2LaTeX extends LaTeXParserListener
       }
    }
 
+   @Override
    public void overwithdelims(TeXObject firstDelim,
      TeXObject secondDelim, TeXObject before, TeXObject after)
     throws IOException
@@ -810,6 +846,7 @@ public class LaTeX2LaTeX extends LaTeXParserListener
       }
    }
 
+   @Override
    public void abovewithdelims(TeXObject firstDelim,
      TeXObject secondDelim, TeXDimension thickness, 
      TeXObject before, TeXObject after)
@@ -880,12 +917,14 @@ public class LaTeX2LaTeX extends LaTeXParserListener
       }
    }
 
+   @Override
    public void skipping(Ignoreable ignoreable)
      throws IOException
    {
       write(ignoreable.toString(getParser()));
    }
 
+   @Override
    public void subscript(TeXObject arg)
      throws IOException
    {
@@ -895,6 +934,7 @@ public class LaTeX2LaTeX extends LaTeXParserListener
       writeCodePoint(parser.getEgChar());
    }
 
+   @Override
    public void superscript(TeXObject arg)
      throws IOException
    {
@@ -904,6 +944,7 @@ public class LaTeX2LaTeX extends LaTeXParserListener
       writeCodePoint(parser.getEgChar());
    }
 
+   @Override
    public TeXApp getTeXApp()
    {
       return texApp;
@@ -929,6 +970,7 @@ public class LaTeX2LaTeX extends LaTeXParserListener
       return false;
    }
 
+   @Override
    public void beginParse(File file, Charset encoding)
      throws IOException
    {
@@ -971,6 +1013,7 @@ public class LaTeX2LaTeX extends LaTeXParserListener
       return inFile.getName();
    }
 
+   @Override
    public void endParse(File file)
     throws IOException
    {
@@ -989,6 +1032,7 @@ public class LaTeX2LaTeX extends LaTeXParserListener
       }
    }
 
+   @Override
    public void href(String url, TeXObject text)
     throws IOException
    {
@@ -1005,6 +1049,7 @@ public class LaTeX2LaTeX extends LaTeXParserListener
       writeCodePoint(eg);
    }
 
+   @Override
    public void verb(String name, boolean isStar, int delim, String text)
      throws IOException
    {
@@ -1025,6 +1070,7 @@ public class LaTeX2LaTeX extends LaTeXParserListener
       writeCodePoint(delim);
    }
 
+   @Override
    public void newcommand(byte overwrite,
      String type, String csName, boolean isShort,
      int numParams, TeXObject defValue, TeXObject definition)

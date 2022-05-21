@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2018 Nicola L.C. Talbot
+    Copyright (C) 2018-2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -34,6 +34,7 @@ public class MfirstucSty extends LaTeXSty
       super(options, "mfirstuc", listener, loadParentOptions);
    }
 
+   @Override
    public void addDefinitions()
    {
       LaTeXParserListener listener = getListener();

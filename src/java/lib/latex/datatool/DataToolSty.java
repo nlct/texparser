@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -37,6 +37,7 @@ public class DataToolSty extends LaTeXSty
       super(options, "datatool", listener, loadParentOptions);
    }
 
+   @Override
    public void addDefinitions()
    {
       registerControlSequence(new DTLifDbExists(this));
@@ -80,12 +81,13 @@ public class DataToolSty extends LaTeXSty
         new UserNumber(DataToolHeader.TYPE_CURRENCY)));
    }
 
-   protected void preOptions() throws IOException
+   @Override
+   protected void preOptions(TeXObjectList stack) throws IOException
    {
-      getListener().requirepackage(null, "etoolbox", false);
+      getListener().requirepackage(null, "etoolbox", false, stack);
 
       dataToolBaseSty = (DataToolBaseSty)getListener().requirepackage(
-         null, "datatool-base", true);
+         null, "datatool-base", true, stack);
    }
 
    public static String getContentsRegisterName(String dbName)

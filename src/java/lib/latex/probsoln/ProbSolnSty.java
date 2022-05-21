@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -60,6 +60,7 @@ public class ProbSolnSty extends LaTeXSty
       random = new Random();
    }
 
+   @Override
    public void addDefinitions()
    {
       registerControlSequence(new DefProblem(this));
@@ -108,6 +109,7 @@ public class ProbSolnSty extends LaTeXSty
 
    }
 
+   @Override
    public void processOption(String option, TeXObject value)
     throws IOException
    {
@@ -141,7 +143,8 @@ public class ProbSolnSty extends LaTeXSty
       return getListener().isIfTrue(cs);
    }
 
-   protected void preOptions()
+   @Override
+   protected void preOptions(TeXObjectList stack)
      throws IOException
    {
       NewIf.createConditional(true, getListener().getParser(),

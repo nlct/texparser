@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -97,7 +97,7 @@ public class Input extends ControlSequence
 
       listener.addFileReference(texPath);
 
-      listener.input(texPath);
+      listener.input(texPath, stack);
    }
 
    public void process(TeXParser parser)
@@ -114,6 +114,6 @@ public class Input extends ControlSequence
 
       listener.addFileReference(texPath);
 
-      listener.input(texPath);
+      listener.input(texPath, null);
    }
 }

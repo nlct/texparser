@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -32,6 +32,7 @@ public class NatbibSty extends LaTeXSty
       super(options, "natbib", listener, loadParentOptions);
    }
 
+   @Override
    public void addDefinitions()
    {
       registerControlSequence(new Citep(this));
@@ -47,6 +48,7 @@ public class NatbibSty extends LaTeXSty
       }
    }
 
+   @Override
    public void processOption(String option, TeXObject value)
     throws IOException
    {

@@ -31,11 +31,22 @@ public class TeXObjectList extends Vector<TeXObject>
    public TeXObjectList()
    {
       super();
+      assignStackID();
    }
 
    public TeXObjectList(int capacity)
    {
       super(capacity);
+      assignStackID();
+   }
+
+   private void assignStackID()
+   {
+      if (isStack())
+      {
+         stackID = currentStackID;
+         currentStackID++;
+      }
    }
 
    public TeXObjectList(TeXParserListener listener, String text)
@@ -494,6 +505,58 @@ public class TeXObjectList extends Vector<TeXObject>
 
       throw new TeXSyntaxException(parser,
                TeXSyntaxException.ERROR_MISSING_UNIT);
+   }
+
+   public InternalQuantity popInternalQuantity(TeXParser parser)
+     throws IOException
+   {
+      TeXObject object = popToken(POP_IGNORE_LEADING_SPACE);
+
+      if (object == null)
+      {
+         throw new TeXSyntaxException(parser,
+            TeXSyntaxException.ERROR_INTERNAL_QUANTITY_EXPECTED);
+      }
+
+      if (object instanceof TeXCsRef)
+      {
+         object = parser.getListener().getControlSequence(
+          ((TeXCsRef)object).getName());
+      }
+
+      if (object instanceof InternalQuantity)
+      {
+         return (InternalQuantity)object;
+      }
+
+      if (object instanceof Expandable)
+      {
+         TeXObjectList expanded;
+
+         if (this == parser)
+         {
+            expanded = ((Expandable)object).expandfully(parser);
+         }
+         else
+         {
+            expanded = ((Expandable)object).expandfully(parser,this);
+         }
+
+         if (expanded != null)
+         {
+            addAll(0, expanded);
+            object = popToken(POP_IGNORE_LEADING_SPACE);
+
+            if (object instanceof InternalQuantity)
+            {
+               return (InternalQuantity)object;
+            }
+         }
+      }
+
+      throw new TeXSyntaxException(parser,
+         TeXSyntaxException.ERROR_INTERNAL_QUANTITY_EXPECTED_BUT_FOUND,
+          object.toString(parser));
    }
 
    public Register popRegister(TeXParser parser)
@@ -1684,9 +1747,19 @@ public class TeXObjectList extends Vector<TeXObject>
    public void process(TeXParser parser)
       throws IOException
    {
+      if (parser.getDebugLevel() > 0)
+      {
+         parser.logMessage("PROCESSING STACK "+toString());
+      }
+
       while (size() > 0)
       {
          TeXObject object = remove(0);
+
+         if (parser.getDebugLevel() > 0)
+         {
+            parser.logMessage("POPPED "+object);
+         }
 
          if (object instanceof TeXCsRef)
          {
@@ -1701,6 +1774,11 @@ public class TeXObjectList extends Vector<TeXObject>
 
          if (!(object instanceof Ignoreable))
          {
+            if (parser.getDebugLevel() > 0)
+            {
+               parser.logMessage("PROCESSING "+object);
+            }
+
             object.process(parser, this);
          }
       }
@@ -1709,6 +1787,11 @@ public class TeXObjectList extends Vector<TeXObject>
    public void process(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
+      if (parser.getDebugLevel() > 0)
+      {
+         parser.logMessage("PROCESSING STACK "+toString()+" SUBSTACK: "+stack);
+      }
+
       StackMarker marker = null;
 
       if (stack != parser && stack != null)
@@ -1723,6 +1806,11 @@ public class TeXObjectList extends Vector<TeXObject>
       while (size() > 0)
       {
          TeXObject object = remove(0);
+
+         if (parser.getDebugLevel() > 0)
+         {
+            parser.logMessage("POPPED "+object);
+         }
 
          if (object.equals(marker))
          {
@@ -1742,6 +1830,11 @@ public class TeXObjectList extends Vector<TeXObject>
 
          if (!(object instanceof Ignoreable))
          {
+            if (parser.getDebugLevel() > 0)
+            {
+               parser.logMessage("PROCESSING "+object);
+            }
+
             object.process(parser, this);
          }
       }
@@ -1756,6 +1849,14 @@ public class TeXObjectList extends Vector<TeXObject>
    public String toString()
    {
       StringBuilder builder = new StringBuilder();
+
+      builder.append(getClass().getSimpleName());
+
+      if (stackID >= 0)
+      {
+         builder.append("#"+stackID);
+      }
+
       builder.append('[');
 
       for (int i = 0, n = size(); i < n; i++)
@@ -2024,6 +2125,9 @@ public class TeXObjectList extends Vector<TeXObject>
 
    private ArrayDeque<Declaration> declarations
      = new ArrayDeque<Declaration>();
+
+   private long stackID = -1;
+   private static long currentStackID=0;
 
    public static byte POP_SHORT=1;
    public static byte POP_RETAIN_IGNOREABLES=2;

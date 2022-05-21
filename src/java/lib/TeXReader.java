@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -249,10 +249,12 @@ public class TeXReader implements Readable,Closeable
       this.parent = parentReader;
    }
 
+   @Override
    public String toString()
    {
-      return "TeXReader[reader:"+reader+",source:"+source
-       +",parent="+parent+"]";
+      return String.format("%s[source=%s,pending=%s,isOpen=%s,eofFound=%s,parent=%s]", 
+        getClass().getSimpleName(), source, pending, isOpen, eofFound,
+         parent == null ? null : parent.source);
    }
 
    public void setPending(TeXObjectList pending)

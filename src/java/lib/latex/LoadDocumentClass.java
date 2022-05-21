@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -34,15 +34,17 @@ public class LoadDocumentClass extends DocumentClass
       super(name, loadParentOptions);
    }
 
+   @Override
    public Object clone()
    {
       return new LoadDocumentClass(getName(), loadParentOptions);
    }
 
+   @Override
    protected void loadDocumentClass(LaTeXParserListener listener, 
-     KeyValList options, String clsName)
+     KeyValList options, String clsName, TeXObjectList stack)
     throws IOException
    {
-      listener.loadclass(options, clsName, loadParentOptions);
+      listener.loadclass(options, clsName, loadParentOptions, stack);
    }
 }

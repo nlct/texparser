@@ -20,7 +20,7 @@ package com.dickimawbooks.texparserlib;
 
 import java.io.IOException;
 
-public abstract class Register extends ControlSequence
+public abstract class Register extends ControlSequence implements InternalQuantity
 {
    public Register(String name)
    {
@@ -36,6 +36,12 @@ public abstract class Register extends ControlSequence
    public int getAllocation()
    {
       return allocation;
+   }
+
+   public TeXObject getQuantity(TeXParser parser, TeXObjectList stack)
+    throws IOException
+   {
+      return (TeXObject)getContents(parser).clone();
    }
 
    public abstract TeXObject getContents(TeXParser parser)

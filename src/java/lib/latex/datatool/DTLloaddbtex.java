@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -35,11 +35,13 @@ public class DTLloaddbtex extends ControlSequence
       super(name);
    }
 
+   @Override
    public Object clone()
    {
       return new DTLloaddbtex(getName());
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
@@ -108,15 +110,16 @@ public class DTLloaddbtex extends ControlSequence
       stack.push(csArg);
       stack.push(new TeXCsRef("let"));
 
-      if (!listener.input(texPath))
+      listener.addFileReference(texPath);
+
+      if (!listener.input(texPath, stack))
       {
          throw new TeXSyntaxException(parser, 
            TeXSyntaxException.ERROR_FILE_NOT_FOUND, texPath);
       }
-
-      listener.addFileReference(texPath);
    }
 
+   @Override
    public void process(TeXParser parser)
      throws IOException
    {

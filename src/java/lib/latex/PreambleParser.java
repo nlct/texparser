@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -56,6 +56,7 @@ public class PreambleParser extends LaTeXParserListener
       setUndefinedAction(undefAction);
    }
 
+   @Override
    public TeXApp getTeXApp()
    {
       return texApp;
@@ -97,10 +98,10 @@ public class PreambleParser extends LaTeXParserListener
       PreambleParser listener = new PreambleParser(app)
       {
          public void documentclass(KeyValList options, String clsName, 
-            boolean loadParentOptions)
+            boolean loadParentOptions, TeXObjectList stack)
             throws IOException
          {
-            super.documentclass(options, clsName, loadParentOptions);
+            super.documentclass(options, clsName, loadParentOptions, stack);
             throw new EOFException();
          }
       };
@@ -111,11 +112,13 @@ public class PreambleParser extends LaTeXParserListener
       return listener.getDocumentClass();
    }
 
+   @Override
    public Writeable getWriteable()
    {
       return this;
    }
 
+   @Override
    public void write(String text)
      throws IOException
    {
@@ -126,22 +129,26 @@ public class PreambleParser extends LaTeXParserListener
    {
    }
 
+   @Override
    public void write(char c)
      throws IOException
    {
    }
 
+   @Override
    public void writeCodePoint(int codePoint)
      throws IOException
    {
    }
 
+   @Override
    public void overwithdelims(TeXObject firstDelim,
      TeXObject secondDelim, TeXObject before, TeXObject after)
     throws IOException
    {
    }
 
+   @Override
    public void abovewithdelims(TeXObject firstDelim,
      TeXObject secondDelim, TeXDimension thickness, TeXObject before, 
      TeXObject after)
@@ -149,43 +156,51 @@ public class PreambleParser extends LaTeXParserListener
    {
    }
 
+   @Override
    public void skipping(Ignoreable ignoreable)
       throws IOException
    {
    }
 
+   @Override
    public void substituting(String original, String replacement)
    {
       texApp.substituting(parser, original, replacement);
    }
 
+   @Override
    public void href(String url, TeXObject text)
       throws IOException
    {
    }
 
+   @Override
    public void includegraphics( 
      KeyValList options, String imgName)
      throws IOException
    {
    }
 
+   @Override
    public void subscript(TeXObject arg)
      throws IOException
    {
    }
 
+   @Override
    public void superscript(TeXObject arg)
      throws IOException
    {
    }
 
+   @Override
    public void endParse(File file)
       throws IOException
    {
       this.file = null;
    }
 
+   @Override
    public void beginParse(File file, Charset encoding)
       throws IOException
    {
@@ -197,6 +212,7 @@ public class PreambleParser extends LaTeXParserListener
       return file;
    }
 
+   @Override
    public void beginDocument()
      throws IOException
    {

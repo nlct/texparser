@@ -177,7 +177,7 @@ public abstract class TeXParserListener
     throws IOException;
 
    // Returns true if the path is processed
-   public abstract boolean input(TeXPath path)
+   public abstract boolean input(TeXPath path, TeXObjectList stack)
     throws IOException;
 
    public abstract Charset getCharSet();

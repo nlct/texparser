@@ -58,6 +58,7 @@ public class TeXParser extends TeXObjectList
    {
    }
 
+   @Override
    public TeXObjectList createList()
    {
       return new TeXParser(listener);
@@ -181,6 +182,65 @@ public class TeXParser extends TeXObjectList
 
    }
 
+   public int getDebugLevel()
+   {
+      return debugLevel;
+   }
+
+   public void setDebugLevel(int level)
+   {
+      debugLevel = level;
+   }
+
+   public void setDebugLevel(int level, PrintWriter writer)
+   {
+      debugLevel = level;
+      logWriter = writer;
+   }
+
+   public void debugMessage(int level, String msg)
+   {
+      if (level >= debugLevel)
+      {
+         logMessage(msg);
+      }
+   }
+
+   public void logMessage(String msg)
+   {
+      File file = getCurrentFile();
+
+      String tag = "";
+
+      if (file != null)
+      {
+         tag = file.getName();
+
+         int lineNum = getLineNumber();
+
+         if (lineNum > 0)
+         {
+            tag += ":"+lineNum;
+         }
+
+         tag += ": ";
+      }
+
+      if (logWriter == null)
+      {
+         System.out.println(tag+msg);
+      }
+      else
+      {
+         logWriter.println(tag+msg);
+      }
+   }
+
+   public void setLogWriter(PrintWriter writer)
+   {
+      logWriter = writer;
+   }
+
    public boolean isActive(int c)
    {
       // check if in the active map
@@ -282,6 +342,11 @@ public class TeXParser extends TeXObjectList
 
       if (c == -1)
       {
+         if (debugLevel > 0)
+         {
+            logMessage("EOF "+reader);
+         }
+
          TeXReader parentReader = reader.getParent();
 
          if (parentReader == null)
@@ -300,14 +365,17 @@ public class TeXParser extends TeXObjectList
 
          reader = parentReader;
 
+         if (debugLevel > 0)
+         {
+            logMessage("READER: "+reader);
+         }
+
          TeXObjectList pending = reader.getPending();
 
          if (pending != null)
          {
-            while (pending.size() > 0)
-            {
-               add(pending.remove(0));
-            }
+            addAll(pending);
+            pending.clear();
 
             reader.setPending(null);
          }
@@ -330,6 +398,11 @@ public class TeXParser extends TeXObjectList
 
    public void terminate()
    {
+      if (debugLevel > 0)
+      {
+         logMessage("TERMINATE closing all open readers");
+      }
+
       reader.closeAll(listener.getTeXApp());
    }
 
@@ -367,13 +440,18 @@ public class TeXParser extends TeXObjectList
       {
          if (size() > 0)
          {
-            pending = new TeXObjectList();
+            pending = getListener().createStack();
             pending.addAll(this);
             clear();
          }
 
          otherReader.setParent(reader);
          reader = otherReader;
+
+         if (debugLevel > 0)
+         {
+            logMessage("READLINE switch to "+otherReader+" PENDING: "+pending);
+         }
 
          TeXObject obj = pop();
 
@@ -406,9 +484,15 @@ public class TeXParser extends TeXObjectList
          reader = orgReader;
          otherReader.setParent(orgParent);
 
+         if (debugLevel > 0)
+         {
+            logMessage("READLINE switching back to "+reader+" PENDING: "+pending);
+         }
+
          if (pending != null)
          {
             addAll(0, pending);
+            pending.clear();
          }
       }
 
@@ -1744,21 +1828,37 @@ public class TeXParser extends TeXObjectList
 
          TeXObjectList pending = null;
 
+         if (this.reader != null)
+         {
+            pending = this.reader.getPending();
+         }
+
          if (size() > 0)
          {
-            pending = new TeXObjectList(size());
-
-            while (size() > 0)
+            if (pending == null)
             {
-               pending.add(remove(0));
+               pending = new TeXObjectList(size());
             }
+
+            pending.addAll(this);
+            clear();
 
             this.reader.setPending(pending);
             pending = null;
          }
 
+         if (debugLevel > 0)
+         {
+            logMessage("PARSE switching from "+this.reader + " to "+reader);
+         }
+
          reader.setParent(this.reader);
          this.reader = reader;
+      }
+
+      if (debugLevel > 0)
+      {
+         logMessage("PARSE setting mode: "+mode);
       }
 
       settings.setMode(mode);
@@ -1772,9 +1872,19 @@ public class TeXParser extends TeXObjectList
                break;
             }
 
+            if (debugLevel > 0)
+            {
+               logMessage("PARSE FETCH NEXT "+toString());
+            }
+
             while (size() > 0)
             {
                TeXObject object = pop();
+
+               if (debugLevel > 1)
+               {
+                  logMessage("PARSE POPPED "+object);
+               }
 
                try
                {
@@ -1782,9 +1892,27 @@ public class TeXParser extends TeXObjectList
                }
                catch (EOFException e)
                {
+                  TeXObjectList pending = reader.getPending();
+
+                  if (pending != null)
+                  {
+                     if (debugLevel > 0)
+                     {
+                        logMessage("PARSE EOF processing pending for reader: "+reader);
+                     }
+
+                     pending.process(this);
+                  }
+
                   if (this.reader == reader)
                   {
                      this.reader = reader.getParent();
+
+                     if (debugLevel > 0)
+                     {
+                        logMessage("PARSE EOF switching from child "+ reader
+                          + " to parent "+this.reader);
+                     }
                   }
                   else
                   {
@@ -1794,6 +1922,11 @@ public class TeXParser extends TeXObjectList
                catch (TeXSyntaxException e)
                {
                   listener.getTeXApp().error(e);
+
+                  if (debugLevel > 0)
+                  {
+                     logMessage("PARSE ERROR" + e.getMessage());
+                  }
                }
             }
          }
@@ -1803,9 +1936,39 @@ public class TeXParser extends TeXObjectList
          if (this.reader == reader)
          {
             this.reader = reader.getParent();
+
+            if (debugLevel > 0)
+            {
+               logMessage("PARSE EOF switching from "+reader+" to "+this.reader);
+            }
          }
       }
 
+   }
+
+   @Override
+   public void process(TeXParser parser)
+      throws IOException
+   {
+      if (debugLevel > 0)
+      {
+         logMessage("PROCESS "+toString());
+      }
+   }
+
+   @Override
+   public void process(TeXParser parser, TeXObjectList stack)
+      throws IOException
+   {
+      if (debugLevel > 0)
+      {
+         logMessage("PROCESS "+toString()+" SUBSTACK: "+stack);
+      }
+
+      if (stack != null && stack != this)
+      {
+         push(stack, true);
+      }
    }
 
    public void parse(File file)
@@ -1815,6 +1978,12 @@ public class TeXParser extends TeXObjectList
    }
 
    public void parse(File file, Charset charset)
+     throws IOException
+   {
+      parse(file, charset, null);
+   }
+
+   public void parse(File file, Charset charset, TeXObjectList stack)
      throws IOException
    {
       if (!getListener().getTeXApp().isReadAccessAllowed(file))
@@ -1841,7 +2010,14 @@ public class TeXParser extends TeXObjectList
       {
          listener.beginParse(file, charset);
 
-         parse(new TeXReader(this.reader, file, charset));
+         TeXReader nextReader = new TeXReader(this.reader, file, charset);
+
+         if (stack != null && stack != this && !stack.isEmpty())
+         {
+            nextReader.setPending(stack);
+         }
+
+         parse(nextReader);
       }
       catch (EOFException e)
       {
@@ -1865,6 +2041,12 @@ public class TeXParser extends TeXObjectList
    }
 
    public void parse(TeXPath path, Charset charset)
+     throws IOException
+   {
+      parse(path, charset, null);
+   }
+
+   public void parse(TeXPath path, Charset charset, TeXObjectList stack)
      throws IOException
    {
       if (!getListener().getTeXApp().isReadAccessAllowed(path))
@@ -1893,7 +2075,14 @@ public class TeXParser extends TeXObjectList
       {
          listener.beginParse(file, charset);
 
-         parse(new TeXReader(this.reader, file, charset));
+         TeXReader nextReader = new TeXReader(this.reader, file, charset);
+
+         if (stack != null && stack != this && !stack.isEmpty())
+         {
+            nextReader.setPending(stack);
+         }
+
+         parse(nextReader);
       }
       catch (EOFException e)
       {
@@ -2888,6 +3077,10 @@ public class TeXParser extends TeXObjectList
    private Vector<String> verbatim;
 
    private String jobname = null;
+
+   private int debugLevel = 0;
+
+   private PrintWriter logWriter = null;
 
    public static final String VERSION = "0.9.2.6b";
    public static final String VERSION_DATE = "2021-11-11";

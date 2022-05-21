@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -179,10 +179,10 @@ public abstract class Macro implements TeXObject
       return false;
    }
 
-   // pops a token but only if it's a CharObject and matches the
-   // given char code. Returns true if token was popped.
-   protected boolean popModifier(int charCode,
-      TeXParser parser, TeXObjectList stack)
+   // pops a token but only if it's a CharObject and matches one of the
+   // given char code. Returns the char code if token was popped
+   // otherwise -1.
+   protected int popModifier(TeXParser parser, TeXObjectList stack, int... charCodes)
    throws IOException
    {
       TeXObject object;
@@ -196,22 +196,35 @@ public abstract class Macro implements TeXObject
          object = stack.peekStack();
       }
 
-      if (object instanceof CharObject 
-           && ((CharObject)object).getCharCode() == charCode)
+      int found = -1;
+
+      if (object instanceof CharObject)
       {
-         if (parser == stack || stack == null)
+         int cp = ((CharObject)object).getCharCode();
+
+         for (int mod : charCodes)
          {
-            parser.popStack();
-         }
-         else
-         {
-            stack.popStack(parser);
+            if (cp == mod)
+            {
+               found = mod;
+               break;
+            }
          }
 
-         return true;
+         if (found != -1)
+         {
+            if (parser == stack || stack == null)
+            {
+               parser.popStack();
+            }
+            else
+            {
+               stack.popStack(parser);
+            }
+         }
       }
 
-      return false;
+      return found;
    }
 
    // pops an argument that should be a label that needs to be fully
@@ -264,6 +277,42 @@ public abstract class Macro implements TeXObject
       {
          return stack.popArg(parser, '[', ']');
       }
+   }
+
+   // pops an argument and then fully expands it
+   protected TeXObject popArgExpandFully(TeXParser parser, TeXObjectList stack)
+    throws IOException
+   {
+      TeXObject arg = popArg(parser, stack);
+
+      if (arg instanceof Expandable)
+      {
+         TeXObjectList expanded = null;
+
+         if (stack == parser || stack == null)
+         {
+            expanded = ((Expandable)arg).expandfully(parser);
+         }
+         else
+         {
+            expanded = ((Expandable)arg).expandfully(parser, stack);
+         }
+
+         if (expanded != null)
+         {
+            arg = expanded;
+         }
+      }
+
+      return arg;
+   }
+
+   protected int popInt(TeXParser parser, TeXObjectList stack)
+     throws IOException
+   {
+      Numerical num = popNumericalArg(parser, stack);
+
+      return num.number(parser);
    }
 
    // pops an argument that should be a numerical value

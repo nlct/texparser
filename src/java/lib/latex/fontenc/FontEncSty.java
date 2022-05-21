@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -33,6 +33,7 @@ public class FontEncSty extends LaTeXSty
       super(options, "fontenc", listener, loadParentOptions);
    }
 
+   @Override
    public void addDefinitions()
    {
       LaTeXParserListener listener = getListener();
@@ -40,6 +41,7 @@ public class FontEncSty extends LaTeXSty
       registerControlSequence(new FontEncodingCs(this));
    }
 
+   @Override
    public void processOption(String option, TeXObject value)
     throws IOException
    {
@@ -55,7 +57,8 @@ public class FontEncSty extends LaTeXSty
       }
    }
 
-   protected void preOptions()
+   @Override
+   protected void preOptions(TeXObjectList stack)
      throws IOException
    {
       registerEncoding(new T2AEncoding());

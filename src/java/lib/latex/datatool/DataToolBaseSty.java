@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -36,6 +36,7 @@ public class DataToolBaseSty extends LaTeXSty
       super(options, "datatool-base", listener, loadParentOptions);
    }
 
+   @Override
    public void addDefinitions()
    {
       TeXParser parser = getListener().getParser();
@@ -80,11 +81,12 @@ public class DataToolBaseSty extends LaTeXSty
       addCurrencySymbol("yen");
    }
 
-   protected void preOptions() throws IOException
+   @Override
+   protected void preOptions(TeXObjectList stack) throws IOException
    {
-      getListener().requirepackage("etoolbox");
+      getListener().requirepackage("etoolbox", stack);
 
-      ifThenSty = (IfThenSty)getListener().requirepackage("ifthen");
+      ifThenSty = (IfThenSty)getListener().requirepackage("ifthen", stack);
    }
 
    public void addCurrencySymbol(TeXObject symbol)

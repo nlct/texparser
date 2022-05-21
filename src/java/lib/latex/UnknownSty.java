@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -39,17 +39,20 @@ public class UnknownSty extends LaTeXSty
       super(options, name, listener, loadParentOptions);
    }
 
+   @Override
    public void addDefinitions()
    {
    }
 
+   @Override
    public void processOption(String option, TeXObject value)
     throws IOException
    {
       processDeclaredOption(option, value);
    }
 
-   protected void preOptions()
+   @Override
+   protected void preOptions(TeXObjectList stack)
      throws IOException
    {
    }
