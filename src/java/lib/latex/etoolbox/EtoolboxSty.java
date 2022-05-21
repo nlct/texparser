@@ -111,5 +111,10 @@ public class EtoolboxSty extends LaTeXSty
 
       registerControlSequence(new IfDefString());
       registerControlSequence(new IfDefString("ifcsstring", true));
+
+      registerControlSequence(new IfDef());
+      registerControlSequence(new IfDef("ifcsdef", true));
+      registerControlSequence(new IfUndef());
+      registerControlSequence(new IfUndef("ifcsundef", true));
    }
 }

@@ -407,6 +407,7 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       parser.putControlSequence(new AtGobble("@gobblefour", 4));
       parser.putControlSequence(new AtGobble("@gobblefive", 5));
       parser.putControlSequence(new AtNameUse());
+      parser.putControlSequence(new IfUndef("@ifundefined", true));
 
       parser.putControlSequence(new AtAlph("@Alph", AtAlph.UPPER));
       parser.putControlSequence(new AtAlph("@alph", AtAlph.LOWER));
