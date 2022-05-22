@@ -43,40 +43,36 @@ public class Ref extends Command
    public TeXObjectList expandonce(TeXParser parser)
       throws IOException
    {
-      TeXObject arg = parser.popNextArg();
-
-      if (arg instanceof Expandable)
-      {
-         TeXObjectList expanded = ((Expandable)arg).expandfully(parser);
-
-         if (expanded != null)
-         {
-            arg = expanded;
-         }
-      }
-
-      return expandref(parser, arg);
+      return expandonce(parser, parser);
    }
 
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
-      TeXObject arg = stack.popArg(parser);
+      LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
 
-      if (arg instanceof Expandable)
+      boolean hyper = false;
+
+      if (listener.isStyLoaded("hyperref") 
+            && popModifier(parser, stack, '*') == -1)
       {
-         TeXObjectList expanded = ((Expandable)arg).expandfully(parser, stack);
-
-         if (expanded != null)
-         {
-            arg = expanded;
-         }
+         hyper = true;
       }
 
-      return expandref(parser, arg);
+      TeXObject arg = popArgExpandFully(parser, stack);
+
+      return expandref(parser, arg, hyper);
    }
 
+   @Deprecated
    protected TeXObjectList expandref(TeXParser parser, TeXObject arg)
+   throws IOException
+   {
+      return expandref(parser, arg, 
+       ((LaTeXParserListener)parser.getListener()).isStyLoaded("hyperref"));
+   }
+
+   protected TeXObjectList expandref(TeXParser parser, TeXObject arg, boolean hyper)
    throws IOException
    {
       LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
@@ -87,58 +83,13 @@ public class Ref extends Command
 
       TeXObjectList list = new TeXObjectList();
 
-      if (listener.isStyLoaded("hyperref"))
+      if (hyper)
       {
-         list.add(new TeXCsRef("hyperlink"));
-
-         if (arg instanceof Group)
-         {
-            list.add(arg);
-         }
-         else
-         {
-            Group grp = listener.createGroup();
-
-            if (arg instanceof TeXObjectList)
-            {
-               grp.addAll((TeXObjectList)arg);
-            }
-            else
-            {
-               grp.add(arg);
-            }
-
-            list.add(grp);
-         }
-
-         if (ref instanceof Group)
-         {
-            list.add(ref);
-         }
-         else
-         {
-            Group grp = listener.createGroup();
-
-            if (ref instanceof TeXObjectList)
-            {
-               grp.addAll((TeXObjectList)ref);
-            }
-            else
-            {
-               grp.add(ref);
-            }
-
-            list.add(grp);
-         }
+         list.add(parser.getListener().createLink(arg.toString(parser), ref));
       }
       else
       {
-         if (ref instanceof TeXObjectList)
-         {
-            return (TeXObjectList)ref;
-         }
-
-         list.add(ref);
+         list.add(ref, true);
       }
 
       return list;

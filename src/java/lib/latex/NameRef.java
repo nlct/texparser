@@ -35,12 +35,14 @@ public class NameRef extends Ref
       super(name);
    }
 
+   @Override
    public Object clone()
    {
       return new NameRef(getName());
    }
 
-   protected TeXObjectList expandref(TeXParser parser, TeXObject arg)
+   @Override
+   protected TeXObjectList expandref(TeXParser parser, TeXObject arg, boolean hyper)
    throws IOException
    {
       LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
@@ -51,58 +53,13 @@ public class NameRef extends Ref
 
       TeXObjectList list = new TeXObjectList();
 
-      if (listener.isStyLoaded("hyperref"))
+      if (hyper)
       {
-         list.add(new TeXCsRef("hyperlink"));
-
-         if (arg instanceof Group)
-         {
-            list.add(arg);
-         }
-         else
-         {
-            Group grp = listener.createGroup();
-
-            if (arg instanceof TeXObjectList)
-            {
-               grp.addAll((TeXObjectList)arg);
-            }
-            else
-            {
-               grp.add(arg);
-            }
-
-            list.add(grp);
-         }
-
-         if (ref instanceof Group)
-         {
-            list.add(ref);
-         }
-         else
-         {
-            Group grp = listener.createGroup();
-
-            if (ref instanceof TeXObjectList)
-            {
-               grp.addAll((TeXObjectList)ref);
-            }
-            else
-            {
-               grp.add(ref);
-            }
-
-            list.add(grp);
-         }
+         list.add(parser.getListener().createLink(arg.toString(parser), ref));
       }
       else
       {
-         if (ref instanceof TeXObjectList)
-         {
-            return (TeXObjectList)ref;
-         }
-
-         list.add(ref);
+         list.add(ref, true);
       }
 
       return list;
