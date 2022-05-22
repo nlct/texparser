@@ -205,7 +205,6 @@ public abstract class TeXParserListener
     * @return an object that incorporates the text with a target or
     * just the text
     */
-   @Override
    public abstract TeXObject createAnchor(String anchorName, TeXObject text);
 
    /**

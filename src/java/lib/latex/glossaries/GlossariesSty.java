@@ -1139,7 +1139,7 @@ public class GlossariesSty extends LaTeXSty
 
       substack.add(getListener().getControlSequence("let"));
       substack.add(new TeXCsRef("gls@org@glossaryentryfield"));
-      substack.add(glossentryCs);
+      substack.add(getListener().getControlSequence("glossentry"));
 
       substack.add(getListener().getControlSequence("let"));
       substack.add(new TeXCsRef("gls@org@glossarysubentryfield"));

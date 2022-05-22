@@ -179,9 +179,19 @@ public abstract class Macro implements TeXObject
       return false;
    }
 
-   // pops a token but only if it's a CharObject and matches one of the
-   // given char code. Returns the char code if token was popped
-   // otherwise -1.
+   /**
+   * Pops a matching token if present.
+   * This method will pop the next token but only if it's a CharObject
+   * and matches one of the given char codes. Returns the char code 
+   * if token was popped otherwise -1.
+   * @param parser the TeX parser
+   * @param stack the local stack (may be null or the parser, if no
+   * local stack)
+   * @param charCodes list of allowed character codes
+   * @return the character code of the popped token or -1 if no
+   * match
+   * @throws IOException if I/O error
+   */
    protected int popModifier(TeXParser parser, TeXObjectList stack, int... charCodes)
    throws IOException
    {

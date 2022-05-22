@@ -59,9 +59,9 @@ public class Href extends ControlSequence
    {
       popOptArg(parser, stack);
 
-      TeXObject urlArg = popArgFullyExpand(parser, stack);
+      TeXObject urlArg = popArgExpandFully(parser, stack);
 
-      TeXObject text = popArgFullyExpand(parser, stack);
+      TeXObject text = popArgExpandFully(parser, stack);
       
       if (urlArg instanceof TeXObjectList)
       {

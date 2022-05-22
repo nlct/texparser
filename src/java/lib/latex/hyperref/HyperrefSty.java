@@ -37,7 +37,7 @@ public class HyperrefSty extends LaTeXSty
    {
       registerControlSequence(new HyperTarget());
       registerControlSequence(new HyperLink());
-      registerControlSequence(new HyperRef());
+      registerControlSequence(new HyperRef(this));
       registerControlSequence(new Href(this));
       registerControlSequence(new NoLinkUrl());
       registerControlSequence(new Url(this));

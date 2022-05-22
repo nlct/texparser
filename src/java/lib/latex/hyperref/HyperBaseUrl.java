@@ -36,7 +36,7 @@ public class HyperBaseUrl extends ControlSequence
       this.sty = sty;
    }
 
-   @override
+   @Override
    public Object clone()
    {
       return new HyperBaseUrl(getName(), sty);
@@ -49,9 +49,9 @@ public class HyperBaseUrl extends ControlSequence
    }
 
    @Override
-   public void process(TeXParser parser, TeXObjectList list) throws IOException
+   public void process(TeXParser parser, TeXObjectList stack) throws IOException
    {
-      TeXObject urlArg = popArgFullyExpand(parser, stack);
+      TeXObject urlArg = popArgExpandFully(parser, stack);
 
       if (urlArg instanceof TeXObjectList)
       {

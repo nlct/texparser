@@ -22,15 +22,16 @@ import java.io.IOException;
 import java.util.Vector;
 
 import com.dickimawbooks.texparserlib.*;
+import com.dickimawbooks.texparserlib.latex.LaTeXParserListener;
 
-public class Href extends ControlSequence
+public class HyperRef extends ControlSequence
 {
-   public Href(HyperrefSty sty)
+   public HyperRef(HyperrefSty sty)
    {
-      this("href", sty);
+      this("hyperref", sty);
    }
 
-   public Href(String name, HyperrefSty sty)
+   public HyperRef(String name, HyperrefSty sty)
    {
       super(name);
       this.sty = sty;
@@ -39,7 +40,7 @@ public class Href extends ControlSequence
    @Override
    public Object clone()
    {
-      return new Href(getName(), sty);
+      return new HyperRef(getName(), sty);
    }
 
    @Override
@@ -58,12 +59,12 @@ public class Href extends ControlSequence
       if (label == null)
       {// syntax \hyperref{URL}{category}{name}{text}
 
-         TeXObject urlArg = popArgFullyExpand(parser, stack);
+         TeXObject urlArg = popArgExpandFully(parser, stack);
 
          String category = popLabelString(parser, stack);
          String name = popLabelString(parser, stack);
 
-         TeXObject text = popArgFullyExpand(parser, stack);
+         TeXObject text = popArgExpandFully(parser, stack);
       
          if (urlArg instanceof TeXObjectList)
          {
@@ -81,7 +82,7 @@ public class Href extends ControlSequence
             }
          }
 
-         String url = String.format("%s#%s.%s", url.toString(parser),
+         String url = String.format("%s#%s.%s", urlArg.toString(parser),
            category, name);
 
          listener.href(sty.toFullUrl(url), text);
@@ -89,7 +90,7 @@ public class Href extends ControlSequence
       else
       {// syntax \hyperref[label]{text}
       
-         TeXObject link = listener.createLink(label, text);
+         TeXObject link = listener.createLink(label, popArgExpandFully(parser, stack));
 
          if (parser == stack || stack == null)
          {
