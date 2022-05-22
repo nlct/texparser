@@ -1156,6 +1156,20 @@ public class GlossariesSty extends LaTeXSty
       return glossary;
    }
 
+   /**
+    * Only display the warning once otherwise it will cause too much
+    * clutter.
+    */  
+   public void noStyleWarning()
+   {
+      if (!nostyleWarningIssued)
+      {
+         TeXApp texApp = getListener().getTeXApp();
+         texApp.warning(getParser(), texApp.getMessage(GLOSSARY_NO_STYLE));
+         nostyleWarningIssued = true;
+      }
+   }
+
    private HashMap<String,GlossaryEntry> entries;
 
    private HashMap<String,Glossary> glossaries;
@@ -1196,6 +1210,8 @@ public class GlossariesSty extends LaTeXSty
    private boolean loadLong = true;
    private boolean loadSuper = true;
 
+   private boolean nostyleWarningIssued = false;
+
    public static final String GLOSSARY_NOT_DEFINED 
     = "glossaries.glossary.not.defined";
    public static final String ENTRY_NOT_DEFINED 
@@ -1206,4 +1222,6 @@ public class GlossariesSty extends LaTeXSty
     = "glossaries.entry.exists";
    public static final String GLOSSARY_STYLE_NOT_DEFINED 
     = "glossaries.glossary.style.not.defined";
+   public static final String GLOSSARY_NO_STYLE 
+    = "glossaries.glossary.no_style";
 }
