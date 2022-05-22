@@ -243,6 +243,8 @@ public class L2HConverter extends LaTeXParserListener
       parser.putControlSequence(new L2HEqnarray());
       parser.putControlSequence(new L2HEqnarray("eqnarray*", false));
 
+      parser.putControlSequence(new Relax("strut"));
+
       putControlSequence(new GenericCommand(true, "bigskip", null, 
        new TeXObject[] {new HtmlTag("<div class=\"bigskip\"></div>")}));
       putControlSequence(new GenericCommand(true, "medskip", null, 
