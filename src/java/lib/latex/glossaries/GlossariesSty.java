@@ -240,7 +240,15 @@ public class GlossariesSty extends LaTeXSty
       NewIf.createConditional(true, getParser(), "ifglsnopostdot", isExtra());
 
       registerControlSequence(new Gls(this));
+      registerControlSequence(new Gls("Gls", CaseChange.SENTENCE, this));
+      registerControlSequence(new Gls("GLS", CaseChange.TO_UPPER, this));
+
+      registerControlSequence(new Gls("glspl", CaseChange.NO_CHANGE, true, this));
+      registerControlSequence(new Gls("Glspl", CaseChange.SENTENCE, true, this));
+      registerControlSequence(new Gls("GLSpl", CaseChange.TO_UPPER, true, this));
+
       registerControlSequence(new IfGlsUsed(this));
+
       registerControlSequence(new GlsEntryField("glsentryname", "name", this));
       registerControlSequence(new GlsEntryField("glsentrytext", "text", this));
       registerControlSequence(new GlsEntryField("glsentryplural", "plural", this));
@@ -274,6 +282,11 @@ public class GlossariesSty extends LaTeXSty
         "symbol", CaseChange.SENTENCE, this));
       registerControlSequence(new GlsEntryField("Glsentrysymbolplural",
         "symbolplural", CaseChange.SENTENCE, this));
+
+      registerControlSequence(new IfHasField("ifglshassymbol", "symbol", this));
+      registerControlSequence(new IfHasField("ifglshasdesc", "description", this));
+      registerControlSequence(new IfHasField("ifglshasshort", "short", this));
+      registerControlSequence(new IfHasField("ifglshaslong", "long", this));
 
       TeXParserListener listener = getParser().getListener();
 
@@ -321,6 +334,7 @@ public class GlossariesSty extends LaTeXSty
    protected void preOptions(TeXObjectList stack) throws IOException
    {
       getListener().requirepackage(null, "etoolbox", false, stack);
+      getListener().requirepackage(null, "textcase", false, stack);
       getListener().requirepackage(null, "mfirstuc", false, stack);
       getListener().requirepackage(null, "ifthen", false, stack);
       getListener().requirepackage(null, "keyval", false, stack);
