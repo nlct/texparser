@@ -824,6 +824,15 @@ public class L2HConverter extends LaTeXParserListener
       extraHead.add(content);
    }
 
+   /**
+    * Writes the DOCTYPE line.
+    */ 
+   protected void writeDocType()
+     throws IOException
+   {
+      writeable.writeln("<!DOCTYPE html>");
+   }
+
    @Override
    public void documentclass(KeyValList options, String clsName, 
       boolean loadParentOptions, TeXObjectList stack)
@@ -831,7 +840,7 @@ public class L2HConverter extends LaTeXParserListener
    {
       super.documentclass(options, clsName, loadParentOptions, stack);
 
-      writeable.writeln("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 3.2 Final//EN\">");
+      writeDocType();
       writeable.writeln("<html>");
       writeable.writeln("<head>");
 

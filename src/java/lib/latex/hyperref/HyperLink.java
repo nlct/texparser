@@ -51,7 +51,7 @@ public class HyperLink extends Command
 
       TeXObjectList expanded = parser.getListener().createStack();
 
-      expanded.add(parser.getListener().createAnchor(link, text));
+      expanded.add(parser.getListener().createLink(link, text));
 
       return expanded;
    }

@@ -496,6 +496,8 @@ public abstract class DefaultTeXParserListener extends TeXParserListener
    @Override
    public TeXObject createAnchor(String anchorName, TeXObject text)
    {
+      getParser().debugMessage(1,
+        "No hyperlink anchor supported. Anchor: "+anchorName);
       return text;
    }
 
@@ -509,6 +511,8 @@ public abstract class DefaultTeXParserListener extends TeXParserListener
    @Override
    public TeXObject createLink(String anchorName, TeXObject text)
    {
+      getParser().debugMessage(1,
+       "No hyperlink supported. Anchor: "+anchorName);
       return text;
    }
 

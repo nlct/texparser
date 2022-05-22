@@ -26,6 +26,8 @@ import java.util.Iterator;
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.primitives.NewIf;
 import com.dickimawbooks.texparserlib.latex.*;
+import com.dickimawbooks.texparserlib.latex.hyperref.HyperTarget;
+import com.dickimawbooks.texparserlib.latex.hyperref.HyperLink;
 
 /**
  * Limited support for the glossaries and glossaries-extra packages. They are
@@ -150,7 +152,64 @@ public class GlossariesSty extends LaTeXSty
          registerControlSequence(new SubGlossEntry(this));
       }
 
-      registerControlSequence(new AtSecondOfTwo("glstarget"));
+      registerControlSequence(new TextualContentCommand("glolinkprefix", "glo:"));
+      registerControlSequence(new TextualContentCommand("glspluralsuffix", "s"));
+
+      boolean isHyper = listener.isStyLoaded("hyperref");
+
+      NewIf.createConditional(true, getParser(), "ifKV@glslink@hyper", isHyper);
+
+      if (isHyper)
+      {
+         registerControlSequence(new HyperTarget("@glstarget"));
+         registerControlSequence(new HyperLink("@glslink"));
+
+         registerControlSequence(new GenericCommand(true, "glsifhyperon", null,
+           new TeXObject[]{new TeXCsRef("ifKV@glslink@hyper"), 
+             getListener().getParam(1), new TeXCsRef("else"),
+             getListener().getParam(2), new TeXCsRef("fi")}));
+
+         registerControlSequence(new GenericCommand(true, 
+           "glsdisablehyper", null, new TeXObject[]
+           {
+              new TeXCsRef("KV@glslink@hyperfalse"),
+              new TeXCsRef("let"),
+              new TeXCsRef("@glslink"),
+              new TeXCsRef("glsdonohyperlink"),
+              new TeXCsRef("let"),
+              new TeXCsRef("@glstarget"),
+              new TeXCsRef("glsdonohypertarget")
+           }));
+
+         registerControlSequence(new GenericCommand(true, 
+           "glsenablehyper", null, new TeXObject[]
+           {
+              new TeXCsRef("KV@glslink@hypertrue"),
+              new TeXCsRef("let"),
+              new TeXCsRef("@glslink"),
+              new TeXCsRef("glsdohyperlink"),
+              new TeXCsRef("let"),
+              new TeXCsRef("@glstarget"),
+              new TeXCsRef("glsdohypertarget")
+           }));
+
+         registerControlSequence(new GlsTarget());
+      }
+      else
+      {
+         registerControlSequence(new AtSecondOfTwo("glsifhyperon"));
+         registerControlSequence(new AtSecondOfTwo("glstarget"));
+         registerControlSequence(new AtSecondOfTwo("@glstarget"));
+         registerControlSequence(new AtSecondOfTwo("@glslink"));
+         registerControlSequence(new GenericCommand("glsdisablehyper"));
+         registerControlSequence(new GenericCommand("glsenablehyper"));
+      }
+
+      registerControlSequence(new AtSecondOfTwo("glsdonohypertarget"));
+      registerControlSequence(new AtSecondOfTwo("glsdonohyperlink"));
+      registerControlSequence(new HyperTarget("glsdohypertarget"));
+      registerControlSequence(new HyperLink("glsdohyperlink"));
+
       registerControlSequence(new AtGobble("glsentryitem"));
       registerControlSequence(new AtGobble("glssubentryitem"));
       registerControlSequence(new GlsPostDescription(this));
@@ -171,20 +230,9 @@ public class GlossariesSty extends LaTeXSty
       registerControlSequence(new GlsEntryFmt(this));
       registerControlSequence(new GlsGenEntryFmt(this));
       registerControlSequence(new AtFirstOfOne("glstextformat"));
-      registerControlSequence(new AtSecondOfTwo("glsdonohyperlink"));
-      registerControlSequence(new AtSecondOfTwo("@glslink"));
-      registerControlSequence(new TextualContentCommand("glolinkprefix", "glo:"));
 
       registerControlSequence(new GenericCommand("glscapitalisewords", null,
          new TeXCsRef("capitalisewords")));
-
-      NewIf.createConditional(true, getParser(), "ifKV@glslink@hyper",
-       listener.isStyLoaded("hyperref"));
-
-      registerControlSequence(new GenericCommand(true, "glsifhyperon", null,
-           new TeXObject[]{new TeXCsRef("ifKV@glslink@hyper"), 
-             getListener().getParam(1), new TeXCsRef("else"),
-             getListener().getParam(2), new TeXCsRef("fi")}));
 
       NewIf.createConditional(true, getParser(), "ifglsnogroupskip", false);
       registerControlSequence(new TextualContentCommand("glsgroupskip", ""));

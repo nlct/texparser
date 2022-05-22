@@ -5,16 +5,22 @@
 
 \usepackage[T1]{fontenc}
 \usepackage[colorlinks]{hyperref}
-\usepackage[notree]{glossaries}
+\usepackage[notree,toc]{glossaries}
 
 \makeglossaries
 
 \newglossaryentry{sample}{name={sample},description={an example}}
 
 \begin{document}
+\tableofcontents
+
+\section{Sample}
+\label{sec:sample}
 Name value: \glsentryname{sample}.
 Text value: \glsentrytext{sample}.
 Description value: \glsentrydesc{sample}.
+
+\hypertarget{sampleanchor}{Sample anchor}.
 
 Sentence case: \Glsentryname{sample}.
 
@@ -22,6 +28,13 @@ Is used? \ifglsused{sample}{true}{false}.
 A \gls{sample}.
 Is used? \ifglsused{sample}{true}{false}.
 Next use: \gls{sample}.
+
+\section{Another}
+\label{sec:another}
+
+Reference section~\ref{sec:sample} (\ref*{sec:sample}).
+
+\hyperlink{sampleanchor}{Sample hyperlink}.
 
 \printglossaries
 
