@@ -1127,7 +1127,7 @@ public class GlossariesSty extends LaTeXSty
 
          if (cs == null)
          {
-            TeXApp texApp = parser.getListener().getTeXApp();
+            TeXApp texApp = getListener().getTeXApp();
             texApp.warning(parser, 
               texApp.getMessage(GLOSSARY_STYLE_NOT_DEFINED, style));
          }
@@ -1139,7 +1139,7 @@ public class GlossariesSty extends LaTeXSty
 
       substack.add(getListener().getControlSequence("let"));
       substack.add(new TeXCsRef("gls@org@glossaryentryfield"));
-      substack.add(getListener().getControlSequence("glossentry"));
+      substack.add(glossentryCs);
 
       substack.add(getListener().getControlSequence("let"));
       substack.add(new TeXCsRef("gls@org@glossarysubentryfield"));
@@ -1157,6 +1157,7 @@ public class GlossariesSty extends LaTeXSty
    }
 
    /**
+    * Issue a warning if no style has been set.
     * Only display the warning once otherwise it will cause too much
     * clutter.
     */  
