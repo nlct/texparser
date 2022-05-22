@@ -2909,19 +2909,9 @@ public class TeXParser extends TeXObjectList
       return builder.toString();
    }
 
-   public String expandToString(TeXObject object, TeXObjectList stack)
+   public TeXObject expandfully(TeXObject object, TeXObjectList stack)
     throws IOException
    {
-      if (object.isEmpty())
-      {
-         return "";
-      }
-
-      if (object instanceof TextualContentCommand)
-      {
-         return ((TextualContentCommand)object).getText();
-      }
-
       if (object instanceof Expandable)
       {
          TeXObjectList expanded;
@@ -2941,7 +2931,23 @@ public class TeXParser extends TeXObjectList
          }
       }
 
-      return object.toString(this);
+      return object;
+   }
+
+   public String expandToString(TeXObject object, TeXObjectList stack)
+    throws IOException
+   {
+      if (object.isEmpty())
+      {
+         return "";
+      }
+
+      if (object instanceof TextualContentCommand)
+      {
+         return ((TextualContentCommand)object).getText();
+      }
+
+      return expandfully(object, stack).toString(this);
    }
 
    /*
