@@ -145,6 +145,9 @@ public abstract class DefaultTeXParserListener extends TeXParserListener
       parser.putControlSequence(new IfNum());
       parser.putControlSequence(new IfDim());
       parser.putControlSequence(new TeXParserSetUndefAction());
+      parser.putControlSequence(new HangIndent());
+      parser.putControlSequence(new ParIndent());
+      parser.putControlSequence(new ParSkip());
 
       parser.putControlSequence(new MathAccent("vec", 8407));
       parser.putControlSequence(new MathAccent("hat", 0x0302, 0x02C6));
@@ -332,6 +335,12 @@ public abstract class DefaultTeXParserListener extends TeXParserListener
    public Par getPar()
    {
       return new Par();
+   }
+
+   @Override
+   public Paragraph createParagraph()
+   {
+      return new Paragraph();
    }
 
    public Space getSpace()

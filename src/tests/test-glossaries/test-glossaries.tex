@@ -5,11 +5,13 @@
 
 \usepackage[T1]{fontenc}
 \usepackage[colorlinks]{hyperref}
-\usepackage[notree,toc]{glossaries}
+\usepackage[toc,style=tree]{glossaries}
 
 \makeglossaries
 
 \newglossaryentry{sample}{name={sample},description={an example}}
+\newglossaryentry{child}{parent={sample},
+ name={child sample},description={an example sub entry}}
 
 \begin{document}
 \tableofcontents
@@ -28,6 +30,8 @@ Is used? \ifglsused{sample}{true}{false}.
 A \gls{sample}.
 Is used? \ifglsused{sample}{true}{false}.
 Next use: \gls{sample}.
+
+\Gls{child}.
 
 \section{Another}
 \label{sec:another}

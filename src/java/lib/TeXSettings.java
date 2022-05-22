@@ -647,6 +647,81 @@ public class TeXSettings
       }
    }
 
+   public TeXDimension getCurrentParIndent()
+   {
+      return currentParIndent;
+   }
+
+   public TeXDimension getParIndent()
+   {
+      if (currentParIndent == null)
+      {
+         if (parent == null)
+         {
+            return null;
+         }
+
+         return parent.getParIndent();
+      }
+
+      return currentParIndent;
+   }
+
+   public void setParIndent(TeXDimension indent)
+   {
+      currentParIndent = indent;
+   }
+
+   public TeXDimension getCurrentParSkip()
+   {
+      return currentParSkip;
+   }
+
+   public TeXDimension getParSkip()
+   {
+      if (currentParSkip == null)
+      {
+         if (parent == null)
+         {
+            return null;
+         }
+
+         return parent.getParSkip();
+      }
+
+      return currentParSkip;
+   }
+
+   public void setParSkip(TeXDimension indent)
+   {
+      currentParSkip = indent;
+   }
+
+   public TeXDimension getCurrentHangIndent()
+   {
+      return currentHangIndent;
+   }
+
+   public TeXDimension getHangIndent()
+   {
+      if (currentHangIndent == null)
+      {
+         if (parent == null)
+         {
+            return null;
+         }
+
+         return parent.getHangIndent();
+      }
+
+      return currentHangIndent;
+   }
+
+   public void setHangIndent(TeXDimension indent)
+   {
+      currentHangIndent = indent;
+   }
+
    public void setCurrentFgColor(Color color)
    {
       currentFgColor = color;
@@ -2824,6 +2899,10 @@ public class TeXSettings
    private int currentMathFont = INHERIT;
 
    private int currentParAlign = INHERIT;
+
+   private TeXDimension currentParIndent = null;
+   private TeXDimension currentParSkip = null;
+   private TeXDimension currentHangIndent = null;
 
    private int currentMode = INHERIT;
 

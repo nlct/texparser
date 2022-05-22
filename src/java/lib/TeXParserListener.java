@@ -58,6 +58,14 @@ public abstract class TeXParserListener
 
    public abstract Par getPar();
 
+   /**
+    * Process a paragraph block that may have margins.
+    * @param par the paragraph that needs processing
+    * @param stack a sub-stack which may be null or the parser
+    * @throws IOException if I/O error occurs
+    */ 
+   public abstract Paragraph createParagraph();
+
    public abstract Space getSpace();
 
    public abstract Param getParam(int digit);

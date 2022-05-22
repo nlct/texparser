@@ -179,6 +179,9 @@ public class L2HConverter extends LaTeXParserListener
       parser.putControlSequence(new GenericCommand("LaTeX", null,
         createString("LaTeX")));
 
+      parser.putControlSequence(new GenericCommand("indexspace", null,
+        new HtmlTag("<div class=\"indexspace\"></div>")));
+
       putControlSequence(new L2HAmp());
       putControlSequence(new L2HNoBreakSpace());
       putControlSequence(new SpaceCs("newblock"));
@@ -355,6 +358,12 @@ public class L2HConverter extends LaTeXParserListener
    public Par getPar()
    {
       return new L2HPar();
+   }
+
+   @Override
+   public Paragraph createParagraph()
+   {
+      return new L2HParagraph();
    }
 
    @Override

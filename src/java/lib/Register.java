@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -38,10 +38,18 @@ public abstract class Register extends ControlSequence implements InternalQuanti
       return allocation;
    }
 
+   @Override
    public TeXObject getQuantity(TeXParser parser, TeXObjectList stack)
     throws IOException
    {
       return (TeXObject)getContents(parser).clone();
+   }
+
+   @Override
+   public void setQuantity(TeXParser parser, TeXObject quantity)
+    throws TeXSyntaxException
+   {
+      parser.getSettings().localSetRegister(getName(), quantity);
    }
 
    public abstract TeXObject getContents(TeXParser parser)

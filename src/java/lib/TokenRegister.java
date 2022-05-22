@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -33,6 +33,7 @@ public class TokenRegister extends Register
       this.contents = contents;
    }
 
+   @Override
    public Object clone()
    {
       return new TokenRegister(getName(), (TeXObject)contents.clone());

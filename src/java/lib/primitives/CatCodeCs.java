@@ -36,11 +36,19 @@ public class CatCodeCs extends Primitive
       super(name, true);
    }
 
+   @Override
    public Object clone()
    {
       return new CatCodeCs(getName());
    }
 
+   @Override
+   public void setQuantity(TeXParser parser, TeXObject quantity)
+     throws TeXSyntaxException
+   {
+   }
+
+   @Override
    public TeXObject getQuantity(TeXParser parser, TeXObjectList stack)
      throws IOException
    {

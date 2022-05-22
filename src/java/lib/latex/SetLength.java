@@ -34,6 +34,7 @@ public class SetLength extends ControlSequence
       super(name);
    }
 
+   @Override
    public Object clone()
    {
       return new SetLength(getName());
@@ -51,24 +52,37 @@ public class SetLength extends ControlSequence
          obj = popArg(parser, stack);
       }
 
-      if (!(obj instanceof ControlSequence))
+      if (obj instanceof TeXCsRef)
       {
-         throw new TeXSyntaxException(parser,
-          TeXSyntaxException.ERROR_CS_EXPECTED, obj.toString(parser),
-            obj.getClass());
+         obj = parser.getListener().getControlSequence(
+          ((TeXCsRef)obj).getName());
       }
-
-      String csname = ((ControlSequence)obj).getName();
 
       TeXDimension value = popDimensionArg(parser, stack);
 
-      if (getPrefix() == PREFIX_GLOBAL)
+      if (obj instanceof InternalQuantity)
       {
-         parser.getSettings().globalSetRegister(csname, value);
+         ((InternalQuantity)obj).setQuantity(parser, value);
       }
       else
       {
-         parser.getSettings().localSetRegister(csname, value);
+         if (!(obj instanceof ControlSequence))
+         {
+            throw new TeXSyntaxException(parser,
+             TeXSyntaxException.ERROR_CS_EXPECTED, obj.toString(parser),
+               obj.getClass());
+         }
+
+         String csname = ((ControlSequence)obj).getName();
+
+         if (getPrefix() == PREFIX_GLOBAL)
+         {
+            parser.getSettings().globalSetRegister(csname, value);
+         }
+         else
+         {
+            parser.getSettings().localSetRegister(csname, value);
+         }
       }
    }
 

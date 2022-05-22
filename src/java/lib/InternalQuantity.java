@@ -22,6 +22,9 @@ import java.io.IOException;
 
 public interface InternalQuantity extends TeXObject
 {
+   public void setQuantity(TeXParser parser, TeXObject quantity)
+    throws TeXSyntaxException;
+
    public TeXObject getQuantity(TeXParser parser, TeXObjectList stack)
     throws IOException;
 }
