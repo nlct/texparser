@@ -177,7 +177,7 @@ public class GlsGenEntryFmt extends AbstractGlsCommand
       subsubsubgrp = listener.createGroup();
       subsubgrp.add(subsubsubgrp);
 
-      subsubsubgrp.add(new TeXCsRef("Glsentry"));
+      subsubsubgrp.add(new TeXCsRef("Glsentrytext"));
       subsubsubgrp.add(new TeXCsRef("glslabel"));
       subsubsubgrp.add(new TeXCsRef("glsinsert"));
 
@@ -204,7 +204,7 @@ public class GlsGenEntryFmt extends AbstractGlsCommand
       subsubsubsubgrp = listener.createGroup();
       subsubsubgrp.add(subsubsubsubgrp);
 
-      subsubsubsubgrp.add(new TeXCsRef("glsentry"));
+      subsubsubsubgrp.add(new TeXCsRef("glsentrytext"));
       subsubsubsubgrp.add(new TeXCsRef("glslabel"));
       subsubsubsubgrp.add(new TeXCsRef("glsinsert"));
 
