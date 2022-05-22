@@ -32,7 +32,7 @@ public class Gls extends AbstractGlsCommand
 
    public Gls(String name, CaseChange caseChange, GlossariesSty sty)
    {
-      this("gls", caseChange, false, sty);
+      this(name, caseChange, false, sty);
    }
 
    public Gls(String name, CaseChange caseChange, boolean isPlural, GlossariesSty sty)
