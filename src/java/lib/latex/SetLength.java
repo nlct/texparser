@@ -45,7 +45,7 @@ public class SetLength extends ControlSequence
    {
       TeXObject obj = popArg(parser, stack);
 
-      if (obj instanceof TeXObjectList)
+      if (parser.isStack(obj))
       {
          stack.push(obj, true);
 

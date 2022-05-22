@@ -421,6 +421,41 @@ public class TeXObjectList extends Vector<TeXObject>
           new String(Character.toChars(parser.getEscChar())), name));
    }
 
+   public String popWord(TeXParser parser)
+    throws IOException
+   {
+      StringBuilder builder = new StringBuilder();
+      byte popStyle = (byte)(POP_SHORT | POP_IGNORE_LEADING_SPACE);
+
+      while (!isEmpty())
+      {
+         TeXObject obj = peekStack(popStyle);
+
+         if (obj instanceof CharObject)
+         {
+            int cp = ((CharObject)obj).getCharCode();
+
+            if (Character.isAlphabetic(cp))
+            {
+               builder.appendCodePoint(cp);
+               popStack(parser, popStyle);
+            }
+            else
+            {
+               break;
+            }
+         }
+         else
+         {
+            break;
+         }
+
+         popStyle = POP_SHORT;
+      }
+
+      return builder.toString();
+   }
+
    public TeXUnit popUnit(TeXParser parser)
     throws IOException
    {
@@ -648,6 +683,12 @@ public class TeXObjectList extends Vector<TeXObject>
    public TeXDimension popDimension(TeXParser parser)
     throws IOException
    {
+      return popDimension(parser, true);
+   }
+
+   public TeXDimension popDimension(TeXParser parser, boolean glue)
+    throws IOException
+   {
       TeXObject object = expandedPopStack(parser, 
         (byte)(POP_SHORT | POP_IGNORE_LEADING_SPACE));
 
@@ -675,193 +716,61 @@ public class TeXObjectList extends Vector<TeXObject>
 
       TeXDimension dimen = new UserDimension(value, unit);
 
+      if (!glue)
+      {
+         return dimen;
+      }
+
       TeXDimension stretch = null;
 
       TeXDimension shrink = null;
 
-      object = expandedPopStack(parser);
-      push(object);
+      String word = popWord(parser);
 
-      if (!(object instanceof CharObject))
+      if (word.equals("plus"))
       {
-         return dimen;
-      }
+         stretch = popDimension(parser, false);
 
-      if (((CharObject)object).getCharCode() == 'p')
-      {
-         stretch = popStretch(parser);
+         word = popWord(parser);
 
-         if (stretch == null)
+         if (word.equals("minus"))
          {
-            return dimen;
+            shrink = popDimension(parser, false);
          }
-
-         object = expandedPopStack(parser);
-         push(object);
-
-         if ((object instanceof CharObject)
-          && (((CharObject)object).getCharCode() == 'm'))
+         else
          {
-            shrink = popShrink(parser);
+            addAll(0, parser.getListener().createString(word));
          }
       }
-      else if (((CharObject)object).getCharCode() == 'm')
+      else if (word.equals("minus"))
       {
-         shrink = popShrink(parser);
+         shrink = popDimension(parser, false);
 
-         if (shrink == null)
+         word = popWord(parser);
+
+         if (word.equals("plus"))
          {
-            return dimen;
+            stretch = popDimension(parser, false);
+         }
+         else
+         {
+            addAll(0, parser.getListener().createString(word));
          }
       }
       else
       {
+         addAll(0, parser.getListener().createString(word));
+      }
+
+      if (shrink == null && stretch == null)
+      {
          return dimen;
       }
-
-      return new TeXGlue(parser, dimen, stretch, shrink);
-   }
-
-   private TeXDimension popStretch(TeXParser parser)
-     throws IOException
-   {
-      TeXObject object = expandedPopStack(parser, 
-        (byte)(POP_SHORT | POP_IGNORE_LEADING_SPACE));
-
-      if (!(object instanceof CharObject)
-       ||((CharObject)object).getCharCode() != 'p')
+      else
       {
-         push(object);
-         return null;
+         return new TeXGlue(parser, dimen, stretch, shrink);
       }
 
-      TeXObject object2 = expandedPopStack(parser, POP_SHORT);
-
-      if (!(object2 instanceof CharObject)
-       ||((CharObject)object2).getCharCode() != 'l')
-      {
-         push(object2);
-         push(object);
-         return null;
-      }
-
-      TeXObject object3 = expandedPopStack(parser, POP_SHORT);
-
-      if (!(object3 instanceof CharObject)
-       ||((CharObject)object3).getCharCode() != 'u')
-      {
-         push(object3);
-         push(object2);
-         push(object);
-         return null;
-      }
-
-      TeXObject object4 = expandedPopStack(parser, POP_SHORT);
-
-      if (!(object4 instanceof CharObject)
-       ||((CharObject)object4).getCharCode() != 's')
-      {
-         push(object4);
-         push(object3);
-         push(object2);
-         push(object);
-         return null;
-      }
-
-      Float value = popFloat(parser);
-
-      object = expandedPopStack(parser, POP_SHORT);
-
-      if (object instanceof DimenRegister)
-      {
-         TeXDimension dimen = new UserDimension();
-         dimen.setDimension(parser, (DimenRegister)object);
-         dimen.multiply(value.floatValue());
-         return dimen;
-      }
-
-      push(object);
-
-      TeXUnit unit = popUnit(parser);
-      
-      return new UserDimension(value, unit);
-   }
-
-   private TeXDimension popShrink(TeXParser parser)
-     throws IOException
-   {
-      TeXObject object = expandedPopStack(parser, POP_SHORT);
-
-      if (!(object instanceof CharObject)
-       ||((CharObject)object).getCharCode() != 'm')
-      {
-         push(object);
-         return null;
-      }
-
-      TeXObject object2 = expandedPopStack(parser, POP_SHORT);
-
-      if (!(object2 instanceof CharObject)
-       ||((CharObject)object2).getCharCode() != 'i')
-      {
-         push(object2);
-         push(object);
-         return null;
-      }
-
-      TeXObject object3 = expandedPopStack(parser, POP_SHORT);
-
-      if (!(object3 instanceof CharObject)
-       ||((CharObject)object3).getCharCode() != 'n')
-      {
-         push(object3);
-         push(object2);
-         push(object);
-         return null;
-      }
-
-      TeXObject object4 = expandedPopStack(parser, POP_SHORT);
-
-      if (!(object4 instanceof CharObject)
-       ||((CharObject)object4).getCharCode() != 'u')
-      {
-         push(object4);
-         push(object3);
-         push(object2);
-         push(object);
-         return null;
-      }
-
-      TeXObject object5 = expandedPopStack(parser, POP_SHORT);
-
-      if (!(object5 instanceof CharObject)
-       ||((CharObject)object5).getCharCode() != 's')
-      {
-         push(object5);
-         push(object4);
-         push(object3);
-         push(object2);
-         push(object);
-         return null;
-      }
-
-      Float value = popFloat(parser);
-
-      object = expandedPopStack(parser, POP_SHORT);
-
-      if (object instanceof DimenRegister)
-      {
-         TeXDimension dimen = new UserDimension();
-         dimen.setDimension(parser, (DimenRegister)object);
-         dimen.multiply(value.floatValue());
-         return dimen;
-      }
-
-      push(object);
-
-      TeXUnit unit = popUnit(parser);
-      
-      return new UserDimension(value, unit);
    }
 
    public Float popFloat(TeXParser parser)

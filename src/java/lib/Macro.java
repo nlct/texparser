@@ -362,25 +362,27 @@ public abstract class Macro implements TeXObject
    protected TeXDimension popDimensionArg(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      TeXObject obj = popArg(parser, stack);
+      TeXObject obj = popArgExpandFully(parser, stack);
+
+      if (obj instanceof InternalQuantity)
+      {
+         obj = ((InternalQuantity)obj).getQuantity(parser, stack);
+      }
 
       if (obj instanceof TeXDimension)
       {
          return (TeXDimension)obj;
       }
 
-      if (stack == null)
+      if (obj instanceof TeXObjectList)
       {
-         parser.push(obj);
+         TeXObjectList list = (TeXObjectList)obj;
 
-         return parser.popDimension();
+         return list.popDimension(parser);
       }
-      else
-      {
-         stack.push(obj);
 
-         return stack.popDimension(parser);
-      }
+      throw new TeXSyntaxException(parser, 
+           TeXSyntaxException.ERROR_DIMEN_EXPECTED);
    }
 
    public abstract Object clone();
