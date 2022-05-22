@@ -26,6 +26,11 @@ import com.dickimawbooks.texparserlib.*;
 
 public class LaTeXGenericEnvironment extends Declaration
 {
+   public LaTeXGenericEnvironment(String name)
+   {
+      this(name, null, null, false);
+   }
+
    public LaTeXGenericEnvironment(String name,
      TeXObject beginCode, TeXObject endCode)
    {
@@ -46,7 +51,8 @@ public class LaTeXGenericEnvironment extends Declaration
    public Object clone()
    {
       return new LaTeXGenericEnvironment(getName(),  
-        (TeXObject)beginCode.clone(), (TeXObject)endCode.clone());
+       beginCode == null ? null : (TeXObject)beginCode.clone(), 
+       endCode == null ? null : (TeXObject)endCode.clone());
    }
 
    @Override
@@ -58,9 +64,13 @@ public class LaTeXGenericEnvironment extends Declaration
 
       LaTeXGenericEnvironment env = (LaTeXGenericEnvironment)obj;
 
-      return beginCode.equals(env.beginCode) 
-        && endCode.equals(env.endCode)
-        && isModeSwitcher == env.isModeSwitcher;
+      if (isModeSwitcher != env.isModeSwitcher) return false;
+
+      if (beginCode == null && env.beginCode != null) return false;
+      if (endCode == null && env.endCode != null) return false;
+
+      return (beginCode == env.beginCode || beginCode.equals(env.beginCode)) 
+        && (endCode == env.endCode || endCode.equals(env.endCode));
    }
 
    @Override
@@ -75,6 +85,11 @@ public class LaTeXGenericEnvironment extends Declaration
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
     throws IOException
    {
+      if (beginCode == null)
+      {
+         return parser.getListener().createStack();
+      }
+
       TeXObject obj = (TeXObject)beginCode.clone();
 
       if (parser.isStack(obj))
@@ -100,6 +115,11 @@ public class LaTeXGenericEnvironment extends Declaration
    public TeXObjectList expandfully(TeXParser parser, TeXObjectList stack)
     throws IOException
    {
+      if (beginCode == null)
+      {
+         return parser.getListener().createStack();
+      }
+
       TeXObject obj = (TeXObject)beginCode.clone();
 
       TeXObjectList expanded ;
@@ -138,27 +158,36 @@ public class LaTeXGenericEnvironment extends Declaration
    @Override
    public void process(TeXParser parser) throws IOException
    {
-      parser.push((TeXObject)beginCode.clone(), true);
+      if (beginCode != null)
+      {
+         parser.push((TeXObject)beginCode.clone(), true);
+      }
    }
 
    @Override
    public void process(TeXParser parser, TeXObjectList stack) throws IOException
    {
-      stack.push((TeXObject)beginCode.clone(), true);
+      if (beginCode != null)
+      {
+         stack.push((TeXObject)beginCode.clone(), true);
+      }
    }
 
    @Override
    public void end(TeXParser parser, TeXObjectList stack) throws IOException
    {
-      TeXObject obj = (TeXObject)endCode.clone();
+      if (endCode != null)
+      {
+         TeXObject obj = (TeXObject)endCode.clone();
 
-      if (stack == null || stack == parser)
-      {
-         obj.process(parser);
-      }
-      else
-      {
-         obj.process(parser, stack);
+         if (stack == null || stack == parser)
+         {
+            obj.process(parser);
+         }
+         else
+         {
+            obj.process(parser, stack);
+         }
       }
    }
 

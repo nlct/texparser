@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013-2022 Nicola L.C. Talbot
+    Copyright (C) 2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -42,12 +42,6 @@ public class Href extends ControlSequence
       return new Href(getName(), sty);
    }
 
-   protected void process(TeXParser parser, TeXObject url, TeXObject text)
-     throws IOException
-   {
-      parser.getListener().href(sty.toFullUrl(url.toString(parser)), text);
-   }
-
    @Override
    public void process(TeXParser parser) throws IOException
    {
@@ -57,29 +51,55 @@ public class Href extends ControlSequence
    @Override
    public void process(TeXParser parser, TeXObjectList stack) throws IOException
    {
-      popOptArg(parser, stack);
+      LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
 
-      TeXObject urlArg = popArgFullyExpand(parser, stack);
+      String label = popOptLabelString(parser, stack);
 
-      TeXObject text = popArgFullyExpand(parser, stack);
+      if (label == null)
+      {// syntax \hyperref{URL}{category}{name}{text}
+
+         TeXObject urlArg = popArgFullyExpand(parser, stack);
+
+         String category = popLabelString(parser, stack);
+         String name = popLabelString(parser, stack);
+
+         TeXObject text = popArgFullyExpand(parser, stack);
       
-      if (urlArg instanceof TeXObjectList)
-      {
-         TeXObjectList list = (TeXObjectList)urlArg;
-
-         for (int i = 0; i < list.size(); i++)
+         if (urlArg instanceof TeXObjectList)
          {
-            TeXObject obj = list.get(i);
+            TeXObjectList list = (TeXObjectList)urlArg;
 
-            if (obj instanceof CharObject 
-                  && ((CharObject)obj).getCharCode()==0x00A0)
+            for (int i = 0; i < list.size(); i++)
             {
-               list.set(i, parser.getListener().getOther('~'));
+               TeXObject obj = list.get(i);
+
+               if (obj instanceof CharObject 
+                  && ((CharObject)obj).getCharCode()==0x00A0)
+               {
+                  list.set(i, parser.getListener().getOther('~'));
+               }
             }
          }
-      }
 
-      process(parser, urlArg, text);
+         String url = String.format("%s#%s.%s", url.toString(parser),
+           category, name);
+
+         listener.href(sty.toFullUrl(url), text);
+      }
+      else
+      {// syntax \hyperref[label]{text}
+      
+         TeXObject link = listener.createLink(label, text);
+
+         if (parser == stack || stack == null)
+         {
+            link.process(parser);
+         }
+         else
+         {
+            link.process(parser, stack);
+         }
+      }
    }
 
    private HyperrefSty sty;

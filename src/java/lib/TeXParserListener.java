@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -196,6 +196,27 @@ public abstract class TeXParserListener
 
    public abstract void href(String url, TeXObject text)
      throws IOException;
+
+   /**
+    * Creates a hyperlink anchor.
+    * May simply return the text if hyperlinks aren't supported.
+    * @param anchorName the hyperlink anchor name
+    * @param text the text with the anchor
+    * @return an object that incorporates the text with a target or
+    * just the text
+    */
+   @Override
+   public abstract TeXObject createAnchor(String anchorName, TeXObject text);
+
+   /**
+    * Creates a hyperlink.
+    * May simply return the text if hyperlinks aren't supported.
+    * @param anchorName the hyperlink anchor name
+    * @param text the hyperlink text
+    * @return an object that encapsulates the text with a hyperlink
+    * or just the text
+    */
+   public abstract TeXObject createLink(String anchorName, TeXObject text);
 
    public abstract Writeable getWriteable();
 

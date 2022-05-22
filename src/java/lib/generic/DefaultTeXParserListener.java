@@ -486,6 +486,32 @@ public abstract class DefaultTeXParserListener extends TeXParserListener
       return false;
    }
 
+   /**
+    * Creates a hyperlink anchor.
+    * Simply returns the text but may be overridden by sub-classes.
+    * @param anchorName the hyperlink anchor name
+    * @param text the text with the anchor
+    * @return the text
+    */ 
+   @Override
+   public TeXObject createAnchor(String anchorName, TeXObject text)
+   {
+      return text;
+   }
+
+   /**
+    * Creates a hyperlink.
+    * Simply returns the text but may be overridden by sub-classes.
+    * @param anchorName the hyperlink anchor name
+    * @param text the hyperlink text
+    * @return the text
+    */ 
+   @Override
+   public TeXObject createLink(String anchorName, TeXObject text)
+   {
+      return text;
+   }
+
    public Writeable getWriteable()
    {
       return writeable;

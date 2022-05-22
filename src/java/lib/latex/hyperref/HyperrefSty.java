@@ -21,6 +21,7 @@ package com.dickimawbooks.texparserlib.latex.hyperref;
 import java.io.IOException;
 
 import com.dickimawbooks.texparserlib.latex.*;
+import com.dickimawbooks.texparserlib.latex.etoolbox.CsDef;
 
 public class HyperrefSty extends LaTeXSty
 {
@@ -34,12 +35,48 @@ public class HyperrefSty extends LaTeXSty
    @Override
    public void addDefinitions()
    {
+      registerControlSequence(new HyperTarget());
+      registerControlSequence(new HyperLink());
+      registerControlSequence(new HyperRef());
       registerControlSequence(new Href(this));
       registerControlSequence(new NoLinkUrl());
       registerControlSequence(new Url(this));
+      registerControlSequence(new HyperBaseUrl(this));
       registerControlSequence(new AtFirstOfTwo("texorpdfstring"));
       // automatically implement unicode package option
       registerControlSequence(new AtFirstOfTwo("ifpdfstringunicode"));
       registerControlSequence(new SymbolCs("unichar"));
+      // ignore bookmark commands
+      registerControlSequence(new GobbleOpt("pdfbookmark", 1, 2));
+      registerControlSequence(new GobbleOpt("currentpdfbookmark", 0, 2));
+      registerControlSequence(new GobbleOpt("subpdfbookmark", 0, 2));
+      registerControlSequence(new GobbleOpt("belowpdfbookmark", 0, 2));
+      registerControlSequence(new AtGobble("thispdfpagelabel"));
+      registerControlSequence(new LaTeXGenericEnvironment("HoHyper"));
+      // make pdfstringdef simply behave like csdef
+      registerControlSequence(new CsDef("pdfstringdef"));
    }
+
+   /**
+    * Prepends base URL, if supplied.
+    * There's not check to determine if the URL is valid.
+    * @param url URL string
+    * @return full URL with base prepended
+    */ 
+   public String toFullUrl(String url)
+   {
+      if (baseUrl == null)
+      {
+         return url;
+      }
+
+      return baseUrl+url;
+   }
+
+   public void setBaseUrl(String base)
+   {
+      baseUrl = base;
+   }
+
+   protected String baseUrl = null;
 }

@@ -179,9 +179,6 @@ public class L2HConverter extends LaTeXParserListener
       parser.putControlSequence(new GenericCommand("LaTeX", null,
         createString("LaTeX")));
 
-      putControlSequence(new L2HHypertarget());
-      putControlSequence(new L2HHyperlink());
-
       putControlSequence(new L2HAmp());
       putControlSequence(new L2HNoBreakSpace());
       putControlSequence(new SpaceCs("newblock"));
@@ -591,6 +588,36 @@ public class L2HConverter extends LaTeXParserListener
       text.process(parser);
 
       writer.write("</a>");
+   }
+
+   @Override
+   public TeXObject createAnchor(String anchorName, TeXObject text)
+   {
+      TeXObjectList stack = createStack();
+
+      stack.add(new HtmlTag(String.format("<a id=\"%s\">", 
+        HtmlTag.getUriFragment(anchorName))));
+
+      stack.add(text);
+
+      stack.add(new HtmlTag("</a>"));
+
+      return stack;
+   }
+
+   @Override
+   public TeXObject createLink(String anchorName, TeXObject text)
+   {
+      TeXObjectList stack = createStack();
+
+      stack.add(new HtmlTag(String.format("<a href=\"#%s\">", 
+        HtmlTag.getUriFragment(anchorName))));
+
+      stack.add(text);
+
+      stack.add(new HtmlTag("</a>"));
+
+      return stack;
    }
 
    @Override

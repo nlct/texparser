@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013-2022 Nicola L.C. Talbot
+    Copyright (C) 2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -23,14 +23,14 @@ import java.util.Vector;
 
 import com.dickimawbooks.texparserlib.*;
 
-public class Url extends ControlSequence
+public class HyperBaseUrl extends ControlSequence
 {
-   public Url(HyperrefSty sty)
+   public HyperBaseUrl(HyperrefSty sty)
    {
-      this("url", sty);
+      this("hyperbaseurl", sty);
    }
 
-   public Url(String name, HyperrefSty sty)
+   public HyperBaseUrl(String name, HyperrefSty sty)
    {
       super(name);
       this.sty = sty;
@@ -39,17 +39,7 @@ public class Url extends ControlSequence
    @override
    public Object clone()
    {
-      return new Url(getName(), sty);
-   }
-
-   protected void process(TeXParser parser, TeXObject url, TeXObject text)
-     throws IOException
-   {
-      TeXObjectList list = new TeXObjectList(2);
-      list.add(new TeXCsRef("nolinkurl"));
-      list.add(text);
-
-      parser.getListener().href(sty.toFullUrl(url.toString(parser)), list);
+      return new HyperBaseUrl(getName(), sty);
    }
 
    @Override
@@ -79,7 +69,7 @@ public class Url extends ControlSequence
          }
       }
 
-      process(parser, urlArg, text);
+      sty.setBaseUrl(urlArg.toString(parser));
    }
 
    private HyperrefSty sty;
