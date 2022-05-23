@@ -20,8 +20,11 @@ package com.dickimawbooks.texparserlib.primitives;
 
 import java.io.IOException;
 import java.io.EOFException;
+import java.util.Vector;
 
 import com.dickimawbooks.texparserlib.*;
+import com.dickimawbooks.texparserlib.latex.Begin;
+import com.dickimawbooks.texparserlib.latex.End;
 
 public class HangIndent extends Primitive implements Expandable,InternalQuantity
 {
@@ -73,59 +76,91 @@ public class HangIndent extends Primitive implements Expandable,InternalQuantity
    protected void build(Paragraph par, TeXParser parser, TeXObjectList stack)
       throws IOException
    {
-      while (!stack.isEmpty())
+      boolean parFound = false;
+      byte popStyle = TeXObjectList.POP_IGNORE_LEADING_SPACE;
+
+      String currenv = null;
+      Vector<String> envs = null;
+
+      while (!parFound)
       {
-         TeXObject token = stack.popToken(TeXObjectList.POP_IGNORE_LEADING_SPACE);
+         TeXObject token = stack.popToken(popStyle);
+
+         if (token == null)
+         {
+            stack = parser;
+            token = stack.popToken(popStyle);
+         }
+
+         popStyle = (byte)0;
 
          if (token instanceof Expandable)
          {
-            TeXObjectList expanded = ((Expandable)token).expandfully(parser, stack);
+            TeXObjectList expanded;
+
+            if (parser == stack)
+            {
+               expanded = ((Expandable)token).expandfully(parser);
+            }
+            else
+            {
+               expanded = ((Expandable)token).expandfully(parser, stack);
+            }
 
             if (expanded != null)
             {
-               token = expanded;
+               stack.push(expanded, true);
+               token = stack.popToken(popStyle);
             }
          }
 
          if (token.isPar())
          {
-            break;
+            parFound = true;
          }
          else if (token instanceof ParIndent)
          {
-            token.process(parser, stack);
+            if (parser == stack)
+            {
+               token.process(parser);
+            }
+            else
+            {
+               token.process(parser, stack);
+            }
          }
-         else
+         else if (token instanceof Begin)
          {
             par.add(token, true);
-         }
-      }
-   }
 
-   protected void build(Paragraph par, TeXParser parser)
-      throws IOException
-   {
-      while (true)
-      {
-         TeXObject token = parser.popToken(TeXObjectList.POP_IGNORE_LEADING_SPACE);
+            currenv = popLabelString(parser, stack);
 
-         if (token instanceof Expandable)
-         {
-            TeXObjectList expanded = ((Expandable)token).expandfully(parser);
+            par.add(parser.getListener().createGroup(currenv));
 
-            if (expanded != null)
+            if (envs == null)
             {
-               token = expanded;
+               envs = new Vector<String>();
             }
-         }
 
-         if (token.isPar())
-         {
-            break;
+            envs.add(currenv);
          }
-         else if (token instanceof ParIndent)
+         else if (token instanceof End)
          {
-            token.process(parser);
+            String name = popLabelString(parser, stack);
+
+            if (envs == null || envs.isEmpty() || !name.equals(currenv))
+            {
+               stack.push(parser.getListener().createGroup(name));
+               stack.push(token);
+
+               parFound = true;
+            }
+            else
+            {
+               par.add(token, true);
+               par.add(parser.getListener().createGroup(name));
+               currenv = envs.remove(envs.size()-1);
+            }
          }
          else
          {
@@ -170,7 +205,7 @@ public class HangIndent extends Primitive implements Expandable,InternalQuantity
       Paragraph par = parser.getListener().createParagraph();
       par.setLeftMargin(dim);
 
-      build(par, parser);
+      build(par, parser, parser);
 
       parser.getSettings().setHangIndent(null);
 
@@ -221,7 +256,7 @@ public class HangIndent extends Primitive implements Expandable,InternalQuantity
       Paragraph par = parser.getListener().createParagraph();
       par.setLeftMargin(dim);
 
-      build(par, parser);
+      build(par, parser, parser);
 
       parser.getSettings().setHangIndent(null);
       par.process(parser);

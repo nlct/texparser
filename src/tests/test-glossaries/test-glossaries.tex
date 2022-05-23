@@ -5,7 +5,7 @@
 
 \usepackage[T1]{fontenc}
 \usepackage[colorlinks]{hyperref}
-\usepackage[toc,style=tree]{glossaries}
+\usepackage[toc,style=index]{glossaries}
 
 \makeglossaries
 
@@ -40,8 +40,15 @@ Reference section~\ref{sec:sample} (\ref*{sec:sample}).
 
 \hyperlink{sampleanchor}{Sample hyperlink}.
 
-\printglossaries
+%\printglossaries
+%
+%\newenvironment{test}{BEGIN TEST\begin{itemize}}{\end{itemize}END TEST}
+%\begin{test}\item Some content\end{test}
 
-\newenvironment{test}{BEGIN TEST\begin{itemize}}{\end{itemize}END TEST}
-\begin{test}\item Some content\end{test}
+\begin{theglossary}
+\item Item.
+\end{theglossary}
+Test.
+
+Other
 \end{document}
