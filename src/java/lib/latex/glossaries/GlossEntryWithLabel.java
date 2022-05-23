@@ -44,7 +44,22 @@ public class GlossEntryWithLabel extends AbstractGlsCommand
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      return null;
+      LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
+
+      GlsLabel glslabel = popEntryLabel(parser, stack);
+
+      listener.putControlSequence(glslabel.duplicate("glscurrententrylabel"));
+
+      TeXObjectList list = listener.createStack();
+
+      list.add(listener.getControlSequence("gls@org@glossaryentryfield"));
+      list.add(glslabel);
+
+      Group grp = listener.createGroup();
+      list.add(grp);
+      grp.add(popArg(parser, stack));
+
+      return list;
    }
 
    @Override
