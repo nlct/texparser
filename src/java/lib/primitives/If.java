@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -35,11 +35,13 @@ public class If extends Primitive implements Expandable
       super(name, true);
    }
 
+   @Override
    public Object clone()
    {
       return new If(getName());
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
@@ -57,6 +59,7 @@ public class If extends Primitive implements Expandable
       return list;
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser)
       throws IOException
    {
@@ -74,21 +77,26 @@ public class If extends Primitive implements Expandable
       return list;
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser, TeXObjectList stack)
    throws IOException
    {
       return expandonce(parser, stack).expandfully(parser, stack);
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser)
    throws IOException
    {
       return expandonce(parser).expandfully(parser);
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
+      pending = null;
+
       if (istrue(parser, stack))
       {
          doTruePart(parser, stack);
@@ -97,11 +105,20 @@ public class If extends Primitive implements Expandable
       {
          doFalsePart(parser, stack);
       }
+
+      if (pending != null)
+      {
+         stack.push(pending, true);
+         pending = null;
+      }
    }
 
+   @Override
    public void process(TeXParser parser)
       throws IOException
    {
+      pending = null;
+
       if (istrue(parser, parser))
       {
          doTruePart(parser, parser);
@@ -109,6 +126,12 @@ public class If extends Primitive implements Expandable
       else
       {
          doFalsePart(parser, parser);
+      }
+
+      if (pending != null)
+      {
+         parser.push(pending, true);
+         pending = null;
       }
    }
 
@@ -174,7 +197,17 @@ public class If extends Primitive implements Expandable
       {
          if (list == null)
          {
-            if (parser == stack)
+            if (pending != null)
+            {
+               pending.add(obj);
+            }
+            else if (obj instanceof Paragraph 
+               && ((Paragraph)obj).isIncomplete())
+            {
+               pending = parser.getListener().createStack();
+               pending.add(obj);
+            }
+            else if (parser == stack)
             {
                obj.process(parser);
             }
@@ -273,7 +306,17 @@ public class If extends Primitive implements Expandable
       {
          if (list == null)
          {
-            if (parser == stack)
+            if (pending != null)
+            {
+               pending.add(obj);
+            }
+            else if (obj instanceof Paragraph 
+               && ((Paragraph)obj).isIncomplete())
+            {
+               pending = parser.getListener().createStack();
+               pending.add(obj);
+            }
+            else if (parser == stack)
             {
                obj.process(parser);
             }
@@ -291,6 +334,7 @@ public class If extends Primitive implements Expandable
       }
    }
 
+   @Override
    public boolean equals(Object obj)
    {
       if (obj == this) return true;
@@ -308,4 +352,5 @@ public class If extends Primitive implements Expandable
       return obj.getClass().getName().equals(getClass().getName());
    }
 
+   protected TeXObjectList pending = null;
 }

@@ -95,7 +95,7 @@ public class IfCase extends If
 
          if (expanded != null)
          {
-            stack.addAll(0, expanded);
+            stack.push(expanded, true);
             obj = stack.popToken();
          }
       }
@@ -119,7 +119,7 @@ public class IfCase extends If
          }
          else
          {
-            list.add(obj);
+            list.add(obj, true);
          }
 
          doCase(parser, stack, list);
@@ -182,12 +182,13 @@ public class IfCase extends If
    public void process(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
-      stack.add(0, expandonce(parser, stack));
+      stack.push(expandonce(parser, stack), true);
    }
 
    public void process(TeXParser parser)
       throws IOException
    {
-      parser.add(0, expandonce(parser));
+      parser.push(expandonce(parser), true);
    }
+
 }
