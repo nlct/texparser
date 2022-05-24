@@ -341,13 +341,15 @@ public class GenericCommand extends Command
    public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      getReplacement(parser, stack).process(parser, stack);
+      TeXObjectList repl = getReplacement(parser, stack);
+      stack.push(repl, true);
    }
 
    public void process(TeXParser parser)
      throws IOException
    {
-      getReplacement(parser).process(parser);
+      TeXObjectList repl = getReplacement(parser);
+      parser.push(repl, true);
    }
 
    @Override
