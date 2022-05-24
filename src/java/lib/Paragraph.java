@@ -160,5 +160,12 @@ public class Paragraph extends DataObjectList
       }
    }
 
+   @Override
+   protected String toStringExtraIdentifier()
+   {
+      return String.format("(left=%s,right=%s,top=%s,bottom=%s,indent=%s)",
+       leftMargin, rightMargin, topMargin, bottomMargin, parIndent);
+   }
+
    protected TeXDimension leftMargin, rightMargin, topMargin, bottomMargin, parIndent;
 }

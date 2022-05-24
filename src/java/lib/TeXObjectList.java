@@ -1755,6 +1755,11 @@ public class TeXObjectList extends Vector<TeXObject>
       }
    }
 
+   protected String toStringExtraIdentifier()
+   {
+      return "";
+   }
+
    public String toString()
    {
       StringBuilder builder = new StringBuilder();
@@ -1765,6 +1770,8 @@ public class TeXObjectList extends Vector<TeXObject>
       {
          builder.append("#"+stackID);
       }
+
+      builder.append(toStringExtraIdentifier());
 
       builder.append('[');
 
