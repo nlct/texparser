@@ -81,7 +81,7 @@ public class L2HParagraph extends Paragraph
          style += String.format("margin-bottom: %s; ", dim.format());
       }
 
-      dim = parser.getSettings().getCurrentParIndent();
+      dim = getParIndent();
 
       if (dim != null)
       {

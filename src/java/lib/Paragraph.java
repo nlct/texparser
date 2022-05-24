@@ -66,6 +66,11 @@ public class Paragraph extends DataObjectList
       bottomMargin = margin;
    }
 
+   public void setParIndent(TeXDimension indent)
+   {
+      parIndent = indent;
+   }
+
    public TeXDimension getLeftMargin()
    {
       return leftMargin;
@@ -84,6 +89,11 @@ public class Paragraph extends DataObjectList
    public TeXDimension getBottomMargin()
    {
       return bottomMargin;
+   }
+
+   public TeXDimension getParIndent()
+   {
+      return parIndent;
    }
 
    @Override
@@ -150,5 +160,5 @@ public class Paragraph extends DataObjectList
       }
    }
 
-   protected TeXDimension leftMargin, rightMargin, topMargin, bottomMargin;
+   protected TeXDimension leftMargin, rightMargin, topMargin, bottomMargin, parIndent;
 }

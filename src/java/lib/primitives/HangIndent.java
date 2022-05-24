@@ -82,6 +82,8 @@ public class HangIndent extends Primitive implements Expandable,InternalQuantity
       String currenv = null;
       Vector<String> envs = null;
 
+      TeXDimension indent = null;
+
       while (!parFound)
       {
          TeXObject token = stack.popToken(popStyle);
@@ -129,6 +131,12 @@ public class HangIndent extends Primitive implements Expandable,InternalQuantity
                token.process(parser, stack);
             }
          }
+         else if (par.isEmpty() && token instanceof Spacer
+                   && ((Spacer)token).getDirection() == Direction.HORIZONTAL)
+         {
+            indent = new UserDimension();
+            indent.advance(parser, ((Spacer)token).getSize());
+         }
          else if (token instanceof Begin)
          {
             par.add(token, true);
@@ -168,6 +176,19 @@ public class HangIndent extends Primitive implements Expandable,InternalQuantity
          }
       }
 
+      TeXDimension dim = parser.getSettings().getCurrentParIndent();
+
+      if (dim != null)
+      {
+         if (indent == null)
+         {
+            indent = new UserDimension();
+         }
+
+         indent.advance(parser, dim);
+      }
+
+      par.setParIndent(indent);
    }
 
    /**
