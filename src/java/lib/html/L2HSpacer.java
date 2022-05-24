@@ -29,11 +29,16 @@ public class L2HSpacer extends Spacer
       super(direction, size);
    }
 
+   public L2HSpacer(Direction direction, TeXDimension size, boolean inline)
+   {
+      super(direction, size, inline);
+   }
+
    @Override
    public Object clone()
    {
       return new L2HSpacer(direction, 
-        size == null ? null : (TeXDimension)size.clone());
+        size == null ? null : (TeXDimension)size.clone(), isInLine());
    }
 
 

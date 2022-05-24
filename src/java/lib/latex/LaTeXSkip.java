@@ -22,7 +22,7 @@ import java.io.IOException;
 
 import com.dickimawbooks.texparserlib.*;
 
-public class LaTeXSkip extends ControlSequence implements Expandable
+public class LaTeXSkip extends ControlSequence implements Expandable,SpacingObject
 {
    public LaTeXSkip(String name, Direction direction)
    {
@@ -36,9 +36,18 @@ public class LaTeXSkip extends ControlSequence implements Expandable
       return new LaTeXSkip(getName(), getDirection());
    }
 
+   @Override
    public Direction getDirection()
    {
       return direction;
+   }
+
+   @Override
+   public TeXDimension getSize(TeXParser parser, TeXObjectList stack)
+    throws IOException
+   {
+      popModifier(parser, stack, '*');
+      return popDimensionArg(parser, stack);
    }
 
    @Override
@@ -48,7 +57,8 @@ public class LaTeXSkip extends ControlSequence implements Expandable
       popModifier(parser, stack, '*');
       TeXDimension value = popDimensionArg(parser, stack);
 
-      Spacer spacer = parser.getListener().getSpacer(direction, value);
+      Spacer spacer = parser.getListener().getSpacer(direction, value,
+       direction == Direction.HORIZONTAL);
 
       TeXObjectList list = parser.getListener().createStack();
 
@@ -85,7 +95,8 @@ public class LaTeXSkip extends ControlSequence implements Expandable
       popModifier(parser, stack, '*');
       TeXDimension value = popDimensionArg(parser, stack);
 
-      Spacer spacer = parser.getListener().getSpacer(direction, value);
+      Spacer spacer = parser.getListener().getSpacer(direction, value,
+       direction == Direction.HORIZONTAL);
 
       spacer.process(parser, stack);
    }
@@ -97,7 +108,8 @@ public class LaTeXSkip extends ControlSequence implements Expandable
       popModifier(parser, parser, '*');
       TeXDimension value = popDimensionArg(parser, parser);
 
-      Spacer spacer = parser.getListener().getSpacer(direction, value);
+      Spacer spacer = parser.getListener().getSpacer(direction, value,
+       direction == Direction.HORIZONTAL);
 
       spacer.process(parser);
    }

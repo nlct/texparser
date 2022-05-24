@@ -352,9 +352,9 @@ public abstract class DefaultTeXParserListener extends TeXParserListener
    }
 
    @Override
-   public Spacer getSpacer(Direction direction, TeXDimension size)
+   public Spacer getSpacer(Direction direction, TeXDimension size, boolean inline)
    {
-      return new Spacer(direction, size);
+      return new Spacer(direction, size, inline);
    }
 
    public Param getParam(int digit)

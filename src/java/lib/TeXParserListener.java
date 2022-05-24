@@ -68,7 +68,8 @@ public abstract class TeXParserListener
 
    public abstract Space getSpace();
 
-   public abstract Spacer getSpacer(Direction direction, TeXDimension size);
+   public abstract Spacer getSpacer(Direction direction, TeXDimension size, 
+     boolean inline);
 
    public abstract Param getParam(int digit);
 

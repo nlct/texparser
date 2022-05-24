@@ -23,7 +23,7 @@ import java.io.EOFException;
 
 import com.dickimawbooks.texparserlib.*;
 
-public class Skip extends Primitive implements Expandable
+public class Skip extends Primitive implements Expandable,SpacingObject
 {
    public Skip(String name, Direction direction)
    {
@@ -38,12 +38,27 @@ public class Skip extends Primitive implements Expandable
    }
 
    @Override
+   public TeXDimension getSize(TeXParser parser, TeXObjectList stack)
+    throws IOException
+   {
+      if (parser == stack || stack == null)
+      {
+         return stack.popDimension(parser);
+      }
+      else
+      {
+         return parser.popDimension();
+      }
+   }
+
+   @Override
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
       TeXDimension dim = stack.popDimension(parser);
 
-      Spacer spacer = parser.getListener().getSpacer(direction, dim);
+      Spacer spacer = parser.getListener().getSpacer(direction, dim,
+       direction == Direction.HORIZONTAL);
 
       TeXObjectList list = parser.getListener().createStack();
       list.add(spacer);
@@ -57,7 +72,8 @@ public class Skip extends Primitive implements Expandable
    {
       TeXDimension dim = parser.popDimension();
 
-      Spacer spacer = parser.getListener().getSpacer(direction, dim);
+      Spacer spacer = parser.getListener().getSpacer(direction, dim,
+       direction == Direction.HORIZONTAL);
 
       TeXObjectList list = parser.getListener().createStack();
       list.add(spacer);
@@ -85,7 +101,8 @@ public class Skip extends Primitive implements Expandable
    {
       TeXDimension dim = stack.popDimension(parser);
 
-      Spacer spacer = parser.getListener().getSpacer(direction, dim);
+      Spacer spacer = parser.getListener().getSpacer(direction, dim,
+       direction == Direction.HORIZONTAL);
 
       spacer.process(parser, stack);
    }
@@ -96,7 +113,8 @@ public class Skip extends Primitive implements Expandable
    {
       TeXDimension dim = parser.popDimension();
 
-      Spacer spacer = parser.getListener().getSpacer(direction, dim);
+      Spacer spacer = parser.getListener().getSpacer(direction, dim,
+       direction == Direction.HORIZONTAL);
 
       spacer.process(parser);
    }

@@ -369,6 +369,12 @@ public class L2HConverter extends LaTeXParserListener
    }
 
    @Override
+   public Spacer getSpacer(Direction direction, TeXDimension size, boolean inline)
+   {
+      return new L2HSpacer(direction, size, inline);
+   }
+
+   @Override
    public MathGroup createMathGroup()
    {
       return new L2HMathGroup();
