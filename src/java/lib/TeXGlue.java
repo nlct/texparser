@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -46,6 +46,7 @@ public class TeXGlue implements TeXDimension, Expandable
       setShrink(parser, minus);
    }
 
+   @Override
    public Object clone()
    {
       TeXGlue glue = new TeXGlue();
@@ -63,16 +64,19 @@ public class TeXGlue implements TeXDimension, Expandable
       return glue;
    }
 
+   @Override
    public float getValue()
    {
       return fixed.getValue();
    }
 
+   @Override
    public TeXUnit getUnit()
    {
       return fixed.getUnit();
    }
 
+   @Override
    public void setDimension(TeXParser parser, TeXDimension dimen)
      throws TeXSyntaxException
    {
@@ -122,6 +126,7 @@ public class TeXGlue implements TeXDimension, Expandable
       }
    }
 
+   @Override
    public void advance(TeXParser parser, Numerical increment)
     throws TeXSyntaxException
    {
@@ -157,6 +162,7 @@ public class TeXGlue implements TeXDimension, Expandable
       }
    }
 
+   @Override
    public void divide(int divisor)
    {
       fixed.divide(divisor);
@@ -172,6 +178,7 @@ public class TeXGlue implements TeXDimension, Expandable
       }
    }
 
+   @Override
    public void multiply(int factor)
    {
       fixed.multiply(factor);
@@ -187,6 +194,7 @@ public class TeXGlue implements TeXDimension, Expandable
       }
    }
 
+   @Override
    public void multiply(float factor)
    {
       fixed.multiply(factor);
@@ -226,12 +234,14 @@ public class TeXGlue implements TeXDimension, Expandable
       }
    }
 
+   @Override
    public int number(TeXParser parser)
     throws TeXSyntaxException
    {
       return fixed.number(parser);
    }
 
+   @Override
    public String toString(TeXParser parser)
    {
       String str = fixed.toString(parser);
@@ -249,6 +259,7 @@ public class TeXGlue implements TeXDimension, Expandable
       return str;
    }
 
+   @Override
    public String format()
    {
       String str = fixed.format();
@@ -266,58 +277,68 @@ public class TeXGlue implements TeXDimension, Expandable
       return str;
    }
 
+   @Override
    public String toString()
    {
       return String.format("%s[fixed:%s,stretch=%s,shrink=%s]",
         getClass().getName(), fixed, stretch, shrink);
    }
 
+   @Override
    public TeXObjectList string(TeXParser parser) throws IOException
    {
       return parser.string(toString(parser));
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
       return string(parser);
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser)
       throws IOException
    {
       return string(parser);
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
       return expandonce(parser, stack);
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser)
       throws IOException
    {
       return expandonce(parser);
    }
 
+   @Override
    public void process(TeXParser parser)
       throws IOException
    {
       parser.addAll(0, string(parser));
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
       stack.addAll(0, string(parser));
    }
 
+   @Override
    public boolean isPar()
    {
       return false;
    }
 
+   @Override
    public boolean isEmpty()
    {
       return false;

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -26,26 +26,31 @@ public class Tab implements TeXObject
    {
    }
 
+   @Override
    public Object clone()
    {
       return new Tab();
    }
 
+   @Override
    public String toString(TeXParser parser)
    {
       return new String(Character.toChars(parser.getTabChar()));
    }
 
+   @Override
    public String toString()
    {
       return getClass().getName();
    }
 
+   @Override
    public String format()
    {
       return "&";
    }
 
+   @Override
    public TeXObjectList string(TeXParser parser)
      throws IOException
    {
@@ -55,12 +60,14 @@ public class Tab implements TeXObject
       return list;
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
       process(parser);
    }
 
+   @Override
    public void process(TeXParser parser)
      throws IOException
    {
@@ -69,11 +76,13 @@ public class Tab implements TeXObject
       settings.startColumn();
    }
 
+   @Override
    public boolean isPar()
    {
       return false;
    }
 
+   @Override
    public boolean isEmpty()
    {
       return false;

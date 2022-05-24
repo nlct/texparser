@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -42,42 +42,50 @@ public class DataRealElement implements DataNumericElement,Expandable
       this.value = value;
    }
 
+   @Override
    public Object clone()
    {
       return new DataRealElement(sty, value);
    }
 
+   @Override
    public double doubleValue()
    {
       return value;
    }
 
+   @Override
    public float floatValue()
    {
       return (float)value;
    }
 
+   @Override
    public int intValue()
    {
       return (int)value;
    }
 
+   @Override
    public void advance(TeXParser parser, Numerical increment)
     throws TeXSyntaxException
    {
       value += increment.number(parser);
    }
 
+   @Override
    public void divide(int divisor)
    {
       value /= divisor;
    }
 
+   @Override
    public void multiply(int factor)
    {
       value *= factor;
    }
 
+   @Override
    public int number(TeXParser parser) throws TeXSyntaxException
    {
       return intValue();
@@ -88,18 +96,21 @@ public class DataRealElement implements DataNumericElement,Expandable
       return DataToolHeader.TYPE_REAL;
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser)
     throws IOException
    {
       return string(parser);
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
     throws IOException
    {
       return expandonce(parser);
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser)
     throws IOException
    {
@@ -110,6 +121,7 @@ public class DataRealElement implements DataNumericElement,Expandable
       return list.expandfully(parser);
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser, TeXObjectList stack)
     throws IOException
    {
@@ -120,36 +132,43 @@ public class DataRealElement implements DataNumericElement,Expandable
       return list.expandfully(parser, stack);
    }
 
+   @Override
    public String format()
    {
       return String.format("%f", value);
    }
 
+   @Override
    public String toString(TeXParser parser)
    {
       return format();
    }
 
+   @Override
    public TeXObjectList string(TeXParser parser) throws IOException
    {
       return parser.string(toString(parser));
    }
 
+   @Override
    public void process(TeXParser parser) throws IOException
    {
       parser.getListener().getWriteable().write(toString(parser));
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack) throws IOException
    {
       process(parser);
    }
 
+   @Override
    public boolean isPar()
    {
       return false;
    }
 
+   @Override
    public boolean isEmpty()
    {
       return false;

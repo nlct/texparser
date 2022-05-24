@@ -294,17 +294,20 @@ public class KeyValList extends HashMap<String,TeXObject>
       return valList;
    }
 
+   @Override
    public TeXObjectList string(TeXParser parser) throws IOException
    {
       return new TeXObjectList();
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
       process(parser);
    }
 
+   @Override
    public void process(TeXParser parser)
      throws IOException
    {
@@ -336,6 +339,7 @@ public class KeyValList extends HashMap<String,TeXObject>
       }
    }
 
+   @Override
    public String toString(TeXParser parser)
    {
       StringBuilder builder = new StringBuilder();
@@ -378,6 +382,7 @@ public class KeyValList extends HashMap<String,TeXObject>
       return builder.toString();
    }
 
+   @Override
    public String format()
    {
       StringBuilder builder = new StringBuilder();
@@ -418,6 +423,7 @@ public class KeyValList extends HashMap<String,TeXObject>
       return builder.toString();
    }
 
+   @Override
    public boolean isPar()
    {
       return false;

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -43,6 +43,7 @@ public class DataIntElement extends UserNumber implements DataNumericElement
       this.sty = sty;
    }
 
+   @Override
    public Object clone()
    {
       return new DataIntElement(sty, getValue());
@@ -53,21 +54,25 @@ public class DataIntElement extends UserNumber implements DataNumericElement
       return DataToolHeader.TYPE_INT;
    }
 
+   @Override
    public double doubleValue()
    {
       return (double)intValue();
    }
 
+   @Override
    public float floatValue()
    {
       return (float)intValue();
    }
 
+   @Override
    public int intValue()
    {
       return getValue();
    }
 
+   @Override
    public String format()
    {
       return String.format("%d", getValue());

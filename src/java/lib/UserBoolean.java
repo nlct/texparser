@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -27,11 +27,13 @@ public class UserBoolean implements TeXBoolean
       value = isTrue;
    }
 
+   @Override
    public Object clone()
    {
       return new UserBoolean(value);
    }
 
+   @Override
    public boolean booleanValue()
    {
       return value;
@@ -42,23 +44,27 @@ public class UserBoolean implements TeXBoolean
       value = newValue;
    }
 
+   @Override
    public String format()
    {
       return String.format("\\if%s", value);
    }
 
+   @Override
    public String toString()
    {
       return String.format("%s[value=%d]",
          getClass().getSimpleName(), value);
    }
 
+   @Override
    public String toString(TeXParser parser)
    {
       return String.format("%sif%s", 
         new String(Character.toChars(parser.getEscChar())), value);
    }
 
+   @Override
    public TeXObjectList string(TeXParser parser) throws IOException
    {
       return parser.getListener().createString(
@@ -66,22 +72,26 @@ public class UserBoolean implements TeXBoolean
           new String(Character.toChars(parser.getEscChar())), value));
    }
 
+   @Override
    public void process(TeXParser parser) throws IOException
    {
       parser.add(0, new TeXCsRef("if"+value));
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
       stack.add(0, new TeXCsRef("if"+value));
    }
 
+   @Override
    public boolean isPar()
    {
       return false;
    }
 
+   @Override
    public boolean isEmpty()
    {
       return false;

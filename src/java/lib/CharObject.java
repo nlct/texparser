@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -37,22 +37,26 @@ public abstract class CharObject implements TeXObject
 
    public abstract Object clone();
 
+   @Override
    public String toString(TeXParser parser)
    {
       return parser.getSettings().getCharString(charCode);
    }
 
+   @Override
    public String toString()
    {
       return String.format("%s[%s]", getClass().getSimpleName(), 
         format());
    }
 
+   @Override
    public String format()
    {
       return new String(Character.toChars(getCharCode()));
    }
 
+   @Override
    public TeXObjectList string(TeXParser parser)
      throws IOException
    {
@@ -71,22 +75,26 @@ public abstract class CharObject implements TeXObject
       this.charCode = charCode;
    }
 
+   @Override
    public void process(TeXParser parser) throws IOException
    {
       parser.getListener().getWriteable().write(toString(parser));
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
       process(parser);
    }
 
+   @Override
    public boolean isPar()
    {
       return false;
    }
 
+   @Override
    public boolean isEmpty()
    {
       return false;

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -40,6 +40,7 @@ public class DataToolRows extends Vector<DataToolEntryRow>
       this.sty = sty;
    }
 
+   @Override
    public Object clone()
    {
       DataToolRows rows = new DataToolRows(sty, capacity());
@@ -225,16 +226,19 @@ public class DataToolRows extends Vector<DataToolEntryRow>
       return list;
    }
 
+   @Override
    public void process(TeXParser parser) throws IOException
    {
       parser.addAll(0, expandonce(parser));
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack) throws IOException
    {
       process(parser);
    }
 
+   @Override
    public String toString(TeXParser parser)
    {
       try
@@ -247,12 +251,14 @@ public class DataToolRows extends Vector<DataToolEntryRow>
       }
    }
 
+   @Override
    public TeXObjectList string(TeXParser parser)
     throws IOException
    {
       return expandonce(parser).string(parser);
    }
 
+   @Override
    public String format()
    {
       try
@@ -265,6 +271,7 @@ public class DataToolRows extends Vector<DataToolEntryRow>
       }
    }
 
+   @Override
    public boolean isPar()
    {
       return false;

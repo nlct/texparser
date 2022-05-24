@@ -27,11 +27,13 @@ public class TeXPathObject implements TeXObject
       this.texPath = texPath;
    }
 
+   @Override
    public void process(TeXParser parser) throws IOException
    {
       process(parser, parser);
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
@@ -39,37 +41,44 @@ public class TeXPathObject implements TeXObject
         true);
    }
 
+   @Override
    public Object clone()
    {
       return new TeXPathObject(texPath);
    }
 
+   @Override
    public String toString(TeXParser parser)
    {
       return texPath.getTeXPath(false);
    }
 
+   @Override
    public TeXObjectList string(TeXParser parser)
     throws IOException
    {
       return parser.getListener().createString(toString(parser));
    }
 
+   @Override
    public String format()
    {
       return texPath.getTeXPath(false);
    }
 
+   @Override
    public boolean isPar()
    {
       return false;
    }
 
+   @Override
    public boolean isEmpty()
    {
       return false;
    }
 
+   @Override
    public String toString()
    {
       return String.format("%s[path=%s]", getClass().getSimpleName(), texPath);

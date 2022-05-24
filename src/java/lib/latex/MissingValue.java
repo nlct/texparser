@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2018 Nicola L.C. Talbot
+    Copyright (C) 2018-2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -29,64 +29,76 @@ public class MissingValue implements TeXObject,Expandable
       super();
    }
 
+   @Override
    public Object clone()
    {
       return new MissingValue();
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
    throws IOException
    {
       return new TeXObjectList();
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser)
    throws IOException
    {
       return new TeXObjectList();
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser, TeXObjectList stack)
    throws IOException
    {
       return new TeXObjectList();
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser)
    throws IOException
    {
       return new TeXObjectList();
    }
 
+   @Override
    public void process(TeXParser parser) throws IOException
    {
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack) throws IOException
    {
    }
 
+   @Override
    public String toString(TeXParser parser)
    {
       return "";
    }
 
+   @Override
    public TeXObjectList string(TeXParser parser)
     throws IOException
    {
       return new TeXObjectList();
    }
 
+   @Override
    public String format()
    {
       return "";
    }
 
+   @Override
    public boolean isPar()
    {
       return false;
    }
 
+   @Override
    public boolean isEmpty()
    {
       return false;

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -198,16 +198,19 @@ public class DataToolEntry implements TeXObject
       return expandonce(parser);
    }
 
+   @Override
    public void process(TeXParser parser) throws IOException
    {
       parser.addAll(0, expandonce(parser));
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack) throws IOException
    {
       stack.addAll(0, expandonce(parser, stack));
    }
 
+   @Override
    public String toString(TeXParser parser)
    {
       try
@@ -220,12 +223,14 @@ public class DataToolEntry implements TeXObject
       }
    }
 
+   @Override
    public TeXObjectList string(TeXParser parser)
     throws IOException
    {
       return expandonce(parser).string(parser);
    }
 
+   @Override
    public String format()
    {
       try
@@ -238,16 +243,19 @@ public class DataToolEntry implements TeXObject
       }
    }
 
+   @Override
    public boolean isPar()
    {
       return false;
    }
 
+   @Override
    public boolean isEmpty()
    {
       return false;
    }
 
+   @Override
    public boolean equals(Object obj)
    {
       if (obj == null || !(obj instanceof DataToolEntry))
@@ -265,6 +273,7 @@ public class DataToolEntry implements TeXObject
       return contents.equals(entry.contents);
    }
 
+   @Override
    public String toString()
    {
       return String.format("%s[column=%d,contents=%s]",

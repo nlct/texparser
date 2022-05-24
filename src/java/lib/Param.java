@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -42,6 +42,7 @@ public class Param implements ParameterToken
       this.digit = digit;
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
@@ -55,6 +56,7 @@ public class Param implements ParameterToken
       }
    }
 
+   @Override
    public void process(TeXParser parser)
      throws IOException
    {
@@ -68,6 +70,7 @@ public class Param implements ParameterToken
       }
    }
 
+   @Override
    public String toString(TeXParser parser)
    {
       String charStr = new String(Character.toChars(parser.getParamChar()));
@@ -76,11 +79,13 @@ public class Param implements ParameterToken
                          : String.format("%s%d", charStr, digit);
    }
 
+   @Override
    public String format()
    {
       return (digit <= 0 ? "#" : "#"+digit);
    }
 
+   @Override
    public String toString()
    {
       return String.format("%s[%s]", 
@@ -88,6 +93,7 @@ public class Param implements ParameterToken
         (digit <= 0 ? "#" : "#"+digit));
    }
 
+   @Override
    public TeXObjectList string(TeXParser parser)
      throws IOException
    {
@@ -102,21 +108,25 @@ public class Param implements ParameterToken
       return list;
    }
 
+   @Override
    public boolean isPar()
    {
       return false;
    }
 
+   @Override
    public boolean isEmpty()
    {
       return false;
    }
 
+   @Override
    public ParameterToken next()
    {
       return null;
    }
 
+   @Override
    public Param tail()
    {
       return this;

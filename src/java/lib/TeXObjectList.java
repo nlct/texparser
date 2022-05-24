@@ -1930,6 +1930,7 @@ public class TeXObjectList extends Vector<TeXObject>
       }
    }
 
+   @Override
    public boolean isPar()
    {
       return size() == 1 && firstElement().isPar();

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -32,38 +32,45 @@ public class HtmlTag implements TeXObject
       this.tag = tag;
    }
 
+   @Override
    public Object clone()
    {
       return new HtmlTag(getTag());
    }
 
+   @Override
    public TeXObjectList string(TeXParser parser)
    {
       return parser.getListener().createString(getTag());
    }
 
+   @Override
    public String toString()
    {
       return String.format("%s[tag=%s]", 
         getClass().getSimpleName(), getTag());
    }
 
+   @Override
    public String format()
    {
       return getTag();
    }
 
+   @Override
    public String toString(TeXParser parser)
    {
       return getTag();
    }
 
+   @Override
    public void process(TeXParser parser)
       throws IOException
    {
       parser.getListener().getWriteable().write(tag);
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList list) throws IOException
    {
       process(parser);
@@ -74,11 +81,13 @@ public class HtmlTag implements TeXObject
       return tag;
    }
 
+   @Override
    public boolean isPar()
    {
       return false;
    }
 
+   @Override
    public boolean isEmpty()
    {
       return false;

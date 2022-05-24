@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -22,18 +22,21 @@ import java.io.IOException;
 
 public abstract class WhiteSpace implements TeXObject
 {
+   @Override
    public void process(TeXParser parser, TeXObjectList list)
      throws IOException
    {
       process(parser);
    }
 
+   @Override
    public void process(TeXParser parser)
      throws IOException
    {
       parser.getListener().getWriteable().write(' ');
    }
 
+   @Override
    public TeXObjectList string(TeXParser parser) throws IOException
    {
       TeXObjectList list = new TeXObjectList();
@@ -42,21 +45,25 @@ public abstract class WhiteSpace implements TeXObject
       return list;
    }
 
+   @Override
    public boolean isPar()
    {
       return false;
    }
 
+   @Override
    public boolean isEmpty()
    {
       return false;
    }
 
+   @Override
    public String toString()
    {
       return getClass().getName();
    }
 
+   @Override
    public String format()
    {
       return " ";

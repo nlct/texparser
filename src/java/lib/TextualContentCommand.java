@@ -111,11 +111,13 @@ public class TextualContentCommand extends ControlSequence implements Expandable
       return data;
    }
 
+   @Override
    public boolean isEmpty()
    {
       return text.isEmpty();
    }
 
+   @Override
    public String toString()
    {
       return String.format("%s[name=%s,text=%s,data=%s]",

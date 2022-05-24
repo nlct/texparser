@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -60,16 +60,19 @@ public class UserNumber implements TeXNumber
       }
    }
 
+   @Override
    public Object clone()
    {
       return new UserNumber(value);
    }
 
+   @Override
    public int number(TeXParser parser) throws TeXSyntaxException
    {
       return value;
    }
 
+   @Override
    public int getValue()
    {
       return value;
@@ -85,59 +88,70 @@ public class UserNumber implements TeXNumber
       value = (int)newValue;
    }
 
+   @Override
    public void multiply(int factor)
    {
       value *= factor;
    }
 
+   @Override
    public void divide(int divisor)
    {
       value /= divisor;
    }
 
+   @Override
    public void advance(TeXParser parser, Numerical increment)
     throws TeXSyntaxException
    {
       value += increment.number(parser);
    }
 
+   @Override
    public String format()
    {
       return ""+value;
    }
 
+   @Override
    public String toString()
    {
       return String.format("%s[value=%d]",
          getClass().getSimpleName(), value);
    }
 
+   @Override
    public String toString(TeXParser parser)
    {
       return ""+value;
    }
 
+   @Override
    public TeXObjectList string(TeXParser parser) throws IOException
    {
       return parser.string(toString(parser));
    }
 
+   @Override
    public void process(TeXParser parser) throws IOException
    {
       parser.getListener().getWriteable().write(""+value);
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
       process(parser);
    }
 
+   @Override
    public boolean isPar()
    {
       return false;
    }
 
+   @Override
    public boolean isEmpty()
    {
       return false;

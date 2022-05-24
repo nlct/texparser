@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -56,11 +56,13 @@ public abstract class TeXUnit implements TeXObject
       return fromUnit(parser, value, FixedUnit.SP);
    }
 
+   @Override
    public boolean isPar()
    {
       return false;
    }
 
+   @Override
    public boolean isEmpty()
    {
       return false;
@@ -76,6 +78,7 @@ public abstract class TeXUnit implements TeXObject
      return 18f*emValue;
    }
 
+   @Override
    public String toString()
    {
       return String.format("%s[unit=%s]", getClass().getSimpleName(),
