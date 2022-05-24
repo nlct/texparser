@@ -96,23 +96,41 @@ public class HangIndent extends Primitive implements Expandable,InternalQuantity
 
          popStyle = (byte)0;
 
+         if (token instanceof Group)
+         {
+            par.add(token);
+            continue;
+         }
+
+         if (token instanceof TeXCsRef)
+         {
+            token = parser.getListener().getControlSequence(
+              ((TeXCsRef)token).getName());
+         }
+
          if (token instanceof Expandable)
          {
             TeXObjectList expanded;
 
             if (parser == stack)
             {
-               expanded = ((Expandable)token).expandfully(parser);
+               expanded = ((Expandable)token).expandonce(parser);
             }
             else
             {
-               expanded = ((Expandable)token).expandfully(parser, stack);
+               expanded = ((Expandable)token).expandonce(parser, stack);
             }
 
             if (expanded != null)
             {
                stack.push(expanded, true);
                token = stack.popToken(popStyle);
+
+               if (token instanceof Group)
+               {
+                  par.add(token);
+                  continue;
+               }
             }
          }
 
@@ -136,6 +154,12 @@ public class HangIndent extends Primitive implements Expandable,InternalQuantity
          {
             indent = new UserDimension();
             indent.advance(parser, ((Spacer)token).getSize());
+         }
+         else if (token instanceof Spacer
+                   && ((Spacer)token).getDirection() == Direction.VERTICAL)
+         {
+            parFound = true;
+            stack.push(token);
          }
          else if (token instanceof Begin)
          {
