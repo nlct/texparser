@@ -23,19 +23,32 @@ import java.io.IOException;
 /**
  * Represents a horizontal or vertical space.
  */
-public class Spacer implements TeXObject
+public class Spacer implements SpacingObject
 {
    public Spacer(Direction direction, TeXDimension size)
    {
+      this(direction, size, direction==Direction.HORIZONTAL);
+   }
+
+   public Spacer(Direction direction, TeXDimension size, boolean inline)
+   {
       this.direction = direction;
       this.size = size;
+      this.inline = inline;
    }
 
    @Override
    public String toString()
    {
-      return String.format("%s[direction=%s,size=%s]", 
-       getClass().getSimpleName(), direction, size);
+      return String.format("%s[direction=%s,size=%s,inline=%s]", 
+       getClass().getSimpleName(), direction, size, inline);
+   }
+
+   @Override
+   public TeXDimension getSize(TeXParser parser, TeXObjectList stack)
+    throws IOException
+   {
+      return getSize();
    }
 
    public TeXDimension getSize()
@@ -43,17 +56,22 @@ public class Spacer implements TeXObject
       return size;
    }
 
+   @Override
    public Direction getDirection()
    {
       return direction;
    }
 
+   public boolean isInLine()
+   {
+      return inline;
+   }
 
    @Override
    public Object clone()
    {
       return new Spacer(direction, 
-        size == null ? null : (TeXDimension)size.clone());
+        size == null ? null : (TeXDimension)size.clone(), isInLine());
    }
 
    @Override
@@ -123,5 +141,6 @@ public class Spacer implements TeXObject
 
    protected Direction direction;
    protected TeXDimension size;
+   protected boolean inline;
 }
 
