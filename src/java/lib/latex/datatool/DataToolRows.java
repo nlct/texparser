@@ -277,5 +277,11 @@ public class DataToolRows extends Vector<DataToolEntryRow>
       return false;
    }
 
+   @Override
+   public boolean canExpand()
+   {
+      return false;
+   }
+
    private DataToolSty sty;
 }

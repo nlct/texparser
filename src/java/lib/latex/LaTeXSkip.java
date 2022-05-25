@@ -22,7 +22,7 @@ import java.io.IOException;
 
 import com.dickimawbooks.texparserlib.*;
 
-public class LaTeXSkip extends ControlSequence implements Expandable,SpacingObject
+public class LaTeXSkip extends Command implements SpacingObject
 {
    public LaTeXSkip(String name, Direction direction)
    {

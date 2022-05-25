@@ -213,6 +213,12 @@ public class DataToolEntryRow extends Vector<DataToolEntry>
       return false;
    }
 
+   @Override
+   public boolean canExpand()
+   {
+      return false;
+   }
+
    private DataToolSty sty;
    int rowIndex;
 }

@@ -20,7 +20,7 @@ package com.dickimawbooks.texparserlib;
 
 import java.io.IOException;
 
-public class Tab implements TeXObject
+public class Tab extends AbstractTeXObject
 {
    public Tab()
    {
@@ -74,18 +74,6 @@ public class Tab implements TeXObject
       TeXSettings settings = parser.getSettings();
 
       settings.startColumn();
-   }
-
-   @Override
-   public boolean isPar()
-   {
-      return false;
-   }
-
-   @Override
-   public boolean isEmpty()
-   {
-      return false;
    }
 
 }

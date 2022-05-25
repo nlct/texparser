@@ -23,7 +23,7 @@ import java.util.*;
 
 import com.dickimawbooks.texparserlib.*;
 
-public class IndexLocation implements TeXObject
+public class IndexLocation extends AbstractTeXObject
 {
    public IndexLocation(TeXObject location)
    {
@@ -162,18 +162,6 @@ public class IndexLocation implements TeXObject
       }
 
       format.process(parser, stack);
-   }
-
-   @Override
-   public boolean isPar()
-   {
-      return false;
-   }
-
-   @Override
-   public boolean isEmpty()
-   {
-      return false;
    }
 
    @Override

@@ -60,6 +60,12 @@ public class MultiCell extends Command
       return object;
    }
 
+   @Override
+   public boolean canExpand()
+   {
+      return false;
+   }
+
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
      throws IOException
    {

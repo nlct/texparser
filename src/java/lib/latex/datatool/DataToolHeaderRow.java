@@ -180,5 +180,11 @@ public class DataToolHeaderRow extends Vector<DataToolHeader>
       return false;
    }
 
+   @Override
+   public boolean canExpand()
+   {
+      return false;
+   }
+
    private DataToolSty sty;
 }

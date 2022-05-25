@@ -80,6 +80,12 @@ public class Detokenize extends Primitive implements Expandable
       return arg;
    } 
 
+   @Override
+   public boolean canExpand()
+   {
+      return true;
+   }
+
    public TeXObjectList expandonce(TeXParser parser) throws IOException
    {
       return detokenize(parser, parser);

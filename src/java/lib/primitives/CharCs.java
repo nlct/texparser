@@ -40,6 +40,12 @@ public class CharCs extends Primitive implements Expandable
       return new CharCs(getName());
    }
 
+   @Override
+   public boolean canExpand()
+   {
+      return true;
+   }
+
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
    throws IOException
    {

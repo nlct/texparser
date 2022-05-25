@@ -57,6 +57,12 @@ public class SearchControlSequence extends AssignedControlSequence
       super.process(parser, stack);
    }
 
+   @Override
+   public boolean canExpand()
+   {
+      return true;
+   }
+
    public TeXObjectList expandonce(TeXParser parser)
       throws IOException
    {

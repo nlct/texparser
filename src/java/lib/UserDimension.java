@@ -22,7 +22,7 @@ import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 import java.io.IOException;
 
-public class UserDimension implements TeXDimension, Expandable
+public class UserDimension extends AbstractTeXObject implements TeXDimension, Expandable
 {
    public UserDimension()
    {
@@ -214,6 +214,12 @@ public class UserDimension implements TeXDimension, Expandable
    }
 
    @Override
+   public boolean canExpand()
+   {
+      return true;
+   }
+
+   @Override
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
@@ -252,18 +258,6 @@ public class UserDimension implements TeXDimension, Expandable
       throws IOException
    {
       stack.addAll(0, string(parser));
-   }
-
-   @Override
-   public boolean isPar()
-   {
-      return false;
-   }
-
-   @Override
-   public boolean isEmpty()
-   {
-      return false;
    }
 
    private float value;

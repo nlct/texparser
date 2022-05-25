@@ -41,6 +41,12 @@ public class TrivListDec extends Declaration
    }
 
    @Override
+   public boolean canExpand()
+   {
+      return false;
+   }
+
+   @Override
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
      throws IOException
    {

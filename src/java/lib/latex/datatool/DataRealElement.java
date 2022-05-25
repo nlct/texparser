@@ -24,7 +24,8 @@ import java.util.Vector;
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.*;
 
-public class DataRealElement implements DataNumericElement,Expandable
+public class DataRealElement extends AbstractTeXObject
+  implements DataNumericElement,Expandable
 {
    public DataRealElement(DataToolSty sty)
    {
@@ -97,6 +98,12 @@ public class DataRealElement implements DataNumericElement,Expandable
    }
 
    @Override
+   public boolean canExpand()
+   {
+      return true;
+   }
+
+   @Override
    public TeXObjectList expandonce(TeXParser parser)
     throws IOException
    {
@@ -160,18 +167,6 @@ public class DataRealElement implements DataNumericElement,Expandable
    public void process(TeXParser parser, TeXObjectList stack) throws IOException
    {
       process(parser);
-   }
-
-   @Override
-   public boolean isPar()
-   {
-      return false;
-   }
-
-   @Override
-   public boolean isEmpty()
-   {
-      return false;
    }
 
    private double value;

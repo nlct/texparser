@@ -43,6 +43,12 @@ public class MathEg extends EgChar implements Expandable
       return new MathEg(getCharCode(), isInLine());
    }
 
+   @Override
+   public boolean canExpand()
+   {
+      return true;
+   }
+
    public TeXObjectList expandonce(TeXParser parser) throws IOException
    {
       TeXObjectList list = new TeXObjectList(1);

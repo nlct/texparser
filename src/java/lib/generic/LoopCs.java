@@ -40,6 +40,12 @@ public class LoopCs extends ControlSequence implements Expandable
       return new LoopCs(getName());
    }
 
+   @Override
+   public boolean canExpand()
+   {
+      return true;
+   }
+
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
       throws IOException
    {

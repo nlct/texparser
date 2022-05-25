@@ -40,6 +40,12 @@ public class NewCommand extends Command
       return new NewCommand(getName(), getOverwrite());
    }
 
+   @Override
+   public boolean canExpand()
+   {
+      return false;
+   }
+
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList list)
      throws IOException
    {

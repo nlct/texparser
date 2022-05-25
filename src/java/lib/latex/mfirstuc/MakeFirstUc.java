@@ -23,7 +23,7 @@ import java.io.IOException;
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.*;
 
-public class MakeFirstUc extends ControlSequence implements Expandable
+public class MakeFirstUc extends Command
 {
    public MakeFirstUc()
    {

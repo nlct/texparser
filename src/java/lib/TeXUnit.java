@@ -18,7 +18,7 @@
 */
 package com.dickimawbooks.texparserlib;
 
-public abstract class TeXUnit implements TeXObject
+public abstract class TeXUnit extends AbstractTeXObject
 {
    // convert value in other unit to this unit
    public abstract float toUnit(TeXParser parser, float value, 
@@ -54,18 +54,6 @@ public abstract class TeXUnit implements TeXObject
       throws TeXSyntaxException
    {
       return fromUnit(parser, value, FixedUnit.SP);
-   }
-
-   @Override
-   public boolean isPar()
-   {
-      return false;
-   }
-
-   @Override
-   public boolean isEmpty()
-   {
-      return false;
    }
 
    public static float muToEm(float muValue)

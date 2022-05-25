@@ -88,6 +88,12 @@ public class ExpandAfter extends Primitive implements Expandable
       list.push(firstArg);
    }
 
+   @Override
+   public boolean canExpand()
+   {
+      return true;
+   }
+
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
    throws IOException
    {

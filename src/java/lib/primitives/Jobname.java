@@ -40,6 +40,12 @@ public class Jobname extends Primitive implements Expandable
       return new Jobname(getName());
    }
 
+   @Override
+   public boolean canExpand()
+   {
+      return true;
+   }
+
    public TeXObjectList expandonce(TeXParser parser)
    throws IOException
    {

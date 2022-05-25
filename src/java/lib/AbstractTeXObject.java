@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -20,34 +20,26 @@ package com.dickimawbooks.texparserlib;
 
 import java.io.IOException;
 
-public interface TeXObject extends Cloneable
+public abstract class AbstractTeXObject implements TeXObject
 {
-   // Process this. Arguments can be fetched with
-   // parser.popStack()
-   public void process(TeXParser parser)
-      throws IOException;
+   public abstract Object clone();
 
-   // Process with local stack.
-   // If stack is null or empty, same as process(parser)
-   // otherwise arguments can be fetched with stack.popArg()
-   // If you need more arguments once stack is empty, use
-   // parser.popNextArg()
-   public void process(TeXParser parser, TeXObjectList stack)
-      throws IOException;
+   @Override
+   public boolean isPar()
+   {
+      return false;
+   }
 
-   public Object clone();
+   @Override
+   public boolean isEmpty()
+   {
+      return false;
+   }
 
-   public String toString(TeXParser parser);
-
-   public TeXObjectList string(TeXParser parser)
-    throws IOException;
-
-   public String format();
-
-   public boolean isPar();
-
-   public boolean isEmpty();
-
-   public boolean canExpand();
+   @Override
+   public boolean canExpand()
+   {
+      return false;
+   }
 }
 

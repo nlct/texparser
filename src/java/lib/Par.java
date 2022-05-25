@@ -20,7 +20,7 @@ package com.dickimawbooks.texparserlib;
 
 import java.io.IOException;
 
-public class Par implements TeXObject
+public class Par extends AbstractTeXObject
 {
    public Par()
    {
@@ -78,12 +78,6 @@ public class Par implements TeXObject
    public boolean isPar()
    {
       return true;
-   }
-
-   @Override
-   public boolean isEmpty()
-   {
-      return false;
    }
 
    private String name;

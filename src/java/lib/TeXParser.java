@@ -2419,12 +2419,12 @@ public class TeXParser extends TeXObjectList
          {
             Group grp = bgChar.createGroup(this);
             expanded.popRemainingGroup(this, grp, popStyle, bgChar);
-            addAll(0, expanded);
+            push(expanded, true);
 
             return grp;
          }
 
-         addAll(0, expanded);
+         push(expanded, true);
          return object;
       }
 

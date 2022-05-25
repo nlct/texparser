@@ -52,6 +52,12 @@ public class Skip extends Primitive implements Expandable,SpacingObject
    }
 
    @Override
+   public boolean canExpand()
+   {
+      return true;
+   }
+
+   @Override
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
       throws IOException
    {

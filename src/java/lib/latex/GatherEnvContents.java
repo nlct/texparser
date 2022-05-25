@@ -31,6 +31,12 @@ public abstract class GatherEnvContents extends Declaration
    }
 
    @Override
+   public boolean canExpand()
+   {
+      return false;
+   }
+
+   @Override
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
       throws IOException
    {

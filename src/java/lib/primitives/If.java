@@ -42,6 +42,12 @@ public class If extends Primitive implements Expandable
    }
 
    @Override
+   public boolean canExpand()
+   {
+      return true;
+   }
+
+   @Override
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
       throws IOException
    {

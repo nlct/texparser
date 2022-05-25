@@ -64,6 +64,12 @@ public class EncodingSymbol extends ControlSequence
       return parser.getListener().createString(value.toUpperCase());
    }
 
+   @Override
+   public boolean canExpand()
+   {
+      return true;
+   }
+
    public TeXObjectList expandonce(TeXParser parser)
      throws IOException
    {

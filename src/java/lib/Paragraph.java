@@ -131,10 +131,23 @@ public class Paragraph extends DataObjectList
       boolean parFound = false;
       byte popStyle = TeXObjectList.POP_IGNORE_LEADING_SPACE;
 
+      boolean isStart = !incomplete;
+
       String currenv = null;
       Vector<String> envs = null;
 
       TeXDimension indent = null;
+
+      if (isStart)
+      {
+         TeXDimension dim = parser.getSettings().getCurrentParIndent();
+
+         if (dim != null)
+         {
+            indent = new UserDimension();
+            indent.advance(parser, dim);
+         }
+      }
 
       while (!parFound)
       {
@@ -150,48 +163,33 @@ public class Paragraph extends DataObjectList
          if (token instanceof TeXCsRef)
          {
             token = parser.getListener().getControlSequence(
-              ((TeXCsRef)token).getName());
+               ((TeXCsRef)token).getName());
          }
 
-         if (token instanceof Group)
+         if (token instanceof AssignedMacro)
          {
-            add(token);
-            continue;
+            token = ((AssignedMacro)token).getBaseUnderlying();
          }
 
-         if (token instanceof Expandable)
+         if (token.canExpand() && token instanceof Expandable)
          {
             TeXObjectList expanded;
 
             if (parser == stack)
             {
-               expanded = ((Expandable)token).expandfully(parser);
-            }
+               expanded = ((Expandable)token).expandonce(parser);
+            } 
             else
             {
-               expanded = ((Expandable)token).expandfully(parser, stack);
-            }
+               expanded = ((Expandable)token).expandonce(parser, stack);
+            } 
 
             if (expanded != null)
             {
                stack.push(expanded, true);
-               token = stack.popToken(popStyle);
-
-               if (token instanceof TeXCsRef)
-               {
-                  token = parser.getListener().getControlSequence(
-                    ((TeXCsRef)token).getName());
-               }
-
-               if (token instanceof Group)
-               {
-                  add(token);
-                  continue;
-               }
             }
          }
-
-         if (token.isPar())
+         else if (token.isPar())
          {
             parFound = true;
          }
@@ -201,7 +199,7 @@ public class Paragraph extends DataObjectList
             stack.push(token);
             break;
          }
-         else if (token instanceof ParIndent)
+         else if (token instanceof ParIndent && isStart)
          {
             if (parser == stack)
             {
@@ -211,11 +209,27 @@ public class Paragraph extends DataObjectList
             {
                token.process(parser, stack);
             }
+
+            TeXDimension dim = parser.getSettings().getCurrentParIndent();
+
+            if (dim != null)
+            {
+               if (indent == null)
+               {
+                  indent = new UserDimension();
+               }
+
+               indent.advance(parser, dim);
+            }
          }
-         else if (isEmpty() && token instanceof SpacingObject
+         else if (isStart && token instanceof SpacingObject
                    && ((SpacingObject)token).getDirection() == Direction.HORIZONTAL)
          {
-            indent = new UserDimension();
+            if (indent == null)
+            {
+               indent = new UserDimension();
+            }
+
             indent.advance(parser, ((SpacingObject)token).getSize(parser, stack));
          }
          else if (token instanceof SpacingObject
@@ -224,8 +238,14 @@ public class Paragraph extends DataObjectList
             parFound = true;
             stack.push(token);
          }
+         else if (token instanceof Relax)
+         {
+            add(token);
+         }
          else if (token instanceof Begin)
          {
+            isStart = false;
+
             add(token, true);
 
             currenv = ((Begin)token).popLabelString(parser, stack);
@@ -241,6 +261,8 @@ public class Paragraph extends DataObjectList
          }
          else if (token instanceof End)
          {
+            isStart = false;
+
             String name = ((End)token).popLabelString(parser, stack);
 
             if (envs == null || envs.isEmpty() || !name.equals(currenv))
@@ -259,25 +281,24 @@ public class Paragraph extends DataObjectList
          }
          else
          {
+            isStart = false;
+
             add(token, true);
          }
       }
 
-      TeXDimension dim = parser.getSettings().getCurrentParIndent();
-
-      if (dim != null)
+      if (indent != null)
       {
-         if (indent == null)
-         {
-            indent = new UserDimension();
-         }
-
-         indent.advance(parser, dim);
+         setParIndent(indent);
       }
 
-      setParIndent(indent);
-
       incomplete = !parFound;
+   }
+
+   @Override
+   public boolean canExpand()
+   {
+      return false;
    }
 
    @Override

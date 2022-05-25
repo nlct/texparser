@@ -130,6 +130,11 @@ public class L2HImage implements Expandable
       return alt == null ? "" : alt.format();
    }
 
+   public boolean canExpand()
+   {
+      return true;
+   }
+
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
     throws IOException
    {

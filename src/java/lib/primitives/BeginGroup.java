@@ -82,6 +82,12 @@ public class BeginGroup extends Primitive implements Expandable
       popRemainingGroup(group, parser, stack); 
    }
 
+   @Override
+   public boolean canExpand()
+   {
+      return true;
+   }
+
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
      throws IOException
    {

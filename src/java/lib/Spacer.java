@@ -23,7 +23,7 @@ import java.io.IOException;
 /**
  * Represents a horizontal or vertical space.
  */
-public class Spacer implements SpacingObject
+public class Spacer extends AbstractTeXObject implements SpacingObject
 {
    public Spacer(Direction direction, TeXDimension size)
    {
@@ -97,18 +97,6 @@ public class Spacer implements SpacingObject
       return String.format("\\%s %s", 
          direction == Direction.HORIZONTAL ? "hskip" : "vskip",
          size == null ? "0pt" : size.format());
-   }
-
-   @Override
-   public boolean isEmpty()
-   {
-      return false;
-   }
-
-   @Override
-   public boolean isPar()
-   {
-      return false;
    }
 
    @Override

@@ -20,7 +20,7 @@ package com.dickimawbooks.texparserlib;
 
 import java.io.IOException;
 
-public abstract class Macro implements TeXObject
+public abstract class Macro extends AbstractTeXObject
 {
    public boolean getAllowsPrefix()
    {
@@ -165,18 +165,6 @@ public abstract class Macro implements TeXObject
    public boolean hasNoSyntax()
    {
       return numArgs == 0 && (syntax == null || syntax.isEmpty());
-   }
-
-   @Override
-   public boolean isPar()
-   {
-      return false;
-   }
-
-   @Override
-   public boolean isEmpty()
-   {
-      return false;
    }
 
    /**

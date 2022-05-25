@@ -20,7 +20,7 @@ package com.dickimawbooks.texparserlib;
 
 import java.io.IOException;
 
-public abstract class CharObject implements TeXObject
+public abstract class CharObject extends AbstractTeXObject
 {
    public CharObject(int charCode)
    {
@@ -86,18 +86,6 @@ public abstract class CharObject implements TeXObject
       throws IOException
    {
       process(parser);
-   }
-
-   @Override
-   public boolean isPar()
-   {
-      return false;
-   }
-
-   @Override
-   public boolean isEmpty()
-   {
-      return false;
    }
 
    protected int charCode;

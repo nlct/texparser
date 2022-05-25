@@ -40,6 +40,12 @@ public class DirectLua extends Primitive implements Expandable
       return new DirectLua(getName());
    }
 
+   @Override
+   public boolean canExpand()
+   {
+      return true;
+   }
+
    public TeXObjectList expandonce(TeXParser parser) throws IOException
    {
       TeXObject arg = parser.popNextArg();

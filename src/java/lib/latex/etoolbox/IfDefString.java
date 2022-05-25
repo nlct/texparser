@@ -23,7 +23,7 @@ import java.io.IOException;
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.*;
 
-public class IfDefString extends ControlSequence implements Expandable
+public class IfDefString extends Command
 {
    public IfDefString()
    {

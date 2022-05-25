@@ -53,5 +53,11 @@ public abstract class ActiveChar extends Macro implements Expandable
 
       return super.equals(object);
    }
+
+   @Override
+   public boolean canExpand()
+   {
+      return true;
+   }
 }
 

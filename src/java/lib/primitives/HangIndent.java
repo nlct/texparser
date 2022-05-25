@@ -73,6 +73,12 @@ public class HangIndent extends Primitive implements Expandable,InternalQuantity
       parser.getSettings().setHangIndent((TeXDimension)quantity);
    }
 
+   @Override
+   public boolean canExpand()
+   {
+      return true;
+   }
+
    /**
     * This will fully expand because the paragraph break may be
     * inside the definition of a command.

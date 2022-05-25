@@ -182,6 +182,12 @@ public class At extends ActiveChar
       process(parser, parser);
    }
 
+   @Override
+   public boolean canExpand()
+   {
+      return false;
+   }
+
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList list)
      throws IOException
    {

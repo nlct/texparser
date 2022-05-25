@@ -23,7 +23,7 @@ import java.io.IOException;
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.*;
 
-public class DataToolEntry implements TeXObject
+public class DataToolEntry extends AbstractTeXObject
 {
    public DataToolEntry(DataToolSty sty, int column)
    {
@@ -241,18 +241,6 @@ public class DataToolEntry implements TeXObject
       {
          return "";
       }
-   }
-
-   @Override
-   public boolean isPar()
-   {
-      return false;
-   }
-
-   @Override
-   public boolean isEmpty()
-   {
-      return false;
    }
 
    @Override

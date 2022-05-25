@@ -241,15 +241,46 @@ public class Group extends TeXObjectList
       expanded.addAll(this);
       expanded.add(getEnd(parser));
 
-      if (stack != null && stack != parser)
+      StackMarker marker = null;
+
+      if (stack != null && stack != parser && !stack.isEmpty())
       {
+         marker = new StackMarker();
+         expanded.add(marker);
+
          while (stack.size() > 0)
          {
-            expanded.add(stack.remove(0));
+            expanded.add(stack.remove(0), true);
          }
       }
 
-      return expanded.expandfully(parser);
+      TeXObjectList result = expanded.expandfully(parser);
+
+      if (marker != null)
+      {
+         int n = -1;
+
+         for (int i = 0; i < result.size(); i++)
+         {
+            TeXObject obj = result.get(i);
+
+            if (n != -1)
+            {
+               stack.add(obj);
+            }
+            else if (obj.equals(marker))
+            {
+               n = i;
+            }
+         }
+
+         if (n != -1)
+         {
+            result.setSize(n);
+         }
+      }
+
+      return result;
    }
 
    public String toString(TeXParser parser)

@@ -53,6 +53,12 @@ public class MultiColumn extends MultiCell
       return new MultiCell(getName(), numCols, 1, parser, colAlignArg);
    }  
 
+   @Override
+   public boolean canExpand()
+   {
+      return true;
+   }
+
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
      throws IOException
    {

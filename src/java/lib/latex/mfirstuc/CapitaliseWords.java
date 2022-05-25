@@ -24,7 +24,7 @@ import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.primitives.IfTrue;
 import com.dickimawbooks.texparserlib.latex.*;
 
-public class CapitaliseWords extends ControlSequence implements Expandable
+public class CapitaliseWords extends Command
 {
    public CapitaliseWords(MfirstucSty sty)
    {

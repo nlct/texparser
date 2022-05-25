@@ -35,6 +35,12 @@ public class MathSymbol extends Symbol
       return new MathSymbol(getName(), getCharCode());
    }
 
+   @Override
+   public boolean canExpand()
+   {
+      return false;
+   }
+
    public TeXObjectList expandonce(TeXParser parser)
      throws IOException
    {

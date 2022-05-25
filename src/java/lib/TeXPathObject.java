@@ -20,7 +20,7 @@ package com.dickimawbooks.texparserlib;
 
 import java.io.IOException;
 
-public class TeXPathObject implements TeXObject
+public class TeXPathObject extends AbstractTeXObject
 {
    public TeXPathObject(TeXPath texPath)
    {
@@ -64,18 +64,6 @@ public class TeXPathObject implements TeXObject
    public String format()
    {
       return texPath.getTeXPath(false);
-   }
-
-   @Override
-   public boolean isPar()
-   {
-      return false;
-   }
-
-   @Override
-   public boolean isEmpty()
-   {
-      return false;
    }
 
    @Override

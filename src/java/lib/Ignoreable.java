@@ -20,7 +20,7 @@ package com.dickimawbooks.texparserlib;
 
 import java.io.IOException;
 
-public abstract class Ignoreable implements TeXObject
+public abstract class Ignoreable extends AbstractTeXObject
 {
    // Does nothing
    @Override
@@ -40,18 +40,6 @@ public abstract class Ignoreable implements TeXObject
    {
       return new TeXObjectList();
    } 
-
-   @Override
-   public boolean isPar()
-   {
-      return false;
-   }
-
-   @Override
-   public boolean isEmpty()
-   {
-      return false;
-   }
 
    @Override
    public String toString()

@@ -39,6 +39,12 @@ public class Verb extends Command
       return new Verb(getName());
    }
 
+   @Override
+   public boolean canExpand()
+   {
+      return false;
+   }
+
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList list)
      throws IOException
    {

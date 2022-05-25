@@ -24,7 +24,7 @@ import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.*;
 import com.dickimawbooks.texparserlib.primitives.Undefined;
 
-public class IfUndef extends ControlSequence implements Expandable
+public class IfUndef extends Command
 {
    public IfUndef()
    {

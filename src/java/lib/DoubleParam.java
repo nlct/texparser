@@ -20,7 +20,8 @@ package com.dickimawbooks.texparserlib;
 
 import java.io.IOException;
 
-public class DoubleParam implements ParameterToken,Expandable
+public class DoubleParam extends AbstractTeXObject
+   implements ParameterToken,Expandable
 {
    public DoubleParam(ParameterToken param)
    {
@@ -31,6 +32,12 @@ public class DoubleParam implements ParameterToken,Expandable
    public Object clone()
    {
       return new DoubleParam((ParameterToken)param.clone());
+   }
+
+   @Override
+   public boolean canExpand()
+   {
+      return true;
    }
 
    @Override
@@ -132,18 +139,6 @@ public class DoubleParam implements ParameterToken,Expandable
      throws IOException
    {
       parser.push(param);
-   }
-
-   @Override
-   public boolean isPar()
-   {
-      return false;
-   }
-
-   @Override
-   public boolean isEmpty()
-   {
-      return false;
    }
 
    private ParameterToken param;

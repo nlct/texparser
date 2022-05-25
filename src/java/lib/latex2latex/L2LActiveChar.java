@@ -91,6 +91,12 @@ public class L2LActiveChar extends ActiveChar
       }
    }
 
+   @Override
+   public boolean canExpand()
+   {
+      return false;
+   }
+
    public TeXObjectList expandonce(TeXParser parser) throws IOException
    {
       return null;

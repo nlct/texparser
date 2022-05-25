@@ -85,20 +85,20 @@ public class TeXObjectList extends Vector<TeXObject>
          popStyle = (byte)(popStyle^POP_IGNORE_LEADING_SPACE);
       }
 
+      if (object instanceof TeXCsRef)
+      {
+         object = parser.getListener().getControlSequence(
+            ((TeXCsRef)object).getName());
+      }
+
       if (object instanceof AssignedMacro)
       {
          object = ((AssignedMacro)object).getBaseUnderlying();
       }
 
-      if (object instanceof TeXCsRef)
+      if (object instanceof EndCs)
       {
-         object = parser.getListener().getControlSequence(
-            ((TeXCsRef)object).getName());
-
-         if (object instanceof EndCs)
-         {
-            return object;
-         }
+         return object;
       }
 
       if (object instanceof Group)
@@ -116,13 +116,13 @@ public class TeXObjectList extends Vector<TeXObject>
 
             if (!expanded.isEmpty())
             {
-               addAll(0, expanded);
+               push(expanded, true);
             }
 
             return group;
          }
 
-         addAll(0, expanded);
+         push(expanded, true);
          object = popStack(parser, popStyle);
       }
 
@@ -153,7 +153,22 @@ public class TeXObjectList extends Vector<TeXObject>
          return object;
       }
 
-      return expanded;
+      push(expanded, true);
+
+      object = popStack(parser, popStyle);
+
+      if (object instanceof TeXCsRef)
+      {
+         object = parser.getListener().getControlSequence(
+            ((TeXCsRef)object).getName());
+      }
+
+      if (object instanceof AssignedMacro)
+      {
+         object = ((AssignedMacro)object).getBaseUnderlying();
+      }
+
+      return object;
    }
 
    public TeXObject popStack(TeXParser parser)
@@ -1560,36 +1575,81 @@ public class TeXObjectList extends Vector<TeXObject>
       return list;
    }
 
+   @Override
+   public boolean canExpand()
+   {
+      return !isExpanded();
+   }
+
+   public boolean isExpanded()
+   {
+      for (int i = 0; i < size(); i++)
+      {
+         TeXObject obj = get(i);
+
+         if (obj.canExpand())
+         {
+            return false;
+         }
+      }
+
+      return true;
+   }
+
    public TeXObjectList expandfully(TeXParser parser) throws IOException
    {
-      flatten();
-
       TeXObjectList list = new TeXObjectList(size());
-      TeXObjectList remaining = (TeXObjectList)clone();
 
-      while (!remaining.isEmpty())
+      if (isExpanded())
       {
-         TeXObject object = remaining.pop();
+         list.add(this, true);
+         clear();
+         return list;
+      }
 
-         if (object instanceof Ignoreable)
+      while (!isEmpty())
+      {
+         TeXObject object = pop();
+
+         if (object instanceof TeXCsRef)
          {
-            continue;
+            object = parser.getListener().getControlSequence(
+               ((TeXCsRef)object).getName());
          }
 
-         TeXObjectList expanded = null;
-
-         if (object instanceof Expandable)
+         if (object instanceof AssignedMacro)
          {
-            expanded = ((Expandable)object).expandfully(parser, remaining);
+            object = ((AssignedMacro)object).getBaseUnderlying();
          }
 
-         if (expanded == null)
+         if (object instanceof StackMarker)
          {
             list.add(object);
          }
+         else if (object instanceof Ignoreable)
+         {// discard
+         }
+         else if (!object.canExpand())
+         {
+            list.add(object, true);
+         }
+         else if (object instanceof TeXObjectList
+                   && ((TeXObjectList)object).isStack())
+         {
+            push(object, true);
+         }
+         else if (object instanceof Expandable)
+         {
+            TeXObjectList expanded = ((Expandable)object).expandonce(parser, this);
+
+            if (expanded != null && !expanded.isEmpty())
+            {
+               push(expanded, true);
+            }
+         }
          else
          {
-            list.addAll(expanded);
+            list.add(object);
          }
       }
 
@@ -1599,9 +1659,17 @@ public class TeXObjectList extends Vector<TeXObject>
    public TeXObjectList expandfully(TeXParser parser,
         TeXObjectList stack) throws IOException
    {
+      TeXObjectList list = new TeXObjectList(size());
+
+      if (isExpanded())
+      {
+         list.add(this, true);
+         clear();
+         return list;
+      }
+
       flatten();
 
-      TeXObjectList list = new TeXObjectList(size());
       TeXObjectList remaining = (TeXObjectList)clone();
 
       StackMarker marker = null;

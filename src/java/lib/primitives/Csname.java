@@ -40,6 +40,12 @@ public class Csname extends Primitive implements Expandable
       return new Csname(getName());
    }
 
+   @Override
+   public boolean canExpand()
+   {
+      return true;
+   }
+
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
       throws IOException
    {

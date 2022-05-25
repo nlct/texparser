@@ -61,6 +61,12 @@ public class VerbChar extends ActiveChar
       return new String(Character.toChars(codePoint));
    }
 
+   @Override
+   public boolean canExpand()
+   {
+      return false;
+   }
+
    public TeXObjectList expandonce(TeXParser parser)
    {
       return null;

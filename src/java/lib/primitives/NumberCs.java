@@ -40,6 +40,12 @@ public class NumberCs extends Primitive implements Expandable
       return new NumberCs(getName());
    }
 
+   @Override
+   public boolean canExpand()
+   {
+      return true;
+   }
+
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
    throws IOException
    {

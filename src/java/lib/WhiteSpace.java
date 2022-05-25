@@ -20,7 +20,7 @@ package com.dickimawbooks.texparserlib;
 
 import java.io.IOException;
 
-public abstract class WhiteSpace implements TeXObject
+public abstract class WhiteSpace extends AbstractTeXObject
 {
    @Override
    public void process(TeXParser parser, TeXObjectList list)
@@ -43,18 +43,6 @@ public abstract class WhiteSpace implements TeXObject
 
       list.add(parser.getListener().getOther((int)' '));
       return list;
-   }
-
-   @Override
-   public boolean isPar()
-   {
-      return false;
-   }
-
-   @Override
-   public boolean isEmpty()
-   {
-      return false;
    }
 
    @Override

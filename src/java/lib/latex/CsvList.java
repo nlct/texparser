@@ -181,6 +181,12 @@ public class CsvList extends DataObjectList
       return valList;
    }
 
+   @Override
+   public boolean canExpand()
+   {
+      return true;
+   }
+
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
     throws IOException
    {

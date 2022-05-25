@@ -40,6 +40,12 @@ public class Unexpanded extends Primitive implements Expandable
       return new Unexpanded(getName());
    }
 
+   @Override
+   public boolean canExpand()
+   {
+      return true;
+   }
+
    public TeXObjectList expandonce(TeXParser parser)
      throws IOException
    {

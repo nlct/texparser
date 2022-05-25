@@ -27,6 +27,12 @@ public class TeXCsRef extends ControlSequence implements Expandable
       super(name);
    }
 
+   @Override
+   public boolean canExpand()
+   {
+      return true;
+   }
+
    public TeXObjectList expandonce(TeXParser parser)
       throws IOException
    {

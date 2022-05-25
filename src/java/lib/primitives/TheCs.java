@@ -40,6 +40,12 @@ public class TheCs extends Primitive implements Expandable
       return new TheCs(getName());
    }
 
+   @Override
+   public boolean canExpand()
+   {
+      return true;
+   }
+
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
    throws IOException
    {

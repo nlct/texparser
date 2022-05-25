@@ -30,6 +30,12 @@ public abstract class TeXFontDeclaration extends Declaration
    }
 
    @Override
+   public boolean canExpand()
+   {
+      return false;
+   }
+
+   @Override
    public TeXObjectList expandonce(TeXParser parser)
      throws IOException
    {

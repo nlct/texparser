@@ -66,6 +66,12 @@ public class Symbol extends ControlSequence implements Expandable,CaseChangeable
       return parser.getListener().getOther(Character.toUpperCase(codePoint));
    }
 
+   @Override
+   public boolean canExpand()
+   {
+      return true;
+   }
+
    public TeXObjectList expandonce(TeXParser parser)
      throws IOException
    {

@@ -20,7 +20,7 @@ package com.dickimawbooks.texparserlib;
 
 import java.io.IOException;
 
-public class Param implements ParameterToken
+public class Param extends AbstractTeXObject implements ParameterToken
 {
    public Param(int digit)
    {
@@ -106,18 +106,6 @@ public class Param implements ParameterToken
       }
 
       return list;
-   }
-
-   @Override
-   public boolean isPar()
-   {
-      return false;
-   }
-
-   @Override
-   public boolean isEmpty()
-   {
-      return false;
    }
 
    @Override

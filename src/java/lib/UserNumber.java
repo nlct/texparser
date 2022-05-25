@@ -20,7 +20,7 @@ package com.dickimawbooks.texparserlib;
 
 import java.io.IOException;
 
-public class UserNumber implements TeXNumber
+public class UserNumber extends AbstractTeXObject implements TeXNumber
 {
    public UserNumber()
    {
@@ -143,18 +143,6 @@ public class UserNumber implements TeXNumber
       throws IOException
    {
       process(parser);
-   }
-
-   @Override
-   public boolean isPar()
-   {
-      return false;
-   }
-
-   @Override
-   public boolean isEmpty()
-   {
-      return false;
    }
 
    private int value;

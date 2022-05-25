@@ -33,6 +33,12 @@ public abstract class Command extends ControlSequence implements Expandable
       super(name, isShort);
    }
 
+   @Override
+   public boolean canExpand()
+   {
+      return true;
+   }
+
    public TeXObjectList expandonce(TeXParser parser)
      throws IOException
    {

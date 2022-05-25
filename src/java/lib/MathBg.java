@@ -43,6 +43,12 @@ public class MathBg extends BgChar implements Expandable
       return new MathBg(getCharCode(), isInLine());
    }
 
+   @Override
+   public boolean canExpand()
+   {
+      return true;
+   }
+
    public TeXObjectList expandonce(TeXParser parser) throws IOException
    {
       TeXObjectList list = new TeXObjectList(1);

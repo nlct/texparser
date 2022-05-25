@@ -52,6 +52,12 @@ public class StringCs extends Primitive implements Expandable
       return stack.popToken().string(parser);
    } 
 
+   @Override
+   public boolean canExpand()
+   {
+      return true;
+   }
+
    public TeXObjectList expandonce(TeXParser parser) throws IOException
    {
       return string(parser, parser);

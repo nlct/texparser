@@ -135,6 +135,7 @@ public class GlossariesSty extends LaTeXSty
       registerControlSequence(new PrintGlossary(this));
       registerControlSequence(new PrintGlossaries(this));
       registerControlSequence(new TextualContentCommand("glsresetentrylist", ""));
+      registerControlSequence(new AtFirstOfOne("glsnamefont"));
       registerControlSequence(new AtFirstOfOne("glossaryentrynumbers"));
       registerControlSequence(new GobbleOpt("setentrycounter", 1, 1));
       registerControlSequence(new AtFirstOfOne("glsnumberformat"));

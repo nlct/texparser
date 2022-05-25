@@ -22,7 +22,7 @@ import java.io.IOException;
 
 import com.dickimawbooks.texparserlib.*;
 
-public class HCode extends ControlSequence implements Expandable
+public class HCode extends Command
 {
    public HCode()
    {

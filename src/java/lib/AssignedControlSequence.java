@@ -100,6 +100,12 @@ public class AssignedControlSequence extends Command
       underlying.process(parser, stack);
    }
 
+   @Override
+   public boolean canExpand()
+   {
+      return underlying.canExpand();
+   }
+
    public TeXObjectList expandonce(TeXParser parser)
       throws IOException
    {

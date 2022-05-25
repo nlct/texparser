@@ -22,7 +22,7 @@ import java.io.IOException;
 
 import com.dickimawbooks.texparserlib.*;
 
-public class MissingValue implements TeXObject,Expandable
+public class MissingValue extends AbstractTeXObject implements Expandable
 {
    public MissingValue()
    {
@@ -33,6 +33,12 @@ public class MissingValue implements TeXObject,Expandable
    public Object clone()
    {
       return new MissingValue();
+   }
+
+   @Override
+   public boolean canExpand()
+   {
+      return true;
    }
 
    @Override
@@ -90,18 +96,6 @@ public class MissingValue implements TeXObject,Expandable
    public String format()
    {
       return "";
-   }
-
-   @Override
-   public boolean isPar()
-   {
-      return false;
-   }
-
-   @Override
-   public boolean isEmpty()
-   {
-      return false;
    }
 
 }

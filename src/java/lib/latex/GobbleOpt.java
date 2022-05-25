@@ -69,7 +69,7 @@ public class GobbleOpt extends Command
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      process(parser);
+      process(parser, stack);
       return new TeXObjectList();
    }
 

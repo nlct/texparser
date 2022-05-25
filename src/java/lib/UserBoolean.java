@@ -20,7 +20,7 @@ package com.dickimawbooks.texparserlib;
 
 import java.io.IOException;
 
-public class UserBoolean implements TeXBoolean
+public class UserBoolean extends AbstractTeXObject implements TeXBoolean
 {
    public UserBoolean(boolean isTrue)
    {
@@ -83,18 +83,6 @@ public class UserBoolean implements TeXBoolean
       throws IOException
    {
       stack.add(0, new TeXCsRef("if"+value));
-   }
-
-   @Override
-   public boolean isPar()
-   {
-      return false;
-   }
-
-   @Override
-   public boolean isEmpty()
-   {
-      return false;
    }
 
    private boolean value;

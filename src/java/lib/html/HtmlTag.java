@@ -25,7 +25,7 @@ import java.net.URISyntaxException;
 
 import com.dickimawbooks.texparserlib.*;
 
-public class HtmlTag implements TeXObject
+public class HtmlTag extends AbstractTeXObject
 {
    public HtmlTag(String tag)
    {
@@ -79,18 +79,6 @@ public class HtmlTag implements TeXObject
    public String getTag()
    {
       return tag;
-   }
-
-   @Override
-   public boolean isPar()
-   {
-      return false;
-   }
-
-   @Override
-   public boolean isEmpty()
-   {
-      return false;
    }
 
    public static String getUriFragment(String label)

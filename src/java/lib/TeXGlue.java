@@ -20,7 +20,7 @@ package com.dickimawbooks.texparserlib;
 
 import java.io.IOException;
 
-public class TeXGlue implements TeXDimension, Expandable
+public class TeXGlue extends AbstractTeXObject implements TeXDimension, Expandable
 {
    public TeXGlue()
    {
@@ -291,6 +291,12 @@ public class TeXGlue implements TeXDimension, Expandable
    }
 
    @Override
+   public boolean canExpand()
+   {
+      return true;
+   }
+
+   @Override
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
@@ -330,18 +336,6 @@ public class TeXGlue implements TeXDimension, Expandable
       throws IOException
    {
       stack.addAll(0, string(parser));
-   }
-
-   @Override
-   public boolean isPar()
-   {
-      return false;
-   }
-
-   @Override
-   public boolean isEmpty()
-   {
-      return false;
    }
 
    public TeXDimension getStretch()

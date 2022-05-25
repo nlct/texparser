@@ -23,7 +23,7 @@ import java.io.IOException;
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.*;
 
-public class GlsMakeFirstUc extends ControlSequence implements Expandable
+public class GlsMakeFirstUc extends Command
 {
    public GlsMakeFirstUc()
    {

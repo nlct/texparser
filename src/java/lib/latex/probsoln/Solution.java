@@ -43,6 +43,12 @@ public class Solution extends Declaration
    }
 
    @Override
+   public boolean canExpand()
+   {
+      return false;
+   }
+
+   @Override
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList list)
       throws IOException
    {
