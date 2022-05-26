@@ -1071,7 +1071,7 @@ public class LaTeX2LaTeX extends LaTeXParserListener
    }
 
    @Override
-   public void newcommand(byte overwrite,
+   public void newcommand(Overwrite overwrite,
      String type, String csName, boolean isShort,
      int numParams, TeXObject defValue, TeXObject definition)
     throws IOException

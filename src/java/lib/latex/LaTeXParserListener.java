@@ -355,18 +355,18 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
 
       parser.putControlSequence(new NewCommand());
       parser.putControlSequence(new NewCommand("renewcommand",
-        NewCommand.OVERWRITE_FORCE));
+        Overwrite.FORCE));
       parser.putControlSequence(new NewCommand("providecommand",
-        NewCommand.OVERWRITE_SKIP));
+        Overwrite.SKIP));
 
       // make \DeclareRobustCommand behave like \providecommand
       // (this library has different expansion rules to TeX)
       parser.putControlSequence(new NewCommand("DeclareRobustCommand",
-        NewCommand.OVERWRITE_SKIP));
+        Overwrite.SKIP));
 
       parser.putControlSequence(new NewEnvironment());
       parser.putControlSequence(new NewEnvironment("renewenvironment",
-        NewCommand.OVERWRITE_FORCE));
+        Overwrite.FORCE));
 
       parser.putControlSequence(new Label());
       parser.putControlSequence(new Ref());
@@ -678,7 +678,7 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       parser.putControlSequence(cs);
    }
 
-   public void newcommand(byte overwrite, 
+   public void newcommand(Overwrite overwrite, 
      String type, String csName, boolean isShort,
      int numParams, TeXObject defValue, TeXObject definition)
    throws IOException
@@ -687,7 +687,7 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
 
       if (cs instanceof Undefined)
       {
-         if (overwrite == NewCommand.OVERWRITE_FORCE)
+         if (overwrite == Overwrite.FORCE)
          {
             throw new TeXSyntaxException(parser,
              TeXSyntaxException.ERROR_UNDEFINED,
@@ -697,13 +697,13 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       }
       else
       {
-         if (overwrite == NewCommand.OVERWRITE_FORBID)
+         if (overwrite == Overwrite.FORBID)
          {
             throw new LaTeXSyntaxException(parser,
              LaTeXSyntaxException.ERROR_DEFINED,
              cs.toString(parser));
          }
-         else if (overwrite == NewCommand.OVERWRITE_SKIP)
+         else if (overwrite == Overwrite.SKIP)
          {
             return;
          }
@@ -765,7 +765,7 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       }
    }
 
-   public void newenvironment(byte overwrite, String type, String envName, 
+   public void newenvironment(Overwrite overwrite, String type, String envName, 
      int numParams, TeXObject defValue, TeXObject definition, TeXObject endDefinition)
    throws IOException
    {
@@ -773,7 +773,7 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
 
       if (cs instanceof Undefined)
       {
-         if (overwrite == NewCommand.OVERWRITE_FORCE)
+         if (overwrite == Overwrite.FORCE)
          {
             throw new TeXSyntaxException(parser,
              TeXSyntaxException.ERROR_UNDEFINED,
@@ -783,13 +783,13 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       }
       else
       {
-         if (overwrite == NewCommand.OVERWRITE_FORBID)
+         if (overwrite == Overwrite.FORBID)
          {
             throw new LaTeXSyntaxException(parser,
              LaTeXSyntaxException.ERROR_DEFINED,
              cs.toString(parser));
          }
-         else if (overwrite == NewCommand.OVERWRITE_SKIP)
+         else if (overwrite == Overwrite.SKIP)
          {
             return;
          }

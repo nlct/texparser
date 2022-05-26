@@ -26,10 +26,10 @@ public class NewCommand extends Command
 {
    public NewCommand()
    {
-      this("newcommand", OVERWRITE_FORBID);
+      this("newcommand", Overwrite.FORBID);
    }
 
-   public NewCommand(String name, byte overwrite)
+   public NewCommand(String name, Overwrite overwrite)
    {
       super(name);
       this.overwrite = overwrite;
@@ -175,15 +175,10 @@ public class NewCommand extends Command
       process(parser, parser);
    }
 
-   public byte getOverwrite()
+   public Overwrite getOverwrite()
    {
       return overwrite;
    }
 
-   public static final byte OVERWRITE_FORBID=(byte)0;
-   public static final byte OVERWRITE_FORCE=(byte)1;
-   public static final byte OVERWRITE_SKIP=(byte)2;
-   public static final byte OVERWRITE_ALLOW=(byte)3;
-
-   private byte overwrite=OVERWRITE_FORBID;
+   private Overwrite overwrite=Overwrite.FORBID;
 }

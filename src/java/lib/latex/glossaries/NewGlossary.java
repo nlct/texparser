@@ -27,15 +27,15 @@ public class NewGlossary extends ControlSequence
 {
    public NewGlossary(GlossariesSty sty)
    {
-      this("newglossary", NewCommand.OVERWRITE_FORBID, false, sty);
+      this("newglossary", Overwrite.FORBID, false, sty);
    }
 
-   public NewGlossary(String name, byte overwrite, GlossariesSty sty)
+   public NewGlossary(String name, Overwrite overwrite, GlossariesSty sty)
    {
       this(name, overwrite, false, sty);
    }
 
-   public NewGlossary(String name, byte overwrite, boolean ignored, GlossariesSty sty)
+   public NewGlossary(String name, Overwrite overwrite, boolean ignored, GlossariesSty sty)
    {
       super(name);
       this.sty = sty;
@@ -108,6 +108,6 @@ public class NewGlossary extends ControlSequence
    }
 
    private GlossariesSty sty;
-   private byte overwrite;
+   private Overwrite overwrite;
    protected boolean ignored=false;
 }

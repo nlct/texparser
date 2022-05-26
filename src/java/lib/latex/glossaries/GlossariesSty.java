@@ -357,6 +357,8 @@ public class GlossariesSty extends LaTeXSty
 
       registerControlSequence(new GobbleOpt("makeglossaries", 1, 0));
 
+      registerControlSequence(new GlsAddStorageKey(this));
+
       if (extra)
       {
          addExtraDefinitions();
@@ -390,6 +392,9 @@ public class GlossariesSty extends LaTeXSty
          "abbreviationname", "Abbreviations"));
 
       registerControlSequence(new GlossEntryField("glossentrynameother", this));
+
+      registerControlSequence(new GlsAddStorageKey("providestoragekey",
+        Overwrite.SKIP, this));
    }
 
    @Override
@@ -794,7 +799,7 @@ public class GlossariesSty extends LaTeXSty
      throws TeXSyntaxException
    {
       createGlossary(label, title, null, null, null, null, isIgnored, false,
-        NewCommand.OVERWRITE_FORBID);
+        Overwrite.FORBID);
    }
 
    public void createGlossary(String label, TeXObject title,
@@ -802,22 +807,22 @@ public class GlossariesSty extends LaTeXSty
      throws TeXSyntaxException
    {
       createGlossary(label, title, counter, glg, gls, glo, false, false,
-        NewCommand.OVERWRITE_FORBID);
+        Overwrite.FORBID);
    }
 
    public void createGlossary(String label, TeXObject title,
     String counter, String glg, String gls, String glo, boolean isIgnored,
-    boolean noHyper, byte overwrite)
+    boolean noHyper, Overwrite overwrite)
      throws TeXSyntaxException
    {
       if (isGlossaryDefined(label))
       {
-         if (overwrite == NewCommand.OVERWRITE_FORBID)
+         if (overwrite == Overwrite.FORBID)
          {
             throw new LaTeXSyntaxException(getParser(), 
               GLOSSARY_EXISTS, label);
          }
-         else if (overwrite == NewCommand.OVERWRITE_SKIP)
+         else if (overwrite == Overwrite.SKIP)
          {
             return;
          }
@@ -848,7 +853,7 @@ public class GlossariesSty extends LaTeXSty
       return glossaryTypes;
    }
 
-   public void addEntry(byte overwrite, GlossaryEntry entry)
+   public void addEntry(Overwrite overwrite, GlossaryEntry entry)
      throws TeXSyntaxException
    {
       String label = entry.getLabel();
@@ -857,11 +862,10 @@ public class GlossariesSty extends LaTeXSty
       {
          switch (overwrite)
          {
-            case NewCommand.OVERWRITE_FORBID :
+            case FORBID :
               throw new LaTeXSyntaxException(getParser(), 
                  ENTRY_EXISTS, label);
-            case NewCommand.OVERWRITE_SKIP:
-              return;
+            case SKIP: return;
          }
       }
 
@@ -876,6 +880,11 @@ public class GlossariesSty extends LaTeXSty
       glossary.add(label);
 
       entries.put(label, entry);
+   }
+
+   public void setFieldExpansionOn(String field, boolean on)
+   {
+      expandField.put(field, Boolean.valueOf(on));
    }
 
    public boolean isFieldExpansionOn(String field)

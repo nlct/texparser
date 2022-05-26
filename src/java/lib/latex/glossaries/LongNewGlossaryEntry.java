@@ -27,10 +27,10 @@ public class LongNewGlossaryEntry extends NewGlossaryEntry
 {
    public LongNewGlossaryEntry(GlossariesSty sty)
    {
-      this("longnewglossaryentry", NewCommand.OVERWRITE_FORBID, sty);
+      this("longnewglossaryentry", Overwrite.FORBID, sty);
    }
 
-   public LongNewGlossaryEntry(String name, byte overwrite, GlossariesSty sty)
+   public LongNewGlossaryEntry(String name, Overwrite overwrite, GlossariesSty sty)
    {
       super(name, overwrite, sty);
    }

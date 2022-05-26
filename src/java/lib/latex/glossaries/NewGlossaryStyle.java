@@ -32,10 +32,10 @@ public class NewGlossaryStyle extends ControlSequence
 
    public NewGlossaryStyle(String name)
    {
-      this(name, NewCommand.OVERWRITE_FORBID);
+      this(name, Overwrite.FORBID);
    }
 
-   public NewGlossaryStyle(String name, byte overwrite)
+   public NewGlossaryStyle(String name, Overwrite overwrite)
    {
       super(name);
       this.overwrite = overwrite;
@@ -64,5 +64,5 @@ public class NewGlossaryStyle extends ControlSequence
       process(parser, parser);
    }
 
-   private byte overwrite;
+   private Overwrite overwrite;
 }

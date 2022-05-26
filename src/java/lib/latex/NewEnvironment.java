@@ -26,10 +26,10 @@ public class NewEnvironment extends Command
 {
    public NewEnvironment()
    {
-      this("newenvironment", NewCommand.OVERWRITE_FORBID);
+      this("newenvironment", Overwrite.FORBID);
    }
 
-   public NewEnvironment(String name, byte overwrite)
+   public NewEnvironment(String name, Overwrite overwrite)
    {
       super(name);
       this.overwrite = overwrite;
@@ -131,10 +131,10 @@ public class NewEnvironment extends Command
       process(parser, parser);
    }
 
-   public byte getOverwrite()
+   public Overwrite getOverwrite()
    {
       return overwrite;
    }
 
-   private byte overwrite=NewCommand.OVERWRITE_FORBID;
+   private Overwrite overwrite=Overwrite.FORBID;
 }

@@ -27,10 +27,10 @@ public class NewGlossaryEntry extends AbstractGlsCommand
 {
    public NewGlossaryEntry(GlossariesSty sty)
    {
-      this("newglossaryentry", NewCommand.OVERWRITE_FORBID, sty);
+      this("newglossaryentry", Overwrite.FORBID, sty);
    }
 
-   public NewGlossaryEntry(String name, byte overwrite, GlossariesSty sty)
+   public NewGlossaryEntry(String name, Overwrite overwrite, GlossariesSty sty)
    {
       super(name, sty);
       this.overwrite = overwrite;
@@ -196,5 +196,5 @@ public class NewGlossaryEntry extends AbstractGlsCommand
       process(parser, parser);
    }
 
-   protected byte overwrite;
+   protected Overwrite overwrite;
 }

@@ -39,11 +39,11 @@ public class EtoolboxSty extends LaTeXSty
       // Definitions
 
       registerControlSequence(new NewCommand("newrobustcmd",
-        NewCommand.OVERWRITE_FORBID));
+        Overwrite.FORBID));
       registerControlSequence(new NewCommand("renewrobustcmd",
-        NewCommand.OVERWRITE_FORCE));
+        Overwrite.FORCE));
       registerControlSequence(new NewCommand("providerobustcmd",
-        NewCommand.OVERWRITE_SKIP));
+        Overwrite.SKIP));
 
       registerControlSequence(new CsDef());
       registerControlSequence(new CsDef("csgdef", true, false, false));
