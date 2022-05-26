@@ -52,7 +52,7 @@ public class L2LVerbatim extends Verbatim
          parser.getListener().getWriteable().write(obj.toString(parser));
       }
 
-      end(parser);
+      end(parser, stack);
    }
 
    @Override
