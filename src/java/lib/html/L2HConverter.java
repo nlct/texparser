@@ -216,6 +216,8 @@ public class L2HConverter extends LaTeXParserListener
       putControlSequence(new L2HFloat("table"));
 
       putControlSequence(new L2HAbstract());
+      putControlSequence(new L2HMultiCols());
+      putControlSequence(new L2HMultiCols("multicols*"));
 
       putControlSequence(new L2HItem());
 
