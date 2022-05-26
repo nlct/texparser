@@ -55,7 +55,8 @@ public class L2HAbstract extends AbstractDec
       super.process(parser, stack);
    }
 
-   public void end(TeXParser parser)
+   @Override
+   public void end(TeXParser parser, TeXObjectList stack)
     throws IOException
    {
       parser.getListener().getWriteable().write("</div>");

@@ -57,6 +57,7 @@ public class L2HEqnarray extends L2HMathDeclaration
       settings.startAlignment();
    }   
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
@@ -75,6 +76,7 @@ public class L2HEqnarray extends L2HMathDeclaration
       row.process(parser);
    }
 
+   @Override
    public void process(TeXParser parser)
      throws IOException
    {
@@ -95,7 +97,8 @@ public class L2HEqnarray extends L2HMathDeclaration
       row.process(parser);
    }
 
-   public void end(TeXParser parser) throws IOException
+   @Override
+   public void end(TeXParser parser, TeXObjectList stack) throws IOException
    {
       L2HConverter listener = (L2HConverter)parser.getListener();
 
