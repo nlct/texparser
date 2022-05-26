@@ -228,6 +228,7 @@ public class GlossariesSty extends LaTeXSty
       registerControlSequence(new AtGlsAtAtLink(this));
       registerControlSequence(new AtGlsAtAtLink("glslink", this, true));
       registerControlSequence(new AtGlsAtLink(this));
+      registerControlSequence(new AtGlsAtFieldAtLink(this));
       registerControlSequence(new GlsEntryFmt(this));
       registerControlSequence(new GlsGenEntryFmt(this));
       registerControlSequence(new AtFirstOfOne("glstextformat"));
@@ -249,6 +250,66 @@ public class GlossariesSty extends LaTeXSty
       registerControlSequence(new Gls("GLSpl", CaseChange.TO_UPPER, true, this));
 
       registerControlSequence(new IfGlsUsed(this));
+
+      registerControlSequence(new GlsFieldLink("glsname", "name", this));
+      registerControlSequence(new GlsFieldLink("Glsname", "name", CaseChange.SENTENCE, this));
+      registerControlSequence(new GlsFieldLink("GLSname", "name", CaseChange.TO_UPPER, this));
+
+      registerControlSequence(new GlsFieldLink("glstext", "text", this));
+      registerControlSequence(new GlsFieldLink("Glstext", "text", CaseChange.SENTENCE, this));
+      registerControlSequence(new GlsFieldLink("GLStext", "text", CaseChange.TO_UPPER, this));
+
+      registerControlSequence(new GlsFieldLink("glsplural", "plural", true, this));
+      registerControlSequence(new GlsFieldLink("Glsplural", "plural", CaseChange.SENTENCE, true, this));
+      registerControlSequence(new GlsFieldLink("GLSplural", "plural", CaseChange.TO_UPPER, true, this));
+
+      registerControlSequence(new GlsFieldLink("glsfirst", "first", this));
+      registerControlSequence(new GlsFieldLink("Glsfirst", "first", CaseChange.SENTENCE, this));
+      registerControlSequence(new GlsFieldLink("GLSfirst", "first", CaseChange.TO_UPPER, this));
+
+      registerControlSequence(new GlsFieldLink("glsfirstplural", "firstplural", true, this));
+      registerControlSequence(new GlsFieldLink("Glsfirstplural", "firstplural", CaseChange.SENTENCE, true, this));
+      registerControlSequence(new GlsFieldLink("GLSfirstplural", "firstplural", CaseChange.TO_UPPER, true, this));
+
+      registerControlSequence(new GlsFieldLink("glssymbol", "symbol", this));
+      registerControlSequence(new GlsFieldLink("Glssymbol", "symbol", CaseChange.SENTENCE, this));
+      registerControlSequence(new GlsFieldLink("GLSsymbol", "symbol", CaseChange.TO_UPPER, this));
+
+      registerControlSequence(new GlsFieldLink("glssymbolplural", "symbolplural", true, this));
+      registerControlSequence(new GlsFieldLink("Glssymbolplural", "symbolplural", CaseChange.SENTENCE, true, this));
+      registerControlSequence(new GlsFieldLink("GLSsymbolplural", "symbolplural", CaseChange.TO_UPPER, true, this));
+
+      registerControlSequence(new GlsFieldLink("glsdesc", "description", this));
+      registerControlSequence(new GlsFieldLink("Glsdesc", "description", CaseChange.SENTENCE, this));
+      registerControlSequence(new GlsFieldLink("GLSdesc", "description", CaseChange.TO_UPPER, this));
+
+      registerControlSequence(new GlsFieldLink("glsdescplural", "descriptionplural", true, this));
+      registerControlSequence(new GlsFieldLink("Glsdescplural", "descriptionplural", CaseChange.SENTENCE, true, this));
+      registerControlSequence(new GlsFieldLink("GLSdescplural", "descriptionplural", CaseChange.TO_UPPER, true, this));
+
+      registerControlSequence(new GlsFieldLink("glsuseri", "user1", this));
+      registerControlSequence(new GlsFieldLink("Glsuseri", "user1", CaseChange.SENTENCE, this));
+      registerControlSequence(new GlsFieldLink("GLSuseri", "user1", CaseChange.TO_UPPER, this));
+
+      registerControlSequence(new GlsFieldLink("glsuserii", "user2", this));
+      registerControlSequence(new GlsFieldLink("Glsuserii", "user2", CaseChange.SENTENCE, this));
+      registerControlSequence(new GlsFieldLink("GLSuserii", "user2", CaseChange.TO_UPPER, this));
+
+      registerControlSequence(new GlsFieldLink("glsuseriii", "user3", this));
+      registerControlSequence(new GlsFieldLink("Glsuseriii", "user3", CaseChange.SENTENCE, this));
+      registerControlSequence(new GlsFieldLink("GLSuseriii", "user3", CaseChange.TO_UPPER, this));
+
+      registerControlSequence(new GlsFieldLink("glsuseriv", "user4", this));
+      registerControlSequence(new GlsFieldLink("Glsuseriv", "user4", CaseChange.SENTENCE, this));
+      registerControlSequence(new GlsFieldLink("GLSuseriv", "user4", CaseChange.TO_UPPER, this));
+
+      registerControlSequence(new GlsFieldLink("glsuserv", "user5", this));
+      registerControlSequence(new GlsFieldLink("Glsuserv", "user5", CaseChange.SENTENCE, this));
+      registerControlSequence(new GlsFieldLink("GLSuserv", "user5", CaseChange.TO_UPPER, this));
+
+      registerControlSequence(new GlsFieldLink("glsuservi", "user6", this));
+      registerControlSequence(new GlsFieldLink("Glsuservi", "user6", CaseChange.SENTENCE, this));
+      registerControlSequence(new GlsFieldLink("GLSuservi", "user6", CaseChange.TO_UPPER, this));
 
       registerControlSequence(new GlsEntryField("glsentryname", "name", this));
       registerControlSequence(new GlsEntryField("glsentrytext", "text", this));

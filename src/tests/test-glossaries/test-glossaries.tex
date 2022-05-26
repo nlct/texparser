@@ -9,7 +9,8 @@
 
 \makeglossaries
 
-\newglossaryentry{sample}{name={sample},description={an example}}
+\newglossaryentry{sample}{name={sample},description={an example},
+  symbol={\ensuremath{\pi}}}
 \newglossaryentry{child}{parent={sample},
  name={child sample},description={an example sub entry}}
 
@@ -21,6 +22,7 @@
 Name value: \glsentryname{sample}.
 Text value: \glsentrytext{sample}.
 Description value: \glsentrydesc{sample}.
+Symbol value: \glsentrysymbol{sample}.
 
 \hypertarget{sampleanchor}{Sample anchor}.
 
@@ -32,6 +34,8 @@ Is used? \ifglsused{sample}{true}{false}.
 Next use: \gls{sample}.
 
 \Gls{child}.
+
+Symbol: \glssymbol{sample}.
 
 \section{Another}
 \label{sec:another}

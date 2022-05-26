@@ -37,6 +37,7 @@ public class GlsEntryField extends AbstractGlsCommand
       this.caseChange = caseChange;
    }
 
+   @Override
    public Object clone()
    {
       return new GlsEntryField(getName(), getField(), getCaseChange(), getSty());
@@ -98,6 +99,7 @@ public class GlsEntryField extends AbstractGlsCommand
       return list;
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
@@ -113,11 +115,13 @@ public class GlsEntryField extends AbstractGlsCommand
       return expand(glslabel, fieldLabel, caseChange, parser, stack);
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser) throws IOException
    {
       return expandonce(parser, parser);
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
@@ -181,12 +185,14 @@ public class GlsEntryField extends AbstractGlsCommand
       }
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser)
      throws IOException
    {
       return expandfully(parser, parser);
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
@@ -229,6 +235,7 @@ public class GlsEntryField extends AbstractGlsCommand
       }
    }
 
+   @Override
    public void process(TeXParser parser)
      throws IOException
    {
