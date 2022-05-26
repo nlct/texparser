@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -35,6 +35,7 @@ public class NumberCs extends Primitive implements Expandable
       super(name, true);
    }
 
+   @Override
    public Object clone()
    {
       return new NumberCs(getName());
@@ -46,6 +47,7 @@ public class NumberCs extends Primitive implements Expandable
       return true;
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
    throws IOException
    {
@@ -53,18 +55,12 @@ public class NumberCs extends Primitive implements Expandable
 
       TeXObjectList list = new TeXObjectList();
 
-      if (arg instanceof TeXNumber)
-      {
-         list.add((TeXNumber)arg);
-      }
-      else
-      {
-         list.add(new UserNumber(arg.number(parser)));
-      }
+      list.add(new UserNumber(arg.number(parser)));
 
       return list;
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser)
    throws IOException
    {
@@ -72,18 +68,12 @@ public class NumberCs extends Primitive implements Expandable
 
       TeXObjectList list = new TeXObjectList();
 
-      if (arg instanceof TeXNumber)
-      {
-         list.add((TeXNumber)arg);
-      }
-      else
-      {
-         list.add(new UserNumber(arg.number(parser)));
-      }
+      list.add(new UserNumber(arg.number(parser)));
 
       return list;
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser, TeXObjectList stack)
    throws IOException
    {
@@ -93,6 +83,7 @@ public class NumberCs extends Primitive implements Expandable
          String.format("%d", arg.number(parser)));
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser)
    throws IOException
    {
@@ -102,6 +93,7 @@ public class NumberCs extends Primitive implements Expandable
          String.format("%d", arg.number(parser)));
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
@@ -111,6 +103,7 @@ public class NumberCs extends Primitive implements Expandable
          String.format("%d", arg.number(parser)));
    }
 
+   @Override
    public void process(TeXParser parser)
       throws IOException
    {
