@@ -46,7 +46,7 @@ public abstract class MakeTextChangeCase extends ControlSequence
 
       while (list.size() > 0)
       {
-         TeXObject arg = list.expandedPopStack(parser);
+         TeXObject arg = list.popStack(parser);
 
          if (arg instanceof TeXObjectList)
          {
@@ -68,7 +68,7 @@ public abstract class MakeTextChangeCase extends ControlSequence
 
             while (list.size() > 0)
             {
-               arg = list.expandedPopStack(parser);
+               arg = list.popStack(parser);
                newList.add(arg);
 
                if (arg instanceof EndDeclaration

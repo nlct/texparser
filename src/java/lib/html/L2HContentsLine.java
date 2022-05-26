@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -36,37 +36,49 @@ public class L2HContentsLine extends ContentsLine
       super(name);
    }
 
+   @Override
    public Object clone()
    {
       return new L2HContentsLine(getName());
    }
 
+   @Override
    public TeXObjectList contentsline(TeXParser parser, TeXObject type,
     TeXObject title, TeXObject page, TeXObject link)
       throws IOException
    {
+      String linkStr = link.toString(parser);
+
+      if (linkStr.isEmpty())
+      {
+         return contentsline(parser, type, title, page);
+      }
+
+      String typeStr = type.toString(parser);
       TeXObjectList list = new TeXObjectList();
 
       list.add(new HtmlTag(
         String.format("<div class=\"toc-%s\"><a href=\"#%s\">",
-        type.toString(parser),
-         HtmlTag.getUriFragment(link.toString(parser)))));
+        typeStr, HtmlTag.getUriFragment(linkStr))));
       list.add(title);
-      list.add(new HtmlTag("</a></div>"));
+      list.add(new HtmlTag(String.format("</a></div><!-- end of toc-%s -->%n", typeStr)));
 
       return list;
    }
 
+   @Override
    public TeXObjectList contentsline(TeXParser parser, TeXObject type,
     TeXObject title, TeXObject page)
       throws IOException
    {
       TeXObjectList list = new TeXObjectList();
 
+      String typeStr = type.toString(parser);
+
       list.add(new HtmlTag(String.format("<div class=\"toc-%s\">",
-        type.toString(parser))));
+        typeStr)));
       list.add(title);
-      list.add(new HtmlTag("</div>"));
+      list.add(new HtmlTag(String.format("</div><!-- end of toc-%s -->%n", typeStr)));
 
       return list;
    }

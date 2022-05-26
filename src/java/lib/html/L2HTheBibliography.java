@@ -49,7 +49,7 @@ public class L2HTheBibliography extends TheBibliography
    {
       L2HConverter listener = (L2HConverter)parser.getListener();
 
-      listener.write("<div class=\"bibliography\"><div>");
+      listener.write("<div class=\"bibliography\"><div><!-- start of bibitem -->");
    }
 
    @Override
@@ -58,6 +58,6 @@ public class L2HTheBibliography extends TheBibliography
    {
       L2HConverter listener = (L2HConverter)parser.getListener();
 
-      listener.write("</div></div>");
+      listener.write("</div><!-- end of bibitem --></div><!-- end of bibliography -->");
    }
 }

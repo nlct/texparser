@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -61,6 +61,7 @@ public class StoreDataCs extends ControlSequence
       return optInternalName;
    }
 
+   @Override
    public Object clone()
    {
       return new StoreDataCs(getName(),
@@ -117,6 +118,7 @@ public class StoreDataCs extends ControlSequence
       }
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
@@ -124,25 +126,18 @@ public class StoreDataCs extends ControlSequence
 
       if (getOptionalInternalName() != null)
       {
-         optArg = stack.popArg(parser, '[', ']');
+         optArg = popOptArg(parser, stack);
       }
 
-      TeXObject arg = stack.popArg(parser);
+      TeXObject arg = popArg(parser, stack);
       setData(parser, optArg, arg);
    }
 
+   @Override
    public void process(TeXParser parser)
       throws IOException
    {
-      TeXObject optArg = null;
-
-      if (getOptionalInternalName() != null)
-      {
-         optArg = parser.popNextArg('[', ']');
-      }
-
-      TeXObject arg = parser.popNextArg();
-      setData(parser, optArg, arg);
+      process(parser, parser);
    }
 
    private String internalName, optInternalName;

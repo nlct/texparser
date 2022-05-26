@@ -948,7 +948,7 @@ public class L2HConverter extends LaTeXParserListener
 
       processFootnotes();
 
-      writeable.writeln("</div>");// ends <div id="main">
+      writeable.writeln("</div><!-- end of main -->");// ends <div id="main">
 
       ControlSequence cs = parser.getControlSequence(
         "@enddocumenthook");

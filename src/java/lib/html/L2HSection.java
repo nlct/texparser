@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -36,12 +36,13 @@ public class L2HSection extends Section
       super(name);
    }
 
+   @Override
    public Object clone()
    {
       return new L2HSection(getName());
    }
 
-   protected TeXObject popLabel(TeXParser parser, TeXObjectList stack)
+   protected String popLabel(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
       L2HConverter listener = (L2HConverter)parser.getListener();
@@ -76,40 +77,10 @@ public class L2HSection extends Section
 
       if (object instanceof Label)
       {
-         TeXObject label;
-
-         if (parser == stack || stack == null)
-         {
-            label = parser.popNextArg();
-         }
-         else
-         {
-            label = stack.popArg(parser);
-         }
-
-         if (label instanceof Expandable)
-         {
-            TeXObjectList expanded;
-
-            if (parser == stack || stack == null)
-            {
-               expanded = ((Expandable)label).expandfully(parser);
-            }
-            else
-            {
-               expanded = ((Expandable)label).expandfully(parser, stack);
-            }
-
-            if (expanded != null)
-            {
-               label = expanded;
-            }
-         }
-
-         return label;
+         return popLabelString(parser, stack);
       }
 
-      if (parser == stack || stack == null)
+      if (stack == null)
       {
          parser.push(object);
       }
@@ -131,14 +102,7 @@ public class L2HSection extends Section
 
       listener.startSection(false, tag, getName());
 
-      if (tag == null)
-      {
-         listener.write("<div class=\""+getName()+"\">");
-      }
-      else
-      {
-         listener.write("<"+tag+">");
-      }
+      TeXObjectList substack = listener.createStack();
 
       TeXObject cs = parser.getControlSequence("theH"+getName()+"*");
       String labelName = null;
@@ -150,65 +114,77 @@ public class L2HSection extends Section
 
       if (cs != null)
       {
-         if (cs instanceof Expandable)
-         {
-            TeXObjectList expanded;
-
-            if (parser == stack || stack == null)
-            {
-               expanded = ((Expandable)cs).expandfully(parser);
-            }
-            else
-            {
-               expanded = ((Expandable)cs).expandfully(parser, stack);
-            }
-
-            if (expanded != null)
-            {
-               cs = expanded;
-            }
-         }
+         String theHctr = parser.expandToString(cs, stack);
 
          String counter = getName()+"*";
 
-         TeXObject label = popLabel(parser, stack);
+         labelName = popLabel(parser, stack);
 
-         if (label != null)
+         if (labelName == null)
          {
-            labelName = label.toString(parser);
+            labelName = HtmlTag.getUriFragment(counter+"."+theHctr);
          }
-         else
-         {
-            labelName = HtmlTag.getUriFragment(counter+"."+cs.toString(parser));
-         }
-
-         listener.write(String.format("<a name=\"%s\"></a>", labelName));
 
          listener.stepcounter(counter);
       }
 
-      if (parser == stack || stack == null)
+      if (tag == null)
       {
-         arg.process(parser);
+         if (labelName == null)
+         {
+            substack.add(new HtmlTag(
+             String.format("%n<div class=\"%s\"><!-- start of %s header -->",
+                getName(), getName())));
+         }
+         else
+         {
+            substack.add(new HtmlTag(
+             String.format("%n<div id=\"%s\" class=\"%s\"><!-- start of %s header -->",
+                labelName, getName(), getName())));
+         }
       }
       else
       {
-         arg.process(parser, stack);
+         if (labelName == null)
+         {
+            substack.add(new HtmlTag(
+              String.format("%n<%s><!-- start of %s header -->", tag, getName())));
+         }
+         else
+         {
+            substack.add(new HtmlTag(
+              String.format("%n<%s id=\"%s\"><!-- start of %s header -->", 
+                  tag, labelName, getName())));
+         }
       }
+
+      substack.add(arg);
 
       if (labelName != null)
       {
-         listener.createLinkBox(labelName).process(parser);
+         substack.add(listener.createLinkBox(labelName));
       }
 
       if (tag == null)
       {
-         listener.write("</div>");
+         substack.add(new HtmlTag(
+           String.format("</div><!-- end of %s header -->%n", getName())));
       }
       else
       {
-         listener.write("</"+tag+">");
+         substack.add(new HtmlTag(
+            String.format("</%s><!-- end of %s header -->%n", tag, getName())));
       }
+
+      if (parser == stack || stack == null)
+      {
+         substack.process(parser);
+      }
+      else
+      {
+         substack.process(parser, stack);
+      }
+
    }
 
    protected void numbered(TeXParser parser, TeXObjectList stack,
@@ -223,31 +199,15 @@ public class L2HSection extends Section
 
       listener.startSection(true, tag, getName());
 
-      if (tag == null)
-      {
-         list.add(new HtmlTag("<div class=\""+getName()+"\">"));
-      }
-      else
-      {
-         list.add(new HtmlTag("<"+tag+">"));
-      }
-
-      list.add(listener.getControlSequence("the"+getName()));
-      list.add(listener.getOther('.'));
-      list.add(listener.getSpace());
-
       String labelName=null;
 
       // Is there a label following the section command?
 
-      TeXObject label = popLabel(parser, stack);
+      String label = popLabel(parser, stack);
 
       if (label != null)
       {
-         labelName = HtmlTag.getUriFragment(label.toString(parser));
-
-         list.add(1, new HtmlTag(String.format("<a name=\"%s\">", labelName)));
-         list.add(new HtmlTag("</a>"));
+         labelName = HtmlTag.getUriFragment(label);
       }
       else
       {
@@ -260,32 +220,46 @@ public class L2HSection extends Section
 
          if (cs != null)
          {
-            if (cs instanceof Expandable)
-            {
-               TeXObjectList expanded;
-
-               if (parser == stack || stack == null)
-               {
-                  expanded = ((Expandable)cs).expandfully(parser);
-               }
-               else
-               {
-                  expanded = ((Expandable)cs).expandfully(parser, stack);
-               }
-
-               if (expanded != null)
-               {
-                  cs = expanded;
-               }
-            }
+            String theHctr = parser.expandToString(cs, stack);
 
             labelName = HtmlTag.getUriFragment(String.format("%s.%s", 
-              getName(), cs.toString(parser)));
-
-            list.add(1, new HtmlTag(String.format("<a name=\"%s\">", labelName)));
-            list.add(new HtmlTag("</a>"));
+              getName(), theHctr));
          }
       }
+
+      if (tag == null)
+      {
+         if (labelName == null)
+         {
+            list.add(new HtmlTag(
+             String.format("%n<div class=\"%s\"><!-- start of %s header -->",
+                 getName(), getName())));
+         }
+         else
+         {
+            list.add(new HtmlTag(
+             String.format("%n<div id=\"%s\" class=\"%s\"><!-- start of %s header -->",
+                labelName, getName(), getName())));
+         }
+      }
+      else
+      {
+         if (labelName == null)
+         {
+            list.add(new HtmlTag(String.format("%n<%s><!-- start of %s header -->",
+               tag, getName())));
+         }
+         else
+         {
+            list.add(new HtmlTag(
+               String.format("%n<%s id=\"%s\"><!-- start of %s header -->", 
+                  tag, labelName, getName())));
+         }
+      }
+
+      list.add(listener.getControlSequence("the"+getName()));
+      list.add(listener.getOther('.'));
+      list.add(listener.getSpace());
 
       list.add(arg);
 
@@ -296,11 +270,13 @@ public class L2HSection extends Section
 
       if (tag == null)
       {
-         list.add(new HtmlTag("</div>"));
+         list.add(new HtmlTag(String.format("</div><!-- end of %s header -->%n",
+           getName())));
       }
       else
       {
-         list.add(new HtmlTag("</"+tag+">"));
+         list.add(new HtmlTag(String.format("</%s><!-- end of %s header -->%n",
+            tag, getName())));
       }
 
       if (parser == stack || stack == null)

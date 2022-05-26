@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -43,14 +43,16 @@ public class L2HAbstract extends AbstractDec
 
    public void process(TeXParser parser) throws IOException
    {
-      parser.getListener().getWriteable().write("<div class=\"abstract\">");
+      parser.getListener().getWriteable().write(
+        String.format("%n<div class=\"%s\">", getName()));
 
       super.process(parser);
    }
 
    public void process(TeXParser parser, TeXObjectList stack) throws IOException
    {
-      parser.getListener().getWriteable().write("<div class=\"abstract\">");
+      parser.getListener().getWriteable().write(
+       String.format("%n<div class=\"%s\">", getName()));
 
       super.process(parser, stack);
    }
@@ -59,6 +61,7 @@ public class L2HAbstract extends AbstractDec
    public void end(TeXParser parser, TeXObjectList stack)
     throws IOException
    {
-      parser.getListener().getWriteable().write("</div>");
+      parser.getListener().getWriteable().write(
+       String.format("</div><!-- end of %s -->%n", getName()));
    }
 }

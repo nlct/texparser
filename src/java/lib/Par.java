@@ -54,7 +54,7 @@ public class Par extends AbstractTeXObject
 
    public String toString()
    {
-      return String.format("%s%n", getClass().getName());
+      return String.format("%s%n", getClass().getSimpleName());
    }
 
    public TeXObjectList string(TeXParser parser)

@@ -283,7 +283,7 @@ public abstract class Macro extends AbstractTeXObject
    {
       TeXObject arg = popArg(parser, stack);
 
-      if (arg instanceof Expandable)
+      if (arg.canExpand() && arg instanceof Expandable)
       {
          TeXObjectList expanded = null;
 

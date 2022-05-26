@@ -101,6 +101,7 @@ public class Maketitle extends ControlSequence
       return list;
    }
 
+   @Override
    public void process(TeXParser parser)
    throws IOException
    {
@@ -111,6 +112,7 @@ public class Maketitle extends ControlSequence
       postProcess(parser);
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack)
    throws IOException
    {

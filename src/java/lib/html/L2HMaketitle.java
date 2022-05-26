@@ -36,48 +36,33 @@ public class L2HMaketitle extends Maketitle
       super(name);
    }
 
+   @Override
    public Object clone()
    {
       return new L2HMaketitle(getName());
    }
 
-   public void process(TeXParser parser)
-   throws IOException
+   @Override
+   protected TeXObjectList createTitle(TeXParser parser)
+    throws IOException
    {
-      preProcess(parser);
-
       L2HConverter listener = (L2HConverter)parser.getListener();
 
-      listener.write("<div class=\"title\">");
+      TeXObjectList list = listener.createStack();
 
-      ControlSequence cs = listener.getControlSequence("@title");
+      list.add(new HtmlTag("<div class=\"title\">"));
+      list.add(listener.getControlSequence("@title"));
+      list.add(new HtmlTag("</div><!-- end of title -->"));
 
-      cs.process(parser);
+      list.add(new HtmlTag("<div class=\"author\">"));
+      list.add(listener.getControlSequence("@author"));
+      list.add(new HtmlTag("</div><!-- end of author -->"));
 
-      listener.write("</div>");
+      list.add(new HtmlTag("<div class=\"date\">"));
+      list.add(listener.getControlSequence("@date"));
+      list.add(new HtmlTag("</div><!-- end of date -->"));
 
-      listener.write("<div class=\"author\">");
-
-      cs = listener.getControlSequence("@author");
-
-      cs.process(parser);
-
-      listener.write("</div>");
-
-      listener.write("<div class=\"date\">");
-
-      cs = listener.getControlSequence("@date");
-
-      cs.process(parser);
-
-      listener.write("</div>");
-
-      postProcess(parser);
+      return list;
    }
 
-   public void process(TeXParser parser, TeXObjectList stack)
-   throws IOException
-   {
-      process(parser);
-   }
 }

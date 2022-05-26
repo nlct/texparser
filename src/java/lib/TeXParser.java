@@ -406,7 +406,7 @@ public class TeXParser extends TeXObjectList
       {
          if (debugLevel > 0)
          {
-            logMessage("EOF "+reader);
+            logMessage("EOF read() "+reader);
          }
 
          TeXReader parentReader = reader.getParent();
@@ -427,19 +427,21 @@ public class TeXParser extends TeXObjectList
 
          reader = parentReader;
 
-         if (debugLevel > 0)
-         {
-            logMessage("READER: "+reader);
-         }
-
          TeXObjectList pending = reader.getPending();
 
          if (pending != null)
          {
-            addAll(pending);
+            push(pending, true);
             pending.clear();
 
             reader.setPending(null);
+
+            logMessage("PUSHED PENDING "+toString());
+         }
+
+         if (debugLevel > 0)
+         {
+            logMessage("READER: "+reader);
          }
 
          return read();
@@ -1900,25 +1902,48 @@ public class TeXParser extends TeXObjectList
          // Is the current stack non-empty?
          // If it is, save remaining content for later
 
-         TeXObjectList pending = null;
+         boolean down = true;
 
          if (this.reader != null)
          {
-            pending = this.reader.getPending();
+            debugMessage(1, "CURRENT READER "+this.reader);
+
+            if (this.reader == reader.getParent())
+            {
+               debugMessage(1, "MOVING DOWN TO NESTED FILE "+reader);
+            }
+            else if (this.reader.getParent() == reader)
+            {
+               down = false;
+               debugMessage(1, "MOVING UP TO PARENT FILE "+reader);
+            }
+            else
+            {
+               debugMessage(1, "MOVING SIDEWAYS TO NESTED FILE "+reader);
+               reader.setParent(this.reader);
+            }
          }
 
-         if (size() > 0)
+         if (down && !isEmpty())
          {
-            if (pending == null)
-            {
-               pending = new TeXObjectList(size());
-            }
+            TeXObjectList pending = new TeXObjectList(size());
 
             pending.addAll(this);
             clear();
 
-            this.reader.setPending(pending);
+            reader.setPending(pending);
             pending = null;
+         }
+         else if (!down)
+         {
+            TeXObjectList pending = reader.getPending();
+
+            if (pending != null)
+            {
+               push(pending, true);
+            }
+
+            reader.setPending(null);
          }
 
          if (debugLevel > 0)
@@ -1926,7 +1951,6 @@ public class TeXParser extends TeXObjectList
             logMessage("PARSE switching from "+this.reader + " to "+reader);
          }
 
-         reader.setParent(this.reader);
          this.reader = reader;
       }
 
@@ -1966,6 +1990,8 @@ public class TeXParser extends TeXObjectList
                }
                catch (EOFException e)
                {
+                  debugMessage(1, "EOF while processing object "+object);
+
                   TeXObjectList pending = reader.getPending();
 
                   if (pending != null)
@@ -2007,6 +2033,22 @@ public class TeXParser extends TeXObjectList
       }
       catch (EOFException e)
       {
+         debugMessage(1, "EOF while fetching next from "+this.reader);
+
+         TeXObjectList pending = this.reader.getPending();
+
+         if (pending != null)
+         {
+            if (debugLevel > 0)
+            {
+               logMessage("PARSE EOF processing pending for reader: "+this.reader);
+            }
+
+            pending.process(this);
+
+            this.reader.setPending(null);
+         }
+
          if (this.reader == reader)
          {
             this.reader = reader.getParent();
@@ -2082,6 +2124,7 @@ public class TeXParser extends TeXObjectList
 
       try
       {
+         debugMessage(1, "PARSE FILE: "+file);
          listener.beginParse(file, charset);
 
          TeXReader nextReader = new TeXReader(this.reader, file, charset);
@@ -2091,10 +2134,17 @@ public class TeXParser extends TeXObjectList
             nextReader.setPending(stack);
          }
 
+         debugMessage(1, "READER: "+nextReader);
+
          parse(nextReader);
       }
       catch (EOFException e)
       {
+         if (debugLevel > 0)
+         {
+            logMessage("EOF parsing file: "+file);
+            logMessage("Current reader: "+reader);
+         }
       }
       finally
       {

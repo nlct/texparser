@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -36,6 +36,7 @@ public class L2HBibItem extends BibItem
       super(name);
    }
 
+   @Override
    public Object clone()
    {
       return new L2HBibItem(getName());
@@ -47,11 +48,11 @@ public class L2HBibItem extends BibItem
    {
       if (parser == stack || stack == null)
       {
-         parser.push(new HtmlTag("</div><div>"));
+         parser.push(new HtmlTag("</div><!-- end of bibitem --><div>"));
       }
       else
       {
-         stack.push(new HtmlTag("</div><div>"));
+         stack.push(new HtmlTag("</div><!-- end of bibitem --><div>"));
       }
 
       super.pushPostItem(parser, stack, arg);
@@ -74,45 +75,28 @@ public class L2HBibItem extends BibItem
    {
       LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
 
-      if (arg instanceof Expandable)
-      {
-         TeXObjectList expanded;
+      String label = parser.expandToString(arg, stack);
 
-         if (parser == stack || stack == null)
-         {
-            expanded = ((Expandable)arg).expandfully(parser);
-         }
-         else
-         {
-            expanded = ((Expandable)arg).expandfully(parser, stack);
-         }
-
-         if (expanded != null)
-         {
-            arg = expanded;
-         }
-      }
-
-      String label = HtmlTag.getUriFragment(arg.toString(parser));
+      label = HtmlTag.getUriFragment(label);
 
       if (parser == stack || stack == null)
       {
-         parser.push(new HtmlTag("<a name=\""+label+"\">"));
+         parser.push(new HtmlTag("<a id=\""+label+"\">"));
       }
       else
       {
-         stack.push(new HtmlTag("<a name=\""+label+"\">"));
+         stack.push(new HtmlTag("<a id=\""+label+"\">"));
       }
 
       super.pushPreItem(parser, stack, arg);
 
       if (parser == stack || stack == null)
       {
-         parser.push(new HtmlTag("</div><div class=\"bibitem\">"));
+         parser.push(new HtmlTag("</div><!-- end of bibitem --><div class=\"bibitem\">"));
       }
       else
       {
-         stack.push(new HtmlTag("</div><div class=\"bibitem\">"));
+         stack.push(new HtmlTag("</div><!-- end of bibitem --><div class=\"bibitem\">"));
       }
 
    }

@@ -75,15 +75,11 @@ public class AbstractDec extends Declaration
       return null;
    }
 
-   @Override
-   public void process(TeXParser parser) throws IOException
+   protected TeXObjectList getHeader(TeXParser parser, TeXObjectList stack)
+     throws IOException
    {
-      process(parser, parser);
-   }
+      TeXObjectList substack = parser.getListener().createStack();
 
-   @Override
-   public void process(TeXParser parser, TeXObjectList stack) throws IOException
-   {
       ControlSequence cs = parser.getControlSequence("chapter");
 
       if (cs == null)
@@ -91,17 +87,24 @@ public class AbstractDec extends Declaration
          cs = new TeXCsRef("section");
       }
 
-      stack.push(new TeXCsRef("abstractname"));
-      stack.push(parser.getListener().getOther('*'));
+      substack.add(cs);
 
-      if (parser == stack || stack == null)
-      {
-         cs.process(parser);
-      }
-      else
-      {
-         cs.process(parser, stack);
-      }
+      substack.add(parser.getListener().getOther('*'));
+      substack.add(new TeXCsRef("abstractname"));
+
+      return substack;
+   }
+
+   @Override
+   public void process(TeXParser parser) throws IOException
+   {
+      getHeader(parser, parser).process(parser);
+   }
+
+   @Override
+   public void process(TeXParser parser, TeXObjectList stack) throws IOException
+   {
+      getHeader(parser, stack).process(parser, stack);
    }
 
    @Override

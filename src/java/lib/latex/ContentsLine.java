@@ -43,6 +43,7 @@ public abstract class ContentsLine extends ControlSequence
     TeXObject title, TeXObject page)
       throws IOException;
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack)
    throws IOException
    {
@@ -55,6 +56,8 @@ public abstract class ContentsLine extends ControlSequence
 
       if (listener.isStyLoaded("hyperref"))
       {
+         TeXObject obj = stack.peek();
+
          link = stack.popArg(parser);
       }
 
@@ -81,6 +84,7 @@ public abstract class ContentsLine extends ControlSequence
       stack.addAll(0, list);
    }
 
+   @Override
    public void process(TeXParser parser)
    throws IOException
    {

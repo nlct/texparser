@@ -80,6 +80,8 @@ public class TeXObjectList extends Vector<TeXObject>
 
       TeXObject object = popStack(parser, popStyle);
 
+      if (object == null) return null;
+
       if (isIgnoreLeadingSpace(popStyle))
       {
          popStyle = (byte)(popStyle^POP_IGNORE_LEADING_SPACE);
@@ -96,7 +98,8 @@ public class TeXObjectList extends Vector<TeXObject>
          object = ((AssignedMacro)object).getBaseUnderlying();
       }
 
-      if (object instanceof EndCs)
+      if (object instanceof EndCs || object instanceof InternalQuantity
+           || !object.canExpand())
       {
          return object;
       }
@@ -1607,9 +1610,19 @@ public class TeXObjectList extends Vector<TeXObject>
          return list;
       }
 
+      TeXObject prevObj = null;
+
       while (!isEmpty())
       {
          TeXObject object = pop();
+
+         if (object == prevObj)
+         {
+            list.add(object);
+            continue;
+         }
+
+         prevObj = object;
 
          if (object instanceof TeXCsRef)
          {
@@ -1698,7 +1711,7 @@ public class TeXObjectList extends Vector<TeXObject>
 
          TeXObjectList expanded = null;
 
-         if (object instanceof Expandable)
+         if (object.canExpand() && object instanceof Expandable)
          {
             expanded = ((Expandable)object).expandfully(parser, remaining);
          }
