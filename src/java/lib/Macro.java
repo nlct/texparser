@@ -183,46 +183,7 @@ public abstract class Macro extends AbstractTeXObject
    protected int popModifier(TeXParser parser, TeXObjectList stack, int... charCodes)
    throws IOException
    {
-      TeXObject object;
-
-      if (parser == stack || stack == null)
-      {
-         object = parser.peekStack();
-      }
-      else
-      {
-         object = stack.peekStack();
-      }
-
-      int found = -1;
-
-      if (object instanceof CharObject)
-      {
-         int cp = ((CharObject)object).getCharCode();
-
-         for (int mod : charCodes)
-         {
-            if (cp == mod)
-            {
-               found = mod;
-               break;
-            }
-         }
-
-         if (found != -1)
-         {
-            if (parser == stack || stack == null)
-            {
-               parser.popStack();
-            }
-            else
-            {
-               stack.popStack(parser);
-            }
-         }
-      }
-
-      return found;
+      return TeXParserUtils.popModifier(parser, stack, charCodes);
    }
 
    // pops an argument that should be a label that needs to be fully
@@ -230,7 +191,7 @@ public abstract class Macro extends AbstractTeXObject
    protected String popLabelString(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      return parser.expandToString(popArg(parser, stack), stack);
+      return TeXParserUtils.popLabelString(parser, stack);
    }
 
    // pops an optional argument that should be a label that needs to be fully
@@ -238,28 +199,14 @@ public abstract class Macro extends AbstractTeXObject
    protected String popOptLabelString(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      TeXObject arg = popOptArg(parser, stack);
-
-      if (arg == null)
-      {
-         return null;
-      }
-
-      return parser.expandToString(arg, stack);
+      return TeXParserUtils.popOptLabelString(parser, stack);
    }
 
    // pops a mandatory argument
    protected TeXObject popArg(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      if (parser == stack || stack == null)
-      {
-         return parser.popNextArg();
-      }
-      else
-      {
-         return stack.popArg(parser);
-      }
+      return TeXParserUtils.popArg(parser, stack);
    }
 
    // pops an optional argument
@@ -267,110 +214,39 @@ public abstract class Macro extends AbstractTeXObject
    protected TeXObject popOptArg(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      if (parser == stack || stack == null)
-      {
-         return parser.popNextArg('[', ']');
-      }
-      else
-      {
-         return stack.popArg(parser, '[', ']');
-      }
+      return TeXParserUtils.popOptArg(parser, stack);
    }
 
    // pops an argument and then fully expands it
    protected TeXObject popArgExpandFully(TeXParser parser, TeXObjectList stack)
     throws IOException
    {
-      TeXObject arg = popArg(parser, stack);
-
-      if (arg.canExpand() && arg instanceof Expandable)
-      {
-         TeXObjectList expanded = null;
-
-         if (stack == parser || stack == null)
-         {
-            expanded = ((Expandable)arg).expandfully(parser);
-         }
-         else
-         {
-            expanded = ((Expandable)arg).expandfully(parser, stack);
-         }
-
-         if (expanded != null)
-         {
-            arg = expanded;
-         }
-      }
-
-      return arg;
+      return TeXParserUtils.popArgExpandFully(parser, stack);
    }
 
    protected int popInt(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      Numerical num = popNumericalArg(parser, stack);
-
-      return num.number(parser);
+      return TeXParserUtils.popInt(parser, stack);
    }
 
    // pops an argument that should be a numerical value
    protected Numerical popNumericalArg(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      if (parser == stack || stack == null)
-      {
-         return parser.popNumericalArg();
-      }
-      else
-      {
-         return stack.popNumericalArg(parser);
-      }
+      return TeXParserUtils.popNumericalArg(parser, stack);
    }
 
    protected NumericRegister popNumericRegister(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      TeXObject obj = popArg(parser, stack);
-      NumericRegister reg = null;
-
-      if (obj instanceof ControlSequence)
-      {
-         reg = parser.getSettings().getNumericRegister(((ControlSequence)obj).getName());
-      }
-
-      if (reg == null)
-      {
-         throw new TeXSyntaxException(parser, 
-           TeXSyntaxException.ERROR_REGISTER_NOT_NUMERIC, obj.toString(parser));
-      }
-
-      return reg;
+      return TeXParserUtils.popNumericRegister(parser, stack);
    }
 
    protected TeXDimension popDimensionArg(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      TeXObject obj = popArgExpandFully(parser, stack);
-
-      if (obj instanceof InternalQuantity)
-      {
-         obj = ((InternalQuantity)obj).getQuantity(parser, stack);
-      }
-
-      if (obj instanceof TeXDimension)
-      {
-         return (TeXDimension)obj;
-      }
-
-      if (obj instanceof TeXObjectList)
-      {
-         TeXObjectList list = (TeXObjectList)obj;
-
-         return list.popDimension(parser);
-      }
-
-      throw new TeXSyntaxException(parser, 
-           TeXSyntaxException.ERROR_DIMEN_EXPECTED);
+      return TeXParserUtils.popDimensionArg(parser, stack);
    }
 
    public abstract Object clone();
