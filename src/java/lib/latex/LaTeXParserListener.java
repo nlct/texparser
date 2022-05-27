@@ -235,7 +235,19 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       return AuxData.getHyperReference(auxData, getParser(), label);
    }
 
+   @Deprecated
    public TeXObject getLabelForLink(TeXObject link)
+     throws IOException
+   {
+      if (auxData == null)
+      {
+         return null;
+      }
+
+      return AuxData.getLabelForLink(auxData, getParser(), link);
+   }
+
+   public TeXObject getLabelForLink(String link)
      throws IOException
    {
       if (auxData == null)

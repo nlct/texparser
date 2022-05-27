@@ -82,15 +82,19 @@ public class AbstractDec extends Declaration
 
       ControlSequence cs = parser.getControlSequence("chapter");
 
-      if (cs == null)
+      if (cs != null)
       {
-         cs = new TeXCsRef("section");
+         substack.add(cs);
+         substack.add(parser.getListener().getOther('*'));
+         substack.add(new TeXCsRef("abstractname"));
       }
-
-      substack.add(cs);
-
-      substack.add(parser.getListener().getOther('*'));
-      substack.add(new TeXCsRef("abstractname"));
+      else
+      {
+         substack.add(parser.getListener().getPar());
+         substack.add(parser.getListener().getControlSequence("textbf"));
+         substack.add(new TeXCsRef("abstractname"));
+         substack.add(parser.getListener().getPar());
+      }
 
       return substack;
    }

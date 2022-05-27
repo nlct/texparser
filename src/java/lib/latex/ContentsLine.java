@@ -35,8 +35,16 @@ public abstract class ContentsLine extends ControlSequence
       super(name);
    }
 
-   public abstract TeXObjectList contentsline(TeXParser parser, TeXObject type,
+   @Deprecated
+   public TeXObjectList contentsline(TeXParser parser, TeXObject type,
     TeXObject title, TeXObject page, TeXObject link)
+      throws IOException
+   {
+      return contentsline(parser, type, title, page, link.toString());
+   }
+
+   public abstract TeXObjectList contentsline(TeXParser parser, TeXObject type,
+    TeXObject title, TeXObject page, String link)
       throws IOException;
 
    public abstract TeXObjectList contentsline(TeXParser parser, TeXObject type,
@@ -52,7 +60,7 @@ public abstract class ContentsLine extends ControlSequence
       TeXObject type = stack.popArg(parser);
       TeXObject title = stack.popArg(parser);
       TeXObject page = stack.popArg(parser);
-      TeXObject link = null;
+      String link = null;
 
       if (listener.isStyLoaded("hyperref"))
       {
@@ -60,7 +68,7 @@ public abstract class ContentsLine extends ControlSequence
 
          if (obj instanceof BgChar || obj instanceof Group)
          {
-            link = stack.popArg(parser);
+            link = popLabelString(parser, stack);
          }
       }
 
@@ -72,9 +80,9 @@ public abstract class ContentsLine extends ControlSequence
 
          TeXObject label = listener.getLabelForLink(link);
 
-         if (label != null)
+         if (label != null && !label.isEmpty())
          {
-            link = label;
+            link = label.toString(parser);
          }
 
          list = contentsline(parser, type, title, page, link);
@@ -96,7 +104,7 @@ public abstract class ContentsLine extends ControlSequence
       TeXObject type = parser.popNextArg();
       TeXObject title = parser.popNextArg();
       TeXObject page = parser.popNextArg();
-      TeXObject link = null;
+      String link = null;
 
       if (listener.isStyLoaded("hyperref"))
       {
@@ -104,7 +112,7 @@ public abstract class ContentsLine extends ControlSequence
 
          if (obj instanceof BgChar)
          {
-            link = parser.popNextArg();
+            link = popLabelString(parser, parser);
          }
       }
 
@@ -116,9 +124,9 @@ public abstract class ContentsLine extends ControlSequence
 
          TeXObject label = listener.getLabelForLink(link);
 
-         if (label != null)
+         if (label != null && !label.isEmpty())
          {
-            link = label;
+            link = label.toString(parser);
          }
 
          list = contentsline(parser, type, title, page, link);

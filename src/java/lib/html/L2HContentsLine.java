@@ -44,12 +44,10 @@ public class L2HContentsLine extends ContentsLine
 
    @Override
    public TeXObjectList contentsline(TeXParser parser, TeXObject type,
-    TeXObject title, TeXObject page, TeXObject link)
+    TeXObject title, TeXObject page, String link)
       throws IOException
    {
-      String linkStr = link.toString(parser);
-
-      if (linkStr.isEmpty())
+      if (link == null || link.isEmpty())
       {
          return contentsline(parser, type, title, page);
       }
@@ -59,7 +57,7 @@ public class L2HContentsLine extends ContentsLine
 
       list.add(new HtmlTag(
         String.format("<div class=\"toc-%s\"><a href=\"#%s\">",
-        typeStr, HtmlTag.getUriFragment(linkStr))));
+        typeStr, HtmlTag.getUriFragment(link))));
       list.add(title);
       list.add(new HtmlTag(String.format("</a></div><!-- end of toc-%s -->%n", typeStr)));
 

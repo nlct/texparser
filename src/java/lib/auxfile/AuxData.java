@@ -297,6 +297,7 @@ public class AuxData
       return new UnknownReference(listener, label);
    }
 
+   @Deprecated
    public static TeXObject getLabelForLink(Vector<AuxData> auxData,
      TeXParser parser, TeXObject link)
    throws IOException

@@ -51,11 +51,15 @@ public class L2HTableOfContents extends ControlSequence
       L2HConverter listener = (L2HConverter)parser.getListener();
 
       TeXObject cs = parser.getControlSequence("chapter");
+      String counter = "chapter*";
 
       if (cs == null || cs instanceof Undefined)
       {
          cs = listener.getControlSequence("section");
+         counter = "section*";
       }
+
+      listener.stepcounter(counter);
 
       stack.push(new HtmlTag("</div><!-- end of toc -->"));
 
@@ -82,11 +86,15 @@ public class L2HTableOfContents extends ControlSequence
       L2HConverter listener = (L2HConverter)parser.getListener();
 
       TeXObject cs = parser.getControlSequence("chapter");
+      String counter = "chapter*";
 
       if (cs == null || cs instanceof Undefined)
       {
          cs = listener.getControlSequence("section");
+         counter = "section*";
       }
+
+      listener.stepcounter(counter);
 
       parser.push(new HtmlTag("</div><!-- end of toc -->"));
 
