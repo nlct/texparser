@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -35,47 +35,28 @@ public class Cite extends Command
       super(name);
    }
 
+   @Override
    public Object clone()
    {
       return new Cite(getName());
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser)
       throws IOException
    {
-      boolean isStar = false;
+      boolean isStar = (popModifier(parser, parser, '*') == '*');
 
-      TeXObject obj = parser.peekStack();
-
-      if (obj instanceof CharObject)
-      {
-         if (((CharObject)obj).getCharCode() == (int)'*')
-         {
-            isStar = true;
-            parser.popStack();
-         }
-      }
-
-      TeXObject opt1 = parser.popNextArg('[', ']');
+      TeXObject opt1 = popOptArg(parser, parser);
 
       TeXObject opt2 = null;
 
       if (opt1 != null)
       {
-         opt2 = parser.popNextArg('[', ']');
+         opt2 = popOptArg(parser, parser);
       }
 
-      TeXObject arg = parser.popNextArg();
-
-      if (arg instanceof Expandable)
-      {
-         TeXObjectList expanded = ((Expandable)arg).expandfully(parser);
-
-         if (expanded != null)
-         {
-            arg = expanded;
-         }
-      }
+      TeXObject arg = popArgExpandFully(parser, parser);
 
       CsvList csvList = CsvList.getList(parser, arg);
 
@@ -98,42 +79,22 @@ public class Cite extends Command
       return list;
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
-      boolean isStar = false;
+      boolean isStar = (popModifier(parser, stack, '*') == '*');
 
-      TeXObject obj = stack.peekStack();
-
-      if (obj instanceof CharObject)
-      {
-         if (((CharObject)obj).getCharCode() == (int)'*')
-         {
-            isStar = true;
-            stack.popStack(parser);
-         }
-      }
-
-      TeXObject opt1 = stack.popArg(parser, '[', ']');
+      TeXObject opt1 = popOptArg(parser, stack);
 
       TeXObject opt2 = null;
 
       if (opt1 != null)
       {
-         opt2 = stack.popArg(parser, '[', ']');
+         opt2 = popOptArg(parser, stack);
       }
 
-      TeXObject arg = stack.popArg(parser);
-
-      if (arg instanceof Expandable)
-      {
-         TeXObjectList expanded = ((Expandable)arg).expandfully(parser, stack);
-
-         if (expanded != null)
-         {
-            arg = expanded;
-         }
-      }
+      TeXObject arg = popArgExpandFully(parser, stack);
 
       CsvList csvList = CsvList.getList(parser, arg);
 
@@ -156,6 +117,7 @@ public class Cite extends Command
       return list;
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
@@ -167,6 +129,7 @@ public class Cite extends Command
       }
    }
 
+   @Override
    public void process(TeXParser parser)
       throws IOException
    {
@@ -219,9 +182,11 @@ public class Cite extends Command
    {
       LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
 
-      TeXObject cite = listener.getCitation(arg);
+      String label = arg.toString(parser);
 
-      return cite == null ? listener.createUnknownReference(arg) : cite;
+      TeXObject cite = listener.getCitation(label);
+
+      return cite == null ? listener.createUnknownReference(label) : cite;
    }
 
    public void addLinkCitation(TeXParser parser, TeXObjectList list,

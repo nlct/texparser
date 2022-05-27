@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -43,8 +43,9 @@ public class L2HAlignRow extends AlignRow
       parse(parser, stack);
    }
 
-   protected void startRow(TeXParser parser) throws IOException
-   {
+   @Override
+   protected void startRow(TeXParser parser, TeXObjectList stack) throws IOException
+   {// don't push onto stack
       hlines = new int[parser.getSettings().getAlignmentColumnCount()];
 
       for (int i = 0; i < hlines.length; i++)
@@ -78,7 +79,9 @@ public class L2HAlignRow extends AlignRow
 
       TeXParserListener listener = parser.getListener();
 
-      listener.getWriteable().write("<tr>");
+      TeXObjectList substack = listener.createStack();
+
+      substack.add(new HtmlTag("<tr>"));
 
       if (isEmpty())
       {
@@ -95,19 +98,29 @@ public class L2HAlignRow extends AlignRow
 
             if (style == null)
             {
-               listener.getWriteable().write("<td></td>");
+               substack.add(new HtmlTag("<td></td>"));
             }
             else
             {
-               listener.getWriteable().write("<td style=\""+style+"\"></td>");
+               substack.add(new HtmlTag(String.format("<td style=\"%s\"></td>", style)));
             }
          }
       }
+
+      if (parser == stack || stack == null)
+      {
+         substack.process(parser);
+      }
+      else
+      {
+         substack.process(parser, stack);
+      }
    }
 
-   protected void endRow(TeXParser parser) throws IOException
-   {
-      parser.getListener().getWriteable().writeln("</tr>");
+   @Override
+   protected void endRow(TeXParser parser, TeXObjectList stack) throws IOException
+   {// don't push onto stack
+      parser.getListener().getWriteable().write("</tr>");
    }
 
    public TeXDimension getDefaultColSep(TeXParser parser)
@@ -192,8 +205,9 @@ public class L2HAlignRow extends AlignRow
       return style;
    }
 
-   protected void processCell(TeXParser parser, TeXCellAlign alignCell,
-      Group cellContents)
+   @Override
+   protected void processCell(TeXParser parser, TeXObjectList stack,
+      TeXCellAlign alignCell, Group cellContents)
      throws IOException
    {
       Writeable writeable = parser.getListener().getWriteable();
@@ -235,7 +249,7 @@ public class L2HAlignRow extends AlignRow
          alignment = alignCell;
       }
 
-      startCell(parser, span, getAlignStyle(parser, alignment, defaultColSep));
+      startCell(parser, stack, span, getAlignStyle(parser, alignment, defaultColSep));
 
       TeXObjectList contentsList = new TeXObjectList();
 
@@ -268,22 +282,21 @@ public class L2HAlignRow extends AlignRow
          contentsList.add((TeXObject)after.clone());
       }
 
-      while (contentsList.size() > 0)
-      {
-         contentsList.pop().process(parser, contentsList);
-      }
+      contentsList.process(parser, stack);
 
-      endCell(parser);
+      endCell(parser, stack);
    }
 
-   protected void startCell(TeXParser parser, String span, String style)
+   // don't push to stack
+   protected void startCell(TeXParser parser, TeXObjectList stack, String span, String style)
     throws IOException
    {
       Writeable writeable = parser.getListener().getWriteable();
       writeable.write(String.format("<td%s style=\"%s\">", span, style));
    }
 
-   protected void endCell(TeXParser parser) throws IOException
+   // don't push to stack
+   protected void endCell(TeXParser parser, TeXObjectList stack) throws IOException
    {
       parser.getListener().getWriteable().writeln("</td>");
    }

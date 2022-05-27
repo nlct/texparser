@@ -118,22 +118,7 @@ public class AlignRow extends DataObjectList
          }
          else if (obj instanceof Begin)
          {
-            TeXObject arg = (stack == parser ? 
-              parser.popNextArg() : stack.popArg(parser));
-
-            if (arg instanceof Expandable)
-            {
-               TeXObjectList expanded = (stack == parser ?
-                 ((Expandable)arg).expandfully(parser) : 
-                 ((Expandable)arg).expandfully(parser, stack));
-
-               if (expanded != null)
-               {
-                  arg = expanded;
-               }
-            }
-
-            String envname = arg.toString(parser);
+            String envname = TeXParserUtils.popLabelString(parser, stack);
 
             envs.push(envname);
 
@@ -142,22 +127,7 @@ public class AlignRow extends DataObjectList
          }
          else if (obj instanceof End)
          {
-            TeXObject arg = (stack == parser ? 
-              parser.popNextArg() : stack.popArg(parser));
-
-            if (arg instanceof Expandable)
-            {
-               TeXObjectList expanded = (stack == parser ?
-                 ((Expandable)arg).expandfully(parser) : 
-                 ((Expandable)arg).expandfully(parser, stack));
-
-               if (expanded != null)
-               {
-                  arg = expanded;
-               }
-            }
-
-            String envname = arg.toString(parser);
+            String envname = TeXParserUtils.popLabelString(parser, stack);
 
             if (envs.size() == 0)
             {
@@ -172,7 +142,16 @@ public class AlignRow extends DataObjectList
          }
          else if (obj instanceof MultiCell)
          {
-            TeXObjectList expanded = ((MultiCell)obj).expandonce(parser, stack);
+            TeXObjectList expanded;
+
+            if (parser == stack)
+            {
+               expanded = ((MultiCell)obj).expandonce(parser);
+            }
+            else
+            {
+               expanded = ((MultiCell)obj).expandonce(parser, stack);
+            }
 
             if (group == null)
             {
@@ -205,12 +184,14 @@ public class AlignRow extends DataObjectList
       }
    }
 
+   @Override
    public void process(TeXParser parser)
     throws IOException
    {
       process(parser, parser);
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack)
     throws IOException
    {
@@ -224,7 +205,7 @@ public class AlignRow extends DataObjectList
             LaTeXSyntaxException.ERROR_NO_ALIGNMENT);
       }
 
-      startRow(parser);
+      startRow(parser, stack);
 
       settings.startRow();
 
@@ -236,7 +217,7 @@ public class AlignRow extends DataObjectList
 
          if (obj instanceof TabularNewline)
          {
-            endRow(parser);
+            endRow(parser, stack);
 
             doEnd = false;
 
@@ -278,7 +259,7 @@ public class AlignRow extends DataObjectList
                colSpan = ((MultiCell)firstObj).getColumnSpan();
             }
 
-            processCell(parser, alignCell, cell);
+            processCell(parser, stack, alignCell, cell);
 
             for (int i = 1; i < colSpan; i++)
             {
@@ -289,22 +270,60 @@ public class AlignRow extends DataObjectList
 
       if (doEnd)
       {
-         endRow(parser);
+         endRow(parser, stack);
       }
    }
 
-   protected void startRow(TeXParser parser) throws IOException
+   /**
+   * Starts the current row. This method shouldn't push onto the stack.
+   * @param parser the TeX parser
+   * @param stack either the current stack or the parser
+   */
+   protected void startRow(TeXParser parser, TeXObjectList stack) throws IOException
    {
    }
 
-   protected void endRow(TeXParser parser) throws IOException
+   /**
+   * Ends the current row. This method shouldn't push onto the stack.
+   * @param parser the TeX parser
+   * @param stack either the current stack or the parser
+   */
+   protected void endRow(TeXParser parser, TeXObjectList stack) throws IOException
    {
    }
 
-   protected void processCell(TeXParser parser, TeXCellAlign alignCell, Group cellContents)
+   protected void processCell(TeXParser parser, TeXObjectList stack,
+       TeXCellAlign alignCell, Group cellContents)
      throws IOException
    {
-      cellContents.process(parser, this);
+      if (parser == stack || stack == null)
+      {
+         cellContents.process(parser, this);
+      }
+      else
+      {
+         StackMarker marker = new StackMarker();
+         add(marker);
+         addAll(stack);
+         stack.clear();
+
+         cellContents.process(parser, this);
+
+         for (int i = 0; i < size(); i++)
+         {
+            TeXObject obj = get(i);
+
+            if (obj == marker)
+            {
+               for (int j = i+1; j < size(); j++)
+               {
+                  stack.add(get(j));
+               }
+
+               setSize(i);
+            }
+         }
+      }
    }
 
    public TeXObjectList getAlignSpanList()

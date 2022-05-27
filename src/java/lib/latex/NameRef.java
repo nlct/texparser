@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -42,12 +42,12 @@ public class NameRef extends Ref
    }
 
    @Override
-   protected TeXObjectList expandref(TeXParser parser, TeXObject arg, boolean hyper)
+   protected TeXObjectList expandref(TeXParser parser, String label, boolean hyper)
    throws IOException
    {
       LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
 
-      TeXObject ref = listener.getNameReference(arg);
+      TeXObject ref = listener.getNameReference(label);
 
       if (ref == null) return null;
 
@@ -55,7 +55,7 @@ public class NameRef extends Ref
 
       if (hyper)
       {
-         list.add(parser.getListener().createLink(arg.toString(parser), ref));
+         list.add(parser.getListener().createLink(label, ref));
       }
       else
       {

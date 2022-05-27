@@ -59,104 +59,122 @@ public class L2HMathDeclaration extends MathDeclaration
 
       L2HConverter listener = (L2HConverter)parser.getListener();
 
-      if (getMode() == TeXSettings.MODE_DISPLAY_MATH)
+      String label = null;
+
+      if (isNumbered())
       {
-         listener.write("<div class=\"displaymath\">");
+         // Find label if there is one
+
+         TeXObjectList list = new TeXObjectList();
+
+         while (!stack.isEmpty())
+         {
+            TeXObject obj = stack.popStack(parser);
+
+            if (obj instanceof TeXCsRef)
+            {
+               obj = listener.getControlSequence(((TeXCsRef)obj).getName());
+            }
+
+            if (obj instanceof Label)
+            {
+               label = popLabelString(parser, stack);
+
+               break;
+            }
+
+            if (obj.canExpand() && obj instanceof Expandable)
+            {
+               TeXObjectList expanded = 
+                  ((Expandable)obj).expandonce(parser, stack);
+
+               if (expanded != null)
+               {
+                  obj = expanded;
+               }
+            }
+
+            if (obj instanceof TeXObjectList)
+            {
+               stack.push(obj, true);
+
+               obj = stack.popStack(parser);
+            }
+
+            if (obj instanceof TeXCsRef)
+            {
+               obj = listener.getControlSequence(((TeXCsRef)obj).getName());
+            }
+
+            if (obj instanceof End)
+            {
+               TeXObject arg = stack.peekStack();
+
+               if (arg instanceof Group)
+               {
+                  arg = ((Group)arg).toList();
+               }
+
+               if (getName().equals(arg.toString(parser)))
+               {
+                  list.add(obj);
+
+                  break;
+               }
+            }
+            else if (obj instanceof EndDeclaration)
+            {
+               if (((EndDeclaration)obj).getDeclarationName().equals(getName()))
+               {
+                  list.add(obj);
+
+                  break;
+               }
+            }
+            else if (obj instanceof Label)
+            {
+               label = popLabelString(parser, stack);
+
+               break;
+            }
+
+            list.add(obj);
+         }
+
+         stack.push(list, true);
       }
 
       if (listener.useMathJax())
       {
-         if (isNumbered())
-         {
-            // Find label if there is one
-
-            TeXObjectList list = new TeXObjectList();
-
-            while (stack.size() > 0)
-            {
-               TeXObject obj = stack.popStack(parser);
-
-               if (obj instanceof TeXCsRef)
-               {
-                  obj = listener.getControlSequence(((TeXCsRef)obj).getName());
-               }
-
-               if (obj instanceof Label)
-               {
-                  obj.process(parser, stack);
-
-                  break;
-               }
-
-               if (obj instanceof Expandable)
-               {
-                  TeXObjectList expanded = 
-                     ((Expandable)obj).expandonce(parser, stack);
-
-                  if (expanded != null)
-                  {
-                     obj = expanded;
-                  }
-               }
-
-               if (obj instanceof TeXObjectList
-                && !(obj instanceof Group))
-               {
-                  stack.addAll(0, (TeXObjectList)obj);
-
-                  obj = stack.popStack(parser);
-               }
-
-               if (obj instanceof TeXCsRef)
-               {
-                  obj = listener.getControlSequence(((TeXCsRef)obj).getName());
-               }
-
-               if (obj instanceof End)
-               {
-                  TeXObject arg = stack.peekStack();
-
-                  if (arg instanceof Group)
-                  {
-                     arg = ((Group)arg).toList();
-                  }
-
-                  if (getName().equals(arg.toString(parser)))
-                  {
-                     list.add(obj);
-
-                     break;
-                  }
-               }
-               else if (obj instanceof EndDeclaration)
-               {
-                  if (((EndDeclaration)obj).getDeclarationName().equals(getName()))
-                  {
-                     list.add(obj);
-
-                     break;
-                  }
-               }
-               else if (obj instanceof Label)
-               {
-                  obj.process(parser, stack);
-
-                  break;
-               }
-
-               list.add(obj);
-            }
-
-            stack.addAll(0, list);
-         }
-
          if (getMode() == TeXSettings.MODE_DISPLAY_MATH)
          {
-            listener.write(listener.mathJaxStartDisplay());
+            stack.push(new HtmlTag(listener.mathJaxStartDisplay()));
          }
          else
          {
-            listener.write(listener.mathJaxStartInline());
+            stack.push(new HtmlTag(listener.mathJaxStartInline()));
+         }
+      }
+
+      if (isNumbered())
+      {
+         stack.push(new HtmlTag("</span>"));
+         stack.push(listener.getOther(')'));
+         stack.push(listener.getControlSequence("theequation"));
+         stack.push(listener.getOther('('));
+         stack.push(new HtmlTag("<span class=\"eqno\">"));
+      }
+
+      if (getMode() == TeXSettings.MODE_DISPLAY_MATH)
+      {
+         if (label == null)
+         {
+            listener.write("<div class=\"displaymath\">");
+         }
+         else
+         {
+            listener.write(String.format("<div class=\"displaymath\" id=\"%s\">",
+               label));
          }
       }
    }
@@ -169,108 +187,122 @@ public class L2HMathDeclaration extends MathDeclaration
 
       L2HConverter listener = (L2HConverter)parser.getListener();
 
-      if (getMode() == TeXSettings.MODE_DISPLAY_MATH)
+      String label = null;
+
+      if (isNumbered())
       {
-         listener.write("<div class=\"displaymath\">");
+         // Find label if there is one
+
+         TeXObjectList list = new TeXObjectList();
+
+         while (true)
+         {
+            TeXObject obj = parser.popStack();
+
+            if (obj instanceof TeXCsRef)
+            {
+               obj = listener.getControlSequence(((TeXCsRef)obj).getName());
+            }
+
+            if (obj instanceof Label)
+            {
+               label = popLabelString(parser, parser);
+
+               break;
+            }
+
+            if (obj.canExpand() && obj instanceof Expandable)
+            {
+               TeXObjectList expanded = 
+                  ((Expandable)obj).expandonce(parser);
+
+               if (expanded != null)
+               {
+                  obj = expanded;
+               }
+            }
+
+            if (obj instanceof TeXObjectList)
+            {
+               parser.push(obj, true);
+
+               obj = parser.popStack();
+            }
+
+            if (obj instanceof TeXCsRef)
+            {
+               obj = listener.getControlSequence(((TeXCsRef)obj).getName());
+            }
+
+            if (obj instanceof End)
+            {
+               TeXObject arg = parser.peekStack();
+
+               if (arg instanceof Group)
+               {
+                  arg = ((Group)arg).toList();
+               }
+
+               if (getName().equals(arg.toString(parser)))
+               {
+                  list.add(obj);
+
+                  break;
+               }
+            }
+            else if (obj instanceof EndDeclaration)
+            {
+               if (((EndDeclaration)obj).getDeclarationName().equals(getName()))
+               {
+                  list.add(obj);
+
+                  break;
+               }
+            }
+            else if (obj instanceof Label)
+            {
+               label = popLabelString(parser, parser);
+
+               break;
+            }
+
+            list.add(obj);
+         }
+
+         parser.push(list, true);
       }
 
       if (listener.useMathJax())
       {
-         if (isNumbered())
-         {
-            // Find label if there is one
-
-            TeXObjectList list = new TeXObjectList();
-
-            while (true)
-            {
-               TeXObject obj = parser.popStack();
-
-               if (obj instanceof TeXCsRef)
-               {
-                  obj = listener.getControlSequence(((TeXCsRef)obj).getName());
-               }
-
-               if (obj instanceof Label)
-               {
-                  obj.process(parser);
-
-                  break;
-               }
-
-               if (obj instanceof Expandable)
-               {
-                  TeXObjectList expanded = 
-                     ((Expandable)obj).expandonce(parser);
-
-                  if (expanded != null)
-                  {
-                     obj = expanded;
-                  }
-               }
-
-               if (obj instanceof TeXObjectList
-                && !(obj instanceof Group))
-               {
-                  parser.addAll(0, (TeXObjectList)obj);
-
-                  obj = parser.popStack();
-               }
-
-               if (obj instanceof TeXCsRef)
-               {
-                  obj = listener.getControlSequence(((TeXCsRef)obj).getName());
-               }
-
-               if (obj instanceof End)
-               {
-                  TeXObject arg = parser.peekStack();
-
-                  if (arg instanceof Group)
-                  {
-                     arg = ((Group)arg).toList();
-                  }
-
-                  if (getName().equals(arg.toString(parser)))
-                  {
-                     list.add(obj);
-
-                     break;
-                  }
-               }
-               else if (obj instanceof EndDeclaration)
-               {
-                  if (((EndDeclaration)obj).getDeclarationName().equals(getName()))
-                  {
-                     list.add(obj);
-
-                     break;
-                  }
-               }
-               else if (obj instanceof Label)
-               {
-                  obj.process(parser);
-
-                  break;
-               }
-
-               list.add(obj);
-            }
-
-            parser.addAll(0, list);
-
-            listener.write("<span class=\"eqno\">(");
-            listener.getControlSequence("theequation").process(parser);
-            listener.write(")</span>");
-         }
-
          if (getMode() == TeXSettings.MODE_DISPLAY_MATH)
          {
-            listener.write(listener.mathJaxStartDisplay());
+            parser.push(new HtmlTag(listener.mathJaxStartDisplay()));
          }
          else
          {
-            listener.write(listener.mathJaxStartInline());
+            parser.push(new HtmlTag(listener.mathJaxStartInline()));
+         }
+      }
+
+      if (isNumbered())
+      {
+         parser.push(new HtmlTag("</span>"));
+         parser.push(listener.getOther(')'));
+         parser.push(listener.getControlSequence("theequation"));
+         parser.push(listener.getOther('('));
+         parser.push(new HtmlTag("<span class=\"eqno\">"));
+      }
+
+      if (getMode() == TeXSettings.MODE_DISPLAY_MATH)
+      {
+         if (label == null)
+         {
+            listener.write("<div class=\"displaymath\">");
+         }
+         else
+         {
+            listener.write(String.format("<div class=\"displaymath\" id=\"%s\">",
+               label));
          }
       }
    }

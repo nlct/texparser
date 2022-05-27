@@ -136,7 +136,29 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       return AuxData.getCitation(auxData, getParser(), label);
    }
 
+   public TeXObject getCitation(String label)
+      throws IOException
+   {
+      if (auxData == null)
+      {
+         return createUnknownReference(label);
+      }
+
+      return AuxData.getCitation(auxData, getParser(), label);
+   }
+
    public TeXObject getReference(TeXObject label)
+      throws IOException
+   {
+      if (auxData == null)
+      {
+         return createUnknownReference(label);
+      }
+
+      return AuxData.getReference(auxData, getParser(), label);
+   }
+
+   public TeXObject getReference(String label)
       throws IOException
    {
       if (auxData == null)
@@ -158,6 +180,17 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       return AuxData.getPageReference(auxData, getParser(), label);
    }
 
+   public TeXObject getPageReference(String label)
+      throws IOException
+   {
+      if (auxData == null)
+      {
+         return createUnknownReference(label);
+      }
+
+      return AuxData.getPageReference(auxData, getParser(), label);
+   }
+
    public TeXObject getNameReference(TeXObject label)
       throws IOException
    {
@@ -169,7 +202,29 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       return AuxData.getNameReference(auxData, getParser(), label);
    }
 
+   public TeXObject getNameReference(String label)
+      throws IOException
+   {
+      if (auxData == null)
+      {
+         return createUnknownReference(label);
+      }
+
+      return AuxData.getNameReference(auxData, getParser(), label);
+   }
+
    public TeXObject getHyperReference(TeXObject label)
+      throws IOException
+   {
+      if (auxData == null)
+      {
+         return createUnknownReference(label);
+      }
+
+      return AuxData.getHyperReference(auxData, getParser(), label);
+   }
+
+   public TeXObject getHyperReference(String label)
       throws IOException
    {
       if (auxData == null)

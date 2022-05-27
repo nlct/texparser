@@ -46,8 +46,9 @@ public class L2HMathAlignRow extends L2HAlignRow
       parse(parser, stack);
    }
 
-   protected void processCell(TeXParser parser, TeXCellAlign alignCell,
-      Group cellContents)
+   @Override
+   protected void processCell(TeXParser parser, TeXObjectList stack, 
+      TeXCellAlign alignCell, Group cellContents)
      throws IOException
    {
       for (int i = cellContents.size()-1; i >= 0; i--)
@@ -61,33 +62,44 @@ public class L2HMathAlignRow extends L2HAlignRow
          }
       }
 
-      super.processCell(parser, alignCell, cellContents);
+      super.processCell(parser, stack, alignCell, cellContents);
    }
 
-   protected void startRow(TeXParser parser) throws IOException
-   {
-      super.startRow(parser);
+   @Override
+   protected void startRow(TeXParser parser, TeXObjectList stack) throws IOException
+   {// don't push to stack
+      super.startRow(parser, stack);
 
       parser.getListener().getWriteable().write("<td style=\"width: 50%; \"></td>");
    }
 
-   protected void endRow(TeXParser parser) throws IOException
-   {
+   @Override
+   protected void endRow(TeXParser parser, TeXObjectList stack) throws IOException
+   {// don't push to stack
       L2HConverter listener = (L2HConverter)parser.getListener();
+
+      Writeable writeable = parser.getListener().getWriteable();
 
       if (isNumbered)
       {
          listener.stepcounter("equation");
-         listener.write("<td style=\"width: 50%; align: right;\"><span class=\"eqno\">(");
-         listener.getControlSequence("theequation").process(parser);
-         listener.write(")</span></td>");
+
+         writeable.write("<td style=\"width: 50%; align: right;\"><span class=\"eqno\">(");
+
+         ControlSequence cs = parser.getListener().getControlSequence("theequation");
+
+         String eqnum = parser.expandToString(cs, stack);
+
+         writeable.write(eqnum);
+
+         writeable.write(")</span></td>");
       }
       else
       {
-         listener.write("<td style=\"width: 50%; \"></td>");
+         writeable.write("<td style=\"width: 50%; \"></td>");
       }
 
-      super.endRow(parser);
+      super.endRow(parser, stack);
    }
 
    public TeXDimension getDefaultColSep(TeXParser parser)
@@ -107,12 +119,14 @@ public class L2HMathAlignRow extends L2HAlignRow
    }
 
 
-   protected void startCell(TeXParser parser, String span, String style)
+   @Override
+   protected void startCell(TeXParser parser, TeXObjectList stack, 
+      String span, String style)
     throws IOException
    {
       L2HConverter listener = (L2HConverter)parser.getListener();
 
-      super.startCell(parser, span, style);
+      super.startCell(parser, stack, span, style);
 
       if (listener.useMathJax())
       {
@@ -120,7 +134,8 @@ public class L2HMathAlignRow extends L2HAlignRow
       }
    }
 
-   protected void endCell(TeXParser parser) throws IOException
+   @Override
+   protected void endCell(TeXParser parser, TeXObjectList stack) throws IOException
    {
       L2HConverter listener = (L2HConverter)parser.getListener();
 
@@ -131,10 +146,17 @@ public class L2HMathAlignRow extends L2HAlignRow
 
       while (tags.size() > 0)
       {
-         tags.pop().process(parser);
+         if (parser == stack || stack == null)
+         {
+            tags.pop().process(parser);
+         }
+         else
+         {
+            tags.pop().process(parser, stack);
+         }
       }
 
-      super.endCell(parser);
+      super.endCell(parser, stack);
    }
 
    private boolean isNumbered;

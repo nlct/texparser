@@ -58,7 +58,10 @@ public abstract class ContentsLine extends ControlSequence
       {
          TeXObject obj = stack.peek();
 
-         link = stack.popArg(parser);
+         if (obj instanceof BgChar || obj instanceof Group)
+         {
+            link = stack.popArg(parser);
+         }
       }
 
       TeXObjectList list;
@@ -97,7 +100,12 @@ public abstract class ContentsLine extends ControlSequence
 
       if (listener.isStyLoaded("hyperref"))
       {
-         link = parser.popNextArg();
+         TeXObject obj = parser.peekStack();
+
+         if (obj instanceof BgChar)
+         {
+            link = parser.popNextArg();
+         }
       }
 
       TeXObjectList list;
