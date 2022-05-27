@@ -1931,7 +1931,7 @@ public class TeXParser extends TeXObjectList
             {
                if (getDebugLevel() > 0)
                {
-                  logMessage("MOVING SIDEWAYS TO NESTED FILE "+reader);
+                  logMessage("MOVING SIDEWAYS(??) TO NESTED FILE "+reader);
                }
 
                reader.setParent(this.reader);
@@ -1940,7 +1940,12 @@ public class TeXParser extends TeXObjectList
 
          if (down && !isEmpty())
          {
-            TeXObjectList pending = new TeXObjectList(size());
+            TeXObjectList pending = reader.getPending();
+
+            if (pending == null)
+            {
+               pending = new TeXObjectList(size());
+            }
 
             pending.addAll(this);
             clear();

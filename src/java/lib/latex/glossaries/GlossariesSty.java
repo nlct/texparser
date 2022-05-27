@@ -25,6 +25,8 @@ import java.util.Iterator;
 
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.primitives.NewIf;
+import com.dickimawbooks.texparserlib.primitives.Undefined;
+import com.dickimawbooks.texparserlib.generic.TeXParserSetUndefAction;
 import com.dickimawbooks.texparserlib.latex.*;
 import com.dickimawbooks.texparserlib.latex.hyperref.HyperTarget;
 import com.dickimawbooks.texparserlib.latex.hyperref.HyperLink;
@@ -430,18 +432,48 @@ public class GlossariesSty extends LaTeXSty
       getListener().putControlSequence(true, 
         new GlossarySection(section, isNumberedSection, isAutoLabel));
 
+      boolean loadStyles = (loadList || loadTree);
+
+      byte orgAction = listener.getUndefinedAction();
+      int orgCatCode = getParser().getCatCode('@');
+
+      if (loadStyles)
+      {
+         substack.add(new TeXParserSetUndefAction(Undefined.ACTION_WARN));
+
+         if (orgCatCode != TeXParser.TYPE_LETTER)
+         {
+            substack.add(listener.getControlSequence("makeatletter"));
+         }
+      }
+
       if (loadList)
       {
-         getListener().loadpackage(null, "glossary-list", false, true, substack);
+         substack.add(listener.getControlSequence("input"));
+         substack.add(listener.createGroup("glossary-list.sty"));
 
          loadList = false;
       }
 
       if (loadTree)
       {
-         getListener().loadpackage(null, "glossary-tree", false, true, substack);
+         substack.add(listener.getControlSequence("input"));
+         substack.add(listener.createGroup("glossary-tree.sty"));
 
          loadTree = false;
+      }
+
+      if (loadStyles)
+      {
+         if (orgCatCode != TeXParser.TYPE_LETTER)
+         {
+            substack.add(listener.getControlSequence("catcode"));
+            substack.add(new UserNumber((int)'@'));
+            substack.add(listener.getOther('='));
+            substack.add(new UserNumber(orgCatCode));
+         }
+
+         substack.add(new TeXParserSetUndefAction(orgAction));
       }
 
       if (extra)
@@ -454,10 +486,7 @@ public class GlossariesSty extends LaTeXSty
          substack.add(new TeXCsRef("@glsstyle@"+initialStyle));
       }
 
-      if (!substack.isEmpty())
-      {
-         substack.process(getParser(), stack);
-      }
+      stack.push(substack, true);
    }
 
    protected void extraPostOptions(TeXObjectList stack) throws IOException
