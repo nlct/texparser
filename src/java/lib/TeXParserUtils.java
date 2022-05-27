@@ -151,17 +151,9 @@ public class TeXParserUtils
       }
    }
 
-   /**
-    * Pops an argument and then fully expands it.
-    * @param parser the TeX parser
-    * @param stack the stack or the parser or null
-    * @return the fully expanded argument
-    */ 
-   public static TeXObject popArgExpandFully(TeXParser parser, TeXObjectList stack)
+   public static TeXObject expandFully(TeXObject arg, TeXParser parser, TeXObjectList stack)
     throws IOException
    {
-      TeXObject arg = popArg(parser, stack);
-
       if (arg.canExpand() && arg instanceof Expandable)
       {
          TeXObjectList expanded = null;
@@ -182,6 +174,39 @@ public class TeXParserUtils
       }
 
       return arg;
+   }
+
+   /**
+    * Pops an argument and then fully expands it.
+    * @param parser the TeX parser
+    * @param stack the stack or the parser or null
+    * @return the fully expanded argument
+    */ 
+   public static TeXObject popArgExpandFully(TeXParser parser, TeXObjectList stack)
+    throws IOException
+   {
+      TeXObject arg = popArg(parser, stack);
+
+      return expandFully(arg, parser, stack);
+   }
+
+   /**
+    * Pops an optional argument and then (if present) fully expands it.
+    * @param parser the TeX parser
+    * @param stack the stack or the parser or null
+    * @return the fully expanded argument or null if not present
+    */ 
+   public static TeXObject popOptArgExpandFully(TeXParser parser, TeXObjectList stack)
+    throws IOException
+   {
+      TeXObject arg = popOptArg(parser, stack);
+
+      if (arg == null)
+      {
+         return null;
+      }
+
+      return expandFully(arg, parser, stack);
    }
 
    /**
