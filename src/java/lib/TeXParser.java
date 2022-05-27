@@ -256,7 +256,7 @@ public class TeXParser extends TeXObjectList
 
    public void debugMessage(int level, String msg)
    {
-      if (level >= debugLevel)
+      if (level <= debugLevel)
       {
          logMessage(msg);
       }
@@ -1906,20 +1906,34 @@ public class TeXParser extends TeXObjectList
 
          if (this.reader != null)
          {
-            debugMessage(1, "CURRENT READER "+this.reader);
+            if (getDebugLevel() > 0)
+            {
+               logMessage("CURRENT READER "+this.reader);
+            }
 
             if (this.reader == reader.getParent())
             {
-               debugMessage(1, "MOVING DOWN TO NESTED FILE "+reader);
+               if (getDebugLevel() > 0)
+               {
+                  logMessage("MOVING DOWN TO NESTED FILE "+reader);
+               }
             }
             else if (this.reader.getParent() == reader)
             {
                down = false;
-               debugMessage(1, "MOVING UP TO PARENT FILE "+reader);
+
+               if (getDebugLevel() > 0)
+               {
+                  logMessage("MOVING UP TO PARENT FILE "+reader);
+               }
             }
             else
             {
-               debugMessage(1, "MOVING SIDEWAYS TO NESTED FILE "+reader);
+               if (getDebugLevel() > 0)
+               {
+                  logMessage("MOVING SIDEWAYS TO NESTED FILE "+reader);
+               }
+
                reader.setParent(this.reader);
             }
          }
