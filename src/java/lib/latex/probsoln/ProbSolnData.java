@@ -345,7 +345,30 @@ public class ProbSolnData
    private TeXObjectList getData(TeXParser parser, TeXObject[] params)
      throws IOException
    {
-      return getData(parser, params, contents);
+      TeXObjectList data = getData(parser, params, contents);
+
+      if (parser.getDebugLevel() > 0)
+      {
+         parser.logMessage("UseProblem Content: "+contents.toString(parser));
+
+         if (params == null)
+         {
+            parser.logMessage("UseProblem No Params");
+         }
+         else
+         {
+            parser.logMessage("UseProblem Params:");
+
+            for (int i = 0; i < params.length; i++)
+            {
+               parser.logMessage("Param["+i+"]: "+params[i].toString(parser));
+            }
+         }
+
+         parser.logMessage("UseProblem Data: "+data.toString(parser));
+      }
+
+      return data; 
    }
 
    private TeXObjectList getData(TeXParser parser, TeXObject[] params,

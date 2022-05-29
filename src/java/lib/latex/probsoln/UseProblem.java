@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -46,69 +46,41 @@ public class UseProblem extends ControlSequence
    public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      String db = "default";
+      String db = popOptLabelString(parser, stack);
 
-      TeXObject dataset = stack.popArg(parser, '[', ']');
-
-      if (dataset != null)
+      if (db == null)
       {
-         TeXObjectList expanded = null;
-
-         if (dataset instanceof Expandable)
-         {
-            expanded = ((Expandable)dataset).expandfully(parser, stack);
-
-            if (expanded != null)
-            {
-               dataset = expanded;
-            }
-         }
-
-         db = dataset.toString(parser);
+         db = "default";
       }
 
-      TeXObject object = stack.expandedPopStack(parser);
+      TeXObject object = popArg(parser, stack);
 
-      if (object instanceof Group)
+      ProbSolnData data;
+
+      if (object instanceof ProblemLabel)
       {
-         object = ((Group)object).toList();
+         data = ((ProblemLabel)object).getEntry();
+      }
+      else
+      {
+         String label = parser.expandToString(object, stack);
+         data = sty.getProblem(label, db);
       }
 
-      sty.getProblem(object.toString(parser), db).process(parser, stack);
+      if (parser == stack || stack == null)
+      {
+         data.process(parser);
+      }
+      else
+      {
+         data.process(parser, stack);
+      }
    }
 
    public void process(TeXParser parser)
      throws IOException
    {
-      String db = "default";
-
-      TeXObject dataset = parser.popNextArg('[', ']');
-
-      if (dataset != null)
-      {
-         TeXObjectList expanded = null;
-
-         if (dataset instanceof Expandable)
-         {
-            expanded = ((Expandable)dataset).expandfully(parser);
-
-            if (expanded != null)
-            {
-               dataset = expanded;
-            }
-         }
-
-         db = dataset.toString(parser);
-      }
-
-      TeXObject object = parser.expandedPopStack(TeXObjectList.POP_SHORT);
-
-      if (object instanceof Group)
-      {
-         object = ((Group)object).toList();
-      }
-
-      sty.getProblem(object.toString(parser), db).process(parser);
+      process(parser, parser);
    }
 
    private ProbSolnSty sty;

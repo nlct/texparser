@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -45,38 +45,14 @@ public class ForEachProblem extends ControlSequence
    public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      String db = "default";
+      String db = popOptLabelString(parser, stack);
 
-      TeXObject dataset =
-        parser == stack ? parser.popNextArg('[', ']')
-                        : stack.popArg(parser, '[', ']');
-
-      if (dataset != null)
+      if (db == null)
       {
-         TeXObjectList expanded = null;
-
-         if (dataset instanceof Expandable)
-         {
-            if (parser == stack || stack == null)
-            {
-               expanded = ((TeXObjectList)dataset).expandfully(parser);
-            }
-            else
-            {
-               expanded = ((TeXObjectList)dataset).expandfully(parser, stack);
-            }
-
-            if (expanded != null)
-            {
-               dataset = expanded;
-            }
-         }
-
-         db = dataset.toString(parser);
+         db = "default";
       }
 
-      TeXObject body = 
-        (parser == stack ? parser.popNextArg() : stack.popArg(parser));
+      TeXObject body = popArg(parser, stack);
 
       ProbSolnDatabase database = sty.getDatabase(db);
 
@@ -88,16 +64,16 @@ public class ForEachProblem extends ControlSequence
 
          TeXObject contents = (TeXObject)body.clone();
 
-         parser.putControlSequence(true, 
-           new GenericCommand("thisproblemlabel", null, 
-             parser.getListener().createString(key)));
-
          ProbSolnData data = database.get(key);
+
+         ProblemLabel label = new ProblemLabel(data);
+
+         parser.putControlSequence(true, label);
 
          TeXObjectList useproblem = new TeXObjectList();
 
-         useproblem.add(new TeXCsRef("useproblem"));
-         useproblem.add(new TeXCsRef("thisproblemlabel"));
+         useproblem.add(parser.getListener().getControlSequence("useproblem"));
+         useproblem.add(label);
 
          int numArgs = data.getNumArgs();
 
