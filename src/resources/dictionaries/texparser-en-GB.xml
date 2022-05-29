@@ -33,11 +33,8 @@ There is NO WARRANTY, to the extent permitted by law.</entry>
 
 <!--  Syntax -->
 <entry key="syntax.title">Syntax:</entry>
-<entry key="syntax.or">or</entry>
 <entry key="syntax.opt_in">{0} [&lt;option&gt;]+ --in &lt;TeX file&gt;</entry>
 <entry key="syntax.general">General Options:</entry>
-<entry key="syntax.gui">{0} (or {1})			GUI interface.</entry>
-<entry key="syntax.batch">{0} (or {1})			No GUI interface. (Default.)</entry>
 <entry key="syntax.in">{0} (or {1}) &lt;TeX file&gt;		Parse &lt;TeX file&gt;.</entry>
 <entry key="syntax.version">{0} (or {1})		Print version and exit.</entry>
 <entry key="syntax.help">{0} (or {1})			Print this help message and exit.</entry>

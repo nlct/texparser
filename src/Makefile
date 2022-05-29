@@ -1,6 +1,3 @@
-APP_VERSION:=$(shell grep "public static final String appVersion" java/test/TeXParserApp.java | sed "s/public\sstatic\sfinal\sString\sappVersion=//" | tr -d "\"\; ")
-IZPACKDIR=/usr/local/IzPack
-
 ifeq ($(origin JAVA8BOOTCLASSLIB),undefined)
 TARGET_VERSION :=
 else
@@ -73,19 +70,8 @@ test-mkimages : app tests/output
 	bin/texparsertest --debug --in tests/test-mkimages/test-mkimages.tex --output tests/output/test-mkimages --html
 
 app     : lib lib/texparserlib.jar lib/texparsertest.jar \
-	  lib/resources lib/texparser-splash.png \
-	  bin/texparsertest lib/icons \
-	  resources/helpsets/texparser-en/Map.jhm \
-	  resources/LICENSE
-
-dist    : source ../dist/texparser-installer.jar ../dist
-	cp doc/texparser.pdf ../dist
-
-../dist/texparser-installer.jar        : app installer/install.xml
-	$(IZPACKDIR)/bin/compile installer/install.xml -b . \
-	-o ../dist/texparser-installer.jar -k standard
-
-../dist	: mkdir ../dist
+	  lib/resources \
+	  bin/texparsertest
 
 lib/texparserlib.jar      : lib classes/com/dickimawbooks/texparserlib/TeXParser.class 
 	cd classes; \
@@ -99,19 +85,16 @@ lib/texparsertest.jar      : java/test/Manifest.txt \
 	cd classes; \
 	jar cmf ../java/test/Manifest.txt ../lib/texparsertest.jar \
 	com/dickimawbooks/texparsertest/*.class \
-	com/dickimawbooks/texparsertest/*/*.class \
-	com/dickimawbooks/texparsertest/icons/*.png
+	com/dickimawbooks/texparsertest/*/*.class 
 
 classes/com/dickimawbooks/texparsertest/TeXParserApp.class   : classes/com/dickimawbooks/texparsertest \
-	java/test/*.java java/test/*/*.java java/test/icons/*.png \
-	lib/javahelp2.jar lib/jlfgr-1_0.jar lib/texparserlib.jar
+	java/test/*.java java/test/*/*.java \
+	lib/texparserlib.jar
 	cd java/test; \
 	javac -d ../../classes \
 	 -Xlint:unchecked -Xlint:deprecation \
-	-cp ../../lib/javahelp2.jar:../../lib/jlfgr-1_0.jar:../../lib/texparserlib.jar \
+	-cp ../../lib/texparserlib.jar \
 	*.java */*.java
-	mkdir -p classes/com/dickimawbooks/texparsertest/icons
-	cp java/test/icons/*.png classes/com/dickimawbooks/texparsertest/icons/
 
 classes/com/dickimawbooks/texparserlib/TeXParser.class   : classes/com/dickimawbooks/texparserlib \
 	java/lib/*.java java/lib/*/*.java java/lib/*/*/*.java
@@ -127,20 +110,8 @@ classes/com/dickimawbooks/texparserlib    :
 resources/LICENSE       :
 	cd resources; ln -s ../doc/LICENSE
 
-resources/helpsets/texparser-en/Map.jhm   : doc/texparser.tex
-	make -C doc helpset
-
 lib/resources   :
 	cd lib; ln -s ../resources
-
-lib/icons       :
-	cd lib; ln -s ../images/icons
-
-lib/jlfgr-1_0.jar       : 
-	cd lib; ln -f -s /usr/share/java/jlfgr-1_0.jar
-
-lib/javahelp2.jar      : 
-	cd lib; ln -f -s /usr/share/java/javahelp2.jar 
 
 lib     :
 	mkdir -p lib

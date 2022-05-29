@@ -75,9 +75,8 @@ precautionary measure to ensure you don't accidentally overwrite the
 original files.
 
 I experimented with including a GUI to provide a way of testing the
-library with a graphical interface but I haven't had time to develop
-it further. The command line interface is usually sufficient. I may
-remove the GUI part in future versions.
+library with a graphical interface but I've now removed it as I don't have time
+to develop it, and it requires additional libraries.
 
 ## TEST FILES
 

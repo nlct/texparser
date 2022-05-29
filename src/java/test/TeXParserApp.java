@@ -40,14 +40,12 @@ import com.dickimawbooks.texparserlib.latex.*;
 import com.dickimawbooks.texparserlib.latex2latex.*;
 import com.dickimawbooks.texparserlib.html.*;
 
-import com.dickimawbooks.texparsertest.gui.*;
 import com.dickimawbooks.texparsertest.io.*;
 
 public class TeXParserApp implements TeXApp
 {
    public TeXParserApp() 
    {
-      guiMode = false;
 
       settings = new TeXParserAppSettings(this);
 
@@ -62,31 +60,14 @@ public class TeXParserApp implements TeXApp
    {
       errorListener = new ErrorListener()
       {
-         // check for GUI mode in case error occurs before GUI
-         // system initialised.
-
          public void warning(String message)
          {
-            if (guiMode)
-            {
-               TeXParserAppGuiResources.warning(app, message);
-            }
-            else
-            {
-               System.err.println(String.format("%s: %s", APP_NAME, message));
-            }
+            System.err.println(String.format("%s: %s", APP_NAME, message));
          }
 
          public void error(String message)
          {
-            if (guiMode)
-            {
-               TeXParserAppGuiResources.error(app, message);
-            }
-            else
-            {
-               System.err.println(String.format("%s: %s", APP_NAME, message));
-            }
+            System.err.println(String.format("%s: %s", APP_NAME, message));
          }
 
          public void error(Exception e)
@@ -121,11 +102,6 @@ public class TeXParserApp implements TeXApp
       }
    }
 
-   public TeXParserAppGUI getGui()
-   {
-      return guiApp;
-   }
-
    private void doBatchProcess() throws IOException
    {
       if (inFileName == null)
@@ -153,12 +129,6 @@ public class TeXParserApp implements TeXApp
          throw new InvalidSyntaxException(
             getMessage("error.syntax.batch.unknown_format", outputFormat));
       }
-   }
-
-   private void createAndShowGUI()
-   {
-      guiApp = new TeXParserAppGUI(this);
-      errorListener = guiApp;
    }
 
    public void latex2latex(File inFileName, File outDir)
@@ -848,11 +818,6 @@ public class TeXParserApp implements TeXApp
          timer.cancel();
          Thread.interrupted();
          removeProcessListener(listener);
-
-         if (guiApp != null)
-         {
-            guiApp.updateAbortItem();
-         }
       }
 
       return exitCode;
@@ -934,14 +899,7 @@ public class TeXParserApp implements TeXApp
       {
          String message = getMessage("message.running", execName+params);
 
-         if (guiApp != null)
-         {
-            guiApp.setInfo(message);
-         }
-         else
-         {
-            System.out.println(message);
-         }
+         System.out.println(message);
       }
 
       ProcessBuilder pb = new ProcessBuilder(cmd);
@@ -1015,13 +973,9 @@ public class TeXParserApp implements TeXApp
       System.out.println();
       System.out.println(getMessage("syntax.title"));
       System.out.println();
-      System.out.println(APP_NAME+" --gui");
-      System.out.println(getMessage("syntax.or"));
       System.out.println(getMessage("syntax.opt_in", APP_NAME));
       System.out.println();
       System.out.println(getMessage("syntax.general"));
-      System.out.println(getMessage("syntax.gui", "--gui", "-g"));
-      System.out.println(getMessage("syntax.batch", "--batch", "-b"));
       System.out.println(getMessage("syntax.in", "--in", "-i", APP_NAME));
       System.out.println();
       System.out.println(getMessage("syntax.timeout", "--timeout"));
@@ -1344,14 +1298,6 @@ public class TeXParserApp implements TeXApp
          {
             logFile = null;
          }
-         else if (args[i].equals("--gui") || args[i].equals("-g"))
-         {
-            guiMode = true;
-         }
-         else if (args[i].equals("--batch") || args[i].equals("-b"))
-         {
-            guiMode = false;
-         }
          else if (args[i].equals("--latex"))
          {
             outputFormat = "latex";
@@ -1454,32 +1400,19 @@ public class TeXParserApp implements TeXApp
 
    private void runApplication()
    {
-      if (guiMode)
+      try
       {
-         javax.swing.SwingUtilities.invokeLater(new Runnable()
-          {
-             public void run()
-             {
-                createAndShowGUI();
-             }
-          });
-      } 
-      else
+         doBatchProcess();
+      }
+      catch (InvalidSyntaxException e)
       {
-         try
-         {
-            doBatchProcess();
-         }
-         catch (InvalidSyntaxException e)
-         {
-            error(e.getMessage());
+         error(e.getMessage());
 
-            System.exit(1);
-         }
-         catch (Exception e)
-         {
-            error(e);
-         }
+         System.exit(1);
+      }
+      catch (Exception e)
+      {
+         error(e);
       }
    }
 
@@ -1517,11 +1450,7 @@ public class TeXParserApp implements TeXApp
 
    private boolean debugMode = false;
 
-   private boolean guiMode = false;
-
    private TeXParserAppSettings settings;
-
-   private TeXParserAppGUI guiApp = null;
 
    private File inFileName;
 
