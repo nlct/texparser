@@ -43,19 +43,20 @@ public class DescriptionDec extends ListDec
    @Override
    public void process(TeXParser parser) throws IOException
    {
-      setup(parser);
+      setup(parser, parser);
    }
 
    @Override
    public void process(TeXParser parser, TeXObjectList stack) throws IOException
    {
-      setup(parser);
+      setup(parser, stack);
    }
 
    @Override
-   public void setup(TeXParser parser) throws IOException
+   public void setup(TeXParser parser, TeXObjectList stack)
+      throws IOException
    {
-      super.setup(parser);
+      super.setup(parser, stack);
 
       LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
 
@@ -65,7 +66,7 @@ public class DescriptionDec extends ListDec
       listsettings.add(new TeXCsRef("item"));
       listsettings.add(listener.getControlSequence("descriptionitem"));
 
-      setup(parser, new TeXObjectList(), listsettings);
+      setup(parser, stack, new TeXObjectList(), listsettings);
    }
 
    @Override

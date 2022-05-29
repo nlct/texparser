@@ -45,18 +45,19 @@ public class ListDec extends TrivListDec
    public void process(TeXParser parser) throws IOException
    {
       parser.getListener().getControlSequence("@nmbrlistfalse").process(parser);
-      setup(parser, parser.popNextArg(), parser.popNextArg());
+      setup(parser, parser, parser.popNextArg(), parser.popNextArg());
    }
 
    @Override
    public void process(TeXParser parser, TeXObjectList stack) throws IOException
    {
-      parser.getListener().getControlSequence("@nmbrlistfalse").process(parser);
-      setup(parser, stack.popArg(parser), stack.popArg(parser));
+      parser.getListener().getControlSequence("@nmbrlistfalse").process(
+       parser, stack);
+      setup(parser, stack, stack.popArg(parser), stack.popArg(parser));
    }
 
-   public void setup(TeXParser parser, TeXObject labelCs, 
-     TeXObject listsettings)
+   public void setup(TeXParser parser, TeXObjectList stack,
+    TeXObject labelCs, TeXObject listsettings)
    throws IOException
    {
       parser.putControlSequence(true, new GenericCommand(true, "@itemlabel",
@@ -75,7 +76,14 @@ public class ListDec extends TrivListDec
          cs = parser.getListener().getControlSequence("relax");
       }
 
-      listsettings.process(parser);
+      if (parser == stack || stack == null)
+      {
+         listsettings.process(parser);
+      }
+      else
+      {
+         listsettings.process(parser, stack);
+      }
 
       ((LaTeXParserListener)parser.getListener()).startList(this);
    }

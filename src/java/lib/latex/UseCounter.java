@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -35,58 +35,40 @@ public class UseCounter extends ControlSequence
       super(name);
    }
 
+   @Override
    public Object clone()
    {
       return new UseCounter(getName());
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
       LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
 
-      TeXObject arg = stack.popArg(parser);
+      String ctr = popLabelString(parser, stack);
 
-      listener.getControlSequence("@nmbrlisttrue").process(parser);
+      ControlSequence cs = listener.getControlSequence("@nmbrlisttrue");
 
-      if (arg instanceof Expandable)
+      if (parser == stack || stack == null)
       {
-         TeXObjectList expanded = ((Expandable)arg).expandfully(parser, stack);
-
-         if (expanded != null)
-         {
-            arg = expanded;
-         }
+         cs.process(parser);
+      }
+      else
+      {
+         cs.process(parser, stack);
       }
 
-      parser.putControlSequence(true, new GenericCommand(true, "@listctr",
-        null, arg));
+      parser.putControlSequence(true,
+        new TextualContentCommand("@listctr", ctr));
 
-      listener.setcounter(arg.toString(parser), listener.ZERO);
+      listener.setcounter(ctr, listener.ZERO);
    }
 
    public void process(TeXParser parser)
       throws IOException
    {
-      LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
-
-      TeXObject arg = parser.popNextArg();
-
-      listener.getControlSequence("@nmbrlisttrue").process(parser);
-
-      parser.putControlSequence(true, new GenericCommand(true, "@listctr",
-        null, arg));
-
-      if (arg instanceof Expandable)
-      {
-         TeXObjectList expanded = ((Expandable)arg).expandfully(parser);
-
-         if (expanded != null)
-         {
-            arg = expanded;
-         }
-      }
-
-      listener.setcounter(arg.toString(parser), listener.ZERO);
+      process(parser, parser);
    }
 }

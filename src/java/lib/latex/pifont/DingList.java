@@ -43,18 +43,19 @@ public class DingList extends ListDec
    @Override
    public void process(TeXParser parser) throws IOException
    {
-      setup(parser, parser.popStack());
+      setup(parser, parser, parser.popStack());
    }
 
    @Override
    public void process(TeXParser parser, TeXObjectList stack) throws IOException
    {
-      setup(parser, stack.popStack(parser));
+      setup(parser, stack, stack.popStack(parser));
    }
 
-   public void setup(TeXParser parser, TeXObject arg) throws IOException
+   public void setup(TeXParser parser, TeXObjectList stack, TeXObject arg)
+      throws IOException
    {
-      setup(parser);
+      setup(parser, stack);
 
       TeXObjectList label = new TeXObjectList();
 
@@ -63,7 +64,7 @@ public class DingList extends ListDec
 
       TeXObjectList listsettings = new TeXObjectList();
 
-      setup(parser, label, listsettings);
+      setup(parser, stack, label, listsettings);
    }
 
    @Override

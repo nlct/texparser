@@ -77,21 +77,31 @@ public class TrivListDec extends Declaration
    @Override
    public void process(TeXParser parser) throws IOException
    {
-      setup(parser);
+      setup(parser, parser);
       ((LaTeXParserListener)parser.getListener()).startList(this);
    }
 
    @Override
    public void process(TeXParser parser, TeXObjectList stack) throws IOException
    {
-      setup(parser);
+      setup(parser, stack);
       ((LaTeXParserListener)parser.getListener()).startList(this);
    }
 
-   public void setup(TeXParser parser) throws IOException
+   public void setup(TeXParser parser, TeXObjectList stack) throws IOException
    {
       parser.putControlSequence(true, new GenericCommand(true, "@itemlabel"));
-      parser.getListener().getControlSequence("@nmbrlistfalse").process(parser);
+
+      ControlSequence cs = parser.getListener().getControlSequence("@nmbrlistfalse");
+
+      if (parser == stack || stack == null)
+      {
+         cs.process(parser);
+      }
+      else
+      {
+         cs.process(parser, stack);
+      }
    }
 
    @Override

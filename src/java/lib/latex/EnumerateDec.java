@@ -44,19 +44,19 @@ public class EnumerateDec extends ListDec
    @Override
    public void process(TeXParser parser) throws IOException
    {
-      setup(parser);
+      setup(parser, parser);
    }
 
    @Override
    public void process(TeXParser parser, TeXObjectList stack) throws IOException
    {
-      setup(parser);
+      setup(parser, stack);
    }
 
    @Override
-   public void setup(TeXParser parser) throws IOException
+   public void setup(TeXParser parser, TeXObjectList stack) throws IOException
    {
-      super.setup(parser);
+      super.setup(parser, stack);
 
       TeXSettings settings = parser.getSettings();
 
@@ -66,9 +66,8 @@ public class EnumerateDec extends ListDec
       String enumctrstr = "enum"
         +RomanNumeral.romannumeral(enumdepth.number(parser));
 
-      ControlSequence enumctr = new GenericCommand(true, 
-          "@enumctr", null,
-          parser.getListener().createString(enumctrstr));
+      ControlSequence enumctr = new TextualContentCommand(
+          "@enumctr", enumctrstr);
 
       parser.putControlSequence(true, enumctr);
 
@@ -85,8 +84,7 @@ public class EnumerateDec extends ListDec
       listsettings.add(parser.getListener().getControlSequence("usecounter"));
       listsettings.add(enumctr);
 
-      setup(parser, labelCs, listsettings);
-
+      setup(parser, stack, labelCs, listsettings);
    }
 
    @Override

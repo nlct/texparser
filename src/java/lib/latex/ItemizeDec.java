@@ -44,19 +44,19 @@ public class ItemizeDec extends ListDec
    @Override
    public void process(TeXParser parser) throws IOException
    {
-      setup(parser);
+      setup(parser, parser);
    }
 
    @Override
    public void process(TeXParser parser, TeXObjectList stack) throws IOException
    {
-      setup(parser);
+      setup(parser, stack);
    }
 
    @Override
-   public void setup(TeXParser parser) throws IOException
+   public void setup(TeXParser parser, TeXObjectList stack) throws IOException
    {
-      super.setup(parser);
+      super.setup(parser, stack);
 
       TeXSettings settings = parser.getSettings();
 
@@ -66,10 +66,8 @@ public class ItemizeDec extends ListDec
       String labelitem = "labelitem"
         +RomanNumeral.romannumeral(itemdepth.number(parser));
 
-      parser.putControlSequence(true, new GenericCommand(true, 
-          "@itemitem", null,
-          parser.getListener().createString(labelitem))
-      );
+      parser.putControlSequence(true,
+         new TextualContentCommand("@itemitem", labelitem));
 
       ControlSequence labelCs = parser.getControlSequence(labelitem);
 
@@ -80,7 +78,7 @@ public class ItemizeDec extends ListDec
 
       TeXObjectList listsettings = new TeXObjectList();
 
-      setup(parser, labelCs, listsettings);
+      setup(parser, stack, labelCs, listsettings);
    }
 
    @Override

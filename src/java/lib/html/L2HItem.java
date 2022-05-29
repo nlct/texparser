@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -41,8 +41,9 @@ public class L2HItem extends ListItem
       return new L2HItem(getName());
    }
 
-   public void makelabel(TeXParser parser, TrivListDec trivList, 
-     TeXObject label)
+   @Override
+   public void makelabel(TeXParser parser, TeXObjectList stack,
+     TrivListDec trivList, TeXObject label)
     throws IOException
    {
       L2HConverter listener = (L2HConverter)parser.getListener();
@@ -63,7 +64,15 @@ public class L2HItem extends ListItem
          }
       }
 
-      label.process(parser);
+      if (parser == stack || stack == null)
+      {
+         label.process(parser);
+      }
+      else
+      {
+         label.process(parser, stack);
+      }
+
       listener.write("</span>");
    }
 

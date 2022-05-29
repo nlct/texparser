@@ -42,11 +42,12 @@ public class L2HList extends ListDec
       return new L2HList(getName());
    }
 
-   public void setup(TeXParser parser, TeXObject labelCs,
+   @Override
+   public void setup(TeXParser parser, TeXObjectList stack, TeXObject labelCs,
      TeXObject listsettings)
    throws IOException
    {
-      super.setup(parser, labelCs, listsettings);
+      super.setup(parser, stack, labelCs, listsettings);
 
       parser.getListener().getWriteable().write(
         String.format("<ul class=\"%s\">",

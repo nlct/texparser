@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -35,15 +35,17 @@ public class ListItem extends ControlSequence
       super(name);
    }
 
+   @Override
    public Object clone()
    {
       return new ListItem(getName());
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
-      TeXObject label = stack.popArg(parser, '[', ']');
+      TeXObject label = popOptArg(parser, stack);
 
       LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
 
@@ -61,38 +63,20 @@ public class ListItem extends ControlSequence
 
       Group grp = listener.createGroup();
 
-      grp.add(setuplabel(parser, label));
+      grp.add(setuplabel(parser, stack, label));
 
-      makelabel(parser, trivList, grp);
+      makelabel(parser, stack, trivList, grp);
    }
 
+   @Override
    public void process(TeXParser parser)
       throws IOException
    {
-      TeXObject label = parser.popNextArg('[', ']');
-
-      LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
-
-      TrivListDec trivList; 
-
-      try
-      {
-         trivList = listener.peekTrivListStack();
-      }
-      catch (java.util.EmptyStackException e)
-      {
-         throw new LaTeXSyntaxException(e, parser, 
-           LaTeXSyntaxException.ERROR_LONELY_ITEM);
-      }
-
-      Group grp = listener.createGroup();
-
-      grp.add(setuplabel(parser, label));
-
-      makelabel(parser, trivList, grp);
+      process(parser, parser);
    }
 
-   public TeXObject setuplabel(TeXParser parser, TeXObject label)
+   public TeXObject setuplabel(TeXParser parser, TeXObjectList stack,
+     TeXObject label)
     throws IOException
    {
       LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
@@ -106,25 +90,25 @@ public class ListItem extends ControlSequence
       {
          TeXObject cs = listener.getControlSequence("@listctr");
 
-         if (cs instanceof Expandable)
-         {
-            TeXObjectList expanded = ((Expandable)cs).expandfully(parser);
+         String ctr = parser.expandToString(cs, stack);
 
-            if (expanded != null)
-            {
-               cs = expanded;
-            }
-         }
-
-         listener.stepcounter(cs.toString(parser));
+         listener.stepcounter(ctr);
       } 
 
       return listener.getControlSequence("@itemlabel");
    }
 
-   public void makelabel(TeXParser parser, TrivListDec trivList, TeXObject label)
+   public void makelabel(TeXParser parser, TeXObjectList stack,
+       TrivListDec trivList, TeXObject label)
     throws IOException
    {
-      label.process(parser);
+      if (parser == stack || stack == null)
+      {
+         label.process(parser);
+      }
+      else
+      {
+         label.process(parser, stack);
+      }
    }
 }
