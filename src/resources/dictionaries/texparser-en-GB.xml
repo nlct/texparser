@@ -160,7 +160,7 @@ There is NO WARRANTY, to the extent permitted by law.</entry>
 <!--  Package messages -->
 
 <entry key="probsoln.no_such_db">ProbSoln database ''{0}'' doesn''t exist.</entry>
-<entry key="probsoln.no_such_entry_in_db">Entry ''{0}'' doesn''t exist in ProbSoln database '{1}'.</entry>
+<entry key="probsoln.no_such_entry_in_db">Entry ''{0}'' doesn''t exist in ProbSoln database ''{1}''.</entry>
 <entry key="probsoln.db_exists">ProbSoln database ''{0}'' already exists.</entry>
 <entry key="probsoln.request_args">Problem ''{0}'' (in database ''{1}'') requires {2} arguments. Please specify</entry>
 <entry key="probsoln.request_arg">Problem ''{0}'' (in database ''{1}'') requires 1 argument. Please specify</entry>
