@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -41,24 +41,22 @@ public class Input extends ControlSequence
       this.notFoundAction = notFoundAction;
    }
 
+   @Override
    public Object clone()
    {
       return new Input(getName(), notFoundAction);
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
-      TeXObject arg = stack.popArg(parser);
+      TeXObject arg = popArg(parser, stack);
 
-      if (arg instanceof Expandable)
+      if (!(arg instanceof TeXPathObject)
+           && arg.canExpand() && arg instanceof Expandable)
       {
-         TeXObjectList expanded = ((Expandable)arg).expandfully(parser, stack);
-
-         if (expanded != null)
-         {
-            arg = expanded;
-         }
+         arg = TeXParserUtils.expandFully(arg, parser, stack);
       }
 
       if (!doInput(parser, arg, stack))
@@ -81,39 +79,11 @@ public class Input extends ControlSequence
       }
    }
 
+   @Override
    public void process(TeXParser parser)
       throws IOException
    {
-      TeXObject arg = parser.popNextArg();
-
-      if (arg instanceof Expandable)
-      {
-         TeXObjectList expanded = ((Expandable)arg).expandfully(parser);
-
-         if (expanded != null)
-         {
-            arg = expanded;
-         }
-      }
-
-      if (!doInput(parser, arg, null))
-      {
-         switch (notFoundAction)
-         {
-            case NOT_FOUND_ACTION_WARN:
-
-              TeXApp texapp = parser.getListener().getTeXApp();
-
-              texapp.warning(parser, texapp.getMessage(
-                 TeXSyntaxException.ERROR_FILE_NOT_FOUND, 
-                  arg.toString(parser)));
-            break;
-            case NOT_FOUND_ACTION_ERROR:
-               throw new TeXSyntaxException(parser,
-               TeXSyntaxException.ERROR_FILE_NOT_FOUND, 
-               arg.toString(parser));
-         }
-      }
+      process(parser, parser);
    }
 
    protected String getDefaultExtension()

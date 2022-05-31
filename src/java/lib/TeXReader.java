@@ -267,6 +267,11 @@ public class TeXReader implements Readable,Closeable
       return pending;
    }
 
+   public boolean hasPending()
+   {
+      return pending != null;
+   }
+
    private Reader reader;
    private TeXReader parent;
    private Object source;

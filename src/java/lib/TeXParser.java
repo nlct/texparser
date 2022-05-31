@@ -409,6 +409,20 @@ public class TeXParser extends TeXObjectList
             logMessage("EOF read() "+reader);
          }
 
+         TeXObjectList pending = reader.getPending();
+
+         if (pending != null)
+         {
+            push(pending, true);
+
+            if (getDebugLevel() > 0)
+            {
+               logMessage("PUSHED PENDING "+toString());
+            }
+
+            reader.setPending(null);
+         }
+
          TeXReader parentReader = reader.getParent();
 
          if (parentReader == null)
@@ -427,24 +441,12 @@ public class TeXParser extends TeXObjectList
 
          reader = parentReader;
 
-         TeXObjectList pending = reader.getPending();
-
-         if (pending != null)
-         {
-            push(pending, true);
-            pending.clear();
-
-            reader.setPending(null);
-
-            logMessage("PUSHED PENDING "+toString());
-         }
-
          if (debugLevel > 0)
          {
             logMessage("READER: "+reader);
          }
 
-         return read();
+         return '\n';
       }
 
       return c;
@@ -2011,29 +2013,9 @@ public class TeXParser extends TeXObjectList
                {
                   debugMessage(1, "EOF while processing object "+object);
 
-                  TeXObjectList pending = reader.getPending();
+                  closeReader(reader);
 
-                  if (pending != null)
-                  {
-                     if (debugLevel > 0)
-                     {
-                        logMessage("PARSE EOF processing pending for reader: "+reader);
-                     }
-
-                     pending.process(this);
-                  }
-
-                  if (this.reader == reader)
-                  {
-                     this.reader = reader.getParent();
-
-                     if (debugLevel > 0)
-                     {
-                        logMessage("PARSE EOF switching from child "+ reader
-                          + " to parent "+this.reader);
-                     }
-                  }
-                  else
+                  if (this.reader == null)
                   {
                      break;
                   }
@@ -2054,29 +2036,62 @@ public class TeXParser extends TeXObjectList
       {
          debugMessage(1, "EOF while fetching next from "+this.reader);
 
-         TeXObjectList pending = this.reader.getPending();
+         closeReader(this.reader);
+      }
+   }
 
-         if (pending != null)
+   private void closeReader(TeXReader reader)
+    throws IOException
+   {
+      TeXObjectList pending = reader.getPending();
+
+      reader.setPending(null);
+
+      reader.close();
+
+      this.reader = reader.getParent();
+
+      while (this.reader != null)
+      {
+         if (debugLevel > 0)
          {
-            if (debugLevel > 0)
-            {
-               logMessage("PARSE EOF processing pending for reader: "+this.reader);
-            }
-
-            pending.process(this);
-
-            this.reader.setPending(null);
+            logMessage("CLOSE READER switching from child "+ reader
+              + " to parent "+this.reader);
          }
 
-         if (this.reader == reader)
+         if (this.reader.isClosed())
          {
-            this.reader = reader.getParent();
-
-            if (debugLevel > 0)
+            if (this.reader.hasPending())
             {
-               logMessage("PARSE EOF switching from "+reader+" to "+this.reader);
+               if (pending == null)
+               {
+                  pending = this.reader.getPending();
+               }
+               else
+               {
+                  pending.addAll(this.reader.getPending());
+               }
+
+               this.reader.setPending(null);
             }
+
+            reader = this.reader;
+            this.reader = this.reader.getParent();
          }
+         else
+         {
+            break;
+         }
+      }
+
+      if (pending != null)
+      {
+         if (debugLevel > 0)
+         {
+            logMessage("CLOSE READER processing pending");
+         }
+
+         pending.process(this);
       }
 
    }

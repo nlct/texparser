@@ -91,12 +91,22 @@ public class AssignedControlSequence extends Command
    public void process(TeXParser parser)
       throws IOException
    {
+      if (parser.getDebugLevel() > 0)
+      {
+         parser.logMessage("PROCESSING "+toString());
+      }
+
       underlying.process(parser);
    }
 
    public void process(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
+      if (parser.getDebugLevel() > 0)
+      {
+         parser.logMessage("PROCESSING "+toString());
+      }
+
       underlying.process(parser, stack);
    }
 
@@ -163,6 +173,13 @@ public class AssignedControlSequence extends Command
       }
 
       return underlying;
+   }
+
+   @Override
+   public String toString()
+   {
+      return String.format("%s[name=%s,underlying=%s]", 
+        getClass().getSimpleName(), getName(), underlying);
    }
 
    private TeXObject underlying;

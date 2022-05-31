@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -36,39 +36,21 @@ public class DTLrowcount extends Command
       this.sty = sty;
    }
 
+   @Override
    public Object clone()
    {
       return new DTLrowcount(getName(), sty);
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      TeXObject dbArg = (stack == null || stack==parser ? 
-         parser.popNextArg() : stack.popArg(parser));
-
-      if (dbArg instanceof Expandable)
-      {
-         TeXObjectList expanded;
-
-         if (stack == null || stack == parser)
-         {
-             expanded = ((Expandable)dbArg).expandfully(parser);
-         }
-         else
-         {
-             expanded = ((Expandable)dbArg).expandfully(parser, stack);
-         }
-
-         if (expanded != null)
-         {
-            dbArg = expanded;
-         }
-      }
+      String db = popLabelString(parser, stack);
 
       TeXObjectList list = new TeXObjectList();
 
-      list.add(new UserNumber(sty.getRowCount(dbArg.format())));
+      list.add(new UserNumber(sty.getRowCount(db)));
 
       return list;
    }

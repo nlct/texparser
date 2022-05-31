@@ -1299,15 +1299,21 @@ public class GlossariesSty extends LaTeXSty
          }
       }
 
-      substack.add(getListener().getControlSequence("let"));
-      substack.add(new TeXCsRef("gls@org@glossaryentryfield"));
-      substack.add(getListener().getControlSequence("glossentry"));
+      ControlSequence cs = getListener().getControlSequence("glossentry");
 
-      substack.add(getListener().getControlSequence("let"));
-      substack.add(new TeXCsRef("gls@org@glossarysubentryfield"));
-      substack.add(getListener().getControlSequence("subglossentry"));
+      if (!(cs instanceof GlossEntryWithLabel))
+      {
+         parser.putControlSequence(true, 
+          new AssignedControlSequence("gls@org@glossaryentryfield", cs));
+      }
 
-      substack.process(parser);
+      cs = getListener().getControlSequence("subglossentry");
+
+      if (!(cs instanceof SubGlossEntryWithLabel))
+      {
+         parser.putControlSequence(true, 
+          new AssignedControlSequence("gls@org@glossarysubentryfield", cs));
+      }
 
       getListener().putControlSequence(true,
         new GlossEntryWithLabel(this));

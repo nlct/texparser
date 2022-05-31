@@ -27,6 +27,7 @@ public class Param extends AbstractTeXObject implements ParameterToken
       setDigit(digit);
    }
 
+   @Override
    public Object clone()
    {
       return new Param(digit);
@@ -89,7 +90,7 @@ public class Param extends AbstractTeXObject implements ParameterToken
    public String toString()
    {
       return String.format("%s[%s]", 
-        getClass().getName(),
+        getClass().getSimpleName(),
         (digit <= 0 ? "#" : "#"+digit));
    }
 

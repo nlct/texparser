@@ -45,20 +45,9 @@ public class DTLloaddbtex extends ControlSequence
    public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      TeXObject csArg;
+      TeXObject csArg = popArg(parser, stack);
 
-      TeXObject fileArg;
-
-      if (parser == stack)
-      {
-         csArg = parser.popNextArg();
-         fileArg = parser.popNextArg();
-      }
-      else
-      {
-         csArg = stack.popArg(parser);
-         fileArg = stack.popArg(parser);
-      }
+      String filename = popLabelString(parser, stack);
 
       if (csArg instanceof TeXObjectList)
       {
@@ -66,28 +55,9 @@ public class DTLloaddbtex extends ControlSequence
          csArg = list.popToken(TeXObjectList.POP_SHORT);
       }
 
-      if (fileArg instanceof Expandable)
-      {
-         TeXObjectList expanded;
-
-         if (parser == stack)
-         {
-            expanded = ((Expandable)fileArg).expandfully(parser);
-         }
-         else
-         {
-            expanded = ((Expandable)fileArg).expandfully(parser, stack);
-         }
-
-         if (expanded != null)
-         {
-            fileArg = expanded;
-         }
-      }
-
       TeXParserListener listener = parser.getListener();
 
-      TeXPath texPath = new TeXPath(parser, fileArg.toString(parser));
+      TeXPath texPath = new TeXPath(parser, filename);
 
       if (!(csArg instanceof ControlSequence))
       {
@@ -109,14 +79,10 @@ public class DTLloaddbtex extends ControlSequence
       stack.push(new TeXCsRef("dtllastloadeddb"));
       stack.push(csArg);
       stack.push(new TeXCsRef("let"));
+      stack.push(new TeXPathObject(texPath));
+      stack.push(listener.getControlSequence("input"));
 
       listener.addFileReference(texPath);
-
-      if (!listener.input(texPath, stack))
-      {
-         throw new TeXSyntaxException(parser, 
-           TeXSyntaxException.ERROR_FILE_NOT_FOUND, texPath);
-      }
    }
 
    @Override

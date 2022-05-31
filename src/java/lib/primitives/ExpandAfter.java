@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -35,6 +35,7 @@ public class ExpandAfter extends Primitive implements Expandable
       super(name, true);
    }
 
+   @Override
    public Object clone()
    {
       return new ExpandAfter(getName());
@@ -56,7 +57,12 @@ public class ExpandAfter extends Primitive implements Expandable
            ((TeXCsRef)secondArg).getName());
       }
 
-      if (secondArg instanceof Expandable)
+      if (parser.getDebugLevel() > 0)
+      {
+         parser.logMessage("EXPANDAFTER: FIRST: "+firstArg+". SECOND: "+secondArg);
+      }
+
+      if (secondArg.canExpand() && secondArg instanceof Expandable)
       {
          TeXObjectList expanded;
 
@@ -75,17 +81,14 @@ public class ExpandAfter extends Primitive implements Expandable
          }
       }
 
-      if (secondArg instanceof TeXObjectList
-           && !(secondArg instanceof Group))
-      {
-         list.addAll(0, (TeXObjectList)secondArg);
-      }
-      else
-      {
-         list.push(secondArg);
-      }
+      list.push(secondArg, true);
 
       list.push(firstArg);
+
+      if (parser.getDebugLevel() > 0)
+      {
+         parser.logMessage("EXPANDED: "+list.toString(parser));
+      }
    }
 
    @Override

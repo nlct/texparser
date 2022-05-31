@@ -1836,6 +1836,98 @@ public class TeXObjectList extends Vector<TeXObject>
       }
    }
 
+   /**
+    * Process up to the given marker and pick up any mid control sequences.
+    * For use where the list is the interior of a group.
+    * @param parser the parser
+    * @param marker the marker
+    */
+   protected void processList(TeXParser parser, StackMarker marker)
+    throws IOException
+   {
+      TeXObjectList before = new TeXObjectList();
+      TeXObjectList after = new TeXObjectList();
+
+      MidControlSequence midcs = null;
+
+      for (int i = 0; i < size(); i++)
+      {
+         TeXObject object = get(i);
+
+         if (object.equals(marker))
+         {
+            break;
+         }
+
+         if (object instanceof TeXCsRef)
+         {
+            object = parser.getListener().getControlSequence(
+               ((TeXCsRef)object).getName());
+         }
+
+         if (object == null)
+         {
+            break;
+         }
+
+         if (object instanceof MidControlSequence)
+         {
+            midcs = (MidControlSequence)object;
+            continue;
+         }
+
+         if (midcs == null)
+         {
+            before.add(object);
+         }
+         else
+         {
+            after.add(object);
+         }
+      }
+
+      if (midcs == null)
+      {
+         before = null;
+         after = null;
+
+         while (size() != 0)
+         {
+            TeXObject object = remove(0);
+
+            if (parser.getDebugLevel() > 0)
+            {
+               parser.logMessage("PROCESS LIST OBJ: "+object);
+            }
+
+            if (object.equals(marker) || object == null)
+            {
+               break;
+            }
+
+            if (object instanceof TeXCsRef)
+            {
+               object = parser.getListener().getControlSequence(
+                  ((TeXCsRef)object).getName());
+            }
+
+            if (object instanceof Declaration)
+            {
+               pushDeclaration((Declaration)object);
+            }
+
+            object.process(parser, this);
+         }
+      }
+      else
+      {
+         clear();
+         midcs.process(parser, before, after);
+      }
+
+      processEndDeclarations(parser);
+   }
+
    protected String toStringExtraIdentifier()
    {
       return "";

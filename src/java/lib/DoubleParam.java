@@ -113,7 +113,7 @@ public class DoubleParam extends AbstractTeXObject
    @Override
    public String toString()
    {
-      return String.format("%s[param=%s]", getClass().getName(),
+      return String.format("%s[param=%s]", getClass().getSimpleName(),
         next().toString());
    }
 

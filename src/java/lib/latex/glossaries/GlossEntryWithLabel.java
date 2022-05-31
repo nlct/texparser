@@ -73,7 +73,18 @@ public class GlossEntryWithLabel extends AbstractGlsCommand
       listener.putControlSequence(glslabel.duplicate("glscurrententrylabel"));
 
       stack.push(glslabel);
-      stack.push(listener.getControlSequence("gls@org@glossaryentryfield"));
+
+      ControlSequence cs =
+        listener.getControlSequence("gls@org@glossaryentryfield");
+
+      if (stack == parser || stack == null)
+      {
+         cs.process(parser);
+      }
+      else
+      {
+         cs.process(parser, stack);
+      }
    }
 
    @Override

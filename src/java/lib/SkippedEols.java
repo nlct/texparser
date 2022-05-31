@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -59,6 +59,7 @@ public class SkippedEols extends Ignoreable
       return contents;
    }
 
+   @Override
    public Object clone()
    {
       SkippedEols obj = new SkippedEols();
@@ -68,6 +69,7 @@ public class SkippedEols extends Ignoreable
       return obj;
    }
 
+   @Override
    public String toString(TeXParser parser)
    {
       StringBuilder builder = new StringBuilder();
@@ -80,10 +82,11 @@ public class SkippedEols extends Ignoreable
       return builder.toString();
    }
 
+   @Override
    public String toString()
    {
       StringBuilder builder = new StringBuilder();
-      builder.append(String.format("%s[", getClass().getName()));
+      builder.append(String.format("%s[", getClass().getSimpleName()));
 
       for (Eol eol : contents)
       {
@@ -95,6 +98,7 @@ public class SkippedEols extends Ignoreable
       return builder.toString();
    }
 
+   @Override
    public String format()
    {
       StringBuilder builder = new StringBuilder();

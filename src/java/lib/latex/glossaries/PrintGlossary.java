@@ -23,7 +23,7 @@ import java.io.IOException;
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.*;
 
-public class PrintGlossary extends Input
+public class PrintGlossary extends ControlSequence
 {
    public PrintGlossary(GlossariesSty sty)
    {
@@ -41,12 +41,6 @@ public class PrintGlossary extends Input
       return new PrintGlossary(getName(), sty);
    }
 
-   @Override
-   protected String getDefaultExtension()
-   {
-      return ext;
-   }
-
    protected void initOptions(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
@@ -60,8 +54,6 @@ public class PrintGlossary extends Input
       {
          throw new NullPointerException();
       }
-
-      stack.push(parser.getListener().getControlSequence("jobname"));
    }
 
    @Override
@@ -72,7 +64,18 @@ public class PrintGlossary extends Input
 
       initOptions(parser, stack);
 
-      super.process(parser, stack);
+      TeXParserListener listener = parser.getListener();
+
+      ControlSequence cs = listener.getControlSequence("jobname");
+      String jobname = parser.expandToString(cs, stack);
+
+      TeXPath texPath = new TeXPath(parser, jobname, ext, false);
+
+      if (texPath.exists())
+      {
+         listener.addFileReference(texPath);
+         listener.input(texPath, stack);
+      }
 
       parser.endGroup();
    }
@@ -81,13 +84,7 @@ public class PrintGlossary extends Input
    public void process(TeXParser parser)
      throws IOException
    {
-      parser.startGroup();
-
-      initOptions(parser, parser);
-
-      super.process(parser);
-
-      parser.endGroup();
+      process(parser, parser);
    }
 
    private String ext = "gls";

@@ -44,7 +44,7 @@ public abstract class Ignoreable extends AbstractTeXObject
    @Override
    public String toString()
    {
-      return getClass().getName();
+      return getClass().getSimpleName();
    }
 
    public abstract Object clone();

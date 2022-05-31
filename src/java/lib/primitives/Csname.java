@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -35,6 +35,7 @@ public class Csname extends Primitive implements Expandable
       super(name);
    }
 
+   @Override
    public Object clone()
    {
       return new Csname(getName());
@@ -46,12 +47,18 @@ public class Csname extends Primitive implements Expandable
       return true;
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
       TeXObjectList list = new TeXObjectList();
 
       String name = csname(parser, stack);
+
+      if (parser.getDebugLevel() > 0)
+      {
+         parser.logMessage("CSNAME: "+name);
+      }
 
       ControlSequence cs = parser.getControlSequence(name);
 
@@ -67,12 +74,14 @@ public class Csname extends Primitive implements Expandable
       return list;
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser)
       throws IOException
    {
       return expandonce(parser, parser);
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
@@ -94,6 +103,7 @@ public class Csname extends Primitive implements Expandable
       return list;
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser)
       throws IOException
    {
@@ -134,25 +144,10 @@ public class Csname extends Primitive implements Expandable
          obj = stack.popStack(parser);
       }
 
-      TeXObjectList expanded;
-
-      if (parser == stack)
-      {
-         expanded = list.expandfully(parser);
-      }
-      else
-      {
-         expanded = list.expandfully(parser, stack);
-      }
-
-      if (expanded == null)
-      {
-         expanded = list;
-      }
-
-      return list.toString(parser);
+      return parser.expandToString(list, stack);
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
@@ -164,6 +159,7 @@ public class Csname extends Primitive implements Expandable
       }
    }
 
+   @Override
    public void process(TeXParser parser)
       throws IOException
    {
