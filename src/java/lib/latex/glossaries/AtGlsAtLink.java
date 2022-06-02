@@ -124,7 +124,14 @@ public class AtGlsAtLink extends AbstractGlsCommand
       grp.add(subgrp);
       subgrp.add(linkText);
 
-      stack.addAll(0, list);
+      if (parser == stack || stack == null)
+      {
+         list.process(parser);
+      }
+      else
+      {
+         list.process(parser, stack);
+      }
    }
 
    public void process(TeXParser parser)

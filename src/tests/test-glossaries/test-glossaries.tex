@@ -14,6 +14,8 @@
 \newglossaryentry{child}{parent={sample},
  name={child sample},description={an example sub entry}}
 
+\newacronym{html}{HTML}{hypertext markup language}
+
 \begin{document}
 \tableofcontents
 
@@ -36,6 +38,12 @@ Next use: \gls{sample}.
 \Gls{child}.
 
 Symbol: \glssymbol{sample}.
+
+Abbreviation. 
+Is used? \ifglsused{html}{true}{false}.
+\gls{html}.
+Is used? \ifglsused{html}{true}{false}.
+Next use: \gls{html}.
 
 \section{Another}
 \label{sec:another}

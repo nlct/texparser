@@ -116,6 +116,9 @@ public class GlossariesSty extends LaTeXSty
    public void addDefinitions()
    {
       registerControlSequence(new TextualContentCommand("glsdefaulttype", "main"));
+      registerControlSequence(new GenericCommand(true, "acronymtype", 
+              null, new TeXCsRef("glsdefaulttype")));
+
       registerControlSequence(new TextualContentCommand("glossaryname", "Glossary"));
       registerControlSequence(new TextualContentCommand("acronymname", "Acronyms"));
 
@@ -347,12 +350,28 @@ public class GlossariesSty extends LaTeXSty
       registerControlSequence(new GlsEntryField("Glsentrysymbolplural",
         "symbolplural", CaseChange.SENTENCE, this));
 
+      registerControlSequence(new GlsEntryField("glsentryshort", "short", this));
+      registerControlSequence(new GlsEntryField("Glsentryshort", "short",
+        CaseChange.SENTENCE, this));
+      registerControlSequence(new GlsEntryField("glsentryshortpl", "shortplural",
+        this));
+      registerControlSequence(new GlsEntryField("Glsentryshortpl", "shortplural",
+        CaseChange.SENTENCE, this));
+
+      registerControlSequence(new GlsEntryField("glsentrylong", "long", this));
+      registerControlSequence(new GlsEntryField("Glsentrylong", "long",
+        CaseChange.SENTENCE, this));
+      registerControlSequence(new GlsEntryField("glsentrylongpl", "longplural",
+        this));
+      registerControlSequence(new GlsEntryField("Glsentrylongpl", "longplural",
+        CaseChange.SENTENCE, this));
+
       registerControlSequence(new IfHasField("ifglshassymbol", "symbol", this));
       registerControlSequence(new IfHasField("ifglshasdesc", "description", this));
       registerControlSequence(new IfHasField("ifglshasshort", "short", this));
       registerControlSequence(new IfHasField("ifglshaslong", "long", this));
 
-      TeXParserListener listener = getParser().getListener();
+      LaTeXParserListener listener = (LaTeXParserListener)getParser().getListener();
 
       setModifier(listener.getOther('*'), "hyper", new UserBoolean(true));
       setModifier(listener.getOther('+'), "hyper", new UserBoolean(false));
@@ -361,14 +380,58 @@ public class GlossariesSty extends LaTeXSty
 
       registerControlSequence(new GlsAddStorageKey(this));
 
+      listener.newtoks(true, "glslabeltok");
+      listener.newtoks(true, "glsshorttok");
+      listener.newtoks(true, "glslongtok");
+
+      registerControlSequence(new NewAcronym(this));
+
+      registerControlSequence(new GlsEntryFull(this));
+      registerControlSequence(new GlsEntryFull("Glsentryfull", CaseChange.SENTENCE, this));
+      registerControlSequence(new GlsEntryFull("glsentryfullpl", true, this));
+      registerControlSequence(new GlsEntryFull("Glsentryfullpl", CaseChange.SENTENCE, true, this));
+
       if (extra)
       {
          addExtraDefinitions();
+      }
+      else
+      {
+         KeyValList keyValList = new KeyValList();
+         TeXObjectList val = listener.createStack();
+         val.add(new TeXCsRef("the"));
+         val.add(new TeXCsRef("glslongtok"));
+
+         keyValList.put("description", val);
+         registerControlSequence(new GenericCommand(true, "GenericAcronymFields",
+          null, keyValList));
+
+         registerControlSequence(new GenericCommand("newacronymhook"));
+         registerControlSequence(new AcrFullFmt(this));
+         registerControlSequence(new AcrFullFmt("Acrfullfmt", CaseChange.SENTENCE, this));
+         registerControlSequence(new AcrFullFmt("ACRfullfmt", CaseChange.TO_UPPER, this));
+         registerControlSequence(new AcrFullFmt("acrfullplfmt", true, this));
+         registerControlSequence(new AcrFullFmt("Acrfullplfmt", CaseChange.SENTENCE, true, this));
+         registerControlSequence(new AcrFullFmt("ACRfullplfmt", CaseChange.TO_UPPER, true, this));
+
+         registerControlSequence(new NewAcronymStyle(this));
+         registerControlSequence(new NewAcronymStyle("renewacronymstyle",
+           Overwrite.FORCE, this));
+
+         registerControlSequence(new SetAcronymStyle(this));
+
+         registerControlSequence(new AtGlsAcrAtDispStyleAtLongShort(this));
+         registerControlSequence(new AtGlsAcrAtStyleDefsAtLongShort(this));
+
+         registerControlSequence(new GlsGenAcFmt(this));
       }
    }
 
    protected void addExtraDefinitions()
    {
+      registerControlSequence(new GenericCommand(true, "glsxtrabbrvtype", 
+        null, new TeXCsRef("glsdefaulttype")));
+
       registerControlSequence(
         new TextualContentCommand("GlsXtrDefaultResourceOptions", ""));
 
@@ -378,6 +441,8 @@ public class GlossariesSty extends LaTeXSty
       registerControlSequence(new GlsXtrLoadResources());
 
       registerControlSequence(new GlsXtrPostDescription(this));
+
+      registerControlSequence(new NewAcronym("newabbreviation", this));
 
       registerControlSequence(new GenericCommand("glsxtrfieldtitlecasecs", null,
          new TeXCsRef("glscapitalisewords")));
@@ -397,6 +462,14 @@ public class GlossariesSty extends LaTeXSty
 
       registerControlSequence(new GlsAddStorageKey("providestoragekey",
         Overwrite.SKIP, this));
+
+      registerControlSequence(new AtGobble("glsxtrnewabbrevpresetkeyhook", 3));
+      registerControlSequence(new GenericCommand("newabbreviationhook"));
+      registerControlSequence(new GenericCommand("GlsXtrPostNewAbbreviation"));
+      registerControlSequence(new GenericCommand("CustomAbbreviationFields"));
+
+      listener.newtoks(true, "glsshortpltok");
+      listener.newtoks(true, "glslongpltok");
    }
 
    @Override
@@ -427,6 +500,48 @@ public class GlossariesSty extends LaTeXSty
          createGlossary("main", new TeXCsRef("glossaryname"), null,
            "glg", "gls", "glo");
          createMain = false;
+      }
+
+      if (createAbbreviations)
+      {
+         registerControlSequence(new TextualContentCommand("abbreviationsname", "Abbreviations"));
+         registerControlSequence(new TextualContentCommand("glsxtrabbrvtype", "abbreviations"));
+         createGlossary("abbreviations", new TeXCsRef("abbreviationsname"), null,
+           "glg-abr", "gls-abr", "glo-abr");
+
+         declareAbbreviationGlossary("abbreviations");
+
+         if (!createAcronyms)
+         {
+            registerControlSequence(new GenericCommand(true, "acronymtype",  null,
+              new TeXCsRef("glsxtrabbrvtype")));
+         }
+
+         createAbbreviations = false;
+      }
+
+      if (createAcronyms)
+      {
+         createGlossary("acronym", new TeXCsRef("acronymname"), null,
+           "alg", "acr", "acn");
+
+         registerControlSequence(new TextualContentCommand("acronymtype", 
+              "acronym"));
+
+         declareAbbreviationGlossary("acronym");
+
+         createAcronyms = false;
+      }
+
+      if (isExtra())
+      {
+         substack.add(new TeXCsRef("setabbreviationstyle"));
+         substack.add(getListener().createGroup("long-short"));
+      }
+      else
+      {
+         substack.add(new TeXCsRef("setacronymstyle"));
+         substack.add(getListener().createGroup("long-short"));
       }
 
       getListener().putControlSequence(true, 
@@ -502,6 +617,21 @@ public class GlossariesSty extends LaTeXSty
       if (option.equals("nomain"))
       {
          createMain = false;
+      }
+      else if (option.equals("acronyms") || option.equals("acronym"))
+      {
+         if (value == null)
+         {
+            createAcronyms = true;
+         }
+         else
+         {
+            createAcronyms = value.toString(parser).equals("true");
+         }
+      }
+      else if (option.equals("abbreviations"))
+      {
+         createAbbreviations = true;
       }
       else if (option.equals("nolist"))
       {
@@ -1339,16 +1469,42 @@ public class GlossariesSty extends LaTeXSty
       }
    }
 
+   public void declareAbbreviationGlossary(String type)
+   {
+      if (abbreviationTypes == null)
+      {
+         abbreviationTypes = new Vector<String>();
+         abbreviationTypes.add(type);
+      }
+      else if (!abbreviationTypes.contains(type))
+      {
+         abbreviationTypes.add(type);
+      }
+   }
+
+   public boolean isAbbreviationGlossary(String type)
+   {
+      return abbreviationTypes != null && abbreviationTypes.contains(type);
+   }
+
+   public Vector<String> getAbbreviationGlossaries()
+   {
+      return abbreviationTypes;
+   }
+
    private HashMap<String,GlossaryEntry> entries;
 
    private HashMap<String,Glossary> glossaries;
 
    private Vector<String> glossaryTypes;
    private Vector<String> ignoredGlossaryTypes;
+   private Vector<String> abbreviationTypes;
 
    private HashMap<String,Category> categories;
 
    private boolean createMain = true;
+   private boolean createAbbreviations = true;
+   private boolean createAcronyms = true;
 
    private boolean expandFields = true;
 
@@ -1393,4 +1549,12 @@ public class GlossariesSty extends LaTeXSty
     = "glossaries.glossary.style.not.defined";
    public static final String GLOSSARY_NO_STYLE 
     = "glossaries.glossary.no_style";
+   public static final String ACRONYM_STYLE_DEFINED 
+    = "glossaries.acronym.style.defined";
+   public static final String ACRONYM_STYLE_NOT_DEFINED 
+    = "glossaries.acronym.style.not.defined";
+   public static final String ABBREVIATION_STYLE_DEFINED 
+    = "glossaries.abbreviation.style.defined";
+   public static final String ABBREVIATION_STYLE_NOT_DEFINED 
+    = "glossaries.abbreviation.style.not.defined";
 }

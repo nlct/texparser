@@ -61,6 +61,19 @@ public abstract class AbstractGlsCommand extends Command
       return sty.popOptKeyValList(parser, stack, checkModifier);
    }
 
+   protected KeyValList popKeyValList(TeXParser parser, TeXObjectList stack)
+     throws IOException
+   {
+      TeXObject arg = popArg(parser, stack);
+
+      if (arg instanceof KeyValList)
+      {
+         return (KeyValList)arg;
+      }
+
+      return KeyValList.getList(parser, arg);
+   }
+
    protected GlsLabel popEntryLabel(TeXParser parser, TeXObjectList stack)
     throws IOException
    {

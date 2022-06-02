@@ -199,6 +199,10 @@ There is NO WARRANTY, to the extent permitted by law.</entry>
 <entry key="glossaries.entry.exists">Entry ''{0}'' already exists</entry>
 <entry key="glossaries.glossary.style.not.defined">Glossary style ''{0}'' not defined</entry>
 <entry key="glossaries.glossary.no_style">No glossary style seems to have been set. Using fallback style</entry>
+<entry key="glossaries.acronym.style.defined">Acronym style ''{0}'' already defined</entry>
+<entry key="glossaries.acronym.style.not.defined">Acronym style ''{0}'' not defined</entry>
+<entry key="glossaries.abbreviation.style.defined">Abbreviation style ''{0}'' already defined</entry>
+<entry key="glossaries.abbreviation.style.not.defined">Abbreviation style ''{0}'' not defined</entry>
 
 <!--  Image drawing messages -->
 
