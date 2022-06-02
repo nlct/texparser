@@ -441,8 +441,22 @@ public class GlossariesSty extends LaTeXSty
       registerControlSequence(new GlsXtrLoadResources());
 
       registerControlSequence(new GlsXtrPostDescription(this));
+      registerControlSequence(new PrintUnsrtGlossaries(this));
 
       registerControlSequence(new NewAcronym("newabbreviation", this));
+
+      registerControlSequence(new NewAbbreviationStyle(this));
+      registerControlSequence(new NewAbbreviationStyle("renewabbreviationstyle",
+         Overwrite.FORCE, this));
+      registerControlSequence(new LetAbbreviationStyle(this));
+      registerControlSequence(new GlsXtrUseAbbrStyleSetup(this));
+      registerControlSequence(new GlsXtrUseAbbrStyleFmts(this));
+      registerControlSequence(new SetAbbreviationStyle(this));
+      registerControlSequence(new GlsXtrSetComplexStyle(this));
+      registerControlSequence(new IfApplyInnerFmtField(this));
+      registerControlSequence(new GlsExclApplyInnerFmtField(this));
+
+      NewIf.createConditional(true, getParser(), "ifglsxtrinsertinside", false);
 
       registerControlSequence(new GenericCommand("glsxtrfieldtitlecasecs", null,
          new TeXCsRef("glscapitalisewords")));
@@ -467,6 +481,239 @@ public class GlossariesSty extends LaTeXSty
       registerControlSequence(new GenericCommand("newabbreviationhook"));
       registerControlSequence(new GenericCommand("GlsXtrPostNewAbbreviation"));
       registerControlSequence(new GenericCommand("CustomAbbreviationFields"));
+
+      registerControlSequence(new AtFirstOfOne("glsxtrgenentrytextfmt"));
+      registerControlSequence(new AtFirstOfOne("glsabbrvdefaultfont"));
+      registerControlSequence(new AtFirstOfOne("glslongdefaultfont"));
+      registerControlSequence(new GlsXtrParen());
+      registerControlSequence(new GlsXtrFullSep());
+      registerControlSequence(new GlsFmtField(this));
+      registerControlSequence(new GlsFmtField("Glsfmtfield", CaseChange.SENTENCE, this));
+      registerControlSequence(new GlsFmtField("GLSfmtfield", CaseChange.TO_UPPER, this));
+      registerControlSequence(new GlsFmtInsert());
+      registerControlSequence(new GlsFmtInsert("GLSfmtinsert", CaseChange.TO_UPPER));
+
+      registerControlSequence(new GlsXtrFullFormat(this));
+      registerControlSequence(new GlsXtrFullFormat("Glsxtrfullformat",
+        CaseChange.SENTENCE, this));
+      registerControlSequence(new GlsXtrFullFormat("GLSxtrfullformat",
+        CaseChange.TO_UPPER, this));
+
+      registerControlSequence(new GlsXtrFullFormat("glsxtrfullplformat", true, this));
+      registerControlSequence(new GlsXtrFullFormat("Glsxtrfullplformat",
+        CaseChange.SENTENCE, true, this));
+      registerControlSequence(new GlsXtrFullFormat("GLSxtrfullplformat",
+        CaseChange.TO_UPPER, true, this));
+
+      registerControlSequence(new GenericCommand(true,
+       "glsxtrinlinefullformat", null, new TeXCsRef("glsxtrfullformat")));
+
+      registerControlSequence(new GenericCommand(true,
+       "Glsxtrinlinefullformat", null, new TeXCsRef("Glsxtrfullformat")));
+
+      registerControlSequence(new GenericCommand(true,
+       "GLSxtrinlinefullformat", null, new TeXCsRef("GLSxtrfullformat")));
+
+      registerControlSequence(new GenericCommand(true,
+       "glsxtrinlinefullplformat", null, new TeXCsRef("glsxtrfullplformat")));
+
+      registerControlSequence(new GenericCommand(true,
+       "Glsxtrinlinefullplformat", null, new TeXCsRef("Glsxtrfullplformat")));
+
+      registerControlSequence(new GenericCommand(true,
+       "GLSxtrinlinefullplformat", null, new TeXCsRef("GLSxtrfullplformat")));
+
+      registerControlSequence(new GenericCommand(true,
+       "glsfirstabbrvfont", null, new TeXCsRef("glsfirstabbrvdefaultfont")));
+
+      registerControlSequence(new GenericCommand(true,
+       "glsfirstlongfont", null, new TeXCsRef("glsfirstlongdefaultfont")));
+
+      registerControlSequence(new GenericCommand(true,
+       "glsfirstlongdefaultfont", null, new TeXCsRef("glslongdefaultfont")));
+
+      registerControlSequence(new GenericCommand(true,
+       "glslongfont", null, new TeXCsRef("glslongdefaultfont")));
+
+      registerControlSequence(new GenericCommand(true,
+       "glsfirstabbrvdefaultfont", null, new TeXCsRef("glsabbrvdefaultfont")));
+
+      registerControlSequence(new GenericCommand(true,
+       "glsabbrvfont", null, new TeXCsRef("glsabbrvdefaultfont")));
+
+      registerControlSequence(new GenericCommand(true,
+       "glsxtrabbrvpluralsuffix", null, new TeXCsRef("glspluralsuffix")));
+
+      registerControlSequence(new GenericCommand(true,
+       "abbrvpluralsuffix", null, new TeXCsRef("glsxtrabbrvpluralsuffix")));
+
+      registerControlSequence(new GlsInnerFmtFont("glsfirstinnerfmtabbrvfont"));
+      registerControlSequence(new GlsInnerFmtFont("glsinnerfmtabbrvfont"));
+      registerControlSequence(new GlsInnerFmtFont("glsfirstinnerfmtlongfont"));
+      registerControlSequence(new GlsInnerFmtFont("glsinnerfmtlongfont"));
+
+      registerControlSequence(new GlsXpFont("glsfirstxpabbrvfont", this));
+      registerControlSequence(new GlsXpFont("glsxpabbrvfont", this));
+      registerControlSequence(new GlsXpFont("glsfirstxplongfont", this));
+      registerControlSequence(new GlsXpFont("glsxplongfont", this));
+
+      registerControlSequence(new AtGobble("glsxtrAccSuppAbbrSetNoLongAttrs"));
+      registerControlSequence(new AtGobble("glsxtrAccSuppAbbrSetFirstLongAttrs"));
+      registerControlSequence(new AtGobble("glsxtrAccSuppAbbrSetTextShortAttrs"));
+      registerControlSequence(new AtGobble("glsxtrAccSuppAbbrSetNameShortAttrs"));
+      registerControlSequence(new AtGobble("glsxtrAccSuppAbbrSetNameLongAttrs"));
+
+      registerControlSequence(new GlsAccessField("glsaccessname", "name", this));
+      registerControlSequence(new GlsAccessField("Glsaccessname", "name", CaseChange.SENTENCE, this));
+      registerControlSequence(new GlsAccessField("GLSaccessname", "name", CaseChange.TO_UPPER, this));
+
+      registerControlSequence(new GlsAccessFmtField("glsaccessfmtname", "name", this));
+      registerControlSequence(new GlsAccessFmtField("Glsaccessfmtname", "name", CaseChange.SENTENCE, this));
+      registerControlSequence(new GlsAccessFmtField("GLSaccessfmtname", "name", CaseChange.TO_UPPER, this));
+
+      registerControlSequence(new GlsAccessField("glsaccesstext", "text", this));
+      registerControlSequence(new GlsAccessField("Glsaccesstext", "text", CaseChange.SENTENCE, this));
+      registerControlSequence(new GlsAccessField("GLSaccesstext", "text", CaseChange.TO_UPPER, this));
+
+      registerControlSequence(new GlsAccessFmtField("glsaccessfmttext", "text", this));
+      registerControlSequence(new GlsAccessFmtField("Glsaccessfmttext", "text", CaseChange.SENTENCE, this));
+      registerControlSequence(new GlsAccessFmtField("GLSaccessfmttext", "text", CaseChange.TO_UPPER, this));
+
+      registerControlSequence(new GlsAccessField("glsaccessplural", "plural", this));
+      registerControlSequence(new GlsAccessField("Glsaccessplural", "plural", CaseChange.SENTENCE, this));
+      registerControlSequence(new GlsAccessField("GLSaccessplural", "plural", CaseChange.TO_UPPER, this));
+
+      registerControlSequence(new GlsAccessFmtField("glsaccessfmtplural", "plural", this));
+      registerControlSequence(new GlsAccessFmtField("Glsaccessfmtplural", "plural", CaseChange.SENTENCE, this));
+      registerControlSequence(new GlsAccessFmtField("GLSaccessfmtplural", "plural", CaseChange.TO_UPPER, this));
+
+      registerControlSequence(new GlsAccessField("glsaccessfirst", "first", this));
+      registerControlSequence(new GlsAccessField("Glsaccessfirst", "first", CaseChange.SENTENCE, this));
+      registerControlSequence(new GlsAccessField("GLSaccessfirst", "first", CaseChange.TO_UPPER, this));
+
+      registerControlSequence(new GlsAccessFmtField("glsaccessfmtfirst", "first", this));
+      registerControlSequence(new GlsAccessFmtField("Glsaccessfmtfirst", "first", CaseChange.SENTENCE, this));
+      registerControlSequence(new GlsAccessFmtField("GLSaccessfmtfirst", "first", CaseChange.TO_UPPER, this));
+
+      registerControlSequence(new GlsAccessField("glsaccessfirstplural", "firstplural", this));
+      registerControlSequence(new GlsAccessField("Glsaccessfirstplural", "firstplural", CaseChange.SENTENCE, this));
+      registerControlSequence(new GlsAccessField("GLSaccessfirstplural", "firstplural", CaseChange.TO_UPPER, this));
+
+      registerControlSequence(new GlsAccessFmtField("glsaccessfmtfirstplural", "firstplural", this));
+      registerControlSequence(new GlsAccessFmtField("Glsaccessfmtfirstplural", "firstplural", CaseChange.SENTENCE, this));
+      registerControlSequence(new GlsAccessFmtField("GLSaccessfmtfirstplural", "firstplural", CaseChange.TO_UPPER, this));
+
+      registerControlSequence(new GlsAccessField("glsaccesssymbol", "symbol", this));
+      registerControlSequence(new GlsAccessField("Glsaccesssymbol", "symbol", CaseChange.SENTENCE, this));
+      registerControlSequence(new GlsAccessField("GLSaccesssymbol", "symbol", CaseChange.TO_UPPER, this));
+
+      registerControlSequence(new GlsAccessFmtField("glsaccessfmtsymbol", "symbol", this));
+      registerControlSequence(new GlsAccessFmtField("Glsaccessfmtsymbol", "symbol", CaseChange.SENTENCE, this));
+      registerControlSequence(new GlsAccessFmtField("GLSaccessfmtsymbol", "symbol", CaseChange.TO_UPPER, this));
+
+      registerControlSequence(new GlsAccessField("glsaccesssymbolplural", "symbolplural", this));
+      registerControlSequence(new GlsAccessField("Glsaccesssymbolplural", "symbolplural", CaseChange.SENTENCE, this));
+      registerControlSequence(new GlsAccessField("GLSaccesssymbolplural", "symbolplural", CaseChange.TO_UPPER, this));
+
+      registerControlSequence(new GlsAccessFmtField("glsaccessfmtsymbolplural", "symbolplural", this));
+      registerControlSequence(new GlsAccessFmtField("Glsaccessfmtsymbolplural", "symbolplural", CaseChange.SENTENCE, this));
+      registerControlSequence(new GlsAccessFmtField("GLSaccessfmtsymbolplural", "symbolplural", CaseChange.TO_UPPER, this));
+
+      registerControlSequence(new GlsAccessField("glsaccessdesc", "description", this));
+      registerControlSequence(new GlsAccessField("Glsaccessdesc", "description", CaseChange.SENTENCE, this));
+      registerControlSequence(new GlsAccessField("GLSaccessdesc", "description", CaseChange.TO_UPPER, this));
+
+      registerControlSequence(new GlsAccessFmtField("glsaccessfmtdesc", "description", this));
+      registerControlSequence(new GlsAccessFmtField("Glsaccessfmtdesc", "description", CaseChange.SENTENCE, this));
+      registerControlSequence(new GlsAccessFmtField("GLSaccessfmtdesc", "description", CaseChange.TO_UPPER, this));
+
+      registerControlSequence(new GlsAccessField("glsaccessdescplural", "descriptionplural", this));
+      registerControlSequence(new GlsAccessField("Glsaccessdescplural", "descriptionplural", CaseChange.SENTENCE, this));
+      registerControlSequence(new GlsAccessField("GLSaccessdescplural", "descriptionplural", CaseChange.TO_UPPER, this));
+
+      registerControlSequence(new GlsAccessFmtField("glsaccessfmtdescplural", "descriptionplural", this));
+      registerControlSequence(new GlsAccessFmtField("Glsaccessfmtdescplural", "descriptionplural", CaseChange.SENTENCE, this));
+      registerControlSequence(new GlsAccessFmtField("GLSaccessfmtdescplural", "descriptionplural", CaseChange.TO_UPPER, this));
+
+      registerControlSequence(new GlsAccessField("glsaccessshort", "short", this));
+      registerControlSequence(new GlsAccessField("Glsaccessshort", "short", CaseChange.SENTENCE, this));
+      registerControlSequence(new GlsAccessField("GLSaccessshort", "short", CaseChange.TO_UPPER, this));
+
+      registerControlSequence(new GlsAccessFmtField("glsaccessfmtshort", "short", this));
+      registerControlSequence(new GlsAccessFmtField("Glsaccessfmtshort", "short", CaseChange.SENTENCE, this));
+      registerControlSequence(new GlsAccessFmtField("GLSaccessfmtshort", "short", CaseChange.TO_UPPER, this));
+
+      registerControlSequence(new GlsAccessField("glsaccessshortpl", "shortplural", this));
+      registerControlSequence(new GlsAccessField("Glsaccessshortpl", "shortplural", CaseChange.SENTENCE, this));
+      registerControlSequence(new GlsAccessField("GLSaccessshortpl", "shortplural", CaseChange.TO_UPPER, this));
+
+      registerControlSequence(new GlsAccessFmtField("glsaccessfmtshortpl", "shortplural", this));
+      registerControlSequence(new GlsAccessFmtField("Glsaccessfmtshortpl", "shortplural", CaseChange.SENTENCE, this));
+      registerControlSequence(new GlsAccessFmtField("GLSaccessfmtshortpl", "shortplural", CaseChange.TO_UPPER, this));
+
+      registerControlSequence(new GlsAccessField("glsaccesslong", "long", this));
+      registerControlSequence(new GlsAccessField("Glsaccesslong", "long", CaseChange.SENTENCE, this));
+      registerControlSequence(new GlsAccessField("GLSaccesslong", "long", CaseChange.TO_UPPER, this));
+
+      registerControlSequence(new GlsAccessFmtField("glsaccessfmtlong", "long", this));
+      registerControlSequence(new GlsAccessFmtField("Glsaccessfmtlong", "long", CaseChange.SENTENCE, this));
+      registerControlSequence(new GlsAccessFmtField("GLSaccessfmtlong", "long", CaseChange.TO_UPPER, this));
+
+      registerControlSequence(new GlsAccessField("glsaccesslongpl", "longplural", this));
+      registerControlSequence(new GlsAccessField("Glsaccesslongpl", "longplural", CaseChange.SENTENCE, this));
+      registerControlSequence(new GlsAccessField("GLSaccesslongpl", "longplural", CaseChange.TO_UPPER, this));
+
+      registerControlSequence(new GlsAccessFmtField("glsaccessfmtlongpl", "longplural", this));
+      registerControlSequence(new GlsAccessFmtField("Glsaccessfmtlongpl", "longplural", CaseChange.SENTENCE, this));
+      registerControlSequence(new GlsAccessFmtField("GLSaccessfmtlongpl", "longplural", CaseChange.TO_UPPER, this));
+
+      registerControlSequence(new GlsAccessField("glsaccessuseri", "user1", this));
+      registerControlSequence(new GlsAccessField("Glsaccessuseri", "user1", CaseChange.SENTENCE, this));
+      registerControlSequence(new GlsAccessField("GLSaccessuseri", "user1", CaseChange.TO_UPPER, this));
+
+      registerControlSequence(new GlsAccessFmtField("glsaccessfmtuseri", "user1", this));
+      registerControlSequence(new GlsAccessFmtField("Glsaccessfmtuseri", "user1", CaseChange.SENTENCE, this));
+      registerControlSequence(new GlsAccessFmtField("GLSaccessfmtuseri", "user1", CaseChange.TO_UPPER, this));
+
+      registerControlSequence(new GlsAccessField("glsaccessuserii", "user2", this));
+      registerControlSequence(new GlsAccessField("Glsaccessuserii", "user2", CaseChange.SENTENCE, this));
+      registerControlSequence(new GlsAccessField("GLSaccessuserii", "user2", CaseChange.TO_UPPER, this));
+
+      registerControlSequence(new GlsAccessFmtField("glsaccessfmtuserii", "user2", this));
+      registerControlSequence(new GlsAccessFmtField("Glsaccessfmtuserii", "user2", CaseChange.SENTENCE, this));
+      registerControlSequence(new GlsAccessFmtField("GLSaccessfmtuserii", "user2", CaseChange.TO_UPPER, this));
+
+      registerControlSequence(new GlsAccessField("glsaccessuseriii", "user3", this));
+      registerControlSequence(new GlsAccessField("Glsaccessuseriii", "user3", CaseChange.SENTENCE, this));
+      registerControlSequence(new GlsAccessField("GLSaccessuseriii", "user3", CaseChange.TO_UPPER, this));
+
+      registerControlSequence(new GlsAccessFmtField("glsaccessfmtuseriii", "user3", this));
+      registerControlSequence(new GlsAccessFmtField("Glsaccessfmtuseriii", "user3", CaseChange.SENTENCE, this));
+      registerControlSequence(new GlsAccessFmtField("GLSaccessfmtuseriii", "user3", CaseChange.TO_UPPER, this));
+
+      registerControlSequence(new GlsAccessField("glsaccessuseriv", "user4", this));
+      registerControlSequence(new GlsAccessField("Glsaccessuseriv", "user4", CaseChange.SENTENCE, this));
+      registerControlSequence(new GlsAccessField("GLSaccessuseriv", "user4", CaseChange.TO_UPPER, this));
+
+      registerControlSequence(new GlsAccessFmtField("glsaccessfmtuseriv", "user4", this));
+      registerControlSequence(new GlsAccessFmtField("Glsaccessfmtuseriv", "user4", CaseChange.SENTENCE, this));
+      registerControlSequence(new GlsAccessFmtField("GLSaccessfmtuseriv", "user4", CaseChange.TO_UPPER, this));
+
+      registerControlSequence(new GlsAccessField("glsaccessuserv", "user5", this));
+      registerControlSequence(new GlsAccessField("Glsaccessuserv", "user5", CaseChange.SENTENCE, this));
+      registerControlSequence(new GlsAccessField("GLSaccessuserv", "user5", CaseChange.TO_UPPER, this));
+
+      registerControlSequence(new GlsAccessFmtField("glsaccessfmtuserv", "user5", this));
+      registerControlSequence(new GlsAccessFmtField("Glsaccessfmtuserv", "user5", CaseChange.SENTENCE, this));
+      registerControlSequence(new GlsAccessFmtField("GLSaccessfmtuserv", "user5", CaseChange.TO_UPPER, this));
+
+      registerControlSequence(new GlsAccessField("glsaccessuservi", "user6", this));
+      registerControlSequence(new GlsAccessField("Glsaccessuservi", "user6", CaseChange.SENTENCE, this));
+      registerControlSequence(new GlsAccessField("GLSaccessuservi", "user6", CaseChange.TO_UPPER, this));
+
+      registerControlSequence(new GlsAccessFmtField("glsaccessfmtuservi", "user6", this));
+      registerControlSequence(new GlsAccessFmtField("Glsaccessfmtuservi", "user6", CaseChange.SENTENCE, this));
+      registerControlSequence(new GlsAccessFmtField("GLSaccessfmtuservi", "user6", CaseChange.TO_UPPER, this));
 
       listener.newtoks(true, "glsshortpltok");
       listener.newtoks(true, "glslongpltok");
@@ -533,21 +780,10 @@ public class GlossariesSty extends LaTeXSty
          createAcronyms = false;
       }
 
-      if (isExtra())
-      {
-         substack.add(new TeXCsRef("setabbreviationstyle"));
-         substack.add(getListener().createGroup("long-short"));
-      }
-      else
-      {
-         substack.add(new TeXCsRef("setacronymstyle"));
-         substack.add(getListener().createGroup("long-short"));
-      }
-
       getListener().putControlSequence(true, 
         new GlossarySection(section, isNumberedSection, isAutoLabel));
 
-      boolean loadStyles = (loadList || loadTree);
+      boolean loadStyles = (loadList || loadTree || extra);
 
       byte orgAction = listener.getUndefinedAction();
       int orgCatCode = getParser().getCatCode('@');
@@ -578,6 +814,21 @@ public class GlossariesSty extends LaTeXSty
          loadTree = false;
       }
 
+      boolean abbrStylesLoaded = false;
+
+      if (extra)
+      {
+         TeXPath texPath = new TeXPath(getParser(), "glossaries-extra-abbrstyles.def");
+
+         if (texPath.exists())
+         {
+            substack.add(listener.getControlSequence("input"));
+            substack.add(new TeXPathObject(texPath));
+
+            abbrStylesLoaded = true;
+         }
+      }
+
       if (loadStyles)
       {
          if (orgCatCode != TeXParser.TYPE_LETTER)
@@ -593,7 +844,16 @@ public class GlossariesSty extends LaTeXSty
 
       if (extra)
       {
-         extraPostOptions(stack);
+         if (abbrStylesLoaded)
+         {
+            substack.add(new TeXCsRef("setabbreviationstyle"));
+            substack.add(getListener().createGroup("long-short"));
+         }
+      }
+      else
+      {
+         substack.add(new TeXCsRef("setacronymstyle"));
+         substack.add(getListener().createGroup("long-short"));
       }
 
       if (initialStyle != null)
@@ -602,10 +862,6 @@ public class GlossariesSty extends LaTeXSty
       }
 
       stack.push(substack, true);
-   }
-
-   protected void extraPostOptions(TeXObjectList stack) throws IOException
-   {
    }
 
    @Override
@@ -632,6 +888,10 @@ public class GlossariesSty extends LaTeXSty
       else if (option.equals("abbreviations"))
       {
          createAbbreviations = true;
+      }
+      else if (option.equals("accsupp"))
+      {
+         accsupp = true;
       }
       else if (option.equals("nolist"))
       {
@@ -759,6 +1019,11 @@ public class GlossariesSty extends LaTeXSty
       }
    }
 
+   public boolean isAccSupp()
+   {
+      return accsupp;
+   }
+
    public boolean isExtra()
    {
       return extra;
@@ -788,8 +1053,6 @@ public class GlossariesSty extends LaTeXSty
          processOptions(extraOptions);
          addOptions(extraOptions);
       }
-
-      extraPostOptions(stack);
    }
 
    public void setup(KeyValList options, TeXObjectList stack) throws IOException
@@ -1143,6 +1406,26 @@ public class GlossariesSty extends LaTeXSty
       return val == null ? internalFieldName : val;
    }
 
+   public String getInternalFieldName(String fieldName)
+   {
+      if (fieldMap == null)
+      {
+         return fieldName;
+      }
+
+      for (Iterator<String> it=fieldMap.keySet().iterator(); it.hasNext(); )
+      {
+         String key = it.next();
+
+         if (fieldName.equals(fieldMap.get(key)))
+         {
+            return key;
+         }
+      }
+
+      return fieldName;
+   }
+
    public boolean isKnownField(String field)
    {
       return knownFields.contains(field);
@@ -1492,6 +1775,42 @@ public class GlossariesSty extends LaTeXSty
       return abbreviationTypes;
    }
 
+   public void addInnerFmtExclusion(String label, String field)
+   {
+      Vector<String> list = null;
+
+      if (innerFmtExclusions == null)
+      {
+         innerFmtExclusions = new HashMap<String,Vector<String>>();
+      }
+      else
+      {
+         list = innerFmtExclusions.get(label);
+      }
+
+      if (list == null)
+      {
+         list = new Vector<String>();
+         list.add(field);
+
+         innerFmtExclusions.put(label, list);
+      }
+      else if (!list.contains(field))
+      {
+         list.add(field);
+      }
+   }
+
+   public boolean isApplyInnerFmt(String label, String field)
+   {
+      if (innerFmtExclusions == null) return true;
+
+      Vector<String> list = innerFmtExclusions.get(label);
+
+      return list == null || !list.contains(field);
+   }
+
+
    private HashMap<String,GlossaryEntry> entries;
 
    private HashMap<String,Glossary> glossaries;
@@ -1521,6 +1840,8 @@ public class GlossariesSty extends LaTeXSty
 
    private HashMap<CharObject,KeyValList> modifierOptions;
 
+   private HashMap<String,Vector<String>> innerFmtExclusions;
+
    private Vector<String> nohyperlist;
 
    private String section = "section";
@@ -1534,6 +1855,7 @@ public class GlossariesSty extends LaTeXSty
    private boolean loadTree = true;
    private boolean loadLong = true;
    private boolean loadSuper = true;
+   private boolean accsupp = false;
 
    private boolean nostyleWarningIssued = false;
 

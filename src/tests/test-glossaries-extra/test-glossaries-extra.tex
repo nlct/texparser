@@ -1,0 +1,54 @@
+% arara: pdflatex
+% arara: pdflatex
+\documentclass{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[colorlinks]{hyperref}
+\usepackage[toc,style=index]{glossaries-extra}
+
+\newglossaryentry{sample}{name={sample},description={an example},
+  symbol={\ensuremath{\pi}}}
+\newglossaryentry{child}{parent={sample},
+ name={child sample},description={an example sub entry}}
+
+\newabbreviation{html}{HTML}{hypertext markup language}
+
+\begin{document}
+\tableofcontents
+
+\section{Sample}
+\label{sec:sample}
+Name value: \glsentryname{sample}.
+Text value: \glsentrytext{sample}.
+Description value: \glsentrydesc{sample}.
+Symbol value: \glsentrysymbol{sample}.
+
+\hypertarget{sampleanchor}{Sample anchor}.
+
+Sentence case: \Glsentryname{sample}.
+
+Is used? \ifglsused{sample}{true}{false}.
+A \gls{sample}.
+Is used? \ifglsused{sample}{true}{false}.
+Next use: \gls{sample}.
+
+\Gls{child}.
+
+Symbol: \glssymbol{sample}.
+
+Abbreviation. 
+Is used? \ifglsused{html}{true}{false}.
+\gls{html}.
+Is used? \ifglsused{html}{true}{false}.
+Next use: \gls{html}.
+
+\section{Another}
+\label{sec:another}
+
+Reference section~\ref{sec:sample} (\ref*{sec:sample}).
+
+\hyperlink{sampleanchor}{Sample hyperlink}.
+
+\printunsrtglossaries
+
+\end{document}

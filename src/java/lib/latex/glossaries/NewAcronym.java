@@ -376,6 +376,12 @@ public class NewAcronym extends NewGlossaryEntry
 
       if (sty.isExtra())
       {
+         sty.addInnerFmtExclusion(label, "first");
+         sty.addInnerFmtExclusion(label, "firstplural");
+         sty.addInnerFmtExclusion(label, "text");
+         sty.addInnerFmtExclusion(label, "plural");
+         sty.addInnerFmtExclusion(label, "name");
+
          ControlSequence hookCs = parser.getListener().getControlSequence(
            "GlsXtrPostNewAbbreviation");
 
