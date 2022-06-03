@@ -29,6 +29,19 @@ public class NewCommand extends Command
       this("newcommand", Overwrite.FORBID);
    }
 
+   public NewCommand(String name, byte overwriteNum)
+   {
+      super(name);
+
+      switch ((int)overwriteNum)
+      {
+         case 0: overwrite = Overwrite.FORBID; break;
+         case 1: overwrite = Overwrite.FORCE; break;
+         case 2: overwrite = Overwrite.SKIP; break;
+         case 3: overwrite = Overwrite.ALLOW; break;
+      }
+   }
+
    public NewCommand(String name, Overwrite overwrite)
    {
       super(name);
