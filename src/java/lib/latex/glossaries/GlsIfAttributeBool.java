@@ -42,24 +42,35 @@ public class GlsIfAttributeBool extends GlsIfAttribute
       return new GlsIfAttributeBool(getName(), getAttribute(), attrValue, getSty());
    }
 
-   protected TeXObject expand(GlsLabel glslabel, String attributeLabel,
+   @Override
+   protected TeXObject expand(String catLabel, String attributeLabel,
      TeXParser parser, TeXObjectList stack)
    throws IOException
    {
       TeXObject trueCode = popArg(parser, stack);
       TeXObject falseCode = popArg(parser, stack);
 
-      if (attrValue && sty.isAttributeTrue(glslabel, attributeLabel))
-      {
-         return trueCode;
-      }
-      else if (!attrValue && sty.isAttributeFalse(glslabel, attributeLabel))
-      {
-         return trueCode;
+      if (attrValue)
+      {// if attribute true return true code
+         if (sty.isAttributeTrue(catLabel, attributeLabel))
+         {
+            return trueCode;
+         }
+         else
+         {
+            return falseCode;
+         }
       }
       else
-      {
-         return falseCode;
+      {// if attribute false return true code
+         if (sty.isAttributeFalse(catLabel, attributeLabel))
+         {
+            return trueCode;
+         }
+         else
+         {
+            return falseCode;
+         }
       }
    }
 

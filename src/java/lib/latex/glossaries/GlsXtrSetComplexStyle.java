@@ -82,10 +82,10 @@ public class GlsXtrSetComplexStyle extends AbstractGlsCommand
    {
       String label = popLabelString(parser, stack);
 
-      String style = popLabelString(parser, stack);
+      String id = popLabelString(parser, stack);
 
       parser.putControlSequence(true, 
-        new TextualContentCommand("@glsxtr@has@complexstyle@"+label, style));
+        new TextualContentCommand("@glsxtr@has@complexstyle@"+label, id));
    }
 
    @Override

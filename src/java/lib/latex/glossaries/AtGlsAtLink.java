@@ -116,9 +116,30 @@ public class AtGlsAtLink extends AbstractGlsCommand
       grp.add(new TeXCsRef("glolinkprefix"));
       grp.add(new TeXCsRef("glslabel"));
 
+      String csname = null;
+
+      if (sty.isExtra())
+      {
+         TeXObject val = options.get("textformat");
+
+         if (val == null)
+         {
+            csname = sty.getAttribute(glslabel, "textformat");
+         }
+         else
+         {
+            csname = parser.expandToString(val, stack).trim();
+         }
+      }
+
+      if (csname == null || csname.isEmpty())
+      {
+         csname = "glstextformat";
+      }
+
       grp = listener.createGroup();
       list.add(grp);
-      grp.add(new TeXCsRef("glstextformat"));
+      grp.add(new TeXCsRef(csname));
 
       Group subgrp = listener.createGroup();
       grp.add(subgrp);

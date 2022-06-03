@@ -19,27 +19,27 @@
 package com.dickimawbooks.texparserlib.latex.glossaries;
 
 import java.io.IOException;
-import java.util.Vector;
 
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.*;
 
-public class GlsSetAbbrvFmt extends AbstractGlsCommand
+public class GlsSetAttribute extends AbstractGlsCommand
 {
-   public GlsSetAbbrvFmt(GlossariesSty sty)
+   public GlsSetAttribute(GlossariesSty sty)
    {
-      this("glssetabbrvfmt", sty);
+      this("glssetattribute", false, sty);
    }
 
-   public GlsSetAbbrvFmt(String name, GlossariesSty sty)
+   public GlsSetAttribute(String name, boolean argIsCatLabel, GlossariesSty sty)
    {
       super(name, sty);
+      this.argIsCatLabel = argIsCatLabel;
    }
 
    @Override
    public Object clone()
    {
-      return new GlsSetAbbrvFmt(getName(), getSty());
+      return new GlsSetAttribute(getName(), argIsCatLabel, getSty());
    }
 
    @Override
@@ -78,17 +78,53 @@ public class GlsSetAbbrvFmt extends AbstractGlsCommand
 
    @Override
    public void process(TeXParser parser, TeXObjectList stack)
-     throws IOException
+    throws IOException
    {
-      String catLabel = popLabelString(parser, stack);
+      String catLabel = null;
 
-      setCurrentAbbreviationStyleFmts(catLabel, parser, stack);
+      if (argIsCatLabel)
+      {
+         catLabel = popLabelString(parser, stack);
+      }
+      else
+      {
+         GlsLabel glslabel = popEntryLabel(parser, stack);
+
+         GlossaryEntry entry = glslabel.getEntry();
+
+         if (entry != null)
+         {
+            catLabel = entry.getCategory();
+         }
+      }
+
+      String attributeName = popLabelString(parser, stack);
+      String attributeValue = popLabelString(parser, stack);
+
+      if (catLabel == null)
+      {
+         return;
+      }
+
+      String[] categories = catLabel.split(" *, *");
+
+      String[] names = attributeName.split(" *, *");
+
+      for (String cat : categories)
+      {
+         for (String attr : names)
+         {
+            sty.setAttribute(cat, attr, attributeValue);
+         }
+      }
    }
 
    @Override
    public void process(TeXParser parser)
-     throws IOException
+    throws IOException
    {
       process(parser, parser);
    }
+
+   protected boolean argIsCatLabel = false;
 }

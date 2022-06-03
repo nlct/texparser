@@ -2809,10 +2809,29 @@ public class TeXParser extends TeXObjectList
 
       if (cs != null)
       {
+         if (getDebugLevel() > 0)
+         {
+            logMessage("Fetched LOCAL control sequence: "+cs);
+         }
+
          return cs;
       }
 
-      return csTable.get(name);
+      cs = csTable.get(name);
+
+      if (getDebugLevel() > 0)
+      {
+         if (cs == null)
+         {
+            logMessage("No control sequence found for: "+name);
+         }
+         else
+         {
+            logMessage("Fetched GLOBAL control sequence: "+cs);
+         }
+      }
+
+      return cs;
    }
 
    public ControlSequence removeControlSequence(boolean isLocal, String name)

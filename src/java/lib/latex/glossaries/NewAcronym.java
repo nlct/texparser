@@ -87,7 +87,7 @@ public class NewAcronym extends NewGlossaryEntry
 
          if (catVal == null)
          {
-            keyValList.put("category", parser.getListener().createString("acronym"));
+            keyValList.put("category", parser.getListener().createString(catLabel));
          }
          else
          {
@@ -112,26 +112,7 @@ public class NewAcronym extends NewGlossaryEntry
 
       if (sty.isExtra())
       {
-         ControlSequence styleCs = parser.getControlSequence(
-           "@glsabbrv@current@"+catLabel);
-
-         if (styleCs == null)
-         {
-            styleCs = parser.getControlSequence(
-             "@glsabbrv@current@abbreviation");
-         }
-
-         if (styleCs != null)
-         {
-            if (stack == parser || stack == null)
-            {
-               styleCs.process(parser);
-            }
-            else
-            {
-               styleCs.process(parser, stack);
-            }
-         }
+         setCurrentAbbreviationStyle(catLabel, parser, stack);
       }
 
       if (sty.isExtra())
@@ -350,7 +331,6 @@ public class NewAcronym extends NewGlossaryEntry
    {
       process(parser, parser);
    }
-
 
    protected boolean isAbbrv;
 }

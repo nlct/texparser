@@ -449,6 +449,16 @@ public class GlossariesSty extends LaTeXSty
       registerControlSequence(new GlsIfAttributeBool("glsifnotregular",
        "regular", false, this));
 
+      registerControlSequence(new GlsIfAttribute(this));
+      registerControlSequence(new GlsIfAttribute("glsifcategoryattribute", true, this));
+      registerControlSequence(new GlsHasAttribute(this));
+      registerControlSequence(new GlsHasAttribute("glshascategoryattribute", true, this));
+      registerControlSequence(new GlsSetAttribute(this));
+      registerControlSequence(new GlsSetAttribute("glssetcategoryattribute", true, this));
+      registerControlSequence(new GlsSetAttribute("glssetcategoryattributes", true, this));
+      registerControlSequence(new GlsSetAttribute("glssetcategoriesattribute", true, this));
+      registerControlSequence(new GlsSetAttribute("glssetcategoriesattributes", true, this));
+
       registerControlSequence(new GlsXtrPostDescription(this));
       registerControlSequence(new PrintUnsrtGlossaries(this));
       registerControlSequence(new PrintUnsrtGlossary(this));
@@ -459,6 +469,7 @@ public class GlossariesSty extends LaTeXSty
       registerControlSequence(new NewAbbreviationStyle("renewabbreviationstyle",
          Overwrite.FORCE, this));
       registerControlSequence(new LetAbbreviationStyle(this));
+      registerControlSequence(new LetAbbreviationStyle("@glsxtr@deprecated@abbrstyle", this));
       registerControlSequence(new GlsXtrUseAbbrStyleSetup(this));
       registerControlSequence(new GlsXtrUseAbbrStyleFmts(this));
       registerControlSequence(new SetAbbreviationStyle(this));
@@ -1624,7 +1635,7 @@ public class GlossariesSty extends LaTeXSty
 
       if (category == null) return null;
 
-      return getAttribute(category.getLabel(), attrName);
+      return getAttribute(category, attrName);
    }
 
    public String getAttribute(GlsLabel glslabel, String attrName)
@@ -1633,7 +1644,7 @@ public class GlossariesSty extends LaTeXSty
 
       if (category == null) return null;
 
-      return getAttribute(category.getLabel(), attrName);
+      return getAttribute(category, attrName);
    }
 
    public String getAttribute(String categoryLabel, String attrName)
@@ -1643,6 +1654,43 @@ public class GlossariesSty extends LaTeXSty
       if (category == null) return null;
 
       return category.getAttribute(attrName);
+   }
+
+   public String getAttribute(Category category, String attrName)
+   {
+      return category.getAttribute(attrName);
+   }
+
+   public boolean hasAttribute(GlossaryEntry entry, String attrName)
+   {
+      Category category = getCategory(entry);
+
+      if (category == null) return false;
+
+      return hasAttribute(category, attrName);
+   }
+
+   public boolean hasAttribute(GlsLabel glslabel, String attrName)
+   {
+      Category category = getCategory(glslabel);
+
+      if (category == null) return false;
+
+      return hasAttribute(category, attrName);
+   }
+
+   public boolean hasAttribute(String categoryLabel, String attrName)
+   {
+      Category category = getCategory(categoryLabel);
+
+      if (category == null) return false;
+
+      return category.getAttribute(attrName) != null;
+   }
+
+   public boolean hasAttribute(Category category, String attrName)
+   {
+      return category.getAttribute(attrName) != null;
    }
 
    public void setAttribute(String categoryLabel, String attrName, String attrVal)

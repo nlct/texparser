@@ -243,4 +243,25 @@ public class GlsXtrGenAbbrvFmt extends AbstractGlsCommand
 
       return list;
    }
+
+   @Override
+   public TeXObjectList expandonce(TeXParser parser)
+     throws IOException
+   {
+      return expandonce(parser, parser);
+   }
+
+   @Override
+   public TeXObjectList expandfully(TeXParser parser, TeXObjectList stack)
+     throws IOException
+   {
+      return expandonce(parser, stack);
+   }
+
+   @Override
+   public TeXObjectList expandfully(TeXParser parser)
+     throws IOException
+   {
+      return expandonce(parser);
+   }
 }

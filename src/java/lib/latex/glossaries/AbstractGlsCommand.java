@@ -112,6 +112,93 @@ public abstract class AbstractGlsCommand extends Command
       return new GlsType("@@glstype", label, glossary);
    }
 
+   /**
+    * Sets the style currently associated with the given category.
+    * @param catLabel the category label
+    * @param parser the parser
+    * @param stack the current stack or the parser if no local stack
+    */ 
+   protected void setCurrentAbbreviationStyle(String catLabel, TeXParser parser, TeXObjectList stack)
+    throws IOException
+   {
+      ControlSequence cs = parser.getControlSequence(
+        "@glsabbrv@current@"+catLabel);
+
+      if (cs == null)
+      {
+         cs = parser.getControlSequence(
+          "@glsabbrv@current@abbreviation");
+      }
+
+      if (cs != null)
+      {
+         String styleName = parser.expandToString(cs, stack);
+
+         cs = parser.getControlSequence(
+           "@glsabbrv@dispstyle@setup@"+styleName);
+
+         if (cs != null)
+         {
+            if (stack == parser || stack == null)
+            {
+               cs.process(parser);
+            }
+            else
+            {
+               cs.process(parser, stack);
+            }
+         }
+         
+         cs = parser.getControlSequence(
+           "@glsabbrv@dispstyle@fmts@"+styleName);
+
+         if (cs != null)
+         {
+            if (stack == parser || stack == null)
+            {
+               cs.process(parser);
+            }
+            else
+            {
+               cs.process(parser, stack);
+            }
+         }
+      }
+   }
+
+   protected void setCurrentAbbreviationStyleFmts(String catLabel, TeXParser parser, TeXObjectList stack)
+    throws IOException
+   {
+      ControlSequence cs = parser.getControlSequence(
+        "@glsabbrv@current@"+catLabel);
+
+      if (cs == null)
+      {
+         cs = parser.getControlSequence(
+          "@glsabbrv@current@abbreviation");
+      }
+
+      if (cs != null)
+      {
+         String styleName = parser.expandToString(cs, stack);
+
+         cs = parser.getControlSequence(
+           "@glsabbrv@dispstyle@fmts@"+styleName);
+
+         if (cs != null)
+         {
+            if (stack == parser || stack == null)
+            {
+               cs.process(parser);
+            }
+            else
+            {
+               cs.process(parser, stack);
+            }
+         }
+      }
+   }
+
    public GlossariesSty getSty()
    {
       return sty;

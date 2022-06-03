@@ -23,29 +23,29 @@ import java.io.IOException;
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.*;
 
-public class GlsIfAttribute extends AbstractGlsCommand
+public class GlsHasAttribute extends AbstractGlsCommand
 {
-   public GlsIfAttribute(GlossariesSty sty)
+   public GlsHasAttribute(GlossariesSty sty)
    {
-      this("glsifattribute", sty);
+      this("glshasattribute", sty);
    }
 
-   public GlsIfAttribute(String name, GlossariesSty sty)
+   public GlsHasAttribute(String name, GlossariesSty sty)
    {
       this(name, null, false, sty);
    }
 
-   public GlsIfAttribute(String name, String attribute, GlossariesSty sty)
+   public GlsHasAttribute(String name, String attribute, GlossariesSty sty)
    {
       this(name, attribute, false, sty);
    }
 
-   public GlsIfAttribute(String name, boolean argIsCatLabel, GlossariesSty sty)
+   public GlsHasAttribute(String name, boolean argIsCatLabel, GlossariesSty sty)
    {
       this(name, null, argIsCatLabel, sty);
    }
 
-   public GlsIfAttribute(String name, String attribute, 
+   public GlsHasAttribute(String name, String attribute, 
       boolean argIsCatLabel, GlossariesSty sty)
    {
       super(name, sty);
@@ -56,18 +56,17 @@ public class GlsIfAttribute extends AbstractGlsCommand
    @Override
    public Object clone()
    {
-      return new GlsIfAttribute(getName(), getAttribute(), argIsCatLabel, getSty());
+      return new GlsHasAttribute(getName(), getAttribute(), argIsCatLabel, getSty());
    }
 
    protected TeXObject expand(String catLabel, String attributeLabel,
      TeXParser parser, TeXObjectList stack)
    throws IOException
    {
-      String attrValue = popLabelString(parser, stack);
       TeXObject trueCode = popArg(parser, stack);
       TeXObject falseCode = popArg(parser, stack);
 
-      if (catLabel != null && sty.isAttributeValue(catLabel, attributeLabel, attrValue))
+      if (catLabel != null && sty.hasAttribute(catLabel, attributeLabel))
       {
          return trueCode;
       }
