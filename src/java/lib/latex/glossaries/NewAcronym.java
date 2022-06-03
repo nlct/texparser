@@ -269,31 +269,14 @@ public class NewAcronym extends NewGlossaryEntry
          TeXObject fieldList = parser.getListener().getControlSequence(
            "CustomAbbreviationFields");
 
-         if (fieldList.canExpand() && fieldList instanceof Expandable)
-         {
-            TeXObjectList expanded;
-
-            if (parser == stack || stack == null)
-            {
-               expanded = ((Expandable)fieldList).expandonce(parser);
-            }
-            else
-            {
-               expanded = ((Expandable)fieldList).expandonce(parser, stack);
-            }
-
-            if (expanded != null)
-            {
-               fieldList = expanded;
-            }
-         }
-
          if (fieldList instanceof KeyValList)
          {
             extraFields = (KeyValList)fieldList;
          }
          else
          {
+            fieldList = TeXParserUtils.expandFully(fieldList, parser, stack);
+
             extraFields = KeyValList.getList(parser, fieldList);
          }
 
@@ -302,31 +285,14 @@ public class NewAcronym extends NewGlossaryEntry
          fieldList = parser.getListener().getControlSequence(
            "ExtraCustomAbbreviationFields");
 
-         if (fieldList.canExpand() && fieldList instanceof Expandable)
-         {
-            TeXObjectList expanded;
-
-            if (parser == stack || stack == null)
-            {
-               expanded = ((Expandable)fieldList).expandonce(parser);
-            }
-            else
-            {
-               expanded = ((Expandable)fieldList).expandonce(parser, stack);
-            }
-
-            if (expanded != null)
-            {
-               fieldList = expanded;
-            }
-         }
-
          if (fieldList instanceof KeyValList)
          {
             extraFields = (KeyValList)fieldList;
          }
          else
          {
+            fieldList = TeXParserUtils.expandFully(fieldList, parser, stack);
+
             extraFields = KeyValList.getList(parser, fieldList);
          }
 
@@ -337,31 +303,14 @@ public class NewAcronym extends NewGlossaryEntry
          TeXObject fieldList = parser.getListener().getControlSequence(
            "GenericAcronymFields");
 
-         if (fieldList.canExpand() && fieldList instanceof Expandable)
-         {
-            TeXObjectList expanded;
-
-            if (parser == stack || stack == null)
-            {
-               expanded = ((Expandable)fieldList).expandonce(parser);
-            }
-            else
-            {
-               expanded = ((Expandable)fieldList).expandonce(parser, stack);
-            }
-
-            if (expanded != null)
-            {
-               fieldList = expanded;
-            }
-         }
-
          if (fieldList instanceof KeyValList)
          {
             extraFields = (KeyValList)fieldList;
          }
          else
          {
+            fieldList = TeXParserUtils.expandFully(fieldList, parser, stack);
+
             extraFields = KeyValList.getList(parser, fieldList);
          }
 

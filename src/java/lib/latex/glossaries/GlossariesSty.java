@@ -440,8 +440,18 @@ public class GlossariesSty extends LaTeXSty
       registerControlSequence(new GlsXtrResourceFile());
       registerControlSequence(new GlsXtrLoadResources());
 
+      registerControlSequence(new GlsSetAbbrvFmt(this));
+      registerControlSequence(new GlsXtrGenAbbrvFmt(this));
+
+      registerControlSequence(new GlsEntryField("glscategory", "category", this));
+      registerControlSequence(new GlsIfAttributeBool("glsifregular",
+       "regular", true, this));
+      registerControlSequence(new GlsIfAttributeBool("glsifnotregular",
+       "regular", false, this));
+
       registerControlSequence(new GlsXtrPostDescription(this));
       registerControlSequence(new PrintUnsrtGlossaries(this));
+      registerControlSequence(new PrintUnsrtGlossary(this));
 
       registerControlSequence(new NewAcronym("newabbreviation", this));
 
@@ -481,6 +491,9 @@ public class GlossariesSty extends LaTeXSty
       registerControlSequence(new GenericCommand("newabbreviationhook"));
       registerControlSequence(new GenericCommand("GlsXtrPostNewAbbreviation"));
       registerControlSequence(new GenericCommand("CustomAbbreviationFields"));
+
+      registerControlSequence(new AtFirstOfOne("glsxtrabbreviationfont"));
+      registerControlSequence(new AtFirstOfOne("glsxtrregularfont"));
 
       registerControlSequence(new AtFirstOfOne("glsxtrgenentrytextfmt"));
       registerControlSequence(new AtFirstOfOne("glsabbrvdefaultfont"));
@@ -522,6 +535,30 @@ public class GlossariesSty extends LaTeXSty
 
       registerControlSequence(new GenericCommand(true,
        "GLSxtrinlinefullplformat", null, new TeXCsRef("GLSxtrfullplformat")));
+
+      registerControlSequence(new GlsXtrSubSequentFmt(this));
+      registerControlSequence(new GlsXtrSubSequentFmt("Glsxtrsubsequentfmt",
+        CaseChange.SENTENCE, this));
+      registerControlSequence(new GlsXtrSubSequentFmt("GLSxtrsubsequentfmt",
+        CaseChange.TO_UPPER, this));
+      registerControlSequence(new GlsXtrSubSequentFmt("glsxtrsubsequentplfmt",
+        true, this));
+      registerControlSequence(new GlsXtrSubSequentFmt("Glsxtrsubsequentplfmt",
+        CaseChange.SENTENCE, true, this));
+      registerControlSequence(new GlsXtrSubSequentFmt("GLSxtrsubsequentplfmt",
+        CaseChange.TO_UPPER, true, this));
+
+      registerControlSequence(new GlsXtrSubSequentFmt("glsxtrdefaultsubsequentfmt", this));
+      registerControlSequence(new GlsXtrSubSequentFmt("Glsxtrdefaultsubsequentfmt",
+        CaseChange.SENTENCE, this));
+      registerControlSequence(new GlsXtrSubSequentFmt("GLSxtrdefaultsubsequentfmt",
+        CaseChange.TO_UPPER, this));
+      registerControlSequence(new GlsXtrSubSequentFmt("glsxtrdefaultsubsequentplfmt",
+        true, this));
+      registerControlSequence(new GlsXtrSubSequentFmt("Glsxtrdefaultsubsequentplfmt",
+        CaseChange.SENTENCE, true, this));
+      registerControlSequence(new GlsXtrSubSequentFmt("GLSxtrdefaultsubsequentplfmt",
+        CaseChange.TO_UPPER, true, this));
 
       registerControlSequence(new GenericCommand(true,
        "glsfirstabbrvfont", null, new TeXCsRef("glsfirstabbrvdefaultfont")));
@@ -814,18 +851,22 @@ public class GlossariesSty extends LaTeXSty
          loadTree = false;
       }
 
-      boolean abbrStylesLoaded = false;
-
       if (extra)
       {
-         TeXPath texPath = new TeXPath(getParser(), "glossaries-extra-abbrstyles.def");
+         String defFileName = "glossaries-extra-abbrstyles.def";
+         TeXPath texPath = new TeXPath(getParser(), defFileName);
 
          if (texPath.exists())
          {
             substack.add(listener.getControlSequence("input"));
             substack.add(new TeXPathObject(texPath));
+         }
+         else
+         {
+            TeXApp texApp = listener.getTeXApp();
 
-            abbrStylesLoaded = true;
+            texApp.warning(getParser(), 
+              texApp.getMessage(ABBREVIATION_STYLE_FILE_NOT_FOUND, defFileName));
          }
       }
 
@@ -842,15 +883,7 @@ public class GlossariesSty extends LaTeXSty
          substack.add(new TeXParserSetUndefAction(orgAction));
       }
 
-      if (extra)
-      {
-         if (abbrStylesLoaded)
-         {
-            substack.add(new TeXCsRef("setabbreviationstyle"));
-            substack.add(getListener().createGroup("long-short"));
-         }
-      }
-      else
+      if (!extra)
       {
          substack.add(new TeXCsRef("setacronymstyle"));
          substack.add(getListener().createGroup("long-short"));
@@ -1879,4 +1912,6 @@ public class GlossariesSty extends LaTeXSty
     = "glossaries.abbreviation.style.defined";
    public static final String ABBREVIATION_STYLE_NOT_DEFINED 
     = "glossaries.abbreviation.style.not.defined";
+   public static final String ABBREVIATION_STYLE_FILE_NOT_FOUND 
+    = "glossaries.abbreviation.style.file.not.found";
 }

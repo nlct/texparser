@@ -203,6 +203,7 @@ There is NO WARRANTY, to the extent permitted by law.</entry>
 <entry key="glossaries.acronym.style.not.defined">Acronym style ''{0}'' not defined</entry>
 <entry key="glossaries.abbreviation.style.defined">Abbreviation style ''{0}'' already defined</entry>
 <entry key="glossaries.abbreviation.style.not.defined">Abbreviation style ''{0}'' not defined</entry>
+<entry key="glossaries.abbreviation.style.file.not.found">Abbreviation style file ''{0}'' not found (provided with glossaries-extra.sty v1.49+). Abbreviation styles won''t be defined.</entry>
 
 <!--  Image drawing messages -->
 

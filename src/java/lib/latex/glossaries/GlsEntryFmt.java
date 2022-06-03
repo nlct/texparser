@@ -44,28 +44,59 @@ public class GlsEntryFmt extends AbstractGlsCommand
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      TeXObjectList list = parser.getListener().createStack();
+      TeXParserListener listener = parser.getListener();
 
-      list.add(new TeXCsRef("glsgenentryfmt"));
+      TeXObjectList list = listener.createStack();
+
+      if (sty.isExtra())
+      {
+         list.add(new TeXCsRef("ifglshasshort"));
+         list.add(new TeXCsRef("glslabel"));
+
+         Group grp = listener.createGroup();
+         list.add(grp);
+
+         grp.add(new TeXCsRef("glssetabbrvfmt"));
+         Group subgrp = listener.createGroup();
+         grp.add(subgrp);
+
+         subgrp.add(new TeXCsRef("glscategory"));
+         subgrp.add(new TeXCsRef("glslabel"));
+
+         list.add(listener.createGroup());
+
+         list.add(new TeXCsRef("glsifregular"));
+         list.add(new TeXCsRef("glslabel"));
+
+         grp = listener.createGroup();
+         list.add(grp);
+
+         grp.add(new TeXCsRef("glsxtrregularfont"));
+         grp.add(new TeXCsRef("glsgenentryfmt"));
+
+         grp = listener.createGroup();
+         list.add(grp);
+
+         grp.add(new TeXCsRef("ifglshasshort"));
+         grp.add(new TeXCsRef("glslabel"));
+
+         subgrp = listener.createGroup();
+         grp.add(subgrp);
+
+         subgrp.add(new TeXCsRef("glsxtrabbreviationfont"));
+         subgrp.add(new TeXCsRef("glsxtrgenabbrvfmt"));
+
+         subgrp = listener.createGroup();
+         grp.add(subgrp);
+
+         subgrp.add(new TeXCsRef("glsxtrregularfont"));
+         subgrp.add(new TeXCsRef("glsgenentryfmt"));
+      }
+      else
+      {
+         list.add(new TeXCsRef("glsgenentryfmt"));
+      }
 
       return list;
-   }
-
-   @Override
-   public void process(TeXParser parser, TeXObjectList stack)
-     throws IOException
-   {
-      ControlSequence cs = parser.getListener().getControlSequence("glsgenentryfmt");
-
-      cs.process(parser, stack);
-   }
-
-   @Override
-   public void process(TeXParser parser)
-     throws IOException
-   {
-      ControlSequence cs = parser.getListener().getControlSequence("glsgenentryfmt");
-
-      cs.process(parser);
    }
 }

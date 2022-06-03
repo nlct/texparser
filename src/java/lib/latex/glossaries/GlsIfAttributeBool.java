@@ -19,50 +19,49 @@
 package com.dickimawbooks.texparserlib.latex.glossaries;
 
 import java.io.IOException;
-import java.util.Vector;
 
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.*;
 
-public class GlsXtrFullSep extends Command
+public class GlsIfAttributeBool extends GlsIfAttribute
 {
-   public GlsXtrFullSep()
+   public GlsIfAttributeBool(String name, GlossariesSty sty)
    {
-      this("glsxtrfullsep");
+      this(name, null, true, sty);
    }
 
-   public GlsXtrFullSep(String name)
+   public GlsIfAttributeBool(String name, String attribute, boolean attrValue, GlossariesSty sty)
    {
-      super(name);
+      super(name, attribute, sty);
+      this.attrValue = attrValue;
    }
 
    @Override
    public Object clone()
    {
-      return new GlsXtrFullSep(getName());
+      return new GlsIfAttributeBool(getName(), getAttribute(), attrValue, getSty());
    }
 
-   @Override
-   public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
-     throws IOException
+   protected TeXObject expand(GlsLabel glslabel, String attributeLabel,
+     TeXParser parser, TeXObjectList stack)
+   throws IOException
    {
-      String label = popLabelString(parser, stack);
+      TeXObject trueCode = popArg(parser, stack);
+      TeXObject falseCode = popArg(parser, stack);
 
-      TeXParserListener listener = parser.getListener();
-
-      TeXObjectList list = listener.createStack();
-
-      list.add(listener.getControlSequence("glsxtrgenentrytextfmt"));
-      list.add(listener.getControlSequence("space"));
-
-      return list;
+      if (attrValue && sty.isAttributeTrue(glslabel, attributeLabel))
+      {
+         return trueCode;
+      }
+      else if (!attrValue && sty.isAttributeFalse(glslabel, attributeLabel))
+      {
+         return trueCode;
+      }
+      else
+      {
+         return falseCode;
+      }
    }
 
-   @Override
-   public TeXObjectList expandonce(TeXParser parser)
-     throws IOException
-   {
-      return expandonce(parser, parser);
-   }
-
+   protected boolean attrValue;
 }
