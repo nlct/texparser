@@ -46,7 +46,7 @@ test-glossaries-extra : app tests/test-glossaries-extra/test-glossaries-extra.pd
 	bin/texparsertest --debug --in tests/test-glossaries-extra/test-glossaries-extra.tex --output tests/output/test-glossaries-extra --html
 
 tests/test-glossaries-extra/test-glossaries-extra.pdf	: tests/test-glossaries-extra/test-glossaries-extra.tex
-					cd tests/test-glossaries; arara test-glossaries
+					cd tests/test-glossaries-extra; arara test-glossaries-extra
 
 test-jmlrutils : app tests/output
 	rm -f -r tests/output/test-jmlrutils
