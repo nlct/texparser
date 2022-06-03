@@ -141,7 +141,7 @@ public class NewGlossaryEntry extends AbstractGlsCommand
          if (firstplural == null)
          {
             firstplural = (TeXObject)plural.clone();
-            keyValList.put("first", firstplural);
+            keyValList.put("firstplural", firstplural);
          }
       }
       else if (firstplural == null)
