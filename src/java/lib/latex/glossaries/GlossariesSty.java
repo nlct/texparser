@@ -248,6 +248,15 @@ public class GlossariesSty extends LaTeXSty
 
       NewIf.createConditional(true, getParser(), "ifglsnopostdot", isExtra());
 
+      registerControlSequence(new GlsGetGroupTitle());
+      registerControlSequence(new AtGlsAtGetGroupTitle());
+      registerControlSequence(new GlsNavHyperLink());
+      registerControlSequence(new GlsNavHyperLinkName());
+      registerControlSequence(new GlsNavHyperTarget());
+      registerControlSequence(new GlsNavigation());
+      registerControlSequence(new GlsSymbolNav());
+      registerControlSequence(new TextualContentCommand("glshypernavsep", " | "));
+
       registerControlSequence(new Gls(this));
       registerControlSequence(new Gls("Gls", CaseChange.SENTENCE, this));
       registerControlSequence(new Gls("GLS", CaseChange.TO_UPPER, this));
@@ -317,6 +326,10 @@ public class GlossariesSty extends LaTeXSty
       registerControlSequence(new GlsFieldLink("glsuservi", "user6", this));
       registerControlSequence(new GlsFieldLink("Glsuservi", "user6", CaseChange.SENTENCE, this));
       registerControlSequence(new GlsFieldLink("GLSuservi", "user6", CaseChange.TO_UPPER, this));
+
+      registerControlSequence(new GlsEntryField("glsunexpandedfieldvalue", 
+        true, this));
+      registerControlSequence(new GlsEntryField("@gls@entry@field", this));
 
       registerControlSequence(new GlsEntryField("glsentryname", "name", this));
       registerControlSequence(new GlsEntryField("glsentrytext", "text", this));
@@ -507,7 +520,7 @@ public class GlossariesSty extends LaTeXSty
       registerControlSequence(new GenericCommand("glsxtrfieldtitlecasecs", null,
          new TeXCsRef("glscapitalisewords")));
 
-      registerControlSequence(new GlsEntryField("glsxtrusefield", null, this));
+      registerControlSequence(new GlsEntryField("glsxtrusefield", this));
       registerControlSequence(new GlsEntryField("Glsxtrusefield", null,
          CaseChange.SENTENCE, this));
       registerControlSequence(new GlsEntryField("GLSxtrusefield", null,

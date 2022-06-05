@@ -25,22 +25,39 @@ import com.dickimawbooks.texparserlib.latex.*;
 
 public class GlsEntryField extends AbstractGlsCommand
 {
+   public GlsEntryField(String name, GlossariesSty sty)
+   {
+      this(name, null, CaseChange.NO_CHANGE, sty);
+   }
+
    public GlsEntryField(String name, String field, GlossariesSty sty)
    {
       this(name, field, CaseChange.NO_CHANGE, sty);
    }
 
+   public GlsEntryField(String name, boolean protect, GlossariesSty sty)
+   {
+      this(name, null, CaseChange.NO_CHANGE, protect, sty);
+   }
+
    public GlsEntryField(String name, String field, CaseChange caseChange, GlossariesSty sty)
+   {
+      this(name, field, caseChange, false, sty);
+   }
+
+   public GlsEntryField(String name, String field, CaseChange caseChange,
+     boolean protect, GlossariesSty sty)
    {
       super(name, sty);
       this.field = field;
       this.caseChange = caseChange;
+      this.protect = protect;
    }
 
    @Override
    public Object clone()
    {
-      return new GlsEntryField(getName(), getField(), getCaseChange(), getSty());
+      return new GlsEntryField(getName(), getField(), getCaseChange(), protect, getSty());
    }
 
    public TeXObject getFieldValue(GlsLabel glslabel, String fieldLabel)
@@ -112,7 +129,19 @@ public class GlsEntryField extends AbstractGlsCommand
          fieldLabel = sty.getFieldName(popLabelString(parser, stack));
       }
 
-      return expand(glslabel, fieldLabel, caseChange, parser, stack);
+      TeXObjectList expanded = 
+         expand(glslabel, fieldLabel, caseChange, parser, stack);
+
+      if (protect)
+      {
+         DataObjectList list = parser.getListener().createDataList(true);
+         list.addAll(expanded);
+
+         expanded = parser.getListener().createStack();
+         expanded.add(list);
+      }
+
+      return expanded;
    }
 
    @Override
@@ -125,6 +154,11 @@ public class GlsEntryField extends AbstractGlsCommand
    public TeXObjectList expandfully(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
+      if (protect)
+      {
+         return expandonce(parser, stack);
+      }
+
       if (caseChange != CaseChange.NO_CHANGE)
       {
          if (parser == stack || stack == null)
@@ -254,4 +288,5 @@ public class GlsEntryField extends AbstractGlsCommand
 
    protected String field;
    protected CaseChange caseChange;
+   protected boolean protect = false;
 }
