@@ -34,6 +34,12 @@ public class UserBoolean extends AbstractTeXObject implements TeXBoolean
    }
 
    @Override
+   public boolean isDataObject()
+   {
+      return true;
+   }
+
+   @Override
    public boolean booleanValue()
    {
       return value;

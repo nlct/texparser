@@ -404,9 +404,19 @@ public abstract class DefaultTeXParserListener extends TeXParserListener
       return new DataObjectList();
    }
 
+   public DataObjectList createDataList(boolean protect)
+   {
+      return new DataObjectList(protect);
+   }
+
    public DataObjectList createDataList(String string)
    {
       return new DataObjectList(this, string);
+   }
+
+   public DataObjectList createDataList(String string, boolean protect)
+   {
+      return new DataObjectList(this, string, protect);
    }
 
    public SkippedSpaces createSkippedSpaces()

@@ -35,11 +35,19 @@ public class Or extends Primitive
       super(name);
    }
 
+   @Override
    public Object clone()
    {
       return new Or(getName());
    }
 
+   @Override
+   public boolean isExpansionBlocker()
+   {
+      return true;
+   }
+
+   @Override
    public void process(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
@@ -48,6 +56,7 @@ public class Or extends Primitive
         toString(parser));
    }
 
+   @Override
    public void process(TeXParser parser)
       throws IOException
    {

@@ -815,6 +815,8 @@ public class L2HConverter extends LaTeXParserListener
       writeln("span.bulletitem { float: left; margin-left: -1em; }");
       writeln("span.descitem { font: normal; font-weight: bold; }");
 
+      writeln("div.indexspace { min-height: 2ex; }");
+
       for (Iterator<String> it = defaultStyles.keySet().iterator();
            it.hasNext();)
       {
@@ -967,6 +969,9 @@ public class L2HConverter extends LaTeXParserListener
 
       writeable.writeln("</body>");
       writeable.writeln("</html>");
+
+      documentEnded = true;
+      //writer.close();
 
       throw new EOFException();
    }

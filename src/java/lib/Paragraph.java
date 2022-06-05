@@ -171,23 +171,10 @@ public class Paragraph extends DataObjectList
             token = ((AssignedMacro)token).getBaseUnderlying();
          }
 
-         if (token.canExpand() && token instanceof Expandable)
+         if (token.canExpand() && token instanceof Expandable
+              && !token.isDataObject())
          {
-            TeXObjectList expanded;
-
-            if (parser == stack)
-            {
-               expanded = ((Expandable)token).expandonce(parser);
-            } 
-            else
-            {
-               expanded = ((Expandable)token).expandonce(parser, stack);
-            } 
-
-            if (expanded != null)
-            {
-               stack.push(expanded, true);
-            }
+            stack.push(TeXParserUtils.expandOnce(token, parser, stack), true);
          }
          else if (token.isPar())
          {

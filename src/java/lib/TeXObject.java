@@ -49,5 +49,9 @@ public interface TeXObject extends Cloneable
    public boolean isEmpty();
 
    public boolean canExpand();
+
+   public boolean isExpansionBlocker();
+
+   public boolean isDataObject();
 }
 

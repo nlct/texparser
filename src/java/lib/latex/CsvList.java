@@ -182,6 +182,12 @@ public class CsvList extends DataObjectList
    }
 
    @Override
+   public boolean isDataObject()
+   {
+      return true;
+   }
+
+   @Override
    public boolean canExpand()
    {
       return true;

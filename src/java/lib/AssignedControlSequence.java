@@ -116,48 +116,62 @@ public class AssignedControlSequence extends Command
       return underlying.canExpand();
    }
 
+   @Override
+   public boolean isExpansionBlocker()
+   {
+      return underlying.isExpansionBlocker();
+   }
+
    public TeXObjectList expandonce(TeXParser parser)
       throws IOException
    {
-      if (!(underlying instanceof Expandable))
+      TeXObject base = getBaseUnderlying();
+
+      if (!(base instanceof Expandable))
       {
          return null;
       }
 
-      return ((Expandable)underlying).expandonce(parser);
+      return ((Expandable)base).expandonce(parser);
    }
 
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
-      if (!(underlying instanceof Expandable))
+      TeXObject base = getBaseUnderlying();
+
+      if (!(base instanceof Expandable))
       {
          return null;
       }
 
-      return ((Expandable)underlying).expandonce(parser, stack);
+      return ((Expandable)base).expandonce(parser, stack);
    }
 
    public TeXObjectList expandfully(TeXParser parser)
       throws IOException
    {
-      if (!(underlying instanceof Expandable))
+      TeXObject base = getBaseUnderlying();
+
+      if (!(base instanceof Expandable))
       {
          return null;
       }
 
-      return ((Expandable)underlying).expandfully(parser);
+      return ((Expandable)base).expandfully(parser);
    }
 
    public TeXObjectList expandfully(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
-      if (!(underlying instanceof Expandable))
+      TeXObject base = getBaseUnderlying();
+
+      if (!(base instanceof Expandable))
       {
          return null;
       }
 
-      return ((Expandable)underlying).expandfully(parser, stack);
+      return ((Expandable)base).expandfully(parser, stack);
    }
 
    public TeXObject getUnderlying()

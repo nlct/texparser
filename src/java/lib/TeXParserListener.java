@@ -105,7 +105,11 @@ public abstract class TeXParserListener
 
    public abstract DataObjectList createDataList();
 
+   public abstract DataObjectList createDataList(boolean protect);
+
    public abstract DataObjectList createDataList(String text);
+
+   public abstract DataObjectList createDataList(String text, boolean protect);
 
    public abstract MathGroup createMathGroup();
 

@@ -435,6 +435,18 @@ public class KeyValList extends HashMap<String,TeXObject>
       return false;
    }
 
+   @Override
+   public boolean isExpansionBlocker()
+   {
+      return false;
+   }
+
+   @Override
+   public boolean isDataObject()
+   {
+      return true;
+   }
+
    public Iterator<String> getOrderedKeyIterator()
    {
       return keyList.iterator();

@@ -68,6 +68,12 @@ public class TextualContentCommand extends ControlSequence implements Expandable
    }
 
    @Override
+   public boolean isDataObject()
+   {
+      return true;
+   }
+
+   @Override
    public TeXObjectList expandonce(TeXParser parser)
      throws IOException
    {

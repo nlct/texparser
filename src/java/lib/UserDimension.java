@@ -81,6 +81,12 @@ public class UserDimension extends AbstractTeXObject implements TeXDimension, Ex
    }
 
    @Override
+   public boolean isDataObject()
+   {
+      return true;
+   }
+
+   @Override
    public int number(TeXParser parser)
      throws TeXSyntaxException
    {

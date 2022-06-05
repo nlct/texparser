@@ -42,7 +42,7 @@ public abstract class Command extends ControlSequence implements Expandable
    public TeXObjectList expandonce(TeXParser parser)
      throws IOException
    {
-      return expandonce(parser, null);
+      return canExpand() ? expandonce(parser, null) : null;
    }
 
    public abstract TeXObjectList expandonce(TeXParser parser,
@@ -51,6 +51,11 @@ public abstract class Command extends ControlSequence implements Expandable
 
    public TeXObjectList expandfully(TeXParser parser) throws IOException
    {
+      if (!canExpand())
+      {
+         return null;
+      }
+
       TeXObjectList expanded = expandonce(parser);
 
       if (expanded == null)
@@ -66,7 +71,12 @@ public abstract class Command extends ControlSequence implements Expandable
    public TeXObjectList expandfully(TeXParser parser,
         TeXObjectList stack) throws IOException
    {
-      if (stack == null)
+      if (!canExpand())
+      {
+         return null;
+      }
+
+      if (stack == null || parser == stack)
       {
          return expandfully(parser);
       }

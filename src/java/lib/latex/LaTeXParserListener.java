@@ -1039,6 +1039,11 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       this.docEnvFound = inDocEnv;
    }
 
+   public boolean hasDocumentEnded()
+   {
+      return documentEnded;
+   }
+
    public void beginDocument()
      throws IOException
    {
@@ -1098,6 +1103,8 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
             getTeXApp().error(e);
          }
       }
+
+      documentEnded = true;
 
       throw new EOFException();
    }
@@ -2405,6 +2412,8 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
    };
 
    private boolean docEnvFound = false;
+
+   protected boolean documentEnded = false;
 
    private String inputEncoding = null;
 

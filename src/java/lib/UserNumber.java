@@ -67,6 +67,12 @@ public class UserNumber extends AbstractTeXObject implements TeXNumber
    }
 
    @Override
+   public boolean isDataObject()
+   {
+      return true;
+   }
+
+   @Override
    public int number(TeXParser parser) throws TeXSyntaxException
    {
       return value;

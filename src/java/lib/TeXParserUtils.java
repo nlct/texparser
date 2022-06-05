@@ -151,6 +151,31 @@ public class TeXParserUtils
       }
    }
 
+   public static TeXObject expandOnce(TeXObject arg, TeXParser parser, TeXObjectList stack)
+    throws IOException
+   {
+      if (arg.canExpand() && arg instanceof Expandable)
+      {
+         TeXObjectList expanded = null;
+
+         if (stack == parser || stack == null)
+         {
+            expanded = ((Expandable)arg).expandonce(parser);
+         }
+         else
+         {
+            expanded = ((Expandable)arg).expandonce(parser, stack);
+         }
+
+         if (expanded != null)
+         {
+            arg = expanded;
+         }
+      }
+
+      return arg;
+   }
+
    public static TeXObject expandFully(TeXObject arg, TeXParser parser, TeXObjectList stack)
     throws IOException
    {
@@ -305,5 +330,99 @@ public class TeXParserUtils
            TeXSyntaxException.ERROR_DIMEN_EXPECTED);
    }
 
+   public static ControlSequence popControlSequence(TeXParser parser, TeXObjectList stack)
+     throws IOException
+   {
+      TeXObject arg = popArg(parser, stack);
+
+      if (arg instanceof ControlSequence)
+      {
+         return (ControlSequence)arg;
+      }
+
+      if (parser.isStack(arg))
+      {
+         if (stack == null)
+         {
+            parser.push(arg, true);
+         }
+         else
+         {
+            stack.push(arg, true);
+         }
+
+         arg = popArg(parser, stack);
+
+         if (arg instanceof ControlSequence)
+         {
+            return (ControlSequence)arg;
+         }
+      }
+
+      throw new TeXSyntaxException(parser,
+         TeXSyntaxException.ERROR_CS_EXPECTED,
+         arg.format(), arg.getClass().getSimpleName());
+   }
+
+   public static TeXBoolean toBoolean(String csname, TeXParser parser)
+   {
+      return toBoolean(parser.getControlSequence(csname), parser);
+   }
+
+   public static TeXBoolean toBoolean(TeXObject object, TeXParser parser)
+   {
+      if (object == null)
+      {
+         return null;
+      }
+
+      if (object instanceof TeXBoolean)
+      {
+         return (TeXBoolean)object;
+      }
+
+      if (object instanceof AssignedControlSequence)
+      {
+         TeXObject underlying = ((AssignedControlSequence)object).getBaseUnderlying();
+
+         if (underlying instanceof TeXBoolean)
+         {
+            return (TeXBoolean)underlying;
+         }
+      }
+
+      return null;
+   }
+
+   public static int toInt(TeXObject object, TeXParser parser, TeXObjectList stack)
+     throws IOException
+   {
+      if (object instanceof TeXNumber)
+      {
+         return ((TeXNumber)object).getValue();
+      }
+
+      if (object instanceof AssignedControlSequence)
+      {
+         TeXObject underlying = ((AssignedControlSequence)object).getBaseUnderlying();
+
+         if (underlying instanceof TeXNumber)
+         {
+            return ((TeXNumber)underlying).getValue();
+         }
+      }
+
+      String str = parser.expandToString(object, stack);
+
+      try
+      {
+         return Integer.parseInt(str);
+      }
+      catch (NumberFormatException e)
+      {
+         throw new TeXSyntaxException(e, parser,
+           TeXSyntaxException.ERROR_NUMBER_EXPECTED, str);
+      }
+   }
 }
 

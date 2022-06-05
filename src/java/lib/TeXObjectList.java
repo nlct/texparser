@@ -681,6 +681,11 @@ public class TeXObjectList extends Vector<TeXObject>
          }
       }
 
+      if (object instanceof Numerical)
+      {
+         return (Numerical)popStack(parser, POP_IGNORE_LEADING_SPACE);
+      }
+
       object = expandedPopStack(parser, POP_SHORT);
 
       if (object instanceof NumericRegister)
@@ -1484,7 +1489,7 @@ public class TeXObjectList extends Vector<TeXObject>
          {
             ((TeXObjectList)obj).flatten();
 
-            if (!(obj instanceof Group))
+            if (((TeXObjectList)obj).isStack())
             {
                remove(i);
                addAll(i, (TeXObjectList)obj);
@@ -1501,13 +1506,26 @@ public class TeXObjectList extends Vector<TeXObject>
       TeXObjectList list = new TeXObjectList(size());
       TeXObjectList remaining = (TeXObjectList)clone();
 
+      boolean blocked = false;
+
       while (!remaining.isEmpty())
       {
          TeXObject object = remaining.pop();
 
+         if (object instanceof TeXCsRef)
+         {
+            object = parser.getListener().getControlSequence(
+               ((TeXCsRef)object).getName());
+         }
+
+         if (object.isExpansionBlocker())
+         {
+            blocked = true;
+         }
+
          TeXObjectList expanded = null;
 
-         if (object instanceof Expandable)
+         if (!blocked && object.canExpand() && object instanceof Expandable)
          {
             expanded = ((Expandable)object).expandonce(parser, remaining);
          }
@@ -1518,7 +1536,34 @@ public class TeXObjectList extends Vector<TeXObject>
          }
          else
          {
-            list.addAll(expanded);
+            for (int i = 0; i < expanded.size(); i++)
+            {
+               object = expanded.get(i);
+
+               if (object instanceof TeXCsRef)
+               {
+                  object = parser.getListener().getControlSequence(
+                     ((TeXCsRef)object).getName());
+               }
+
+               if (object.isExpansionBlocker())
+               {
+                  list.add(object);
+
+                  for (int j = i+1; j < expanded.size(); j++)
+                  {
+                     list.add(expanded.get(j));
+                  }
+
+                  blocked = true;
+
+                  break;
+               }
+               else
+               {
+                  list.add(object);
+               }
+            }
          }
       }
 
@@ -1534,7 +1579,10 @@ public class TeXObjectList extends Vector<TeXObject>
       TeXObjectList list = new TeXObjectList(size());
       TeXObjectList remaining = (TeXObjectList)clone();
 
+      boolean blocked = false;
+
       StackMarker marker = null;
+      boolean markerFound = false;
 
       if (stack != null && stack != parser)
       {
@@ -1550,12 +1598,24 @@ public class TeXObjectList extends Vector<TeXObject>
 
          if (object.equals(marker))
          {
+            markerFound = true;
             break;
+         }
+
+         if (object instanceof TeXCsRef)
+         {
+            object = parser.getListener().getControlSequence(
+               ((TeXCsRef)object).getName());
+         }
+
+         if (object.isExpansionBlocker())
+         {
+            blocked = true;
          }
 
          TeXObjectList expanded = null;
 
-         if (object instanceof Expandable)
+         if (!blocked && object.canExpand() && object instanceof Expandable)
          {
             expanded = ((Expandable)object).expandonce(parser, remaining);
          }
@@ -1566,16 +1626,82 @@ public class TeXObjectList extends Vector<TeXObject>
          }
          else
          {
-            list.addAll(expanded);
+            for (int i = 0; i < expanded.size(); i++)
+            {
+               object = expanded.get(i);
+
+               if (object instanceof TeXCsRef)
+               {
+                  object = parser.getListener().getControlSequence(
+                     ((TeXCsRef)object).getName());
+               }
+
+               if (object.equals(marker))
+               {
+                  for (int j = i+1; j < expanded.size(); j++)
+                  {
+                     stack.add(expanded.get(j));
+                  }
+
+                  markerFound = true;
+
+                  break;
+               }
+               else if (object.isExpansionBlocker())
+               {
+                  list.add(object);
+
+                  for (int j = i+1; j < expanded.size(); j++)
+                  {
+                     list.add(expanded.get(j));
+                  }
+
+                  blocked = true;
+                  break;
+               }
+               else
+               {
+                  list.add(object);
+               }
+            }
          }
       }
 
       if (!remaining.isEmpty())
       {
-         stack.addAll(remaining);
+         if (marker != null && !markerFound)
+         {
+            int idx = remaining.indexOf(marker);
+
+            for (int i = 0; i < idx; i++)
+            {
+               list.add(remaining.get(i));
+            }
+
+            for (int i = idx+1; i < remaining.size(); i++)
+            {
+               stack.add(remaining.get(i));
+            }
+         }
+         else
+         {
+            stack.addAll(remaining);
+         }
       }
 
       return list;
+   }
+
+   @Override
+   public boolean isDataObject()
+   {
+      return false;
+   }
+
+   @Override
+   public boolean isExpansionBlocker()
+   {
+      return false;
    }
 
    @Override
@@ -1610,6 +1736,8 @@ public class TeXObjectList extends Vector<TeXObject>
          return list;
       }
 
+      boolean blocked = false;
+
       TeXObject prevObj = null;
 
       while (!isEmpty())
@@ -1635,7 +1763,12 @@ public class TeXObjectList extends Vector<TeXObject>
             object = ((AssignedMacro)object).getBaseUnderlying();
          }
 
-         if (object instanceof StackMarker)
+         if (object.isExpansionBlocker())
+         {
+            blocked = true;
+         }
+
+         if (object instanceof StackMarker || blocked)
          {
             list.add(object);
          }
@@ -1655,7 +1788,11 @@ public class TeXObjectList extends Vector<TeXObject>
          {
             TeXObjectList expanded = ((Expandable)object).expandonce(parser, this);
 
-            if (expanded != null && !expanded.isEmpty())
+            if (expanded == null)
+            {
+               list.add(object);
+            }
+            else if (!expanded.isEmpty())
             {
                push(expanded, true);
             }
@@ -1680,6 +1817,8 @@ public class TeXObjectList extends Vector<TeXObject>
          clear();
          return list;
       }
+
+      boolean blocked = false;
 
       flatten();
 
@@ -1709,11 +1848,22 @@ public class TeXObjectList extends Vector<TeXObject>
             continue;
          }
 
+         if (object instanceof TeXCsRef)
+         {
+            object = parser.getListener().getControlSequence(
+               ((TeXCsRef)object).getName());
+         }
+
+         if (object.isExpansionBlocker())
+         {
+            blocked = true;
+         }
+
          TeXObjectList expanded = null;
 
-         if (object.canExpand() && object instanceof Expandable)
+         if (!blocked && object.canExpand() && object instanceof Expandable)
          {
-            expanded = ((Expandable)object).expandfully(parser, remaining);
+            expanded = ((Expandable)object).expandonce(parser, remaining);
          }
 
          if (expanded == null)
@@ -1722,7 +1872,7 @@ public class TeXObjectList extends Vector<TeXObject>
          }
          else
          {
-            list.addAll(expanded);
+            remaining.push(expanded, true);
          }
       }
 

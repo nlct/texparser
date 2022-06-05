@@ -219,6 +219,18 @@ public class DataToolEntryRow extends Vector<DataToolEntry>
       return false;
    }
 
+   @Override
+   public boolean isExpansionBlocker()
+   {
+      return false;
+   }
+
+   @Override
+   public boolean isDataObject()
+   {
+      return true;
+   }
+
    private DataToolSty sty;
    int rowIndex;
 }

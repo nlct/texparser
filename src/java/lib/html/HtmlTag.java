@@ -39,6 +39,12 @@ public class HtmlTag extends AbstractTeXObject
    }
 
    @Override
+   public boolean isDataObject()
+   {
+      return true;
+   }
+
+   @Override
    public TeXObjectList string(TeXParser parser)
    {
       return parser.getListener().createString(getTag());

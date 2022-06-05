@@ -278,7 +278,19 @@ public class DataToolRows extends Vector<DataToolEntryRow>
    }
 
    @Override
+   public boolean isDataObject()
+   {
+      return true;
+   }
+
+   @Override
    public boolean canExpand()
+   {
+      return false;
+   }
+
+   @Override
+   public boolean isExpansionBlocker()
    {
       return false;
    }

@@ -130,5 +130,6 @@ public class TeXCsRef extends ControlSequence implements Expandable
 
       return getName().equals(((TeXCsRef)other).getName());
    }
+
 }
 

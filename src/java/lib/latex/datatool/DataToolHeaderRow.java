@@ -181,7 +181,19 @@ public class DataToolHeaderRow extends Vector<DataToolHeader>
    }
 
    @Override
+   public boolean isDataObject()
+   {
+      return true;
+   }
+
+   @Override
    public boolean canExpand()
+   {
+      return false;
+   }
+
+   @Override
+   public boolean isExpansionBlocker()
    {
       return false;
    }

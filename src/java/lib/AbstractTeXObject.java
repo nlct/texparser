@@ -41,5 +41,17 @@ public abstract class AbstractTeXObject implements TeXObject
    {
       return false;
    }
+
+   @Override
+   public boolean isExpansionBlocker()
+   {
+      return false;
+   }
+
+   @Override
+   public boolean isDataObject()
+   {
+      return false;
+   }
 }
 

@@ -33,27 +33,87 @@ public class DataObjectList extends TeXObjectList
 {
    public DataObjectList()
    {
+      this(false);
+   }
+
+   public DataObjectList(boolean protect)
+   {
       super();
+      this.protect = protect;
    }
 
    public DataObjectList(int capacity)
    {
+      this(capacity, false);
+   }
+
+   public DataObjectList(int capacity, boolean protect)
+   {
       super(capacity);
+      this.protect = protect;
    }
 
    public DataObjectList(TeXParserListener listener, String text)
    {
-      super(listener, text);
+      this(listener, text, false);
    }
 
+   public DataObjectList(TeXParserListener listener, String text, boolean protect)
+   {
+      super(listener, text);
+      this.protect = protect;
+   }
+
+   @Override
    public boolean isStack()
    {
       return false;
    }
 
-   public TeXObjectList createList()
+   @Override
+   public boolean canExpand()
    {
-      return new DataObjectList(capacity());
+      return protect ? false : super.canExpand();
    }
 
+   @Override
+   public boolean isDataObject()
+   {
+      return true;
+   }
+
+   public TeXObjectList createList()
+   {
+      return new DataObjectList(capacity(), protect);
+   }
+
+   @Override
+   public boolean add(TeXObject object, boolean flatten)
+   {
+      if (flatten && object instanceof DataObjectList
+           && (protect || ((DataObjectList)object).protect))
+      {
+         return add(object, false);
+      }
+      else
+      {
+         return super.add(object, flatten);
+      }
+   }
+
+   @Override
+   public void push(TeXObject object, boolean flatten)
+   {
+      if (flatten && object instanceof DataObjectList
+           && (protect || ((DataObjectList)object).protect))
+      {
+         super.push(object, false);
+      }
+      else
+      {
+         super.push(object, flatten);
+      }
+   }
+
+   protected boolean protect = false;
 }

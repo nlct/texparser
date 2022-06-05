@@ -35,11 +35,19 @@ public class Fi extends Primitive
       super(name);
    }
 
+   @Override
    public Object clone()
    {
       return new Fi(getName());
    }
 
+   @Override
+   public boolean isExpansionBlocker()
+   {
+      return true;
+   }
+
+   @Override
    public void process(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
@@ -48,6 +56,7 @@ public class Fi extends Primitive
         toString(parser));
    }
 
+   @Override
    public void process(TeXParser parser)
       throws IOException
    {
