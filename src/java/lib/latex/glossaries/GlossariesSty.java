@@ -25,6 +25,8 @@ import java.util.Iterator;
 
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.primitives.NewIf;
+import com.dickimawbooks.texparserlib.primitives.IfFalse;
+import com.dickimawbooks.texparserlib.primitives.IfTrue;
 import com.dickimawbooks.texparserlib.primitives.Undefined;
 import com.dickimawbooks.texparserlib.generic.TeXParserSetUndefAction;
 import com.dickimawbooks.texparserlib.latex.*;
@@ -391,6 +393,8 @@ public class GlossariesSty extends LaTeXSty
       registerControlSequence(new GlsEntryFull("glsentryfullpl", true, this));
       registerControlSequence(new GlsEntryFull("Glsentryfullpl", CaseChange.SENTENCE, true, this));
 
+      getParser().getSettings().newcount("gls@level");
+
       if (extra)
       {
          addExtraDefinitions();
@@ -462,6 +466,17 @@ public class GlossariesSty extends LaTeXSty
       registerControlSequence(new GlsXtrPostDescription(this));
       registerControlSequence(new PrintUnsrtGlossaries(this));
       registerControlSequence(new PrintUnsrtGlossary(this));
+      registerControlSequence(new GlsXtrUnsrtDo(this));
+      registerControlSequence(new GlsXtrAddGroup(this));
+      registerControlSequence(new PrintUnsrtGlossaryHandler());
+      registerControlSequence(new AtPrintUnsrtAtGlossaryAtHandler(this));
+      registerControlSequence(new AtGobble("printunsrtglossaryentryprocesshook"));
+      registerControlSequence(new AtGlsXtrAtCheckGroup(this));
+      registerControlSequence(new GlsSubGroupHeading());
+      registerControlSequence(new TextualContentCommand(
+        "printunsrtglossarypredoglossary", ""));
+      registerControlSequence(new GlsXtrPostNameHook(this));
+      registerControlSequence(new AtGobble("glsextrapostnamehook"));
 
       registerControlSequence(new NewAcronym("newabbreviation", this));
 
@@ -476,6 +491,16 @@ public class GlossariesSty extends LaTeXSty
       registerControlSequence(new GlsXtrSetComplexStyle(this));
       registerControlSequence(new IfApplyInnerFmtField(this));
       registerControlSequence(new GlsExclApplyInnerFmtField(this));
+
+      registerControlSequence(new TextualContentCommand(
+         "glsxtrgroupfield", "group"));
+      registerControlSequence(new TextualContentCommand(
+         "GlsXtrLocationField", "location"));
+
+      getParser().getSettings().newcount("@glsxtr@leveloffset");
+
+      NewIf.createConditional(true, getParser(), "ifglsxtr@printgloss@groups", true);
+      NewIf.createConditional(true, getParser(), "ifglsxtrprintglossflatten", false);
 
       NewIf.createConditional(true, getParser(), "ifglsxtrinsertinside", false);
 
@@ -936,6 +961,18 @@ public class GlossariesSty extends LaTeXSty
       else if (option.equals("accsupp"))
       {
          accsupp = true;
+      }
+      else if (option.equals("makeindex"))
+      {
+         indexingOption = IndexingOption.MAKEINDEX;
+      }
+      else if (option.equals("xindy"))
+      {
+         indexingOption = IndexingOption.XINDY;
+      }
+      else if (option.equals("record"))
+      {
+         indexingOption = IndexingOption.UNSRT;
       }
       else if (option.equals("nolist"))
       {
@@ -1720,6 +1757,12 @@ public class GlossariesSty extends LaTeXSty
    public Glossary initPrintGloss(KeyValList options, 
      TeXObjectList stack) throws IOException
    {
+      return initPrintGloss(indexingOption, options, stack);
+   }
+
+   public Glossary initPrintGloss(IndexingOption indexingOpt, KeyValList options, 
+     TeXObjectList stack) throws IOException
+   {
       TeXParser parser = getParser();
 
       TeXObject typeObj = null;
@@ -1733,6 +1776,83 @@ public class GlossariesSty extends LaTeXSty
          title = options.getExpandedValue("title", parser, stack);
 
          styleObj = options.getExpandedValue("style", parser, stack);
+
+         if (indexingOpt == IndexingOption.UNSRT)
+         {
+            TeXObject val = options.get("flatten");
+
+            if (val != null)
+            {
+               String flatten = parser.expandToString(val, stack).trim();
+
+               if (!flatten.equals("false"))
+               {
+                  parser.putControlSequence(true,
+                    new IfTrue("ifglsxtrprintglossflatten"));
+               }
+               else
+               {
+                  parser.putControlSequence(true,
+                    new IfFalse("ifglsxtrprintglossflatten"));
+               }
+            }
+
+            val = options.get("groups");
+
+            if (val != null)
+            {
+               String groups = parser.expandToString(val, stack).trim();
+
+               if (!groups.equals("false"))
+               {
+                  parser.putControlSequence(true,
+                    new IfTrue("ifglsxtr@printgloss@groups"));
+               }
+               else
+               {
+                  parser.putControlSequence(true,
+                    new IfFalse("ifglsxtr@printgloss@groups"));
+               }
+            }
+
+            val = options.get("leveloffset");
+
+            if (val != null)
+            {
+               String str = parser.expandToString(val, stack);
+
+               boolean inc = str.startsWith("++");
+
+               if (inc)
+               {
+                  str = str.substring(1);
+               }
+
+               int offset = 0;
+
+               try
+               {
+                  offset = Integer.parseInt(str);
+               }
+               catch (NumberFormatException e)
+               {
+                  throw new TeXSyntaxException(e, parser,
+                    TeXSyntaxException.ERROR_NUMBER_EXPECTED, str);
+               }
+
+               NumericRegister reg = parser.getSettings().getNumericRegister("@glsxtr@leveloffset");
+
+               if (reg != null)
+               {
+                  if (inc)
+                  {
+                     offset = reg.number(parser) + offset;
+                  }
+
+                  reg.setValue(parser, new UserNumber(offset));
+               }
+            }
+         }
       }
 
       String type = "main";
@@ -1903,8 +2023,8 @@ public class GlossariesSty extends LaTeXSty
    private HashMap<String,Category> categories;
 
    private boolean createMain = true;
-   private boolean createAbbreviations = true;
-   private boolean createAcronyms = true;
+   private boolean createAbbreviations = false;
+   private boolean createAcronyms = false;
 
    private boolean expandFields = true;
 
@@ -1939,6 +2059,8 @@ public class GlossariesSty extends LaTeXSty
    private boolean accsupp = false;
 
    private boolean nostyleWarningIssued = false;
+
+   private IndexingOption indexingOption = IndexingOption.MAKEINDEX;
 
    public static final String GLOSSARY_NOT_DEFINED 
     = "glossaries.glossary.not.defined";

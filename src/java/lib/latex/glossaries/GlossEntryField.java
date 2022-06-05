@@ -119,7 +119,9 @@ public class GlossEntryField extends GlsEntryField
          if (sty.isExtra())
          {
             list.add(parser.getListener().getControlSequence("glsxtrpostnamehook"));
-            list.add(glslabel);
+            grp = parser.getListener().createGroup();
+            list.add(grp);
+            grp.add(glslabel);
          }
       }
       else if (category != null)

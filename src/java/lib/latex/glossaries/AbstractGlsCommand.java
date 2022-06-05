@@ -77,20 +77,73 @@ public abstract class AbstractGlsCommand extends Command
    protected GlsLabel popEntryLabel(TeXParser parser, TeXObjectList stack)
     throws IOException
    {
-      TeXObject arg = popArg(parser, stack);
+      TeXObject arg = null;
+
+      if (stack != null && !stack.isEmpty())
+      {
+         arg = stack.firstElement();
+
+         if (arg instanceof GlsLabel && ((GlsLabel)arg).getEntry() != null)
+         {
+            return (GlsLabel)stack.remove(0);
+         }
+      }
+
+      arg = popArg(parser, stack);
 
       if (arg instanceof GlsLabel)
       {
-         ((GlsLabel)arg).refresh(sty);
+         GlsLabel glslabel = (GlsLabel)arg;
 
-         return (GlsLabel)arg;
+         glslabel.refresh(sty);
+
+         return glslabel;
       }
 
       String label = parser.expandToString(arg, stack);
 
       GlossaryEntry entry = getEntry(label);
 
-      return new GlsLabel("@@glslabel", label, entry);
+      return new GlsLabel("@@glslabel@"+label, label, entry);
+   }
+
+   protected GlsLabel popEntryLabel(String csname, TeXParser parser, TeXObjectList stack)
+    throws IOException
+   {
+      TeXObject arg = null;
+
+      if (stack != null && !stack.isEmpty())
+      {
+         arg = stack.firstElement();
+
+         if (arg instanceof GlsLabel && ((GlsLabel)arg).getEntry() != null
+              && ((GlsLabel)arg).getName().equals(csname))
+         {
+            return (GlsLabel)stack.remove(0);
+         }
+      }
+
+      arg = popArg(parser, stack);
+
+      if (arg instanceof GlsLabel)
+      {
+         GlsLabel glslabel = (GlsLabel)arg;
+
+         glslabel.refresh(sty);
+
+         if (!glslabel.getName().equals(csname))
+         {
+            return new GlsLabel(csname, glslabel.getLabel(), glslabel.getEntry());
+         }
+
+         return glslabel;
+      }
+
+      String label = parser.expandToString(arg, stack);
+
+      GlossaryEntry entry = getEntry(label);
+
+      return new GlsLabel(csname, label, entry);
    }
 
    protected GlsType popGlossaryLabel(TeXParser parser, TeXObjectList stack)
@@ -109,7 +162,7 @@ public abstract class AbstractGlsCommand extends Command
 
       Glossary glossary = getGlossary(label);
 
-      return new GlsType("@@glstype", label, glossary);
+      return new GlsType("@@glstype@"+label, label, glossary);
    }
 
    /**

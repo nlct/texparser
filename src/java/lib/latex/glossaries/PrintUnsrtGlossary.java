@@ -41,6 +41,87 @@ public class PrintUnsrtGlossary extends ControlSequence
       return new PrintUnsrtGlossary(getName(), sty);
    }
 
+   protected void initHooks(TeXParser parser)
+     throws IOException
+   {
+      parser.putControlSequence(true, 
+        new InternalGetGroupTitle("@gls@getgrouptitle", sty.isKnownField("group")));
+
+      parser.putControlSequence(true, 
+        new TextualContentCommand("@gls@currentlettergroup", ""));
+
+      parser.putControlSequence(true, 
+        new GenericCommand(true, "glscurrententrylevel", null, 
+          new UserNumber(-1)));
+
+      parser.putControlSequence(true, 
+        new TextualContentCommand("glscurrentrootentry", ""));
+
+      parser.putControlSequence(true, 
+        new TextualContentCommand("glscurrenttoplevelentry", ""));
+
+   }
+
+   protected void initProcess(GlsLabel glslabel, 
+      TeXParser parser, TeXObjectList stack)
+   throws IOException
+   {
+      GlossaryEntry entry = glslabel.getEntry();
+
+      TeXBoolean flatten = TeXParserUtils.toBoolean("ifglsxtrprintglossflatten",
+         parser);
+
+      int offset = TeXParserUtils.toInt(parser.getControlSequence(
+        "@glsxtr@leveloffset"), parser, stack);
+
+      int level;
+
+      if (flatten.booleanValue())
+      {
+         level = offset;
+      }
+      else
+      {
+         level = entry.getLevel()+offset;
+      }
+
+      parser.putControlSequence(true, 
+        new GenericCommand(true, "glscurrententrylevel", null, 
+           new UserNumber(level)));
+
+      if (level == 0)
+      {
+         parser.putControlSequence(true, 
+           new TextualContentCommand("glscurrenttoplevelentry", entry.getLabel()));
+      }
+
+      if (flatten.booleanValue() || entry.getLevel() == 0)
+      {
+         parser.putControlSequence(true, 
+           new TextualContentCommand("glscurrentrootentry", entry.getLabel()));
+      }
+
+      parser.putControlSequence(true, new AtFirstOfOne("glsxtr@process"));
+      parser.putControlSequence(true, new PrintUnsrtGlossarySkipEntry());
+
+      ControlSequence cs = parser.getListener().getControlSequence(
+        "printunsrtglossaryentryprocesshook");
+
+      if (!(cs instanceof AtGobble))
+      {
+         if (parser == stack || stack == null)
+         {
+            parser.push(glslabel);
+            cs.process(parser);
+         }
+         else
+         {
+            stack.push(glslabel);
+            cs.process(parser, stack);
+         }
+      }
+   }
+
    @Override
    public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
@@ -51,16 +132,117 @@ public class PrintUnsrtGlossary extends ControlSequence
 
       KeyValList options = sty.popOptKeyValList(parser, stack);
 
-      TeXObject initCode = null;
-
       if (isStar)
       {
-         initCode = popArg(parser, stack);
+         TeXObject initCode = popArg(parser, stack);
+
+         if (parser == stack || stack == null)
+         {
+            initCode.process(parser);
+         }
+         else
+         {
+            initCode.process(parser, stack);
+         }
       }
 
-      Glossary glossary = sty.initPrintGloss(options, stack);
+      Glossary glossary = sty.initPrintGloss(IndexingOption.UNSRT, options, stack);
 
-// TODO
+      TeXParserListener listener = parser.getListener();
+
+      TeXObjectList list = listener.createStack();
+
+      list.add(listener.getControlSequence("glossarysection"));
+      list.add(listener.getOther('['));
+      list.add(listener.getControlSequence("glossarytoctitle"));
+      list.add(listener.getOther(']'));
+      list.add(listener.getControlSequence("glossarytitle"));
+      list.add(listener.getControlSequence("glossarypreamble"));
+
+      if (!glossary.isEmpty())
+      {
+         initHooks(parser);
+
+         TeXObjectList body = listener.createStack();
+
+         ControlSequence cs = new GenericCommand(true, "@glsxtr@doglossary",
+           null, body);
+
+         parser.putControlSequence(true, cs);
+
+         body.add(new TeXCsRef("begin"));
+         body.add(listener.createGroup("theglossary"));
+         body.add(new TeXCsRef("glossaryheader"));
+         //body.add(new TeXCsRef("glsresetentrylist"));
+
+         for (String label : glossary)
+         {
+            GlsLabel glslabel = new GlsLabel("glscurrententrylabel",
+              label, sty.getEntry(label));
+
+            parser.putControlSequence(true, glslabel);
+
+            initProcess(glslabel, parser, stack);
+
+            cs = parser.getControlSequence("glsxtr@process");
+
+            if (cs instanceof AtFirstOfOne)
+            {
+               TeXBoolean groups = TeXParserUtils.toBoolean(
+                "ifglsxtr@printgloss@groups", parser);
+
+               if (groups.booleanValue())
+               {
+                  parser.putControlSequence(true, new TextualContentCommand(
+                    "@glsxtr@groupheading", ""));
+
+                  TeXObjectList substack = listener.createStack();
+                  substack.add(listener.getControlSequence("glsxtraddgroup"));
+                  substack.add(glslabel);
+                  Group grp = listener.createGroup();
+                  substack.add(grp);
+                  grp.add(listener.getControlSequence("@glsxtr@checkgroup"));
+                  grp.add(glslabel);
+
+                  if (parser == stack || stack == null)
+                  {
+                     substack.process(parser);
+                  }
+                  else
+                  {
+                     substack.process(parser, stack);
+                  }
+
+                  cs = listener.getControlSequence("@glsxtr@groupheading");
+
+                  if (!cs.isEmpty())
+                  {
+                     body.add(TeXParserUtils.expandOnce(cs, parser, stack));
+                  }
+               }
+
+               body.add(listener.getControlSequence("@printunsrt@glossary@handler"));
+               body.add(listener.createGroup(label));
+            }
+         }
+
+         body.add(new TeXCsRef("end"));
+         body.add(listener.createGroup("theglossary"));
+
+         list.add(new TeXCsRef("printunsrtglossarypredoglossary"));
+         list.add(new TeXCsRef("@glsxtr@doglossary"));
+      }
+
+      list.add(new TeXCsRef("glossarypostamble"));
+
+      if (parser == stack || stack == null)
+      {
+         list.process(parser);
+      }
+      else
+      {
+         list.process(parser, stack);
+      }
 
       parser.endGroup();
    }

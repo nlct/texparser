@@ -109,11 +109,14 @@ public class SetAcronymStyle extends AbstractGlsCommand
          types = sty.getAbbreviationGlossaries();
       }
 
-      for (String type : types)
+      if (types != null)
       {
-         parser.putControlSequence(false, new GenericCommand(true,
-          "gls@"+type+"@entryfmt", null, 
-            new TeXCsRef("@glsacr@dispstyle@"+styleName)));
+         for (String type : types)
+         {
+            parser.putControlSequence(false, new GenericCommand(true,
+             "gls@"+type+"@entryfmt", null, 
+               new TeXCsRef("@glsacr@dispstyle@"+styleName)));
+         }
       }
    }
 

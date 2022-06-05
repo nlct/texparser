@@ -101,6 +101,14 @@ public class NewGlossaryEntry extends AbstractGlsCommand
          }
       }
 
+      TeXObject sort = keyValList.get("sort");
+
+      if (sort == null)
+      {// doesn't take sort option into account
+         sort = (TeXObject)name.clone();
+         keyValList.put("sort", sort);
+      }
+
       TeXObject text = keyValList.get("text");
 
       if (text == null)

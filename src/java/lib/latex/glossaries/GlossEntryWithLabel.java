@@ -48,12 +48,17 @@ public class GlossEntryWithLabel extends AbstractGlsCommand
 
       GlsLabel glslabel = popEntryLabel(parser, stack);
 
-      listener.putControlSequence(glslabel.duplicate("glscurrententrylabel"));
-
       TeXObjectList list = listener.createStack();
 
+      DataObjectList noexpand = listener.createDataList(true);
+      list.add(noexpand);
+
+      noexpand.add(new TeXCsRef("def"));
+      noexpand.add(new TeXCsRef("glscurrententrylabel"));
+      noexpand.add(listener.createGroup(glslabel.getLabel()));
+
       list.add(listener.getControlSequence("gls@org@glossaryentryfield"));
-      list.add(glslabel);
+      list.add(listener.createGroup(glslabel.getLabel()));
 
       Group grp = listener.createGroup();
       list.add(grp);
@@ -70,27 +75,24 @@ public class GlossEntryWithLabel extends AbstractGlsCommand
 
       GlsLabel glslabel = popEntryLabel(parser, stack);
 
-      listener.putControlSequence(glslabel.duplicate("glscurrententrylabel"));
-
-      stack.push(glslabel);
-
-      ControlSequence cs =
-        listener.getControlSequence("gls@org@glossaryentryfield");
-
-      if (stack == parser || stack == null)
+      if (!glslabel.getName().equals("glscurrententrylabel"))
       {
-         cs.process(parser);
+         listener.putControlSequence(glslabel.duplicate("glscurrententrylabel"));
+      }
+
+      TeXObjectList list = listener.createStack();
+
+      list.add(listener.getControlSequence("gls@org@glossaryentryfield"));
+      list.add(glslabel);
+
+      if (parser == stack || stack == null)
+      {
+         list.process(parser);
       }
       else
       {
-         cs.process(parser, stack);
+         list.process(parser, stack);
       }
    }
 
-   @Override
-   public void process(TeXParser parser)
-     throws IOException
-   {
-      process(parser, parser);
-   }
 }

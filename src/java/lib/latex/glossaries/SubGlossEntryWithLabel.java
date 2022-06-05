@@ -43,14 +43,41 @@ public class SubGlossEntryWithLabel extends AbstractGlsCommand
    @Override
    public boolean canExpand()
    {
-      return false;
+      return true;
    }
 
    @Override
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      return null;
+      LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
+
+      Numerical level = popNumericalArg(parser, stack);
+
+      GlsLabel glslabel = popEntryLabel(parser, stack);
+
+      TeXObjectList list = listener.createStack();
+
+      DataObjectList noexpand = listener.createDataList(true);
+      list.add(noexpand);
+
+      noexpand.add(new TeXCsRef("def"));
+      noexpand.add(new TeXCsRef("glscurrententrylabel"));
+      noexpand.add(listener.createGroup(glslabel.getLabel()));
+
+      list.add(listener.getControlSequence("gls@org@glossarysubentryfield"));
+
+      Group grp = listener.createGroup();
+      list.add(grp);
+      grp.add(level);
+
+      list.add(listener.createGroup(glslabel.getLabel()));
+
+      grp = listener.createGroup();
+      list.add(grp);
+      grp.add(popArg(parser, stack));
+
+      return list;
    }
 
    @Override
@@ -67,7 +94,18 @@ public class SubGlossEntryWithLabel extends AbstractGlsCommand
 
       stack.push(glslabel);
       stack.push(level);
-      stack.push(listener.getControlSequence("gls@org@glossarysubentryfield"));
+
+      ControlSequence cs =
+         listener.getControlSequence("gls@org@glossarysubentryfield");
+
+      if (parser == stack || stack == null)
+      {
+         cs.process(parser);
+      }
+      else
+      {
+         cs.process(parser, stack);
+      }
    }
 
    @Override

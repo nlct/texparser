@@ -808,6 +808,16 @@ public class TeXSettings
       csTable.put(cs.getName(), cs);
    }
 
+   public void undefControlSequence(String name)
+   {
+      removeLocalControlSequence(name);
+
+      if (parent != null)
+      {
+         parent.undefControlSequence(name);
+      }
+   }
+
    public ControlSequence removeLocalControlSequence(String name)
    {
       ControlSequence cs = csTable.remove(name);

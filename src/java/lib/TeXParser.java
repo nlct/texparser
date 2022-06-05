@@ -2776,6 +2776,15 @@ public class TeXParser extends TeXObjectList
 
    public void putControlSequence(ControlSequence cs)
    {
+      settings.undefControlSequence(cs.getName());
+      settings.putControlSequence(cs);
+
+      if (cs instanceof Declaration)
+      {
+         EndDeclaration endDec = new EndDeclaration(cs.getName());
+         settings.putControlSequence(endDec);
+      }
+
       csTable.put(cs.getName(), cs);
 
       if (cs instanceof Declaration && isLetter(cs.getName().charAt(0)))
