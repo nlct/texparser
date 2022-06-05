@@ -971,7 +971,7 @@ public class L2HConverter extends LaTeXParserListener
       writeable.writeln("</html>");
 
       documentEnded = true;
-      //writer.close();
+      writer.close();
 
       throw new EOFException();
    }

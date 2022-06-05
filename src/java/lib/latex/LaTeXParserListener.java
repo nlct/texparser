@@ -463,6 +463,8 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       parser.putControlSequence(new SymbolCs());
 
       parser.putControlSequence(new TextualContentCommand("p@", "pt"));
+      parser.putControlSequence(new TextualContentCommand("@minus", "minus"));
+      parser.putControlSequence(new TextualContentCommand("@plus", "plus"));
       parser.putControlSequence(new AtFor());
       parser.putControlSequence(new AtIfNextChar());
       parser.putControlSequence(new AtFirstOfTwo());

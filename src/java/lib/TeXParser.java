@@ -400,56 +400,7 @@ public class TeXParser extends TeXObjectList
 
    private int read() throws IOException
    {
-      int c = reader.read();
-
-      if (c == -1)
-      {
-         if (debugLevel > 0)
-         {
-            logMessage("EOF read() "+reader);
-         }
-
-         TeXObjectList pending = reader.getPending();
-
-         if (pending != null)
-         {
-            push(pending, true);
-
-            if (getDebugLevel() > 0)
-            {
-               logMessage("PUSHED PENDING "+toString());
-            }
-
-            reader.setPending(null);
-         }
-
-         TeXReader parentReader = reader.getParent();
-
-         if (parentReader == null)
-         {
-            return -1;
-         }
-
-         try
-         {
-            reader.close();
-         }
-         catch (IOException e)
-         {
-            listener.getTeXApp().error(e);
-         }
-
-         reader = parentReader;
-
-         if (debugLevel > 0)
-         {
-            logMessage("READER: "+reader);
-         }
-
-         return '\n';
-      }
-
-      return c;
+      return reader.read();
    }
 
    private void mark(int limit) throws IOException
@@ -1984,16 +1935,34 @@ public class TeXParser extends TeXObjectList
 
       try
       {
-         while (fetchNext())
+         boolean done = false;
+
+         while (!done)
          {
-            if (size() == 0)
-            {
-               break;
-            }
+            boolean eof = (!fetchNext() || isEmpty());
 
             if (debugLevel > 0)
             {
-               logMessage("PARSE FETCH NEXT "+toString());
+               if (eof)
+               {
+                  logMessage("PARSE FETCH NEXT EOF FOUND");
+               }
+               else
+               {
+                  logMessage("PARSE FETCH NEXT "+toString());
+               }
+            }
+
+            if (eof)
+            {
+               closeReader(reader);
+
+               reader = this.reader;
+
+               if (this.reader == null)
+               {
+                  done = true;
+               }
             }
 
             while (size() > 0)
@@ -2015,9 +1984,11 @@ public class TeXParser extends TeXObjectList
 
                   closeReader(reader);
 
+                  reader = this.reader;
+
                   if (this.reader == null)
                   {
-                     break;
+                     done = true;
                   }
                }
                catch (TeXSyntaxException e)
