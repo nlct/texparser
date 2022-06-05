@@ -20,20 +20,42 @@ package com.dickimawbooks.texparserlib;
 
 import java.io.IOException;
 
+import com.dickimawbooks.texparserlib.primitives.UnSkip;
+
 public abstract class WhiteSpace extends AbstractTeXObject
 {
    @Override
-   public void process(TeXParser parser, TeXObjectList list)
+   public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      process(parser);
+      TeXObject obj = stack.peekStack();
+
+      if (obj instanceof TeXCsRef)
+      {
+         ControlSequence cs = parser.getControlSequence(((TeXCsRef)obj).getName());
+
+         if (cs != null)
+         {
+            obj = cs;
+         }
+      }
+
+      if (obj instanceof AssignedMacro)
+      {
+         obj = ((AssignedMacro)obj).getBaseUnderlying();
+      }
+
+      if (!(obj instanceof UnSkip))
+      {
+         parser.getListener().getWriteable().write(' ');
+      }
    }
 
    @Override
    public void process(TeXParser parser)
      throws IOException
    {
-      parser.getListener().getWriteable().write(' ');
+      process(parser, parser);
    }
 
    @Override

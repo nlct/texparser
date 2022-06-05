@@ -93,6 +93,7 @@ public abstract class DefaultTeXParserListener extends TeXParserListener
       parser.putControlSequence(new OverWithDelims());
       parser.putControlSequence(new Accent("a"));
       parser.putControlSequence(new Relax());
+      parser.putControlSequence(new UnSkip());
       parser.putControlSequence(new Unexpanded());
       parser.putControlSequence(new DisplayStyle());
       parser.putControlSequence(new TextStyle());

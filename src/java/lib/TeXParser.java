@@ -2644,6 +2644,11 @@ public class TeXParser extends TeXObjectList
       if (size() == 0)
       {
          fetchNext();
+
+         if (size() == 0)
+         {
+            return null;
+         }
       }
 
       TeXObject obj = firstElement();
@@ -2660,6 +2665,11 @@ public class TeXParser extends TeXObjectList
                fetchNext();
             }
 
+            if (idx >= size())
+            {
+               return null;
+            }
+
             obj = get(idx);
          }
       }
@@ -2672,6 +2682,11 @@ public class TeXParser extends TeXObjectList
             if (size() == idx)
             {
                fetchNext();
+            }
+
+            if (idx >= size())
+            {
+               return null;
             }
 
             obj = get(idx);
