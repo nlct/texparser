@@ -473,6 +473,9 @@ public class GlossariesSty extends LaTeXSty
 
    protected void addExtraDefinitions()
    {
+      listener.newtoks(true, "glsshortpltok");
+      listener.newtoks(true, "glslongpltok");
+
       registerControlSequence(new GenericCommand(true, "glsxtrabbrvtype", 
         null, new TeXCsRef("glsdefaulttype")));
 
@@ -844,8 +847,11 @@ public class GlossariesSty extends LaTeXSty
       registerControlSequence(new GlsAccessFmtField("Glsaccessfmtuservi", "user6", CaseChange.SENTENCE, this));
       registerControlSequence(new GlsAccessFmtField("GLSaccessfmtuservi", "user6", CaseChange.TO_UPPER, this));
 
-      listener.newtoks(true, "glsshortpltok");
-      listener.newtoks(true, "glslongpltok");
+      registerControlSequence(new GlsXtrDisplayLocNameRef());
+      registerControlSequence(new GlsXtrEquationLocFmt());
+      registerControlSequence(new GlsXtrNameRefLink());
+      registerControlSequence(new GlsXtrFmtInternalNameRef());
+      registerControlSequence(new GlsXtrFmtExternalNameRef());
    }
 
    @Override
