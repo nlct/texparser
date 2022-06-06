@@ -611,6 +611,7 @@ public class L2HConverter extends LaTeXParserListener
 
    @Override
    public TeXObject createAnchor(String anchorName, TeXObject text)
+    throws IOException
    {
       TeXObjectList stack = createStack();
 
@@ -626,7 +627,15 @@ public class L2HConverter extends LaTeXParserListener
 
    @Override
    public TeXObject createLink(String anchorName, TeXObject text)
+    throws IOException
    {
+      TeXObject label = AuxData.getLabelForLink(getAuxData(), getParser(), anchorName);
+
+      if (label != null)
+      {
+         anchorName = label.toString(parser);
+      }
+
       TeXObjectList stack = createStack();
 
       stack.add(new HtmlTag(String.format("<a href=\"#%s\">", 

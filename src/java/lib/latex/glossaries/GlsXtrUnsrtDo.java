@@ -54,8 +54,6 @@ public class GlsXtrUnsrtDo extends AbstractGlsCommand
 
       if (entry != null)
       {
-         TeXObject location = null;
-
          String locationField = "location";
 
          ControlSequence cs = parser.getControlSequence("GlsXtrLocationField");
@@ -65,9 +63,9 @@ public class GlsXtrUnsrtDo extends AbstractGlsCommand
             locationField = parser.expandToString(cs, stack);
          }
 
-         TeXObject val = entry.get(locationField);
+         TeXObject location = entry.get(locationField);
 
-         if (val != null)
+         if (location != null)
          {// not using loclist field
 
             DataObjectList noexpand = listener.createDataList(true);
@@ -78,7 +76,7 @@ public class GlsXtrUnsrtDo extends AbstractGlsCommand
             Group grp = listener.createGroup();
             noexpand.add(grp);
 
-            grp.add((TeXObject)val.clone());
+            grp.add((TeXObject)location.clone());
          }
 
          NumericRegister levelReg = parser.getSettings().getNumericRegister("gls@level");
@@ -156,8 +154,6 @@ public class GlsXtrUnsrtDo extends AbstractGlsCommand
 
       if (entry != null)
       {
-         TeXObject location = null;
-
          String locationField = "location";
 
          ControlSequence cs = parser.getControlSequence("GlsXtrLocationField");
@@ -167,14 +163,14 @@ public class GlsXtrUnsrtDo extends AbstractGlsCommand
             locationField = parser.expandToString(cs, stack);
          }
 
-         TeXObject val = entry.get(locationField);
+         TeXObject location = entry.get(locationField);
 
-         if (val != null)
+         if (location != null)
          {// not using loclist field
 
             parser.putControlSequence(false,
               new GenericCommand(true, "@gls@location", null,
-                  (TeXObject)val.clone()));
+                  (TeXObject)location.clone()));
          }
 
          NumericRegister levelReg = parser.getSettings().getNumericRegister("gls@level");

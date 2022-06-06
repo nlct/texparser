@@ -23,57 +23,50 @@ import java.io.IOException;
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.*;
 
-public class GlsNoIdxDisplayLoc extends Command
+public class SetEntryCounter extends ControlSequence
 {
-   public GlsNoIdxDisplayLoc()
+   public SetEntryCounter()
    {
-      this("glsnoidxdisplayloc");
+      this("setentrycounter");
    }
 
-   public GlsNoIdxDisplayLoc(String name)
+   public SetEntryCounter(String name)
    {
       super(name);
    }
 
    public Object clone()
    {
-      return new GlsNoIdxDisplayLoc(getName());
+      return new SetEntryCounter(getName());
    }
 
    @Override
-   public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
+   public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      String prefix = popLabelString(parser, stack);
+      String prefix = popOptLabelString(parser, stack);
       String counter = popLabelString(parser, stack);
-      String csname = popLabelString(parser, stack);
 
-      TeXObject loc = popArg(parser, stack);
-
-      LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
-      TeXObjectList list = listener.createStack();
-
-      DataObjectList noexpand = listener.createDataList(true);
-      list.add(noexpand);
-
-      noexpand.add(listener.getControlSequence("setentrycounter"));
-
-      if (!prefix.isEmpty())
+      if (prefix == null || prefix.isEmpty())
       {
-         noexpand.add(listener.getOther('['));
-         noexpand.add(listener.createString(prefix), true);
-         noexpand.add(listener.getOther(']'));
+         prefix = ".";
+      }
+      else
+      {
+         prefix = "." + prefix + ".";
       }
 
-      noexpand.add(listener.createGroup(counter));
+      parser.putControlSequence(true, new TextualContentCommand(
+       "@glo@counterprefix", prefix));
 
-      list.add(listener.getControlSequence(csname));
-      Group grp = listener.createGroup();
-      list.add(grp);
-
-      grp.add(loc);
-
-      return list;
+      parser.putControlSequence(true,
+         new TextualContentCommand("glsentrycounter", counter));
    }
 
+   @Override
+   public void process(TeXParser parser)
+     throws IOException
+   {
+      process(parser, parser);
+   }
 }

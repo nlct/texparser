@@ -220,7 +220,8 @@ public abstract class TeXParserListener
     * @return an object that incorporates the text with a target or
     * just the text
     */
-   public abstract TeXObject createAnchor(String anchorName, TeXObject text);
+   public abstract TeXObject createAnchor(String anchorName, TeXObject text)
+    throws IOException;
 
    /**
     * Creates a hyperlink.
@@ -230,7 +231,8 @@ public abstract class TeXParserListener
     * @return an object that encapsulates the text with a hyperlink
     * or just the text
     */
-   public abstract TeXObject createLink(String anchorName, TeXObject text);
+   public abstract TeXObject createLink(String anchorName, TeXObject text)
+    throws IOException;
 
    public abstract Writeable getWriteable();
 

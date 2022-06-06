@@ -144,8 +144,11 @@ public class GlossariesSty extends LaTeXSty
       registerControlSequence(new TextualContentCommand("glsresetentrylist", ""));
       registerControlSequence(new AtFirstOfOne("glsnamefont"));
       registerControlSequence(new AtFirstOfOne("glossaryentrynumbers"));
-      registerControlSequence(new GobbleOpt("setentrycounter", 1, 1));
-      registerControlSequence(new AtFirstOfOne("glsnumberformat"));
+      registerControlSequence(new SetEntryCounter());
+      registerControlSequence(new GenericCommand(true, "glsnumberformat", null,
+        new TeXCsRef("glshypernumber")));
+      registerControlSequence(new GlsHyperNumber());
+
       registerControlSequence(new TextualContentCommand("glossarytitle", ""));
       registerControlSequence(new TextualContentCommand("glossarytoctitle", ""));
       registerControlSequence(new TextualContentCommand("glossarypreamble", ""));
