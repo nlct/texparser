@@ -117,6 +117,8 @@ public class GlossariesSty extends LaTeXSty
    @Override
    public void addDefinitions()
    {
+      registerControlSequence(new TextualContentCommand("glscounter", "page"));
+
       registerControlSequence(new TextualContentCommand("glsdefaulttype", "main"));
       registerControlSequence(new GenericCommand(true, "acronymtype", 
               null, new TeXCsRef("glsdefaulttype")));
@@ -279,6 +281,8 @@ public class GlossariesSty extends LaTeXSty
       registerControlSequence(new GlsSymbolNav());
       registerControlSequence(new TextualContentCommand("glshypernavsep", " | "));
 
+      registerControlSequence(new GlsAdd(this));
+
       registerControlSequence(new Gls(this));
       registerControlSequence(new Gls("Gls", CaseChange.SENTENCE, this));
       registerControlSequence(new Gls("GLS", CaseChange.TO_UPPER, this));
@@ -434,6 +438,11 @@ public class GlossariesSty extends LaTeXSty
       registerControlSequence(new GlsEntryFull("Glsentryfullpl", CaseChange.SENTENCE, true, this));
 
       getParser().getSettings().newcount("gls@level");
+
+      registerControlSequence(new GenericCommand(true, "@gls@counter", null,
+         new TeXCsRef("glscounter")));
+
+      registerControlSequence(new KVAtGlsLinkAtCounter());
 
       if (extra)
       {
@@ -852,6 +861,15 @@ public class GlossariesSty extends LaTeXSty
       registerControlSequence(new GlsXtrNameRefLink());
       registerControlSequence(new GlsXtrFmtInternalNameRef());
       registerControlSequence(new GlsXtrFmtExternalNameRef());
+
+      registerControlSequence(new GlsXtrInternalLocationHyperlink());
+      registerControlSequence(new GlsXtrLocationHyperLink());
+
+      registerControlSequence(new AtGobble("glsxtr@inc@wrglossaryctr"));
+
+      NewIf.createConditional(true, getParser(), "ifKV@glslink@noindex", false);
+
+      registerControlSequence(new AtFirstOfTwo("glsxtr@wrglossarylocation"));
    }
 
    @Override
@@ -874,6 +892,17 @@ public class GlossariesSty extends LaTeXSty
    protected void postOptions(TeXObjectList stack) throws IOException
    {
       super.postOptions(stack);
+
+      if (indexcounter)
+      {
+         getListener().newcounter("wrglossary");
+         registerControlSequence(new TextualContentCommand("glscounter", 
+           "wrglossary"));
+
+         registerControlSequence(new GlsXtrAtIncAtWrGlossaryCtr());
+         registerControlSequence(new GlsXtrAtIncAtWrGlossaryCtr(
+           "@@do@wrglossary"));
+      }
 
       TeXObjectList substack = getListener().createStack();
 
@@ -1054,6 +1083,15 @@ public class GlossariesSty extends LaTeXSty
          {
             indexingOption = IndexingOption.UNSRT;
          }
+      }
+      else if (option.equals("indexcounter"))
+      {
+         indexcounter = true;
+      }
+      else if (option.equals("counter"))
+      {
+         registerControlSequence(new TextualContentCommand("glscounter", 
+           value.toString(parser)));
       }
       else if (option.equals("nolist"))
       {
@@ -2169,6 +2207,8 @@ public class GlossariesSty extends LaTeXSty
    private boolean isNumberedSection = false;
 
    private boolean isAutoLabel = false;
+
+   private boolean indexcounter = false;
 
    private String initialStyle = "list";
    private boolean loadList = true;

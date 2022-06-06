@@ -72,9 +72,11 @@ public class AtGlsAtLink extends AbstractGlsCommand
       TeXObject linkText = popArg(parser, stack);
 
       parser.putControlSequence(true, glslabel.duplicate("@gls@link@label"));
-
-      // ignore indexing stuff (location counter and format)
    
+      parser.putControlSequence(true, new TextualContentCommand(
+        "@gls@counter", parser.expandToString(
+            listener.getControlSequence("glscounter"), stack)));
+
       if (entry == null)
       {
          parser.putControlSequence(true, new GlsType("glstype", "main"));
@@ -82,6 +84,19 @@ public class AtGlsAtLink extends AbstractGlsCommand
       else
       {
          parser.putControlSequence(true, new GlsType(entry.getGlossary(stack)));
+
+         Glossary glossary = sty.getGlossary(entry);
+
+         if (glossary != null)
+         {
+            String counter = glossary.getCounter();
+
+            if (counter != null)
+            {
+               parser.putControlSequence(true, new TextualContentCommand(
+                  "@gls@counter", counter));
+            }
+         }
       }
 
       TeXObjectList list = new TeXObjectList();
@@ -98,11 +113,52 @@ public class AtGlsAtLink extends AbstractGlsCommand
 
       list.add(listener.getControlSequence("glslinkpostsetkeys"));
 
-      list.process(parser);
+      if (parser == stack || stack == null)
+      {
+         list.process(parser);
+      }
+      else
+      {
+         list.process(parser, stack);
+      }
 
-      ControlSequence cs = parser.getControlSequence("ifKV@glslink@hyper");
+      boolean doIndex = true;
 
-      if (cs instanceof TeXBoolean && ((TeXBoolean)cs).booleanValue())
+      if (sty.isExtra())
+      {
+         TeXBoolean noIndex = TeXParserUtils.toBoolean("ifKV@glslink@noindex",
+            parser);
+
+         if (noIndex != null && noIndex.booleanValue())
+         {
+            doIndex = false;
+         }
+      } 
+
+      if (doIndex)
+      {
+         ControlSequence cs = parser.getControlSequence("@@do@wrglossary");
+
+         if (cs != null)
+         {
+            list.add(cs);
+            list.add(glslabel);
+
+            if (parser == stack || stack == null)
+            {
+               list.process(parser);
+            }
+            else
+            {
+               list.process(parser, stack);
+            }
+         }
+      }
+
+      TeXBoolean isHyper = TeXParserUtils.toBoolean("ifKV@glslink@hyper",
+        parser);
+
+      if (isHyper != null && isHyper.booleanValue())
       {
          list.add(new TeXCsRef("@glslink"));
       }
