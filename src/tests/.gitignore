@@ -11,3 +11,4 @@ test*.pdf
 *.glg
 *.idx
 *.ist
+*.glstex
