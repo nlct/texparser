@@ -66,9 +66,29 @@ public class GlsEntryField extends AbstractGlsCommand
 
       GlossaryEntry entry = glslabel.getEntry();
 
-      if (entry == null) return null;
+      TeXObject value = null;
 
-      TeXObject value = entry.get(fieldLabel);
+      if (entry == null)
+      {
+         ControlSequence cs = sty.getParser().getControlSequence(
+           String.format("glo@%s@%s", glslabel.getLabel(), fieldLabel));
+
+         if (cs != null)
+         {
+            if (cs instanceof GenericCommand)
+            {
+               value = ((GenericCommand)cs).getDefinition();
+            }
+            else
+            {
+               value = cs;
+            }
+         }
+      }
+      else
+      {
+         value = entry.get(fieldLabel);
+      }
 
       if (value != null)
       {
@@ -182,7 +202,7 @@ public class GlsEntryField extends AbstractGlsCommand
 
       TeXObject value = getFieldValue(glslabel, fieldLabel);
 
-      if (value == null || !(value instanceof Expandable))
+      if (value == null || !value.canExpand())
       {
          TeXObjectList list = new TeXObjectList();
 

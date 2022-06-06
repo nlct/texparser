@@ -47,14 +47,7 @@ public class LongNewGlossaryEntry extends NewGlossaryEntry
 
       if (sty.isExtra())
       {
-         TeXObject object = stack.peekStack();
-
-         if (object instanceof CharObject
-               && ((CharObject)object).getCharCode() == (int)'*')
-         {
-            isStar = true;
-            stack.popStack(parser);
-         }
+         isStar = (popModifier(parser, stack, '*') == '*');
       }
 
       String label = popLabelString(parser, stack);

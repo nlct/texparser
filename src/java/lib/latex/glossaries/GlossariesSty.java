@@ -150,6 +150,10 @@ public class GlossariesSty extends LaTeXSty
       registerControlSequence(new TextualContentCommand("glossarytoctitle", ""));
       registerControlSequence(new TextualContentCommand("glossarypreamble", ""));
       registerControlSequence(new TextualContentCommand("glossarypostamble", ""));
+      registerControlSequence(new TextualContentCommand("delimR", "\u2013"));
+      registerControlSequence(new TextualContentCommand("delimN", ", "));
+
+      registerControlSequence(new GlsNoIdxDisplayLoc());
 
       if (getParser().getControlSequence("glossentry") == null)
       {
@@ -223,7 +227,13 @@ public class GlossariesSty extends LaTeXSty
       registerControlSequence(new GlsPostDescription(this));
 
       registerControlSequence(new NewGlossaryEntry(this));
+      registerControlSequence(new LongNewGlossaryEntry(this));
       registerControlSequence(new LoadGlsEntries());
+
+      registerControlSequence(new GlsExpandFields(this));
+      registerControlSequence(new GlsExpandFields("glsnoexpandfields", false, true, this));
+      registerControlSequence(new GlsExpandFields("glssetnoexpandfield", false, false, this));
+      registerControlSequence(new GlsExpandFields("glssetexpandfield", true, false, this));
 
       registerControlSequence(new TextualContentCommand("glsautoprefix", ""));
 
@@ -386,6 +396,11 @@ public class GlossariesSty extends LaTeXSty
       registerControlSequence(new IfHasField("ifglshasshort", "short", this));
       registerControlSequence(new IfHasField("ifglshaslong", "long", this));
 
+      registerControlSequence(new GlsSetField("glsfielddef", this));
+      registerControlSequence(new GlsSetField("glsfieldgdef", false, true, this));
+      registerControlSequence(new GlsSetField("glsfieldxdef", true, true, this));
+      registerControlSequence(new GlsSetField("glsfieldedef", true, false, this));
+
       LaTeXParserListener listener = (LaTeXParserListener)getParser().getListener();
 
       setModifier(listener.getOther('*'), "hyper", new UserBoolean(true));
@@ -525,6 +540,22 @@ public class GlossariesSty extends LaTeXSty
          CaseChange.SENTENCE, this));
       registerControlSequence(new GlsEntryField("GLSxtrusefield", null,
          CaseChange.TO_UPPER, this));
+
+      registerControlSequence(new GlsSetField("GlsXtrSetField", this));
+      registerControlSequence(new GlsSetField("gGlsXtrSetField", false, true, this));
+      registerControlSequence(new GlsSetField("xGlsXtrSetField", true, true, this));
+      registerControlSequence(new GlsSetField("eGlsXtrSetField", true, false, this));
+      registerControlSequence(new GlsSetField("glsxtrdeffield", false, false, false, this));
+      registerControlSequence(new GlsSetField("glsxtredeffield", true, false, false, this));
+      registerControlSequence(new GlsXtrAppToCsvField(this));
+
+      registerControlSequence(new GlsXtrFieldListAdd());
+      registerControlSequence(new GlsXtrFieldListAdd("glsxtrfieldlisteadd", false, true));
+      registerControlSequence(new GlsXtrFieldListAdd("glsxtrfieldlistgadd", true, false));
+      registerControlSequence(new GlsXtrFieldListAdd("glsxtrfieldlistxadd", true, true));
+
+      registerControlSequence(new GlsXtrFieldDoListLoop());
+      registerControlSequence(new GlsXtrFieldDoListLoop("glsxtrfieldforlistloop", false));
 
       registerControlSequence(new TextualContentCommand("glsxtrundeftag", "??"));
 
@@ -932,7 +963,16 @@ public class GlossariesSty extends LaTeXSty
          substack.add(new TeXParserSetUndefAction(orgAction));
       }
 
-      if (!extra)
+      if (extra)
+      {
+         if (indexingOption == IndexingOption.UNSRT)
+         {
+            undefWarn = true;
+            addField("group");
+            addField("location");
+         }
+      }
+      else
       {
          substack.add(new TeXCsRef("setacronymstyle"));
          substack.add(getListener().createGroup("long-short"));
@@ -985,7 +1025,17 @@ public class GlossariesSty extends LaTeXSty
       }
       else if (option.equals("record"))
       {
-         indexingOption = IndexingOption.UNSRT;
+         record = (value == null ? "only" : value.toString(parser).trim());
+
+         if (record.isEmpty())
+         {
+            record = "only";
+         }
+
+         if (record.equals("only") || record.equals("nameref"))
+         {
+            indexingOption = IndexingOption.UNSRT;
+         }
       }
       else if (option.equals("nolist"))
       {
@@ -1012,7 +1062,11 @@ public class GlossariesSty extends LaTeXSty
       }
       else if (option.equals("style"))
       {
-         initialStyle = getParser().expandToString(value, null);
+         initialStyle = value.toString(parser);
+      }
+      else if (option.equals("undefaction"))
+      {
+         undefWarn = value.toString(parser).equals("warn");
       }
       else if (option.equals("section"))
       {
@@ -1398,6 +1452,11 @@ public class GlossariesSty extends LaTeXSty
       entries.put(label, entry);
    }
 
+   public void setFieldExpansionOn(boolean on)
+   {
+      expandFields = on;
+   }
+
    public void setFieldExpansionOn(String field, boolean on)
    {
       expandField.put(field, Boolean.valueOf(on));
@@ -1456,7 +1515,7 @@ public class GlossariesSty extends LaTeXSty
       }
    }
 
-   public void addDefaultFieldValues(GlossaryEntry entry)
+   public void addDefaultFieldValues(GlossaryEntry entry, TeXObjectList stack)
      throws IOException
    {
       if (fieldDefaultValues != null)
@@ -1482,7 +1541,36 @@ public class GlossariesSty extends LaTeXSty
                   }
                }
 
-               entry.setField(field, val);
+               if (getParser().getDebugLevel() > 0)
+               {
+                  getParser().logMessage("ADDING DEFAULT FIELD "+field 
+                    + " -> "+val.toString(getParser()));
+               }
+
+               entry.setField(field, val, stack);
+            }
+         }
+      }
+
+      if (indexingOption != IndexingOption.UNSRT)
+      {
+         TeXObject sort = entry.get("sort");
+
+         if (sort == null)
+         {
+            TeXObject name = entry.get("name");
+
+            if (name != null)
+            {
+               TeXObject val = (TeXObjectList)name.clone();
+
+               if (getParser().getDebugLevel() > 0)
+               {
+                  getParser().logMessage("ADDING DEFAULT sort FIELD" 
+                    + " -> "+val.toString(getParser()));
+               }
+
+               entry.setField("sort", val, stack);
             }
          }
       }
@@ -2074,11 +2162,14 @@ public class GlossariesSty extends LaTeXSty
    private boolean nostyleWarningIssued = false;
 
    private IndexingOption indexingOption = IndexingOption.MAKEINDEX;
+   private String record = "off";
 
    public static final String GLOSSARY_NOT_DEFINED 
     = "glossaries.glossary.not.defined";
    public static final String ENTRY_NOT_DEFINED 
     = "glossaries.entry.not.defined";
+   public static final String FIELD_NOT_DEFINED 
+    = "glossaries.field.not.defined";
    public static final String GLOSSARY_EXISTS 
     = "glossaries.glossary.exists";
    public static final String ENTRY_EXISTS 

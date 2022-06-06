@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 */
 package com.dickimawbooks.texparserlib.latex.glossaries;
 
-import java.util.HashMap;
+import java.util.Vector;
 import java.util.Iterator;
 import java.io.IOException;
 
@@ -29,16 +29,23 @@ import com.dickimawbooks.texparserlib.primitives.IfFalse;
 import com.dickimawbooks.texparserlib.latex.KeyValList;
 import com.dickimawbooks.texparserlib.latex.LaTeXSyntaxException;
 
-public class GlossaryEntry extends HashMap<String,TeXObject>
+public class GlossaryEntry
 {
    public GlossaryEntry(GlossariesSty sty, 
-     String label, KeyValList options)
+     String label, KeyValList options, TeXObjectList stack)
    throws IOException
    {
       super();
       this.label = label;
       this.sty = sty;
+      fields = new Vector<String>();
+
       TeXParser parser = sty.getParser();
+
+      if (parser.getDebugLevel() > 0)
+      {
+         parser.logMessage("Defining GlossaryEntry "+label);
+      }
 
       for (Iterator<String> it = options.keySet().iterator();
            it.hasNext(); )
@@ -48,23 +55,35 @@ public class GlossaryEntry extends HashMap<String,TeXObject>
 
          if (sty.isFieldExpansionOn(key))
          {
-            value = options.getExpandedValue(key, parser, parser);
+            value = options.getExpandedValue(key, parser, stack);
          }
          else
          {
             value = options.getValue(key);
          }
 
-         setField(key, value);
+         if (parser.getDebugLevel() > 0)
+         {
+            parser.logMessage("FIELD "+key+" -> "+value.toString(parser));
+         }
+
+         setField(key, value, stack);
       }
 
       NewIf.createConditional(false, parser, "ifglo@"+label+"@flag");
 
-      sty.addDefaultFieldValues(this);
+      sty.addDefaultFieldValues(this, stack);
    }
 
-   public TeXObject setField(String key, TeXObject value)
+   public void setField(String key, TeXObject value, TeXObjectList stack)
      throws IOException
+   {
+      setField(key, value, true, stack);
+   }
+
+   public void setField(String key, TeXObject value, boolean local,
+       TeXObjectList stack)
+   throws IOException
    {
       if (key.equals("type"))
       {
@@ -72,17 +91,7 @@ public class GlossaryEntry extends HashMap<String,TeXObject>
          {
             TeXObject typeVal = (TeXObject)value.clone();
 
-            if (typeVal instanceof Expandable)
-            {
-               TeXObjectList expanded = ((Expandable)typeVal).expandfully(sty.getParser());
-
-               if (expanded != null)
-               {
-                  typeVal = expanded;
-               }
-            }
-
-            String type = typeVal.toString(sty.getParser());
+            String type = sty.getParser().expandToString(typeVal, stack);
 
             value = new GlsType("@@glstype", type, sty.getGlossary(type));
          }
@@ -91,16 +100,7 @@ public class GlossaryEntry extends HashMap<String,TeXObject>
       {
          TeXObject categoryVal = (TeXObject)value.clone();
 
-         if (categoryVal instanceof Expandable)
-         {
-            TeXObjectList expanded =
-              ((Expandable)categoryVal).expandfully(sty.getParser());
-
-            if (expanded != null)
-            {
-               categoryVal = expanded;
-            }
-         }
+         category = sty.getParser().expandToString(categoryVal, stack);
 
          category = categoryVal.toString(sty.getParser());
       }
@@ -109,7 +109,8 @@ public class GlossaryEntry extends HashMap<String,TeXObject>
          if (value == null || value.isEmpty())
          {
             level = 0;
-            return remove("parent");
+            remove("parent", local);
+            return;
          }
 
          if (value instanceof GlsLabel)
@@ -122,22 +123,13 @@ public class GlossaryEntry extends HashMap<String,TeXObject>
          {
             TeXObject parentVal = (TeXObject)value.clone();
 
-            if (parentVal instanceof Expandable)
-            {
-               TeXObjectList expanded = ((Expandable)parentVal).expandfully(sty.getParser());
-
-               if (expanded != null)
-               {
-                  parentVal = expanded;
-               }
-            }
-
-            String parent = parentVal.toString(sty.getParser());
+            String parent = sty.getParser().expandToString(parentVal, stack);
 
             if (parent.isEmpty())
             {
                level = 0;
-               return remove(parent);
+               remove(parent, local);
+               return;
             }
 
             GlossaryEntry parentEntry = sty.getEntry(parent);
@@ -153,12 +145,69 @@ public class GlossaryEntry extends HashMap<String,TeXObject>
             value = new GlsLabel("@@parent@label", parentEntry);
          }
       }
-      else if (value == null)
+
+      String internalField = sty.getInternalFieldName(key);
+
+      String csname = String.format("glo@%s@%s", getLabel(), internalField);
+
+      if (value == null)
       {
-         return remove(key);
+         fields.remove(key);
+
+         sty.getParser().removeControlSequence(local, csname);
+      }
+      else
+      {
+         if (fields.contains(key))
+         {
+            fields.add(key);
+         }
+
+         sty.getParser().putControlSequence(local,
+            new GenericCommand(true, csname, null, value));
+      }
+   }
+
+   public void remove(String key)
+   {
+      remove(key, true);
+   }
+
+   public void remove(String key, boolean local)
+   {
+      String internalField = sty.getInternalFieldName(key);
+
+      String csname = String.format("glo@%s@%s", getLabel(), internalField);
+
+      fields.remove(key);
+
+      sty.getParser().removeControlSequence(local, csname);
+   }
+
+   public TeXObject get(String field)
+   {
+      String internalField = sty.getInternalFieldName(field);
+
+      String csname = String.format("glo@%s@%s", getLabel(), internalField);
+
+      ControlSequence cs = sty.getParser().getControlSequence(csname);
+
+      if (cs == null)
+      {
+         return null;
       }
 
-      return put(key, value);
+      if (!fields.contains(field))
+      {
+         fields.add(field);
+      }
+
+      if (cs instanceof GenericCommand)
+      {
+         return ((GenericCommand)cs).getDefinition();
+      }
+
+      return cs;
    }
 
    public int getLevel()
@@ -183,7 +232,7 @@ public class GlossaryEntry extends HashMap<String,TeXObject>
       return "main";
    }
 
-   public Glossary getGlossary() throws IOException
+   public Glossary getGlossary(TeXObjectList stack) throws IOException
    {
       TeXObject val = get("type");
 
@@ -241,7 +290,8 @@ public class GlossaryEntry extends HashMap<String,TeXObject>
       }
 
       GlsType glstype = new GlsType("@@glstype", type, glossary);
-      put("type", glstype);
+
+      setField("type", glstype, stack);
 
       return glossary;
    }
@@ -251,7 +301,7 @@ public class GlossaryEntry extends HashMap<String,TeXObject>
       return label;
    }
 
-   public GlossaryEntry getParent() throws IOException
+   public GlossaryEntry getParent(TeXObjectList stack) throws IOException
    {
       TeXObject val = get("parent");
 
@@ -282,7 +332,7 @@ public class GlossaryEntry extends HashMap<String,TeXObject>
          return entry;
       }
 
-      String parent = val.toString(sty.getParser());
+      String parent = sty.getParser().expandToString(val, stack);
       GlossaryEntry entry = sty.getEntry(parent);
 
       if (entry == null)
@@ -295,7 +345,7 @@ public class GlossaryEntry extends HashMap<String,TeXObject>
       }
 
       level = entry.getLevel()+1;
-      put("parent", new GlsLabel("@@parent@label", entry));
+      setField("parent", new GlsLabel("@@parent@label", entry), stack);
 
       return entry;
    }
@@ -328,4 +378,6 @@ public class GlossaryEntry extends HashMap<String,TeXObject>
    private String category;
    private int level=0;
    private GlossariesSty sty;
+
+   private Vector<String> fields;
 }

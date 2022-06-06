@@ -81,7 +81,7 @@ public class AtGlsAtLink extends AbstractGlsCommand
       }
       else
       {
-         parser.putControlSequence(true, new GlsType(entry.getGlossary()));
+         parser.putControlSequence(true, new GlsType(entry.getGlossary(stack)));
       }
 
       TeXObjectList list = new TeXObjectList();

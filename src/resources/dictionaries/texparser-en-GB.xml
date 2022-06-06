@@ -195,6 +195,7 @@ There is NO WARRANTY, to the extent permitted by law.</entry>
 
 <entry key="glossaries.glossary.not.defined">Glossary ''{0}'' not defined</entry>
 <entry key="glossaries.entry.not.defined">Entry ''{0}'' not defined</entry>
+<entry key="glossaries.field.not.defined">Field ''{0}'' not defined</entry>
 <entry key="glossaries.glossary.exists">Glossary ''{0}'' already exists</entry>
 <entry key="glossaries.entry.exists">Entry ''{0}'' already exists</entry>
 <entry key="glossaries.glossary.style.not.defined">Glossary style ''{0}'' not defined</entry>

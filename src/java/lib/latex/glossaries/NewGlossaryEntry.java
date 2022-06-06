@@ -101,14 +101,6 @@ public class NewGlossaryEntry extends AbstractGlsCommand
          }
       }
 
-      TeXObject sort = keyValList.get("sort");
-
-      if (sort == null)
-      {// doesn't take sort option into account
-         sort = (TeXObject)name.clone();
-         keyValList.put("sort", sort);
-      }
-
       TeXObject text = keyValList.get("text");
 
       if (text == null)
@@ -183,7 +175,7 @@ public class NewGlossaryEntry extends AbstractGlsCommand
          }
       }
 
-      sty.addEntry(overwrite, new GlossaryEntry(sty, label, keyValList));
+      sty.addEntry(overwrite, new GlossaryEntry(sty, label, keyValList, stack));
    }
 
    public void process(TeXParser parser, TeXObjectList stack)

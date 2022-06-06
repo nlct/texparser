@@ -23,60 +23,61 @@ import java.io.IOException;
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.*;
 
-public class AtPrintUnsrtAtGlossaryAtHandler extends AbstractGlsCommand
+public class GlsXtrFieldListAdd extends ControlSequence
 {
-   public AtPrintUnsrtAtGlossaryAtHandler(GlossariesSty sty)
+   public GlsXtrFieldListAdd()
    {
-      this("@printunsrt@glossary@handler", sty);
+      this("glsxtrfieldlistadd", false, false);
    }
 
-   public AtPrintUnsrtAtGlossaryAtHandler(String name, GlossariesSty sty)
+   public GlsXtrFieldListAdd(String name, boolean isGlobal, boolean expandItem)
    {
-      super(name, sty);
+      super(name);
+      this.isGlobal = isGlobal;
+      this.expandItem = expandItem;
    }
 
    public Object clone()
    {
-      return new AtPrintUnsrtAtGlossaryAtHandler(getName(), getSty());
-   }
-
-   public TeXObjectList expandonce(TeXParser parser,
-      TeXObjectList stack)
-     throws IOException
-   {
-      GlsLabel label = popEntryLabel("glscurrententrylabel", parser, stack);
-
-      TeXObjectList substack = parser.getListener().createStack();
-
-      DataObjectList noexpand = parser.getListener().createDataList(true);
-      substack.add(noexpand);
-
-      noexpand.add(parser.getListener().getControlSequence("gdef"));
-      noexpand.add(new TeXCsRef("glscurrententrylabel"));
-      noexpand.add(parser.getListener().createGroup(label.getLabel()));
-
-      substack.add(parser.getListener().getControlSequence(
-        "printunsrtglossaryhandler"));
-      substack.add(parser.getListener().createGroup(label.getLabel()));
-
-      return substack;
+      return new GlsXtrFieldListAdd(getName(), isGlobal, expandItem);
    }
 
    @Override
    public void process(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
-      GlsLabel label = popEntryLabel("glscurrententrylabel", parser, stack);
+      String label = popLabelString(parser, stack);
+      String field = popLabelString(parser, stack);
 
-      parser.putControlSequence(false, label);
+      String csname;
 
-      ControlSequence cs = parser.getListener().getControlSequence(
-        "printunsrtglossaryhandler");
+      if (isGlobal)
+      {
+         if (expandItem)
+         {
+            csname = "listcsxadd";
+         }
+         else
+         {
+            csname = "listcsgadd";
+         }
+      }
+      else if (expandItem)
+      {
+         csname = "listcseadd";
+      }
+      else
+      {
+         csname = "listcsadd";
+      }
+
+      ControlSequence cs = parser.getListener().getControlSequence(csname);
 
       TeXObjectList substack = parser.getListener().createStack();
 
       substack.add(cs);
-      substack.add(label);
+      substack.add(parser.getListener().createGroup(
+        String.format("glo@%s@%s", label, field)));
 
       if (parser == stack || stack == null)
       {
@@ -94,4 +95,6 @@ public class AtPrintUnsrtAtGlossaryAtHandler extends AbstractGlsCommand
    {
       process(parser, parser);
    }
+
+   protected boolean isGlobal, expandItem;
 }

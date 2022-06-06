@@ -1,54 +1,56 @@
 % arara: pdflatex
+% arara: bib2gls
 % arara: pdflatex
 \documentclass{article}
 
 \usepackage[T1]{fontenc}
+\usepackage{lipsum}
 \usepackage[colorlinks]{hyperref}
-\usepackage[toc,style=index]{glossaries-extra}
+\usepackage[toc,style=index,record]{glossaries-extra}
 
-\newglossaryentry{sample}{name={sample},description={an example},
-  symbol={\ensuremath{\pi}}}
-\newglossaryentry{child}{parent={sample},
- name={child sample},description={an example sub entry}}
-
-\newabbreviation{html}{HTML}{hypertext markup language}
+\GlsXtrLoadResources[src={example-glossaries-symbols,example-glossaries-acronym,example-glossaries-parent}]
 
 \begin{document}
 \tableofcontents
 
-\section{Sample}
-\label{sec:sample}
-Name value: \glsentryname{sample}.
-Text value: \glsentrytext{sample}.
-Description value: \glsentrydesc{sample}.
-Symbol value: \glsentrysymbol{sample}.
+\printunsrtglossaries
+
+\section{No Links}
+\label{sec:nolinks}
+Name value: \glsentryname{alpha}.
+Text value: \glsentrytext{alpha}.
+Description value: \glsentrydesc{alpha}.
+Symbol value: \glsentrysymbol{alpha}.
 
 \hypertarget{sampleanchor}{Sample anchor}.
 
-Sentence case: \Glsentryname{sample}.
+Sentence case: \Glsentryname{alpha}.
 
-Is used? \ifglsused{sample}{true}{false}.
-A \gls{sample}.
-Is used? \ifglsused{sample}{true}{false}.
-Next use: \gls{sample}.
+\section{Links}
+\label{sec:links}
 
-\Gls{child}.
+Is used? \ifglsused{alpha}{true}{false}.
+\gls{alpha}.
+Is used? \ifglsused{alpha}{true}{false}.
+Next use: \gls{alpha}.
 
-Symbol: \glssymbol{sample}.
+\Gls{gravida}.
+
+Symbol: \glssymbol{alpha}.
 
 Abbreviation. 
-Is used? \ifglsused{html}{true}{false}.
-\gls{html}.
-Is used? \ifglsused{html}{true}{false}.
-Next use: \gls{html}.
+Is used? \ifglsused{lid}{true}{false}.
+\gls{lid}.
+Is used? \ifglsused{lid}{true}{false}.
+Next use: \gls{lid}.
 
-\section{Another}
+\section{Another Section}
 \label{sec:another}
 
-Reference section~\ref{sec:sample} (\ref*{sec:sample}).
+Reference section~\ref{sec:nolinks} (\ref*{sec:nolinks}).
 
 \hyperlink{sampleanchor}{Sample hyperlink}.
 
-\printunsrtglossaries
+\lipsum
 
 \end{document}

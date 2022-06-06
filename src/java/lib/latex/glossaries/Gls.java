@@ -89,7 +89,7 @@ public class Gls extends AbstractGlsCommand
       {
          boolean isUnset = entry.isUnset();
 
-         Glossary glossary = entry.getGlossary();
+         Glossary glossary = entry.getGlossary(stack);
          String type = glossary.getType();
 
          listener.putControlSequence(true, glslabel.duplicate("glslabel"));
