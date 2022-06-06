@@ -1498,6 +1498,33 @@ public class TeXObjectList extends Vector<TeXObject>
       }
    }
 
+   public void stripIgnoreables()
+   {
+      for (int i = size()-1; i >= 0; i--)
+      {
+         TeXObject obj = get(i);
+
+         if (obj instanceof Ignoreable)
+         {
+            remove(i);
+         }
+         else if (obj instanceof TeXObjectList)
+         {
+            ((TeXObjectList)obj).stripIgnoreables();
+
+            if (((TeXObjectList)obj).isStack())
+            {
+               remove(i);
+
+               if (!obj.isEmpty())
+               {
+                  addAll(i, (TeXObjectList)obj);
+               }
+            }
+         }
+      }
+   }
+
    public TeXObjectList expandonce(TeXParser parser)
      throws IOException
    {

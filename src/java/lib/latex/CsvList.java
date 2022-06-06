@@ -47,17 +47,25 @@ public class CsvList extends DataObjectList
    {
       CsvList csvList = new CsvList();
 
+      csvList.parseList(parser, object);
+
+      return csvList;
+   }
+
+   public void parseList(TeXParser parser, TeXObject object)
+     throws IOException
+   {
       if (object instanceof TeXObjectList)
       {
-         if (((TeXObjectList)object).isEmpty()) return csvList;
+         if (((TeXObjectList)object).isEmpty()) return;
 
          TeXObjectList list = new TeXObjectList();
 
          for (TeXObject obj : (TeXObjectList)object)
          {
-            if (isComma(obj))
+            if (isSeparator(obj))
             {
-               csvList.add(list);
+               add(list);
                list = new TeXObjectList();
             }
             else
@@ -66,18 +74,26 @@ public class CsvList extends DataObjectList
             }
          }
 
-         csvList.add(list);
+         add(list);
 
       }
       else
       {
-         if (!isComma(object))
+         if (!isSeparator(object))
          {
-            csvList.add(object);
+            add(object);
          }
       }
+   }
 
-      return csvList;
+   public TeXObject getSeparator(TeXParser parser)
+   {
+      return parser.getListener().getOther(',');
+   }
+
+   public boolean isSeparator(TeXObject obj)
+   {
+      return isComma(obj);
    }
 
    public static boolean isComma(TeXObject obj)
@@ -208,7 +224,7 @@ public class CsvList extends DataObjectList
       {
          if (i > 0)
          {
-            list.add(parser.getListener().getOther(','));
+            list.add(getSeparator(parser));
          }
 
          list.add((TeXObject)get(i).clone());
@@ -268,7 +284,7 @@ public class CsvList extends DataObjectList
             }
             else
             {
-               parser.getListener().getOther(',').process(parser, stack);
+               getSeparator(parser).process(parser, stack);
             }
 
             object.process(parser, this);
@@ -305,7 +321,7 @@ public class CsvList extends DataObjectList
             }
             else
             {
-               parser.getListener().getOther(',').process(parser);
+               getSeparator(parser).process(parser);
             }
 
             object.process(parser, this);
@@ -328,7 +344,7 @@ public class CsvList extends DataObjectList
             }
             else
             {
-               builder.append(',');
+               builder.append(getSeparator(parser).toString(parser));
             }
          }
 

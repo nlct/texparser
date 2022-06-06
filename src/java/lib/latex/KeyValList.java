@@ -56,6 +56,8 @@ public class KeyValList extends HashMap<String,TeXObject>
       {
          TeXObjectList list = (TeXObjectList)object;
 
+         list.stripIgnoreables();
+
          StringBuilder keyBuilder = new StringBuilder();
          TeXObjectList valBuilder = null;
 
