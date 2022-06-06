@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -33,125 +33,141 @@ public class PreTo extends ControlSequence
    public PreTo(String name, boolean isGlobal, boolean isPre, 
       boolean expandCode, boolean isCsname)
    {
+      this(name, isGlobal, isPre, expandCode, isCsname, false);
+   }
+
+   public PreTo(String name, boolean isGlobal, boolean isPre, 
+      boolean expandCode, boolean isCsname, boolean isInternalList)
+   {
       super(name);
       this.isGlobal = isGlobal;
       this.isPre = isPre;
       this.expandCode = expandCode;
       this.isCsname = isCsname;
+      this.isInternalList = isInternalList;
    }
 
    public Object clone()
    {
-      return new PreTo(getName(), isGlobal, isPre, expandCode, isCsname);
+      return new PreTo(getName(), isGlobal, isPre, expandCode, isCsname, isInternalList);
    }
 
-   public void process(TeXParser parser, TeXObjectList list)
+   public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      TeXObject arg = (list == parser ? parser.popNextArg():list.popArg(parser));
+      TeXObject arg = popArg(parser, stack);
+
+      String csname;
+      ControlSequence cs;
 
       if (isCsname)
       {
-         if (arg instanceof Expandable)
-         {
-            TeXObjectList expanded;
+         csname = parser.expandToString(arg, stack);
 
-            if (list == parser)
-            {
-               expanded = ((Expandable)arg).expandfully(parser);
-            }
-            else
-            {
-               expanded = ((Expandable)arg).expandfully(parser, list);
-            }
-
-            if (expanded != null)
-            {
-               arg = expanded;
-            }
-         }
-
-         arg = parser.getListener().getControlSequence(arg.toString(parser));
+         cs = parser.getListener().getControlSequence(csname);
       }
-
-      if (arg instanceof TeXCsRef)
+      else
       {
-         arg = parser.getListener().getControlSequence(((TeXCsRef)arg).getName());
+         if (arg instanceof TeXCsRef)
+         {
+            arg = parser.getListener().getControlSequence(((TeXCsRef)arg).getName());
+         }
+
+         if (!(arg instanceof ControlSequence))
+         {
+            throw new LaTeXSyntaxException(parser,
+              LaTeXSyntaxException.ERROR_UNACCESSIBLE,
+              arg.toString(parser));
+         }
+
+         cs = (ControlSequence)arg;
+
+         csname = cs.getName();
       }
 
-      if (!(arg instanceof ControlSequence))
+      TeXObject code = popArg(parser, stack);
+
+      if (expandCode)
       {
-         throw new LaTeXSyntaxException(parser,
-           LaTeXSyntaxException.ERROR_UNACCESSIBLE,
-           arg.toString(parser));
+         code = TeXParserUtils.expandFully(code, parser, stack);
       }
 
-      ControlSequence hook = (ControlSequence)arg;
-
-      TeXObject code = (list == parser ? parser.popNextArg():list.popArg(parser));
-
-      if (expandCode && code instanceof Expandable)
+      if (code.isEmpty())
       {
-         TeXObjectList expanded;
-
-         if (list == parser)
-         {
-            expanded = ((Expandable)code).expandfully(parser);
-         }
-         else
-         {
-            expanded = ((Expandable)code).expandfully(parser, list);
-         }
-
-         if (expanded != null)
-         {
-            code = expanded;
-         }
+         return;
       }
 
-      TeXObjectList syntax = hook.getSyntax();
-      TeXObjectList defn = new TeXObjectList();
+      boolean isShort = cs.isShort();
+      TeXObjectList syntax = cs.getSyntax();
+      TeXObjectList defn;
+
+      if (isInternalList)
+      {
+         defn = new EtoolboxList();
+      }
+      else
+      {
+         defn = new TeXObjectList();
+      }
 
       if (isPre)
       {
-         defn.add(code);
+         defn.add(code, true);
       }
+
+      TeXObject hook = cs;
+
+      if (cs instanceof AssignedControlSequence)
+      {
+         hook = ((AssignedControlSequence)cs).getBaseUnderlying();
+      }
+
+      TeXObject origDef = hook;
 
       if (hook instanceof GenericCommand)
       {
-         for (TeXObject obj : ((GenericCommand)hook).getDefinition())
+         origDef = ((GenericCommand)hook).getDefinition();
+      }
+      else
+      {
+         origDef = TeXParserUtils.expandOnce(hook, parser, stack);
+      }
+
+      if (origDef instanceof TeXObjectList && ((TeXObjectList)origDef).isStack())
+      {
+         ((TeXObjectList)origDef).stripIgnoreables();
+
+         if (isInternalList)
          {
-            defn.add(obj);
+            if (((TeXObjectList)origDef).size() == 1)
+            {
+               origDef = ((TeXObjectList)origDef).firstElement();
+            }
          }
       }
-      else if (hook instanceof Expandable)
-      {
-         TeXObjectList expanded = ((Expandable)hook).expandonce(parser, list);
 
-         if (expanded == null)
+      if (isInternalList)
+      {
+         if (origDef instanceof EtoolboxList)
          {
-            defn.add(hook);
+            defn.addAll((EtoolboxList)origDef);
          }
          else
          {
-            for (TeXObject obj : expanded)
-            {
-               defn.add(obj);
-            }
+            defn.add(origDef);
          }
       }
       else
       {
-         defn.add(parser.getListener().createUndefinedCs(hook.toString(parser)));
+         defn.add(origDef, true);
       }
 
       if (!isPre)
       {
-         defn.add(code);
+         defn.add(code, true);
       }
 
-      GenericCommand cs = new GenericCommand(
-        hook.isShort(), hook.getName(), syntax, defn);
+      cs = new GenericCommand(isShort, csname, syntax, defn);
 
       parser.putControlSequence(!isGlobal, cs);
    }
@@ -162,5 +178,5 @@ public class PreTo extends ControlSequence
       process(parser, parser);
    }
 
-   private boolean isGlobal, isPre, expandCode, isCsname;
+   private boolean isGlobal, isPre, expandCode, isCsname, isInternalList;
 }

@@ -106,6 +106,44 @@ public class EtoolboxSty extends LaTeXSty
       registerControlSequence(new PreTo("protected@csxappto", true,
         false, true, true));
 
+      registerControlSequence(new PreTo("listadd", false,
+        false, false, false, true));
+      registerControlSequence(new PreTo("listgadd", true,
+        false, false, false, true));
+      registerControlSequence(new PreTo("listeadd", false,
+        false, true, false, true));
+      registerControlSequence(new PreTo("listxadd", true,
+        false, true, false, true));
+
+      registerControlSequence(new PreTo("listcsadd", false,
+        false, false, true, true));
+      registerControlSequence(new PreTo("listcsgadd", true,
+        false, false, true, true));
+      registerControlSequence(new PreTo("listcseadd", false,
+        false, true, true, true));
+      registerControlSequence(new PreTo("listcsxadd", true,
+        false, true, true, true));
+
+      registerControlSequence(new IfInList());
+      registerControlSequence(new IfInList("xifinlist", true, false));
+      registerControlSequence(new IfInList("ifinlistcs", false, true));
+      registerControlSequence(new IfInList("xifinlistcs", true, true));
+
+      registerControlSequence(new ListBreak());
+      registerControlSequence(new AtFirstOfOne("do"));
+      registerControlSequence(new DoListLoop());
+      registerControlSequence(new DoListLoop("dolistcsloop", true, true));
+      registerControlSequence(new DoListLoop("forlistloop", false, false));
+      registerControlSequence(new DoListLoop("forlistcsloop", true, false));
+
+      registerControlSequence(new DoCsvList());
+      registerControlSequence(new DoCsvList("forcsvlist", true));
+
+      registerControlSequence(new ListRemove());
+      registerControlSequence(new ListRemove("listgremove", true, false));
+      registerControlSequence(new ListRemove("listcsremove", false, true));
+      registerControlSequence(new ListRemove("listcsgremove", true, true));
+
       registerControlSequence(new IfDefEmpty());
       registerControlSequence(new IfDefEmpty("ifcsempty", true));
 
