@@ -148,6 +148,15 @@ public class GlossariesSty extends LaTeXSty
       registerControlSequence(new GenericCommand(true, "glsnumberformat", null,
         new TeXCsRef("glshypernumber")));
       registerControlSequence(new GlsHyperNumber());
+      registerControlSequence(new HyperFont("hyperrm", "textrm"));
+      registerControlSequence(new HyperFont("hypersf", "textsf"));
+      registerControlSequence(new HyperFont("hypertt", "texttt"));
+      registerControlSequence(new HyperFont("hyperem", "emph"));
+      registerControlSequence(new HyperFont("hyperit", "textit"));
+      registerControlSequence(new HyperFont("hypersl", "textsl"));
+      registerControlSequence(new HyperFont("hypersc", "textsc"));
+      registerControlSequence(new HyperFont("hyperbf", "textbf"));
+      registerControlSequence(new HyperFont("hypermd", "textmd"));
 
       registerControlSequence(new TextualContentCommand("glossarytitle", ""));
       registerControlSequence(new TextualContentCommand("glossarytoctitle", ""));
