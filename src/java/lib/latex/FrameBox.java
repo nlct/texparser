@@ -28,26 +28,41 @@ public class FrameBox extends ControlSequence
 {
    public FrameBox()
    {
-      this("fbox", BORDER_SOLID, ALIGN_DEFAULT, ALIGN_DEFAULT, true);
+      this("fbox", BorderStyle.SOLID, AlignHStyle.DEFAULT, AlignVStyle.DEFAULT, true);
    }
 
    public FrameBox(String name)
    {
-      this(name, BORDER_SOLID, ALIGN_DEFAULT, ALIGN_DEFAULT, true);
+      this(name, BorderStyle.SOLID, AlignHStyle.DEFAULT, AlignVStyle.DEFAULT, true);
    }
 
+   @Deprecated
    public FrameBox(String name, byte style, byte halign, byte valign, 
       boolean isinline)
    {
       this(name, style, halign, valign, isinline, null, null);
    }
 
+   public FrameBox(String name, BorderStyle style, AlignHStyle halign, AlignVStyle valign, 
+      boolean isinline)
+   {
+      this(name, style, halign, valign, isinline, null, null);
+   }
+
+   @Deprecated
    public FrameBox(String name, byte style, byte halign, byte valign, 
       boolean isinline, TeXDimension borderWidth, TeXDimension innerMargin)
    {
       this(name, style, halign, valign, isinline, false, borderWidth, innerMargin);
    }
 
+   public FrameBox(String name, BorderStyle style, AlignHStyle halign, AlignVStyle valign, 
+      boolean isinline, TeXDimension borderWidth, TeXDimension innerMargin)
+   {
+      this(name, style, halign, valign, isinline, false, borderWidth, innerMargin);
+   }
+
+   @Deprecated
    public FrameBox(String name, byte style, byte halign, byte valign, 
       boolean isinline, boolean isMultiLine, 
       TeXDimension borderWidth, TeXDimension innerMargin)
@@ -60,17 +75,144 @@ public class FrameBox extends ControlSequence
       setIsMultiLine(isMultiLine);
       currentBorderWidth = borderWidth;
       currentInnerMargin = innerMargin;
+      id = name;
+   }
+
+   public FrameBox(String name, BorderStyle style, AlignHStyle halign, AlignVStyle valign, 
+      boolean isinline, boolean isMultiLine, 
+      TeXDimension borderWidth, TeXDimension innerMargin)
+   {
+      super(name);
+      setStyle(style);
+      setHAlign(halign);
+      setVAlign(valign);
+      setIsInLine(isinline);
+      setIsMultiLine(isMultiLine);
+      currentBorderWidth = borderWidth;
+      currentInnerMargin = innerMargin;
+      id = name;
+   }
+
+   public FrameBox createBox()
+   {
+      return new FrameBox(getName());
    }
 
    public Object clone()
    {
-      return new FrameBox(getName(), style, halign, valign, 
-        isInline, isMultiLine,
-        currentBorderWidth == null ? null : 
-          (TeXDimension)currentBorderWidth.clone(),
-        currentInnerMargin == null ? null : 
-          (TeXDimension)currentInnerMargin.clone()
-      );
+      FrameBox box = createBox();
+
+      copySettingsInto(box);
+
+      return box;
+   }
+
+   protected void copySettingsInto(FrameBox box)
+   {
+      box.isChangeable = isChangeable;
+
+      box.id = id;
+      box.isInline = isInline;
+      box.isMultiLine = isMultiLine;
+      box.style = style;
+      box.halign = halign;
+      box.valign = valign;
+      box.currentAngle = currentAngle;
+
+      if (currentBorderWidth == null)
+      {
+         box.currentBorderWidth = null;
+      }
+      else
+      {
+         box.currentBorderWidth = (TeXDimension)currentBorderWidth.clone();
+      }
+
+      if (currentInnerMargin == null)
+      {
+         box.currentInnerMargin = null;
+      }
+      else
+      {
+         box.currentInnerMargin = (TeXDimension)currentInnerMargin.clone();
+      }
+
+      if (currentOuterMarginLeft == null)
+      {
+         box.currentOuterMarginLeft = null;
+      }
+      else
+      {
+         box.currentOuterMarginLeft = (TeXDimension)currentOuterMarginLeft.clone();
+      }
+
+      if (currentOuterMarginRight == null)
+      {
+         box.currentOuterMarginRight = null;
+      }
+      else
+      {
+         box.currentOuterMarginRight = (TeXDimension)currentOuterMarginRight.clone();
+      }
+
+      if (currentOuterMarginTop == null)
+      {
+         box.currentOuterMarginTop = null;
+      }
+      else
+      {
+         box.currentOuterMarginTop = (TeXDimension)currentOuterMarginTop.clone();
+      }
+
+      if (currentOuterMarginBottom == null)
+      {
+         box.currentOuterMarginBottom = null;
+      }
+      else
+      {
+         box.currentOuterMarginBottom = (TeXDimension)currentOuterMarginBottom.clone();
+      }
+
+      if (currentBorderRadius == null)
+      {
+         box.currentBorderRadius = null;
+      }
+      else
+      {
+         box.currentBorderRadius = (TeXDimension)currentBorderRadius.clone();
+      }
+
+      if (currentWidth == null)
+      {
+         box.currentWidth = null;
+      }
+      else
+      {
+         box.currentWidth = (TeXDimension)currentWidth.clone();
+      }
+
+      if (currentHeight == null)
+      {
+         box.currentHeight = null;
+      }
+      else
+      {
+         box.currentHeight = (TeXDimension)currentHeight.clone();
+      }
+
+      box.currentBorderColor = currentBorderColor;
+      box.currentFgColor = currentFgColor;
+      box.currentBgColor = currentBgColor;
+   }
+
+   public boolean isStyleChangeable()
+   {
+      return isChangeable;
+   }
+
+   public void fixStyle()
+   {
+      isChangeable = false;
    }
 
    public boolean isInLine()
@@ -80,7 +222,10 @@ public class FrameBox extends ControlSequence
 
    public void setIsInLine(boolean isinline)
    {
-      this.isInline = isinline;
+      if (isChangeable)
+      {
+         this.isInline = isinline;
+      }
    }
 
    public boolean isMultiLine()
@@ -90,10 +235,23 @@ public class FrameBox extends ControlSequence
 
    public void setIsMultiLine(boolean isMultiLine)
    {
-      this.isMultiLine = isMultiLine;
+      if (isChangeable)
+      {
+         this.isMultiLine = isMultiLine;
+      }
    }
 
-   public byte getStyle()
+   public void setId(String id)
+   {
+      this.id = id;
+   }
+
+   public String getId()
+   {
+      return id;
+   }
+
+   public BorderStyle getStyle()
    {
       return style;
    }
@@ -103,55 +261,105 @@ public class FrameBox extends ControlSequence
       switch (newStyle)
       {
          case BORDER_NONE:
+            style = BorderStyle.NONE;
+         break;
          case BORDER_SOLID:
+            style = BorderStyle.SOLID;
+         break;
          case BORDER_DOUBLE:
-           style = newStyle;
+            style = BorderStyle.DOUBLE;
          break;
          default:
             throw new IllegalArgumentException("Invalid style "+newStyle);
       }
    }
 
-   public byte getHAlign()
+   public void setStyle(BorderStyle newStyle)
+   {
+      if (isChangeable)
+      {
+         style = newStyle;
+      }
+   }
+
+   public AlignHStyle getHAlign()
    {
       return halign;
    }
 
-   public void setHAlign(byte newAlign)
+   public void setHAlign(AlignHStyle newAlign)
    {
-      switch (newAlign)
+      if (isChangeable)
       {
-         case ALIGN_DEFAULT:
-         case ALIGN_LEFT:
-         case ALIGN_CENTER:
-         case ALIGN_RIGHT:
-           halign = newAlign;
-         break;
-         default:
-            throw new IllegalArgumentException(
-               "Invalid horizontal alignment "+newAlign);
+         halign = newAlign;
       }
    }
 
-   public byte getVAlign()
+   @Deprecated
+   public void setHAlign(byte newAlign)
+   {
+      if (isChangeable)
+      {
+         switch (newAlign)
+         {
+            case ALIGN_DEFAULT:
+              halign=AlignHStyle.DEFAULT;
+            break;
+            case ALIGN_LEFT:
+              halign=AlignHStyle.LEFT;
+            break;
+            case ALIGN_CENTER:
+              halign=AlignHStyle.CENTER;
+            break;
+            case ALIGN_RIGHT:
+              halign = AlignHStyle.RIGHT;
+            break;
+            default:
+               throw new IllegalArgumentException(
+                  "Invalid horizontal alignment "+newAlign);
+         }
+      }
+   }
+
+   public AlignVStyle getVAlign()
    {
       return valign;
    }
 
+   public void setVAlign(AlignVStyle newAlign)
+   {
+      if (isChangeable)
+      {
+         valign = newAlign;
+      }
+   }
+
+   @Deprecated
    public void setVAlign(byte newAlign)
    {
-      switch (newAlign)
+      if (isChangeable)
       {
-         case ALIGN_DEFAULT:
-         case ALIGN_TOP:
-         case ALIGN_MIDDLE:
-         case ALIGN_BOTTOM:
-         case ALIGN_BASE:
-           valign = newAlign;
-         break;
-         default:
-            throw new IllegalArgumentException(
-              "Invalid vertical alignment "+newAlign);
+         switch (newAlign)
+         {
+            case ALIGN_DEFAULT:
+              valign = AlignVStyle.DEFAULT;
+            break;
+            case ALIGN_TOP:
+              valign = AlignVStyle.TOP;
+            break;
+            case ALIGN_MIDDLE:
+              valign = AlignVStyle.MIDDLE;
+            break;
+            case ALIGN_BOTTOM:
+              valign = AlignVStyle.BOTTOM;
+            break;
+            case ALIGN_BASE:
+              valign = AlignVStyle.BASE;
+            break;
+            default:
+               throw new IllegalArgumentException(
+                 "Invalid vertical alignment "+newAlign);
+         }
       }
    }
 
@@ -172,14 +380,93 @@ public class FrameBox extends ControlSequence
 
    public TeXDimension getBorderWidth(TeXParser parser) throws IOException
    {
-      return currentBorderWidth == null ? parser.getDimenRegister("fboxrule")
-        : currentBorderWidth;
+      if (isChangeable)
+      {
+         return currentBorderWidth == null ? parser.getDimenRegister("fboxrule")
+           : currentBorderWidth;
+      }
+      else
+      {
+         return currentBorderWidth;
+      }
+   }
+
+   public void setBorderRadius(TeXDimension dim)
+   {
+      if (isChangeable)
+      {
+         currentBorderRadius = dim;
+      }
+   }
+
+   public TeXDimension getBorderRadius(TeXParser parser) throws IOException
+   {
+      return currentBorderRadius;
    }
 
    public TeXDimension getInnerMargin(TeXParser parser) throws IOException
    {
-      return currentInnerMargin == null ? parser.getDimenRegister("fboxsep")
-        : currentInnerMargin;
+      if (isChangeable)
+      {
+         return currentInnerMargin == null ? parser.getDimenRegister("fboxsep")
+           : currentInnerMargin;
+      }
+      else
+      {
+         return currentInnerMargin;
+      }
+   }
+
+   public TeXDimension getOuterMarginLeft(TeXParser parser) throws IOException
+   {
+      return currentOuterMarginLeft;
+   }
+
+   public TeXDimension getOuterMarginRight(TeXParser parser) throws IOException
+   {
+      return currentOuterMarginRight;
+   }
+
+   public TeXDimension getOuterMarginTop(TeXParser parser) throws IOException
+   {
+      return currentOuterMarginTop;
+   }
+
+   public TeXDimension getOuterMarginBottom(TeXParser parser) throws IOException
+   {
+      return currentOuterMarginBottom;
+   }
+
+   public void setOuterMarginLeft(TeXDimension dim)
+   {
+      if (isChangeable)
+      {
+         currentOuterMarginLeft = dim;
+      }
+   }
+
+   public void setOuterMarginRight(TeXDimension dim)
+   {
+      if (isChangeable)
+      {
+         currentOuterMarginRight = dim;
+      }
+   }
+
+   public void setOuterMarginTop(TeXDimension dim)
+   {
+      if (isChangeable)
+      {
+         currentOuterMarginTop = dim;
+      }
+   }
+
+   public void setOuterMarginBottom(TeXDimension dim)
+   {
+      if (isChangeable)
+      {
+         currentOuterMarginBottom = dim;
+      }
    }
 
    public TeXDimension getWidth(TeXParser parser) throws IOException
@@ -187,104 +474,83 @@ public class FrameBox extends ControlSequence
       return currentWidth;
    }
 
+   public void setWidth(TeXDimension dim)
+   {
+      if (isChangeable)
+      {
+         currentWidth = dim;
+      }
+   }
+
    public TeXDimension getHeight(TeXParser parser) throws IOException
    {
       return currentHeight;
    }
 
+   public void setHeight(TeXDimension dim)
+   {
+      if (isChangeable)
+      {
+         currentHeight = dim;
+      }
+   }
+
+   public Angle getAngle(TeXParser parser) throws IOException
+   {
+      return currentAngle;
+   }
+
+   public void setAngle(Angle angle)
+   {
+      if (isChangeable)
+      {
+         currentAngle = angle;
+      }
+   }
+
    protected void popSettings(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      TeXObject width = null;
-
-      if (parser == stack)
-      {
-         width = parser.popNextArg('[', ']');
-      }
-      else
-      {
-         width = stack.popArg(parser, '[', ']');
-      }
+      TeXObject width = popOptArg(parser, stack);
+      String pos = null;
 
       if (width != null)
       {
-         if (width instanceof Expandable)
+         if (!(width instanceof TeXDimension))
          {
-            TeXObjectList expanded;
+            width = TeXParserUtils.expandFully(width, parser, stack);
 
-            if (parser == stack)
+            if (width instanceof TeXObjectList)
             {
-               expanded = ((Expandable)width).expandfully(parser);
-            }
-            else
-            {
-               expanded = ((Expandable)width).expandfully(parser, stack);
-            }
-
-            if (expanded != null)
-            {
-               width = expanded;
+               width = ((TeXObjectList)width).popDimension(parser);
             }
          }
 
-         if (width instanceof TeXObjectList)
+         pos = popOptLabelString(parser, stack);
+      }
+
+      if (pos != null)
+      {
+         String val = pos.trim();
+
+         if (val.equals("c"))
          {
-            width = ((TeXObjectList)width).popDimension(parser);
+            halign = AlignHStyle.CENTER;
          }
-
-         TeXObject pos = null;
-
-         if (parser == stack)
+         else if (val.equals("l"))
          {
-            pos = parser.popNextArg('[', ']');
+            halign = AlignHStyle.LEFT;
+         }
+         else if (val.equals("r"))
+         {
+            halign = AlignHStyle.RIGHT;
          }
          else
          {
-            pos = stack.popArg(parser, '[', ']');
-         }
+            TeXApp texApp = parser.getListener().getTeXApp();
 
-         if (pos != null)
-         {
-            if (pos instanceof Expandable)
-            {
-               TeXObjectList expanded;
-
-               if (parser == stack)
-               {
-                  expanded = ((Expandable)pos).expandfully(parser);
-               }
-               else
-               {
-                  expanded = ((Expandable)pos).expandfully(parser, stack);
-               }
-
-               if (expanded != null)
-               {
-                  pos = expanded;
-               }
-            }
-
-            String val = pos.toString(parser).trim();
-
-            if (val.equals("c"))
-            {
-               halign = ALIGN_CENTER;
-            }
-            else if (val.equals("l"))
-            {
-               halign = ALIGN_LEFT;
-            }
-            else if (val.equals("r"))
-            {
-               halign = ALIGN_RIGHT;
-            }
-            else
-            {
-               TeXApp texApp = parser.getListener().getTeXApp();
-
-               texApp.warning(parser, texApp.getMessage(
-                 LaTeXSyntaxException.ILLEGAL_ARG_TYPE, val));
-            }
+            texApp.warning(parser, texApp.getMessage(
+              LaTeXSyntaxException.ILLEGAL_ARG_TYPE, val));
          }
       }
 
@@ -292,7 +558,6 @@ public class FrameBox extends ControlSequence
       {
          currentWidth = (TeXDimension)width;
       }
-
    }
 
    protected TeXObject popContents(TeXParser parser, TeXObjectList stack)
@@ -317,16 +582,22 @@ public class FrameBox extends ControlSequence
    {
       TeXDimension orgWidth = currentWidth;
       TeXDimension orgHeight = currentHeight;
-      byte orgHalign = halign;
-      byte orgValign = valign;
+      AlignHStyle orgHalign = halign;
+      AlignVStyle orgValign = valign;
       Color orgBorderColor = currentBorderColor;
       Color orgFgColor = currentFgColor;
       Color orgBgColor = currentBgColor;
       TeXDimension orgBorderWidth = currentBorderWidth;
       TeXDimension orgInnerMargin = currentInnerMargin;
+      TeXDimension orgBorderRadius = currentBorderRadius;
+      Angle orgAngle = currentAngle;
 
       parser.startGroup();
-      popSettings(parser, stack);
+
+      if (isChangeable)
+      {
+         popSettings(parser, stack);
+      }
 
       TeXObject arg = popContents(parser, stack);
 
@@ -336,7 +607,14 @@ public class FrameBox extends ControlSequence
 
       try
       {
-         arg.process(parser, stack);
+         if (currentAngle != null && isChangeable)
+         {
+            listener.rotate(currentAngle.toDegrees(), parser, stack, arg);
+         }
+         else
+         {
+            arg.process(parser, stack);
+         }
       }
       finally
       {
@@ -353,28 +631,41 @@ public class FrameBox extends ControlSequence
             currentFgColor = orgFgColor;
             currentBgColor = orgBgColor;
             currentBorderWidth = orgBorderWidth;
+            currentBorderRadius = orgBorderRadius;
             currentInnerMargin = orgInnerMargin;
             halign = orgHalign;
             valign = orgValign;
+            currentAngle = orgAngle;
          }
       }
    }
+
+   protected String id;
 
    protected TeXDimension currentWidth=null;
    protected TeXDimension currentHeight=null;
    protected TeXDimension currentBorderWidth = null;
    protected TeXDimension currentInnerMargin = null;
+   protected TeXDimension currentBorderRadius = null;
+
+   protected TeXDimension currentOuterMarginLeft = null;
+   protected TeXDimension currentOuterMarginRight = null;
+   protected TeXDimension currentOuterMarginTop = null;
+   protected TeXDimension currentOuterMarginBottom = null;
 
    protected Color currentBorderColor=null;
    protected Color currentFgColor=null;
    protected Color currentBgColor=null;
 
-   protected byte style = BORDER_SOLID;
-   protected byte halign = ALIGN_DEFAULT;
-   protected byte valign = ALIGN_DEFAULT;
+   protected BorderStyle style = BorderStyle.SOLID;
+   protected AlignHStyle halign = AlignHStyle.DEFAULT;
+   protected AlignVStyle valign = AlignVStyle.DEFAULT;
+
+   protected Angle currentAngle = null;
 
    protected boolean isInline = true;
    protected boolean isMultiLine = true;
+   protected boolean isChangeable = true;
 
    public static final byte BORDER_NONE=0;
    public static final byte BORDER_SOLID=1;

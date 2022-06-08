@@ -123,45 +123,6 @@ public class L2HConverter extends LaTeXParserListener
    {
       super.addPredefined();
 
-      ControlSequence cs = getParser().getControlSequence("fbox");
-
-      if (cs instanceof FrameBox)
-      {
-         try
-         {
-            defaultStyles.put(getFrameBoxSpecs((FrameBox)cs), "fbox");
-         }
-         catch (IOException e)
-         {
-         }
-      }
-
-      cs = getParser().getControlSequence("mbox");
-
-      if (cs instanceof FrameBox)
-      {
-         try
-         {
-            defaultStyles.put(getFrameBoxSpecs((FrameBox)cs), "mbox");
-         }
-         catch (IOException e)
-         {
-         }
-      }
-
-      cs = getParser().getControlSequence("frame");
-
-      if (cs instanceof FrameBox)
-      {
-         try
-         {
-            defaultStyles.put(getFrameBoxSpecs((FrameBox)cs), "frame");
-         }
-         catch (IOException e)
-         {
-         }
-      }
-
       // Add 
       // \providecommand{\IfTeXParserLib}[2]{#2}
       // to the document to provide a conditional that depends on
@@ -541,13 +502,30 @@ public class L2HConverter extends LaTeXParserListener
    {
       if (writer == null) return;
 
-      if (codePoint >= 32 && codePoint <= 126)
+      if (codePoint == '<')
+      {
+         writer.write("&lt;");
+      }
+      else if (codePoint == '>')
+      {
+         writer.write("&gt;");
+      }
+      else if (codePoint == '&')
+      {
+         writer.write("&amp;");
+      }
+      else if (codePoint <= 0xFFFF)
       {
          writer.write((char)codePoint);
       }
       else
       {
-         writer.write("&#x"+Integer.toHexString(codePoint)+";");
+         char[] chars = Character.toChars(codePoint);
+
+         for (char c : chars)
+         {
+            writer.write(c);
+         }
       }
 
    }
@@ -629,11 +607,16 @@ public class L2HConverter extends LaTeXParserListener
    public TeXObject createLink(String anchorName, TeXObject text)
     throws IOException
    {
-      TeXObject label = AuxData.getLabelForLink(getAuxData(), getParser(), anchorName);
+      Vector<AuxData> auxData = getAuxData();
 
-      if (label != null)
+      if (auxData != null)
       {
-         anchorName = label.toString(parser);
+         TeXObject label = AuxData.getLabelForLink(auxData, getParser(), anchorName);
+
+         if (label != null)
+         {
+            anchorName = label.toString(parser);
+         }
       }
 
       TeXObjectList stack = createStack();
@@ -880,9 +863,19 @@ public class L2HConverter extends LaTeXParserListener
          Charset.defaultCharset().name() : 
          htmlCharSet.name()));
 
-      writeable.writeln("<style type=\"text/css\">");
-      writeCssStyles();
-      writeable.writeln("</style>");
+      ControlSequence cs = parser.getControlSequence("TeXParserLibGeneratorName");
+      String generator = "TeX Parser Library";
+
+      if (cs != null)
+      {
+         generator = parser.expandToString(cs, stack);
+      }
+
+      if (!generator.isEmpty())
+      {
+         writeable.writeln(String.format("<meta name=\"generator\" content=\"%s\">",
+           generator));
+      }
 
       if (useMathJax())
       {
@@ -921,6 +914,10 @@ public class L2HConverter extends LaTeXParserListener
          writeable.writeln("</title>");
       }
 
+      writeable.writeln("<style type=\"text/css\">");
+      writeCssStyles();
+      writeable.writeln("</style>");
+
       writeable.writeln("</head>");
       writeable.write("<body");
 
@@ -955,6 +952,13 @@ public class L2HConverter extends LaTeXParserListener
       {
          throw new LaTeXSyntaxException(parser,
             LaTeXSyntaxException.ERROR_NO_BEGIN_DOC);
+      }
+
+      if (currentSection != null)
+      {
+         write(String.format("%n</section><!-- end of section %s -->%n", currentSection));
+
+         currentSection = null;
       }
 
       processFootnotes();
@@ -1740,18 +1744,15 @@ public class L2HConverter extends LaTeXParserListener
               return String.format("%fpt", value);
          }
       }
-
-      if (unit == TeXUnit.EM)
+      else if (unit == TeXUnit.EM)
       {
          return String.format("%fem", value);
       }
-
-      if (unit == TeXUnit.EX)
+      else if (unit == TeXUnit.EX)
       {
          return String.format("%fex", value);
       }
-
-      if (unit instanceof PercentUnit)
+      else if (unit instanceof PercentUnit)
       {
          return String.format("%f%%", value);
       }
@@ -1826,52 +1827,104 @@ public class L2HConverter extends LaTeXParserListener
       }
    }
 
+   protected String getElementTag(FrameBox fbox)
+   {
+      return fbox.isInLine() && !fbox.isMultiLine() ? "span" : "div";
+   }
+
+   @Override
+   public void declareFrameBox(FrameBox fbox, boolean isChangeable)
+   {
+      super.declareFrameBox(fbox, isChangeable);
+
+      if (!fbox.isStyleChangeable())
+      {
+         try
+         {
+            String specs = getFrameBoxSpecs(fbox);
+
+            String css = String.format("%s.%s {%s}", getElementTag(fbox),
+                 fbox.getId(), specs);
+
+            if (isInDocEnv())
+            {
+               write(String.format("<style>%s</style>", css));
+            }
+            else
+            {
+               addCssStyle(css);
+            }
+         }
+         catch (IOException e)
+         {
+            getTeXApp().warning(getParser(), e.getMessage());
+         }
+      }
+   }
+
    protected String getFrameBoxSpecs(FrameBox fbox)
     throws IOException
    {
+      boolean isInlineBlock = fbox.isInLine() && fbox.isMultiLine();
+
       StringBuilder builder = new StringBuilder();
 
-      if (fbox.isInLine())
-      {
-         builder.append("display: inline-block; ");
-      }
+      String tag = getElementTag(fbox);
 
       switch (fbox.getHAlign())
       {
-         case FrameBox.ALIGN_LEFT:
+         case LEFT:
             builder.append("text-align: left; ");
          break;
-         case FrameBox.ALIGN_CENTER:
+         case CENTER:
             builder.append("text-align: center; ");
          break;
-         case FrameBox.ALIGN_RIGHT:
+         case RIGHT:
             builder.append("text-align: right; ");
          break;
       }
 
       switch (fbox.getVAlign())
       {
-         case FrameBox.ALIGN_TOP:
+         case TOP:
             builder.append("vertical-align: top; ");
          break;
-         case FrameBox.ALIGN_MIDDLE:
+         case MIDDLE:
             builder.append("vertical-align: middle; ");
          break;
-         case FrameBox.ALIGN_BOTTOM:
+         case BOTTOM:
             builder.append("vertical-align: bottom; ");
          break;
-         case FrameBox.ALIGN_BASE:
+         case BASE:
             builder.append("vertical-align: base; ");
          break;
       }
 
       switch (fbox.getStyle())
       {
-         case FrameBox.BORDER_SOLID:
+         case SOLID:
            builder.append("border-style: solid; ");
          break;
-         case FrameBox.BORDER_DOUBLE:
+         case DOUBLE:
            builder.append("border-style: double; ");
+         break;
+         case DOTTED:
+           builder.append("border-style: dotted; ");
+         break;
+         case DASHED:
+           builder.append("border-style: dashed; ");
+         break;
+         case GROOVE:
+           builder.append("border-style: groove; ");
+         break;
+         case RIDGE:
+           builder.append("border-style: ridge; ");
+         break;
+         case INSET:
+           builder.append("border-style: inset; ");
+         break;
+         case OUTSET:
+           builder.append("border-style: outset; ");
          break;
       }
 
@@ -1897,6 +1950,41 @@ public class L2HConverter extends LaTeXParserListener
          builder.append(String.format("padding: %s; ", getHtmlDimension(innersep)));
       }
 
+      TeXDimension margin = fbox.getOuterMarginLeft(getParser());
+
+      if (margin != null)
+      {
+         builder.append(String.format("margin-left: %s; ", getHtmlDimension(margin)));
+      }
+
+      margin = fbox.getOuterMarginRight(getParser());
+
+      if (margin != null)
+      {
+         builder.append(String.format("margin-right: %s; ", getHtmlDimension(margin)));
+      }
+
+      margin = fbox.getOuterMarginTop(getParser());
+
+      if (margin != null)
+      {
+         builder.append(String.format("margin-top: %s; ", getHtmlDimension(margin)));
+      }
+
+      margin = fbox.getOuterMarginBottom(getParser());
+
+      if (margin != null)
+      {
+         builder.append(String.format("margin-bottom: %s; ", getHtmlDimension(margin)));
+      }
+
+      TeXDimension radius = fbox.getBorderRadius(getParser());
+
+      if (radius != null)
+      {
+         builder.append(String.format("border-radius: %s;", getHtmlDimension(radius)));
+      }
+
       col = fbox.getForegroundColor(getParser());
 
       if (col != null)
@@ -1916,6 +2004,11 @@ public class L2HConverter extends LaTeXParserListener
 
       if (width != null)
       {
+         if (fbox.isInLine())
+         {
+            isInlineBlock = true;
+         }
+
          builder.append(String.format("width: %s; ", getHtmlDimension(width)));
       }
 
@@ -1923,8 +2016,31 @@ public class L2HConverter extends LaTeXParserListener
 
       if (height != null)
       {
+         if (fbox.isInLine())
+         {
+            isInlineBlock = true;
+         }
+
          builder.append(String.format("height: %s; ", 
            getHtmlDimension(height)));
+      }
+
+      Angle angle = fbox.getAngle(parser);
+
+      if (angle != null)
+      {
+         String transform = String.format("rotate(%fdeg)", angle.toDegrees());
+
+         builder.append(String.format("transform: %s; ", transform));
+         builder.append(String.format("-ms-transform: %s; ", transform));
+         builder.append(String.format("-webkit-transform: %s; ", transform));
+
+         isInlineBlock = true;
+      }
+
+      if (isInlineBlock)
+      {
+         builder.append("display: inline-block; ");
       }
 
       return builder.toString();
@@ -1933,26 +2049,28 @@ public class L2HConverter extends LaTeXParserListener
    public void startFrameBox(FrameBox fbox)
     throws IOException
    {
-      String specs = getFrameBoxSpecs(fbox);
+      String tag = getElementTag(fbox);
 
-      if (fbox.isInLine())
+      write(String.format("<%s ", tag));
+
+      if (getDeclaredFrameBox(fbox.getId()) == null)
       {
-         write("<span ");
+         String specs = getFrameBoxSpecs(fbox);
+
+         String style = defaultStyles.get(specs);
+
+         if (style == null)
+         {
+            write(String.format("style=\"%s\"", specs));
+         }
+         else
+         {
+            write(String.format("class=\"%s\"", style));
+         }
       }
       else
       {
-         write("<div ");
-      }
-
-      String style = defaultStyles.get(specs);
-
-      if (style == null)
-      {
-         write(String.format("style=\"%s\"", specs));
-      }
-      else
-      {
-         write(String.format("class=\"%s\"", style));
+         write(String.format("class=\"%s\"", fbox.getId()));
       }
 
       write(">");
@@ -1961,14 +2079,9 @@ public class L2HConverter extends LaTeXParserListener
    public void endFrameBox(FrameBox fbox)
     throws IOException
    {
-      if (fbox.isInLine())
-      {
-         write("</span>");
-      }
-      else
-      {
-         write("</div>");
-      }
+      String tag = getElementTag(fbox);
+
+      write(String.format("</%s>", tag));
    }
 
    public void startTheorem(String name) throws IOException
@@ -2010,28 +2123,37 @@ public class L2HConverter extends LaTeXParserListener
          label, text));
    }
 
-   public void startSection(boolean isNumbered, String tag, String name)
+   public void startSection(boolean isNumbered, String tag, String name,
+     String id, TeXObjectList stack)
     throws IOException
    {
+      if (currentSection != null)
+      {
+         write(String.format("%n</section><!-- end of section %s -->%n", currentSection));
+      }
+
+      if (id == null)
+      {
+         currentSection = tag+"-"+name;
+
+         write(String.format("%n<section><!-- start of section %s -->", currentSection));
+      }
+      else
+      {
+         currentSection = id;
+
+         write(String.format("%n<section id=\"%s\"><!-- start of section %s -->",
+           id, currentSection));
+      }
+
       ControlSequence cs = parser.getControlSequence("TeXParserLibToTopName");
       String text = "[top]";
 
-      if (cs instanceof Expandable)
+      if (cs != null)
       {
-         try
-         {
-            TeXObjectList expanded = parser.expandfully(parser);
-
-            if (expanded != null)
-            {
-               text = expanded.toString(parser);
-            }
-         }
-         catch (IOException e)
-         {
-            getTeXApp().error(e);
-         }
+         text = parser.expandToString(cs, stack);
       }
+
       write(String.format(
        "<div class=\"tomain\"><a href=\"#main\">%s</a></div>",
        text));
@@ -2068,6 +2190,7 @@ public class L2HConverter extends LaTeXParserListener
 
    private HashMap<String,String> defaultStyles;
 
+   private String currentSection = null;
 
    private Stack<TrivListDec> trivListStack = new Stack<TrivListDec>();
 

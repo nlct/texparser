@@ -33,9 +33,10 @@ public class MBox extends FrameBox
 
    public MBox(String name)
    {
-      super(name, BORDER_NONE, ALIGN_DEFAULT, ALIGN_DEFAULT, true);
+      super(name, BorderStyle.NONE, AlignHStyle.DEFAULT, AlignVStyle.DEFAULT, true);
    }
 
+   @Deprecated
    public MBox(String name, byte borderStyle, 
       TeXDimension borderWidth, TeXDimension innerMargin)
    {
@@ -43,14 +44,17 @@ public class MBox extends FrameBox
         borderWidth, innerMargin);
    }
 
-   public Object clone()
+   public MBox(String name, BorderStyle borderStyle, 
+      TeXDimension borderWidth, TeXDimension innerMargin)
    {
-      return new MBox(getName(), getStyle(), 
-        currentBorderWidth == null ? null :
-          (TeXDimension)currentBorderWidth.clone(),
-        currentInnerMargin == null ? null :
-          (TeXDimension)currentInnerMargin.clone()
-      );
+      super(name, borderStyle, AlignHStyle.DEFAULT, AlignVStyle.DEFAULT, true,
+        borderWidth, innerMargin);
+   }
+
+   @Override
+   public FrameBox createBox()
+   {
+      return new MBox(getName());
    }
 
    public TeXDimension getBorderWidth(TeXParser parser) throws IOException

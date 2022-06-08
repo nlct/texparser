@@ -44,6 +44,7 @@ import com.dickimawbooks.texparserlib.latex.bpchem.*;
 import com.dickimawbooks.texparserlib.latex.color.*;
 import com.dickimawbooks.texparserlib.latex.datatool.*;
 import com.dickimawbooks.texparserlib.latex.etoolbox.*;
+import com.dickimawbooks.texparserlib.latex.fontawesome.*;
 import com.dickimawbooks.texparserlib.latex.fontenc.*;
 import com.dickimawbooks.texparserlib.latex.fourier.*;
 import com.dickimawbooks.texparserlib.latex.glossaries.*;
@@ -549,15 +550,17 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       newlength("fboxsep", 3, TeXUnit.PT);
       newlength("fboxrule", 0.4f, TeXUnit.PT);
 
-      parser.putControlSequence(new FrameBox());
-      parser.putControlSequence(new MBox());
-      parser.putControlSequence(new ParBox());
-      parser.putControlSequence(new FrameBox("framebox"));
-      parser.putControlSequence(new MBox("makebox"));
-      parser.putControlSequence(new MBox("frame",
-        FrameBox.BORDER_SOLID,
+      declareFrameBox(new FrameBox());
+      declareFrameBox(new MBox(), false);
+      declareFrameBox(new ParBox());
+      declareFrameBox(new FrameBox("framebox"));
+      declareFrameBox(new MBox("makebox"));
+      declareFrameBox(new MBox("frame",
+        BorderStyle.SOLID,
         new UserDimension(1, FixedUnit.BP), 
-        new UserDimension(0, FixedUnit.BP)));
+        new UserDimension(0, FixedUnit.BP)), false);
+
+      addSupplementaryBoxes();
 
       newlength("tabcolsep", 6, TeXUnit.PT);
       newlength("arraycolsep", 5, TeXUnit.PT);
@@ -736,6 +739,116 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       parser.putControlSequence(new GenericError());
       parser.putControlSequence(new DocumentStyle());
    }
+
+   protected void addSupplementaryBoxes()
+   {
+      // These are designed for adding frames or overlays to symbols
+
+      FrameBox boxFrame = new FrameBox("texparser@boxed",
+        BorderStyle.SOLID, AlignHStyle.CENTER, AlignVStyle.MIDDLE, true,
+        new UserDimension(2, FixedUnit.BP), new UserDimension());
+
+      boxFrame.setId("boxed");
+      boxFrame.setWidth(new UserDimension(1, TeXUnit.EM));
+      boxFrame.setHeight(new UserDimension(1, TeXUnit.EM));
+
+      declareFrameBox(boxFrame, false);
+
+      boxFrame = new FrameBox("texparser@circled",
+        BorderStyle.SOLID, AlignHStyle.CENTER, AlignVStyle.MIDDLE, true,
+        new UserDimension(2, FixedUnit.BP), new UserDimension(1, TeXUnit.BP));
+
+      boxFrame.setId("circled");
+      boxFrame.setWidth(new UserDimension(1, TeXUnit.EM));
+      boxFrame.setHeight(new UserDimension(1, TeXUnit.EM));
+
+      boxFrame.setBorderRadius(new UserDimension(50, 
+        new PercentUnit(PercentUnit.BOX_WIDTH)));
+
+      declareFrameBox(boxFrame, false);
+
+      boxFrame = new FrameBox("texparser@overlapped",
+        BorderStyle.NONE, AlignHStyle.CENTER, AlignVStyle.DEFAULT, true, 
+        null, new UserDimension());
+
+      boxFrame.setId("overlapped");
+      boxFrame.setWidth(new UserDimension(1, TeXUnit.EM));
+      boxFrame.setHeight(new UserDimension(1, TeXUnit.EM));
+
+      declareFrameBox(boxFrame, false);
+
+      boxFrame = new FrameBox("texparser@overlapper",
+        BorderStyle.NONE, AlignHStyle.CENTER, AlignVStyle.DEFAULT, true, 
+        null, new UserDimension());
+
+      boxFrame.setId("overlapper");
+      boxFrame.setWidth(new UserDimension(1, TeXUnit.EM));
+      boxFrame.setHeight(new UserDimension(1, TeXUnit.EM));
+      boxFrame.setOuterMarginLeft(new UserDimension(-1, TeXUnit.EM));
+
+      declareFrameBox(boxFrame, false);
+
+      boxFrame = new FrameBox("texparser@overlapper@top",
+        BorderStyle.NONE, AlignHStyle.CENTER, AlignVStyle.TOP, true, 
+        null, new UserDimension());
+
+      boxFrame.setId("overlappertop");
+      boxFrame.setWidth(new UserDimension(1, TeXUnit.EM));
+      boxFrame.setHeight(new UserDimension(1, TeXUnit.EM));
+      boxFrame.setOuterMarginLeft(new UserDimension(-1, TeXUnit.EM));
+
+      declareFrameBox(boxFrame, false);
+
+      boxFrame = new FrameBox("texparser@partial@overlapper",
+        BorderStyle.NONE, AlignHStyle.CENTER, AlignVStyle.DEFAULT, true, 
+        null, new UserDimension());
+
+      boxFrame.setId("partialoverlapper");
+      boxFrame.setWidth(new UserDimension(1, TeXUnit.EM));
+      boxFrame.setHeight(new UserDimension(1, TeXUnit.EM));
+      boxFrame.setOuterMarginLeft(new UserDimension(-0.75f, TeXUnit.EM));
+
+      declareFrameBox(boxFrame, false);
+
+      parser.putControlSequence(new BoxOverlap("texparser@overlap@strike", 0x29F5));
+
+      boxFrame = new FrameBox("texparser@quarterleft",
+        BorderStyle.NONE, AlignHStyle.CENTER, AlignVStyle.MIDDLE, true, 
+        null, new UserDimension());
+
+      boxFrame.setId("quarterleft");
+      boxFrame.setAngle(new Angle(-90, AngleUnit.DEGREES));
+
+      declareFrameBox(boxFrame, false);
+
+      boxFrame = new FrameBox("texparser@quarterright",
+        BorderStyle.NONE, AlignHStyle.CENTER, AlignVStyle.MIDDLE, true, 
+        null, new UserDimension());
+
+      boxFrame.setId("quarterright");
+      boxFrame.setAngle(new Angle(90, AngleUnit.DEGREES));
+
+      declareFrameBox(boxFrame, false);
+
+      boxFrame = new FrameBox("texparser@eighthleft",
+        BorderStyle.NONE, AlignHStyle.CENTER, AlignVStyle.MIDDLE, true, 
+        null, new UserDimension());
+
+      boxFrame.setId("eighthleft");
+      boxFrame.setAngle(new Angle(-45, AngleUnit.DEGREES));
+
+      declareFrameBox(boxFrame, false);
+
+      boxFrame = new FrameBox("texparser@eighthright",
+        BorderStyle.NONE, AlignHStyle.CENTER, AlignVStyle.MIDDLE, true, 
+        null, new UserDimension());
+
+      boxFrame.setId("eighthright");
+      boxFrame.setAngle(new Angle(45, AngleUnit.DEGREES));
+
+      declareFrameBox(boxFrame, false);
+   }
+
 
    protected void addMathFontCommand(String name, int style)
    {
@@ -1484,6 +1597,11 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       if (styName.equals("keyval") || styName.equals("xkeyval"))
       {
          return new KeyValSty(options, styName, this, loadParentOptions);
+      }
+
+      if (styName.equals("fontawesome"))
+      {
+         return new FontAweSomeSty(options, this, loadParentOptions);
       }
 
       if (styName.equals("fontenc"))
@@ -2386,6 +2504,43 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       return passOptions.get(name);
    }
 
+   public void declareFrameBox(FrameBox fbox)
+   {
+      declareFrameBox(fbox, true);
+   }
+
+   public void declareFrameBox(FrameBox fbox, boolean isChangeable)
+   {
+      if (!isChangeable)
+      {
+         fbox.fixStyle();
+      }
+
+      if (!fbox.isStyleChangeable())
+      {
+         if (frameBoxes == null)
+         {
+            frameBoxes = new HashMap<String,FrameBox>();
+         }
+
+         String id = fbox.getId();
+
+         frameBoxes.put(id, fbox);
+      }
+
+      parser.putControlSequence(fbox);
+   }
+
+   public FrameBox getDeclaredFrameBox(String id)
+   {
+      if (frameBoxes == null || id == null)
+      {
+         return null;
+      }
+
+      return frameBoxes.get(id);
+   }
+
    private Vector<String> verbEnv;
 
    protected Vector<LaTeXFile> loadedPackages;
@@ -2436,6 +2591,8 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
    private boolean indexingEnabled = false;
 
    private Stack<TrivListDec> trivListStack = new Stack<TrivListDec>();
+
+   protected HashMap<String,FrameBox> frameBoxes;
 
    public static final UserNumber ZERO = new UserNumber(0);
    public static final UserNumber ONE = new UserNumber(1);

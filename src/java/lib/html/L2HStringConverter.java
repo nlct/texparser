@@ -110,7 +110,9 @@ public class L2HStringConverter extends L2HConverter
       return html;
    }
 
-   public void startSection(boolean isNumbered, String tag, String name)
+   @Override
+   public void startSection(boolean isNumbered, String tag, String name,
+     String id, TeXObjectList stack)
     throws IOException
    {
    }

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -33,12 +33,13 @@ public class SubFloat extends FrameBox
 
    public SubFloat(String name, String floatname)
    {
-      super(name, BORDER_NONE, ALIGN_DEFAULT, ALIGN_DEFAULT, true, true,
+      super(name, BorderStyle.NONE, AlignHStyle.DEFAULT, AlignVStyle.DEFAULT, true, true,
         null, null);
       this.floatname = floatname;
    }
 
-   public Object clone()
+   @Override
+   public FrameBox createBox()
    {
       return new SubFloat(getName(), floatname);
    }
@@ -46,92 +47,32 @@ public class SubFloat extends FrameBox
    protected void popSettings(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      caption = null;
-      TeXObject pos = null;
-
-      if (parser == stack)
-      {
-         caption = parser.popNextArg('[', ']');
-      }
-      else
-      {
-         caption = stack.popArg(parser, '[', ']');
-      }
-
-      if (parser == stack)
-      {
-         pos = parser.popNextArg('[', ']');
-      }
-      else
-      {
-         pos = stack.popArg(parser, '[', ']');
-      }
+      caption = popOptArg(parser, stack);
+      String pos = popOptLabelString(parser, stack);
 
       if (pos != null)
       {
-         if (pos instanceof Expandable)
+         pos = pos.trim();
+
+         if (pos.equals("c"))
          {
-            TeXObjectList expanded;
-
-            if (parser == stack)
-            {
-               expanded = ((Expandable)pos).expandfully(parser);
-            }
-            else
-            {
-               expanded = ((Expandable)pos).expandfully(parser, stack);
-            }
-
-            if (expanded != null)
-            {
-               pos = expanded;
-            }
+            valign = AlignVStyle.MIDDLE;
          }
-
-         if (pos != null)
+         else if (pos.equals("t"))
          {
-            if (pos instanceof Expandable)
-            {
-               TeXObjectList expanded;
-
-               if (parser == stack)
-               {
-                  expanded = ((Expandable)pos).expandfully(parser);
-               }
-               else
-               {
-                  expanded = ((Expandable)pos).expandfully(parser, stack);
-               }
-
-               if (expanded != null)
-               {
-                  pos = expanded;
-               }
-            }
-
-            String val = pos.toString(parser).trim();
-
-            if (val.equals("c"))
-            {
-               valign = ALIGN_CENTER;
-            }
-            else if (val.equals("t"))
-            {
-               valign = ALIGN_TOP;
-            }
-            else if (val.equals("b"))
-            {
-               valign = ALIGN_BOTTOM;
-            }
-            else
-            {
-               TeXApp texApp = parser.getListener().getTeXApp();
-
-               texApp.warning(parser, texApp.getMessage(
-                 LaTeXSyntaxException.ILLEGAL_ARG_TYPE, val));
-            }
+            valign = AlignVStyle.TOP;
          }
+         else if (pos.equals("b"))
+         {
+            valign = AlignVStyle.BOTTOM;
+         }
+         else
+         {
+            TeXApp texApp = parser.getListener().getTeXApp();
 
+            texApp.warning(parser, texApp.getMessage(
+              LaTeXSyntaxException.ILLEGAL_ARG_TYPE, pos));
+         }
       }
    }
 
@@ -140,16 +81,7 @@ public class SubFloat extends FrameBox
    {
       LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
 
-      TeXObject arg;
-
-      if (parser == stack)
-      {
-         arg = parser.popNextArg();
-      }
-      else
-      {
-         arg = stack.popArg(parser);
-      }
+      TeXObject arg = popArg(parser, stack);
 
       TeXObjectList list = new TeXObjectList();
 

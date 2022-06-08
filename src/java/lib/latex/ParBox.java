@@ -33,24 +33,20 @@ public class ParBox extends FrameBox
 
    public ParBox(String name)
    {
-      this(name, BORDER_NONE, null, null);
+      this(name, BorderStyle.NONE, null, null);
    }
 
-   public ParBox(String name, byte borderStyle, 
+   public ParBox(String name, BorderStyle borderStyle, 
       TeXDimension borderWidth, TeXDimension innerMargin)
    {
-      super(name, borderStyle, ALIGN_DEFAULT, ALIGN_DEFAULT, true, true,
+      super(name, borderStyle, AlignHStyle.DEFAULT, AlignVStyle.DEFAULT, true, true,
         borderWidth, innerMargin);
    }
 
-   public Object clone()
+   @Override
+   public FrameBox createBox()
    {
-      return new ParBox(getName(), getStyle(), 
-        currentBorderWidth == null ? null :
-          (TeXDimension)currentBorderWidth.clone(),
-        currentInnerMargin == null ? null :
-          (TeXDimension)currentInnerMargin.clone()
-      );
+      return new ParBox(getName());
    }
 
    public TeXDimension getBorderWidth(TeXParser parser) throws IOException
@@ -124,15 +120,15 @@ public class ParBox extends FrameBox
 
             if (val.equals("c"))
             {
-               valign = ALIGN_CENTER;
+               valign = AlignVStyle.MIDDLE;
             }
             else if (val.equals("t"))
             {
-               valign = ALIGN_TOP;
+               valign = AlignVStyle.TOP;
             }
             else if (val.equals("b"))
             {
-               valign = ALIGN_BOTTOM;
+               valign = AlignVStyle.BOTTOM;
             }
             else
             {

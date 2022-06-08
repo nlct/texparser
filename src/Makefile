@@ -6,7 +6,8 @@ endif
 
 test	: test-obs test-abs test-article test-nested test-doc \
 	  test-probsoln test-lists test-datatool test-mkimages \
-	  test-jmlrutils test-glossaries test-glossaries-extra
+	  test-jmlrutils test-glossaries test-glossaries-extra \
+	  test-fontawesome
 
 tests/output	:
 	mkdir -p tests/output
@@ -47,6 +48,13 @@ test-glossaries-extra : app tests/test-glossaries-extra/test-glossaries-extra.pd
 
 tests/test-glossaries-extra/test-glossaries-extra.pdf	: tests/test-glossaries-extra/test-glossaries-extra.tex
 					cd tests/test-glossaries-extra; arara test-glossaries-extra
+
+test-fontawesome : app tests/test-fontawesome/test-fontawesome.pdf tests/output
+	rm -f -r tests/output/test-fontawesome
+	bin/texparsertest --debug --in tests/test-fontawesome/test-fontawesome.tex --output tests/output/test-fontawesome --html
+
+tests/test-fontawesome/test-fontawesome.pdf	: tests/test-fontawesome/test-fontawesome.tex
+					cd tests/test-fontawesome; arara test-fontawesome
 
 test-jmlrutils : app tests/output
 	rm -f -r tests/output/test-jmlrutils

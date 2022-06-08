@@ -44,7 +44,33 @@ public class Gls extends AbstractGlsCommand
 
    public Object clone()
    {
-      return new Gls(getName(), getCaseChange(), isPlural(), getSty());
+      Gls gls = new Gls(getName(), getCaseChange(), isPlural(), getSty());
+
+      gls.setPrefix(prefix);
+      gls.setDefaultOptions(defaultOptions);
+
+      return gls;
+   }
+
+   public void setPrefix(String prefix)
+   {
+      if (prefix == null)
+      {
+         throw new NullPointerException();
+      }
+
+      this.prefix = prefix;
+   }
+
+   @Override
+   public String getEntryLabelPrefix()
+   {
+      return prefix;
+   }
+
+   public void setDefaultOptions(KeyValList options)
+   {
+      this.defaultOptions = options;
    }
 
    @Override
@@ -65,7 +91,26 @@ public class Gls extends AbstractGlsCommand
    {
       boolean localUnset = false;
 
-      KeyValList keyValList = popOptKeyValList(parser, stack, true);
+      KeyValList keyValList = null;
+
+      if (defaultOptions != null)
+      {
+         keyValList = (KeyValList)defaultOptions.clone();
+      }
+
+      KeyValList options = popOptKeyValList(parser, stack, true);
+
+      if (options != null)
+      {
+         if (keyValList == null)
+         {
+            keyValList = options;
+         }
+         else
+         {
+            keyValList.putAll(options);
+         }
+      }
 
       if (keyValList == null)
       {
@@ -181,4 +226,7 @@ public class Gls extends AbstractGlsCommand
 
    protected CaseChange caseChange;
    protected boolean isPlural;
+
+   private String prefix = "";
+   private KeyValList defaultOptions;
 }

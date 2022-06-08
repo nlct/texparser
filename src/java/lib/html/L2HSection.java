@@ -100,8 +100,6 @@ public class L2HSection extends Section
 
       String tag = getTag();
 
-      listener.startSection(false, tag, getName());
-
       TeXObjectList substack = listener.createStack();
 
       TeXObject cs = parser.getControlSequence("theH"+getName()+"*");
@@ -128,34 +126,18 @@ public class L2HSection extends Section
          listener.stepcounter(counter);
       }
 
+      listener.startSection(false, tag, getName(), labelName, stack);
+
       if (tag == null)
       {
-         if (labelName == null)
-         {
-            substack.add(new HtmlTag(
-             String.format("%n<div class=\"%s\"><!-- start of %s header -->",
-                getName(), getName())));
-         }
-         else
-         {
-            substack.add(new HtmlTag(
-             String.format("%n<div id=\"%s\" class=\"%s\"><!-- start of %s header -->",
-                labelName, getName(), getName())));
-         }
+         substack.add(new HtmlTag(
+          String.format("%n<div class=\"%s\"><!-- start of %s header -->",
+             getName(), getName())));
       }
       else
       {
-         if (labelName == null)
-         {
-            substack.add(new HtmlTag(
-              String.format("%n<%s><!-- start of %s header -->", tag, getName())));
-         }
-         else
-         {
-            substack.add(new HtmlTag(
-              String.format("%n<%s id=\"%s\"><!-- start of %s header -->", 
-                  tag, labelName, getName())));
-         }
+         substack.add(new HtmlTag(
+           String.format("%n<%s><!-- start of %s header -->", tag, getName())));
       }
 
       substack.add(arg);
@@ -197,8 +179,6 @@ public class L2HSection extends Section
 
       String tag = getTag();
 
-      listener.startSection(true, tag, getName());
-
       String labelName=null;
 
       // Is there a label following the section command?
@@ -227,34 +207,18 @@ public class L2HSection extends Section
          }
       }
 
+      listener.startSection(true, tag, getName(), labelName, stack);
+
       if (tag == null)
       {
-         if (labelName == null)
-         {
-            list.add(new HtmlTag(
-             String.format("%n<div class=\"%s\"><!-- start of %s header -->",
-                 getName(), getName())));
-         }
-         else
-         {
-            list.add(new HtmlTag(
-             String.format("%n<div id=\"%s\" class=\"%s\"><!-- start of %s header -->",
-                labelName, getName(), getName())));
-         }
+         list.add(new HtmlTag(
+          String.format("%n<div class=\"%s\"><!-- start of %s header -->",
+              getName(), getName())));
       }
       else
       {
-         if (labelName == null)
-         {
-            list.add(new HtmlTag(String.format("%n<%s><!-- start of %s header -->",
-               tag, getName())));
-         }
-         else
-         {
-            list.add(new HtmlTag(
-               String.format("%n<%s id=\"%s\"><!-- start of %s header -->", 
-                  tag, labelName, getName())));
-         }
+         list.add(new HtmlTag(String.format("%n<%s><!-- start of %s header -->",
+            tag, getName())));
       }
 
       list.add(listener.getControlSequence("the"+getName()));

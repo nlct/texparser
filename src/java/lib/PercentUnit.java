@@ -84,6 +84,7 @@ public class PercentUnit extends TeXUnit
          case PAPER_WIDTH:
          case PAPER_HEIGHT:
          case MARGIN_WIDTH:
+         case BOX_WIDTH:
            type = newType;
          break;
          default:
@@ -106,6 +107,7 @@ public class PercentUnit extends TeXUnit
          case PAPER_WIDTH: return "\\paperwidth ";
          case PAPER_HEIGHT: return "\\paperwidth ";
          case MARGIN_WIDTH: return "\\marginparwidth ";
+         case BOX_WIDTH: return "\\wd ";
       }
 
       return "";
@@ -147,4 +149,5 @@ public class PercentUnit extends TeXUnit
    public static final int PAPER_WIDTH=7;
    public static final int PAPER_HEIGHT=8;
    public static final int MARGIN_WIDTH=9;
+   public static final int BOX_WIDTH=10;
 }

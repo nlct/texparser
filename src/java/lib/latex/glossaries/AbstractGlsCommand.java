@@ -74,10 +74,16 @@ public abstract class AbstractGlsCommand extends Command
       return KeyValList.getList(parser, arg);
    }
 
+   protected String getEntryLabelPrefix()
+   {
+      return "";
+   }
+
    protected GlsLabel popEntryLabel(TeXParser parser, TeXObjectList stack)
     throws IOException
    {
       TeXObject arg = null;
+      GlsLabel glsLabel = null;
 
       if (stack != null && !stack.isEmpty())
       {
@@ -85,22 +91,37 @@ public abstract class AbstractGlsCommand extends Command
 
          if (arg instanceof GlsLabel && ((GlsLabel)arg).getEntry() != null)
          {
-            return (GlsLabel)stack.remove(0);
+            glsLabel = (GlsLabel)stack.remove(0);
          }
       }
 
-      arg = popArg(parser, stack);
-
-      if (arg instanceof GlsLabel)
+      if (glsLabel == null)
       {
-         GlsLabel glslabel = (GlsLabel)arg;
+         arg = popArg(parser, stack);
 
-         glslabel.refresh(sty);
-
-         return glslabel;
+         if (arg instanceof GlsLabel)
+         {
+            glsLabel = (GlsLabel)arg;
+         }
+      }
+      else
+      {
+         arg = glsLabel;
       }
 
-      String label = parser.expandToString(arg, stack);
+      String prefix = getEntryLabelPrefix();
+
+      if (glsLabel != null)
+      {
+         if (!prefix.isEmpty() || glsLabel.getLabel().startsWith(prefix))
+         {
+            glsLabel.refresh(sty);
+
+            return glsLabel;
+         }
+      }
+
+      String label = prefix + parser.expandToString(arg, stack);
 
       GlossaryEntry entry = getEntry(label);
 

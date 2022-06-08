@@ -78,7 +78,7 @@ public abstract class CharObject extends AbstractTeXObject
    @Override
    public void process(TeXParser parser) throws IOException
    {
-      parser.getListener().getWriteable().write(toString(parser));
+      parser.getListener().getWriteable().writeCodePoint(charCode);
    }
 
    @Override
