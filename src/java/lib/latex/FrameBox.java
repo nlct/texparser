@@ -363,6 +363,30 @@ public class FrameBox extends ControlSequence
       }
    }
 
+   public void setBorderColor(Color col)
+   {
+      if (isChangeable)
+      {
+         currentBorderColor = col;
+      }
+   }
+
+   public void setForegroundColor(Color col)
+   {
+      if (isChangeable)
+      {
+         currentFgColor = col;
+      }
+   }
+
+   public void setBackgroundColor(Color col)
+   {
+      if (isChangeable)
+      {
+         currentBgColor = col;
+      }
+   }
+
    public Color getBorderColor(TeXParser parser) throws IOException
    {
       return currentBorderColor;
