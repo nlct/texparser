@@ -20,6 +20,7 @@ package com.dickimawbooks.texparserlib.latex.fontawesome;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.awt.Color;
 
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.*;
@@ -33,12 +34,6 @@ public class FontAweSomeSty extends LaTeXSty
       super(options, "fontawesome", listener, loadParentOptions);
 
       iconMap = new HashMap<String,TeXObject>();
-   }
-
-   @Override
-   protected void preOptions(TeXObjectList stack) throws IOException
-   {
-      getListener().requirepackage(null, "graphicx", false, stack);
    }
 
    @Override
@@ -134,6 +129,20 @@ public class FontAweSomeSty extends LaTeXSty
       registerControlSequence(new GenericCommand(true, "faExternalLink", null, list));
 
       iconMap.put("external-link", list);
+
+      FrameBox box = new FrameBox("fontawesome@disabledicon", 
+        BorderStyle.NONE, AlignHStyle.DEFAULT, AlignVStyle.DEFAULT, true);
+
+      box.setForegroundColor(Color.GRAY);
+      box.setId("fwsdisabledicon");
+      listener.declareFrameBox(box, false);
+
+      box = new FrameBox("fontawesome@activeicon", 
+        BorderStyle.NONE, AlignHStyle.DEFAULT, AlignVStyle.DEFAULT, true);
+
+      box.setForegroundColor(Color.GREEN);
+      box.setId("fwsactiveicon");
+      listener.declareFrameBox(box, false);
    }
 
    public TeXObject getIconDefinition(String iconname)
@@ -562,6 +571,10 @@ public class FontAweSomeSty extends LaTeXSty
       new Object[]{"Ticket", "ticket", Integer.valueOf(0x1F3AB)},
       new Object[]{"Times", "times", Integer.valueOf(0x274C)},
       new Object[]{"Tint", "tint", Integer.valueOf(0x1F322)},
+      new Object[]{"ToggleOff", "toggle-off", "\uD83D\uDD18\uFE0E",
+       "fontawesome@disabledicon"},
+      new Object[]{"ToggleOn", "toggle-on", Integer.valueOf(0x1F518),
+       "fontawesome@activeicon"},
       new Object[]{"Train", "train", Integer.valueOf(0x1F689)},
       new Object[]{"Transgender", "transgender", Integer.valueOf(0x26A5)},
       new Object[]{"TransgenderAlt", "transgender-alt", Integer.valueOf(0x26A7)},
