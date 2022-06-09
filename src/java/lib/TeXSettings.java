@@ -140,18 +140,18 @@ public class TeXSettings
           "Invalid argument '%d' for setCharMapMode(int)", setting));
    }
 
-   public int getCurrentFontFamily()
+   public TeXFontFamily getCurrentFontFamily()
    {
       return currentFontFamily;
    }
 
-   public int getFontFamily()
+   public TeXFontFamily getFontFamily()
    {
-      if (currentFontFamily == INHERIT)
+      if (currentFontFamily == TeXFontFamily.INHERIT)
       {
          if (parent == null)
          {
-            return FAMILY_RM;
+            return TeXFontFamily.RM;
          }
 
          return parent.getFontFamily();
@@ -160,18 +160,18 @@ public class TeXSettings
       return currentFontFamily;
    }
 
-   public int getCurrentFontShape()
+   public TeXFontShape getCurrentFontShape()
    {
       return currentFontShape;
    }
 
-   public int getFontShape()
+   public TeXFontShape getFontShape()
    {
-      if (currentFontShape == INHERIT)
+      if (currentFontShape == TeXFontShape.INHERIT)
       {
          if (parent == null)
          {
-            return SHAPE_UP;
+            return TeXFontShape.UP;
          }
 
          return parent.getFontShape();
@@ -180,18 +180,18 @@ public class TeXSettings
       return currentFontShape;
    }
 
-   public int getCurrentFontWeight()
+   public TeXFontWeight getCurrentFontWeight()
    {
       return currentFontWeight;
    }
 
-   public int getFontWeight()
+   public TeXFontWeight getFontWeight()
    {
-      if (currentFontWeight == INHERIT)
+      if (currentFontWeight == TeXFontWeight.INHERIT)
       {
          if (parent == null)
          {
-            return WEIGHT_MD;
+            return TeXFontWeight.MD;
          }
 
          return parent.getFontWeight();
@@ -200,18 +200,18 @@ public class TeXSettings
       return currentFontWeight;
    }
 
-   public int getCurrentFontSize()
+   public TeXFontSize getCurrentFontSize()
    {
       return currentFontSize;
    }
 
-   public int getFontSize()
+   public TeXFontSize getFontSize()
    {
-      if (currentFontSize == INHERIT)
+      if (currentFontSize == TeXFontSize.INHERIT)
       {
          if (parent == null)
          {
-            return SIZE_NORMAL;
+            return TeXFontSize.NORMAL;
          }
 
          return parent.getFontSize();
@@ -220,18 +220,18 @@ public class TeXSettings
       return currentFontSize;
    }
 
-   public int getCurrentMathFont()
+   public TeXFontMath getCurrentMathFont()
    {
       return currentMathFont;
    }
 
-   public int getMathFont()
+   public TeXFontMath getMathFont()
    {
-      if (currentMathFont == INHERIT)
+      if (currentMathFont == TeXFontMath.INHERIT)
       {
          if (parent == null)
          {
-            return MATH_STYLE_NORMAL;
+            return TeXFontMath.NORMAL;
          }
 
          return parent.getMathFont();
@@ -527,16 +527,32 @@ public class TeXSettings
       currentBgColor = col;
    }
 
+   public void setFontFamily(TeXFontFamily setting)
+   {
+      currentFontFamily = setting;
+   }
+
    public void setFontFamily(int setting)
    {
       switch (setting)
       {
          case INHERIT:
+           currentFontFamily = TeXFontFamily.INHERIT;
+         break;
          case FAMILY_RM:
+           currentFontFamily = TeXFontFamily.RM;
+         break;
          case FAMILY_SF:
+           currentFontFamily = TeXFontFamily.SF;
+         break;
          case FAMILY_TT:
+           currentFontFamily = TeXFontFamily.TT;
+         break;
          case FAMILY_CAL:
-           currentFontFamily = setting;
+           currentFontFamily = TeXFontFamily.CAL;
+         break;
+         case FAMILY_VERB:
+           currentFontFamily = TeXFontFamily.VERB;
          break;
          default:
            throw new IllegalArgumentException(String.format(
@@ -545,17 +561,32 @@ public class TeXSettings
       }
    }
 
+   public void setFontShape(TeXFontShape setting)
+   {
+      currentFontShape = setting;
+   }
+
    public void setFontShape(int setting)
    {
       switch (setting)
       {
          case INHERIT:
+           currentFontShape = TeXFontShape.INHERIT;
+         break;
          case SHAPE_UP:
+           currentFontShape = TeXFontShape.UP;
+         break;
          case SHAPE_IT:
+           currentFontShape = TeXFontShape.IT;
+         break;
          case SHAPE_SL:
+           currentFontShape = TeXFontShape.SL;
+         break;
          case SHAPE_EM:
+           currentFontShape = TeXFontShape.EM;
+         break;
          case SHAPE_SC:
-           currentFontShape = setting;
+           currentFontShape = TeXFontShape.SC;
          break;
          default:
            throw new IllegalArgumentException(String.format(
@@ -564,14 +595,23 @@ public class TeXSettings
       }
    }
 
+   public void setFontWeight(TeXFontWeight setting)
+   {
+      currentFontWeight = setting;
+   }
+
    public void setFontWeight(int setting)
    {
       switch (setting)
       {
          case INHERIT:
+           currentFontWeight = TeXFontWeight.INHERIT;
+         break;
          case WEIGHT_MD:
+           currentFontWeight = TeXFontWeight.MD;
+         break;
          case WEIGHT_BF:
-           currentFontWeight = setting;
+           currentFontWeight = TeXFontWeight.BF;
          break;
          default:
            throw new IllegalArgumentException(String.format(
@@ -580,23 +620,50 @@ public class TeXSettings
       }
    }
 
+   public void setFontSize(TeXFontSize setting)
+   {
+      currentFontSize = setting;
+   }
+
    public void setFontSize(int setting)
    {
       switch (setting)
       {
          case INHERIT:
+            currentFontSize = TeXFontSize.INHERIT;
+         break;
          case SIZE_NORMAL:
+            currentFontSize = TeXFontSize.NORMAL;
+         break;
          case SIZE_LARGE:
+            currentFontSize = TeXFontSize.LARGE;
+         break;
          case SIZE_XLARGE:
+            currentFontSize = TeXFontSize.XLARGE;
+         break;
          case SIZE_XXLARGE:
+            currentFontSize = TeXFontSize.XXLARGE;
+         break;
          case SIZE_HUGE:
+            currentFontSize = TeXFontSize.HUGE;
+         break;
          case SIZE_XHUGE:
+            currentFontSize = TeXFontSize.XHUGE;
+         break;
          case SIZE_XXHUGE:
+            currentFontSize = TeXFontSize.XXHUGE;
+         break;
          case SIZE_SMALL:
+            currentFontSize = TeXFontSize.SMALL;
+         break;
          case SIZE_FOOTNOTE:
+            currentFontSize = TeXFontSize.FOOTNOTE;
+         break;
          case SIZE_SCRIPT:
+            currentFontSize = TeXFontSize.SCRIPT;
+         break;
          case SIZE_TINY:
-           currentFontSize = setting;
+            currentFontSize = TeXFontSize.TINY;
          break;
          default:
            throw new IllegalArgumentException(String.format(
@@ -605,22 +672,48 @@ public class TeXSettings
       }
    }
 
+   public void setMathFont(TeXFontMath setting)
+   {
+      currentMathFont = setting;
+   }
+
    public void setMathFont(int setting)
    {
       switch (setting)
       {
          case INHERIT:
          case MATH_STYLE_RM:
+           currentMathFont = TeXFontMath.RM;
+         break;
          case MATH_STYLE_SF:
+           currentMathFont = TeXFontMath.SF;
+         break;
          case MATH_STYLE_TT: 
+           currentMathFont = TeXFontMath.TT;
+         break;
          case MATH_STYLE_IT:
+           currentMathFont = TeXFontMath.IT;
+         break;
          case MATH_STYLE_BF:
+           currentMathFont = TeXFontMath.BF;
+         break;
          case MATH_STYLE_CAL:
+           currentMathFont = TeXFontMath.CAL;
+         break;
          case MATH_STYLE_BB:
+           currentMathFont = TeXFontMath.BB;
+         break;
          case MATH_STYLE_FRAK:
+           currentMathFont = TeXFontMath.FRAK;
+         break;
          case MATH_STYLE_BOLDSYMBOL:
+           currentMathFont = TeXFontMath.BOLDSYMBOL;
+         break;
          case MATH_STYLE_PMB:
-           currentMathFont = setting;
+           currentMathFont = TeXFontMath.PMB;
+         break;
+         case MATH_STYLE_NORMAL:
+           currentMathFont = TeXFontMath.NORMAL;
          break;
          default:
            throw new IllegalArgumentException(String.format(
@@ -1341,13 +1434,14 @@ public class TeXSettings
 
    public boolean isMathBold()
    {
-      if (currentMathFont == MATH_STYLE_BF || currentMathFont == MATH_STYLE_BOLDSYMBOL
-       || currentMathFont == MATH_STYLE_PMB)
+      if (currentMathFont == TeXFontMath.BF 
+       || currentMathFont == TeXFontMath.BOLDSYMBOL
+       || currentMathFont == TeXFontMath.PMB)
       {
          return true;
       }
 
-      if (currentMathFont == INHERIT)
+      if (currentMathFont == TeXFontMath.INHERIT)
       {
          if (parent == null)
          {
@@ -1362,12 +1456,12 @@ public class TeXSettings
 
    public boolean isMathSf()
    {
-      if (currentMathFont == MATH_STYLE_SF)
+      if (currentMathFont == TeXFontMath.SF)
       {
          return true;
       }
 
-      if (currentMathFont == INHERIT)
+      if (currentMathFont == TeXFontMath.INHERIT)
       {
          if (parent == null)
          {
@@ -1382,12 +1476,12 @@ public class TeXSettings
 
    public boolean isMathRm()
    {
-      if (currentMathFont == MATH_STYLE_RM)
+      if (currentMathFont == TeXFontMath.RM)
       {
          return true;
       }
 
-      if (currentMathFont == INHERIT)
+      if (currentMathFont == TeXFontMath.INHERIT)
       {
          if (parent == null)
          {
@@ -1402,12 +1496,12 @@ public class TeXSettings
 
    public boolean isMathTt()
    {
-      if (currentMathFont == MATH_STYLE_TT)
+      if (currentMathFont == TeXFontMath.TT)
       {
          return true;
       }
 
-      if (currentMathFont == INHERIT)
+      if (currentMathFont == TeXFontMath.INHERIT)
       {
          if (parent == null)
          {
@@ -1422,12 +1516,12 @@ public class TeXSettings
 
    public boolean isMathCal()
    {
-      if (currentMathFont == MATH_STYLE_CAL)
+      if (currentMathFont == TeXFontMath.CAL)
       {
          return true;
       }
 
-      if (currentMathFont == INHERIT)
+      if (currentMathFont == TeXFontMath.INHERIT)
       {
          if (parent == null)
          {
@@ -1442,12 +1536,12 @@ public class TeXSettings
 
    public boolean isMathFrak()
    {
-      if (currentMathFont == MATH_STYLE_FRAK)
+      if (currentMathFont == TeXFontMath.FRAK)
       {
          return true;
       }
 
-      if (currentMathFont == INHERIT)
+      if (currentMathFont == TeXFontMath.INHERIT)
       {
          if (parent == null)
          {
@@ -1462,12 +1556,12 @@ public class TeXSettings
 
    public boolean isMathBb()
    {
-      if (currentMathFont == MATH_STYLE_BB)
+      if (currentMathFont == TeXFontMath.BB)
       {
          return true;
       }
 
-      if (currentMathFont == INHERIT)
+      if (currentMathFont == TeXFontMath.INHERIT)
       {
          if (parent == null)
          {
@@ -1482,14 +1576,14 @@ public class TeXSettings
 
    public boolean isMathIt()
    {
-      if (currentMathFont == MATH_STYLE_RM || currentMathFont == MATH_STYLE_SF
-        || currentMathFont == MATH_STYLE_TT || currentMathFont == MATH_STYLE_BF
-        || currentMathFont == MATH_STYLE_CAL || currentMathFont == MATH_STYLE_BB)
+      if (currentMathFont == TeXFontMath.RM || currentMathFont == TeXFontMath.SF
+        || currentMathFont == TeXFontMath.TT || currentMathFont == TeXFontMath.BF
+        || currentMathFont == TeXFontMath.CAL || currentMathFont == TeXFontMath.BB)
       {
           return false;
       }
 
-      if (currentMathFont == INHERIT)
+      if (currentMathFont == TeXFontMath.INHERIT)
       {
          if (parent == null)
          {
@@ -1504,12 +1598,12 @@ public class TeXSettings
 
    public boolean isTextSansSerif()
    {
-      if (currentFontFamily == FAMILY_SF)
+      if (currentFontFamily == TeXFontFamily.SF)
       {
          return true;
       }
 
-      if (currentFontFamily == INHERIT)
+      if (currentFontFamily == TeXFontFamily.INHERIT)
       {
          if (parent == null)
          {
@@ -1524,12 +1618,12 @@ public class TeXSettings
 
    public boolean isTextItalic()
    {
-      if (currentFontShape == SHAPE_IT || currentFontShape == SHAPE_SL)
+      if (currentFontShape == TeXFontShape.IT || currentFontShape == TeXFontShape.SL)
       {
          return true;
       }
 
-      if (currentFontShape == SHAPE_EM)
+      if (currentFontShape == TeXFontShape.EM)
       {
          if (parent == null)
          {
@@ -1539,7 +1633,7 @@ public class TeXSettings
          return !parent.isTextItalic();
       }
 
-      if (currentFontShape == INHERIT)
+      if (currentFontShape == TeXFontShape.INHERIT)
       {
          if (parent == null)
          {
@@ -1744,7 +1838,7 @@ public class TeXSettings
 
    public static final int INHERIT=-1, USER=-2;
 
-   public static final int FAMILY_RM=0, FAMILY_SF=1, FAMILY_TT=2, FAMILY_CAL=3;
+   public static final int FAMILY_RM=0, FAMILY_SF=1, FAMILY_TT=2, FAMILY_CAL=3, FAMILY_VERB=4;
 
    public static final int SHAPE_UP=0, SHAPE_IT=1, SHAPE_SL=2,
      SHAPE_EM=3, SHAPE_SC=4;
@@ -2902,11 +2996,11 @@ public class TeXSettings
       }
    }
 
-   private int currentFontFamily   = INHERIT;
-   private int currentFontShape    = INHERIT;
-   private int currentFontWeight   = INHERIT;
-   private int currentFontSize     = INHERIT;
-   private int currentMathFont = INHERIT;
+   private TeXFontFamily currentFontFamily = TeXFontFamily.INHERIT;
+   private TeXFontShape currentFontShape   = TeXFontShape.INHERIT;
+   private TeXFontWeight currentFontWeight = TeXFontWeight.INHERIT;
+   private TeXFontSize currentFontSize     = TeXFontSize.INHERIT;
+   private TeXFontMath currentMathFont = TeXFontMath.INHERIT;
 
    private int currentParAlign = INHERIT;
 

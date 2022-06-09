@@ -25,15 +25,40 @@ import com.dickimawbooks.texparserlib.*;
 
 public class TeXFontShapeDeclaration extends TeXFontDeclaration
 {
-   public TeXFontShapeDeclaration(String name, int shape)
+   public TeXFontShapeDeclaration(String name, int shapeID)
+   {
+      super(name);
+      this.orgWeight = TeXFontWeight.INHERIT;
+      this.orgFamily = TeXFontFamily.INHERIT;
+      this.orgShape = TeXFontShape.INHERIT;
+
+      switch (shapeID)
+      {
+         case TeXSettings.INHERIT:
+           shape = TeXFontShape.INHERIT;
+         break;
+         case TeXSettings.SHAPE_UP:
+           shape = TeXFontShape.UP;
+         break;
+         case TeXSettings.SHAPE_IT:
+           shape = TeXFontShape.IT;
+         break;
+         case TeXSettings.SHAPE_SL:
+           shape = TeXFontShape.SL;
+         break;
+         default:
+            throw new IllegalArgumentException("Invalid font shape ID "+shapeID);
+      }
+   }
+
+   public TeXFontShapeDeclaration(String name, TeXFontShape shape)
    {
       super(name);
       this.shape = shape;
-      this.orgWeight = TeXSettings.INHERIT;
-      this.orgFamily = TeXSettings.INHERIT;
-      this.orgShape = TeXSettings.INHERIT;
+      this.orgWeight = TeXFontWeight.INHERIT;
+      this.orgFamily = TeXFontFamily.INHERIT;
+      this.orgShape = TeXFontShape.INHERIT;
    }
-
    @Override
    public Object clone()
    {
@@ -49,9 +74,9 @@ public class TeXFontShapeDeclaration extends TeXFontDeclaration
       orgShape = settings.getCurrentFontShape();
       orgFamily = settings.getCurrentFontFamily();
 
-      settings.setFontWeight(TeXSettings.WEIGHT_MD);
+      settings.setFontWeight(TeXFontWeight.MD);
       settings.setFontShape(shape);
-      settings.setFontFamily(TeXSettings.FAMILY_RM);
+      settings.setFontFamily(TeXFontFamily.RM);
    }
 
    @Override
@@ -69,5 +94,7 @@ public class TeXFontShapeDeclaration extends TeXFontDeclaration
       settings.setFontFamily(orgFamily);
    }
 
-   private int shape, orgWeight, orgFamily, orgShape;
+   private TeXFontShape shape, orgShape;
+   private TeXFontWeight orgWeight;
+   private TeXFontFamily orgFamily;
 }

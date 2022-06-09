@@ -30,6 +30,11 @@ public class L2HFontWeightDeclaration extends FontWeightDeclaration
       super(name, weight);
    }
 
+   public L2HFontWeightDeclaration(String name, TeXFontWeight weight)
+   {
+      super(name, weight);
+   }
+
    @Override
    public Object clone()
    {
@@ -45,10 +50,10 @@ public class L2HFontWeightDeclaration extends FontWeightDeclaration
 
       switch (getWeight())
       {
-         case TeXSettings.WEIGHT_MD:
+         case MD:
             style += "font-weight: normal; ";
          break;
-         case TeXSettings.WEIGHT_BF:
+         case BF:
             style += "font-weight: bold; ";
          break;
       }

@@ -25,13 +25,45 @@ import com.dickimawbooks.texparserlib.*;
 
 public class TeXFontFamilyDeclaration extends TeXFontDeclaration
 {
-   public TeXFontFamilyDeclaration(String name, int family)
+   public TeXFontFamilyDeclaration(String name, int familyId)
+   {
+      super(name);
+      this.orgWeight = TeXFontWeight.INHERIT;
+      this.orgFamily = TeXFontFamily.INHERIT;
+      this.orgShape = TeXFontShape.INHERIT;
+
+      switch (familyId)
+      {
+         case TeXSettings.INHERIT:
+            family = TeXFontFamily.INHERIT;
+         break;
+         case TeXSettings.FAMILY_RM:
+            family = TeXFontFamily.RM;
+         break;
+         case TeXSettings.FAMILY_SF:
+            family = TeXFontFamily.SF;
+         break;
+         case TeXSettings.FAMILY_CAL:
+            family = TeXFontFamily.CAL;
+         break;
+         case TeXSettings.FAMILY_TT:
+            family = TeXFontFamily.TT;
+         break;
+         case TeXSettings.FAMILY_VERB:
+            family = TeXFontFamily.VERB;
+         break;
+         default:
+            throw new IllegalArgumentException("Invalid font name ID "+familyId);
+      }
+   }
+
+   public TeXFontFamilyDeclaration(String name, TeXFontFamily family)
    {
       super(name);
       this.family = family;
-      this.orgWeight = TeXSettings.INHERIT;
-      this.orgFamily = TeXSettings.INHERIT;
-      this.orgShape = TeXSettings.INHERIT;
+      this.orgWeight = TeXFontWeight.INHERIT;
+      this.orgFamily = TeXFontFamily.INHERIT;
+      this.orgShape = TeXFontShape.INHERIT;
    }
 
    @Override
@@ -49,8 +81,8 @@ public class TeXFontFamilyDeclaration extends TeXFontDeclaration
       orgShape = settings.getCurrentFontShape();
       orgFamily = settings.getCurrentFontFamily();
 
-      settings.setFontWeight(TeXSettings.WEIGHT_MD);
-      settings.setFontShape(TeXSettings.SHAPE_UP);
+      settings.setFontWeight(TeXFontWeight.MD);
+      settings.setFontShape(TeXFontShape.UP);
       settings.setFontFamily(family);
    }
 
@@ -69,5 +101,7 @@ public class TeXFontFamilyDeclaration extends TeXFontDeclaration
       settings.setFontFamily(orgFamily);
    }
 
-   private int family, orgWeight, orgFamily, orgShape;
+   private TeXFontFamily family, orgFamily;
+   private TeXFontWeight orgWeight;
+   private TeXFontShape orgShape;
 }

@@ -695,41 +695,41 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
 
       // Math font commands
 
-      addMathFontCommand("mathrm",TeXSettings.MATH_STYLE_RM);
-      addMathFontCommand("mathsf",TeXSettings.MATH_STYLE_SF);
-      addMathFontCommand("mathtt",TeXSettings.MATH_STYLE_TT);
-      addMathFontCommand("mathit",TeXSettings.MATH_STYLE_IT);
-      addMathFontCommand("mathbf",TeXSettings.MATH_STYLE_BF);
-      addMathFontCommand("mathcal",TeXSettings.MATH_STYLE_CAL);
-      addMathFontCommand("mathbb",TeXSettings.MATH_STYLE_BB);
-      addMathFontCommand("mathfrak",TeXSettings.MATH_STYLE_FRAK);
-      addMathFontCommand("boldsymbol",TeXSettings.MATH_STYLE_BOLDSYMBOL);
-      addMathFontCommand("pmb",TeXSettings.MATH_STYLE_PMB);
+      addMathFontCommand("mathrm",TeXFontMath.RM);
+      addMathFontCommand("mathsf",TeXFontMath.SF);
+      addMathFontCommand("mathtt",TeXFontMath.TT);
+      addMathFontCommand("mathit",TeXFontMath.IT);
+      addMathFontCommand("mathbf",TeXFontMath.BF);
+      addMathFontCommand("mathcal",TeXFontMath.CAL);
+      addMathFontCommand("mathbb",TeXFontMath.BB);
+      addMathFontCommand("mathfrak",TeXFontMath.FRAK);
+      addMathFontCommand("boldsymbol",TeXFontMath.BOLDSYMBOL);
+      addMathFontCommand("pmb",TeXFontMath.PMB);
 
       // Font declarations
-      addFontWeightDeclaration("mdseries", "textmd", TeXSettings.WEIGHT_MD);
-      addFontWeightDeclaration("bfseries", "textbf", TeXSettings.WEIGHT_BF);
+      addFontWeightDeclaration("mdseries", "textmd", TeXFontWeight.MD);
+      addFontWeightDeclaration("bfseries", "textbf", TeXFontWeight.BF);
 
-      addFontFamilyDeclaration("rmfamily", "textrm", TeXSettings.FAMILY_RM);
-      addFontFamilyDeclaration("sffamily", "textsf", TeXSettings.FAMILY_SF);
-      addFontFamilyDeclaration("ttfamily", "texttt", TeXSettings.FAMILY_TT);
+      addFontFamilyDeclaration("rmfamily", "textrm", TeXFontFamily.RM);
+      addFontFamilyDeclaration("sffamily", "textsf", TeXFontFamily.SF);
+      addFontFamilyDeclaration("ttfamily", "texttt", TeXFontFamily.TT);
 
-      addFontShapeDeclaration("upshape", "textup", TeXSettings.SHAPE_UP);
-      addFontShapeDeclaration("itshape", "textit", TeXSettings.SHAPE_IT);
-      addFontShapeDeclaration("slshape", "textsl", TeXSettings.SHAPE_SL);
-      addFontShapeDeclaration("scshape", "textsc", TeXSettings.SHAPE_SC);
+      addFontShapeDeclaration("upshape", "textup", TeXFontShape.UP);
+      addFontShapeDeclaration("itshape", "textit", TeXFontShape.IT);
+      addFontShapeDeclaration("slshape", "textsl", TeXFontShape.SL);
+      addFontShapeDeclaration("scshape", "textsc", TeXFontShape.SC);
 
-      addFontSizeDeclaration("normalsize", TeXSettings.SIZE_NORMAL);
-      addFontSizeDeclaration("large", TeXSettings.SIZE_LARGE);
-      addFontSizeDeclaration("Large", TeXSettings.SIZE_XLARGE);
-      addFontSizeDeclaration("LARGE", TeXSettings.SIZE_XXLARGE);
-      addFontSizeDeclaration("huge", TeXSettings.SIZE_HUGE);
-      addFontSizeDeclaration("Huge", TeXSettings.SIZE_XHUGE);
-      addFontSizeDeclaration("HUGE", TeXSettings.SIZE_XXHUGE);
-      addFontSizeDeclaration("small", TeXSettings.SIZE_SMALL);
-      addFontSizeDeclaration("footnotesize", TeXSettings.SIZE_FOOTNOTE);
-      addFontSizeDeclaration("scriptsize", TeXSettings.SIZE_SCRIPT);
-      addFontSizeDeclaration("tiny", TeXSettings.SIZE_TINY);
+      addFontSizeDeclaration("normalsize", TeXFontSize.NORMAL);
+      addFontSizeDeclaration("large", TeXFontSize.LARGE);
+      addFontSizeDeclaration("Large", TeXFontSize.XLARGE);
+      addFontSizeDeclaration("LARGE", TeXFontSize.XXLARGE);
+      addFontSizeDeclaration("huge", TeXFontSize.HUGE);
+      addFontSizeDeclaration("Huge", TeXFontSize.XHUGE);
+      addFontSizeDeclaration("HUGE", TeXFontSize.XXHUGE);
+      addFontSizeDeclaration("small", TeXFontSize.SMALL);
+      addFontSizeDeclaration("footnotesize", TeXFontSize.FOOTNOTE);
+      addFontSizeDeclaration("scriptsize", TeXFontSize.SCRIPT);
+      addFontSizeDeclaration("tiny", TeXFontSize.TINY);
 
       parser.putControlSequence(
         new GenericCommand(true, "@spaces", null, 
@@ -850,7 +850,7 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
    }
 
 
-   protected void addMathFontCommand(String name, int style)
+   protected void addMathFontCommand(String name, TeXFontMath style)
    {
       parser.putControlSequence(new MathFontCommand(name, style));
    }
@@ -1037,7 +1037,7 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
    }
 
    private void addFontWeightDeclaration(
-       String declName, String textblockName, int weight)
+       String declName, String textblockName, TeXFontWeight weight)
    {
       Declaration decl = getFontWeightDeclaration(declName, weight);
       parser.putControlSequence(decl);
@@ -1045,28 +1045,29 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
    }
 
    private void addFontShapeDeclaration(
-       String declName, String textblockName, int shape)
+       String declName, String textblockName, TeXFontShape shape)
    {
       Declaration decl = getFontShapeDeclaration(declName, shape);
       parser.putControlSequence(decl);
       parser.putControlSequence(new TextBlockCommand(textblockName, decl));
    }
 
-   private void addFontSizeDeclaration(String name, int size)
+   private void addFontSizeDeclaration(String name, TeXFontSize size)
    {
       parser.putControlSequence(getFontSizeDeclaration(name, size));
    }
 
    private void addFontFamilyDeclaration(
-       String declName, String textblockName, int family)
+       String declName, String textblockName, TeXFontFamily family)
    {
       Declaration decl =  getFontFamilyDeclaration(declName, family);
       parser.putControlSequence(decl);
       parser.putControlSequence(new TextBlockCommand(textblockName, decl));
    }
 
+   @Override
    public ControlSequence getTeXFontFamilyDeclaration(
-      String name, int family)
+      String name, TeXFontFamily family)
    {
       ControlSequence decl = super.getTeXFontFamilyDeclaration(name, family);
 
@@ -1077,8 +1078,9 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       return newDecl == null ? decl : new Obsolete(decl, newDecl);
    }
 
+   @Override
    public ControlSequence getTeXFontWeightDeclaration(
-      String name, int weight)
+      String name, TeXFontWeight weight)
    {
       ControlSequence decl = super.getTeXFontWeightDeclaration(name, weight);
 
@@ -1089,12 +1091,13 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       return newDecl == null ? decl : new Obsolete(decl, newDecl);
    }
 
+   @Override
    public ControlSequence getTeXFontShapeDeclaration(
-      String name, int shape)
+      String name, TeXFontShape shape)
    {
       if (name.equals("em"))
       {
-         Declaration decl = getFontShapeDeclaration("em", TeXSettings.SHAPE_EM);
+         Declaration decl = getFontShapeDeclaration("em", TeXFontShape.EM);
          putControlSequence(new TextBlockCommand("emph", decl));
          return decl;
       }
@@ -1108,22 +1111,22 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       return newDecl == null ? decl : new Obsolete(decl, newDecl);
    }
 
-   public FontWeightDeclaration getFontWeightDeclaration(String name, int weight)
+   public FontWeightDeclaration getFontWeightDeclaration(String name, TeXFontWeight weight)
    {
       return new FontWeightDeclaration(name, weight);
    }
 
-   public FontSizeDeclaration getFontSizeDeclaration(String name, int size)
+   public FontSizeDeclaration getFontSizeDeclaration(String name, TeXFontSize size)
    {
       return new FontSizeDeclaration(name, size);
    }
 
-   public FontShapeDeclaration getFontShapeDeclaration(String name, int shape)
+   public FontShapeDeclaration getFontShapeDeclaration(String name, TeXFontShape shape)
    {
       return new FontShapeDeclaration(name, shape);
    }
 
-   public FontFamilyDeclaration getFontFamilyDeclaration(String name, int family)
+   public FontFamilyDeclaration getFontFamilyDeclaration(String name, TeXFontFamily family)
    {
       return new FontFamilyDeclaration(name, family);
    }

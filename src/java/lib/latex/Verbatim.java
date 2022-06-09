@@ -86,7 +86,7 @@ public class Verbatim extends Declaration
    {
       TeXSettings settings = parser.getSettings();
       orgFamily = settings.getCurrentFontFamily();
-      settings.setFontFamily(TeXSettings.FAMILY_TT);
+      settings.setFontFamily(TeXFontFamily.VERB);
 
       Writeable writeable = parser.getListener().getWriteable();
 
@@ -118,5 +118,5 @@ public class Verbatim extends Declaration
       return false;
    }
 
-   private int orgFamily;
+   private TeXFontFamily orgFamily;
 }

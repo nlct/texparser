@@ -26,6 +26,11 @@ import com.dickimawbooks.texparserlib.latex.*;
 
 public class L2HFontSizeDeclaration extends FontSizeDeclaration
 {
+   public L2HFontSizeDeclaration(String name, TeXFontSize size)
+   {
+      super(name, size);
+   }
+
    public L2HFontSizeDeclaration(String name, int size)
    {
       super(name, size);
@@ -46,42 +51,49 @@ public class L2HFontSizeDeclaration extends FontSizeDeclaration
 
       switch (getSize())
       {
-         case TeXSettings.SIZE_NORMAL:
+         case NORMAL:
             style = "font-size: medium; ";
          break;
-         case TeXSettings.SIZE_LARGE:
+         case LARGE:
             style = "font-size: large; ";
          break;
-         case TeXSettings.SIZE_XLARGE:
+         case XLARGE:
             style = "font-size: x-large; ";
          break;
-         case TeXSettings.SIZE_XXLARGE:
+         case XXLARGE:
             style = "font-size: xx-large; ";
          break;
-         case TeXSettings.SIZE_HUGE:
+         case HUGE:
             style = "font-size: xx-large; ";
          break;
-         case TeXSettings.SIZE_XHUGE:
+         case XHUGE:
             style = "font-size: xx-large; ";
          break;
-         case TeXSettings.SIZE_XXHUGE:
+         case XXHUGE:
             style = "font-size: xx-large; ";
          break;
-         case TeXSettings.SIZE_SMALL:
+         case SMALL:
             style = "font-size: small; ";
          break;
-         case TeXSettings.SIZE_FOOTNOTE:
+         case FOOTNOTE:
             style = "font-size: x-small; ";
          break;
-         case TeXSettings.SIZE_SCRIPT:
+         case SCRIPT:
             style = "font-size: xx-small; ";
          break;
-         case TeXSettings.SIZE_TINY:
+         case TINY:
             style = "font-size: xx-small; ";
          break;
       }
 
-      parser.getListener().getWriteable().write("<span style=\""+style+"\">");
+      if (!style.isEmpty())
+      {
+         parser.getListener().getWriteable().write("<span style=\""+style+"\">");
+      }
+      else
+      {
+         parser.getListener().getWriteable().write("<span>");
+      }
    }
 
    @Override

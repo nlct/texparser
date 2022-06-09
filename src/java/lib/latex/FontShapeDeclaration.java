@@ -25,11 +25,38 @@ import com.dickimawbooks.texparserlib.*;
 
 public class FontShapeDeclaration extends Declaration
 {
-   public FontShapeDeclaration(String name, int shape)
+   public FontShapeDeclaration(String name, int shapeId)
+   {
+      super(name);
+      this.orgShape = TeXFontShape.INHERIT;
+
+      switch (shapeId)
+      {
+         case TeXSettings.INHERIT:
+           shape = TeXFontShape.INHERIT;
+         break;
+         case TeXSettings.SHAPE_UP:
+           shape = TeXFontShape.UP;
+         break;
+         case TeXSettings.SHAPE_IT:
+           shape = TeXFontShape.IT;
+         break;
+         case TeXSettings.SHAPE_SC:
+           shape = TeXFontShape.SC;
+         break;
+         case TeXSettings.SHAPE_EM:
+           shape = TeXFontShape.EM;
+         break;
+         default:
+            throw new IllegalArgumentException("Invalid shape ID: "+shapeId);
+      }
+   }
+
+   public FontShapeDeclaration(String name, TeXFontShape shape)
    {
       super(name);
       this.shape = shape;
-      this.orgShape = TeXSettings.INHERIT;
+      this.orgShape = TeXFontShape.INHERIT;
    }
 
    @Override
@@ -101,11 +128,11 @@ public class FontShapeDeclaration extends Declaration
       return false;
    }
 
-   public int getShape()
+   public TeXFontShape getShape()
    {
       return shape;
    }
 
    private String name;
-   private int shape, orgShape;
+   private TeXFontShape shape, orgShape;
 }

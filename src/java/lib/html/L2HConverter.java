@@ -392,39 +392,43 @@ public class L2HConverter extends LaTeXParserListener
 
          switch (settings.getCurrentFontFamily())
          {
-            case TeXSettings.FAMILY_RM:
+            case RM:
                style = "font-family: serif; ";
                break;
-            case TeXSettings.FAMILY_SF:
+            case SF:
                style = "font-family: sans-serif; ";
                break;
-            case TeXSettings.FAMILY_TT:
+            case TT:
+            case VERB:
                style = "font-family: monospace; ";
+               break;
+            case CAL:
+               style = "font-family: cursive; ";
                break;
          }
 
          switch (settings.getCurrentFontShape())
          {
-            case TeXSettings.SHAPE_UP:
+            case UP:
                style += "font-style: normal; font-variant: normal; ";
                break;
-            case TeXSettings.SHAPE_IT:
+            case IT:
                style += "font-style: italic; font-variant: normal; ";
                break;
-            case TeXSettings.SHAPE_SL:
+            case SL:
                style += "font-style: oblique; font-variant: normal; ";
                break;
-            case TeXSettings.SHAPE_EM:
+            case EM:
                TeXSettings parent = settings.getParent();
 
                if (parent != null)
                {
-                  int parentStyle = parent.getFontShape();
+                  TeXFontShape parentStyle = parent.getFontShape();
 
-                  if (parentStyle == TeXSettings.SHAPE_UP
-                    ||parentStyle == TeXSettings.INHERIT)
+                  if (parentStyle == TeXFontShape.UP
+                    ||parentStyle == TeXFontShape.INHERIT)
                   {
-                     if (settings.getFontFamily() == TeXSettings.FAMILY_SF)
+                     if (settings.getFontFamily() == TeXFontFamily.SF)
                      {
                         style += "font-style: oblique; ";
                      }
@@ -440,7 +444,7 @@ public class L2HConverter extends LaTeXParserListener
                }
                else
                {
-                  if (settings.getFontFamily() == TeXSettings.FAMILY_SF)
+                  if (settings.getFontFamily() == TeXFontFamily.SF)
                   {
                      style += "font-style: oblique; ";
                   }
@@ -453,17 +457,17 @@ public class L2HConverter extends LaTeXParserListener
                style += "font-variant: normal; ";
 
                break;
-            case TeXSettings.SHAPE_SC:
+            case SC:
                style += "font-style: normal; font-variant: small-caps; ";
                break;
          }
 
          switch (settings.getCurrentFontWeight())
          {
-            case TeXSettings.WEIGHT_MD:
+            case MD:
                style += "font-weight: normal; ";
                break;
-            case TeXSettings.WEIGHT_BF:
+            case BF:
                style += "font-weight: bold; ";
                break;
          }
@@ -473,25 +477,25 @@ public class L2HConverter extends LaTeXParserListener
    }
 
    @Override
-   public FontWeightDeclaration getFontWeightDeclaration(String name, int weight)
+   public FontWeightDeclaration getFontWeightDeclaration(String name, TeXFontWeight weight)
    {
       return new L2HFontWeightDeclaration(name, weight);
    }
 
    @Override
-   public FontSizeDeclaration getFontSizeDeclaration(String name, int size)
+   public FontSizeDeclaration getFontSizeDeclaration(String name, TeXFontSize size)
    {
       return new L2HFontSizeDeclaration(name, size);
    }
 
    @Override
-   public FontShapeDeclaration getFontShapeDeclaration(String name, int shape)
+   public FontShapeDeclaration getFontShapeDeclaration(String name, TeXFontShape shape)
    {
       return new L2HFontShapeDeclaration(name, shape);
    }
 
    @Override
-   public FontFamilyDeclaration getFontFamilyDeclaration(String name, int family)
+   public FontFamilyDeclaration getFontFamilyDeclaration(String name, TeXFontFamily family)
    {
       return new L2HFontFamilyDeclaration(name, family);
    }
@@ -1829,7 +1833,30 @@ public class L2HConverter extends LaTeXParserListener
 
    protected String getElementTag(FrameBox fbox)
    {
-      return fbox.isInLine() && !fbox.isMultiLine() ? "span" : "div";
+      TeXFontText font = fbox.getTextFont();
+
+      if (fbox.isInLine() && !fbox.isMultiLine())
+      {
+         if (font != null && font.getFamily() == TeXFontFamily.VERB)
+         {
+            return "code";
+         }
+         else
+         {
+            return "span";
+         }
+      }
+      else
+      {
+         if (font != null && font.getFamily() == TeXFontFamily.VERB)
+         {
+            return "pre";
+         }
+         else
+         {
+            return "div";
+         }
+      }
    }
 
    @Override
@@ -1870,6 +1897,13 @@ public class L2HConverter extends LaTeXParserListener
       StringBuilder builder = new StringBuilder();
 
       String tag = getElementTag(fbox);
+
+      TeXFontText font = fbox.getTextFont();
+
+      if (font != null)
+      {
+         builder.append(font.getCss(getParser()));
+      }
 
       switch (fbox.getHAlign())
       {

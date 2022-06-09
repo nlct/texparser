@@ -31,6 +31,11 @@ public class L2HFontShapeDeclaration extends FontShapeDeclaration
       super(name, shape);
    }
 
+   public L2HFontShapeDeclaration(String name, TeXFontShape shape)
+   {
+      super(name, shape);
+   }
+
    @Override
    public Object clone()
    {
@@ -46,27 +51,27 @@ public class L2HFontShapeDeclaration extends FontShapeDeclaration
 
       switch (getShape())
       {
-         case TeXSettings.SHAPE_UP:
+         case UP:
             style = "font-style: normal; font-variant: normal; ";
          break;
-         case TeXSettings.SHAPE_IT:
+         case IT:
             style = "font-style: italic; font-variant: normal; ";
          break;
-         case TeXSettings.SHAPE_SL:
+         case SL:
             style = "font-style: oblique; font-variant: normal; ";
          break;
-         case TeXSettings.SHAPE_EM:
+         case EM:
             TeXSettings settings = parser.getSettings();
             TeXSettings parent = settings.getParent();
 
             if (parent != null)
             {
-               int parentStyle = parent.getFontShape();
+               TeXFontShape parentStyle = parent.getFontShape();
 
-               if (parentStyle == TeXSettings.SHAPE_UP
-                 ||parentStyle == TeXSettings.INHERIT)
+               if (parentStyle == TeXFontShape.UP
+                 ||parentStyle == TeXFontShape.INHERIT)
                {
-                  if (settings.getFontFamily() == TeXSettings.FAMILY_SF)
+                  if (settings.getFontFamily() == TeXFontFamily.SF)
                   {
                      style += "font-style: oblique; ";
                   }
@@ -82,7 +87,7 @@ public class L2HFontShapeDeclaration extends FontShapeDeclaration
             }
             else
             {
-               if (settings.getFontFamily() == TeXSettings.FAMILY_SF)
+               if (settings.getFontFamily() == TeXFontFamily.SF)
                {
                   style += "font-style: oblique; ";
                }
@@ -95,7 +100,7 @@ public class L2HFontShapeDeclaration extends FontShapeDeclaration
             style += "font-variant: normal; ";
 
          break;
-         case TeXSettings.SHAPE_SC:
+         case SC:
             style += "font-style: normal; font-variant: small-caps; ";
          break;
       }

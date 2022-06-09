@@ -25,7 +25,7 @@ import com.dickimawbooks.texparserlib.*;
 
 public class MathFontCommand extends ControlSequence
 {
-   public MathFontCommand(String name, int style)
+   public MathFontCommand(String name, TeXFontMath style)
    {
       super(name);
       this.style = style;
@@ -42,7 +42,7 @@ public class MathFontCommand extends ControlSequence
 
       TeXSettings settings = parser.getSettings();
 
-      int orgStyle = settings.getCurrentMathFont();
+      TeXFontMath orgStyle = settings.getCurrentMathFont();
 
       settings.setMathFont(style);
 
@@ -58,7 +58,7 @@ public class MathFontCommand extends ControlSequence
 
       TeXSettings settings = parser.getSettings();
 
-      int orgStyle = settings.getCurrentMathFont();
+      TeXFontMath orgStyle = settings.getCurrentMathFont();
 
       settings.setMathFont(style);
 
@@ -67,10 +67,10 @@ public class MathFontCommand extends ControlSequence
       settings.setMathFont(orgStyle);
    }
 
-   public int getStyle()
+   public TeXFontMath getStyle()
    {
       return style;
    }
 
-   private int style;
+   private TeXFontMath style;
 }

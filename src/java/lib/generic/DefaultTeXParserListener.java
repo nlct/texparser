@@ -176,41 +176,41 @@ public abstract class DefaultTeXParserListener extends TeXParserListener
       // TeX font changing declarations
 
       parser.putControlSequence(getTeXFontFamilyDeclaration("rm", 
-         TeXSettings.FAMILY_RM));
+         TeXFontFamily.RM));
       parser.putControlSequence(getTeXFontFamilyDeclaration("sf", 
-         TeXSettings.FAMILY_SF));
+         TeXFontFamily.SF));
       parser.putControlSequence(getTeXFontFamilyDeclaration("tt", 
-         TeXSettings.FAMILY_TT));
+         TeXFontFamily.TT));
       parser.putControlSequence(getTeXFontFamilyDeclaration("cal", 
-         TeXSettings.FAMILY_CAL));
+         TeXFontFamily.CAL));
 
       parser.putControlSequence(getTeXFontWeightDeclaration("bf",
-         TeXSettings.WEIGHT_BF));
+         TeXFontWeight.BF));
 
       parser.putControlSequence(getTeXFontShapeDeclaration("it",
-         TeXSettings.SHAPE_IT));
+         TeXFontShape.IT));
       parser.putControlSequence(getTeXFontShapeDeclaration("sl",
-         TeXSettings.SHAPE_SL));
+         TeXFontShape.SL));
       parser.putControlSequence(getTeXFontShapeDeclaration("em",
-         TeXSettings.SHAPE_EM));
+         TeXFontShape.EM));
       parser.putControlSequence(getTeXFontShapeDeclaration("sc",
-         TeXSettings.SHAPE_SC));
+         TeXFontShape.SC));
 
       newlength("hsize", 1, new PercentUnit(PercentUnit.HSIZE));
       newlength("vsize", 1, new PercentUnit(PercentUnit.VSIZE));
    }
 
-   public ControlSequence getTeXFontFamilyDeclaration(String name, int family)
+   public ControlSequence getTeXFontFamilyDeclaration(String name, TeXFontFamily family)
    {
       return new TeXFontFamilyDeclaration(name, family);
    }
 
-   public ControlSequence getTeXFontShapeDeclaration(String name, int shape)
+   public ControlSequence getTeXFontShapeDeclaration(String name, TeXFontShape shape)
    {
       return new TeXFontShapeDeclaration(name, shape);
    }
 
-   public ControlSequence getTeXFontWeightDeclaration(String name, int weight)
+   public ControlSequence getTeXFontWeightDeclaration(String name, TeXFontWeight weight)
    {
       return new TeXFontWeightDeclaration(name, weight);
    }

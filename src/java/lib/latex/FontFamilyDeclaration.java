@@ -25,11 +25,38 @@ import com.dickimawbooks.texparserlib.*;
 
 public class FontFamilyDeclaration extends Declaration
 {
-   public FontFamilyDeclaration(String name, int family)
+   public FontFamilyDeclaration(String name, int familyId)
+   {
+      super(name);
+      this.orgFamily = TeXFontFamily.INHERIT;
+
+      switch (familyId)
+      {
+         case TeXSettings.INHERIT:
+           family = TeXFontFamily.INHERIT;
+         break;
+         case TeXSettings.FAMILY_RM:
+           family = TeXFontFamily.RM;
+         break;
+         case TeXSettings.FAMILY_SF:
+           family = TeXFontFamily.SF;
+         break;
+         case TeXSettings.FAMILY_TT:
+           family = TeXFontFamily.TT;
+         break;
+         case TeXSettings.FAMILY_CAL:
+           family = TeXFontFamily.CAL;
+         break;
+         default:
+          throw new IllegalArgumentException("Invalid family ID "+familyId);
+      }
+   }
+
+   public FontFamilyDeclaration(String name, TeXFontFamily family)
    {
       super(name);
       this.family = family;
-      this.orgFamily = TeXSettings.INHERIT;
+      this.orgFamily = TeXFontFamily.INHERIT;
    }
 
    @Override
@@ -101,10 +128,10 @@ public class FontFamilyDeclaration extends Declaration
       return false;
    }
 
-   public int getFamily()
+   public TeXFontFamily getFamily()
    {
       return family;
    }
 
-   private int family, orgFamily;
+   private TeXFontFamily family, orgFamily;
 }

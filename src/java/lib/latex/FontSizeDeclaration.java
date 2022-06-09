@@ -25,11 +25,59 @@ import com.dickimawbooks.texparserlib.*;
 
 public class FontSizeDeclaration extends Declaration
 {
-   public FontSizeDeclaration(String name, int size)
+   public FontSizeDeclaration(String name, int sizeId)
+   {
+      super(name);
+      this.orgSize = TeXFontSize.INHERIT;
+
+      switch (sizeId)
+      {
+         case TeXSettings.INHERIT:
+           size = TeXFontSize.INHERIT;
+         break;
+         case TeXSettings.SIZE_NORMAL:
+           size = TeXFontSize.NORMAL;
+         break;
+         case TeXSettings.SIZE_LARGE:
+           size = TeXFontSize.LARGE;
+         break;
+         case TeXSettings.SIZE_XLARGE:
+           size = TeXFontSize.XLARGE;
+         break;
+         case TeXSettings.SIZE_XXLARGE:
+           size = TeXFontSize.XXLARGE;
+         break;
+         case TeXSettings.SIZE_HUGE:
+           size = TeXFontSize.HUGE;
+         break;
+         case TeXSettings.SIZE_XHUGE:
+           size = TeXFontSize.XHUGE;
+         break;
+         case TeXSettings.SIZE_XXHUGE:
+           size = TeXFontSize.XXHUGE;
+         break;
+         case TeXSettings.SIZE_SMALL:
+           size = TeXFontSize.SMALL;
+         break;
+         case TeXSettings.SIZE_FOOTNOTE:
+           size = TeXFontSize.FOOTNOTE;
+         break;
+         case TeXSettings.SIZE_SCRIPT:
+           size = TeXFontSize.SCRIPT;
+         break;
+         case TeXSettings.SIZE_TINY:
+           size = TeXFontSize.TINY;
+         break;
+         default:
+            throw new IllegalArgumentException("Invalid size ID: "+sizeId);
+      }
+   }
+
+   public FontSizeDeclaration(String name, TeXFontSize size)
    {
       super(name);
       this.size = size;
-      this.orgSize = TeXSettings.INHERIT;
+      this.orgSize = TeXFontSize.INHERIT;
    }
 
    @Override
@@ -101,10 +149,10 @@ public class FontSizeDeclaration extends Declaration
       return false;
    }
 
-   public int getSize()
+   public TeXFontSize getSize()
    {
       return size;
    }
 
-   private int size, orgSize;
+   private TeXFontSize size, orgSize;
 }

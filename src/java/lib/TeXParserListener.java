@@ -126,6 +126,16 @@ public abstract class TeXParserListener
    // returns page layout length in bp
    public abstract float getPageDimension(int type);
 
+   public int getNormalFontSize()
+   {
+      return normalFontSize;
+   }
+
+   public void setNormalFontSize(int size)
+   {
+      normalFontSize = size;
+   }
+
    public TeXUnit createUnit(String unitName)
     throws TeXSyntaxException
    {
@@ -253,4 +263,5 @@ public abstract class TeXParserListener
    }
 
    protected TeXParser parser;
+   private int normalFontSize = 10;
 }

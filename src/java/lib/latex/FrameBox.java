@@ -532,6 +532,16 @@ public class FrameBox extends ControlSequence
       }
    }
 
+   public TeXFontText getTextFont()
+   {
+      return textFont;
+   }
+
+   public void setTextFont(TeXFontText textFont)
+   {
+      this.textFont = textFont;
+   }
+
    protected void popSettings(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
@@ -686,6 +696,8 @@ public class FrameBox extends ControlSequence
    protected AlignVStyle valign = AlignVStyle.DEFAULT;
 
    protected Angle currentAngle = null;
+
+   protected TeXFontText textFont = null;
 
    protected boolean isInline = true;
    protected boolean isMultiLine = true;

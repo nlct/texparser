@@ -31,6 +31,11 @@ public class L2HFontFamilyDeclaration extends FontFamilyDeclaration
       super(name, family);
    }
 
+   public L2HFontFamilyDeclaration(String name, TeXFontFamily family)
+   {
+      super(name, family);
+   }
+
    @Override
    public Object clone()
    {
@@ -43,27 +48,47 @@ public class L2HFontFamilyDeclaration extends FontFamilyDeclaration
       super.process(parser);
 
       String spec = "";
+      String tag = "span";
 
       switch (getFamily())
       {
-         case TeXSettings.FAMILY_RM:
+         case RM:
             spec = "font-family: serif; ";
          break;
-         case TeXSettings.FAMILY_SF:
+         case SF:
             spec = "font-family: sans-serif; ";
          break;
-         case TeXSettings.FAMILY_TT:
+         case TT:
             spec = "font-family: monospace; ";
          break;
+         case VERB:
+            tag = "code";
+         return;
       }
 
-      parser.getListener().getWriteable().write("<span style=\""+spec+"\">");
+      if (spec.isEmpty())
+      {
+         parser.getListener().getWriteable().write(String.format("<%s>", tag));
+      }
+      else
+      {
+         parser.getListener().getWriteable().write(
+           String.format("<%s style=\"%s\">", tag, spec));
+      }
    }
 
    @Override
    public void end(TeXParser parser, TeXObjectList stack) throws IOException
    {
-      parser.getListener().getWriteable().write("</span>");
+      if (getFamily() == TeXFontFamily.VERB)
+      {
+         parser.getListener().getWriteable().write("</code>");
+      }
+      else
+      {
+         parser.getListener().getWriteable().write("</span>");
+      }
+
       super.end(parser, stack);
    }
 

@@ -45,8 +45,8 @@ public class NoLinkUrl extends ControlSequence
    {
       TeXSettings settings = parser.getSettings();
 
-      int family = settings.getCurrentFontFamily();
-      settings.setFontFamily(TeXSettings.FAMILY_TT);
+      TeXFontFamily family = settings.getCurrentFontFamily();
+      settings.setFontFamily(TeXFontFamily.TT);
 
       TeXObjectList expanded = null;
 

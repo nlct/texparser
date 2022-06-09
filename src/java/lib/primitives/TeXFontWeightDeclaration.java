@@ -25,13 +25,36 @@ import com.dickimawbooks.texparserlib.*;
 
 public class TeXFontWeightDeclaration extends TeXFontDeclaration
 {
-   public TeXFontWeightDeclaration(String name, int weight)
+   public TeXFontWeightDeclaration(String name, int weightId)
+   {
+      super(name);
+      this.orgWeight = TeXFontWeight.INHERIT;
+      this.orgFamily = TeXFontFamily.INHERIT;
+      this.orgShape = TeXFontShape.INHERIT;
+
+      switch (weightId)
+      {
+         case TeXSettings.INHERIT:
+           weight = TeXFontWeight.INHERIT;
+         break;
+         case TeXSettings.WEIGHT_MD:
+           weight = TeXFontWeight.MD;
+         break;
+         case TeXSettings.WEIGHT_BF:
+           weight = TeXFontWeight.BF;
+         break;
+         default:
+            throw new IllegalArgumentException("Invalid font weightD "+weightId);
+      }
+   }
+
+   public TeXFontWeightDeclaration(String name, TeXFontWeight weight)
    {
       super(name);
       this.weight = weight;
-      this.orgWeight = TeXSettings.INHERIT;
-      this.orgFamily = TeXSettings.INHERIT;
-      this.orgShape = TeXSettings.INHERIT;
+      this.orgWeight = TeXFontWeight.INHERIT;
+      this.orgFamily = TeXFontFamily.INHERIT;
+      this.orgShape = TeXFontShape.INHERIT;
    }
 
    @Override
@@ -50,8 +73,8 @@ public class TeXFontWeightDeclaration extends TeXFontDeclaration
       orgFamily = settings.getCurrentFontFamily();
 
       settings.setFontWeight(weight);
-      settings.setFontShape(TeXSettings.SHAPE_UP);
-      settings.setFontFamily(TeXSettings.FAMILY_RM);
+      settings.setFontShape(TeXFontShape.UP);
+      settings.setFontFamily(TeXFontFamily.RM);
    }
 
    @Override
@@ -69,5 +92,7 @@ public class TeXFontWeightDeclaration extends TeXFontDeclaration
       settings.setFontFamily(orgFamily);
    }
 
-   private int weight, orgWeight, orgFamily, orgShape;
+   private TeXFontWeight weight, orgWeight;
+   private TeXFontFamily orgFamily;
+   private TeXFontShape orgShape;
 }

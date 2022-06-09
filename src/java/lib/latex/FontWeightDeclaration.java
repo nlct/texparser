@@ -25,11 +25,32 @@ import com.dickimawbooks.texparserlib.*;
 
 public class FontWeightDeclaration extends Declaration
 {
-   public FontWeightDeclaration(String name, int weight)
+   public FontWeightDeclaration(String name, int weightId)
+   {
+      super(name);
+      this.orgWeight = TeXFontWeight.INHERIT;
+
+      switch (weightId)
+      {
+         case TeXSettings.INHERIT:
+            weight = TeXFontWeight.INHERIT;
+         break;
+         case TeXSettings.WEIGHT_MD:
+            weight = TeXFontWeight.MD;
+         break;
+         case TeXSettings.WEIGHT_BF:
+            weight = TeXFontWeight.BF;
+         break;
+         default:
+            throw new IllegalArgumentException("Invalid weight ID "+weightId);
+      }
+   }
+
+   public FontWeightDeclaration(String name, TeXFontWeight weight)
    {
       super(name);
       this.weight = weight;
-      this.orgWeight = TeXSettings.INHERIT;
+      this.orgWeight = TeXFontWeight.INHERIT;
    }
 
    @Override
@@ -101,10 +122,10 @@ public class FontWeightDeclaration extends Declaration
       return false;
    }
 
-   public int getWeight()
+   public TeXFontWeight getWeight()
    {
       return weight;
    }
 
-   private int weight, orgWeight;
+   private TeXFontWeight weight, orgWeight;
 }

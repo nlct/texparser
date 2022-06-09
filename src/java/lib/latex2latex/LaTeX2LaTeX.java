@@ -124,7 +124,7 @@ public class LaTeX2LaTeX extends LaTeXParserListener
    }
 
    @Override
-   protected void addMathFontCommand(String name, int style)
+   protected void addMathFontCommand(String name, TeXFontMath style)
    {
       parser.putControlSequence(new L2LMathFontCommand(name, style));
    }
