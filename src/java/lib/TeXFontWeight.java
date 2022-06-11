@@ -22,7 +22,7 @@ import java.io.IOException;
 
 public enum TeXFontWeight
 {
-   INHERIT(-1), MD(0), BF(1);
+   INHERIT(-1), MD(0), BF(1), STRONG(2);
 
    TeXFontWeight(int id)
    {
@@ -32,6 +32,11 @@ public enum TeXFontWeight
    public int getValue()
    {
       return id;
+   }
+
+   public boolean isBold()
+   {
+      return id > 0;
    }
 
    private final int id;
