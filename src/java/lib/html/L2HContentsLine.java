@@ -55,11 +55,79 @@ public class L2HContentsLine extends ContentsLine
       String typeStr = type.toString(parser);
       TeXObjectList list = new TeXObjectList();
 
-      list.add(new HtmlTag(
-        String.format("<div class=\"toc-%s\"><a href=\"#%s\">",
-        typeStr, HtmlTag.getUriFragment(link))));
+      TeXSettings settings = parser.getSettings();
+
+      CountRegister reg = (CountRegister)settings.getNumericRegister("@curr@toclevel@"+typeStr);
+
+      StartElement startElem;
+      int currLevel = -1;
+      int prevLevel = -1;
+
+      String tag;
+
+      if (reg == null)
+      {
+         tag = "div";
+      }
+      else
+      {
+         tag = "li";
+         currLevel = reg.number(parser);
+         reg = (CountRegister)settings.getNumericRegister("@curr@toclevel");
+         prevLevel = reg.number(parser);
+         reg.setValue(currLevel);
+
+         ControlSequence cs = parser.getControlSequence("@toc@endtags");
+
+         TeXObjectList def=null;
+
+         if (cs instanceof GenericCommand)
+         {
+            def = ((GenericCommand)cs).getDefinition();
+         }
+
+         if (currLevel > prevLevel)
+         {
+            for (int i = prevLevel; i < currLevel; i++)
+            {
+               list.add(new StartElement("ul", true));
+
+               if (def != null)
+               {
+                  def.add(new EndElement("ul"));
+               }
+            }
+         }
+         else if (currLevel < prevLevel)
+         {
+            for (int i = currLevel; i < prevLevel; i++)
+            {
+               if (def != null)
+               {
+                  int n = def.size();
+
+                  if (n >= 0)
+                  {
+                     list.add(def.remove(n-1));
+                  }
+               }
+            }
+         }
+      }
+
+      startElem = new StartElement(tag, true);
+      startElem.putAttribute("class", "toc-"+typeStr);
+
+      list.add(startElem);
+
+      startElem = new StartElement("a");
+      startElem.putAttribute("href", "#"+HtmlTag.getUriFragment(link));
+      list.add(startElem);
+
       list.add(title);
-      list.add(new HtmlTag(String.format("</a></div><!-- end of toc-%s -->%n", typeStr)));
+      list.add(new EndElement("a"));
+      list.add(new EndElement(tag));
+      list.add(new HtmlTag(String.format("<!-- end of toc-%s -->%n", typeStr)));
 
       return list;
    }

@@ -940,6 +940,7 @@ public class L2HConverter extends LaTeXParserListener
       writeln("div.bibliography { display: block; margin-left: 4em; }");
       writeln("div.bibitem { display: inline; float: left; text-indent: -3em; }");
       writeln("span.numberline { display: inline-block; width: 3em; }");
+      writeln("nav ul { list-style-type: none; }");
       writeln("div.toc-part { padding-left: .5em; padding-bottom: 2ex; font-weight: bold; font-size: large;}");
       writeln("div.toc-chapter { padding-left: .5em; padding-bottom: 2ex; font-weight: bold; font-size: large;}");
       writeln("div.toc-section { padding-left: 1em; font-weight: bold;}");

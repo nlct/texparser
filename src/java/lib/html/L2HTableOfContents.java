@@ -50,7 +50,10 @@ public class L2HTableOfContents extends ControlSequence
    {
       L2HConverter listener = (L2HConverter)parser.getListener();
 
-      TeXObject cs = parser.getControlSequence("chapter");
+      int level = -1;
+      CountRegister reg;
+
+      ControlSequence cs = parser.getControlSequence("chapter");
       String counter = "chapter*";
 
       if (cs == null || cs instanceof Undefined)
@@ -58,18 +61,41 @@ public class L2HTableOfContents extends ControlSequence
          cs = listener.getControlSequence("section");
          counter = "section*";
       }
+      else
+      {
+         reg = parser.getSettings().newcount(true, "@curr@toclevel@chapter");
+         reg.setValue(++level);
+      }
+
+      reg = parser.getSettings().newcount(true, "@curr@toclevel@section");
+      reg.setValue(++level);
+
+      reg = parser.getSettings().newcount(true, "@curr@toclevel@subsection");
+      reg.setValue(++level);
+
+      reg = parser.getSettings().newcount(true, "@curr@toclevel@subsubsection");
+      reg.setValue(++level);
+
+      reg = parser.getSettings().newcount(true, "@curr@toclevel@paragraph");
+      reg.setValue(++level);
+
+      reg = parser.getSettings().newcount(true, "@curr@toclevel@subparagraph");
+      reg.setValue(++level);
 
       listener.stepcounter(counter);
 
       stack.push(new HtmlTag("<!-- end of toc -->"));
       stack.push(new EndElement("nav"));
 
+      ControlSequence tagCs = new GenericCommand(true, "@toc@endtags");
+      parser.putControlSequence(true, tagCs);
+      stack.push(tagCs);
+
       File tocFile = listener.getAuxFile("toc");
 
       if (tocFile.exists())
       {
-         stack.push(listener.createGroup(tocFile.getName()));
-         stack.push(listener.getControlSequence("input"));
+         stack.push(TeXParserActionObject.createInputAction(tocFile));
       }
 
       stack.push(listener.createGroup("toc"));
@@ -81,44 +107,15 @@ public class L2HTableOfContents extends ControlSequence
       StartElement elem = new StartElement("nav");
       elem.putAttribute("class", "toc");
       stack.push(elem);
+
+      reg = parser.getSettings().newcount(true, "@curr@toclevel");
+      reg.setValue(-1);
    }
 
    @Override
    public void process(TeXParser parser)
      throws IOException
    {
-      L2HConverter listener = (L2HConverter)parser.getListener();
-
-      TeXObject cs = parser.getControlSequence("chapter");
-      String counter = "chapter*";
-
-      if (cs == null || cs instanceof Undefined)
-      {
-         cs = listener.getControlSequence("section");
-         counter = "section*";
-      }
-
-      listener.stepcounter(counter);
-
-      parser.push(new HtmlTag("<!-- end of toc -->"));
-      parser.push(new EndElement("nav"));
-
-      File tocFile = listener.getAuxFile("toc");
-
-      if (tocFile.exists())
-      {
-         parser.push(listener.createGroup(tocFile.getName()));
-         parser.push(listener.getControlSequence("input"));
-      }
-
-      parser.push(listener.createGroup("toc"));
-      parser.push(new TeXCsRef("label"));
-      parser.push(new TeXCsRef("contentsname"));
-      parser.push(listener.getOther('*'));
-      parser.push(cs);
-
-      StartElement elem = new StartElement("nav");
-      elem.putAttribute("class", "toc");
-      parser.push(elem);
+      process(parser, parser);
    }
 }

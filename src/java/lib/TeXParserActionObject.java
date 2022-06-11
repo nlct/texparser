@@ -61,6 +61,25 @@ public class TeXParserActionObject extends AbstractTeXObject
       return new TeXParserActionObject(TeXParserAction.INPUT_FILE, stack, texPath);
    }
 
+   public static TeXParserActionObject createInputAction(File file)
+   {
+      return createInputAction(file, null);
+   }
+
+   public static TeXParserActionObject createInputAction(File file, TeXObjectList stack)
+   {
+      if (stack != null && !(stack instanceof TeXParser))
+      {
+         TeXObjectList pending = new TeXObjectList();
+         pending.add(stack, true);
+         stack.clear();
+
+         stack = pending;
+      }
+
+      return new TeXParserActionObject(TeXParserAction.INPUT_FILE, stack, file);
+   }
+
    @Override
    public Object clone()
    {
