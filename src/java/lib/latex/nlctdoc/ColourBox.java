@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -16,37 +16,53 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
-package com.dickimawbooks.texparserlib.latex;
+package com.dickimawbooks.texparserlib.latex.nlctdoc;
 
 import java.io.IOException;
 import java.util.Vector;
 import java.awt.Color;
 
 import com.dickimawbooks.texparserlib.*;
+import com.dickimawbooks.texparserlib.latex.*;
 
-public class ParBox extends FrameBox
+public class ColourBox extends FrameBox
 {
-   public ParBox()
+   public ColourBox(String name)
    {
-      this("parbox");
+      this(name, BorderStyle.SOLID, AlignHStyle.DEFAULT, AlignVStyle.DEFAULT, true);
    }
 
-   public ParBox(String name)
+   public ColourBox(String name, BorderStyle style, AlignHStyle halign, AlignVStyle valign, 
+      boolean isinline)
    {
-      this(name, BorderStyle.NONE, null, null);
+      this(name, style, halign, valign, isinline, null, null);
    }
 
-   public ParBox(String name, BorderStyle borderStyle, 
+   public ColourBox(String name, BorderStyle style, AlignHStyle halign, AlignVStyle valign, 
+      boolean isinline, TeXDimension borderWidth, TeXDimension innerMargin)
+   {
+      this(name, style, halign, valign, isinline, false, borderWidth, innerMargin);
+   }
+
+   public ColourBox(String name, BorderStyle style, AlignHStyle halign, AlignVStyle valign, 
+      boolean isinline, boolean isMultiLine, 
       TeXDimension borderWidth, TeXDimension innerMargin)
    {
-      super(name, borderStyle, AlignHStyle.DEFAULT, AlignVStyle.DEFAULT, true, true,
-        borderWidth, innerMargin);
+      super(name);
+      setStyle(style);
+      setHAlign(halign);
+      setVAlign(valign);
+      setIsInLine(isinline);
+      setIsMultiLine(isMultiLine);
+      currentBorderWidth = borderWidth;
+      currentInnerMargin = innerMargin;
+      id = name;
    }
 
    @Override
    public FrameBox createBox()
    {
-      return new ParBox(getName());
+      return new ColourBox(getName());
    }
 
    public TeXDimension getBorderWidth(TeXParser parser) throws IOException
@@ -59,44 +75,9 @@ public class ParBox extends FrameBox
       return currentInnerMargin;
    }
 
-   protected AlignVStyle getAlignVStyle(TeXParser parser, String val)
-    throws LaTeXSyntaxException
-   {
-      if (val.equals("c"))
-      {
-         return AlignVStyle.MIDDLE;
-      }
-      else if (val.equals("t"))
-      {
-         return AlignVStyle.TOP;
-      }
-      else if (val.equals("b"))
-      {
-         return AlignVStyle.BOTTOM;
-      }
-      else
-      {
-         throw new LaTeXSyntaxException(parser, LaTeXSyntaxException.ILLEGAL_ARG_TYPE, val);
-      }
-   }
-
+   @Override
    protected void popSettings(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      String pos = popOptLabelString(parser, stack);
-
-      if (pos != null)
-      {
-         valign = getAlignVStyle(parser, pos);
-
-         TeXDimension height = popOptDimensionArg(parser, stack);
-
-         if (height != null)
-         {
-            currentHeight = height;
-         }
-      }
-
-      currentWidth = popDimensionArg(parser, stack);
    }
 }

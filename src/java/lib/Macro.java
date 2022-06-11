@@ -256,6 +256,12 @@ public abstract class Macro extends AbstractTeXObject
       return TeXParserUtils.popDimensionArg(parser, stack);
    }
 
+   protected TeXDimension popOptDimensionArg(TeXParser parser, TeXObjectList stack)
+     throws IOException
+   {
+      return TeXParserUtils.popOptDimensionArg(parser, stack);
+   }
+
    protected ControlSequence popControlSequence(TeXParser parser, TeXObjectList stack)
      throws IOException
    {

@@ -330,6 +330,44 @@ public class TeXParserUtils
            TeXSyntaxException.ERROR_DIMEN_EXPECTED);
    }
 
+   /**
+    * Pops an optional argument that should be a dimension.
+    * @param parser the TeX parser
+    * @param stack the stack or the parser or null
+    * @return the dimension or null if no optional argument
+    * @throws TeXSyntaxException if the argument isn't a dimension
+    */ 
+   public static TeXDimension popOptDimensionArg(TeXParser parser, TeXObjectList stack)
+     throws IOException
+   {
+      TeXObject obj = popOptArgExpandFully(parser, stack);
+
+      if (obj == null)
+      {
+         return null;
+      }
+
+      if (obj instanceof InternalQuantity)
+      {
+         obj = ((InternalQuantity)obj).getQuantity(parser, stack);
+      }
+
+      if (obj instanceof TeXDimension)
+      {
+         return (TeXDimension)obj;
+      }
+
+      if (obj instanceof TeXObjectList)
+      {
+         TeXObjectList list = (TeXObjectList)obj;
+
+         return list.popDimension(parser);
+      }
+
+      throw new TeXSyntaxException(parser, 
+           TeXSyntaxException.ERROR_DIMEN_EXPECTED);
+   }
+
    public static ControlSequence popControlSequence(TeXParser parser, TeXObjectList stack)
      throws IOException
    {

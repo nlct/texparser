@@ -620,98 +620,58 @@ public class FrameBox extends ControlSequence
       process(parser, parser);
    }
 
-   protected void processContents(TeXObject arg, TeXParser parser,
-      TeXObjectList stack)
-    throws IOException
-   {
-      LaTeXParserListener listener = ((LaTeXParserListener)parser.getListener());
-
-      if (prefix != null || suffix != null)
-      {
-         TeXObjectList substack = listener.createStack();
-
-         if (prefix != null)
-         {
-            substack.add((TeXObject)prefix.clone());
-         }
-
-         substack.add(arg, true);
-
-         if (suffix != null)
-         {
-            substack.add((TeXObject)suffix.clone());
-         }
-
-         arg = substack;
-      }
-
-      if (currentAngle != null && isChangeable)
-      {
-         listener.rotate(currentAngle.toDegrees(), parser, stack, arg);
-      }
-      else if (parser == stack || stack == null)
-      {
-         arg.process(parser);
-      }
-      else
-      {
-         arg.process(parser, stack);
-      }
-   }
-
    public void process(TeXParser parser, TeXObjectList stack) throws IOException
    {
-      TeXDimension orgWidth = currentWidth;
-      TeXDimension orgHeight = currentHeight;
-      AlignHStyle orgHalign = halign;
-      AlignVStyle orgValign = valign;
-      Color orgBorderColor = currentBorderColor;
-      Color orgFgColor = currentFgColor;
-      Color orgBgColor = currentBgColor;
-      TeXDimension orgBorderWidth = currentBorderWidth;
-      TeXDimension orgInnerMargin = currentInnerMargin;
-      TeXDimension orgBorderRadius = currentBorderRadius;
-      Angle orgAngle = currentAngle;
-
-      parser.startGroup();
+      FrameBox fbox = this;
 
       if (isChangeable)
       {
+         TeXDimension orgWidth = currentWidth;
+         TeXDimension orgHeight = currentHeight;
+         AlignHStyle orgHalign = halign;
+         AlignVStyle orgValign = valign;
+         Color orgBorderColor = currentBorderColor;
+         Color orgFgColor = currentFgColor;
+         Color orgBgColor = currentBgColor;
+         TeXDimension orgBorderWidth = currentBorderWidth;
+         TeXDimension orgInnerMargin = currentInnerMargin;
+         TeXDimension orgBorderRadius = currentBorderRadius;
+         Angle orgAngle = currentAngle;
+
          popSettings(parser, stack);
+
+         fbox = (FrameBox)clone();
+
+         currentWidth = orgWidth;
+         currentHeight = orgHeight;
+         currentBorderColor = orgBorderColor;
+         currentFgColor = orgFgColor;
+         currentBgColor = orgBgColor;
+         currentBorderWidth = orgBorderWidth;
+         currentBorderRadius = orgBorderRadius;
+         currentInnerMargin = orgInnerMargin;
+         halign = orgHalign;
+         valign = orgValign;
+         currentAngle = orgAngle;
       }
 
       TeXObject arg = popContents(parser, stack);
 
-      LaTeXParserListener listener = ((LaTeXParserListener)parser.getListener());
+      stack.push(new EndFrameBox(fbox));
 
-      listener.startFrameBox(this);
+      if (suffix != null)
+      {
+         stack.push((TeXObject)suffix.clone(), true);
+      }
 
-      try
+      stack.push(arg, true);
+
+      if (prefix != null)
       {
-         processContents(arg, parser, stack);
+         stack.push((TeXObject)prefix.clone(), true);
       }
-      finally
-      {
-         try
-         {
-            listener.endFrameBox(this);
-         }
-         finally
-         {
-            parser.endGroup();
-            currentWidth = orgWidth;
-            currentHeight = orgHeight;
-            currentBorderColor = orgBorderColor;
-            currentFgColor = orgFgColor;
-            currentBgColor = orgBgColor;
-            currentBorderWidth = orgBorderWidth;
-            currentBorderRadius = orgBorderRadius;
-            currentInnerMargin = orgInnerMargin;
-            halign = orgHalign;
-            valign = orgValign;
-            currentAngle = orgAngle;
-         }
-      }
+
+      stack.push(new StartFrameBox(fbox));
    }
 
    protected String id;

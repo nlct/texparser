@@ -46,43 +46,35 @@ public class MiniPage extends FrameBoxEnv
    {
       TeXObjectList substack = parser.getListener().createStack();
 
-      substack.add(getFrameBox());
+      currentParBox = (ParBox)fbox.clone();
 
-      TeXObject pos = popOptArg(parser, stack);
-      TeXObject height = null;
+      String pos = popOptLabelString(parser, stack);
 
       if (pos != null)
       {
-         substack.add(parser.getListener().getOther('['));
-         substack.add(pos);
-         substack.add(parser.getListener().getOther(']'));
+         currentParBox.setVAlign(currentParBox.getAlignVStyle(parser, pos));
 
-         height = popOptArg(parser, stack);
+         TeXDimension height = popOptDimensionArg(parser, stack);
 
          if (height != null)
          {
-            substack.add(parser.getListener().getOther('['));
-            substack.add(height);
-            substack.add(parser.getListener().getOther(']'));
+            currentParBox.setHeight(height);
          }
       }
 
       TeXDimension width = popDimensionArg(parser, stack);
 
-      substack.add(width);
+      currentParBox.setWidth(width);
 
-      TeXObjectList contents = popContents(parser, stack);
-      Group grp = parser.getListener().createGroup();
-      substack.add(grp);
-      grp.add(contents);
+      StartFrameBox obj = new StartFrameBox(currentParBox);
 
-      if (parser == stack || stack == null)
+      if (parser == stack)
       {
-         substack.process(parser);
+         obj.process(parser);
       }
       else
       {
-         substack.process(parser, stack);
+         obj.process(parser, stack);
       }
    }
 
@@ -92,5 +84,20 @@ public class MiniPage extends FrameBoxEnv
       process(parser, parser);
    }
 
-   protected FrameBox fbox;
+   @Override
+   public void end(TeXParser parser, TeXObjectList stack)
+      throws IOException
+   {
+      EndFrameBox obj = new EndFrameBox(currentParBox);
+      obj.process(parser, stack);
+
+      currentParBox = null;
+   }
+
+   public ParBox getCurrentParBox()
+   {
+      return currentParBox;
+   }
+
+   protected ParBox currentParBox;
 }

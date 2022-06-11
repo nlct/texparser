@@ -23,7 +23,7 @@ import java.io.EOFException;
 
 import com.dickimawbooks.texparserlib.*;
 
-public class FrameBoxEnv extends GatherEnvContents
+public class FrameBoxEnv extends Declaration
 {
    public FrameBoxEnv(FrameBox fbox)
    {
@@ -46,30 +46,24 @@ public class FrameBoxEnv extends GatherEnvContents
    public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      TeXObjectList contents = popContents(parser, stack);
-      Group grp = parser.getListener().createGroup();
-      grp.add(contents);
-
-      stack.push(grp);
-      fbox.process(parser, stack);
+      StartFrameBox obj = new StartFrameBox(fbox);
+      obj.process(parser, stack);
    }
 
    @Override
    public void process(TeXParser parser)
      throws IOException
    {
-      TeXObjectList contents = popContents(parser, parser);
-      Group grp = parser.getListener().createGroup();
-      grp.add(contents);
-
-      parser.push(grp);
-      fbox.process(parser);
+      StartFrameBox obj = new StartFrameBox(fbox);
+      obj.process(parser);
    }
 
    @Override
    public void end(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
+      EndFrameBox obj = new EndFrameBox(fbox);
+      obj.process(parser, stack);
    }
 
    public FrameBox getFrameBox()
@@ -85,6 +79,46 @@ public class FrameBoxEnv extends GatherEnvContents
    public boolean isMultiLine()
    {
       return fbox.isMultiLine();
+   }
+
+   @Override
+   public boolean isModeSwitcher()
+   {
+      return false;
+   }
+
+   @Override
+   public boolean canExpand()
+   {
+      return false;
+   }
+
+   @Override
+   public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
+      throws IOException
+   {
+      return null;
+   }
+
+   @Override
+   public TeXObjectList expandonce(TeXParser parser)
+      throws IOException
+   {
+      return null;
+   }
+
+   @Override
+   public TeXObjectList expandfully(TeXParser parser, TeXObjectList stack)
+      throws IOException
+   {
+      return null;
+   }
+
+   @Override
+   public TeXObjectList expandfully(TeXParser parser)
+      throws IOException
+   {
+      return null;
    }
 
    protected FrameBox fbox;

@@ -97,13 +97,51 @@ public class UserGuideSty extends LaTeXSty
         new TeXFontText(TeXFontFamily.RM),
         Color.BLACK, listener.getOther(0x2329), listener.getOther(0x232A));
 
+      TeXObjectList def = listener.createStack();
+      def.add(listener.getOther('{'));
+      def.add(listener.getParam(1));
+      def.add(listener.getOther('}'));
+      registerControlSequence(new LaTeXGenericCommand(true, "marg",
+        "m", def));
+
+      def = listener.createStack();
+      def.add(listener.getOther('['));
+      def.add(listener.getParam(1));
+      def.add(listener.getOther(']'));
+      registerControlSequence(new LaTeXGenericCommand(true, "oarg",
+        "m", def));
+
+      def = listener.createStack();
+      def.add(new TeXCsRef("marg"));
+      Group grp = listener.createGroup();
+      def.add(grp);
+      grp.add(new TeXCsRef("meta"));
+      Group subgrp = listener.createGroup();
+      grp.add(subgrp);
+      subgrp.add(listener.getParam(1));
+      registerControlSequence(new LaTeXGenericCommand(true, "margm",
+        "m", def));
+
+      def = listener.createStack();
+      def.add(new TeXCsRef("oarg"));
+      grp = listener.createGroup();
+      def.add(grp);
+      grp.add(new TeXCsRef("meta"));
+      subgrp = listener.createGroup();
+      grp.add(subgrp);
+      subgrp.add(listener.getParam(1));
+      registerControlSequence(new LaTeXGenericCommand(true, "oargm",
+        "m", def));
+
       addTaggedColourBox("important", null, Color.RED);
       addTaggedColourBox("warning", null, Color.RED);
       addTaggedColourBox("information", null, Color.BLUE);
       addTaggedColourBox("pinnedbox", "definition", BG_DEF, Color.BLACK);
 
-      addColourBox("defnbox", new TeXFontText(TeXFontFamily.VERB), null,
+      FrameBox defnbox = addColourBox("defnbox", new TeXFontText(TeXFontFamily.VERB), null,
         BG_DEF, Color.BLACK);
+
+      registerControlSequence(new CmdDef(defnbox, glossariesSty));
 
       addTaggedColourBox("settingsbox", "valuesettings", null, Color.BLACK);
       addTaggedColourBox("terminal", new TeXFontText(TeXFontFamily.VERB), 
@@ -151,20 +189,18 @@ public class UserGuideSty extends LaTeXSty
       options.put("nosuper", null);
       options.put("stylemods", getListener().createString("mcols,bookindex,topic,longextra"));
 
-      GlossariesSty sty = (GlossariesSty)getListener().requirepackage(options, "glossaries-extra", false, stack);
+      glossariesSty = (GlossariesSty)getListener().requirepackage(options, "glossaries-extra", false, stack);
 
-      if (sty != null)
-      {
-         sty.addField("modifiers");
-         sty.addField("syntax");
-         sty.addField("defaultvalue");
-         sty.addField("initvalue");
-         sty.addField("status", getListener().createString("default"));
-         sty.addField("note");
-         sty.addField("providedby");
-         sty.addField("pdftitlecasename");
-         sty.addField("defaultkeys");
-      }
+      glossariesSty.addField("modifiers");
+      glossariesSty.addField("syntax");
+      glossariesSty.addField("defaultvalue");
+      glossariesSty.addField("initvalue");
+      glossariesSty.addField("status", getListener().createString("default"));
+      glossariesSty.addField("note");
+      glossariesSty.addField("providedby");
+      glossariesSty.addField("pdftitlecasename");
+      glossariesSty.addField("defaultkeys");
+
    }
 
    protected void addSemanticCommand(String name, TeXFontFamily family)
@@ -233,7 +269,7 @@ public class UserGuideSty extends LaTeXSty
       TeXObject prefix, TeXObject suffix,
       boolean isInLine, boolean isMultiLine)
    {
-      FrameBox boxFrame = new FrameBox(name, BorderStyle.NONE,
+      FrameBox boxFrame = new ColourBox(name, BorderStyle.NONE,
        AlignHStyle.DEFAULT, AlignVStyle.DEFAULT, isInLine, null, null);
 
       boxFrame.setIsMultiLine(isMultiLine);
@@ -315,14 +351,14 @@ public class UserGuideSty extends LaTeXSty
          name, "m", list));
    }
 
-   protected void addTaggedColourBox(String tag, Color bg, Color frameCol)
+   protected TaggedColourBox addTaggedColourBox(String tag, Color bg, Color frameCol)
    {
-      addTaggedColourBox(tag, tag, bg, frameCol);
+      return addTaggedColourBox(tag, tag, bg, frameCol);
    }
 
-   protected void addTaggedColourBox(String name, String tag, Color bg, Color frameCol)
+   protected TaggedColourBox addTaggedColourBox(String name, String tag, Color bg, Color frameCol)
    {
-      addTaggedColourBox(name, tag, null, bg, frameCol);
+      return addTaggedColourBox(name, tag, null, bg, frameCol);
    }
 
    protected void addTaggedColourBox(String name, TeXFontText font,
@@ -331,32 +367,32 @@ public class UserGuideSty extends LaTeXSty
       addTaggedColourBox(name, name, font, bg, frameCol);
    }
 
-   protected void addTaggedColourBox(String name, String tag, TeXFontText font,
+   protected TaggedColourBox addTaggedColourBox(String name, String tag, TeXFontText font,
       Color bg, Color frameCol)
    {
       TeXObjectList list = listener.createStack();
       list.add(new TeXCsRef("glssymbol"));
       list.add(listener.createGroup("sym."+tag));
 
-      addColourBox(name, font, null, bg, frameCol, list);
+      return addTaggedColourBox(name, false, font, null, bg, frameCol, list);
    }
 
-   protected void addColourBox(String name, 
+   protected TaggedColourBox addTaggedColourBox(String name, 
       Color fg, Color bg, Color frameCol, TeXObject tag)
    {
-      addColourBox(name, false, null, fg, bg, frameCol, tag);
+      return addTaggedColourBox(name, false, null, fg, bg, frameCol, tag);
    }
 
-   protected void addColourBox(String name, TeXFontText font, 
+   protected TaggedColourBox addTaggedColourBox(String name, TeXFontText font, 
       Color fg, Color bg, Color frameCol, TeXObject tag)
    {
-      addColourBox(name, false, font, fg, bg, frameCol, tag);
+      return addTaggedColourBox(name, false, font, fg, bg, frameCol, tag);
    }
 
-   protected void addColourBox(String name, boolean isInLine, TeXFontText font, 
+   protected TaggedColourBox addTaggedColourBox(String name, boolean isInLine, TeXFontText font, 
       Color fg, Color bg, Color borderCol, TeXObject tag)
    {
-      FrameBox boxFrame = new FrameBox("frame@"+name, BorderStyle.SOLID,
+      FrameBox boxFrame = new ColourBox("frame@"+name, BorderStyle.SOLID,
        AlignHStyle.DEFAULT, AlignVStyle.DEFAULT, isInLine,
         true,// is multiline 
         new UserDimension(2, TeXUnit.BP), // border width
@@ -368,25 +404,22 @@ public class UserGuideSty extends LaTeXSty
       boxFrame.setBackgroundColor(bg);
       boxFrame.setBorderColor(borderCol);
 
-      FrameBox titleFrame = new FrameBox("frame@"+name+"title", BorderStyle.NONE,
+      FrameBox titleFrame = new ColourBox("frame@"+name+"title", BorderStyle.NONE,
        AlignHStyle.RIGHT, AlignVStyle.DEFAULT, false, true, null, null);
 
       titleFrame.setForegroundColor(borderCol);
       titleFrame.setId(name+"title");
 
-      TeXObjectList prefix = getListener().createStack();
-      boxFrame.setPrefix(prefix);
-
-      prefix.add(titleFrame);
-      Group grp = getListener().createGroup();
-      prefix.add(grp);
-      grp.add(tag);
-
       getListener().declareFrameBox(titleFrame, false);
       getListener().declareFrameBox(boxFrame, false);
 
-      registerControlSequence(new FrameBoxEnv(boxFrame));
+      TaggedColourBox taggedBox = new TaggedColourBox(boxFrame, titleFrame, tag);
+      registerControlSequence(taggedBox);
+
+      return taggedBox;
    }
+
+   protected GlossariesSty glossariesSty;
 
    public static final Color BG_DEF = new Color(1.0f, 1.0f, 0.75f);
    public static final Color BG_OPTION_DEF = new Color(1.0f, 1.0f, 0.89f);
