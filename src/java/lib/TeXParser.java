@@ -2064,7 +2064,6 @@ public class TeXParser extends TeXObjectList
 
          pending.process(this);
       }
-
    }
 
    @Override
@@ -2092,6 +2091,17 @@ public class TeXParser extends TeXObjectList
       }
    }
 
+   public void processAction(TeXParserActionObject obj)
+     throws IOException
+   {
+      switch (obj.getAction())
+      {
+         case INPUT_FILE:
+           parse(obj.getFile(), currentInputCharset, obj.getPending());
+         break;
+      }
+   }
+
    public void parse(File file)
      throws IOException
    {
@@ -2107,6 +2117,8 @@ public class TeXParser extends TeXObjectList
    public void parse(File file, Charset charset, TeXObjectList stack)
      throws IOException
    {
+      currentInputCharset = charset;
+
       if (!getListener().getTeXApp().isReadAccessAllowed(file))
       {
          getListener().getTeXApp().warning(this, 
@@ -3259,6 +3271,8 @@ public class TeXParser extends TeXObjectList
    private int debugLevel = 0;
 
    private PrintWriter logWriter = null;
+
+   private Charset currentInputCharset = null;
 
    public static final String VERSION = "0.9.2.6b";
    public static final String VERSION_DATE = "2021-11-11";

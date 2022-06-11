@@ -505,9 +505,14 @@ public abstract class DefaultTeXParserListener extends TeXParserListener
    {
       if (path != null && Files.exists(path.getPath()))
       {
-         Charset charset = getCharSet();
-
-         getParser().parse(path, charset, stack==getParser() ? null : stack);
+         if (stack == null || stack == getParser())
+         {
+            parser.push(TeXParserActionObject.createInputAction(path, null));
+         }
+         else
+         {
+            parser.push(TeXParserActionObject.createInputAction(path, stack));
+         }
 
          return true;
       }
