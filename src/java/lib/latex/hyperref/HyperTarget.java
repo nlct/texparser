@@ -41,6 +41,12 @@ public class HyperTarget extends Command
       return new HyperTarget(getName());
    }
 
+   protected TeXObject createAnchor(TeXParser parser, String target, TeXObject text)
+    throws IOException
+   {
+      return parser.getListener().createAnchor(target, text);
+   }
+
    @Override
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
      throws IOException
@@ -51,7 +57,7 @@ public class HyperTarget extends Command
 
       TeXObjectList expanded = parser.getListener().createStack();
 
-      expanded.add(parser.getListener().createAnchor(target, text));
+      expanded.add(createAnchor(parser, target, text));
 
       return expanded;
    }
@@ -66,7 +72,7 @@ public class HyperTarget extends Command
 
       TeXObjectList expanded = parser.getListener().createStack();
 
-      expanded.add(parser.getListener().createAnchor(target, text));
+      expanded.add(createAnchor(parser, target, text));
 
       return expanded;
    }
@@ -76,6 +82,26 @@ public class HyperTarget extends Command
      throws IOException
    {
       return expandfully(parser, parser);
+   }
+
+   @Override
+   public void process(TeXParser parser, TeXObjectList stack)
+     throws IOException
+   {
+      String target = popLabelString(parser, stack);
+      TeXObject text = popArg(parser, stack);
+
+      createAnchor(parser, target, text).process(parser, stack);
+   }
+
+   @Override
+   public void process(TeXParser parser)
+     throws IOException
+   {
+      String target = popLabelString(parser, parser);
+      TeXObject text = popArg(parser, parser);
+
+      createAnchor(parser, target, text).process(parser);
    }
 
 }

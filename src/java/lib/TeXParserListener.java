@@ -244,6 +244,20 @@ public abstract class TeXParserListener
    public abstract TeXObject createLink(String anchorName, TeXObject text)
     throws IOException;
 
+   /**
+    * Creates a new object that has the given accessibility support
+    * applied to the given object. If no support available, the
+    * given object is returned.
+    * @param accsupp accessibility support
+    * @param object the object
+    * @return the object with accessibility support applied or the
+    * object itself if no support available
+    */ 
+   public TeXObject applyAccSupp(AccSupp accsupp, TeXObject object)
+   {
+      return object;
+   }
+
    public abstract Writeable getWriteable();
 
    public abstract TeXApp getTeXApp();
