@@ -26,6 +26,16 @@ public class TeXFontText
    {
    }
 
+   public TeXFontText(TeXFontFamily family)
+   {
+      setFamily(family);
+   }
+
+   public TeXFontText(TeXFontShape shape)
+   {
+      setShape(shape);
+   }
+
    public void setName(String name)
    {
       this.name = name;
@@ -162,7 +172,7 @@ public class TeXFontText
 
       if (currentShape == TeXFontShape.IT || currentShape == TeXFontShape.SL)
       {
-         if (currentWeight == TeXFontWeight.BF)
+         if (currentWeight.isBold())
          {
             fontStyle = Font.BOLD | Font.ITALIC;
          }
@@ -171,7 +181,7 @@ public class TeXFontText
             fontStyle = Font.ITALIC;
          }
       }
-      else if (currentWeight == TeXFontWeight.BF)
+      else if (currentWeight.isBold())
       {
          fontStyle = Font.BOLD;
       }
@@ -255,14 +265,13 @@ public class TeXFontText
          break;
       }
 
-      switch (weight)
+      if (weight.isBold())
       {
-         case MD:
-            builder.append("font-weight: normal; ");
-         break;
-         case BF:
-            builder.append("font-weight: bold; ");
-         break;
+         builder.append("font-weight: bold; ");
+      }
+      else
+      {
+         builder.append("font-weight: normal; ");
       }
 
       switch (size)
