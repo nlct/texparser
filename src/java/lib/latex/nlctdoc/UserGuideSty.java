@@ -23,6 +23,7 @@ import java.awt.Color;
 
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.*;
+import com.dickimawbooks.texparserlib.latex.glossaries.*;
 
 public class UserGuideSty extends LaTeXSty
 {
@@ -137,10 +138,8 @@ public class UserGuideSty extends LaTeXSty
    }
 
    @Override
-   protected void postOptions(TeXObjectList stack) throws IOException
+   protected void preOptions(TeXObjectList stack) throws IOException
    {
-      super.postOptions(stack);
-
       getListener().requirepackage(null, "fontawesome", false, stack);
       getListener().requirepackage(null, "hyperref", false, stack);
 
@@ -152,7 +151,20 @@ public class UserGuideSty extends LaTeXSty
       options.put("nosuper", null);
       options.put("stylemods", getListener().createString("mcols,bookindex,topic,longextra"));
 
-      getListener().requirepackage(options, "glossaries-extra", false, stack);
+      GlossariesSty sty = (GlossariesSty)getListener().requirepackage(options, "glossaries-extra", false, stack);
+
+      if (sty != null)
+      {
+         sty.addField("modifiers");
+         sty.addField("syntax");
+         sty.addField("defaultvalue");
+         sty.addField("initvalue");
+         sty.addField("status", getListener().createString("default"));
+         sty.addField("note");
+         sty.addField("providedby");
+         sty.addField("pdftitlecasename");
+         sty.addField("defaultkeys");
+      }
    }
 
    protected void addSemanticCommand(String name, TeXFontFamily family)

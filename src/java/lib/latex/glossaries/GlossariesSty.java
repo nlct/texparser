@@ -1191,7 +1191,7 @@ public class GlossariesSty extends LaTeXSty
       {
          if (getParser() == stack || stack == null)
          {
-            substack.process(getParser());
+            getParser().push(substack, true);
          }
          else
          {
@@ -1271,6 +1271,17 @@ public class GlossariesSty extends LaTeXSty
       {
          registerControlSequence(new TextualContentCommand("glscounter", 
            value.toString(parser)));
+      }
+      else if (option.equals("stylemods"))
+      {
+         if (value == null)
+         {
+            stylemods = "";
+         }
+         else
+         {
+            stylemods = value.toString(parser);
+         }
       }
       else if (option.equals("nolist"))
       {
@@ -2398,6 +2409,8 @@ public class GlossariesSty extends LaTeXSty
    private boolean loadLong = true;
    private boolean loadSuper = true;
    private boolean accsupp = false;
+
+   private String stylemods = null;
 
    private boolean nostyleWarningIssued = false;
 
