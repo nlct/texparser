@@ -85,7 +85,7 @@ public class NewAcronym extends NewGlossaryEntry
       {
          TeXObject catVal = keyValList.get("category");
 
-         if (catVal == null)
+         if (catVal == null || catVal.isEmpty())
          {
             keyValList.put("category", parser.getListener().createString(catLabel));
          }

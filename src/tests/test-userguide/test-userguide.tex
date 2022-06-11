@@ -1,0 +1,41 @@
+% arara: lualatex
+% arara: bib2gls: { group: on }
+% arara: lualatex
+\documentclass[titlepage=false,index=totoc,bibliography=totoc,
+ fontsize=12pt,captions=tableheading]{scrreprt}
+
+\usepackage[autooneside=false]{scrlayer-scrpage}
+
+\usepackage[abbreviations]{nlctuserguide}
+
+\nlctuserguidegls
+{
+  \gcmd{foo\-bar\-cs}
+  {%
+    \syntax{\oargm{options}\margm{text}}%
+    \desc{a sample command}
+    \providedby{\sty{foobarsty} v1.0+}
+  }
+}
+
+\title{Sample Document}
+\author{Nicola Talbot}
+
+\begin{document}
+\maketitle
+
+\begin{important}
+Something important.
+\end{important}
+
+\frontmatter
+\tableofcontents
+
+\mainmatter
+\chapter{Sample}
+
+Meta: \meta{text} and \qt{quoted} and \qtt{quoted-tt}.
+
+Command: \gls{foobarcs}.
+
+\end{document}

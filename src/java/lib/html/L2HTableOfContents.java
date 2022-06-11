@@ -61,7 +61,8 @@ public class L2HTableOfContents extends ControlSequence
 
       listener.stepcounter(counter);
 
-      stack.push(new HtmlTag("</div><!-- end of toc -->"));
+      stack.push(new HtmlTag("<!-- end of toc -->"));
+      stack.push(new EndElement("nav"));
 
       File tocFile = listener.getAuxFile("toc");
 
@@ -76,7 +77,10 @@ public class L2HTableOfContents extends ControlSequence
       stack.push(new TeXCsRef("contentsname"));
       stack.push(listener.getOther('*'));
       stack.push(cs);
-      stack.push(new HtmlTag("<div class=\"toc\">"));
+
+      StartElement elem = new StartElement("nav");
+      elem.putAttribute("class", "toc");
+      stack.push(elem);
    }
 
    @Override
@@ -96,7 +100,8 @@ public class L2HTableOfContents extends ControlSequence
 
       listener.stepcounter(counter);
 
-      parser.push(new HtmlTag("</div><!-- end of toc -->"));
+      parser.push(new HtmlTag("<!-- end of toc -->"));
+      parser.push(new EndElement("nav"));
 
       File tocFile = listener.getAuxFile("toc");
 
@@ -111,6 +116,9 @@ public class L2HTableOfContents extends ControlSequence
       parser.push(new TeXCsRef("contentsname"));
       parser.push(listener.getOther('*'));
       parser.push(cs);
-      parser.push(new HtmlTag("<div class=\"toc\">"));
+
+      StartElement elem = new StartElement("nav");
+      elem.putAttribute("class", "toc");
+      parser.push(elem);
    }
 }

@@ -42,6 +42,37 @@ public abstract class AbstractGlsCommand extends Command
       return sty.getGlossary(label);
    }
 
+   protected GlsLabel expandToEntryLabel(String csname, TeXParser parser, TeXObjectList stack)
+   throws IOException
+   {
+      return expandToEntryLabel(parser.getListener().getControlSequence(csname), parser, stack);
+   }
+
+   protected GlsLabel expandToEntryLabel(TeXObject object, TeXParser parser, TeXObjectList stack)
+   throws IOException
+   {
+      if (object instanceof TeXCsRef)
+      {
+         object = parser.getListener().getControlSequence(((TeXCsRef)object).getName());
+      }
+
+      if (object instanceof TeXObjectList && ((TeXObjectList)object).size()==1)
+      {
+         object = ((TeXObjectList)object).firstElement();
+      }
+
+      if (object instanceof GlsLabel)
+      {
+         return (GlsLabel)object;
+      }
+
+      String label = parser.expandToString(object, stack);
+
+      GlossaryEntry entry = getEntry(label);
+
+      return new GlsLabel("@@glslabel@"+label, label, entry);
+   }
+
    protected KeyValList popModifier(TeXParser parser, TeXObjectList stack)
     throws IOException
    {

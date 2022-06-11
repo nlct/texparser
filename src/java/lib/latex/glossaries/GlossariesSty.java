@@ -187,7 +187,7 @@ public class GlossariesSty extends LaTeXSty
 
       if (isHyper)
       {
-         registerControlSequence(new HyperTarget("@glstarget"));
+         registerControlSequence(new AtGlsTarget());
          registerControlSequence(new HyperLink("@glslink"));
 
          registerControlSequence(new GenericCommand(true, "glsifhyperon", null,
@@ -856,6 +856,47 @@ public class GlossariesSty extends LaTeXSty
       registerControlSequence(new GlsAccessFmtField("Glsaccessfmtuservi", "user6", CaseChange.SENTENCE, this));
       registerControlSequence(new GlsAccessFmtField("GLSaccessfmtuservi", "user6", CaseChange.TO_UPPER, this));
 
+      registerControlSequence(new GlsXtrSaveInsert());
+      registerControlSequence(new GenericCommand(true, "glsxtrfullsaveinsert",
+        null, new TeXCsRef("glsxtrsaveinsert")));
+      registerControlSequence(new GlsXtrSetUpFullDefs());
+
+      registerControlSequence(new GlsXtrAbbrvField("glsxtrshort", "short", this));
+      registerControlSequence(new GlsXtrAbbrvField("Glsxtrshort", "short", CaseChange.SENTENCE, this));
+      registerControlSequence(new GlsXtrAbbrvField("GLSxtrshort", "short", CaseChange.TO_UPPER, this));
+      registerControlSequence(new GlsXtrAbbrvField("glsxtrshortpl", "shortplural", true, this));
+      registerControlSequence(new GlsXtrAbbrvField("Glsxtrshortpl", "shortplural", CaseChange.SENTENCE, true, this));
+      registerControlSequence(new GlsXtrAbbrvField("GLSxtrshortpl", "shortplural", CaseChange.TO_UPPER, true, this));
+
+      registerControlSequence(new GlsXtrAbbrvField("glsxtrlong", "long", this));
+      registerControlSequence(new GlsXtrAbbrvField("Glsxtrlong", "long", CaseChange.SENTENCE, this));
+      registerControlSequence(new GlsXtrAbbrvField("GLSxtrlong", "long", CaseChange.TO_UPPER, this));
+      registerControlSequence(new GlsXtrAbbrvField("glsxtrlongpl", "longplural", true, this));
+      registerControlSequence(new GlsXtrAbbrvField("Glsxtrlongpl", "longplural", CaseChange.SENTENCE, true, this));
+      registerControlSequence(new GlsXtrAbbrvField("GLSxtrlongpl", "longplural", CaseChange.TO_UPPER, true, this));
+
+      registerControlSequence(new GlsXtrFull("glsxtrfull", this));
+      registerControlSequence(new GlsXtrFull("Glsxtrfull", CaseChange.SENTENCE, this));
+      registerControlSequence(new GlsXtrFull("GLSxtrfull", CaseChange.TO_UPPER, this));
+      registerControlSequence(new GlsXtrFull("glsxtrfullpl", true, this));
+      registerControlSequence(new GlsXtrFull("Glsxtrfullpl", CaseChange.SENTENCE, true, this));
+      registerControlSequence(new GlsXtrFull("GLSxtrfullpl", CaseChange.TO_UPPER, true, this));
+
+      registerControlSequence(new TextualContentCommand("glsxtrtitleopts", 
+         "noindex,hyper=false"));
+      addGlsXtrTitleCommands("short");
+      addGlsXtrTitleCommands("shortpl", "shortplural", true);
+      addGlsXtrTitleCommands("long");
+      addGlsXtrTitleCommands("longpl", "longplural", true);
+      addGlsXtrTitleCommands("name");
+      addGlsXtrTitleCommands("text");
+      addGlsXtrTitleCommands("plural", true);
+      addGlsXtrTitleCommands("first");
+      addGlsXtrTitleCommands("firstpl", "firstplural", "firstplural", true);
+
+      addGlsXtrTitleFullCommands(false);
+      addGlsXtrTitleFullCommands(true);
+
       registerControlSequence(new GlsXtrDisplayLocNameRef());
       registerControlSequence(new GlsXtrEquationLocFmt());
       registerControlSequence(new GlsXtrNameRefLink());
@@ -870,6 +911,100 @@ public class GlossariesSty extends LaTeXSty
       NewIf.createConditional(true, getParser(), "ifKV@glslink@noindex", false);
 
       registerControlSequence(new AtFirstOfTwo("glsxtr@wrglossarylocation"));
+   }
+
+   protected void addGlsXtrTitleCommands(String field)
+   {
+      addGlsXtrTitleCommands(field, field);
+   }
+
+   protected void addGlsXtrTitleCommands(String field, boolean isPlural)
+   {
+      addGlsXtrTitleCommands(field, field, isPlural);
+   }
+
+   protected void addGlsXtrTitleCommands(String csFieldTag, String field)
+   {
+      addGlsXtrTitleCommands(csFieldTag, field, false);
+   }
+
+   protected void addGlsXtrTitleCommands(String csFieldTag,
+     String field, boolean isPlural)
+   {
+      addGlsXtrTitleCommands(csFieldTag, csFieldTag, field, isPlural);
+   }
+
+   protected void addGlsXtrTitleCommands(String csXtrFieldTag,
+     String csFmtFieldTag, String field, boolean isPlural)
+   {
+      if (field.startsWith("short") || field.startsWith("long"))
+      {
+         registerControlSequence(new GlsXtrTitleAbbrvField("glsxtrtitle"+csXtrFieldTag,
+           field, isPlural, this));
+
+         registerControlSequence(new GlsXtrTitleAbbrvField("Glsxtrtitle"+csXtrFieldTag,
+           field, CaseChange.SENTENCE, isPlural, this));
+
+         registerControlSequence(new GlsXtrTitleAbbrvField("GLSxtrtitle"+csXtrFieldTag,
+           field, CaseChange.TO_UPPER, isPlural, this));
+      }
+      else
+      {
+         registerControlSequence(new GlsXtrTitleField("glsxtrtitle"+csXtrFieldTag,
+           field, isPlural, this));
+
+         registerControlSequence(new GlsXtrTitleField("Glsxtrtitle"+csXtrFieldTag,
+           field, CaseChange.SENTENCE, isPlural, this));
+
+         registerControlSequence(new GlsXtrTitleField("GLSxtrtitle"+csXtrFieldTag,
+           field, CaseChange.TO_UPPER, isPlural, this));
+      }
+
+      registerControlSequence(new GenericCommand(true, "glsfmt"+csFmtFieldTag,
+        null, new TeXCsRef("glsxtrtitle"+csXtrFieldTag)));
+
+      registerControlSequence(new GenericCommand(true, "Glsfmt"+csFmtFieldTag,
+        null, new TeXCsRef("Glsxtrtitle"+csXtrFieldTag)));
+
+      registerControlSequence(new GenericCommand(true, "GLSfmt"+csFmtFieldTag,
+        null, new TeXCsRef("GLSxtrtitle"+csXtrFieldTag)));
+
+   }
+
+   protected void addGlsXtrTitleFullCommands(boolean isPlural)
+   {
+      String suffix = (isPlural ? "fullpl" : "full");
+
+      TeXObjectList def = getListener().createStack();
+
+      def.add(new TeXCsRef(isPlural ? "glsentrylongpl": "glsentrylong"));
+      Group grp = getListener().createGroup();
+      grp.add(getListener().getParam(1));
+      def.add(grp);
+
+      def.add(new TeXCsRef(isPlural ? "glsentryshortpl": "glsentryshort"));
+      grp = getListener().createGroup();
+      grp.add(getListener().getParam(1));
+      def.add(grp);
+
+      registerControlSequence(new LaTeXGenericCommand(true, "glspdffmt"+suffix,
+        "m", def));
+
+      registerControlSequence(new GlsXtrTitleFull("glsxtrtitle"+suffix, isPlural, this));
+      registerControlSequence(new GlsXtrTitleFull("Glsxtrtitle"+suffix,
+         CaseChange.SENTENCE, isPlural, this));
+      registerControlSequence(new GlsXtrTitleFull("GLSxtrtitle"+suffix,
+         CaseChange.TO_UPPER, isPlural, this));
+
+      registerControlSequence(new GenericCommand(true, "glsfmt"+suffix,
+        null, new TeXCsRef("glsxtrtitle"+suffix)));
+
+      registerControlSequence(new GenericCommand(true, "Glsfmt"+suffix,
+        null, new TeXCsRef("Glsxtrtitle"+suffix)));
+
+      registerControlSequence(new GenericCommand(true, "GLSfmt"+suffix,
+        null, new TeXCsRef("GLSxtrtitle"+suffix)));
+
    }
 
    @Override
@@ -911,6 +1046,28 @@ public class GlossariesSty extends LaTeXSty
          createGlossary("main", new TeXCsRef("glossaryname"), null,
            "glg", "gls", "glo");
          createMain = false;
+      }
+
+      if (createIndex)
+      {
+         createGlossary("index", new TeXCsRef("indexname"), null,
+           "ilg", "ind", "idx");
+         createIndex = false;
+// TODO define newterm and printindex
+      }
+
+      if (createSymbols)
+      {
+         createGlossary("symbols", new TeXCsRef("glssymbolsgroupname"), null,
+           "slg", "sls", "slo");
+         createSymbols = false;
+      }
+
+      if (createNumbers)
+      {
+         createGlossary("numbers", new TeXCsRef("glsnumbersgroupname"), null,
+           "nlg", "nls", "nlo");
+         createNumbers = false;
       }
 
       if (createAbbreviations)
@@ -964,16 +1121,16 @@ public class GlossariesSty extends LaTeXSty
 
       if (loadList)
       {
-         substack.add(listener.getControlSequence("input"));
-         substack.add(listener.createGroup("glossary-list.sty"));
+         substack.add(TeXParserActionObject.createInputAction(
+           getParser(), "glossary-list.sty")); 
 
          loadList = false;
       }
 
       if (loadTree)
       {
-         substack.add(listener.getControlSequence("input"));
-         substack.add(listener.createGroup("glossary-tree.sty"));
+         substack.add(TeXParserActionObject.createInputAction(
+           getParser(), "glossary-tree.sty")); 
 
          loadTree = false;
       }
@@ -985,8 +1142,8 @@ public class GlossariesSty extends LaTeXSty
 
          if (texPath.exists())
          {
-            substack.add(listener.getControlSequence("input"));
-            substack.add(new TeXPathObject(texPath));
+            substack.add(TeXParserActionObject.createInputAction(
+              texPath)); 
          }
          else
          {
@@ -1030,7 +1187,17 @@ public class GlossariesSty extends LaTeXSty
          substack.add(new TeXCsRef("@glsstyle@"+initialStyle));
       }
 
-      stack.push(substack, true);
+      if (!substack.isEmpty())
+      {
+         if (getParser() == stack || stack == null)
+         {
+            substack.process(getParser());
+         }
+         else
+         {
+            substack.process(getParser(), stack);
+         }
+      }
    }
 
    @Override
@@ -1042,6 +1209,18 @@ public class GlossariesSty extends LaTeXSty
       if (option.equals("nomain"))
       {
          createMain = false;
+      }
+      else if (option.equals("index"))
+      {
+         createIndex = true;
+      }
+      else if (option.equals("symbols"))
+      {
+         createSymbols = true;
+      }
+      else if (option.equals("numbers"))
+      {
+         createNumbers = true;
       }
       else if (option.equals("acronyms") || option.equals("acronym"))
       {
@@ -2182,6 +2361,9 @@ public class GlossariesSty extends LaTeXSty
    private boolean createMain = true;
    private boolean createAbbreviations = false;
    private boolean createAcronyms = false;
+   private boolean createIndex = false;
+   private boolean createSymbols = false;
+   private boolean createNumbers = false;
 
    private boolean expandFields = true;
 

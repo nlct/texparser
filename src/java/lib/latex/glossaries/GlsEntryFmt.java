@@ -50,51 +50,34 @@ public class GlsEntryFmt extends AbstractGlsCommand
 
       if (sty.isExtra())
       {
-         list.add(new TeXCsRef("ifglshasshort"));
-         list.add(new TeXCsRef("glslabel"));
+         GlsLabel label = expandToEntryLabel("glslabel", parser, stack);
+         GlossaryEntry entry = label.getEntry();
 
-         Group grp = listener.createGroup();
-         list.add(grp);
+         if (entry != null)
+         {
+            boolean isAbbr = entry.hasField("short");
 
-         grp.add(new TeXCsRef("glssetabbrvfmt"));
-         Group subgrp = listener.createGroup();
-         grp.add(subgrp);
+            if (isAbbr)
+            {
+               list.add(new TeXCsRef("glssetabbrvfmt"));
+               list.add(listener.createGroup(entry.getCategory()));
+            }
 
-         subgrp.add(new TeXCsRef("glscategory"));
-         subgrp.add(new TeXCsRef("glslabel"));
-
-         list.add(listener.createGroup());
-
-         list.add(new TeXCsRef("glsifregular"));
-         list.add(new TeXCsRef("glslabel"));
-
-         grp = listener.createGroup();
-         list.add(grp);
-
-         grp.add(new TeXCsRef("glsxtrregularfont"));
-         grp.add(new TeXCsRef("glsgenentryfmt"));
-
-         grp = listener.createGroup();
-         list.add(grp);
-
-         grp.add(new TeXCsRef("ifglshasshort"));
-         grp.add(new TeXCsRef("glslabel"));
-
-         subgrp = listener.createGroup();
-         grp.add(subgrp);
-
-         subgrp.add(new TeXCsRef("glsxtrabbreviationfont"));
-         subgrp.add(new TeXCsRef("glsxtrgenabbrvfmt"));
-
-         subgrp = listener.createGroup();
-         grp.add(subgrp);
-
-         subgrp.add(new TeXCsRef("glsxtrregularfont"));
-         subgrp.add(new TeXCsRef("glsgenentryfmt"));
+            if (!isAbbr || sty.isRegular(entry))
+            {
+               list.add(listener.getControlSequence("glsxtrregularfont"));
+               list.add(listener.getControlSequence("glsgenentryfmt"));
+            }
+            else
+            {
+               list.add(listener.getControlSequence("glsxtrabbreviationfont"));
+               list.add(listener.getControlSequence("glsxtrgenabbrvfmt"));
+            }
+         }
       }
       else
       {
-         list.add(new TeXCsRef("glsgenentryfmt"));
+         list.add(listener.getControlSequence("glsgenentryfmt"));
       }
 
       return list;

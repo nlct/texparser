@@ -160,11 +160,11 @@ public class AtGlsAtLink extends AbstractGlsCommand
 
       if (isHyper != null && isHyper.booleanValue())
       {
-         list.add(new TeXCsRef("@glslink"));
+         list.add(listener.getControlSequence("@glslink"));
       }
       else
       {
-         list.add(new TeXCsRef("glsdonohyperlink"));
+         list.add(listener.getControlSequence("glsdonohyperlink"));
       }
 
       Group grp = listener.createGroup();

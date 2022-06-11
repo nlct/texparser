@@ -50,17 +50,33 @@ public class L2HMaketitle extends Maketitle
 
       TeXObjectList list = listener.createStack();
 
-      list.add(new HtmlTag("<div class=\"title\">"));
+      list.add(new StartElement("header"));
+
+      StartElement elem = new StartElement("div");
+      elem.putAttribute("class", "title");
+
+      list.add(elem);
       list.add(listener.getControlSequence("@title"));
-      list.add(new HtmlTag("</div><!-- end of title -->"));
+      list.add(new EndElement("div"));
+      list.add(new HtmlTag("<!-- end of title -->"));
 
-      list.add(new HtmlTag("<div class=\"author\">"));
+      elem = new StartElement("div");
+      elem.putAttribute("class", "author");
+
+      list.add(elem);
       list.add(listener.getControlSequence("@author"));
-      list.add(new HtmlTag("</div><!-- end of author -->"));
+      list.add(new EndElement("div"));
+      list.add(new HtmlTag("<!-- end of author -->"));
 
-      list.add(new HtmlTag("<div class=\"date\">"));
+      elem = new StartElement("div");
+      elem.putAttribute("class", "date");
+
+      list.add(elem);
       list.add(listener.getControlSequence("@date"));
-      list.add(new HtmlTag("</div><!-- end of date -->"));
+      list.add(new EndElement("div"));
+      list.add(new HtmlTag("<!-- end of date -->"));
+
+      list.add(new EndElement("header"));
 
       return list;
    }

@@ -168,6 +168,11 @@ public class LaTeXFile extends TeXPath
 
    public void processOptions(TeXObjectList stack) throws IOException
    {
+      if (getParser().getDebugLevel() > 0)
+      {
+         getParser().logMessage("Processing options for "+getName());
+      }
+
       loadParentOptions();
 
       KeyValList options = getOptions();
@@ -187,19 +192,18 @@ public class LaTeXFile extends TeXPath
       finally
       {
          listener.setCurrentSty(prevSty, getExtension());
+
+         if (getParser().getDebugLevel() > 0)
+         {
+            getParser().logMessage("Finished processing options for "+getName());
+         }
       }
    }
 
    public void load(KeyValList options, TeXObjectList stack)
    throws IOException
    {
-      TeXObjectList substack = getListener().createStack();
-      preOptions(substack);
-
-      if (!substack.isEmpty())
-      {
-         substack.process(getParser(), stack);
-      }
+      preOptions(stack);
 
       KeyValList clsOptions = listener.getDocumentClassOptions();
 
@@ -210,13 +214,7 @@ public class LaTeXFile extends TeXPath
 
       processOptions(options);
 
-      postOptions(substack);
-
-      if (!substack.isEmpty())
-      {
-         substack.process(getParser(), stack);
-         stack.push(substack, true);
-      }
+      postOptions(stack);
    }
 
    protected void preOptions(TeXObjectList stack) throws IOException

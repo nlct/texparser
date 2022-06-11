@@ -29,6 +29,7 @@ public class T2BEncoding extends FontEncoding
       super("T2B");
    }
 
+   @Override
    public void addDefinitions(TeXSettings settings)
    {
       TeXParserListener listener = settings.getParser().getListener();

@@ -71,9 +71,9 @@ public class L2HTextSubscript extends ControlSequence
          // Don't use listener as this should be in text mode
          // (push in reverse order)
 
-         stack.push(new HtmlTag("</sub>"));
+         stack.push(new EndElement("sub"));
          stack.push(arg);
-         stack.push(new HtmlTag("<sub>"));
+         stack.push(new StartElement("sub"));
       }
    }
 
@@ -102,9 +102,9 @@ public class L2HTextSubscript extends ControlSequence
          // Don't use listener as this should be in text mode
          // (push in reverse order)
 
-         parser.push(new HtmlTag("</sub>"));
+         parser.push(new EndElement("sub"));
          parser.push(arg);
-         parser.push(new HtmlTag("<sub>"));
+         parser.push(new StartElement("sub"));
       }
    }
 

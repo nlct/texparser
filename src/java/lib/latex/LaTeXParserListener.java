@@ -59,6 +59,7 @@ import com.dickimawbooks.texparserlib.latex.mfirstuc.*;
 import com.dickimawbooks.texparserlib.latex.mhchem.*;
 import com.dickimawbooks.texparserlib.latex.mnsymbol.*;
 import com.dickimawbooks.texparserlib.latex.natbib.*;
+import com.dickimawbooks.texparserlib.latex.nlctdoc.*;
 import com.dickimawbooks.texparserlib.latex.pifont.*;
 import com.dickimawbooks.texparserlib.latex.probsoln.*;
 import com.dickimawbooks.texparserlib.latex.shortvrb.*;
@@ -552,7 +553,11 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
 
       declareFrameBox(new FrameBox());
       declareFrameBox(new MBox(), false);
-      declareFrameBox(new ParBox());
+
+      ParBox parbox = new ParBox();
+      declareFrameBox(parbox);
+      parser.putControlSequence(new MiniPage(parbox));
+
       declareFrameBox(new FrameBox("framebox"));
       declareFrameBox(new MBox("makebox"));
       declareFrameBox(new MBox("frame",
@@ -1334,12 +1339,35 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
 
       if (docCls instanceof UnknownCls)
       {
+         if (isBookClass(clsName) || isReportClass(clsName))
+         {
+            newcounter("chapter");
+            newcounter("chapter*");
+            addtoreset("section", "chapter");
+            addtoreset("section*", "chapter*");
+
+            NewIf.createConditional(true, parser, "if@mainmatter", true);
+            parser.putControlSequence(new FrontMatter());
+            parser.putControlSequence(new MainMatter());
+            parser.putControlSequence(new BackMatter());
+         }
+
          parsePackageFile(docCls, stack);
       }
       else
       {
          docCls.processOptions(stack);
       }
+   }
+
+   protected boolean isBookClass(String name)
+   {
+      return (name.contains("book") || name.equals("memoir"));
+   }
+
+   protected boolean isReportClass(String name)
+   {
+      return (name.contains("report") || name.equals("scrreprt"));
    }
 
    public LaTeXCls getLaTeXCls(KeyValList options, String clsName, 
@@ -1375,6 +1403,8 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
     boolean loadParentOptions, boolean enforceParse, TeXObjectList stack)
    throws IOException
    {
+      parser.debugMessage(1, "Loading package "+name);
+
       LaTeXSty sty = getLoadedPackage(name);
 
       if (sty != null)
@@ -1419,6 +1449,8 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
 
       addFileReference(sty);
       loadedPackages.add(sty);
+
+      parser.debugMessage(1, "Requiring package "+name);
 
       if (sty instanceof UnknownSty)
       {
@@ -1484,6 +1516,7 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
    {
       if (!isStyLoaded(styName))
       {
+         parser.debugMessage(1, "Use package "+styName);
          LaTeXSty sty = getLaTeXSty(options, styName, loadParentOptions, stack);
 
          addFileReference(sty);
@@ -1497,6 +1530,8 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
          {
             sty.processOptions(stack);
          }
+
+         parser.debugMessage(1, "Finished use package "+styName);
 
          return sty;
       }
@@ -1690,6 +1725,11 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       if (styName.equals("natbib"))
       {
          return new NatbibSty(options, this, loadParentOptions);
+      }
+
+      if (styName.equals("nlctuserguide"))
+      {
+         return new UserGuideSty(options, this, loadParentOptions);
       }
 
       if (styName.equals("pifont"))

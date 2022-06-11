@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -71,6 +71,18 @@ public abstract class Section extends ControlSequence
          arg = parser.popStack();
       }
 
+      ControlSequence cs = parser.getControlSequence("if@mainmatter");
+
+      if (cs != null)
+      {
+         TeXBoolean bool = TeXParserUtils.toBoolean(cs, parser);
+
+         if (!bool.booleanValue())
+         {
+            isStar = true;
+         }
+      }
+
       if (isStar)
       {
          unnumbered(parser, stack, arg);
@@ -106,6 +118,18 @@ public abstract class Section extends ControlSequence
       }
 
       TeXObject arg = parser.popNextArg();
+
+      ControlSequence cs = parser.getControlSequence("if@mainmatter");
+
+      if (cs != null)
+      {
+         TeXBoolean bool = TeXParserUtils.toBoolean(cs, parser);
+
+         if (!bool.booleanValue())
+         {
+            isStar = true;
+         }
+      }
 
       if (isStar)
       {

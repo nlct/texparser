@@ -128,17 +128,17 @@ public class L2HSection extends Section
 
       listener.startSection(false, tag, getName(), labelName, stack);
 
+      StartElement startElem = new StartElement(tag == null ? "div" : tag, true);
+
       if (tag == null)
       {
-         substack.add(new HtmlTag(
-          String.format("%n<div class=\"%s\"><!-- start of %s header -->",
-             getName(), getName())));
+         startElem.putAttribute("class", getName());
       }
-      else
-      {
-         substack.add(new HtmlTag(
-           String.format("%n<%s><!-- start of %s header -->", tag, getName())));
-      }
+
+      substack.add(startElem);
+
+      substack.add(new HtmlTag(
+        String.format("<!-- start of %s header -->", getName())));
 
       substack.add(arg);
 
@@ -147,16 +147,10 @@ public class L2HSection extends Section
          substack.add(listener.createLinkBox(labelName));
       }
 
-      if (tag == null)
-      {
-         substack.add(new HtmlTag(
-           String.format("</div><!-- end of %s header -->%n", getName())));
-      }
-      else
-      {
-         substack.add(new HtmlTag(
-            String.format("</%s><!-- end of %s header -->%n", tag, getName())));
-      }
+      substack.add(new EndElement(tag == null ? "div" : tag));
+
+      substack.add(new HtmlTag(
+            String.format("<!-- end of %s header -->%n", getName())));
 
       if (parser == stack || stack == null)
       {
@@ -209,17 +203,17 @@ public class L2HSection extends Section
 
       listener.startSection(true, tag, getName(), labelName, stack);
 
+      StartElement elem = new StartElement(tag == null ? "div" : tag, true);
+
       if (tag == null)
       {
-         list.add(new HtmlTag(
-          String.format("%n<div class=\"%s\"><!-- start of %s header -->",
-              getName(), getName())));
+         elem.putAttribute("class", getName());
       }
-      else
-      {
-         list.add(new HtmlTag(String.format("%n<%s><!-- start of %s header -->",
-            tag, getName())));
-      }
+
+      list.add(elem);
+
+      list.add(new HtmlTag(String.format("<!-- start of %s header -->",
+            getName())));
 
       list.add(listener.getControlSequence("the"+getName()));
       list.add(listener.getOther('.'));
@@ -232,16 +226,10 @@ public class L2HSection extends Section
          list.add(listener.createLinkBox(labelName));
       }
 
-      if (tag == null)
-      {
-         list.add(new HtmlTag(String.format("</div><!-- end of %s header -->%n",
-           getName())));
-      }
-      else
-      {
-         list.add(new HtmlTag(String.format("</%s><!-- end of %s header -->%n",
-            tag, getName())));
-      }
+      list.add(new EndElement(tag == null ? "div" : tag));
+
+      list.add(new HtmlTag(String.format("<!-- end of %s header -->%n",
+            getName())));
 
       if (parser == stack || stack == null)
       {

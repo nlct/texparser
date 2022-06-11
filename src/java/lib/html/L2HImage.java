@@ -146,40 +146,38 @@ public class L2HImage implements Expandable
    {
       TeXObjectList list = new TeXObjectList();
 
-      StringBuilder builder = new StringBuilder();
+      StartElement startElem = new StartElement("object");
 
-      builder.append(String.format("<object data=\"%s\"", getData()));
+      startElem.putAttribute("data", getData());
 
       if (width != 0)
       {
-         builder.append(String.format(" width=\"%d\"", width));
+         startElem.putAttribute("width", ""+width);
       }
 
       if (height != 0)
       {
-         builder.append(String.format(" height=\"%d\"", height));
+         startElem.putAttribute("height", ""+height);
       }
 
       if (mimetype != null)
       {
-         builder.append(String.format(" type=\"%s\"", mimetype));
+         startElem.putAttribute("type", mimetype);
       }
 
       if (name != null)
       {
-         builder.append(String.format(" name=\"%s\"", name));
+         startElem.putAttribute("id", name);
       }
 
-      builder.append(">");
-
-      list.add(new HtmlTag(builder.toString()));
+      list.add(startElem);
 
       if (alt != null)
       {
          list.add(alt);
       }
 
-      list.add(new HtmlTag("</object>"));
+      list.add(new EndElement("object"));
 
       return list;
    }
@@ -195,65 +193,40 @@ public class L2HImage implements Expandable
    {
       TeXObjectList list = new TeXObjectList();
 
-      StringBuilder builder = new StringBuilder();
+      StartElement startElem = new StartElement("object");
 
-      builder.append(String.format("<object data=\"%s\"", getData()));
+      startElem.putAttribute("data", getData());
 
       if (width != 0)
       {
-         builder.append(String.format(" width=\"%d\"", width));
+         startElem.putAttribute("width", ""+width);
       }
 
       if (height != 0)
       {
-         builder.append(String.format(" height=\"%d\"", height));
+         startElem.putAttribute("height", ""+height);
       }
 
       if (mimetype != null)
       {
-         builder.append(String.format(" type=\"%s\"", mimetype));
+         startElem.putAttribute("type", mimetype);
       }
 
       if (name != null)
       {
-         builder.append(String.format(" name=\"%s\"", name));
+         startElem.putAttribute("id", name);
       }
 
-      builder.append(">");
-
-      list.add(new HtmlTag(builder.toString()));
+      list.add(startElem);
 
       if (alt != null)
       {
-         if (alt instanceof Expandable)
-         {
-            TeXObjectList expanded;
+         alt = TeXParserUtils.expandFully(alt, parser, stack);
 
-            if (parser == stack)
-            {
-               expanded = ((Expandable)alt).expandfully(parser);
-            }
-            else
-            {
-               expanded = ((Expandable)alt).expandfully(parser, stack);
-            }
-
-            if (expanded == null)
-            {
-               list.add(alt);
-            }
-            else
-            {
-               list.addAll(expanded);
-            }
-         }
-         else
-         {
-            list.add(alt);
-         }
+         list.add(alt, true);
       }
 
-      list.add(new HtmlTag("</object>"));
+      list.add(new EndElement("object"));
 
       return list;
    }
@@ -318,7 +291,7 @@ public class L2HImage implements Expandable
 
       if (name != null)
       {
-         writer.write(String.format(" name=\"%s\"", name));
+         writer.write(String.format(" id=\"%s\"", name));
       }
 
       writer.write(">");

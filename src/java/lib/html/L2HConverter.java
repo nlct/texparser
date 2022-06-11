@@ -139,6 +139,18 @@ public class L2HConverter extends LaTeXParserListener
         createString("TeX")));
       parser.putControlSequence(new GenericCommand("LaTeX", null,
         createString("LaTeX")));
+      parser.putControlSequence(new GenericCommand("eTeX", null,
+        createString("eTeX")));
+      parser.putControlSequence(new GenericCommand("XeTeX", null,
+        createString("XeTeX")));
+      parser.putControlSequence(new GenericCommand("LuaTeX", null,
+        createString("LuaTeX")));
+      parser.putControlSequence(new GenericCommand("pdfTeX", null,
+        createString("pdfTeX")));
+      parser.putControlSequence(new GenericCommand("pdfLaTeX", null,
+        createString("pdfLaTeX")));
+      parser.putControlSequence(new GenericCommand("BibTeX", null,
+        createString("BibTeX")));
 
       parser.putControlSequence(new GenericCommand("indexspace", null,
         new HtmlTag("<div class=\"indexspace\"></div>")));
@@ -231,6 +243,9 @@ public class L2HConverter extends LaTeXParserListener
       /* indent/noindent not implemented */
       putControlSequence(new Relax("indent"));
       putControlSequence(new Relax("noindent"));
+
+      putControlSequence(new AtGobble("pagenumbering"));
+      putControlSequence(new Input("include"));
 
       try
       {
@@ -592,17 +607,151 @@ public class L2HConverter extends LaTeXParserListener
    }
 
    @Override
+   public TeXObject applyAccSupp(AccSupp accsupp, TeXObject object)
+   {
+      String tag = accsupp.getTag();
+      String attr = accsupp.getAttribute();
+      String text = accsupp.getText();
+      String id = accsupp.getId();
+
+      TeXObjectList list;
+
+      if (tag != null && object instanceof TeXObjectList 
+            && !object.isEmpty())
+      {
+         list = (TeXObjectList)object;
+
+         if (list.firstElement() instanceof StartElement
+              && (list.size() == 1 || list.lastElement() instanceof EndElement))
+         {
+            StartElement elem = (StartElement)list.firstElement();
+            EndElement endElem = null;
+
+            if (list.size() > 1)
+            {
+               endElem = (EndElement)list.lastElement();
+            }
+
+            if (elem.getName().equals(tag) 
+                  && (endElem == null || endElem.getName().equals(tag)))
+            {
+               String elemId = elem.getAttribute("id");
+               String elemText = null;
+
+               if (attr != null)
+               {
+                  elem.getAttribute(attr);
+               }
+
+               if ((elemId == null || id == null || elemId.equals(id))
+                  && (text == null || elemText == null || text.equals(elemText))
+                  )
+               {
+                  if (id != null)
+                  {
+                     elem.putAttribute("id", id);
+                  }
+
+                  if (text != null)
+                  {
+                     elem.putAttribute(attr, text);
+                  }
+
+                  return object;
+               }
+            }
+         }
+      }
+
+      list = createStack();
+
+      if (tag == null)
+      {
+         tag = "span";
+      }
+
+      StartElement startElem = new StartElement(tag);
+
+      if (id != null)
+      {
+         startElem.putAttribute("id", id);
+      }
+
+      if (text != null)
+      {
+         if (attr == null)
+         {
+            startElem.putAttribute("title", text);
+         }
+         else
+         {
+            startElem.putAttribute(attr, text);
+         }
+      }
+
+      list.add(startElem);
+      list.add(object);
+      list.add(new EndElement(tag));
+
+      return list;
+   }
+
+   @Override
    public TeXObject createAnchor(String anchorName, TeXObject text)
     throws IOException
    {
+      if (text instanceof TeXObjectList && !text.isEmpty() 
+           && ((TeXObjectList)text).firstElement() instanceof StartElement)
+      {
+         StartElement elem = (StartElement)((TeXObjectList)text).firstElement();
+
+         if (!elem.hasAttribute("id"))
+         {
+            elem.putAttribute("id", anchorName);
+
+            return text;
+         }
+      }
+
       TeXObjectList stack = createStack();
+      String tag = "a";
+      String id = HtmlTag.getUriFragment(anchorName);
+      String attrName = null;
+      String attrValue = null;
 
-      stack.add(new HtmlTag(String.format("<a id=\"%s\">", 
-        HtmlTag.getUriFragment(anchorName))));
+      if (text instanceof AccSuppObject)
+      {
+         AccSupp accsupp = ((AccSuppObject)text).getAccSupp();
 
+         if ((accsupp.getId() == null || accsupp.getId().equals(id))
+             && accsupp.getTag() != null)
+         {
+            tag = accsupp.getTag();
+
+            attrName = accsupp.getAttribute();
+            attrValue = accsupp.getText();
+
+            if (attrValue != null && attrName == null)
+            {
+               attrName = "title";
+            }
+
+            text = ((AccSuppObject)text).getObject();
+         }
+      }
+
+      StartElement elem = new StartElement(tag);
+      elem.putAttribute("id", id);
+
+      if (attrName != null)
+      {
+         elem.putAttribute(attrName, attrValue);
+      }
+
+      stack.add(elem);
       stack.add(text);
 
-      stack.add(new HtmlTag("</a>"));
+      stack.add(new EndElement(tag));
 
       return stack;
    }
@@ -625,12 +774,14 @@ public class L2HConverter extends LaTeXParserListener
 
       TeXObjectList stack = createStack();
 
-      stack.add(new HtmlTag(String.format("<a href=\"#%s\">", 
-        HtmlTag.getUriFragment(anchorName))));
+      StartElement elem = new StartElement("a");
+      elem.putAttribute("href", "#"+HtmlTag.getUriFragment(anchorName));
+
+      stack.add(elem);
 
       stack.add(text);
 
-      stack.add(new HtmlTag("</a>"));
+      stack.add(new EndElement("a"));
 
       return stack;
    }
@@ -856,6 +1007,11 @@ public class L2HConverter extends LaTeXParserListener
      throws IOException
    {
       super.documentclass(options, clsName, loadParentOptions, stack);
+
+      if (parser.getControlSequence("c@chapter") != null)
+      {
+         putControlSequence(new L2HSection("chapter"));
+      }
 
       writeDocType();
       writeable.writeln("<html>");
@@ -1607,7 +1763,7 @@ public class L2HConverter extends LaTeXParserListener
       String anchor = String.format("idx-%s-%d", 
         HtmlTag.getUriFragment(indexLabel), indexLoc);
 
-      write(String.format("<a name=\"%s\"></a>", anchor));
+      write(String.format("<a id=\"%s\"></a>", anchor));
 
       return new IndexLocation(new HtmlTag(
         String.format("<a ref=\"#%s\">%d</a>", anchor, indexLoc)));
@@ -1840,6 +1996,14 @@ public class L2HConverter extends LaTeXParserListener
          if (font != null && font.getFamily() == TeXFontFamily.VERB)
          {
             return "code";
+         }
+         else if (font != null && font.getWeight() == TeXFontWeight.STRONG)
+         {
+            return "strong";
+         }
+         else if (font != null && font.getShape() == TeXFontShape.EM)
+         {
+            return "em";
          }
          else
          {
@@ -2135,16 +2299,11 @@ public class L2HConverter extends LaTeXParserListener
       ControlSequence cs = parser.getControlSequence("TeXParserLibLinkName");
       String text = "[link]";
 
-      if (cs instanceof Expandable)
+      if (cs instanceof Expandable && cs.canExpand())
       {
          try
          {
-            TeXObjectList expanded = parser.expandfully(parser);
-
-            if (expanded != null)
-            {
-               text = expanded.toString(parser);
-            }
+            text = parser.expandToString(cs, parser);
          }
          catch (IOException e)
          {
@@ -2193,9 +2352,17 @@ public class L2HConverter extends LaTeXParserListener
        text));
    }
 
+   @Override
    public TeXObject getAnchor(String anchorName)
    {
-      return new HtmlTag(String.format("<a name=\"%s\"></a>", anchorName));
+      TeXObjectList stack = createStack();
+      StartElement startElem = new StartElement("a");
+      startElem.putAttribute("id", anchorName);
+
+      stack.add(startElem);
+      stack.add(new EndElement("a"));
+
+      return stack;
    }
 
    private Vector<String> styCs;

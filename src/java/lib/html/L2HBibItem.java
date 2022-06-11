@@ -48,11 +48,15 @@ public class L2HBibItem extends BibItem
    {
       if (parser == stack || stack == null)
       {
-         parser.push(new HtmlTag("</div><!-- end of bibitem --><div>"));
+         parser.push(new EndElement("div"));
+         parser.push(new HtmlTag("<!-- end of bibitem -->"));
+         parser.push(new StartElement("div"));
       }
       else
       {
-         stack.push(new HtmlTag("</div><!-- end of bibitem --><div>"));
+         stack.push(new EndElement("div"));
+         stack.push(new HtmlTag("<!-- end of bibitem -->"));
+         stack.push(new StartElement("div"));
       }
 
       super.pushPostItem(parser, stack, arg);
@@ -61,11 +65,11 @@ public class L2HBibItem extends BibItem
 
       if (parser == stack || stack == null)
       {
-         parser.push(new HtmlTag("</a>"));
+         parser.push(new EndElement("a"));
       }
       else
       {
-         stack.push(new HtmlTag("</a>"));
+         stack.push(new EndElement("a"));
       }
    }
 
@@ -79,24 +83,34 @@ public class L2HBibItem extends BibItem
 
       label = HtmlTag.getUriFragment(label);
 
+      StartElement elem = new StartElement("a");
+      elem.putAttribute("id", label);
+
       if (parser == stack || stack == null)
       {
-         parser.push(new HtmlTag("<a id=\""+label+"\">"));
+         parser.push(elem);
       }
       else
       {
-         stack.push(new HtmlTag("<a id=\""+label+"\">"));
+         stack.push(elem);
       }
 
       super.pushPreItem(parser, stack, arg);
 
+      elem = new StartElement("div");
+      elem.putAttribute("class", "bibitem");
+
       if (parser == stack || stack == null)
       {
-         parser.push(new HtmlTag("</div><!-- end of bibitem --><div class=\"bibitem\">"));
+         parser.push(new EndElement("div"));
+         parser.push(new HtmlTag("<!-- end of bibitem -->"));
+         parser.push(elem);
       }
       else
       {
-         stack.push(new HtmlTag("</div><!-- end of bibitem --><div class=\"bibitem\">"));
+         stack.push(new EndElement("div"));
+         stack.push(new HtmlTag("<!-- end of bibitem -->"));
+         stack.push(elem);
       }
 
    }

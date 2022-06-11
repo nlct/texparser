@@ -51,7 +51,6 @@ public class L2HParagraph extends Paragraph
    protected TeXObject getHead(TeXParser parser)
    {
       String style="";
-      HtmlTag startTag;
 
       TeXDimension dim = getLeftMargin();
 
@@ -88,13 +87,11 @@ public class L2HParagraph extends Paragraph
          style += String.format("text-indent: %s; ", dim.format());
       }
 
-      if (style.isEmpty())
+      StartElement startTag = new StartElement("div");
+
+      if (!style.isEmpty())
       {
-         startTag = new HtmlTag("<div>");
-      }
-      else
-      {
-         startTag = new HtmlTag(String.format("<div style=\"%s\">", style));
+         startTag.putAttribute("style", style);
       }
 
       return startTag;
@@ -103,6 +100,6 @@ public class L2HParagraph extends Paragraph
    @Override
    protected TeXObject getTail(TeXParser parser)
    {
-      return new HtmlTag("</div>");
+      return new EndElement("div");
    }
 }

@@ -203,6 +203,21 @@ public class FrameBox extends ControlSequence
       box.currentBorderColor = currentBorderColor;
       box.currentFgColor = currentFgColor;
       box.currentBgColor = currentBgColor;
+
+      box.textFont = textFont;
+
+      box.prefix = prefix;
+      box.suffix = suffix;
+   }
+
+   public void setPrefix(TeXObject prefix)
+   {
+      this.prefix = prefix;
+   }
+
+   public void setSuffix(TeXObject suffix)
+   {
+      this.suffix = suffix;
    }
 
    public boolean isStyleChangeable()
@@ -597,19 +612,51 @@ public class FrameBox extends ControlSequence
    protected TeXObject popContents(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      if (parser == stack)
-      {
-         return parser.popNextArg();
-      }
-      else
-      {
-         return stack.popArg(parser);
-      }
+      return popArg(parser, stack);
    }
 
    public void process(TeXParser parser) throws IOException
    {
       process(parser, parser);
+   }
+
+   protected void processContents(TeXObject arg, TeXParser parser,
+      TeXObjectList stack)
+    throws IOException
+   {
+      LaTeXParserListener listener = ((LaTeXParserListener)parser.getListener());
+
+      if (prefix != null || suffix != null)
+      {
+         TeXObjectList substack = listener.createStack();
+
+         if (prefix != null)
+         {
+            substack.add((TeXObject)prefix.clone());
+         }
+
+         substack.add(arg, true);
+
+         if (suffix != null)
+         {
+            substack.add((TeXObject)suffix.clone());
+         }
+
+         arg = substack;
+      }
+
+      if (currentAngle != null && isChangeable)
+      {
+         listener.rotate(currentAngle.toDegrees(), parser, stack, arg);
+      }
+      else if (parser == stack || stack == null)
+      {
+         arg.process(parser);
+      }
+      else
+      {
+         arg.process(parser, stack);
+      }
    }
 
    public void process(TeXParser parser, TeXObjectList stack) throws IOException
@@ -641,14 +688,7 @@ public class FrameBox extends ControlSequence
 
       try
       {
-         if (currentAngle != null && isChangeable)
-         {
-            listener.rotate(currentAngle.toDegrees(), parser, stack, arg);
-         }
-         else
-         {
-            arg.process(parser, stack);
-         }
+         processContents(arg, parser, stack);
       }
       finally
       {
@@ -698,6 +738,9 @@ public class FrameBox extends ControlSequence
    protected Angle currentAngle = null;
 
    protected TeXFontText textFont = null;
+
+   protected TeXObject prefix = null;
+   protected TeXObject suffix = null;
 
    protected boolean isInline = true;
    protected boolean isMultiLine = true;

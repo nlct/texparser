@@ -175,6 +175,16 @@ public class NewGlossaryEntry extends AbstractGlsCommand
          }
       }
 
+      if (sty.isExtra())
+      {
+         TeXObject cat = keyValList.get("category");
+
+         if (cat == null || cat.isEmpty())
+         {
+            keyValList.put("category", parser.getListener().createString("general"));
+         }
+      }
+
       sty.addEntry(overwrite, new GlossaryEntry(sty, label, keyValList, stack));
    }
 

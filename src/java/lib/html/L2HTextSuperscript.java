@@ -71,9 +71,9 @@ public class L2HTextSuperscript extends ControlSequence
          // Don't use listener as this should be in text mode
          // (push in reverse order)
 
-         stack.push(new HtmlTag("</sup>"));
+         stack.push(new EndElement("sup"));
          stack.push(arg);
-         stack.push(new HtmlTag("<sup>"));
+         stack.push(new StartElement("sup"));
       }
    }
 
@@ -102,9 +102,9 @@ public class L2HTextSuperscript extends ControlSequence
          // Don't use listener as this should be in text mode
          // (push in reverse order)
 
-         parser.push(new HtmlTag("</sup>"));
+         parser.push(new EndElement("sup"));
          parser.push(arg);
-         parser.push(new HtmlTag("<sup>"));
+         parser.push(new StartElement("sup"));
       }
    }
 

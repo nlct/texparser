@@ -1914,6 +1914,8 @@ public class TeXObjectList extends Vector<TeXObject>
    public void process(TeXParser parser)
       throws IOException
    {
+      flatten();
+
       if (parser.getDebugLevel() > 0)
       {
          parser.logMessage("PROCESSING STACK "+toString());
@@ -1954,6 +1956,8 @@ public class TeXObjectList extends Vector<TeXObject>
    public void process(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
+      flatten();
+
       if (parser.getDebugLevel() > 0)
       {
          parser.logMessage("PROCESSING STACK "+toString()+" SUBSTACK: "+stack);
@@ -2008,7 +2012,7 @@ public class TeXObjectList extends Vector<TeXObject>
 
       if (!isEmpty())
       {
-         stack.addAll(this);
+         stack.addAll(0, this);
          clear();
       }
    }

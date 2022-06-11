@@ -51,6 +51,7 @@ public class GlsXtrLoadResources extends ControlSequence
       NumericRegister register = settings.getNumericRegister("glsxtrresourcecount");
 
       int n = register.number(parser);
+      register.setValue(parser, new UserNumber(n+1));
 
       TeXObject basename;
       String jobname = parser.getJobname();
@@ -61,7 +62,7 @@ public class GlsXtrLoadResources extends ControlSequence
       }
       else
       {
-         basename = parser.getListener().createDataList(jobname+".glstex"+n+".glstex");
+         basename = parser.getListener().createDataList(jobname+"-"+n+".glstex");
       }
 
       stack.push(basename);
@@ -74,8 +75,6 @@ public class GlsXtrLoadResources extends ControlSequence
       {
          parser.getListener().getControlSequence("input").process(parser, stack);
       }
-
-      settings.globalAdvanceRegister("glsxtrresourcecount", UserNumber.ONE);
    }
 
    @Override

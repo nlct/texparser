@@ -158,11 +158,16 @@ public class L2HMathDeclaration extends MathDeclaration
 
       if (isNumbered())
       {
-         stack.push(new HtmlTag("</span>"));
+         //stack.push(new HtmlTag("</span>"));
+         stack.push(new EndElement("span"));
          stack.push(listener.getOther(')'));
          stack.push(listener.getControlSequence("theequation"));
          stack.push(listener.getOther('('));
-         stack.push(new HtmlTag("<span class=\"eqno\">"));
+         //stack.push(new HtmlTag("<span class=\"eqno\">"));
+
+         StartElement elem = new StartElement("span");
+         elem.putAttribute("class", "eqno");
+         stack.push(elem);
       }
 
       if (getMode() == TeXSettings.MODE_DISPLAY_MATH)

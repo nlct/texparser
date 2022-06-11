@@ -29,6 +29,7 @@ public class T2CEncoding extends FontEncoding
       super("T2C");
    }
 
+   @Override
    public void addDefinitions(TeXSettings settings)
    {
       TeXParserListener listener = settings.getParser().getListener();

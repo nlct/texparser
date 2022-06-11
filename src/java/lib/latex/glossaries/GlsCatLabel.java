@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -16,46 +16,48 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
-package com.dickimawbooks.texparserlib.html;
+package com.dickimawbooks.texparserlib.latex.glossaries;
 
 import java.io.IOException;
-import java.io.EOFException;
 
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.*;
 
-public class L2HDescriptionItem extends DescriptionItem
+public class GlsCatLabel extends TextualContentCommand
 {
-   public L2HDescriptionItem()
+   public GlsCatLabel(String name, String label)
    {
-      this("descriptionitem");
+      super(name, label, null);
    }
 
-   public L2HDescriptionItem(String name)
+   public GlsCatLabel(String name, String label, Category category)
    {
-      super(name);
+      super(name, label, category);
    }
 
+   @Override
    public Object clone()
    {
-      return new L2HDescriptionItem(getName());
+      return new GlsCatLabel(getName(), getLabel(), getCategory());
    }
 
-   public void makelabel(TeXParser parser, TrivListDec trivList, 
-     TeXObject label)
-    throws IOException
+   public String getLabel()
    {
-      L2HConverter listener = (L2HConverter)parser.getListener();
-
-      Group grp = listener.createGroup();
-
-      grp.add(new StartElement("dt"));
-      grp.add(listener.getControlSequence("descriptionlabel"));
-      grp.add(label);
-      grp.add(new EndElement("dt"));
-      grp.add(new StartElement("<dd>"));
-
-      grp.process(parser);
+      return getText();
    }
 
+   public Category getCategory()
+   {
+      return (Category)getData();
+   }
+
+   public void refresh(GlossariesSty sty)
+   {
+      Category category = getCategory();
+
+      if (category == null)
+      {
+         data = sty.getCategory(getLabel());
+      }
+   }
 }

@@ -98,11 +98,14 @@ public class GlossaryEntry
       }
       else if (key.equals("category"))
       {
-         TeXObject categoryVal = (TeXObject)value.clone();
+         if (!(value instanceof GlsCatLabel))
+         {
+            TeXObject categoryVal = (TeXObject)value.clone();
 
-         category = sty.getParser().expandToString(categoryVal, stack);
+            String category = sty.getParser().expandToString(categoryVal, stack);
 
-         category = categoryVal.toString(sty.getParser());
+            value = new GlsCatLabel("@@glscategory", category, sty.getCategory(category));
+         }
       }
       else if (key.equals("parent"))
       {
@@ -184,6 +187,19 @@ public class GlossaryEntry
       sty.getParser().removeControlSequence(local, csname);
    }
 
+   /**
+    * Determines whether the given field has been explicitly set.
+    * Doesn't check if a value has been set by assigning the
+    * associated internal command. If that test is required, test if
+    * get(String) returns non null.
+    * @param fieldName the field (key) name
+    * @return true if the field has been assigned
+    */ 
+   public boolean hasField(String fieldName)
+   {
+      return fields.contains(fieldName);
+   }
+
    public TeXObject get(String field)
    {
       String internalField = sty.getInternalFieldName(field);
@@ -217,12 +233,29 @@ public class GlossaryEntry
 
    public String getCategory()
    {
-      return category;
+      TeXObject val = get("category");
+
+      if (val instanceof TeXObjectList && ((TeXObjectList)val).size() == 1)
+      {
+         val = ((TeXObjectList)val).firstElement();
+      }
+
+      if (val != null && val instanceof TextualContentCommand)
+      {
+         return ((TextualContentCommand)val).getText();
+      }
+
+      return "general";
    }
 
    public String getType()
    {
       TeXObject val = get("type");
+
+      if (val instanceof TeXObjectList && ((TeXObjectList)val).size() == 1)
+      {
+         val = ((TeXObjectList)val).firstElement();
+      }
 
       if (val != null && val instanceof TextualContentCommand)
       {
@@ -375,7 +408,6 @@ public class GlossaryEntry
    }
 
    private String label;
-   private String category;
    private int level=0;
    private GlossariesSty sty;
 

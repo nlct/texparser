@@ -81,7 +81,7 @@ public class L2HAlignRow extends AlignRow
 
       TeXObjectList substack = listener.createStack();
 
-      substack.add(new HtmlTag("<tr>"));
+      substack.add(new StartElement("tr"));
 
       if (isEmpty())
       {
@@ -98,11 +98,15 @@ public class L2HAlignRow extends AlignRow
 
             if (style == null)
             {
-               substack.add(new HtmlTag("<td></td>"));
+               substack.add(new StartElement("td"));
+               substack.add(new EndElement("td"));
             }
             else
             {
-               substack.add(new HtmlTag(String.format("<td style=\"%s\"></td>", style)));
+               StartElement startElem = new StartElement("td");
+               startElem.putAttribute("style", style);
+               substack.add(startElem);
+               substack.add(new EndElement("td"));
             }
          }
       }

@@ -8,6 +8,7 @@
 \usepackage[colorlinks]{hyperref}
 \usepackage[indexcounter,style=index,record]{glossaries-extra}
 
+\setabbreviationstyle[acronym]{long-short}
 \GlsXtrLoadResources[src={example-glossaries-symbols,example-glossaries-acronym,example-glossaries-parent}]
 
 \begin{document}
@@ -43,6 +44,10 @@ Is used? \ifglsused{lid}{true}{false}.
 \gls{lid}.
 Is used? \ifglsused{lid}{true}{false}.
 Next use: \gls{lid}.
+
+Short: \glsxtrshort{lid}.
+Long: \glsxtrlong{lid}.
+Full: \glsxtrfull{lid}.
 
 \section{Another Section}
 \label{sec:another}

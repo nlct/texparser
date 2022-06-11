@@ -23,33 +23,34 @@ import java.io.IOException;
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.*;
 
-public class GlsFieldLink extends GlsEntryField
+public class GlsXtrFull extends AbstractGlsCommand
 {
-   public GlsFieldLink(String name, String field, GlossariesSty sty)
+   public GlsXtrFull(String name, GlossariesSty sty)
    {
-      this(name, field, CaseChange.NO_CHANGE, false, sty);
+      this(name, CaseChange.NO_CHANGE, false, sty);
    }
 
-   public GlsFieldLink(String name, String field, boolean isPlural, GlossariesSty sty)
+   public GlsXtrFull(String name, boolean isPlural, GlossariesSty sty)
    {
-      this(name, field, CaseChange.NO_CHANGE, isPlural, sty);
+      this(name, CaseChange.NO_CHANGE, isPlural, sty);
    }
 
-   public GlsFieldLink(String name, String field, CaseChange caseChange, GlossariesSty sty)
+   public GlsXtrFull(String name, CaseChange caseChange, GlossariesSty sty)
    {
-      this(name, field, caseChange, false, sty);
+      this(name, caseChange, false, sty);
    }
 
-   public GlsFieldLink(String name, String field, CaseChange caseChange, boolean isPlural, GlossariesSty sty)
+   public GlsXtrFull(String name, CaseChange caseChange, boolean isPlural, GlossariesSty sty)
    {
-      super(name, field, caseChange, sty);
+      super(name, sty);
+      this.caseChange = caseChange;
       this.isPlural = isPlural;
    }
 
    @Override
    public Object clone()
    {
-      return new GlsFieldLink(getName(), getField(), getCaseChange(), isPlural(), getSty());
+      return new GlsXtrFull(getName(), getCaseChange(), isPlural(), getSty());
    }
 
    @Override
@@ -173,29 +174,48 @@ public class GlsFieldLink extends GlsEntryField
          }
 
          TeXObjectList linktext = listener.createStack();
+         linktext.add(listener.getControlSequence("glsxtrinlinefullformat"));
+         linktext.add(glslabel);
 
-         TeXObject value = getFieldValue(glslabel, getField());
+         Group grp = listener.createGroup();
+         linktext.add(grp);
 
-         if (value != null)
+         if (insert != null && !insert.isEmpty())
          {
-            linktext.add(value, true);
-         }
-
-         if (insert != null)
-         {
-            linktext.add(insert, true);
+            grp.add(insert, true);
          }
 
          listener.putControlSequence(true, new GenericCommand("glscustomtext",
-           null, (TeXObjectList)linktext.clone()));
+           null, linktext));
 
-         Group grp = listener.createGroup();
-         grp.add(linktext, true);
+         ControlSequence cs = parser.getControlSequence(
+           "gls@"+entry.getType()+"@entryfmt");
+
+         if (cs == null)
+         {
+            cs = listener.getControlSequence("glsentryfmt");
+         }
+
+         stack.push(cs);
+         stack.push(glslabel);
+         stack.push(keyValList);
+         stack.push(listener.getControlSequence("@gls@link"));
+         stack.push(new TeXCsRef("glsxtrsetupfulldefs"));
+
+         grp = listener.createGroup();
+
+         if (insert != null && !insert.isEmpty())
+         {
+            grp.add(insert, true);
+         }
 
          stack.push(grp);
          stack.push(glslabel);
-         stack.push(keyValList);
-         stack.push(listener.getControlSequence("@gls@field@link"));
+         stack.push(listener.getControlSequence("glsxtrfullsaveinsert"));
+
+         stack.push(listener.createGroup(entry.getCategory()));
+         stack.push(listener.getControlSequence("glssetabbrvfmt"));
+
       }
 
    }
@@ -207,10 +227,16 @@ public class GlsFieldLink extends GlsEntryField
       process(parser, parser);
    }
 
+   public CaseChange getCaseChange()
+   {
+      return caseChange;
+   }
+
    public boolean isPlural()
    {
       return isPlural;
    }
 
+   protected CaseChange caseChange;
    protected boolean isPlural;
 }

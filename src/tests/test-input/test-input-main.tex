@@ -1,3 +1,5 @@
+% arara: pdflatex
+% arara: pdflatex
 \documentclass{report}
 
 \usepackage{graphicx}
@@ -6,11 +8,18 @@
 \author{Me}
 \title{Test Document}
 
+\newcommand*{\inputchap}{\input{test-ch1} Done}
+
 \begin{document}
 \maketitle
 
 \input{test-frontmatter}
 
-\include{test-ch1}
+Test.
+
+\inputchap
+%\include{test-ch1}
+
+\test.
 
 \end{document}
