@@ -7,7 +7,7 @@ endif
 test	: test-obs test-abs test-article test-nested test-doc \
 	  test-probsoln test-lists test-datatool test-mkimages \
 	  test-jmlrutils test-glossaries test-glossaries-extra \
-	  test-fontawesome
+	  test-fontawesome test-userguide test-input
 
 tests/output	:
 	mkdir -p tests/output
@@ -35,6 +35,13 @@ test-article : app tests/test-article/test-article.pdf tests/output
 tests/test-article/test-article.pdf	: tests/test-article/test-article.tex
 					cd tests/test-article; arara test-article
 
+test-input : app tests/test-input/test-input-main.pdf tests/output
+	rm -f -r tests/output/test-input
+	bin/texparsertest --debug --log tests/output/test-input.log --in tests/test-input/test-input-main.tex --output tests/output/test-input --html
+
+tests/test-input/test-input-main.pdf	: tests/test-input/test-input-main.tex
+					cd tests/test-input; arara test-input-main
+
 test-glossaries : app tests/test-glossaries/test-glossaries.pdf tests/output
 	rm -f -r tests/output/test-glossaries
 	bin/texparsertest --debug --in tests/test-glossaries/test-glossaries.tex --output tests/output/test-glossaries --html
@@ -55,6 +62,13 @@ test-fontawesome : app tests/test-fontawesome/test-fontawesome.pdf tests/output
 
 tests/test-fontawesome/test-fontawesome.pdf	: tests/test-fontawesome/test-fontawesome.tex
 					cd tests/test-fontawesome; arara test-fontawesome
+
+test-userguide : app tests/test-userguide/test-userguide.pdf tests/output
+	rm -f -r tests/output/test-userguide
+	bin/texparsertest --debug --in tests/test-userguide/test-userguide.tex --output tests/output/test-userguide --html
+
+tests/test-userguide/test-userguide.pdf	: tests/test-userguide/test-userguide.tex
+					cd tests/test-userguide; arara test-userguide
 
 test-jmlrutils : app tests/output
 	rm -f -r tests/output/test-jmlrutils
