@@ -51,7 +51,14 @@ public class L2HFloat extends LaTeXFloat
    {
       L2HConverter listener = (L2HConverter)parser.getListener();
 
-      listener.write("<div class=\""+getName()+"\">");
+      if (getName().equals("figure"))
+      {
+         listener.write("<figure>");
+      }
+      else
+      {
+         listener.write("<div class=\""+getName()+"\">");
+      }
    }
 
    @Override
@@ -60,6 +67,13 @@ public class L2HFloat extends LaTeXFloat
    {
       L2HConverter listener = (L2HConverter)parser.getListener();
 
-      listener.write("</div>");
+      if (getName().equals("figure"))
+      {
+         listener.write("</figure>");
+      }
+      else
+      {
+         listener.write("</div>");
+      }
    }
 }
