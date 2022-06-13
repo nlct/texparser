@@ -1261,6 +1261,14 @@ public class TeXObjectList extends Vector<TeXObject>
      int openDelim, int closeDelim)
    throws IOException
    {
+      TeXObject sp = null;
+
+      if (!isEmpty() && isIgnoreLeadingSpace(popStyle)
+            && firstElement() instanceof WhiteSpace)
+      {
+         sp = remove(0);
+      }
+
       TeXObject object = popStack(parser, popStyle);
 
       if (object == null && !(this instanceof TeXParser))
@@ -1271,6 +1279,12 @@ public class TeXObjectList extends Vector<TeXObject>
       if (!(object instanceof CharObject))
       {
          push(object);
+
+         if (sp != null)
+         {
+            push(sp);
+         }
+
          return null;
       }
 
@@ -1279,6 +1293,12 @@ public class TeXObjectList extends Vector<TeXObject>
       if (charObj.getCharCode() != openDelim)
       {
          push(object);
+
+         if (sp != null)
+         {
+            push(sp);
+         }
+
          return null;
       }
 
