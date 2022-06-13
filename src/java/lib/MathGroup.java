@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -33,6 +33,7 @@ public class MathGroup extends Group
       super(capacity);
    }
 
+   @Override
    public boolean isMathGroup()
    {
       return true; 
@@ -48,6 +49,7 @@ public class MathGroup extends Group
       isinline = isInLine;
    }
 
+   @Override
    public TeXObjectList createList()
    {
       MathGroup math = new MathGroup(capacity());
@@ -55,6 +57,7 @@ public class MathGroup extends Group
       return math;
    }
 
+   @Override
    public String format()
    {
       StringBuilder builder = new StringBuilder();
@@ -73,6 +76,7 @@ public class MathGroup extends Group
       return builder.toString();
    }
 
+   @Override
    public String toString()
    {
       StringBuilder builder = new StringBuilder();
@@ -93,6 +97,7 @@ public class MathGroup extends Group
       return builder.toString();
    }
 
+   @Override
    public void startGroup(TeXParser parser)
     throws IOException
    {
@@ -104,11 +109,13 @@ public class MathGroup extends Group
          TeXSettings.MODE_DISPLAY_MATH);
    }
 
+   @Override
    public TeXObject getBegin(TeXParser parser)
    {
       return new MathBg(parser.getMathChar(), isInLine());
    }
 
+   @Override
    public TeXObject getEnd(TeXParser parser)
    {
       return new MathEg(parser.getMathChar(), isInLine());

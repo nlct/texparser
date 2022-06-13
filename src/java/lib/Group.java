@@ -38,6 +38,7 @@ public class Group extends TeXObjectList
       super(listener, text);
    }
 
+   @Override
    public boolean isStack()
    {
       return false;
@@ -57,11 +58,13 @@ public class Group extends TeXObjectList
       return list;
    }
 
+   @Override
    public TeXObjectList createList()
    {
       return new Group(capacity());
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
@@ -77,6 +80,7 @@ public class Group extends TeXObjectList
 
    }
 
+   @Override
    public void process(TeXParser parser)
     throws IOException
    {
@@ -203,6 +207,7 @@ public class Group extends TeXObjectList
       return result;
    }
 
+   @Override
    public String toString(TeXParser parser)
    {
       return String.format("%s%s%s", getBegin(parser).toString(parser),
@@ -210,12 +215,14 @@ public class Group extends TeXObjectList
           getEnd(parser).toString(parser));
    }
 
+   @Override
    public String toString()
    {
       return String.format("%s{%s}", getClass().getSimpleName(),
        super.toString());
    }
 
+   @Override
    public String format()
    {
       return "{"+super.format()+"}";

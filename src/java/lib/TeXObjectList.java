@@ -1938,7 +1938,23 @@ public class TeXObjectList extends Vector<TeXObject>
 
          if (object instanceof Declaration)
          {
+            if (parser.getDebugLevel() > 0)
+            {
+               parser.logMessage("PUSHING DECLARATION "+object);
+            }
+
             pushDeclaration((Declaration)object);
+         }
+         else if (object instanceof EndDeclaration)
+         {
+            Declaration decl = ((EndDeclaration)object).getDeclaration(parser);
+
+            if (parser.getDebugLevel() > 0)
+            {
+               parser.logMessage("POPPING DECLARATION "+decl);
+            }
+
+            popDeclaration(decl);
          }
 
          if (!(object instanceof Ignoreable))
@@ -1996,7 +2012,23 @@ public class TeXObjectList extends Vector<TeXObject>
 
          if (object instanceof Declaration)
          {
+            if (parser.getDebugLevel() > 0)
+            {
+               parser.logMessage("PUSHING DECLARATION "+object);
+            }
+
             pushDeclaration((Declaration)object);
+         }
+         else if (object instanceof EndDeclaration)
+         {
+            Declaration decl = ((EndDeclaration)object).getDeclaration(parser);
+
+            if (parser.getDebugLevel() > 0)
+            {
+               parser.logMessage("POPPING DECLARATION "+decl);
+            }
+
+            popDeclaration(decl);
          }
 
          if (!(object instanceof Ignoreable))
@@ -2094,7 +2126,23 @@ public class TeXObjectList extends Vector<TeXObject>
 
             if (object instanceof Declaration)
             {
+               if (parser.getDebugLevel() > 0)
+               {
+                  parser.logMessage("PUSHING DECLARATION "+object);
+               }
+
                pushDeclaration((Declaration)object);
+            }
+            else if (object instanceof EndDeclaration)
+            {
+               Declaration decl = ((EndDeclaration)object).getDeclaration(parser);
+
+               if (parser.getDebugLevel() > 0)
+               {
+                  parser.logMessage("POPPING DECLARATION "+decl);
+               }
+
+               popDeclaration(decl);
             }
 
             object.process(parser, this);
@@ -2275,12 +2323,25 @@ public class TeXObjectList extends Vector<TeXObject>
       declarations.add(decl);
    }
 
+   public Declaration popDeclaration(Declaration decl)
+   {
+      for (int i = declarations.size()-1; i >= 0; i--)
+      {
+         if (declarations.get(i).equals(decl))
+         {
+            return declarations.remove(i);
+         }
+      }
+
+      return null;
+   }
+
    public void processEndDeclarations(TeXParser parser)
      throws IOException
    {
       while (declarations.size() > 0)
       {
-         declarations.pollLast().end(parser, this);
+         declarations.remove(declarations.size()-1).end(parser, this);
       }
    }
 
@@ -2394,8 +2455,8 @@ public class TeXObjectList extends Vector<TeXObject>
       return this;
    }
 
-   private ArrayDeque<Declaration> declarations
-     = new ArrayDeque<Declaration>();
+   private Vector<Declaration> declarations
+     = new Vector<Declaration>();
 
    private long stackID = -1;
    private static long currentStackID=0;
