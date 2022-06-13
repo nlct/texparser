@@ -2517,23 +2517,92 @@ public class TeXParser extends TeXObjectList
    public TeXObject popStack(byte popStyle)
      throws IOException
    {
-      if (size() == 0)
+      TeXObject object = null;
+
+      boolean skipIgnoreables = !isRetainIgnoreables(popStyle);
+      boolean skipLeadingWhiteSpace = isIgnoreLeadingSpace(popStyle);
+
+      boolean done = false;
+
+      if (skipIgnoreables && skipLeadingWhiteSpace)
       {
-         fetchNext(isShort(popStyle));
+         while (!done)
+         {
+            if (isEmpty())
+            {
+               fetchNext();
+            }
+
+            if (isEmpty())
+            {
+               throw new EOFException();
+            }
+
+            object = remove(0);
+
+            if (!((object instanceof Ignoreable) || (object instanceof WhiteSpace)))
+            {
+               done = true;
+            }
+         }
       }
-
-      if (size() == 0)
+      else if (skipIgnoreables)
       {
-         throw new EOFException();
+         while (!done)
+         {
+            if (isEmpty())
+            {
+               fetchNext();
+            }
+
+            if (isEmpty())
+            {
+               throw new EOFException();
+            }
+
+            object = remove(0);
+
+            if (!(object instanceof Ignoreable))
+            {
+               done = true;
+            }
+         }
       }
-
-      TeXObject object = remove(0);
-
-      if (object instanceof Ignoreable && !isRetainIgnoreables(popStyle))
+      else if (skipLeadingWhiteSpace)
       {
-         listener.skipping((Ignoreable)object);
+         while (!done)
+         {
+            if (isEmpty())
+            {
+               fetchNext();
+            }
 
-         return popStack(popStyle);
+            if (isEmpty())
+            {
+               throw new EOFException();
+            }
+
+            object = remove(0);
+
+            if (!(object instanceof WhiteSpace))
+            {
+               done = true;
+            }
+         }
+      }
+      else
+      {
+         if (isEmpty())
+         {
+            fetchNext(isShort(popStyle));
+         }
+
+         if (fetchNext())
+         {
+            throw new EOFException();
+         }
+
+         object = remove(0);
       }
 
       BgChar bgChar = isBeginGroup(object);
