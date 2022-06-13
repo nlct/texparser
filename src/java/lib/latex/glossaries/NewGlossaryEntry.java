@@ -58,6 +58,8 @@ public class NewGlossaryEntry extends AbstractGlsCommand
     TeXParser parser, TeXObjectList stack)
      throws IOException
    {
+      parser.putControlSequence(true, new TextualContentCommand("glslabel", label));
+
       TeXObject name = keyValList.get("name");
 
       if (name == null)

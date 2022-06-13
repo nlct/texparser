@@ -48,6 +48,17 @@ public class GlsAccessField extends GlsEntryField
       TeXObjectList list = super.expand(glslabel, fieldLabel, 
         caseChange, parser, stack);
 
+      AccSupp accsupp = getAccSupp(glslabel, field);
+
+      if (accsupp != null)
+      {
+         AccSuppObject obj = new AccSuppObject(accsupp, list);
+
+         list = parser.getListener().createStack();
+         list.add(obj);
+      }
+
+/*
       if (sty.isAccSupp())
       {
          String csname = "gls" + sty.getInternalFieldName(fieldLabel) 
@@ -73,6 +84,7 @@ public class GlsAccessField extends GlsEntryField
             list.add(glslabel);
          }
       }
+*/
 
       return list;
    }

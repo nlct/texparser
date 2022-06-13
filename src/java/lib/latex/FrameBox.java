@@ -118,6 +118,7 @@ public class FrameBox extends ControlSequence
       box.halign = halign;
       box.valign = valign;
       box.currentAngle = currentAngle;
+      box.floatStyle = floatStyle;
 
       if (currentBorderWidth == null)
       {
@@ -557,6 +558,16 @@ public class FrameBox extends ControlSequence
       this.textFont = textFont;
    }
 
+   public FloatBoxStyle getFloatStyle()
+   {
+      return floatStyle;
+   }
+
+   public void setFloatStyle(FloatBoxStyle style)
+   {
+      floatStyle = style;
+   }
+
    protected void popSettings(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
@@ -630,6 +641,7 @@ public class FrameBox extends ControlSequence
          TeXDimension orgHeight = currentHeight;
          AlignHStyle orgHalign = halign;
          AlignVStyle orgValign = valign;
+         FloatBoxStyle orgFloat = floatStyle;
          Color orgBorderColor = currentBorderColor;
          Color orgFgColor = currentFgColor;
          Color orgBgColor = currentBgColor;
@@ -652,6 +664,7 @@ public class FrameBox extends ControlSequence
          currentInnerMargin = orgInnerMargin;
          halign = orgHalign;
          valign = orgValign;
+         floatStyle = orgFloat;
          currentAngle = orgAngle;
       }
 
@@ -694,6 +707,7 @@ public class FrameBox extends ControlSequence
    protected BorderStyle style = BorderStyle.SOLID;
    protected AlignHStyle halign = AlignHStyle.DEFAULT;
    protected AlignVStyle valign = AlignVStyle.DEFAULT;
+   protected FloatBoxStyle floatStyle = FloatBoxStyle.NONE;
 
    protected Angle currentAngle = null;
 

@@ -55,6 +55,8 @@ public class L2HAlignRow extends AlignRow
 
       TeXObjectList list = getAlignSpanList();
 
+      int rowlines = 0;
+
       for (TeXObject obj : list)
       {
          if (obj instanceof AlignSpan)
@@ -66,48 +68,54 @@ public class L2HAlignRow extends AlignRow
 
             if (start == -1 || end == -1)
             {
-               start = 1;
-               end = hlines.length;
+               rowlines++;
             }
-
-            for (int i = start; i <= end; i++)
+            else
             {
-               hlines[i-1]++;
+               for (int i = start; i <= end; i++)
+               {
+                  hlines[i-1]++;
+               }
             }
          }
       }
 
-      TeXParserListener listener = parser.getListener();
+      L2HConverter listener = (L2HConverter)parser.getListener();
 
       TeXObjectList substack = listener.createStack();
 
-      substack.add(new StartElement("tr"));
+      StartElement startElem = new StartElement("tr");
+
+      HashMap<String,String> css = new HashMap<String,String>();
+
+      switch (rowlines)
+      {
+         case 1: css.put("border-top", "solid"); break;
+         case 2: css.put("border-top", "double"); break;
+      }
+
+      startElem.putStyle(listener, css);
+
+      substack.add(startElem);
 
       if (isEmpty())
       {
+         css = new HashMap<String,String>();
+
          for (int i = 0; i < hlines.length; i++)
          {
-            String style = null;
-
             switch (hlines[i])
             {
-               case 0: style = "border-top: none; "; break;
-               case 1: style = "border-top: solid; "; break;
-               default: style = "border-top: double; ";
+               case 0: css.put("border-top", "none"); break;
+               case 1: css.put("border-top", "solid"); break;
+               default: css.put("border-top", "double");
             }
 
-            if (style == null)
-            {
-               substack.add(new StartElement("td"));
-               substack.add(new EndElement("td"));
-            }
-            else
-            {
-               StartElement startElem = new StartElement("td");
-               startElem.putAttribute("style", style);
-               substack.add(startElem);
-               substack.add(new EndElement("td"));
-            }
+            startElem = new StartElement("td");
+            startElem.putStyle(listener, css);
+
+            substack.add(startElem);
+            substack.add(new EndElement("td"));
          }
       }
 
@@ -143,70 +151,68 @@ public class L2HAlignRow extends AlignRow
       return ((DimenRegister)reg).getDimension();
    }
 
-   protected String getAlignStyle(TeXParser parser, TeXCellAlign alignCell,
-    TeXDimension defaultColSep)
+   protected void getAlignStyle(TeXParser parser, TeXCellAlign alignCell,
+    TeXDimension defaultColSep, HashMap<String,String> css)
    {
-      String style = "";
-
       int preRules = alignCell.preRuleCount();
       int postRules = alignCell.postRuleCount();
 
       switch (preRules)
       {
-         case 0: style += "border-left: none; "; break;
-         case 1: style += "border-left: solid; "; break;
-         default: style += "border-left: double; ";
+         case 0: css.put("border-left", "none"); break;
+         case 1: css.put("border-left", "solid"); break;
+         default: css.put("border-left", "double");
       }
 
       switch (postRules)
       {
-         case 0: style += "border-right: none; "; break;
-         case 1: style += "border-right: solid; "; break;
-         default: style += "border-right: double; ";
+         case 0: css.put("border-right", "none"); break;
+         case 1: css.put("border-right", "solid"); break;
+         default: css.put("border-right", "double");
       }
 
       int currentColumn = parser.getSettings().getAlignmentColumn();
 
       switch (hlines[currentColumn-1])
       {
-         case 0: style += "border-top: none; "; break;
-         case 1: style += "border-top: solid; "; break;
-         default: style += "border-top: double; ";
+         case 0: css.put("border-top", "none"); break;
+         case 1: css.put("border-top", "solid"); break;
+         default: css.put("border-top", "double");
       }
+
+      String colSep = defaultColSep.format();
 
       if (alignCell.getBefore() == null)
       {
-         style += "padding-left: "+defaultColSep.format()+"; ";
+         css.put("padding-left", colSep);
       }
       else
       {
-         style += "padding-left: 0px; ";
+         css.put("padding-left", "0px");
       }
 
       if (alignCell.getAfter() == null)
       {
-         style += "padding-right: "+defaultColSep.format()+"; ";
+         css.put("padding-right", colSep);
       }
       else
       {
-         style += "padding-right: 0px; ";
+         css.put("padding-right", "0px");
       }
 
       TeXDimension width = alignCell.getWidth();
 
       if (width != null)
       {
-         style += "width: "+width.toString(parser)+"; ";
+         css.put("width", width.toString(parser));
       }
 
       switch (alignCell.getAlign())
       {
-         case 'c': style += "text-align: center; "; break;
-         case 'l': style += "text-align: left; "; break;
-         case 'r': style += "text-align: right; "; break;
+         case 'c': css.put("text-align", "center"); break;
+         case 'l': css.put("text-align", "left"); break;
+         case 'r': css.put("text-align", "right"); break;
       }
-
-      return style;
    }
 
    @Override
@@ -223,7 +229,7 @@ public class L2HAlignRow extends AlignRow
          defaultColSep = ((TeXGlue)defaultColSep).getFixed();
       }
 
-      String span = "";
+      HashMap<String,String> css = new HashMap<String,String>();
 
       TeXCellAlign alignment;
 
@@ -240,12 +246,12 @@ public class L2HAlignRow extends AlignRow
 
          if (rowSpan > 1)
          {
-            span = " rowspan=\""+rowSpan+"\"";
+            css.put("rowspan", ""+rowSpan);
          }
 
          if (colSpan > 1)
          {
-            span += " colspan=\""+colSpan+"\"";
+            css.put("colspan", ""+colSpan);
          }
       }
       else
@@ -253,7 +259,23 @@ public class L2HAlignRow extends AlignRow
          alignment = alignCell;
       }
 
-      startCell(parser, stack, span, getAlignStyle(parser, alignment, defaultColSep));
+      tag = "td";
+
+      if (!cellContents.isEmpty())
+      {
+         TeXObject obj = cellContents.firstElement();
+
+         if (obj instanceof ControlSequence 
+               && ((ControlSequence)obj).getName().equals("bfseries"))
+         {
+            cellContents.remove(0);
+
+            tag = "th";
+         }
+      }
+
+      getAlignStyle(parser, alignment, defaultColSep, css);
+      startCell(parser, stack, css);
 
       TeXObjectList contentsList = new TeXObjectList();
 
@@ -292,18 +314,21 @@ public class L2HAlignRow extends AlignRow
    }
 
    // don't push to stack
-   protected void startCell(TeXParser parser, TeXObjectList stack, String span, String style)
+   protected void startCell(TeXParser parser, TeXObjectList stack,  
+     HashMap<String,String> css)
     throws IOException
    {
-      Writeable writeable = parser.getListener().getWriteable();
-      writeable.write(String.format("<td%s style=\"%s\">", span, style));
+      L2HConverter listener = (L2HConverter)parser.getListener();
+      Writeable writeable = listener.getWriteable();
+      writeable.write(String.format("<%s%s>", tag, listener.getStyleOrClass(css)));
    }
 
    // don't push to stack
    protected void endCell(TeXParser parser, TeXObjectList stack) throws IOException
    {
-      parser.getListener().getWriteable().writeln("</td>");
+      parser.getListener().getWriteable().writeln(String.format("</%s>", tag));
    }
 
    private int[] hlines;
+   protected String tag = "td";
 }

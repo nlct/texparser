@@ -96,6 +96,11 @@ public class TaggedColourBox extends FrameBoxEnv
       process(parser, parser);
    }
 
+   public void setTitle(TeXObject title)
+   {
+      defaultTitle = title;
+   }
+
    protected TeXObject defaultTitle;
    protected FrameBox titleBox;
 }

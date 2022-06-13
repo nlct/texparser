@@ -97,6 +97,10 @@ public class UserGuideSty extends LaTeXSty
         new TeXFontText(TeXFontFamily.RM),
         Color.BLACK, listener.getOther(0x2329), listener.getOther(0x232A));
 
+      addSemanticCommand("summarytagfmt", "summarytag", 
+        new TeXFontText(TeXFontShape.IT),
+        null, null, null, null, listener.createString(": "), true, false);
+
       TeXObjectList def = listener.createStack();
       def.add(listener.getOther('{'));
       def.add(listener.getParam(1));
@@ -136,12 +140,18 @@ public class UserGuideSty extends LaTeXSty
       addTaggedColourBox("important", null, Color.RED);
       addTaggedColourBox("warning", null, Color.RED);
       addTaggedColourBox("information", null, Color.BLUE);
-      addTaggedColourBox("pinnedbox", "definition", BG_DEF, Color.BLACK);
+      TaggedColourBox pinnedBox = addTaggedColourBox("pinnedbox", "definition", BG_DEF, Color.BLACK);
 
-      FrameBox defnbox = addColourBox("defnbox", new TeXFontText(TeXFontFamily.VERB), null,
+      addColourBox("defnbox", new TeXFontText(TeXFontFamily.VERB), null,
         BG_DEF, Color.BLACK);
 
-      registerControlSequence(new CmdDef(defnbox, glossariesSty));
+      FrameBox rightBox = addFloatBox("floatrightbox");
+
+      FrameBox noteBox = new ColourBox("noteBox", BorderStyle.NONE,
+        AlignHStyle.DEFAULT, AlignVStyle.DEFAULT, false, null, null);
+      getListener().declareFrameBox(noteBox, false);
+
+      registerControlSequence(new CmdDef(pinnedBox, rightBox, noteBox, glossariesSty));
 
       addTaggedColourBox("settingsbox", "valuesettings", null, Color.BLACK);
       addTaggedColourBox("terminal", new TeXFontText(TeXFontFamily.VERB), 
@@ -156,6 +166,17 @@ public class UserGuideSty extends LaTeXSty
       addGlsFmtTextCommand("exttext", "ext.");
       addGlsFmtTextCommand("apptext", "app.");
       addGlsFmtTextCommand("switchtext", "switch.");
+
+      registerControlSequence(glossariesSty.createGls("sty", "pkg."));
+
+      registerControlSequence(new GenericCommand(true, 
+       "printterms", null, new TeXObject[]{ new TeXCsRef("printabbrs"),
+         new TeXCsRef("printicons"), new TeXCsRef("printmain")
+       }));
+
+      registerControlSequence(new PrintAbbrs(glossariesSty));
+      registerControlSequence(new PrintIcons(glossariesSty));
+      registerControlSequence(new PrintMain(glossariesSty));
    }
 
    protected void addGlsFmtTextCommand(String name, String prefix)
@@ -201,6 +222,24 @@ public class UserGuideSty extends LaTeXSty
       glossariesSty.addField("pdftitlecasename");
       glossariesSty.addField("defaultkeys");
 
+      addAccessFields();
+   }
+
+   protected void addAccessFields()
+   {
+      TeXObjectList defVal = new TeXObjectList();
+
+      defVal.add(new TeXCsRef("glsentryname"));
+      defVal.add(new TeXCsRef("glslabel"));
+      glossariesSty.addField("symbolaccess", defVal);
+      glossariesSty.setFieldExpansionOn("symbolaccess", true);
+
+      defVal = new TeXObjectList();
+
+      defVal.add(new TeXCsRef("glsentrylong"));
+      defVal.add(new TeXCsRef("glslabel"));
+      glossariesSty.addField("shortaccess", defVal);
+      glossariesSty.setFieldExpansionOn("shortaccess", true);
    }
 
    protected void addSemanticCommand(String name, TeXFontFamily family)
@@ -284,6 +323,24 @@ public class UserGuideSty extends LaTeXSty
       getListener().declareFrameBox(boxFrame, false);
 
       return boxFrame;
+   }
+
+   protected FrameBox addFloatBox(String id)
+   {
+      return addFloatBox("user@"+id, id, FloatBoxStyle.RIGHT);
+   }
+
+   protected FrameBox addFloatBox(String name, String id, FloatBoxStyle style)
+   {
+      FrameBox box = new ColourBox(name, BorderStyle.NONE,
+       AlignHStyle.DEFAULT, AlignVStyle.DEFAULT, true, null, null);
+
+      box.setFloatStyle(style);
+      box.setId(id);
+
+      getListener().declareFrameBox(box, false);
+
+      return box;
    }
 
    protected FrameBox addColourBox(String name,  

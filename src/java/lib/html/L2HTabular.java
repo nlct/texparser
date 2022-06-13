@@ -43,11 +43,25 @@ public class L2HTabular extends Tabular
    }
 
    @Override
-   protected void startTabular(TeXParser parser, 
+   protected void startTabular(TeXParser parser, TeXObjectList stack,
      int verticalAlignment, TeXObject columnSpecs)
      throws IOException
    {
-      super.startTabular(parser, verticalAlignment, columnSpecs);
+      TeXObject obj = stack.peekStack();
+      TeXObject caption = null;
+
+      if (obj instanceof DataObjectList && !obj.isEmpty())
+      {
+         TeXObject firstObj = ((DataObjectList)obj).firstElement();
+
+         if (firstObj instanceof StartElement 
+              && ((StartElement)firstObj).getName().equals("caption"))
+         {
+            caption = stack.popStack(parser);
+         }
+      }
+
+      super.startTabular(parser, stack, verticalAlignment, columnSpecs);
 
       Writeable writeable = parser.getListener().getWriteable();
 
@@ -74,15 +88,24 @@ public class L2HTabular extends Tabular
       }
 
       writeable.writeln(String.format("<table class=\"%s\">", cls));
+
+      if (caption != null)
+      {
+         if (stack == parser)
+         {
+            caption.process(parser);
+         }
+         else
+         {
+            caption.process(parser, stack);
+         }
+      }
    }
 
    @Override
    public void end(TeXParser parser, TeXObjectList stack) throws IOException
    {
       Writeable writeable = parser.getListener().getWriteable();
-
-      TeXSettings settings = parser.getSettings();
-
 
       writeable.writeln("</table>");
 

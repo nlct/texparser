@@ -30,6 +30,14 @@ public class EndDeclaration extends ControlSequence
       decl.setEndDeclaration(this);
    }
 
+   public EndDeclaration(Declaration decl)
+   {
+      super("end"+decl.getName());
+      this.declName = decl.getName();
+
+      decl.setEndDeclaration(this);
+   }
+
    public EndDeclaration(String name)
    {
       super(name);

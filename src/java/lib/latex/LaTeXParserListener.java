@@ -632,6 +632,13 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       parser.putControlSequence(new DescriptionItem());
       parser.putControlSequence(new UseCounter());
 
+      parser.putControlSequence(new DescriptionDec("texparser@inlineblock@list",
+        DescriptionStyle.INLINE_BLOCK_TITLE));
+      parser.putControlSequence(new DescriptionDec("texparser@block@list",
+        DescriptionStyle.BLOCK_TITLE));
+      parser.putControlSequence(new AtFirstOfOne("texparser@listitem"));
+      parser.putControlSequence(new AtFirstOfOne("texparser@listdesc"));
+
       parser.putControlSequence(
         new GenericCommand(true, "labelenumi", null, 
         new TeXObject[] {new TeXCsRef("theenumi"), getOther('.')}));

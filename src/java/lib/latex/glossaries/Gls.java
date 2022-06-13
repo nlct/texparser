@@ -46,13 +46,13 @@ public class Gls extends AbstractGlsCommand
    {
       Gls gls = new Gls(getName(), getCaseChange(), isPlural(), getSty());
 
-      gls.setPrefix(prefix);
+      gls.setEntryLabelPrefix(prefix);
       gls.setDefaultOptions(defaultOptions);
 
       return gls;
    }
 
-   public void setPrefix(String prefix)
+   public void setEntryLabelPrefix(String prefix)
    {
       if (prefix == null)
       {

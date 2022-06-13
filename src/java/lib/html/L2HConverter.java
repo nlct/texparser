@@ -196,6 +196,8 @@ public class L2HConverter extends LaTeXParserListener
 
       putControlSequence(new L2HDescriptionLabel());
       putControlSequence(new L2HDescriptionItem());
+      putControlSequence(new L2HAltListItem());
+      putControlSequence(new L2HAltListDesc());
 
       putControlSequence(new L2HMathDeclaration("math"));
 
@@ -214,6 +216,7 @@ public class L2HConverter extends LaTeXParserListener
 
       parser.putControlSequence(new L2HTabular());
       parser.putControlSequence(new L2HTabular("array"));
+      parser.putControlSequence(new L2HLongTable());
 
       parser.putControlSequence(new L2HEqnarray());
       parser.putControlSequence(new L2HEqnarray("eqnarray*", false));
@@ -899,6 +902,8 @@ public class L2HConverter extends LaTeXParserListener
    public void writeCssStyles()
      throws IOException
    {
+      addDefaultTabularStyles();
+
       writeln("#main {margin-left: 5%; margin-right: 15%}");
       writeln("div.tomain {position: absolute; left: 0pt; width: 5%; text-align: right; font-size: x-small;}");
       writeln("div.tomain a {text-decoration: none;}");
@@ -958,6 +963,17 @@ public class L2HConverter extends LaTeXParserListener
 
       writeln(".displaylist { display: block; list-style-type: none; }");
       writeln(".inlinelist { display: inline; }");
+
+      writeln("dl.inlinetitle dt { display: inline-block; margin-left: 0; margin-right: 1em;}");
+      writeln("dl.inlinetitle dd { display: inline; margin: 0; }");
+      writeln("dl.inlinetitle dd::after { display: block; content: ''; }");
+
+      // TODO The inlineblock needs adjusting
+      writeln("dl.inlineblock dt { display: inline-block; margin-left: 0; margin-right: 1em;}");
+      writeln("dl.inlineblock dd { display: inline; margin: 0; }");
+      writeln("dl.inlineblock dd::after { display: block; content: ''; }");
+
+      writeln(".clearfix::after { content: \"\"; clear: both; display: table; }");
       writeln("span.inlineitem { margin-right: .5em; margin-left: .5em; }");
       writeln("span.numitem { float: left; margin-left: -3em; text-align: right; min-width: 2.5em; }");
       writeln("span.bulletitem { float: left; margin-left: -1em; }");
@@ -1788,7 +1804,17 @@ public class L2HConverter extends LaTeXParserListener
 
       if (trivlist instanceof DescriptionDec)
       {
-         write(String.format("%n<dl>%n"));
+         switch (((DescriptionDec)trivlist).getStyle())
+         {
+            case INLINE_TITLE:
+               write(String.format("%n<dl class=\"inlinetitle\">%n"));
+            break;
+            case INLINE_BLOCK_TITLE:
+               write(String.format("%n<dl class=\"inlineblock\">%n"));
+            break;
+            default:
+               write(String.format("%n<dl>%n"));
+         }
       }
       else if (trivlist.isInLine())
       {
@@ -2070,6 +2096,16 @@ public class L2HConverter extends LaTeXParserListener
          builder.append(font.getCss(getParser()));
       }
 
+      switch (fbox.getFloatStyle())
+      {
+         case LEFT:
+            builder.append("float: left; ");
+         break;
+         case RIGHT:
+            builder.append("float: right; ");
+         break;
+      }
+
       switch (fbox.getHAlign())
       {
          case LEFT:
@@ -2262,6 +2298,10 @@ public class L2HConverter extends LaTeXParserListener
          {
             write(String.format("style=\"%s\"", specs));
          }
+         else if (!fbox.isInLine() && fbox.isMultiLine())
+         {
+            write(String.format("class=\"%s clearfix\"", style));
+         }
          else
          {
             write(String.format("class=\"%s\"", style));
@@ -2366,6 +2406,169 @@ public class L2HConverter extends LaTeXParserListener
       return stack;
    }
 
+   protected void addDefaultTabularStyles()
+    throws IOException
+   {
+      Register reg = parser.getSettings().getRegister("tabcolsep");
+
+      if (reg == null || !(reg instanceof DimenRegister))
+      {
+         throw new TeXSyntaxException(parser,
+           TeXSyntaxException.ERROR_DIMEN_EXPECTED,
+           String.format("%stabcolsep",
+             new String(Character.toChars(parser.getEscChar()))));
+      }
+
+      TeXDimension dim = ((DimenRegister)reg).getDimension();
+
+      if (dim instanceof TeXGlue)
+      {
+         dim = ((TeXGlue)dim).getFixed();
+      }
+
+      String colSep = dim.format();
+
+      HashMap<String,String> css = createCellCss("center");
+      addDefaultStyle("cell-noborder-nosep-c", css);
+
+      css = createCellCss("right");
+      addDefaultStyle("cell-noborder-nosep-r", css);
+
+      css = createCellCss("left");
+      addDefaultStyle("cell-noborder-nosep-l", css);
+
+      css = createCellCss("center");
+      css.put("padding-right", colSep);
+
+      addDefaultStyle("cell-noborder-rightsep-c", css);
+
+      css = createCellCss("center");
+      css.put("padding-left", colSep);
+
+      addDefaultStyle("cell-noborder-rightsep-c", css);
+
+      css = createCellCss("center");
+      css.put("padding-left", colSep);
+      css.put("padding-right", colSep);
+
+      addDefaultStyle("cell-noborder-bothsep-c", css);
+
+      css = createCellCss("left");
+      css.put("padding-right", colSep);
+
+      addDefaultStyle("cell-noborder-rightsep-l", css);
+
+      css = createCellCss("left");
+      css.put("padding-left", colSep);
+
+      addDefaultStyle("cell-noborder-rightsep-l", css);
+
+      css = createCellCss("left");
+      css.put("padding-left", colSep);
+      css.put("padding-right", colSep);
+
+      addDefaultStyle("cell-noborder-bothsep-l", css);
+
+      css = createCellCss("right");
+      css.put("padding-right", colSep);
+
+      addDefaultStyle("cell-noborder-rightsep-r", css);
+
+      css = createCellCss("right");
+      css.put("padding-left", colSep);
+
+      addDefaultStyle("cell-noborder-leftsep-r", css);
+
+      css = createCellCss("right");
+      css.put("padding-left", colSep);
+      css.put("padding-right", colSep);
+
+      addDefaultStyle("cell-noborder-bothsep-r", css);
+
+   }
+
+   protected HashMap<String,String> createCellCss(String textAlign)
+    throws IOException
+   {
+      HashMap<String,String> css = new HashMap<String,String>();
+
+      css.put("padding-left", "0px");
+      css.put("padding-right", "0px");
+
+      css.put("text-align", textAlign);
+
+      css.put("border-left", "none");
+      css.put("border-right", "none");
+      css.put("border-top", "none");
+
+      return css;
+   }
+
+   public void addDefaultStyle(String name, HashMap<String,String> styleAttrs)
+    throws IOException
+   {
+      if (defaultStyleMaps==null)
+      {
+         defaultStyleMaps = new HashMap<HashMap<String,String>,String>();
+      }
+
+      defaultStyleMaps.put(styleAttrs, name);
+
+      String specs = cssAttributesToString(styleAttrs);
+
+      defaultStyles.put(specs, name);
+
+      if (isInDocEnv())
+      {
+         write(String.format("<style>%s: {%s}</style>", name, specs));
+      }
+   }
+
+   public String getCssClass(HashMap<String,String> css)
+   {
+      if (css == null || css.isEmpty())
+      {
+         return null;
+      }
+
+      if (defaultStyleMaps != null)
+      {
+         return defaultStyleMaps.get(css);
+      }
+
+      return null;
+   }
+
+   public String getStyleOrClass(HashMap<String,String> css)
+   {
+      if (css == null || css.isEmpty())
+      {
+         return "";
+      }
+
+      String name = getCssClass(css);
+
+      if (name != null)
+      {
+         return String.format(" class=\"%s\"", name);
+      }
+
+      return String.format(" style=\"%s\"", cssAttributesToString(css));
+   }
+
+   public String cssAttributesToString(HashMap<String,String> css)
+   {
+      StringBuilder builder = new StringBuilder();
+
+      for (Iterator<String> it=css.keySet().iterator(); it.hasNext(); )
+      {
+         String key = it.next();
+         builder.append(String.format("%s: %s; ", key, css.get(key)));
+      }
+
+      return builder.toString();
+   }
+
    private Vector<String> styCs;
 
    private int indexLoc = 0;
@@ -2391,6 +2594,8 @@ public class L2HConverter extends LaTeXParserListener
    private HashMap<String,TeXObject> internalReferences;
 
    private HashMap<String,String> defaultStyles;
+
+   private HashMap<HashMap<String,String>,String> defaultStyleMaps;
 
    private String currentSection = null;
 

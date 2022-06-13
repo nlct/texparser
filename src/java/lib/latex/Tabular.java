@@ -75,7 +75,15 @@ public class Tabular extends Declaration
       return null;
    }
 
+   @Deprecated
    protected void startTabular(TeXParser parser, 
+     int verticalAlignment, TeXObject columnSpecs)
+     throws IOException
+   {
+      startTabular(parser, parser, verticalAlignment, columnSpecs);
+   }
+
+   protected void startTabular(TeXParser parser, TeXObjectList stack,
      int verticalAlignment, TeXObject columnSpecs)
      throws IOException
    {
@@ -115,7 +123,7 @@ public class Tabular extends Declaration
 
       TeXObject columnSpecs = popArgExpandFully(parser, stack);
 
-      startTabular(parser, vertAlign, columnSpecs);
+      startTabular(parser, stack, vertAlign, columnSpecs);
 
       AlignRow row = ((LaTeXParserListener)parser.getListener()).createAlignRow(stack);
 

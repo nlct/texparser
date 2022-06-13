@@ -34,6 +34,7 @@ public class FrameBoxEnv extends Declaration
    {
       super(name);
       this.fbox = fbox;
+      setEndDeclaration(new EndDeclaration(name));
    }
 
    @Override

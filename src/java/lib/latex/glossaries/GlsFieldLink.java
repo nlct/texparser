@@ -174,11 +174,22 @@ public class GlsFieldLink extends GlsEntryField
 
          TeXObjectList linktext = listener.createStack();
 
-         TeXObject value = getFieldValue(glslabel, getField());
+         String field = getField();
+
+         TeXObject value = getFieldValue(glslabel, field);
 
          if (value != null)
          {
-            linktext.add(value, true);
+            AccSupp accsupp = getAccSupp(glslabel, field);
+
+            if (accsupp == null)
+            {
+               linktext.add(value, true);
+            }
+            else
+            {
+               linktext.add(new AccSuppObject(accsupp, value));
+            }
          }
 
          if (insert != null)

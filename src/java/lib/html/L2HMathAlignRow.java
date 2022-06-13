@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -121,12 +121,12 @@ public class L2HMathAlignRow extends L2HAlignRow
 
    @Override
    protected void startCell(TeXParser parser, TeXObjectList stack, 
-      String span, String style)
+      HashMap<String,String> css)
     throws IOException
    {
       L2HConverter listener = (L2HConverter)parser.getListener();
 
-      super.startCell(parser, stack, span, style);
+      super.startCell(parser, stack, css);
 
       if (listener.useMathJax())
       {

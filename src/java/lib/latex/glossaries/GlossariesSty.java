@@ -117,6 +117,10 @@ public class GlossariesSty extends LaTeXSty
    @Override
    public void addDefinitions()
    {
+      registerControlSequence(new TextualContentCommand("glssymbolsgroupname",
+        "Symbols"));
+      registerControlSequence(new TextualContentCommand("glsnumbersgroupname",
+        "Numbers"));
       registerControlSequence(new TextualContentCommand("glscounter", "page"));
 
       registerControlSequence(new TextualContentCommand("glsdefaulttype", "main"));
@@ -1738,7 +1742,10 @@ public class GlossariesSty extends LaTeXSty
    public void addField(String fieldName, String internalFieldName, 
       TeXObject defValue)
    {
-      knownFields.add(fieldName);
+      if (!knownFields.contains(fieldName))
+      {
+         knownFields.add(fieldName);
+      }
 
       if (internalFieldName != null && !fieldName.equals(internalFieldName))
       {
@@ -1777,14 +1784,9 @@ public class GlossariesSty extends LaTeXSty
             {
                val = (TeXObject)fieldDefaultValues.get(field).clone();
 
-               if (isFieldExpansionOn(field) && val instanceof Expandable)
+               if (isFieldExpansionOn(field))
                {
-                  TeXObjectList expanded = ((Expandable)val).expandfully(getParser());
-
-                  if (expanded != null)
-                  {
-                     val = expanded;
-                  }
+                  val = TeXParserUtils.expandFully(val, getParser(), stack);
                }
 
                if (getParser().getDebugLevel() > 0)
@@ -1857,6 +1859,23 @@ public class GlossariesSty extends LaTeXSty
    public boolean isKnownField(String field)
    {
       return knownFields.contains(field);
+   }
+
+   public String getTarget(GlsLabel glslabel)
+   {
+      ControlSequence cs = getParser().getControlSequence("glolinkprefix");
+      String prefix = "";
+
+      if (cs instanceof TextualContentCommand)
+      {
+         prefix = ((TextualContentCommand)cs).getText();
+      }
+      else if (cs instanceof GenericCommand)
+      {
+         prefix = ((GenericCommand)cs).getDefinition().toString(getParser());
+      }
+
+      return prefix + glslabel.getLabel();
    }
 
    public void setModifier(CharObject token, String key, TeXObject value)
@@ -2358,6 +2377,26 @@ public class GlossariesSty extends LaTeXSty
       return list == null || !list.contains(field);
    }
 
+   public Gls createGls(String csname, String prefix)
+   {
+      return createGls(csname, prefix, null, CaseChange.NO_CHANGE);
+   }
+
+   public Gls createGls(String csname, String prefix, KeyValList options)
+   {
+      return createGls(csname, prefix, options, CaseChange.NO_CHANGE);
+   }
+
+   public Gls createGls(String csname, String prefix, KeyValList options,
+      CaseChange caseChange)
+   {
+      Gls gls = new Gls(csname, caseChange, this);
+
+      gls.setEntryLabelPrefix(prefix);
+      gls.setDefaultOptions(options);
+
+      return gls;
+   }
 
    private HashMap<String,GlossaryEntry> entries;
 

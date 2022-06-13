@@ -25,93 +25,57 @@ import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.*;
 import com.dickimawbooks.texparserlib.latex.glossaries.*;
 
-public class CmdDef extends AbstractGlsCommand
+public class CmdDef extends StandaloneDef
 {
-   public CmdDef(FrameBox fbox, GlossariesSty sty)
+   public CmdDef(TaggedColourBox taggedBox, FrameBox rightBox,
+     FrameBox noteBox, GlossariesSty sty)
    {
-      this("cmddef", fbox, sty);
+      this("cmddef", taggedBox, rightBox, noteBox, sty);
    }
 
-   public CmdDef(String name, FrameBox fbox, GlossariesSty sty)
+   public CmdDef(String name, TaggedColourBox taggedBox, FrameBox rightBox,
+     FrameBox noteBox, GlossariesSty sty)
    {
-      super(name, sty);
-      this.fbox = fbox;
+      super(name, taggedBox, rightBox, noteBox, sty);
    }
 
    @Override
    public Object clone()
    {
-      return new CmdDef(getName(), fbox, getSty());
+      return new CmdDef(getName(), taggedBox, rightBox, noteBox, getSty());
    }
 
    @Override
-   public boolean canExpand()
+   protected void addPostEntryName(TeXObjectList list, GlsLabel glslabel, TeXParser parser)
    {
-      return false;
+      TeXObject syntax = glslabel.getEntry().get("syntax");
+
+      if (syntax != null)
+      {
+         list.add(syntax, true);
+      }
    }
 
    @Override
-   public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
-   throws IOException
+   protected TeXObject getRightBoxContent(GlsLabel glslabel, TeXParser parser)
+   {
+      TeXObjectList list = null;
+
+      TeXObject providedby = glslabel.getEntry().get("providedby");
+
+      if (providedby != null)
+      {
+         list = parser.getListener().createString("provided by ");
+         list.add(providedby, true);
+      }
+
+      return list;
+   }
+
+   @Override
+   protected TeXObject getNote(GlsLabel glslabel, TeXParser parser)
    {
       return null;
    }
 
-   @Override
-   public void process(TeXParser parser, TeXObjectList stack)
-   throws IOException
-   {
-      popModifier(parser, stack, '*');
-
-      GlsLabel glslabel = popEntryLabel("glscurrententrylabel", parser, stack);
-
-      TeXParserListener listener = parser.getListener();
-
-      TeXObjectList list = listener.createStack();
-
-      GlossaryEntry entry = glslabel.getEntry();
-
-      if (entry != null)
-      {
-         list.add(listener.getControlSequence("glstarget"));
-         list.add(glslabel);
-
-         Group grp = listener.createGroup();
-         list.add(grp);
-
-         grp.add(listener.getControlSequence("glossentryname"));
-         grp.add(glslabel);
-
-         TeXObject syntax = entry.get("syntax");
-
-         if (syntax != null)
-         {
-            list.add(syntax, true);
-         }
-      }
-
-      list.add(new EndFrameBox(fbox));
-
-      stack.push(list, true);
-
-      StartFrameBox startBox = new StartFrameBox(fbox);
-
-      if (parser == stack)
-      {
-         startBox.process(parser);
-      }
-      else 
-      {
-         startBox.process(parser, stack);
-      }
-   }
-
-   @Override
-   public void process(TeXParser parser)
-   throws IOException
-   {
-      process(parser, parser);
-   }
-
-   protected FrameBox fbox;
 }

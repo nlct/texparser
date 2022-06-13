@@ -31,13 +31,19 @@ public class DescriptionDec extends ListDec
 
    public DescriptionDec(String name)
    {
+      this(name, DescriptionStyle.INLINE_TITLE);
+   }
+
+   public DescriptionDec(String name, DescriptionStyle style)
+   {
       super(name);
+      this.style = style;
    }
 
    @Override
    public Object clone()
    {
-      return new DescriptionDec(getName());
+      return new DescriptionDec(getName(), getStyle());
    }
 
    @Override
@@ -50,6 +56,11 @@ public class DescriptionDec extends ListDec
    public void process(TeXParser parser, TeXObjectList stack) throws IOException
    {
       setup(parser, stack);
+   }
+
+   public DescriptionStyle getStyle()
+   {
+      return style;
    }
 
    @Override
@@ -76,4 +87,5 @@ public class DescriptionDec extends ListDec
       super.end(parser, stack);
    }
 
+   protected DescriptionStyle style;
 }

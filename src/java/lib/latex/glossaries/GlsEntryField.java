@@ -60,6 +60,69 @@ public class GlsEntryField extends AbstractGlsCommand
       return new GlsEntryField(getName(), getField(), getCaseChange(), protect, getSty());
    }
 
+   public AccSupp getAccSupp(GlsLabel glslabel, String fieldLabel)
+   {
+      if (glslabel == null) return null;
+
+      GlossaryEntry entry = glslabel.getEntry();
+
+      if (entry == null) return null;
+
+      TeXObject val = entry.get(fieldLabel+"access");
+
+      if (val == null)
+      {
+         if (fieldLabel.endsWith("plural"))
+         {
+            String singularFieldLabel;
+
+            int idx = fieldLabel.length()-6;
+
+            if (idx > 0)
+            {
+               singularFieldLabel = fieldLabel.substring(0, idx);
+            }
+            else
+            {
+               singularFieldLabel = "text";
+            }
+
+            val = entry.get(singularFieldLabel+"access");
+         }
+      }
+
+      if (val == null) return null;
+
+      String text;
+
+      if (val instanceof TextualContentCommand)
+      {
+         text = ((TextualContentCommand)val).getText();
+      }
+      else if (val instanceof GenericCommand)
+      {
+         text = ((GenericCommand)val).getDefinition().toString(sty.getParser());
+      }
+      else
+      {
+         text = val.toString(sty.getParser());
+      }
+
+      return getAccSupp(glslabel, fieldLabel, text);
+   }
+
+   protected AccSupp getAccSupp(GlsLabel glslabel, String fieldLabel, String text)
+   {
+      if (fieldLabel.startsWith("short"))
+      {
+         return AccSupp.createAbbr(sty.getTarget(glslabel), text);
+      }
+      else
+      {
+         return AccSupp.createSymbol(text);
+      }
+   }
+
    public TeXObject getFieldValue(GlsLabel glslabel, String fieldLabel)
    {
       if (glslabel == null) return null;

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.EOFException;
 
 import com.dickimawbooks.texparserlib.*;
+import com.dickimawbooks.texparserlib.generic.ParAlign;
 import com.dickimawbooks.texparserlib.latex.*;
 
 public class L2HCaption extends ControlSequence
@@ -45,7 +46,7 @@ public class L2HCaption extends ControlSequence
    public void process(TeXParser parser, TeXObjectList stack)
    throws IOException
    {
-      TeXObject optArg = popOptArg(parser, stack);
+      popOptArg(parser, stack);
 
       TeXObject arg = stack.popStack(parser);
 
@@ -53,7 +54,7 @@ public class L2HCaption extends ControlSequence
 
       TeXObject capType = parser.getControlSequence("@captype");
 
-      Group grp = listener.createGroup();
+      Group numArg = listener.createGroup();
 
       String type = null;
 
@@ -63,38 +64,37 @@ public class L2HCaption extends ControlSequence
 
          listener.stepcounter(type);
 
-         grp.add(listener.getControlSequence(type+"name"));
-         grp.add(listener.getControlSequence("nobreakspace"));
-         grp.add(listener.getControlSequence("the"+type));
+         numArg.add(listener.getControlSequence(type+"name"));
+         numArg.add(listener.getControlSequence("nobreakspace"));
+         numArg.add(listener.getControlSequence("the"+type));
       }
 
       // Is there a label following the caption?
 
-      TeXObject object = stack.popStack(parser);
-
-      while (object instanceof WhiteSpace)
-      {
-         object = stack.popStack(parser);
-      }
+      byte popStyle = TeXObjectList.POP_IGNORE_LEADING_SPACE;
+      TeXObject object = stack.popStack(parser, popStyle);
 
       String id = null;
 
       if (object instanceof TeXCsRef)
       {
          object = listener.getControlSequence(((TeXCsRef)object).getName());
+      }
 
-         if (object instanceof Label)
-         {
-            String label = popLabelString(parser, stack);
+      if (object instanceof Label)
+      {
+         String label = popLabelString(parser, stack);
 
-            id = HtmlTag.getUriFragment(label);
-         }
-         else
+         id = HtmlTag.getUriFragment(label);
+         object = stack.popStack(parser, TeXObjectList.POP_IGNORE_LEADING_SPACE);
+
+         if (object instanceof TeXCsRef)
          {
-            parser.push(object);
+            object = listener.getControlSequence(((TeXCsRef)object).getName());
          }
       }
 
+      boolean isTable = "table".equals(type);
       String tag;
       String classAttr = null;
 
@@ -102,7 +102,7 @@ public class L2HCaption extends ControlSequence
       {
          tag = "figcaption";
       }
-      else if ("table".equals(type))
+      else if (isTable)
       {
          tag = "caption";
       }
@@ -111,6 +111,101 @@ public class L2HCaption extends ControlSequence
          tag = "div";
          classAttr = "caption";
       }
+
+      TeXObject nextObj = object;
+
+      if (isTable)
+      {
+         ParAlign align = null;
+
+         if (object instanceof ParAlign)
+         {
+            align = (ParAlign)object;
+            object = stack.popStack(parser, TeXObjectList.POP_IGNORE_LEADING_SPACE);
+
+            if (object instanceof TeXCsRef)
+            {
+               object = listener.getControlSequence(((TeXCsRef)object).getName());
+            }
+         }
+
+         if (object instanceof Begin)
+         {
+            String env = popLabelString(parser, stack);
+
+            if (env.equals("tabular"))
+            {
+               TeXObject optArg = popOptArg(parser, stack);
+               TeXObject specs = stack.popStack(parser);
+
+               stack.push(createCaption(parser, tag, classAttr, id, numArg, arg));
+               stack.push(specs);
+
+               if (optArg != null)
+               {
+                  stack.push(listener.getOther(']'));
+                  stack.push(optArg, true);
+                  stack.push(listener.getOther('['));
+               }
+
+               stack.push(listener.createGroup(env));
+
+               if (align != null)
+               {
+                  stack.push(object);
+                  nextObj = align;
+               }
+            }
+            else
+            {
+               stack.push(listener.createGroup(env));
+               stack.push(object);
+
+               nextObj = createCaption(parser, "div", "caption", id, numArg, arg);
+
+               if (align != null)
+               {
+                  stack.push(nextObj);
+                  nextObj = align;
+               }
+            }
+         }
+         else
+         {
+            stack.push(object);
+
+            nextObj = createCaption(parser, "div", "caption", id, numArg, arg);
+
+            if (align != null)
+            {
+               stack.push(nextObj);
+               nextObj = align;
+            }
+         }
+      }
+      else
+      {
+         stack.push(object);
+
+         nextObj = createCaption(parser, tag, classAttr, id, numArg, arg);
+      }
+
+      if (parser == stack)
+      {
+         nextObj.process(parser);
+      }
+      else
+      {
+         nextObj.process(parser, stack);
+      }
+   }
+
+   protected TeXObjectList createCaption(TeXParser parser, String tag,
+      String classAttr, String id, TeXObject numArg, TeXObject textArg)
+   {
+      TeXParserListener listener = parser.getListener();
+
+      TeXObjectList list = listener.createDataList();
 
       StartElement startElem = new StartElement(tag);
 
@@ -124,22 +219,14 @@ public class L2HCaption extends ControlSequence
          startElem.putAttribute("id", id);
       }
 
-      listener.write(startElem.toString());
+      list.add(startElem);
 
-      ControlSequence cs = listener.getControlSequence("@makecaption");
-      parser.push(arg);
-      parser.push(grp);
+      list.add(listener.getControlSequence("@makecaption"));
+      list.add(numArg);
+      list.add(textArg);
+      list.add(new EndElement(tag));
 
-      if (parser == stack)
-      {
-         cs.process(parser);
-      }
-      else
-      {
-         cs.process(parser, stack);
-      }
-
-      listener.write(String.format("</%s>", tag));
+      return list;
    }
 
    @Override

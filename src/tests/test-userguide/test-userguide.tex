@@ -16,6 +16,30 @@
     \desc{a sample command}
     \providedby{\sty{foobarsty} v1.0+}
   }
+  \gcmd{cs\-with\-starred\-version}
+  {%
+    \syntax{\oargm{options}\margm{text}}%
+    \desc{another sample command}
+    \field{modifiers}{*}
+  }
+  \gcmd{cs\-with\-star\-and\-plus\-version}
+  {%
+    \syntax{\oargm{options}\margm{text}}%
+    \desc{another sample command with star or plus versions}
+    \field{modifiers}{*,+}
+  }
+  \gcmd{cs\-with\-starred\-other\-syntax}
+  {%
+    \syntax{\oargm{options}\margm{text}}%
+    \desc{another sample command}
+    \field{modifiers}{*}
+  }
+  \gcmd{cs\-with\-starred\-other\-syntax*}
+  {%
+    \syntax{\oargm{options}\margm{text}\margm{another arg}}%
+    \desc{starred command}
+  }
+  \gpkg{foobarsty}{}
 }
 
 \title{Sample Document}
@@ -36,8 +60,18 @@ Something important.
 
 Meta: \meta{text} and \qt{quoted} and \qtt{quoted-tt}.
 
-Command: \gls{foobarcs}.
+Command: \gls{foobarcs} defined in \sty{foobarsty}.
 
 \cmddef{foobarcs}
+
+Command with starred version:
+
+\cmddef{cswithstarredversion}
+
+Command with starred and plus version:
+
+\cmddef{cswithstarandplusversion}
+
+\printterms
 
 \end{document}
