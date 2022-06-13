@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -40,25 +40,7 @@ public class L2HLetter extends Letter
       return new L2HLetter(getCharCode());
    }
 
-   public String toString(TeXParser parser)
-   {
-      L2HConverter listener = (L2HConverter)parser.getListener();
-
-      int code = parser.getSettings().getCharCode(getCharCode());
-
-      if (code == -1)
-      {
-         code = getCharCode();
-      }
-
-      if (code >= 32 && code <= 126)
-      {
-         return format();
-      }
-
-      return "&#x"+Integer.toHexString(code)+";";
-   }
-
+   @Override
    public void process(TeXParser parser)
       throws IOException
    {
@@ -68,11 +50,12 @@ public class L2HLetter extends Letter
       }
    }
 
-   public void process(TeXParser parser, TeXObjectList list) throws IOException
+   @Override
+   public void process(TeXParser parser, TeXObjectList stack) throws IOException
    {
       if (((L2HConverter)parser.getListener()).isInDocEnv())
       {
-         super.process(parser);
+         super.process(parser, stack);
       }
    }
 }

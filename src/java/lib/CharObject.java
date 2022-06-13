@@ -75,10 +75,17 @@ public abstract class CharObject extends AbstractTeXObject
       this.charCode = charCode;
    }
 
+   public int getMappedCharCode(TeXParser parser)
+   {
+      int code = parser.getSettings().getCharCode(charCode);
+
+      return (code == -1 ? charCode : code);
+   }
+
    @Override
    public void process(TeXParser parser) throws IOException
    {
-      parser.getListener().getWriteable().writeCodePoint(charCode);
+      parser.getListener().getWriteable().writeCodePoint(getMappedCharCode(parser));
    }
 
    @Override

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -40,19 +40,21 @@ public class L2HOther extends Other
       return new L2HOther(getCharCode());
    }
 
+   @Override
    public void process(TeXParser parser)
       throws IOException
    {
       process(parser, parser);
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack) throws IOException
    {
       L2HConverter listener = (L2HConverter)parser.getListener();
 
       if (listener.isInDocEnv())
       {
-         int c = getCharCode();
+         int c = getMappedCharCode(parser);
 
          if (parser.isMathMode())
          {
