@@ -824,6 +824,7 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
 
       parser.putControlSequence(new BoxOverlap("texparser@overlap@strike", 0x29F5));
 
+      // rotate 1/4 left
       boxFrame = new FrameBox("texparser@quarterleft",
         BorderStyle.NONE, AlignHStyle.CENTER, AlignVStyle.MIDDLE, true, 
         null, new UserDimension());
@@ -833,6 +834,7 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
 
       declareFrameBox(boxFrame, false);
 
+      // rotate 1/4 right
       boxFrame = new FrameBox("texparser@quarterright",
         BorderStyle.NONE, AlignHStyle.CENTER, AlignVStyle.MIDDLE, true, 
         null, new UserDimension());
@@ -842,6 +844,7 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
 
       declareFrameBox(boxFrame, false);
 
+      // rotate 1/8 left
       boxFrame = new FrameBox("texparser@eighthleft",
         BorderStyle.NONE, AlignHStyle.CENTER, AlignVStyle.MIDDLE, true, 
         null, new UserDimension());
@@ -851,12 +854,23 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
 
       declareFrameBox(boxFrame, false);
 
+      // rotate 1/8 right
       boxFrame = new FrameBox("texparser@eighthright",
         BorderStyle.NONE, AlignHStyle.CENTER, AlignVStyle.MIDDLE, true, 
         null, new UserDimension());
 
       boxFrame.setId("eighthright");
       boxFrame.setAngle(new Angle(45, AngleUnit.DEGREES));
+
+      declareFrameBox(boxFrame, false);
+
+      // rotate 1/2
+      boxFrame = new FrameBox("texparser@halfturn",
+        BorderStyle.NONE, AlignHStyle.CENTER, AlignVStyle.MIDDLE, true, 
+        null, new UserDimension());
+
+      boxFrame.setId("halfturn");
+      boxFrame.setAngle(new Angle(180, AngleUnit.DEGREES));
 
       declareFrameBox(boxFrame, false);
    }
