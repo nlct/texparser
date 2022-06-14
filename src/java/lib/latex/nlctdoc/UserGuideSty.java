@@ -146,7 +146,8 @@ public class UserGuideSty extends LaTeXSty
       addTaggedColourBox("important", null, Color.RED);
       addTaggedColourBox("warning", null, Color.RED);
       addTaggedColourBox("information", null, Color.BLUE);
-      TaggedColourBox pinnedBox = addTaggedColourBox("pinnedbox", "definition", BG_DEF, Color.BLACK);
+      TaggedColourBox pinnedBox = addTaggedColourBox("pinnedbox",
+         "definition", BG_DEF, Color.BLACK);
 
       addColourBox("defnbox", new TeXFontText(TeXFontFamily.VERB), null,
         BG_DEF, Color.BLACK);
@@ -159,9 +160,12 @@ public class UserGuideSty extends LaTeXSty
 
       registerControlSequence(new CmdDef(pinnedBox, rightBox, noteBox, glossariesSty));
 
-      addTaggedColourBox("settingsbox", "valuesettings", null, Color.BLACK);
+      TaggedColourBox settingsBox = addTaggedColourBox("settingsbox",
+         "valuesetting", BG_OPTION_DEF, Color.BLACK);
       addTaggedColourBox("terminal", new TeXFontText(TeXFontFamily.VERB), 
         null, Color.BLACK);
+
+      registerControlSequence(new OptionDef(settingsBox, rightBox, noteBox, glossariesSty));
 
       addGlsFmtTextCommand("stytext", "pkg.");
       addGlsFmtTextCommand("clstext", "cls.");

@@ -132,6 +132,11 @@ public class StandaloneDef extends AbstractGlsCommand
       list.add(listener.getPar());
    }
 
+   protected void postArgHook(GlsLabel glslabel, TeXParser parser, TeXObjectList stack)
+   throws IOException
+   {
+   }
+
    @Override
    public void process(TeXParser parser, TeXObjectList stack)
    throws IOException
@@ -139,6 +144,8 @@ public class StandaloneDef extends AbstractGlsCommand
       popModifier(parser, stack, '*');
 
       GlsLabel glslabel = popEntryLabel("glscurrententrylabel", parser, stack);
+
+      postArgHook(glslabel, parser, stack);
 
       TeXParserListener listener = parser.getListener();
 
