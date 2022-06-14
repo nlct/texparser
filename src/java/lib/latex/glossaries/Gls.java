@@ -46,26 +46,10 @@ public class Gls extends AbstractGlsCommand
    {
       Gls gls = new Gls(getName(), getCaseChange(), isPlural(), getSty());
 
-      gls.setEntryLabelPrefix(prefix);
+      gls.setEntryLabelPrefix(getEntryLabelPrefix());
       gls.setDefaultOptions(defaultOptions);
 
       return gls;
-   }
-
-   public void setEntryLabelPrefix(String prefix)
-   {
-      if (prefix == null)
-      {
-         throw new NullPointerException();
-      }
-
-      this.prefix = prefix;
-   }
-
-   @Override
-   public String getEntryLabelPrefix()
-   {
-      return prefix;
    }
 
    public void setDefaultOptions(KeyValList options)
@@ -232,6 +216,5 @@ public class Gls extends AbstractGlsCommand
    protected CaseChange caseChange;
    protected boolean isPlural;
 
-   private String prefix = "";
    private KeyValList defaultOptions;
 }

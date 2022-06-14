@@ -105,9 +105,19 @@ public abstract class AbstractGlsCommand extends Command
       return KeyValList.getList(parser, arg);
    }
 
-   protected String getEntryLabelPrefix()
+   public void setEntryLabelPrefix(String prefix)
    {
-      return "";
+      if (prefix == null)
+      {
+         throw new NullPointerException();
+      }
+
+      this.entryLabelPrefix = prefix;
+   }
+
+   public String getEntryLabelPrefix()
+   {
+      return entryLabelPrefix;
    }
 
    protected GlsLabel popEntryLabel(TeXParser parser, TeXObjectList stack)
@@ -163,35 +173,50 @@ public abstract class AbstractGlsCommand extends Command
     throws IOException
    {
       TeXObject arg = null;
+      String prefix = getEntryLabelPrefix();
+      GlsLabel glsLabel = null;
 
       if (stack != null && !stack.isEmpty())
       {
          arg = stack.firstElement();
 
-         if (arg instanceof GlsLabel && ((GlsLabel)arg).getEntry() != null
-              && ((GlsLabel)arg).getName().equals(csname))
+         if (arg instanceof GlsLabel)
          {
-            return (GlsLabel)stack.remove(0);
+            glsLabel = (GlsLabel)stack.remove(0);
          }
       }
 
-      arg = popArg(parser, stack);
-
-      if (arg instanceof GlsLabel)
+      if (glsLabel == null)
       {
-         GlsLabel glslabel = (GlsLabel)arg;
+         arg = popArg(parser, stack);
 
-         glslabel.refresh(sty);
-
-         if (!glslabel.getName().equals(csname))
+         if (arg instanceof GlsLabel)
          {
-            return new GlsLabel(csname, glslabel.getLabel(), glslabel.getEntry());
+            glsLabel = (GlsLabel)arg;
          }
-
-         return glslabel;
       }
 
-      String label = parser.expandToString(arg, stack);
+      String label;
+
+      if (glsLabel != null)
+      {
+         if ((prefix.isEmpty() || glsLabel.getLabel().startsWith(prefix))
+              && glsLabel.getName().equals(csname))
+         {
+            if (glsLabel.getEntry() == null)
+            {
+               glsLabel.refresh(sty);
+            }
+
+            return glsLabel;
+         }
+
+         label = prefix+glsLabel.getLabel();
+      }
+      else
+      {
+         label = prefix+parser.expandToString(arg, stack);
+      }
 
       GlossaryEntry entry = getEntry(label);
 
@@ -310,4 +335,6 @@ public abstract class AbstractGlsCommand extends Command
    }
 
    protected GlossariesSty sty;
+
+   protected String entryLabelPrefix="";
 }
