@@ -143,6 +143,14 @@ public class FontAweSomeSty extends LaTeXSty
       box.setForegroundColor(Color.GREEN);
       box.setId("fwsactiveicon");
       listener.declareFrameBox(box, false);
+
+      // Sliders (Unicode character only shows a single slider)
+      list = listener.createStack();
+      list.add(getParser().getControlSequence("faSliderUp"));
+      list.add(getParser().getControlSequence("faSliderUp"));
+
+      registerControlSequence(new GenericCommand(true, "faSliders", null, list));
+      iconMap.put("sliders", list);
    }
 
    public TeXObject getIconDefinition(String iconname)
@@ -537,7 +545,9 @@ public class FontAweSomeSty extends LaTeXSty
       new Object[]{"ShoppingBag", "shopping-bag", Integer.valueOf(0x1F6CD)},
       new Object[]{"ShoppingCart", "shopping-cart", Integer.valueOf(0x1F6D2)},
       new Object[]{"Signal", "signal", Integer.valueOf(0x1F4F6)},
-      new Object[]{"Sliders", "sliders", Integer.valueOf(0x1F39A)},
+      new Object[]{"SliderUp", "sliderUp", Integer.valueOf(0x1F39A)},
+      new Object[]{"SliderDown", "sliderDown",
+         Integer.valueOf(0x1F39A), "texparser@halfturn"},
       new Object[]{"SmileO", "smile-o", Integer.valueOf(0x1F642)},
       new Object[]{"SoccerBallO", "soccer-ball-o", Integer.valueOf(0x26BD)},
       new Object[]{"SortAsc", "sort-asc", Integer.valueOf(0x23F6)},
