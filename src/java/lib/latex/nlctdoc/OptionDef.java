@@ -78,6 +78,7 @@ public class OptionDef extends StandaloneDef
       {
          if (!list.isEmpty())
          {
+            list.add(parser.getListener().getOther(';'));
             list.add(parser.getListener().getSpace());
          }
 
