@@ -61,13 +61,14 @@ public class OptionDef extends StandaloneDef
    @Override
    protected TeXObject getRightBoxContent(GlsLabel glslabel, TeXParser parser)
    {
-      TeXObjectList list = null;
+      TeXObjectList list = parser.getListener().createStack();
 
       TeXObject val = glslabel.getEntry().get("defaultvalue");
 
       if (val != null)
       {
-         list = parser.getListener().createString("default: ");
+         list.add(parser.getListener().getControlSequence("summarytagfmt"));
+         list.add(parser.getListener().createGroup("default"));
          list.add(val, true);
       }
 
@@ -75,7 +76,13 @@ public class OptionDef extends StandaloneDef
 
       if (val != null)
       {
-         list = parser.getListener().createString("initial: ");
+         if (!list.isEmpty())
+         {
+            list.add(parser.getListener().getSpace());
+         }
+
+         list.add(parser.getListener().getControlSequence("summarytagfmt"));
+         list.add(parser.getListener().createGroup("initial"));
          list.add(val, true);
       }
 
