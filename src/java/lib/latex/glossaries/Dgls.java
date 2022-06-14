@@ -23,51 +23,48 @@ import java.io.IOException;
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.*;
 
-public class GlsLabel extends TextualContentCommand
+public class Dgls extends Gls
 {
-   public GlsLabel(GlossaryEntry entry)
+   public Dgls(GlossariesSty sty)
    {
-      this("glslabel", entry.getLabel(), entry);
+      this("dgls", CaseChange.NO_CHANGE, false, sty);
    }
 
-   public GlsLabel(String label, GlossaryEntry entry)
+   public Dgls(String name, CaseChange caseChange, GlossariesSty sty)
    {
-      this("glslabel", label, entry);
+      this(name, caseChange, false, sty);
    }
 
-   public GlsLabel(String name, String label)
+   public Dgls(String name, CaseChange caseChange, boolean isPlural, GlossariesSty sty)
    {
-      this(name, label, null);
+      super(name, caseChange, isPlural, sty);
    }
 
-   public GlsLabel(String name, String label, GlossaryEntry entry)
+   public Object clone()
    {
-      super(name, label, entry);
+      Dgls gls = new Dgls(getName(), getCaseChange(), isPlural(), getSty());
+
+      gls.setEntryLabelPrefix(getEntryLabelPrefix());
+      gls.setDefaultOptions(getDefaultOptions());
+
+      return gls;
    }
 
    @Override
-   public Object clone()
+   protected GlsLabel popEntryLabel(TeXParser parser, TeXObjectList stack)
+    throws IOException
    {
-      return new GlsLabel(getName(), getLabel(), getEntry());
-   }
+      String label = popLabelString(parser, stack);
 
-   public String getLabel()
-   {
-      return getText();
-   }
-
-   public GlossaryEntry getEntry()
-   {
-      return (GlossaryEntry)getData();
-   }
-
-   public void refresh(GlossariesSty sty)
-   {
-      GlossaryEntry entry = getEntry();
+      GlossaryEntry entry = sty.getDualEntry(label);
 
       if (entry == null)
       {
-         data = sty.getEntry(getLabel());
+         return new GlsLabel("@@glslabel@"+label, label);
+      }
+      else
+      {
+         return new GlsLabel("@@glslabel@"+label, entry);
       }
    }
 }

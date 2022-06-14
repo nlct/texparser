@@ -72,10 +72,4 @@ public class CmdDef extends StandaloneDef
       return list;
    }
 
-   @Override
-   protected TeXObject getNote(GlsLabel glslabel, TeXParser parser)
-   {
-      return null;
-   }
-
 }

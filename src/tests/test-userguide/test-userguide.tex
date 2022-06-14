@@ -15,6 +15,7 @@
     \syntax{\oargm{options}\margm{text}}%
     \desc{a sample command}
     \providedby{\sty{foobarsty} v1.0+}
+    \note{a sample note}
   }
   \gcmd{cs\-with\-starred\-version}
   {%
@@ -59,6 +60,8 @@ Something important.
 \chapter{Sample}
 
 Meta: \meta{text} and \qt{quoted} and \qtt{quoted-tt}.
+File: \metafilefmt{filename}{tag}{.txt}, 
+\metametafilefmt{file}{tag1}{name}{tag2}{.txt}. 
 
 Command: \gls{foobarcs} defined in \sty{foobarsty}.
 
@@ -71,6 +74,12 @@ Command with starred version:
 Command with starred and plus version:
 
 \cmddef{cswithstarandplusversion}
+
+Command with starred version that has different syntax:
+
+\cmddef{cswithstarredothersyntax}
+
+Something about \gls{cswithstarredothersyntax*}.
 
 \printterms
 

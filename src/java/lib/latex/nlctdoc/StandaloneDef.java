@@ -73,7 +73,7 @@ public class StandaloneDef extends AbstractGlsCommand
 
    protected TeXObject getNote(GlsLabel glslabel, TeXParser parser)
    {
-      return null;
+      return glslabel.getEntry().get("note");
    }
 
    protected void addRow(TeXObjectList list, GlsLabel glslabel, 
@@ -167,9 +167,9 @@ public class StandaloneDef extends AbstractGlsCommand
                GlossaryEntry modTokenEntry = sty.getEntry(modTokenLabel);
 
                String altEntryLabel = glslabel.getLabel()+lb;
-               GlossaryEntry modEntry = sty.getEntry(altEntryLabel);
+               GlossaryEntry altEntry = sty.getEntry(altEntryLabel);
 
-               if (modEntry == null)
+               if (altEntry == null)
                {
                   if (modList == null)
                   {
@@ -192,7 +192,7 @@ public class StandaloneDef extends AbstractGlsCommand
                      modEntries = new Vector<GlsLabel>();
                   }
 
-                  modEntries.add(new GlsLabel("glslabelmod", modEntry));
+                  modEntries.add(new GlsLabel("glslabelmod", altEntry));
                }
             }
          }

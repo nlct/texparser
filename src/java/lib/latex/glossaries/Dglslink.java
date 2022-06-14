@@ -21,53 +21,47 @@ package com.dickimawbooks.texparserlib.latex.glossaries;
 import java.io.IOException;
 
 import com.dickimawbooks.texparserlib.*;
+import com.dickimawbooks.texparserlib.primitives.Relax;
 import com.dickimawbooks.texparserlib.latex.*;
 
-public class GlsLabel extends TextualContentCommand
+public class Dglslink extends AtGlsAtAtLink
 {
-   public GlsLabel(GlossaryEntry entry)
+   public Dglslink(GlossariesSty sty)
    {
-      this("glslabel", entry.getLabel(), entry);
+      this("dglslink", sty, true, false);
    }
 
-   public GlsLabel(String label, GlossaryEntry entry)
+   public Dglslink(String name, boolean doUnset, GlossariesSty sty)
    {
-      this("glslabel", label, entry);
+      this(name, sty, true, doUnset);
+   }
+   
+   public Dglslink(String name, GlossariesSty sty, boolean checkModifier,
+     boolean doUnset)
+   {
+      super(name, sty, checkModifier, doUnset);
    }
 
-   public GlsLabel(String name, String label)
+   public Object clone()
    {
-      this(name, label, null);
-   }
-
-   public GlsLabel(String name, String label, GlossaryEntry entry)
-   {
-      super(name, label, entry);
+      return new Dglslink(getName(), getSty(), checkModifier, doUnset);
    }
 
    @Override
-   public Object clone()
+   protected GlsLabel popEntryLabel(TeXParser parser, TeXObjectList stack)
+    throws IOException
    {
-      return new GlsLabel(getName(), getLabel(), getEntry());
-   }
+      String label = popLabelString(parser, stack);
 
-   public String getLabel()
-   {
-      return getText();
-   }
-
-   public GlossaryEntry getEntry()
-   {
-      return (GlossaryEntry)getData();
-   }
-
-   public void refresh(GlossariesSty sty)
-   {
-      GlossaryEntry entry = getEntry();
+      GlossaryEntry entry = sty.getDualEntry(label);
 
       if (entry == null)
       {
-         data = sty.getEntry(getLabel());
+         return new GlsLabel("@@glslabel@"+label, label);
+      }
+      else
+      {
+         return new GlsLabel("@@glslabel@"+label, entry);
       }
    }
 }

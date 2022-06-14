@@ -23,51 +23,35 @@ import java.io.IOException;
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.*;
 
-public class GlsLabel extends TextualContentCommand
+public class GlsXtrClearLabelPrefixes extends ControlSequence
 {
-   public GlsLabel(GlossaryEntry entry)
+   public GlsXtrClearLabelPrefixes()
    {
-      this("glslabel", entry.getLabel(), entry);
+      this("glsxtrclearlabelprefixes");
    }
 
-   public GlsLabel(String label, GlossaryEntry entry)
+   public GlsXtrClearLabelPrefixes(String name)
    {
-      this("glslabel", label, entry);
+      super(name);
    }
 
-   public GlsLabel(String name, String label)
+   public Object clone()
    {
-      this(name, label, null);
-   }
-
-   public GlsLabel(String name, String label, GlossaryEntry entry)
-   {
-      super(name, label, entry);
+      return new GlsXtrClearLabelPrefixes(getName());
    }
 
    @Override
-   public Object clone()
+   public void process(TeXParser parser, TeXObjectList stack)
+     throws IOException
    {
-      return new GlsLabel(getName(), getLabel(), getEntry());
+      parser.putControlSequence(true,
+         new TextualContentCommand("@glsxtr@labelprefixes", ""));
    }
 
-   public String getLabel()
+   @Override
+   public void process(TeXParser parser)
+     throws IOException
    {
-      return getText();
-   }
-
-   public GlossaryEntry getEntry()
-   {
-      return (GlossaryEntry)getData();
-   }
-
-   public void refresh(GlossariesSty sty)
-   {
-      GlossaryEntry entry = getEntry();
-
-      if (entry == null)
-      {
-         data = sty.getEntry(getLabel());
-      }
+      process(parser, parser);
    }
 }

@@ -73,6 +73,11 @@ public class Gls extends AbstractGlsCommand
       this.defaultOptions = options;
    }
 
+   public KeyValList getDefaultOptions()
+   {
+      return defaultOptions;
+   }
+
    @Override
    public boolean canExpand()
    {

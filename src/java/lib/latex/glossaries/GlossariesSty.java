@@ -262,6 +262,7 @@ public class GlossariesSty extends LaTeXSty
       registerControlSequence(new DoAtGlsDisableHyperInList(this));
       registerControlSequence(new AtGlsAtAtLink(this));
       registerControlSequence(new AtGlsAtAtLink("glslink", this, true));
+      registerControlSequence(new AtGlsAtAtLink("glsdisp", this, true, true));
       registerControlSequence(new AtGlsAtLink(this));
       registerControlSequence(new AtGlsAtFieldAtLink(this));
       registerControlSequence(new GlsEntryFmt(this));
@@ -915,6 +916,23 @@ public class GlossariesSty extends LaTeXSty
       NewIf.createConditional(true, getParser(), "ifKV@glslink@noindex", false);
 
       registerControlSequence(new AtFirstOfTwo("glsxtr@wrglossarylocation"));
+
+      registerControlSequence(new TextualContentCommand("@glsxtr@labelprefixes",
+       ""));
+      registerControlSequence(new GlsXtrClearLabelPrefixes());
+      registerControlSequence(new GlsXtrAddLabelPrefix());
+      registerControlSequence(new GlsXtrPrependLabelPrefix());
+
+      registerControlSequence(new Dgls(this));
+      registerControlSequence(new Dgls("dGls", CaseChange.SENTENCE, this));
+      registerControlSequence(new Dgls("dGLS", CaseChange.TO_UPPER, this));
+
+      registerControlSequence(new Dgls("dglspl", CaseChange.NO_CHANGE, true, this));
+      registerControlSequence(new Dgls("dGlspl", CaseChange.SENTENCE, true, this));
+      registerControlSequence(new Dgls("dGLSpl", CaseChange.TO_UPPER, true, this));
+
+      registerControlSequence(new Dglslink(this));
+      registerControlSequence(new Dglslink("dglsdisp", true, this));
    }
 
    protected void addGlsXtrTitleCommands(String field)
@@ -1582,6 +1600,31 @@ public class GlossariesSty extends LaTeXSty
       {
          throw new LaTeXSyntaxException(parser, messageTag, params);
       }
+   }
+
+   public GlossaryEntry getDualEntry(String label)
+   throws IOException
+   {
+      ControlSequence cs = getParser().getControlSequence("@glsxtr@labelprefixes");
+
+      if (cs != null)
+      {
+         String[] list = getParser().expandToString(cs, getParser()).trim().split(",");
+
+         for (String prefix : list)
+         {
+            String l = prefix+label;
+
+            GlossaryEntry entry = getEntry(l);
+
+            if (entry != null)
+            {
+               return entry;
+            }
+         }
+      }
+
+      return getEntry(label);
    }
 
    public GlossaryEntry getEntry(String label)

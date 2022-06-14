@@ -85,89 +85,141 @@ public class GlossaryEntry
        TeXObjectList stack)
    throws IOException
    {
+      ControlSequence cs = null;
+
       if (key.equals("type"))
       {
-         if (!(value instanceof GlsType))
+         String type;
+         Glossary glossary = null;
+
+         if (value instanceof GlsType)
+         {
+            type = ((GlsType)value).getLabel();
+            glossary = ((GlsType)value).getGlossary();
+         }
+         else
          {
             TeXObject typeVal = (TeXObject)value.clone();
 
-            String type = sty.getParser().expandToString(typeVal, stack);
-
-            value = new GlsType("@@glstype", type, sty.getGlossary(type));
+            type = sty.getParser().expandToString(typeVal, stack);
          }
+
+         if (glossary == null)
+         {
+            glossary = sty.getGlossary(type);
+         }
+
+         value = new GlsType("glo@"+getLabel()+"@type", type, glossary);
+
+         cs = (GlsType)value;
       }
       else if (key.equals("category"))
       {
-         if (!(value instanceof GlsCatLabel))
+         String categoryLabel;
+         Category category = null;
+
+         if (value instanceof GlsCatLabel)
+         {
+            categoryLabel = ((GlsCatLabel)value).getLabel();
+            category = ((GlsCatLabel)value).getCategory();
+         }
+         else
          {
             TeXObject categoryVal = (TeXObject)value.clone();
 
-            String category = sty.getParser().expandToString(categoryVal, stack);
-
-            value = new GlsCatLabel("@@glscategory", category, sty.getCategory(category));
+            categoryLabel = sty.getParser().expandToString(categoryVal, stack);
          }
+
+         if (category == null)
+         {
+            category = sty.getCategory(categoryLabel);
+         }
+
+         value = new GlsCatLabel("glo@"+getLabel()+"@category",
+               categoryLabel, category);
+
+         cs = (GlsCatLabel)value;
       }
       else if (key.equals("parent"))
       {
          if (value == null || value.isEmpty())
          {
             level = 0;
-            remove("parent", local);
-            return;
-         }
-
-         if (value instanceof GlsLabel)
-         {
-            GlossaryEntry parentEntry = ((GlsLabel)value).getEntry();
-
-            level = parentEntry.getLevel()+1;
+            value = null;
          }
          else
          {
-            TeXObject parentVal = (TeXObject)value.clone();
+            String parentLabel;
+            GlossaryEntry parentEntry = null;
 
-            String parent = sty.getParser().expandToString(parentVal, stack);
-
-            if (parent.isEmpty())
+            if (value instanceof GlsLabel)
             {
-               level = 0;
-               remove(parent, local);
-               return;
+               parentLabel = ((GlsLabel)value).getLabel();
+               parentEntry = ((GlsLabel)value).getEntry();
+            }
+            else
+            {
+               TeXObject parentVal = (TeXObject)value.clone();
+
+               parentLabel = sty.getParser().expandToString(parentVal, stack);
             }
 
-            GlossaryEntry parentEntry = sty.getEntry(parent);
+            if (parentEntry == null && !parentLabel.isEmpty())
+            {
+               parentEntry = sty.getEntry(parentLabel);
+            }
 
             if (parentEntry == null)
             {
-               throw new LaTeXSyntaxException(sty.getParser(),
-                  GlossariesSty.ENTRY_NOT_DEFINED, parent);
+               level = 0;
+               value = null;
             }
+            else
+            {
+               level = parentEntry.getLevel()+1;
 
-            level = parentEntry.getLevel()+1;
-
-            value = new GlsLabel("@@parent@label", parentEntry);
+               value = new GlsLabel("glo@"+getLabel()+"@parent", parentLabel, parentEntry);
+               cs = (GlsLabel)value;
+            }
          }
       }
-
-      String internalField = sty.getInternalFieldName(key);
-
-      String csname = String.format("glo@%s@%s", getLabel(), internalField);
 
       if (value == null)
       {
          fields.remove(key);
 
+         String csname;
+
+         if (cs == null)
+         {
+            String internalField = sty.getInternalFieldName(key);
+
+            csname = String.format("glo@%s@%s", getLabel(), internalField);
+         }
+         else
+         {
+            csname = cs.getName();
+         }
+
          sty.getParser().removeControlSequence(local, csname);
       }
       else
       {
-         if (fields.contains(key))
+         if (!fields.contains(key))
          {
             fields.add(key);
          }
 
-         sty.getParser().putControlSequence(local,
-            new GenericCommand(true, csname, null, value));
+         if (cs == null)
+         {
+            String internalField = sty.getInternalFieldName(key);
+
+            String csname = String.format("glo@%s@%s", getLabel(), internalField);
+
+            cs = new GenericCommand(true, csname, null, value);
+         }
+
+         sty.getParser().putControlSequence(local, cs);
       }
    }
 
@@ -292,8 +344,9 @@ public class GlossaryEntry
 
       if (val == null)
       {
-         val = new TeXCsRef("glsdefaulttype");
+         val = sty.getParser().getListener().getControlSequence("glsdefaulttype");
       }
+System.out.println("VAL: "+val);
 
       if (val instanceof TextualContentCommand)
       {

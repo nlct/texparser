@@ -28,18 +28,24 @@ public class AtGlsAtAtLink extends AbstractGlsCommand
 {
    public AtGlsAtAtLink(GlossariesSty sty)
    {
-      this("@gls@@link", sty, false);
+      this("@gls@@link", sty, false, false);
    }
 
    public AtGlsAtAtLink(String name, GlossariesSty sty, boolean checkModifier)
    {
+      this(name, sty, checkModifier, false);
+   }
+
+   public AtGlsAtAtLink(String name, GlossariesSty sty, boolean checkModifier, boolean doUnset)
+   {
       super(name, sty);
       this.checkModifier = checkModifier;
+      this.doUnset = doUnset;
    }
 
    public Object clone()
    {
-      return new AtGlsAtAtLink(getName(), getSty(), checkModifier);
+      return new AtGlsAtAtLink(getName(), getSty(), checkModifier, doUnset);
    }
 
    @Override
@@ -79,6 +85,12 @@ public class AtGlsAtAtLink extends AbstractGlsCommand
          parser.putControlSequence(true, 
             new AssignedControlSequence("do@gls@link@checkfirsthyper", new Relax()));
 
+         if (doUnset)
+         {
+            stack.push(glslabel);
+            stack.push(listener.getControlSequence("glsunset"));
+         }
+
          if (sty.isExtra())
          {
             parser.putControlSequence(true,
@@ -106,5 +118,5 @@ public class AtGlsAtAtLink extends AbstractGlsCommand
       process(parser, parser);
    }
 
-   protected boolean checkModifier;
+   protected boolean checkModifier, doUnset;
 }

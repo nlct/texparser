@@ -59,6 +59,8 @@ public class UserGuideSty extends LaTeXSty
       addSemanticCommand("styoptfmt", TeXFontFamily.TT,FG_STYOPT);
       addSemanticCommand("clsoptfmt", TeXFontFamily.TT);
       addSemanticCommand("ctrfmt", TeXFontFamily.TT);
+      addSemanticCommand("filefmt", TeXFontFamily.TT);
+      addSemanticCommand("extfmt", TeXFontFamily.TT);
 
       registerControlSequence(new GenericCommand(true,
          "thispackagename", null, new TeXCsRef("jobname")));
@@ -101,6 +103,7 @@ public class UserGuideSty extends LaTeXSty
         new TeXFontText(TeXFontShape.IT),
         null, null, null, null, listener.createString(": "), true, false);
 
+      // \marg
       TeXObjectList def = listener.createStack();
       def.add(listener.getOther('{'));
       def.add(listener.getParam(1));
@@ -108,6 +111,7 @@ public class UserGuideSty extends LaTeXSty
       registerControlSequence(new LaTeXGenericCommand(true, "marg",
         "m", def));
 
+      // \oarg
       def = listener.createStack();
       def.add(listener.getOther('['));
       def.add(listener.getParam(1));
@@ -115,6 +119,7 @@ public class UserGuideSty extends LaTeXSty
       registerControlSequence(new LaTeXGenericCommand(true, "oarg",
         "m", def));
 
+      // \margm
       def = listener.createStack();
       def.add(new TeXCsRef("marg"));
       Group grp = listener.createGroup();
@@ -126,6 +131,7 @@ public class UserGuideSty extends LaTeXSty
       registerControlSequence(new LaTeXGenericCommand(true, "margm",
         "m", def));
 
+      // \oargm
       def = listener.createStack();
       def.add(new TeXCsRef("oarg"));
       grp = listener.createGroup();
@@ -168,6 +174,16 @@ public class UserGuideSty extends LaTeXSty
       addGlsFmtTextCommand("switchtext", "switch.");
 
       registerControlSequence(glossariesSty.createGls("sty", "pkg."));
+      registerControlSequence(glossariesSty.createGls("cls", "cls."));
+      registerControlSequence(glossariesSty.createGls("opt", "opt."));
+      registerControlSequence(glossariesSty.createGls("env", "env."));
+      registerControlSequence(glossariesSty.createGls("ctr", "ctr."));
+      registerControlSequence(glossariesSty.createGls("ac", "dual."));
+      registerControlSequence(glossariesSty.createGls("ext", "ext."));
+      registerControlSequence(glossariesSty.createGls("app", "app."));
+      registerControlSequence(glossariesSty.createGls("switch", "switch."));
+      registerControlSequence(glossariesSty.createGls("cmdmod", "idx.mod."));
+      registerControlSequence(glossariesSty.createGls("file", "file."));
 
       registerControlSequence(new GenericCommand(true, 
        "printterms", null, new TeXObject[]{ new TeXCsRef("printabbrs"),
@@ -177,6 +193,172 @@ public class UserGuideSty extends LaTeXSty
       registerControlSequence(new PrintAbbrs(glossariesSty));
       registerControlSequence(new PrintIcons(glossariesSty));
       registerControlSequence(new PrintMain(glossariesSty));
+
+      registerControlSequence(new Dgls("idx", CaseChange.NO_CHANGE, glossariesSty));
+      registerControlSequence(new Dgls("idxpl", 
+       CaseChange.NO_CHANGE, true, glossariesSty));
+      registerControlSequence(new Dgls("Idx", CaseChange.SENTENCE, glossariesSty));
+      registerControlSequence(new Dgls("Idxpl", CaseChange.SENTENCE, true, glossariesSty));
+      registerControlSequence(new Dglslink("idxc", false, glossariesSty));
+
+      // dual prefix list
+      def = getListener().createString("dual.,idx.,");
+        def.add(getListener().getControlSequence("empty"));
+      registerControlSequence(new GenericCommand(true, "@glsxtr@labelprefixes",
+       null, def));
+
+      // \optval
+      def = getListener().createStack();
+      def.add(new TeXCsRef("gls"));
+
+      grp = getListener().createGroup("opt.");
+      def.add(grp);
+      grp.add(getListener().getParam(1));
+
+      def.add(new TeXCsRef("optfmt"));
+      grp = getListener().createGroup("=");
+      def.add(grp);
+      grp.add(getListener().getParam(2));
+
+      registerControlSequence(new LaTeXGenericCommand(true,
+       "optval", "mm", def));
+
+      // \optvalm
+      def = getListener().createStack();
+      def.add(new TeXCsRef("gls"));
+
+      grp = getListener().createGroup("opt.");
+      def.add(grp);
+      grp.add(getListener().getParam(1));
+
+      def.add(new TeXCsRef("optfmt"));
+      grp = getListener().createGroup("=");
+      def.add(grp);
+
+      grp.add(new TeXCsRef("marg"));
+
+      subgrp = getListener().createGroup();
+      grp.add(subgrp);
+      subgrp.add(getListener().getParam(2));
+
+      registerControlSequence(new LaTeXGenericCommand(true,
+       "optvalm", "mm", def));
+
+      // \opteqvalref
+      def = getListener().createStack();
+      def.add(new TeXCsRef("gls"));
+
+      grp = getListener().createGroup("opt.");
+      def.add(grp);
+      grp.add(getListener().getParam(1));
+
+      def.add(new TeXCsRef("optfmt"));
+      grp = getListener().createGroup("=");
+      def.add(grp);
+
+      def.add(new TeXCsRef("gls"));
+
+      grp = getListener().createGroup("optval.");
+      def.add(grp);
+      grp.add(getListener().getParam(1));
+      grp.add(getListener().getOther('.'));
+      grp.add(getListener().getParam(2));
+
+      registerControlSequence(new LaTeXGenericCommand(true,
+       "opteqvalref", "mm", def));
+
+      // \optvalref
+      def = getListener().createStack();
+      def.add(new TeXCsRef("gls"));
+
+      grp = getListener().createGroup("optval.");
+      def.add(grp);
+      grp.add(getListener().getParam(1));
+      grp.add(getListener().getOther('.'));
+      grp.add(getListener().getParam(2));
+
+      registerControlSequence(new LaTeXGenericCommand(true,
+       "optvalref", "mm", def));
+
+      // \fmtorcode
+      def = getListener().createStack();
+      def.add(getListener().getParam(1));
+
+      grp = getListener().createGroup();
+      def.add(grp);
+      grp.add(getListener().getParam(2));
+
+      registerControlSequence(new LaTeXGenericCommand(true,
+       "fmtorcode", "mm", def));
+
+      // \metaboolean
+      def = getListener().createStack();
+      def.add(new TeXCsRef("meta"));
+      def.add(getListener().createGroup("boolean"));
+
+      registerControlSequence(new LaTeXGenericCommand(true,
+       "metaboolean", "m", def));
+
+      // \keyval
+      def = getListener().createStack();
+      def.add(new TeXCsRef("meta"));
+      def.add(getListener().createGroup("key"));
+      def.add(getListener().getOther('='));
+      def.add(new TeXCsRef("meta"));
+      def.add(getListener().createGroup("value"));
+
+      registerControlSequence(new LaTeXGenericCommand(true,
+       "keyval", "m", def));
+
+      // \metafilefmt
+      def = getListener().createStack();
+      def.add(new TeXCsRef("filefmt"));
+      grp = getListener().createGroup();
+      def.add(grp);
+      grp.add(getListener().getParam(1));
+
+      def.add(new TeXCsRef("meta"));
+      grp = getListener().createGroup();
+      def.add(grp);
+      grp.add(getListener().getParam(2));
+
+      def.add(new TeXCsRef("filefmt"));
+      grp = getListener().createGroup();
+      def.add(grp);
+      grp.add(getListener().getParam(3));
+
+      registerControlSequence(new LaTeXGenericCommand(true,
+       "metafilefmt", "mmm", def));
+
+      // \metametafilefmt
+      def = getListener().createStack();
+      def.add(new TeXCsRef("filefmt"));
+      grp = getListener().createGroup();
+      def.add(grp);
+      grp.add(getListener().getParam(1));
+
+      def.add(new TeXCsRef("meta"));
+      grp = getListener().createGroup();
+      def.add(grp);
+      grp.add(getListener().getParam(2));
+
+      def.add(new TeXCsRef("filefmt"));
+      grp = getListener().createGroup();
+      def.add(grp);
+      grp.add(getListener().getParam(3));
+
+      def.add(new TeXCsRef("meta"));
+      grp = getListener().createGroup();
+      def.add(grp);
+      grp.add(getListener().getParam(4));
+
+      def.add(new TeXCsRef("filefmt"));
+      grp = getListener().createGroup();
+      def.add(grp);
+      grp.add(getListener().getParam(5));
+
+      registerControlSequence(new LaTeXGenericCommand(true,
+       "metametafilefmt", "mmmmm", def));
    }
 
    protected void addGlsFmtTextCommand(String name, String prefix)
