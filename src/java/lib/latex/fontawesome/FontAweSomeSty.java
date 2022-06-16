@@ -567,6 +567,7 @@ public class FontAweSomeSty extends LaTeXSty
       new Object[]{"Tag", "tag", Integer.valueOf(0x1F516)},
       new Object[]{"Taxi", "taxi", Integer.valueOf(0x1F696)},
       new Object[]{"Television", "television", Integer.valueOf(0x1F4FA)},
+      new Object[]{"Terminal", "terminal", "\u232A_", "texttt"},
       new Object[]{"ThumbTack", "thumb-tack", Integer.valueOf(0x1F4CC)},
       new Object[]{"ThumbsODown", "thumbs-o-down", Integer.valueOf(0x1F44E)},
       new Object[]{"ThumbsOUp", "thumbs-o-up", Integer.valueOf(0x1F44D)},
