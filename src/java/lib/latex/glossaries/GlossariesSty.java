@@ -490,6 +490,8 @@ public class GlossariesSty extends LaTeXSty
       listener.newtoks(true, "glsshortpltok");
       listener.newtoks(true, "glslongpltok");
 
+      registerControlSequence(new TextualContentCommand("abbreviationsname", "Abbreviations"));
+
       registerControlSequence(new GenericCommand(true, "glsxtrabbrvtype", 
         null, new TeXCsRef("glsdefaulttype")));
 
@@ -1094,7 +1096,6 @@ public class GlossariesSty extends LaTeXSty
 
       if (createAbbreviations)
       {
-         registerControlSequence(new TextualContentCommand("abbreviationsname", "Abbreviations"));
          registerControlSequence(new TextualContentCommand("glsxtrabbrvtype", "abbreviations"));
          createGlossary("abbreviations", new TeXCsRef("abbreviationsname"), null,
            "glg-abr", "gls-abr", "glo-abr");

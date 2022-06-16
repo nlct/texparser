@@ -91,6 +91,27 @@
     \deprecated
     \field{alias}{optval.foo-bar-val.optionvalue}
   }
+  % applications
+  \gapp{foobar\dhyphen cli}%
+  {%
+    \syntax{\meta{options} \meta{aux-file}}%
+    \desc{a sample \idx{cli}}
+  }
+  \gapp{foobar\dhyphen nodesc}{}%
+  % CLI switches
+  \glongswitch{long\dhyphen switch}{\inapp{foobar-cli}}
+  \gshortswitch{s}{\inapp{foobar-cli}\field{alias}{switch.long-switch}}
+  % abbreviations
+  \gtermacr{cli}{CLI}{command-line interface}%
+  {%
+    \desc{an application that doesn't have a graphical user
+     interface. That is, an application that doesn't have any windows,
+     buttons or menus and can be run in
+     \dickimawhref{latex/novices/html/terminal.html}{a command
+     prompt or terminal}}%
+  }%
+  % terms
+  \gterm{someterm}{\name{some term}\desc{an example term}}
 }
 
 \title{Sample Document}
@@ -156,6 +177,9 @@ A deprecated command:
 
 Don't use \gls{incompatiblecmd}, which is incompatible with
 \sty{foobarsty}.
+
+A \idx{cli} application \app{foobar-cli} is invoked with:
+\appdef{foobar-cli}
 
 \printterms
 
