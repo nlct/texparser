@@ -67,8 +67,80 @@ public class StandaloneDef extends AbstractGlsCommand
    }
 
    protected TeXObject getRightBoxContent(GlsLabel glslabel, TeXParser parser)
+   throws IOException
    {
-      return null;
+      TeXObjectList list = null;
+
+      TeXObject val = glslabel.getEntry().get("defaultvalue");
+
+      if (val != null)
+      {
+         list = parser.getListener().createStack();
+         list.add(parser.getListener().getControlSequence("summarytagfmt"));
+         list.add(parser.getListener().createGroup("default"));
+         list.add(val, true);
+      }
+
+      val = glslabel.getEntry().get("initvalue");
+
+      if (val != null)
+      {
+         if (list == null)
+         {
+            list = parser.getListener().createStack();
+         }
+         else
+         {
+            list.add(parser.getListener().getOther(';'));
+            list.add(parser.getListener().getSpace());
+         }
+
+         list.add(parser.getListener().getControlSequence("summarytagfmt"));
+         list.add(parser.getListener().createGroup("initial"));
+         list.add(val, true);
+      }
+
+      TeXObject providedby = glslabel.getEntry().get("providedby");
+
+      if (providedby != null)
+      {
+         if (list == null)
+         {
+            list = parser.getListener().createStack();
+         }
+         else
+         {
+            list.add(parser.getListener().getOther(';'));
+            list.add(parser.getListener().getSpace());
+         }
+
+         list.add(parser.getListener().createString("provided by "), true);
+         list.add(providedby, true);
+      }
+
+      TeXObject statusVal = glslabel.getEntry().get("status");
+
+      if (statusVal != null)
+      {
+         String status = parser.expandToString(statusVal, parser);
+
+         if (!status.equals("default"))
+         {
+            if (list == null)
+            {
+               list = parser.getListener().createStack();
+            }
+            else
+            {
+               list.add(parser.getListener().getSpace());
+            }
+
+            list.add(parser.getListener().getControlSequence("glssymbol"));
+            list.add(parser.getListener().createGroup("sym."+status));
+         }
+      }
+
+      return list;
    }
 
    protected TeXObject getNote(GlsLabel glslabel, TeXParser parser)
@@ -132,6 +204,11 @@ public class StandaloneDef extends AbstractGlsCommand
       list.add(listener.getPar());
    }
 
+   protected void preArgHook(TeXParser parser, TeXObjectList stack)
+   throws IOException
+   {
+   }
+
    protected void postArgHook(GlsLabel glslabel, TeXParser parser, TeXObjectList stack)
    throws IOException
    {
@@ -142,6 +219,8 @@ public class StandaloneDef extends AbstractGlsCommand
    throws IOException
    {
       popModifier(parser, stack, '*');
+
+      preArgHook(parser, stack);
 
       GlsLabel glslabel = popEntryLabel("glscurrententrylabel", parser, stack);
 

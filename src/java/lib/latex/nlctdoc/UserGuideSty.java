@@ -24,6 +24,7 @@ import java.awt.Color;
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.*;
 import com.dickimawbooks.texparserlib.latex.glossaries.*;
+import com.dickimawbooks.texparserlib.html.L2HConverter;
 
 public class UserGuideSty extends LaTeXSty
 {
@@ -38,6 +39,11 @@ public class UserGuideSty extends LaTeXSty
    public void addDefinitions()
    {
       LaTeXParserListener listener = getListener();
+
+      if (listener instanceof L2HConverter)
+      {
+         ((L2HConverter)listener).addCssStyle("dfn { font-style: normal; font-weight: bold; } a.icon { text-decoration: none; }");
+      }
 
       registerControlSequence(new GuideGls());
 
@@ -61,6 +67,7 @@ public class UserGuideSty extends LaTeXSty
       addSemanticCommand("ctrfmt", TeXFontFamily.TT);
       addSemanticCommand("filefmt", TeXFontFamily.TT);
       addSemanticCommand("extfmt", TeXFontFamily.TT);
+      addSemanticCommand("deprecatedorbannedfmt", FG_DEPRECATED_OR_BANNED);
 
       registerControlSequence(new GenericCommand(true,
          "thispackagename", null, new TeXCsRef("jobname")));
@@ -148,6 +155,8 @@ public class UserGuideSty extends LaTeXSty
       addTaggedColourBox("information", null, Color.BLUE);
       TaggedColourBox pinnedBox = addTaggedColourBox("pinnedbox",
          "definition", BG_DEF, Color.BLACK);
+      addTaggedColourBox("terminal", new TeXFontText(TeXFontFamily.VERB), 
+        null, Color.BLACK);
 
       addColourBox("defnbox", new TeXFontText(TeXFontFamily.VERB), null,
         BG_DEF, Color.BLACK);
@@ -162,10 +171,13 @@ public class UserGuideSty extends LaTeXSty
 
       TaggedColourBox settingsBox = addTaggedColourBox("settingsbox",
          "valuesetting", BG_OPTION_DEF, Color.BLACK);
-      addTaggedColourBox("terminal", new TeXFontText(TeXFontFamily.VERB), 
-        null, Color.BLACK);
 
       registerControlSequence(new OptionDef(settingsBox, rightBox, noteBox, glossariesSty));
+
+      TaggedColourBox optValBox = addTaggedColourBox("optionvaluebox",
+         "optionvalue", BG_OPTION_VALUE_DEF, Color.BLACK);
+
+      registerControlSequence(new OptionValDef(optValBox, rightBox, noteBox, glossariesSty));
 
       addGlsFmtTextCommand("stytext", "pkg.");
       addGlsFmtTextCommand("clstext", "cls.");
@@ -419,6 +431,7 @@ public class UserGuideSty extends LaTeXSty
       defVal.add(new TeXCsRef("glslabel"));
       glossariesSty.addField("symbolaccess", defVal);
       glossariesSty.setFieldExpansionOn("symbolaccess", true);
+      glossariesSty.setIconField("symbol");
 
       defVal = new TeXObjectList();
 
@@ -463,6 +476,11 @@ public class UserGuideSty extends LaTeXSty
    protected void addSemanticCommand(String name, TeXFontText font, Color fg)
    {
       addSemanticCommand(name, font, fg, null, null);
+   }
+
+   protected void addSemanticCommand(String name, Color fg)
+   {
+      addSemanticCommand(name, (TeXFontText)null, fg, null, null);
    }
 
    protected FrameBox addSemanticCommand(String name, 
@@ -668,8 +686,10 @@ public class UserGuideSty extends LaTeXSty
    public static final Color BG_OPTION_DEF = new Color(1.0f, 1.0f, 0.89f);
    public static final Color BG_OPTION_VALUE_DEF = new Color(1.0f, 1.0f, 0.96f);
    public static final Color BG_CODE = new Color(0.05f, 0.05f,0.05f);
+
    public static final Color FG_CS = new Color(0.41f,0.545f,0.41f);
    public static final Color FG_STYOPT = new Color(0.408f, 0.132f, 0.545f);
    public static final Color FG_CSOPT = new Color(0.408f, 0.132f, 0.545f);
    public static final Color FG_COMMENT = Color.GRAY;
+   public static final Color FG_DEPRECATED_OR_BANNED = Color.RED;
 }

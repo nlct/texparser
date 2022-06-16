@@ -47,7 +47,7 @@ public class HyperLink extends Command
    {
       String link = popLabelString(parser, stack);
 
-      TeXObject text = popArg(parser, stack);
+      TeXObject text = popArgExpandOnce(parser, stack);
 
       TeXObjectList expanded = parser.getListener().createStack();
 

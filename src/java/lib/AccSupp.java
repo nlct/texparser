@@ -74,16 +74,27 @@ public class AccSupp
 
    public static AccSupp createSymbol(String description)
    {
+      return createSymbol(description, false);
+   }
+
+   public static AccSupp createSymbol(String description, boolean isIcon)
+   {
       AccSupp accsupp = new AccSupp();
 
       accsupp.type = TYPE_ACTUAL_TEXT;
       accsupp.text = description;
       accsupp.attr = ATTR_TITLE;
+      accsupp.isIcon = isIcon;
 
       return accsupp;
    }
 
    public static AccSupp createImage(String alt)
+   {
+      return createImage(alt, true);
+   }
+
+   public static AccSupp createImage(String alt, boolean isIcon)
    {
       AccSupp accsupp = new AccSupp();
 
@@ -91,8 +102,21 @@ public class AccSupp
       accsupp.tag = TAG_IMG;
       accsupp.text = alt;
       accsupp.attr = ATTR_ALT;
+      accsupp.isIcon = isIcon;
 
       return accsupp;
+   }
+
+   public boolean isIcon()
+   {
+      return isIcon;
+   }
+
+   @Override
+   public String toString()
+   {
+      return String.format("%s[id=%s,type=%s,tag=%s,attr=%s,text=%s,isIcon=%s]",
+       getClass().getSimpleName(), id, type, tag, attr, text, isIcon);
    }
 
    private String type;
@@ -100,6 +124,7 @@ public class AccSupp
    private String attr;
    private String text;
    private String id;
+   private boolean isIcon=false;
 
    public static final String ATTR_TITLE="title";
    public static final String ATTR_ALT="alt";

@@ -41,6 +41,16 @@
     \syntax{\oargm{options}\margm{text}\margm{another arg}}%
     \desc{starred command}
   }
+  \gcmd{deprecated\-cmd}
+  {\deprecated
+    \syntax{\margm{text}}
+    \desc{deprecated command}
+  }
+  \gcmd{incompatible\-cmd}
+  {\banned
+    \syntax{\margm{text}}
+    \desc{this command is incompatible with \sty{foobarsty}}
+  }
 % package
   \gpkg{foobarsty}
   {%
@@ -70,6 +80,16 @@
     \parent{foobarcs}
     \syntax{\meta{value}}
     \desc{a sample key=value option}
+  }
+  % option values
+  \goptval{foo-bar-val}{optionvalue}
+  {
+    \desc{some allowed value}
+  }
+  \goptval{foo-bar-val}{deprecatedvalue}
+  {
+    \deprecated
+    \field{alias}{optval.foo-bar-val.optionvalue}
   }
 }
 
@@ -108,7 +128,13 @@ This takes a boolean value that is initially false.
 This takes a boolean value that is initially true.
 
 \optiondef{foo-bar-val}
-This takes a value.
+This takes a value, which may be one of the following:
+
+\optionvaldef{foo-bar-val}{optionvalue}
+
+\optionvaldef{foo-bar-val}{deprecatedvalue}
+This is a deprecated synonym of
+\opteqvalref{foo-bar-val}{optionvalue}.
 
 Command with starred version:
 
@@ -123,6 +149,13 @@ Command with starred version that has different syntax:
 \cmddef{cswithstarredothersyntax}
 
 Something about \gls{cswithstarredothersyntax*}.
+
+A deprecated command:
+
+\cmddef{deprecatedcmd}
+
+Don't use \gls{incompatiblecmd}, which is incompatible with
+\sty{foobarsty}.
 
 \printterms
 

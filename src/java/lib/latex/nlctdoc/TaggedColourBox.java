@@ -101,6 +101,11 @@ public class TaggedColourBox extends FrameBoxEnv
       defaultTitle = title;
    }
 
+   public TeXObject getTitle()
+   {
+      return defaultTitle;
+   }
+
    protected TeXObject defaultTitle;
    protected FrameBox titleBox;
 }

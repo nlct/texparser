@@ -609,6 +609,21 @@ public class L2HConverter extends LaTeXParserListener
       writer.write("</a>");
    }
 
+   public boolean isIcon(AccSupp accsupp)
+   {
+      return accsupp.isIcon();
+   }
+
+   public boolean isIcon(TeXObject obj)
+   {
+      if (obj instanceof AccSuppObject)
+      {
+         return isIcon(((AccSuppObject)obj).getAccSupp());
+      }
+
+      return false;
+   }
+
    @Override
    public TeXObject applyAccSupp(AccSupp accsupp, TeXObject object)
    {
@@ -690,6 +705,11 @@ public class L2HConverter extends LaTeXParserListener
          {
             startElem.putAttribute(attr, text);
          }
+      }
+
+      if (isIcon(accsupp))
+      {
+         startElem.putAttribute("class", "icon");
       }
 
       list.add(startElem);
@@ -778,8 +798,19 @@ public class L2HConverter extends LaTeXParserListener
       TeXObjectList stack = createStack();
 
       StartElement elem = new StartElement("a");
-      elem.putAttribute("href", "#"+HtmlTag.getUriFragment(anchorName));
 
+      if (text instanceof TeXObjectList && ((TeXObjectList)text).isStack()
+        && ((TeXObjectList)text).size() == 1)
+      {
+         text = ((TeXObjectList)text).firstElement();
+
+         if (isIcon(text))
+         {
+            elem.putAttribute("class", "icon");
+         }
+      }
+
+      elem.putAttribute("href", "#"+HtmlTag.getUriFragment(anchorName));
       stack.add(elem);
 
       stack.add(text);

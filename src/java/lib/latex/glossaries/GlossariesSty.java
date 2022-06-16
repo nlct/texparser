@@ -2441,6 +2441,32 @@ public class GlossariesSty extends LaTeXSty
       return gls;
    }
 
+   public boolean isFieldIcon(String field)
+   {
+      return iconFields != null && iconFields.contains(field);
+   }
+
+   public void unsetIconField(String field)
+   {
+      if (iconFields != null)
+      {
+         iconFields.remove(field);
+      }
+   }
+
+   public void setIconField(String field)
+   {
+      if (iconFields == null)
+      {
+         iconFields = new Vector<String>();
+         iconFields.add(field);
+      }
+      else if (!iconFields.contains(field))
+      {
+         iconFields.add(field);
+      }
+   }
+
    private HashMap<String,GlossaryEntry> entries;
 
    private HashMap<String,Glossary> glossaries;
@@ -2448,6 +2474,7 @@ public class GlossariesSty extends LaTeXSty
    private Vector<String> glossaryTypes;
    private Vector<String> ignoredGlossaryTypes;
    private Vector<String> abbreviationTypes;
+   private Vector<String> iconFields;
 
    private HashMap<String,Category> categories;
 

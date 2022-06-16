@@ -69,6 +69,13 @@ public class AccSuppObject extends AbstractTeXObject
    }
 
    @Override
+   public String toString()
+   {
+      return String.format("%s[accsupp=%s,object=%s]", getClass().getSimpleName(),
+      accsupp, object);
+   }
+
+   @Override
    public TeXObjectList string(TeXParser parser)
     throws IOException
    {

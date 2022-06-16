@@ -119,7 +119,7 @@ public class GlsEntryField extends AbstractGlsCommand
       }
       else
       {
-         return AccSupp.createSymbol(text);
+         return AccSupp.createSymbol(text, sty.isFieldIcon(fieldLabel));
       }
    }
 

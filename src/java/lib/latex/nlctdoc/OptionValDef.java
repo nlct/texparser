@@ -20,20 +20,21 @@ package com.dickimawbooks.texparserlib.latex.nlctdoc;
 
 import java.io.IOException;
 import java.awt.Color;
+import java.util.Vector;
 
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.*;
 import com.dickimawbooks.texparserlib.latex.glossaries.*;
 
-public class CmdDef extends StandaloneDef
+public class OptionValDef extends StandaloneDef
 {
-   public CmdDef(TaggedColourBox taggedBox, FrameBox rightBox,
+   public OptionValDef(TaggedColourBox taggedBox, FrameBox rightBox,
      FrameBox noteBox, GlossariesSty sty)
    {
-      this("cmddef", taggedBox, rightBox, noteBox, sty);
+      this("optionvaldef", taggedBox, rightBox, noteBox, sty);
    }
 
-   public CmdDef(String name, TaggedColourBox taggedBox, FrameBox rightBox,
+   public OptionValDef(String name, TaggedColourBox taggedBox, FrameBox rightBox,
      FrameBox noteBox, GlossariesSty sty)
    {
       super(name, taggedBox, rightBox, noteBox, sty);
@@ -42,18 +43,30 @@ public class CmdDef extends StandaloneDef
    @Override
    public Object clone()
    {
-      return new CmdDef(getName(), taggedBox, rightBox, noteBox, getSty());
+      return new OptionValDef(getName(), taggedBox, rightBox, noteBox, getSty());
    }
 
    @Override
-   protected void addPostEntryName(TeXObjectList list, GlsLabel glslabel, TeXParser parser)
+   protected void preArgHook(TeXParser parser, TeXObjectList stack)
+   throws IOException
    {
-      TeXObject syntax = glslabel.getEntry().get("syntax");
+      setEntryLabelPrefix("opt.");
 
-      if (syntax != null)
-      {
-         list.add(syntax, true);
-      }
+      parentLabel = popEntryLabel(parser, stack);
+
+      setEntryLabelPrefix("optval."+parentLabel.getLabel().substring(4)+".");
    }
 
+   @Override
+   protected void addRow(TeXObjectList list, GlsLabel glslabel, 
+      TeXParser parser, Vector<GlsLabel> modList)
+   throws IOException
+   {
+      list.add(parser.getListener().getControlSequence("gls"));
+      list.add(parentLabel);
+      list.add(parser.getListener().getOther('='));
+      super.addRow(list, glslabel, parser, modList);
+   }
+
+   protected GlsLabel parentLabel;
 }
