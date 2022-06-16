@@ -202,6 +202,20 @@ public class TeXParserUtils
    }
 
    /**
+    * Pops an argument and then expands it once.
+    * @param parser the TeX parser
+    * @param stack the stack or the parser or null
+    * @return the expanded argument
+    */ 
+   public static TeXObject popArgExpandOnce(TeXParser parser, TeXObjectList stack)
+    throws IOException
+   {
+      TeXObject arg = popArg(parser, stack);
+
+      return expandOnce(arg, parser, stack);
+   }
+
+   /**
     * Pops an argument and then fully expands it.
     * @param parser the TeX parser
     * @param stack the stack or the parser or null
