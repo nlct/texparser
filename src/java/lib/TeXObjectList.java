@@ -51,14 +51,17 @@ public class TeXObjectList extends Vector<TeXObject>
 
    public TeXObjectList(TeXParserListener listener, String text)
    {
-      this(text.length() > 0 ? text.length() : 10);
+      this(text != null && text.length() > 0 ? text.length() : 10);
 
-      for (int i = 0, n = text.length(); i < n; )
+      if (text != null)
       {
-         int cp = text.codePointAt(i);
-         i += Character.charCount(cp);
+         for (int i = 0, n = text.length(); i < n; )
+         {
+            int cp = text.codePointAt(i);
+            i += Character.charCount(cp);
 
-         add(listener.getOther(cp));
+            add(listener.getOther(cp));
+         }
       }
    }
 
@@ -867,7 +870,7 @@ public class TeXObjectList extends Vector<TeXObject>
          {
             popStack(parser, POP_IGNORE_LEADING_SPACE);
 
-            TeXObject nextObj = peek();
+            TeXObject nextObj = peekStack();
 
             if (nextObj instanceof ControlSequence)
             {
