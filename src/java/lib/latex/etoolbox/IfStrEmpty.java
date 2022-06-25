@@ -97,7 +97,7 @@ public class IfStrEmpty extends Command
    public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      TeXObject arg = parser.popStack();
+      TeXObject arg = popArg(parser, stack);
 
       TeXObject truePart = popArg(parser, stack);
       TeXObject falsePart = popArg(parser, stack);
