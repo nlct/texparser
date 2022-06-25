@@ -55,19 +55,13 @@ public class NewAcronym extends NewGlossaryEntry
    public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      TeXObject options = popOptArg(parser, stack);
+      KeyValList keyValList = TeXParserUtils.popOptKeyValList(parser, stack);
 
       String label = popLabelString(parser, stack);
 
-      KeyValList keyValList;
-
-      if (options == null)
+      if (keyValList == null)
       {
          keyValList = new KeyValList();
-      }
-      else
-      {
-         keyValList = KeyValList.getList(parser, options);
       }
 
       if (sty.isExtra())

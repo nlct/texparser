@@ -51,6 +51,14 @@
     \syntax{\margm{text}}
     \desc{this command is incompatible with \sty{foobarsty}}
   }
+  \gcmd{ab}
+  {%
+    \desc{minor command}
+  }
+  \gcmd{yz}
+  {%
+    \desc{another minor command}
+  }
 % package
   \gpkg{foobarsty}
   {%
@@ -102,7 +110,11 @@
   \glongswitch{long\dhyphen switch}{\inapp{foobar-cli}}
   \gshortswitch{s}{\inapp{foobar-cli}\field{alias}{switch.long-switch}}
   % abbreviations
-  \gtermacr{cli}{CLI}{command-line interface}%
+  \gabbr{html}{HTML}{hypertext markup language}{}
+  \gacr{xml}{XML}{extensible markup language}{}
+  \gtermacr{ascii}{ASCII}{American Standard Code for Information Interchange}
+  {\field{description}{a single-byte character encoding}}
+  \gtermabbr{cli}{CLI}{command-line interface}%
   {%
     \desc{an application that doesn't have a graphical user
      interface. That is, an application that doesn't have any windows,
@@ -128,11 +140,32 @@ Something important.
 \tableofcontents
 
 \mainmatter
-\chapter{Sample}
+\chapter{Sample}\label{ch:sample}
+
+Cross-references: \sectionref{sec:defs}, \tableref{tab:sample}.
+
+\begin{table}[htbp]
+\caption{Sample Table}
+\label{tab:sample}
+\centering
+\begin{tabular}{ll}
+\bfseries Column 1 &
+\bfseries Column 2 \\
+%\inlineglsdef{ab} &
+%\inlineglsdef{yz}
+\end{tabular}
+\end{table}
+
+First use: \gls{html}, next use: \gls{html}.
+First use: \gls{xml}, next use: \gls{xml}.
+
+\section{Semantic Markup}\label{sec:semantic}
 
 Meta: \meta{text} and \qt{quoted} and \qtt{quoted-tt}.
 File: \metafilefmt{filename}{tag}{.txt}, 
 \metametafilefmt{file}{tag1}{name}{tag2}{.txt}. 
+
+\section{Definitions}\label{sec:defs}
 
 Command: \gls{foobarcs} defined in \sty{foobarsty}.
 
@@ -182,5 +215,7 @@ A \idx{cli} application \app{foobar-cli} is invoked with:
 \appdef{foobar-cli}
 
 \printterms
+\printsummary
+\printuserguideindex
 
 \end{document}

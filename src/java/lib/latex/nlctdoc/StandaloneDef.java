@@ -200,8 +200,6 @@ public class StandaloneDef extends AbstractGlsCommand
          list.add(rightBoxContent, true);
          list.add(new EndFrameBox(rightBox));
       }
-
-      list.add(listener.getPar());
    }
 
    protected void preArgHook(TeXParser parser, TeXObjectList stack)
@@ -289,20 +287,22 @@ public class StandaloneDef extends AbstractGlsCommand
          {
             for (GlsLabel lb : modEntries)
             {
+               list.add(listener.getPar());
                addRow(list, lb, parser, null);
             }
          }
 
          TeXObject note = getNote(glslabel, parser);
 
-         list.add(new StartFrameBox(noteBox));
-
          if (note != null)
          {
-            list.add(note, true);
-         }
+            list.add(listener.getPar());
+            list.add(new StartFrameBox(noteBox));
 
-         list.add(new EndFrameBox(noteBox));
+            list.add(note, true);
+
+            list.add(new EndFrameBox(noteBox));
+         }
       }
 
       list.add(taggedBox.getEndDeclaration());

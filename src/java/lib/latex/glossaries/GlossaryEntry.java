@@ -460,6 +460,13 @@ System.out.println("VAL: "+val);
       return (cs instanceof TeXBoolean && ((TeXBoolean)cs).booleanValue());
    }
 
+   @Override
+   public String toString()
+   {
+      return String.format("%s[label=%s,level=%d]", getClass().getSimpleName(),
+        label, level);
+   }
+
    private String label;
    private int level=0;
    private GlossariesSty sty;

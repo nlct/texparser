@@ -540,55 +540,12 @@ public class UserGuideSty extends LaTeXSty
        "faqitem", "mm", def));
 
       // \sectionref
-      def = getListener().createStack();
-      def.add(new TeXCsRef("S"));
-      def.add(new TeXCsRef("ref"));
-      def.add(grp);
-      grp.add(getListener().getParam(1));
-
-      registerControlSequence(new LaTeXGenericCommand(true,
-       "sectionref", "m", def));
+      registerControlSequence(new Ref("sectionref", new TeXCsRef("S")));
 
       // \tableref
-      def = getListener().createStack();
-      def.add(new TeXCsRef("xmakefirstuc"));
-      def.add(new TeXCsRef("tablename"));
-      def.add(getListener().getSpace());
-      def.add(new TeXCsRef("ref"));
-      def.add(grp);
-      grp.add(getListener().getParam(1));
-
-      registerControlSequence(new LaTeXGenericCommand(true,
-       "tableref", "m", def));
-
-      // \figureref
-      def = getListener().createStack();
-      def.add(new TeXCsRef("xmakefirstuc"));
-      def.add(new TeXCsRef("figurename"));
-      def.add(getListener().getSpace());
-      def.add(new TeXCsRef("ref"));
-      def.add(grp);
-      grp.add(getListener().getParam(1));
-
-      registerControlSequence(new LaTeXGenericCommand(true,
-       "figureref", "m", def));
-
-      if (getParser().getControlSequence("examplename") == null)
-      {
-         registerControlSequence(new TextualContentCommand("examplename",
-           "Example"));
-      }
-
-      // \exampleref
-      def = getListener().createStack();
-      def.add(new TeXCsRef("examplename"));
-      def.add(getListener().getSpace());
-      def.add(new TeXCsRef("ref"));
-      def.add(grp);
-      grp.add(getListener().getParam(1));
-
-      registerControlSequence(new LaTeXGenericCommand(true,
-       "exampleref", "m", def));
+      registerControlSequence(new TextualContentCommand("Tablename", "Table"));
+      registerControlSequence(new Ref("tableref", false,
+       new TeXCsRef("Tablename"), listener.getSpace()));
 
       // \badcodesym
       def = getListener().createStack();
@@ -604,6 +561,7 @@ public class UserGuideSty extends LaTeXSty
       registerControlSequence(new GenericCommand(true,
        "badcodesym", null, def));
 
+      registerControlSequence(new NewDualAbbr());
    }
 
    protected void addGlsFmtTextCommand(String name, String prefix)
@@ -634,6 +592,7 @@ public class UserGuideSty extends LaTeXSty
       options.put("record", getListener().createString("nameref"));
       options.put("index", null);
       options.put("symbols", null);
+      options.put("abbreviations", null);
       options.put("nosuper", null);
       options.put("stylemods", getListener().createString("mcols,bookindex,topic,longextra"));
 
@@ -650,6 +609,34 @@ public class UserGuideSty extends LaTeXSty
       glossariesSty.addField("defaultkeys");
 
       addAccessFields();
+   }
+
+   @Override
+   protected void postOptions(TeXObjectList stack) throws IOException
+   {
+      super.postOptions(stack);
+
+      TeXObjectList list = getListener().createStack();
+      list.add(getListener().getControlSequence("setabbreviationstyle"));
+      list.add(getListener().getOther('['));
+      list.add(getListener().createString("termabbreviation"), true);
+      list.add(getListener().getOther(']'));
+      list.add(getListener().createGroup("long-short-desc"));
+
+      list.add(getListener().getControlSequence("setabbreviationstyle"));
+      list.add(getListener().getOther('['));
+      list.add(getListener().createString("termacronym"), true);
+      list.add(getListener().getOther(']'));
+      list.add(getListener().createGroup("short-nolong-desc"));
+
+      if (stack == null || stack == getParser())
+      {
+         getParser().add(list);
+      }
+      else
+      {
+         list.process(getParser(), stack);
+      }
    }
 
    protected void addAccessFields()
