@@ -64,7 +64,7 @@ public class Dgls extends Gls
       }
       else
       {
-         return new GlsLabel("@@glslabel@"+label, entry);
+         return new GlsLabel("@@glslabel@"+label, entry.getLabel(), entry);
       }
    }
 }
