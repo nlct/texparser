@@ -20,6 +20,9 @@ package com.dickimawbooks.texparserlib;
 
 import java.io.IOException;
 
+import com.dickimawbooks.texparserlib.latex.KeyValList;
+import com.dickimawbooks.texparserlib.latex.CsvList;
+
 public class TeXParserUtils
 {
    /**
@@ -414,6 +417,108 @@ public class TeXParserUtils
       throw new TeXSyntaxException(parser,
          TeXSyntaxException.ERROR_CS_EXPECTED,
          arg.format(), arg.getClass().getSimpleName());
+   }
+
+   public static CsvList popCsvList(TeXParser parser, TeXObjectList stack)
+     throws IOException
+   {
+      TeXObject arg = popArg(parser, stack);
+
+      if (arg instanceof CsvList)
+      {
+         return (CsvList)arg;
+      }
+
+      if (parser.isStack(arg))
+      {
+         TeXObjectList list = (TeXObjectList)arg;
+
+         if (list.size() == 1 && list.firstElement() instanceof CsvList)
+         {
+            return (CsvList)list.firstElement();
+         }
+      }
+
+      return CsvList.getList(parser, arg);
+   }
+
+   public static CsvList popOptCsvList(TeXParser parser, TeXObjectList stack)
+     throws IOException
+   {
+      TeXObject arg = popOptArg(parser, stack);
+
+      if (arg == null)
+      {
+         return null;
+      }
+
+      if (arg instanceof CsvList)
+      {
+         return (CsvList)arg;
+      }
+
+      if (parser.isStack(arg))
+      {
+         TeXObjectList list = (TeXObjectList)arg;
+
+         if (list.size() == 1 && list.firstElement() instanceof CsvList)
+         {
+            return (CsvList)list.firstElement();
+         }
+      }
+
+      return CsvList.getList(parser, arg);
+   }
+
+   public static KeyValList popKeyValList(TeXParser parser, TeXObjectList stack)
+     throws IOException
+   {
+      TeXObject arg = popArg(parser, stack);
+
+      if (arg instanceof KeyValList)
+      {
+         return (KeyValList)arg;
+      }
+
+      if (parser.isStack(arg))
+      {
+         TeXObjectList list = (TeXObjectList)arg;
+
+         if (list.size() == 1 && list.firstElement() instanceof KeyValList)
+         {
+            return (KeyValList)list.firstElement();
+         }
+      }
+
+      return KeyValList.getList(parser, arg);
+   }
+
+   public static KeyValList popOptKeyValList(TeXParser parser, TeXObjectList stack)
+     throws IOException
+   {
+      TeXObject arg = popOptArg(parser, stack);
+
+      if (arg == null)
+      {
+         return null;
+      }
+
+      if (arg instanceof KeyValList)
+      {
+         return (KeyValList)arg;
+      }
+
+      if (parser.isStack(arg))
+      {
+         TeXObjectList list = (TeXObjectList)arg;
+
+         if (list.size() == 1 && list.firstElement() instanceof KeyValList)
+         {
+            return (KeyValList)list.firstElement();
+         }
+      }
+
+      return KeyValList.getList(parser, arg);
    }
 
    public static TeXBoolean toBoolean(String csname, TeXParser parser)
