@@ -32,13 +32,25 @@ public class Ref extends Command
 
    public Ref(String name)
    {
+      this(name, true);
+   }
+
+   public Ref(String name, TeXObject... tags)
+   {
+      this(name, true, tags);
+   }
+
+   public Ref(String name, boolean noHyperOnStar, TeXObject... tags)
+   {
       super(name);
+      this.noHyperOnStar = noHyperOnStar;
+      this.tags = tags;
    }
 
    @Override
    public Object clone()
    {
-      return new Ref(getName());
+      return new Ref(getName(), noHyperOnStar, tags);
    }
 
    @Override
@@ -54,12 +66,12 @@ public class Ref extends Command
    {
       LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
 
-      boolean hyper = false;
+      boolean hyper = listener.isStyLoaded("hyperref");
+      boolean isStar = (popModifier(parser, stack, '*') != -1);
 
-      if (listener.isStyLoaded("hyperref") 
-            && popModifier(parser, stack, '*') == -1)
+      if (isStar && noHyperOnStar)
       {
-         hyper = true;
+         hyper = false;
       }
 
       return expandref(parser, popLabelString(parser, stack), hyper);
@@ -83,6 +95,14 @@ public class Ref extends Command
       if (ref == null) return null;
 
       TeXObjectList list = new TeXObjectList();
+
+      if (tags != null)
+      {
+         for (TeXObject tag : tags)
+         {
+            list.add((TeXObject)tag.clone());
+         }
+      }
 
       if (hyper)
       {
@@ -120,4 +140,6 @@ public class Ref extends Command
       }
    }
 
+   protected TeXObject[] tags;
+   protected boolean noHyperOnStar;
 }
