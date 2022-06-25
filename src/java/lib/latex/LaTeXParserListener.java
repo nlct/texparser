@@ -1188,6 +1188,28 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       return documentEnded;
    }
 
+   public void atBeginDoc(TeXObject... code)
+   {
+      ControlSequence cs = parser.getControlSequence(
+        "@begindocumenthook");
+
+      if (cs == null)
+      {
+         cs = new GenericCommand(true, "@begindocumenthook", null,
+          code);
+         parser.putControlSequence(cs);
+      }
+      else if (cs instanceof GenericCommand)
+      {
+         TeXObjectList def = ((GenericCommand)cs).getDefinition();
+
+         for (TeXObject obj : code)
+         {
+            def.add(obj);
+         }
+      }
+   }
+
    public void beginDocument()
      throws IOException
    {

@@ -223,7 +223,7 @@ public class GlossariesSty extends LaTeXSty
               new TeXCsRef("glsdohypertarget")
            }));
 
-         registerControlSequence(new GlsTarget());
+         registerControlSequence(new GlsTarget(this));
       }
       else
       {
@@ -915,6 +915,23 @@ public class GlossariesSty extends LaTeXSty
 
       registerControlSequence(new AtGobble("glsxtr@inc@wrglossaryctr"));
 
+      registerControlSequence(new AtGobble("@@glsxtrwrglosscountermark"));
+      registerControlSequence(new AtGobble("@glsxtrwrglosscountermark"));
+
+      getListener().atBeginDoc(new TeXCsRef("def"), 
+        new TeXCsRef("@@glsxtrwrglosscountermark"), 
+        TeXParserUtils.createGroup(getListener(), 
+          new TeXCsRef("@glsxtrwrglosscountermark")));
+
+      FrameBox wrglossCtrMark = new FrameBox("glsxtrwrglosscountermark",
+        BorderStyle.NONE, AlignHStyle.DEFAULT, AlignVStyle.DEFAULT, true);
+      wrglossCtrMark.setTextFont(
+       new TeXFontText(TeXFontFamily.TT, TeXFontSize.SMALL));
+      wrglossCtrMark.setPrefix(getListener().getOther('['));
+      wrglossCtrMark.setSuffix(getListener().getOther(']'));
+
+      getListener().declareFrameBox(wrglossCtrMark);
+
       NewIf.createConditional(true, getParser(), "ifKV@glslink@noindex", false);
 
       registerControlSequence(new AtFirstOfTwo("glsxtr@wrglossarylocation"));
@@ -1290,6 +1307,15 @@ public class GlossariesSty extends LaTeXSty
       {
          indexcounter = true;
       }
+      else if (option.equals("debug"))
+      {
+         if (value != null)
+         {
+            String debugOpt = value.toString(parser);
+
+            setDebug(debugOpt);
+         }
+      }
       else if (option.equals("counter"))
       {
          registerControlSequence(new TextualContentCommand("glscounter", 
@@ -1433,6 +1459,16 @@ public class GlossariesSty extends LaTeXSty
          }
 
          registerControlSequence(new GlsPostDescription(value, this));
+      }
+   }
+
+   public void setDebug(String debugOpt)
+   {
+      if (debugOpt.equals("showwrgloss") || debugOpt.equals("all"))
+      {
+         registerControlSequence(new GenericCommand(true,
+           "@glsxtrwrglosscountermark", null, 
+           new TeXCsRef("glsxtrwrglosscountermark")));
       }
    }
 
@@ -2468,6 +2504,48 @@ public class GlossariesSty extends LaTeXSty
       }
    }
 
+   public void registerTarget(GlsLabel glslabel, String targetname)
+   {
+      registerTarget(glslabel.getLabel(), targetname);
+   }
+
+   public void registerTarget(String label, String targetname)
+   {
+      Vector<String> targets = null;
+
+      if (targetMap == null)
+      {
+         targetMap = new HashMap<String,Vector<String>>();
+      }
+      else
+      {
+         targets = targetMap.get(label);
+      }
+
+      if (targets == null)
+      {
+         targets = new Vector<String>();
+         targetMap.put(label, targets);
+      }
+
+      targets.add(targetname);
+   }
+
+   public Vector<String> getTargets(GlsLabel glslabel)
+   {
+      return getTargets(glslabel.getLabel());
+   }
+
+   public Vector<String> getTargets(String label)
+   {
+      if (targetMap == null)
+      {
+         return null;
+      }
+
+      return targetMap.get(label);
+   }
+
    private HashMap<String,GlossaryEntry> entries;
 
    private HashMap<String,Glossary> glossaries;
@@ -2526,6 +2604,8 @@ public class GlossariesSty extends LaTeXSty
 
    private IndexingOption indexingOption = IndexingOption.MAKEINDEX;
    private String record = "off";
+
+   private HashMap<String,Vector<String>> targetMap;
 
    public static final String GLOSSARY_NOT_DEFINED 
     = "glossaries.glossary.not.defined";

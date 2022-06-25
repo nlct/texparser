@@ -36,6 +36,12 @@ public class TeXFontText
       setShape(shape);
    }
 
+   public TeXFontText(TeXFontFamily family, TeXFontSize size)
+   {
+      setFamily(family);
+      setSize(size);
+   }
+
    public void setName(String name)
    {
       this.name = name;

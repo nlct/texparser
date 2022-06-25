@@ -19,51 +19,63 @@
 package com.dickimawbooks.texparserlib.latex.glossaries;
 
 import java.io.IOException;
+import java.util.Vector;
 
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.*;
 
-public class GlsTarget extends Command
+public class GlsTarget extends AbstractGlsCommand
 {
-   public GlsTarget()
+   public GlsTarget(GlossariesSty sty)
    {
-      this("glstarget");
+      this("glstarget", sty);
    }
 
-   public GlsTarget(String name)
+   public GlsTarget(String name, GlossariesSty sty)
    {
-      super(name);
+      super(name, sty);
    }
 
    @Override
    public Object clone()
    {
-      return new GlsTarget(getName());
+      return new GlsTarget(getName(), getSty());
    }
 
    @Override
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      TeXObject labelArg = popArg(parser, stack);
+      String label = popLabelString(parser, stack);
       TeXObject textArg = popArg(parser, stack);
 
       TeXParserListener listener = parser.getListener();
 
       TeXObjectList list = listener.createStack();
 
-      list.add(listener.getControlSequence("@glstarget"));
+      String target = parser.expandToString(
+            listener.getControlSequence("glolinkprefix"), stack)
+          + label;
 
-      Group grp = listener.createGroup();
-      list.add(grp);
+      Vector<String> existingTargets = sty.getTargets(label);
 
-      grp.add(listener.getControlSequence("glolinkprefix"));
-      grp.add(labelArg);
+      if (existingTargets == null || !existingTargets.contains(target))
+      {
+         list.add(listener.getControlSequence("@glstarget"));
 
-      grp = listener.createGroup();
-      list.add(grp);
+         list.add(listener.createGroup(target));
 
-      grp.add(textArg);
+         Group grp = listener.createGroup();
+         list.add(grp);
+
+         grp.add(textArg);
+      }
+      else
+      {
+         list.add(textArg, true);
+      }
+
+      sty.registerTarget(label, target);
 
       return list;
    }
@@ -74,15 +86,22 @@ public class GlsTarget extends Command
    {
       TeXParserListener listener = parser.getListener();
 
-      TeXObject labelArg = popArg(parser, stack);
+      String label = popLabelString(parser, stack);
 
-      Group grp = listener.createGroup();
-      grp.add(listener.getControlSequence("glolinkprefix"));
-      grp.add(labelArg);
+      String target = parser.expandToString(
+            listener.getControlSequence("glolinkprefix"), stack)
+          + label;
 
-      stack.push(grp);
+      Vector<String> existingTargets = sty.getTargets(label);
 
-      stack.push(listener.getControlSequence("@glstarget"));
+      if (existingTargets == null || !existingTargets.contains(target))
+      {
+         stack.push(listener.createGroup(target));
+
+         stack.push(listener.getControlSequence("@glstarget"));
+
+         sty.registerTarget(label, target);
+      }
    }
 
    @Override

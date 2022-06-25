@@ -272,7 +272,7 @@ public class GlossaryEntry
 
       if (cs instanceof GenericCommand)
       {
-         return ((GenericCommand)cs).getDefinition();
+         return (TeXObject) ((GenericCommand)cs).getDefinition().clone();
       }
 
       return cs;
@@ -346,7 +346,6 @@ public class GlossaryEntry
       {
          val = sty.getParser().getListener().getControlSequence("glsdefaulttype");
       }
-System.out.println("VAL: "+val);
 
       if (val instanceof TextualContentCommand)
       {
@@ -385,6 +384,13 @@ System.out.println("VAL: "+val);
    public String getLabel()
    {
       return label;
+   }
+
+   public boolean hasParent()
+   {
+      TeXObject val = get("parent");
+
+      return !(val == null || val.isEmpty());
    }
 
    public GlossaryEntry getParent(TeXObjectList stack) throws IOException

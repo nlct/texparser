@@ -581,5 +581,21 @@ public class TeXParserUtils
            TeXSyntaxException.ERROR_NUMBER_EXPECTED, str);
       }
    }
+
+   /**
+    * Creates a group containing the given objects. 
+    */ 
+   public static Group createGroup(TeXParserListener listener,
+     TeXObject... objects)
+   {
+      Group grp = listener.createGroup();
+
+      for (TeXObject obj : objects)
+      {
+         grp.add(obj);
+      }
+
+      return grp;
+   }
 }
 

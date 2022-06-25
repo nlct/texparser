@@ -155,6 +155,8 @@ public class L2HConverter extends LaTeXParserListener
       parser.putControlSequence(new GenericCommand("indexspace", null,
         new HtmlTag("<div class=\"indexspace\"></div>")));
 
+      putControlSequence(new Relax("nonumberline"));
+
       putControlSequence(new L2HAmp());
       putControlSequence(new L2HNoBreakSpace());
       putControlSequence(new SpaceCs("newblock"));

@@ -431,6 +431,14 @@ public class FrameBox extends ControlSequence
       }
    }
 
+   public void setBorderWidth(TeXDimension dim)
+   {
+      if (isChangeable)
+      {
+         currentBorderWidth = dim;
+      }
+   }
+
    public void setBorderRadius(TeXDimension dim)
    {
       if (isChangeable)
@@ -454,6 +462,14 @@ public class FrameBox extends ControlSequence
       else
       {
          return currentInnerMargin;
+      }
+   }
+
+   public void setInnerMargin(TeXDimension dim)
+   {
+      if (isChangeable)
+      {
+         currentInnerMargin = dim;
       }
    }
 

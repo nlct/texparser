@@ -159,7 +159,7 @@ public class UserGuideSty extends LaTeXSty
         addTaggedColourBox("terminal", new TeXFontText(TeXFontFamily.VERB), 
            null, Color.BLACK);
 
-      addColourBox("defnbox", new TeXFontText(TeXFontFamily.VERB), null,
+      FrameBox defnBox = addColourBox("defnbox", null, null,
         BG_DEF, Color.BLACK);
 
       FrameBox rightBox = addFloatBox("floatrightbox");
@@ -181,6 +181,11 @@ public class UserGuideSty extends LaTeXSty
       registerControlSequence(new OptionValDef(optValBox, rightBox, noteBox, glossariesSty));
 
       registerControlSequence(new AppDef(terminalBox, rightBox, noteBox, glossariesSty));
+
+      registerControlSequence(new SummaryBox(defnBox, 
+        rightBox, noteBox, glossariesSty));
+      registerControlSequence(new SummaryCommandBox(defnBox, 
+        rightBox, noteBox, glossariesSty));
 
       addGlsFmtTextCommand("stytext", "pkg.");
       addGlsFmtTextCommand("clstext", "cls.");
@@ -212,6 +217,8 @@ public class UserGuideSty extends LaTeXSty
       registerControlSequence(new PrintAbbrs(glossariesSty));
       registerControlSequence(new PrintIcons(glossariesSty));
       registerControlSequence(new PrintMain(glossariesSty));
+      registerControlSequence(new PrintSummary(glossariesSty));
+      registerControlSequence(new PrintIndex(glossariesSty));
 
       registerControlSequence(new Dgls("idx", CaseChange.NO_CHANGE, glossariesSty));
       registerControlSequence(new Dgls("idxpl", 
@@ -590,9 +597,9 @@ public class UserGuideSty extends LaTeXSty
       KeyValList options = new KeyValList();
 
       options.put("record", getListener().createString("nameref"));
+      options.put("indexcounter", null);
       options.put("index", null);
       options.put("symbols", null);
-      options.put("abbreviations", null);
       options.put("nosuper", null);
       options.put("stylemods", getListener().createString("mcols,bookindex,topic,longextra"));
 
@@ -609,6 +616,13 @@ public class UserGuideSty extends LaTeXSty
       glossariesSty.addField("defaultkeys");
 
       addAccessFields();
+   }
+
+   @Override
+   public void processOption(String option, TeXObject value)
+    throws IOException
+   {
+      glossariesSty.processOption(option, value);
    }
 
    @Override
@@ -728,14 +742,22 @@ public class UserGuideSty extends LaTeXSty
       TeXObject prefix, TeXObject suffix,
       boolean isInLine, boolean isMultiLine)
    {
-      FrameBox boxFrame = new ColourBox(name, BorderStyle.NONE,
+      FrameBox boxFrame = new ColourBox(name, 
+       frameCol == null ? BorderStyle.NONE : BorderStyle.SOLID,
        AlignHStyle.DEFAULT, AlignVStyle.DEFAULT, isInLine, null, null);
 
       boxFrame.setIsMultiLine(isMultiLine);
       boxFrame.setTextFont(font);
       boxFrame.setForegroundColor(fg);
       boxFrame.setBackgroundColor(bg);
-      boxFrame.setBorderColor(frameCol);
+
+      if (frameCol != null)
+      {
+         boxFrame.setBorderColor(frameCol);
+         boxFrame.setBorderWidth(new UserDimension(1, FixedUnit.BP));
+         boxFrame.setInnerMargin(new UserDimension(2, FixedUnit.BP));
+      }
+
       boxFrame.setPrefix(prefix);
       boxFrame.setSuffix(suffix);
       boxFrame.setId(id);

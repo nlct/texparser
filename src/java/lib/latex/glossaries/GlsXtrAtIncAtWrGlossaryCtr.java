@@ -66,6 +66,10 @@ public class GlsXtrAtIncAtWrGlossaryCtr extends ControlSequence
             grp.addAll(parser.getListener().createString("wrglossary."));
             grp.add(new TeXCsRef("thewrglossary"));
 
+            substack.add(parser.getListener().getControlSequence(
+             "@@glsxtrwrglosscountermark"));
+            substack.add(new TeXCsRef("thewrglossary"));
+
             if (parser == stack || stack == null)
             {
                substack.process(parser);

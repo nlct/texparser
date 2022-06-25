@@ -136,6 +136,34 @@ public class TextualContentCommand extends ControlSequence implements Expandable
        getClass().getSimpleName(), getName(), getText(), getData());
    }
 
+   @Override
+   public boolean equals(Object other)
+   {
+      if (!(other instanceof TextualContentCommand) || other == null)
+      {
+         return false;
+      }
+
+      TextualContentCommand cmd = (TextualContentCommand)other;
+
+      if (!text.equals(cmd.text))
+      {
+         return false;
+      }
+
+      if (data == null && cmd.data == null)
+      {
+         return true;
+      }
+
+      if (data == null || cmd.data == null)
+      {
+         return false;
+      }
+
+      return data.equals(cmd.data);
+   }
+
    protected String text;
    protected Object data;
 }

@@ -1,12 +1,12 @@
 % arara: lualatex
 % arara: bib2gls: { group: on }
 % arara: lualatex
-\documentclass[titlepage=false,index=totoc,bibliography=totoc,
- fontsize=12pt,captions=tableheading]{scrreprt}
+\documentclass[titlepage=false,open=any,
+ fontsize=12pt,captions=tableheading]{scrbook}
 
-\usepackage[autooneside=false]{scrlayer-scrpage}
+%\usepackage[autooneside=false]{scrlayer-scrpage}
 
-\usepackage[abbreviations]{nlctuserguide}
+\usepackage[abbreviations,debug=showwrgloss]{nlctuserguide}
 
 \nlctuserguidegls
 {
@@ -156,8 +156,8 @@ Cross-references: \sectionref{sec:defs}, \tableref{tab:sample}.
 \end{tabular}
 \end{table}
 
-First use: \gls{html}, next use: \gls{html}.
-First use: \gls{xml}, next use: \gls{xml}.
+First use: \idx{html}, next use: \idx{html}.
+First use: \idx{xml}, next use: \idx{xml}.
 
 \section{Semantic Markup}\label{sec:semantic}
 
@@ -214,6 +214,7 @@ Don't use \gls{incompatiblecmd}, which is incompatible with
 A \idx{cli} application \app{foobar-cli} is invoked with:
 \appdef{foobar-cli}
 
+\backmatter
 \printterms
 \printsummary
 \printuserguideindex
