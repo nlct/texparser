@@ -3113,6 +3113,11 @@ public class TeXParser extends TeXObjectList
       return object;
    }
 
+   /**
+    * Expands the given object. Note that this will clear the object
+    * if the object is a list. If the object needs to be retained,
+    * pass a copy.
+    */ 
    public String expandToString(TeXObject object, TeXObjectList stack)
     throws IOException
    {
