@@ -906,6 +906,7 @@ public class GlossariesSty extends LaTeXSty
 
       registerControlSequence(new GlsXtrDisplayLocNameRef());
       registerControlSequence(new GlsXtrEquationLocFmt());
+      registerControlSequence(new GlsXtrWrGlossaryLocFmt());
       registerControlSequence(new GlsXtrNameRefLink());
       registerControlSequence(new GlsXtrFmtInternalNameRef());
       registerControlSequence(new GlsXtrFmtExternalNameRef());
@@ -935,6 +936,11 @@ public class GlossariesSty extends LaTeXSty
       NewIf.createConditional(true, getParser(), "ifKV@glslink@noindex", false);
 
       registerControlSequence(new AtFirstOfTwo("glsxtr@wrglossarylocation"));
+      registerControlSequence(new GlsXtrIndexCounterLink(this));
+      registerControlSequence(new GlsXtrDualBackLink(this));
+
+      registerControlSequence(new TextualContentCommand("GlsXtrDualField",
+       "dual"));
 
       registerControlSequence(new TextualContentCommand("@glsxtr@labelprefixes",
        ""));

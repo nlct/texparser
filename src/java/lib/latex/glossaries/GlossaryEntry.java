@@ -242,14 +242,33 @@ public class GlossaryEntry
    /**
     * Determines whether the given field has been explicitly set.
     * Doesn't check if a value has been set by assigning the
-    * associated internal command. If that test is required, test if
-    * get(String) returns non null.
+    * associated internal command. If that test is required,
+    * use isSet(String) or test if get(String) returns non null.
     * @param fieldName the field (key) name
     * @return true if the field has been assigned
     */ 
    public boolean hasField(String fieldName)
    {
       return fields.contains(fieldName);
+   }
+
+   /**
+    * Determines whether the underlying internal control sequence
+    * associated with the field has been set. This is more efficient
+    * than testing if get(String) returns null.
+    * @param fieldName the field (key) name
+    * @return true if the internal control sequence associated with
+    * the given field has been defined
+    */
+   public boolean isSet(String fieldName)
+   {
+      String internalField = sty.getInternalFieldName(fieldName);
+
+      String csname = String.format("glo@%s@%s", getLabel(), internalField);
+
+      ControlSequence cs = sty.getParser().getControlSequence(csname);
+
+      return cs != null;
    }
 
    public TeXObject get(String field)
@@ -269,6 +288,9 @@ public class GlossaryEntry
       {
          fields.add(field);
       }
+
+      // The control sequence should typically be either a
+      // GenericCommand or a TextualContentCommand
 
       if (cs instanceof GenericCommand)
       {
