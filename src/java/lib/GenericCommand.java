@@ -169,7 +169,7 @@ public class GenericCommand extends Command
 
       if (syntax != null)
       {
-         byte popStyle = isShort ? TeXObjectList.POP_SHORT : 0;
+         byte popStyle = TeXObjectList.getArgPopStyle(isShort);
 
          for (TeXObject obj : syntax)
          {

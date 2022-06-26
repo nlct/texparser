@@ -1224,6 +1224,18 @@ public class TeXObjectList extends Vector<TeXObject>
       return (popStyle & POP_IGNORE_LEADING_SPACE) == POP_IGNORE_LEADING_SPACE;
    }
 
+   public static byte getArgPopStyle(boolean isShort)
+   {
+      byte popStyle = TeXObjectList.POP_IGNORE_LEADING_SPACE;
+
+      if (isShort)
+      {
+         popStyle = (byte)(TeXObjectList.POP_SHORT | popStyle);
+      }
+
+      return popStyle;
+   }
+
    // Pops an argument off the stack. Removes any top level
    // grouping. Ignore leading white space.
    public TeXObject popArg(TeXParser parser)

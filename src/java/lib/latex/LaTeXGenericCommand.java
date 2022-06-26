@@ -200,12 +200,7 @@ public class LaTeXGenericCommand extends GenericCommand
 
       if (numArgs > 0)
       {
-         byte popStyle = TeXObjectList.POP_IGNORE_LEADING_SPACE;
-
-         if (isShort)
-         {
-            popStyle = (byte)(TeXObjectList.POP_SHORT | popStyle);
-         }
+         byte popStyle = TeXObjectList.getArgPopStyle(isShort);
 
          int optIdx = 0;
 
