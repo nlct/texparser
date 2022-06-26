@@ -585,6 +585,15 @@ public class TeXParserUtils
    /**
     * Creates a group containing the given objects. 
     */ 
+   public static Group createGroup(TeXParser parser,
+     TeXObject... objects)
+   {
+      return createGroup(parser.getListener(), objects);
+   }
+
+   /**
+    * Creates a group containing the given objects. 
+    */ 
    public static Group createGroup(TeXParserListener listener,
      TeXObject... objects)
    {
