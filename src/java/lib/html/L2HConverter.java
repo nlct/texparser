@@ -2354,6 +2354,11 @@ public class L2HConverter extends LaTeXParserListener
       String tag = getElementTag(fbox);
 
       write(String.format("</%s>", tag));
+
+      if (fbox.getFloatStyle() != FloatBoxStyle.NONE)
+      {
+         write("<span class=\"clearfix\"></span>");
+      }
    }
 
    public void startTheorem(String name) throws IOException
