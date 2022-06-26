@@ -42,17 +42,6 @@ public class IfHasField extends AbstractGlsCommand
       return new IfHasField(getName(), getField(), getSty());
    }
 
-   public TeXObject getFieldValue(GlsLabel glslabel, String fieldLabel)
-   {
-      if (glslabel == null) return null;
-
-      GlossaryEntry entry = glslabel.getEntry();
-
-      if (entry == null) return null;
-
-      return entry.get(fieldLabel);
-   }
-
    protected TeXObject expand(GlsLabel glslabel, String fieldLabel,
      TeXParser parser, TeXObjectList stack)
    throws IOException

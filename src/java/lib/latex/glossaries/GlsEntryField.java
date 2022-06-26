@@ -123,44 +123,6 @@ public class GlsEntryField extends AbstractGlsCommand
       }
    }
 
-   public TeXObject getFieldValue(GlsLabel glslabel, String fieldLabel)
-   {
-      if (glslabel == null) return null;
-
-      GlossaryEntry entry = glslabel.getEntry();
-
-      TeXObject value = null;
-
-      if (entry == null)
-      {
-         ControlSequence cs = sty.getParser().getControlSequence(
-           String.format("glo@%s@%s", glslabel.getLabel(), fieldLabel));
-
-         if (cs != null)
-         {
-            if (cs instanceof GenericCommand)
-            {
-               value = ((GenericCommand)cs).getDefinition();
-            }
-            else
-            {
-               value = cs;
-            }
-         }
-      }
-      else
-      {
-         value = entry.get(fieldLabel);
-      }
-
-      if (value != null)
-      {
-         value = (TeXObject)value.clone();
-      }
-
-      return value;
-   }
-
    protected TeXObjectList expand(GlsLabel glslabel, String fieldLabel,
      CaseChange caseChange, TeXParser parser, TeXObjectList stack)
    throws IOException

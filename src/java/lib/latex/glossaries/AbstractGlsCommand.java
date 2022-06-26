@@ -73,6 +73,42 @@ public abstract class AbstractGlsCommand extends Command
       return new GlsLabel("@@glslabel@"+label, label, entry);
    }
 
+   protected TeXObject getFieldValue(GlsLabel glslabel, String fieldLabel)
+   {
+      if (glslabel == null) return null;
+
+      GlossaryEntry entry = glslabel.getEntry();
+
+      TeXObject value = null;
+
+      if (entry == null)
+      {
+         // allow for the possibility that the entry may not yet be
+         // defined but the field may have been set in advance
+
+         ControlSequence cs = sty.getParser().getControlSequence(
+           String.format("glo@%s@%s", glslabel.getLabel(), fieldLabel));
+
+         if (cs != null)
+         {
+            if (cs instanceof GenericCommand)
+            {
+               value = (TeXObject) ((GenericCommand)cs).getDefinition().value.clone();
+            }
+            else
+            {
+               value = cs;
+            }
+         }
+      }
+      else
+      {
+         value = entry.get(fieldLabel);
+      }
+
+      return value;
+   }
+
    protected KeyValList popModifier(TeXParser parser, TeXObjectList stack)
     throws IOException
    {
