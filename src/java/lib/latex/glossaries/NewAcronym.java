@@ -79,17 +79,16 @@ public class NewAcronym extends NewGlossaryEntry
       {
          TeXObject catVal = keyValList.get("category");
 
-         if (catVal == null || catVal.isEmpty())
-         {
-            keyValList.put("category", parser.getListener().createString(catLabel));
-         }
-         else
+         if (!(catVal == null || catVal.isEmpty()))
          {
             catLabel = parser.expandToString(catVal, stack);
          }
 
-         parser.putControlSequence(true, 
-           new TextualContentCommand("glscategorylabel", catLabel));
+         ControlSequence cs = new GlsCatLabel("glscategorylabel", catLabel);
+
+         parser.putControlSequence(true, cs);
+
+         keyValList.put("category", cs);
       }
 
       keyValList.put("short", shortArg);

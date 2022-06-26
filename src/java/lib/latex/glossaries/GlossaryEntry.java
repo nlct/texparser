@@ -123,6 +123,10 @@ public class GlossaryEntry
             categoryLabel = ((GlsCatLabel)value).getLabel();
             category = ((GlsCatLabel)value).getCategory();
          }
+         else if (value instanceof TextualContentCommand)
+         {
+            categoryLabel = ((TextualContentCommand)value).getText();
+         }
          else
          {
             TeXObject categoryVal = (TeXObject)value.clone();
@@ -493,6 +497,47 @@ public class GlossaryEntry
    {
       return String.format("%s[label=%s,level=%d]", getClass().getSimpleName(),
         label, level);
+   }
+
+   public String toString(TeXParser parser)
+   {
+      StringBuilder builder = new StringBuilder();
+
+      builder.append(String.format("%s[label=%s,level=%d", getClass().getSimpleName(),
+        label, level));
+
+      for (String field : fields)
+      {
+         String internalField = sty.getInternalFieldName(field);
+
+         String csname = String.format("glo@%s@%s", getLabel(), internalField);
+
+         ControlSequence cs = sty.getParser().getControlSequence(csname);
+
+         String val = "";
+
+         if (cs != null)
+         {
+            if (cs instanceof TextualContentCommand)
+            {
+               val = ((TextualContentCommand)cs).getText();
+            }
+            else if (cs instanceof GenericCommand)
+            {
+               val = ((GenericCommand)cs).getDefinition().toString(parser);
+            }
+            else
+            {
+               val = cs.toString(parser);
+            }
+         }
+
+         builder.append(String.format(",%n%s={%s}", field, val));
+      }
+
+      builder.append(']');
+
+      return builder.toString();
    }
 
    private String label;

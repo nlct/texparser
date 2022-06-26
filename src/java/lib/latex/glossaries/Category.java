@@ -66,6 +66,12 @@ public class Category
       return (val != null && val.equals(attrVal));
    }
 
+   @Override
+   public String toString()
+   {
+      return String.format("%s[label=%s]", getClass().getSimpleName(), label);
+   }
+
    protected String label;
    protected HashMap<String,String> attributes;
 }

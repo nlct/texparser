@@ -179,11 +179,18 @@ public class NewGlossaryEntry extends AbstractGlsCommand
 
       if (sty.isExtra())
       {
-         TeXObject cat = keyValList.get("category");
+         TeXObject catVal = keyValList.get("category");
 
-         if (cat == null || cat.isEmpty())
+         if (!(catVal instanceof TextualContentCommand))
          {
-            keyValList.put("category", parser.getListener().createString("general"));
+            String catLabel = "general";
+
+            if (!(catVal == null || catVal.isEmpty()))
+            {
+               catLabel = parser.expandToString(catVal, stack);
+            }
+
+            keyValList.put("category", new GlsCatLabel("@glo@category", catLabel));
          }
       }
 

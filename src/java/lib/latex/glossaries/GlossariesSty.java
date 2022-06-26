@@ -2042,7 +2042,21 @@ public class GlossariesSty extends LaTeXSty
    {
       if (entry == null) return null;
 
-      return getCategory(entry.getCategory());
+      String catLabel = entry.getCategory();
+
+      Category cat = null;
+
+      if (categories != null)
+      {
+         cat = categories.get(catLabel);
+      }
+
+      if (cat == null)
+      {
+         cat = addCategory(catLabel);
+      }
+
+      return cat;
    }
 
    public Category getCategory(String categoryLabel)
@@ -2050,6 +2064,19 @@ public class GlossariesSty extends LaTeXSty
       if (categories == null || categoryLabel == null) return null;
 
       return categories.get(categoryLabel);
+   }
+
+   public Category addCategory(String categoryLabel)
+   {
+      if (categories == null)
+      {
+         categories = new HashMap<String,Category>();
+      }
+
+      Category category = new Category(categoryLabel);
+      categories.put(categoryLabel, category);
+
+      return category;
    }
 
    public boolean isAttributeTrue(GlossaryEntry entry, String attr)

@@ -46,15 +46,38 @@ public class GlsXtrPostDescription extends AbstractGlsCommand
    {
       TeXObjectList list = parser.getListener().createStack();
 
-      String label = parser.expandToString(
-         parser.getListener().getControlSequence("glscurrententrylabel"), stack);
+      ControlSequence labelCs = parser.getListener().getControlSequence(
+        "glscurrententrylabel");
 
-      Category category = sty.getCategory(sty.getEntry(label));
+      GlossaryEntry entry = null;
+
+      if (labelCs instanceof GlsLabel)
+      {
+         entry = ((GlsLabel)labelCs).getEntry();
+      }
+
+      if (entry == null)
+      {
+         String label = parser.expandToString(labelCs, stack);
+         entry = sty.getEntry(label);
+      }
+
+      String category = null;
+
+      if (entry != null)
+      {
+         category = entry.getCategory();
+      }
 
       if (category != null)
       {
          ControlSequence cs = parser.getControlSequence("glsxtrpostdesc"
-           + category.getLabel());
+           + category);
+
+         if (cs != null)
+         {
+            list.add(cs);
+         }
       }
 
       return list;
