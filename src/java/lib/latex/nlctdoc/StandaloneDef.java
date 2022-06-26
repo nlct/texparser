@@ -100,24 +100,6 @@ public class StandaloneDef extends AbstractGlsCommand
          list.add(val, true);
       }
 
-      TeXObject providedby = glslabel.getEntry().get("providedby");
-
-      if (providedby != null)
-      {
-         if (list == null)
-         {
-            list = parser.getListener().createStack();
-         }
-         else
-         {
-            list.add(parser.getListener().getOther(';'));
-            list.add(parser.getListener().getSpace());
-         }
-
-         list.add(parser.getListener().createString("provided by "), true);
-         list.add(providedby, true);
-      }
-
       TeXObject statusVal = glslabel.getEntry().get("status");
 
       if (statusVal != null)
@@ -135,7 +117,7 @@ public class StandaloneDef extends AbstractGlsCommand
                list.add(parser.getListener().getSpace());
             }
 
-            list.add(parser.getListener().getControlSequence("glssymbol"));
+            list.add(parser.getListener().getControlSequence("gls"));
             list.add(parser.getListener().createGroup("sym."+status));
          }
       }
@@ -288,6 +270,9 @@ public class StandaloneDef extends AbstractGlsCommand
             for (GlsLabel lb : modEntries)
             {
                list.add(listener.getPar());
+               list.add(listener.getControlSequence("glsadd"));
+               list.add(lb);
+
                addRow(list, lb, parser, null);
             }
          }

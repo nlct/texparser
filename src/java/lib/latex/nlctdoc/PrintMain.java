@@ -92,8 +92,8 @@ public class PrintMain extends AbstractGlsCommand
          ControlSequence itemDescCs = listener.getControlSequence(
           "texparser@listdesc");
          ControlSequence targetCs = listener.getControlSequence("glstarget");
-         ControlSequence nameCs = listener.getControlSequence("glossentryname");
-         ControlSequence descCs = listener.getControlSequence("glossentrydesc");
+         ControlSequence nameCs = listener.getControlSequence("Glossentryname");
+         ControlSequence descCs = listener.getControlSequence("Glossentrydesc");
          ControlSequence postDescCs = listener.getControlSequence("glspostdescription");
 
          for (String label : glossary)

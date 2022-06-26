@@ -568,7 +568,8 @@ public class UserGuideSty extends LaTeXSty
       registerControlSequence(new GenericCommand(true,
        "badcodesym", null, def));
 
-      registerControlSequence(new NewDualAbbr());
+      registerControlSequence(new TextualContentCommand(
+         "glsxtrpostdescdualindexabbreviation", "."));
    }
 
    protected void addGlsFmtTextCommand(String name, String prefix)

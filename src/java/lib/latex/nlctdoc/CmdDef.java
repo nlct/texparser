@@ -56,4 +56,25 @@ public class CmdDef extends StandaloneDef
       }
    }
 
+   @Override
+   protected void postArgHook(GlsLabel glslabel, TeXParser parser, TeXObjectList stack)
+   throws IOException
+   {
+      TeXObject statusVal = glslabel.getEntry().get("status");
+
+      if (statusVal != null)
+      {
+         String status = parser.expandToString(statusVal, parser);
+
+         if (!status.equals("default"))
+         {
+            TeXObjectList title = parser.getListener().createStack();
+            title.add(parser.getListener().getControlSequence("glssymbol"));
+            title.add(parser.getListener().createGroup("sym."+status));
+
+            taggedBox.setTitle(title);
+         }
+      }
+   }
+
 }

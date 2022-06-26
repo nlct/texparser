@@ -60,8 +60,7 @@ public class PrintAbbrs extends AbstractGlsCommand
    public void process(TeXParser parser, TeXObjectList stack)
    throws IOException
    {
-      String type = parser.expandToString(
-        parser.getControlSequence("glsxtrabbrvtype"), stack);
+      String type = "abbreviations";
 
       Glossary glossary = sty.getGlossary(type);
 
