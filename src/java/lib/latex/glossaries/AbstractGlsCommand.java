@@ -93,7 +93,7 @@ public abstract class AbstractGlsCommand extends Command
          {
             if (cs instanceof GenericCommand)
             {
-               value = (TeXObject) ((GenericCommand)cs).getDefinition().value.clone();
+               value = (TeXObject) ((GenericCommand)cs).getDefinition().clone();
             }
             else
             {
