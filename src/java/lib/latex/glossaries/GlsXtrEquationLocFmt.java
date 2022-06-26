@@ -44,12 +44,13 @@ public class GlsXtrEquationLocFmt extends Command
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      TeXObject arg = popArg(parser, stack);
+      TeXObject location = popArg(parser, stack);
+      TeXObject title = popArg(parser, stack);
 
       TeXObjectList expanded = parser.getListener().createStack();
 
       expanded.add(parser.getListener().getOther('('));
-      expanded.add(arg, true);
+      expanded.add(location, true);
       expanded.add(parser.getListener().getOther(')'));
 
       return expanded;
