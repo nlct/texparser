@@ -198,10 +198,15 @@ public class LaTeXGenericCommand extends GenericCommand
    {
       TeXObject[] args = (numArgs == 0 ? null : new TeXObject[numArgs]);
 
-      byte popStyle = isShort ? TeXObjectList.POP_SHORT : 0;
-
       if (numArgs > 0)
       {
+         byte popStyle = TeXObjectList.POP_IGNORE_LEADING_SPACE;
+
+         if (isShort)
+         {
+            popStyle = (byte)(TeXObjectList.POP_SHORT | popStyle);
+         }
+
          int optIdx = 0;
 
          for (int i = 0; i < numArgs; i++)
@@ -243,7 +248,12 @@ public class LaTeXGenericCommand extends GenericCommand
 
       if (numArgs > 0)
       {
-         byte popStyle = isShort ? TeXObjectList.POP_SHORT : 0;
+         byte popStyle = TeXObjectList.POP_IGNORE_LEADING_SPACE;
+
+         if (isShort)
+         {
+            popStyle = (byte)(TeXObjectList.POP_SHORT | popStyle);
+         }
 
          int optIdx = 0;
 
