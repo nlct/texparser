@@ -27,6 +27,11 @@ public class AtNumberOfNumber extends Command
 {
    public AtNumberOfNumber(String name, int number, int total)
    {
+      this(name, number, total, false);
+   }
+
+   public AtNumberOfNumber(String name, int number, int total, boolean isRobust)
+   {
       super(name);
 
       if (number < 1 || number > total || total < 1)
@@ -37,22 +42,36 @@ public class AtNumberOfNumber extends Command
 
       this.number = number;
       this.total = total;
+      this.isRobust = isRobust;
    }
 
    public Object clone()
    {
-      return new AtNumberOfNumber(getName(), number, total);
+      return new AtNumberOfNumber(getName(), number, total, isRobust);
    }
 
+   @Override
+   public boolean canExpand()
+   {
+      return !isRobust;
+   }
+
+   @Override
    public TeXObjectList expandonce(TeXParser parser)
      throws IOException
    {
       return expandonce(parser, parser);
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
+      if (isRobust)
+      {
+         return null;
+      }
+
       TeXObjectList list = new TeXObjectList();
 
       for (int i = 1; i <= total; i++)
@@ -68,18 +87,58 @@ public class AtNumberOfNumber extends Command
       return list;
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser)
      throws IOException
    {
+      if (isRobust)
+      {
+         return null;
+      }
+
       return expandonce(parser).expandfully(parser);
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
+      if (isRobust)
+      {
+         return null;
+      }
+
       return expandonce(parser, stack).expandfully(parser, stack);
+   }
+
+   @Override
+   public void process(TeXParser parser, TeXObjectList stack)
+     throws IOException
+   {
+      TeXObject obj = null;
+
+      for (int i = 1; i <= total; i++)
+      {
+         TeXObject arg = popArg(parser, stack);
+
+         if (i == number)
+         {
+            obj = arg;
+         }
+      }
+
+      TeXParserUtils.process(obj, parser, stack);
+   }
+
+   @Override
+   public void process(TeXParser parser)
+     throws IOException
+   {
+      process(parser, parser);
    }
 
    private int number;
    private int total;
+
+   private boolean isRobust = false;
 }
