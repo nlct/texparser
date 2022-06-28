@@ -521,6 +521,20 @@ public class TeXParserUtils
       return KeyValList.getList(parser, arg);
    }
 
+   public static boolean isTrue(String csname, TeXParser parser)
+   {
+      TeXBoolean bool = toBoolean(csname, parser);
+
+      return bool != null && bool.booleanValue();
+   }
+
+   public static boolean isFalse(String csname, TeXParser parser)
+   {
+      TeXBoolean bool = toBoolean(csname, parser);
+
+      return bool != null && !bool.booleanValue();
+   }
+
    public static TeXBoolean toBoolean(String csname, TeXParser parser)
    {
       return toBoolean(parser.getControlSequence(csname), parser);
