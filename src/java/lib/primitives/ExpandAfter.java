@@ -49,6 +49,12 @@ public class ExpandAfter extends Primitive implements Expandable
 
       TeXObject firstArg = stack.popToken(popStyle);
 
+      if (firstArg instanceof Group)
+      {
+         stack.push(TeXParserUtils.expandOnce(firstArg, parser, stack), true);
+         firstArg = stack.popToken(popStyle);
+      }
+
       TeXObject secondArg = stack.popToken(popStyle);
 
       if (secondArg instanceof TeXCsRef)
@@ -62,26 +68,9 @@ public class ExpandAfter extends Primitive implements Expandable
          parser.logMessage("EXPANDAFTER: FIRST: "+firstArg+". SECOND: "+secondArg);
       }
 
-      if (secondArg.canExpand() && secondArg instanceof Expandable)
-      {
-         TeXObjectList expanded;
+      TeXObject expanded = TeXParserUtils.expandOnce(secondArg, parser, stack);
 
-         if (parser == stack)
-         {
-            expanded = ((Expandable)secondArg).expandonce(parser);
-         }
-         else
-         {
-            expanded = ((Expandable)secondArg).expandonce(parser, stack);
-         }
-
-         if (expanded != null)
-         {
-            secondArg = expanded;
-         }
-      }
-
-      list.push(secondArg, true);
+      list.push(expanded, true);
 
       list.push(firstArg);
 
