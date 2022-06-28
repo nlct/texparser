@@ -23,14 +23,14 @@ import java.io.IOException;
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.*;
 
-public class GlsSeeFormat extends Command
+public class GlsHyperlink extends Command
 {
-   public GlsSeeFormat()
+   public GlsHyperlink()
    {
-      this("glsseeformat");
+      this("glshyperlink");
    }
 
-   public GlsSeeFormat(String name)
+   public GlsHyperlink(String name)
    {
       super(name);
    }
@@ -38,34 +38,40 @@ public class GlsSeeFormat extends Command
    @Override
    public Object clone()
    {
-      return new GlsSeeFormat(getName());
+      return new GlsHyperlink(getName());
    }
 
    @Override
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      TeXObject tag = popOptArg(parser, stack);
+      TeXParserListener listener = parser.getListener();
 
-      if (tag == null)
+      TeXObjectList expanded = listener.createStack();
+
+      TeXObject linkText = popOptArg(parser, stack);
+      String label = popLabelString(parser, stack);
+
+      if (linkText == null)
       {
-         tag = parser.getListener().getControlSequence("seename");
+         linkText = listener.createStack();
+
+         ((TeXObjectList)linkText).add(new TeXCsRef("glsentrytext"));
+         ((TeXObjectList)linkText).add(listener.createGroup(label));
       }
 
-      TeXObject labelList = popArg(parser, stack);
-      popArg(parser, stack);// ignore
+      expanded.add(new TeXCsRef("@glslink"));
 
-      TeXObjectList expanded = parser.getListener().createStack();
+      Group grp = listener.createGroup();
+      expanded.add(grp);
 
-      expanded.add(parser.getListener().getControlSequence("emph"));
+      grp.add(new TeXCsRef("glolinkprefix"));
+      grp.add(listener.createString(label), true);
 
-      expanded.add(TeXParserUtils.createGroup(parser, tag));
+      grp = listener.createGroup();
+      expanded.add(grp);
 
-      expanded.add(parser.getListener().getSpace());
-
-      expanded.add(parser.getListener().getControlSequence("glsseelist"));
-
-      expanded.add(TeXParserUtils.createGroup(parser, labelList));
+      grp.add(linkText);
 
       return expanded;
    }

@@ -19,7 +19,7 @@
 package com.dickimawbooks.texparserlib.latex.nlctdoc;
 
 import java.io.IOException;
-import java.awt.Color;
+import java.util.Vector;
 
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.*;
@@ -56,6 +56,49 @@ public class PrintIndex extends AbstractGlsCommand
       return null;
    }
 
+   protected void addStatus(TeXObjectList content, GlsLabel glslabel, TeXParser parser)
+   {
+      TeXObject statusVal = glslabel.getEntry().get("status");
+
+      if (statusVal != null)
+      {
+         String status = statusVal.toString(parser);
+
+         if (!status.equals("default") && !status.isEmpty())
+         {
+            content.add(parser.getListener().getControlSequence("glssymbol"));
+            content.add(parser.getListener().createGroup("sym."+status));
+            content.add(parser.getListener().getSpace());
+         }
+      }
+   }
+
+   protected void addTarget(TeXObjectList content, GlsLabel glslabel, TeXParser parser)
+   {
+      TeXParserListener listener = parser.getListener();
+
+      Vector<String> targets = sty.getTargets(glslabel);
+
+      if (targets != null)
+      {
+         String targetName = targets.firstElement();
+
+         ControlSequence hyperlinkCs = parser.getControlSequence("hyperlink");
+
+         if (hyperlinkCs != null)
+         {
+            content.add(hyperlinkCs);
+            content.add(listener.createGroup(targetName));
+         }
+      }
+      else
+      {
+         content.add(listener.getControlSequence("glstarget"));
+         content.add(glslabel);
+      }
+
+   }
+
    @Override
    public void process(TeXParser parser, TeXObjectList stack)
    throws IOException
@@ -84,7 +127,6 @@ public class PrintIndex extends AbstractGlsCommand
 
          TeXParserUtils.process(list, parser, stack);
 
-         ControlSequence targetCs = listener.getControlSequence("glstarget");
          ControlSequence nameCs = listener.getControlSequence("glossentryname");
 
          ControlSequence item0 = listener.getControlSequence("nlctuserguideidx0");
@@ -118,14 +160,15 @@ public class PrintIndex extends AbstractGlsCommand
             Group content = listener.createGroup();
             list.add(content);
 
-            content.add(targetCs);
-            content.add(glslabel);
+            addTarget(content, glslabel, parser);
 
             Group grp = listener.createGroup();
             content.add(grp);
 
             grp.add(nameCs);
             grp.add(glslabel);
+
+            addStatus(content, glslabel, parser);
 
             TeXObject loc = entry.get("location");
 

@@ -96,7 +96,6 @@ public class SummaryBox extends AbstractGlsCommand
    {
       TeXObjectList list = null;
 
-/*
       TeXObject val = glslabel.getEntry().get("defaultvalue");
 
       if (val != null)
@@ -143,7 +142,6 @@ public class SummaryBox extends AbstractGlsCommand
          list.add(providedby, true);
       }
 
-*/
       return list;
    }
 

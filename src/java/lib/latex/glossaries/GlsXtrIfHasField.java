@@ -42,38 +42,48 @@ public class GlsXtrIfHasField extends AbstractGlsCommand
    }
 
    @Override
-   public boolean canExpand()
-   {
-      return false;
-   }
-
-   @Override
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      return null;
-   }
+      boolean addScope = popModifier(parser, stack, '*') == -1;
 
-   @Override
-   public TeXObjectList expandonce(TeXParser parser) throws IOException
-   {
-      return null;
-   }
+      String fieldLabel = sty.getFieldName(popLabelString(parser, stack));
 
-   @Override
-   public TeXObjectList expandfully(TeXParser parser, TeXObjectList stack)
-     throws IOException
-   {
-      return null;
-   }
+      GlsLabel glslabel = popEntryLabel(parser, stack);
 
-   @Override
-   public TeXObjectList expandfully(TeXParser parser)
-     throws IOException
-   {
-      return null;
-   }
+      TeXObject value = getFieldValue(glslabel, fieldLabel);
 
+      boolean hasField = (value != null && !value.isEmpty());
+
+      TeXObject trueCode = popArg(parser, stack);
+      TeXObject falseCode = popArg(parser, stack);
+
+      TeXObjectList expanded = parser.getListener().createStack();
+      TeXObjectList content = expanded;
+
+      if (addScope)
+      {
+         content = parser.getListener().createGroup();
+      }
+
+      content.add(new TeXCsRef("def"));
+      content.add(new TeXCsRef("glscurrentfieldvalue"));
+
+      Group grp = parser.getListener().createGroup();
+      content.add(grp);
+
+      if (hasField)
+      {
+         grp.add(value);
+         content.add(trueCode, true);
+      }
+      else
+      {
+         content.add(falseCode, true);
+      }
+
+      return expanded;
+   }
 
    @Override
    public void process(TeXParser parser, TeXObjectList stack)
@@ -81,9 +91,9 @@ public class GlsXtrIfHasField extends AbstractGlsCommand
    {
       boolean addScope = popModifier(parser, stack, '*') == -1;
 
-      GlsLabel glslabel = popEntryLabel(parser, stack);
-
       String fieldLabel = sty.getFieldName(popLabelString(parser, stack));
+
+      GlsLabel glslabel = popEntryLabel(parser, stack);
 
       TeXObject value = getFieldValue(glslabel, fieldLabel);
 

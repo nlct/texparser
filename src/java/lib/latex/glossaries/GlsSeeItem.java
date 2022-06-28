@@ -23,14 +23,14 @@ import java.io.IOException;
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.*;
 
-public class GlsSeeFormat extends Command
+public class GlsSeeItem extends Command
 {
-   public GlsSeeFormat()
+   public GlsSeeItem()
    {
-      this("glsseeformat");
+      this("glsseeitem");
    }
 
-   public GlsSeeFormat(String name)
+   public GlsSeeItem(String name)
    {
       super(name);
    }
@@ -38,34 +38,24 @@ public class GlsSeeFormat extends Command
    @Override
    public Object clone()
    {
-      return new GlsSeeFormat(getName());
+      return new GlsSeeItem(getName());
    }
 
    @Override
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      TeXObject tag = popOptArg(parser, stack);
+      TeXParserListener listener = parser.getListener();
+      TeXObjectList expanded = listener.createStack();
 
-      if (tag == null)
-      {
-         tag = parser.getListener().getControlSequence("seename");
-      }
+      String label = popLabelString(parser, stack);
 
-      TeXObject labelList = popArg(parser, stack);
-      popArg(parser, stack);// ignore
-
-      TeXObjectList expanded = parser.getListener().createStack();
-
-      expanded.add(parser.getListener().getControlSequence("emph"));
-
-      expanded.add(TeXParserUtils.createGroup(parser, tag));
-
-      expanded.add(parser.getListener().getSpace());
-
-      expanded.add(parser.getListener().getControlSequence("glsseelist"));
-
-      expanded.add(TeXParserUtils.createGroup(parser, labelList));
+      expanded.add(new TeXCsRef("glshyperlink"));
+      expanded.add(listener.getOther('['));
+      expanded.add(new TeXCsRef("glsseeitemformat"));
+      expanded.add(listener.createGroup(label));
+      expanded.add(listener.getOther(']'));
+      expanded.add(listener.createGroup(label));
 
       return expanded;
    }

@@ -239,6 +239,7 @@ public class GlossariesSty extends LaTeXSty
       registerControlSequence(new AtSecondOfTwo("glsdonohyperlink"));
       registerControlSequence(new HyperTarget("glsdohypertarget"));
       registerControlSequence(new HyperLink("glsdohyperlink"));
+      registerControlSequence(new GlsHyperlink());
 
       registerControlSequence(new AtGobble("glsentryitem"));
       registerControlSequence(new AtGobble("glssubentryitem"));
@@ -246,6 +247,8 @@ public class GlossariesSty extends LaTeXSty
 
       registerControlSequence(new GlsSeeFormat());
       registerControlSequence(new GlsSeeList());
+      registerControlSequence(new GlsSeeItem());
+      registerControlSequence(new TextualContentCommand("seename", "see"));
       registerControlSequence(new TextualContentCommand("glsseesep", ", "));
       registerControlSequence(new GenericCommand(true,
         "glsseelastsep", null, TeXParserUtils.createStack(listener,
@@ -489,6 +492,9 @@ public class GlossariesSty extends LaTeXSty
          registerControlSequence(new AtGlsAcrAtStyleDefsAtLongShort(this));
 
          registerControlSequence(new GlsGenAcFmt(this));
+
+         registerControlSequence(new GenericCommand(true,
+          "glsseeitemformat", null, new TeXCsRef("glsentrytext")));
       }
    }
 
@@ -496,6 +502,10 @@ public class GlossariesSty extends LaTeXSty
    {
       listener.newtoks(true, "glsshortpltok");
       listener.newtoks(true, "glslongpltok");
+
+      registerControlSequence(new TextualContentCommand("seealsoname", "see also"));
+      registerControlSequence(new GenericCommand(true,
+       "glsseeitemformat", null, new TeXCsRef("glsentryname")));
 
       registerControlSequence(new TextualContentCommand("abbreviationsname", "Abbreviations"));
 

@@ -27,7 +27,7 @@ public class GlsSeeList extends Command
 {
    public GlsSeeList()
    {
-      this("glsseeformat");
+      this("glsseelist");
    }
 
    public GlsSeeList(String name)
