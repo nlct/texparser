@@ -106,62 +106,16 @@ public abstract class LaTeXSty extends LaTeXFile
 
          if (orgCatCode != TeXParser.TYPE_LETTER)
          {
-            substack.add(new UserNumber(orgCatCode));
-            substack.add(listener.getOther('='));
-            substack.add(new UserNumber((int)'@'));
             substack.add(listener.getControlSequence("catcode"));
+            substack.add(new UserNumber((int)'@'));
+            substack.add(listener.getOther('='));
+            substack.add(new UserNumber(orgCatCode));
          }
 
          substack.add(new TeXParserSetUndefAction(orgAction));
 
          TeXParserUtils.process(substack, getParser(), stack);
 
-/*
-         ControlSequence orgCurrName = getParser().getControlSequence(
-           "@currname");
-         ControlSequence orgCurrExt = getParser().getControlSequence(
-           "@currext");
-
-         getParser().putControlSequence(true, 
-            new GenericCommand("@currname", null, 
-              listener.createString(getName())));
-
-         getParser().putControlSequence(true, 
-            new GenericCommand("@currext", null, 
-              listener.createString(getExtension())));
-
-         try
-         {
-            getParser().setCatCode(true, '@', TeXParser.TYPE_LETTER);
-            listener.input(this);
-         }
-         catch (IOException e)
-         {
-            listener.getTeXApp().error(e);
-         }
-
-         if (orgCurrName == null)
-         {
-            getParser().removeControlSequence(true, "@currname");
-         }
-         else
-         {
-            getParser().putControlSequence(true, orgCurrName);
-         }
-
-         if (orgCurrExt == null)
-         {
-            getParser().removeControlSequence(true, "@currext");
-         }
-         else
-         {
-            getParser().putControlSequence(true, orgCurrExt);
-         }
-
-         getParser().setCatCode(true, '@', orgCatCode);
-
-         listener.setUndefinedAction(orgAction);
-*/
       }
    }
 

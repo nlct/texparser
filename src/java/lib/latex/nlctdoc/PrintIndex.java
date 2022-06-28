@@ -131,7 +131,7 @@ public class PrintIndex extends AbstractGlsCommand
 
             if (loc != null)
             {
-               content.add(listener.getSpace());
+               content.add(listener.getControlSequence("qquad"));
                content.add(loc);
             }
 
