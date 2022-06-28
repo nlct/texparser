@@ -2359,6 +2359,11 @@ public class L2HConverter extends LaTeXParserListener
       {
          write("<span class=\"clearfix\"></span>");
       }
+
+      if (tag.equals("div") && !fbox.isInLine())
+      {
+         writeln("");
+      }
    }
 
    public void startTheorem(String name) throws IOException

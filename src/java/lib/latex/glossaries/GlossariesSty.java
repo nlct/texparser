@@ -244,6 +244,13 @@ public class GlossariesSty extends LaTeXSty
       registerControlSequence(new AtGobble("glssubentryitem"));
       registerControlSequence(new GlsPostDescription(this));
 
+      registerControlSequence(new GlsSeeFormat());
+      registerControlSequence(new GlsSeeList());
+      registerControlSequence(new TextualContentCommand("glsseesep", ", "));
+      registerControlSequence(new GenericCommand(true,
+        "glsseelastsep", null, TeXParserUtils.createStack(listener,
+        new TeXCsRef("space"), new TeXCsRef("andname"), new TeXCsRef("space"))));
+
       registerControlSequence(new NewGlossaryEntry(this));
       registerControlSequence(new LongNewGlossaryEntry(this));
       registerControlSequence(new LoadGlsEntries());
@@ -506,6 +513,7 @@ public class GlossariesSty extends LaTeXSty
       registerControlSequence(new GlsSetAbbrvFmt(this));
       registerControlSequence(new GlsXtrGenAbbrvFmt(this));
 
+      registerControlSequence(new GlsXtrIfHasField(this));
       registerControlSequence(new GlsEntryField("glscategory", "category", this));
       registerControlSequence(new GlsIfAttributeBool("glsifregular",
        "regular", true, this));
@@ -521,6 +529,10 @@ public class GlossariesSty extends LaTeXSty
       registerControlSequence(new GlsSetAttribute("glssetcategoryattributes", true, this));
       registerControlSequence(new GlsSetAttribute("glssetcategoriesattribute", true, this));
       registerControlSequence(new GlsSetAttribute("glssetcategoriesattributes", true, this));
+
+      registerControlSequence(new GlsSeeList("glsxtrseelist"));
+      registerControlSequence(new GenericCommand(true,
+        "glsseelastoxfordsep", null, new TeXCsRef("glsseelastsep")));
 
       registerControlSequence(new GlsXtrPostDescription(this));
       registerControlSequence(new PrintUnsrtGlossaries(this));
@@ -930,7 +942,8 @@ public class GlossariesSty extends LaTeXSty
 
       NewIf.createConditional(true, getParser(), "ifKV@glslink@noindex", false);
 
-      registerControlSequence(new AtFirstOfTwo("glsxtr@wrglossarylocation"));
+      registerControlSequence(new AtNumberOfNumber(
+        "glsxtr@wrglossarylocation", 1, 2, true));
       registerControlSequence(new GlsXtrIndexCounterLink(this));
       registerControlSequence(new GlsXtrDualBackLink(this));
 

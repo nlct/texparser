@@ -58,26 +58,27 @@ public class GlsXtrWrGlossaryLocFmt extends ControlSequence
          substack.add(cs);
          substack.add(TeXParserUtils.createGroup(parser, (TeXObject)location.clone()));
 
-         if (parser == stack)
+         TeXParserUtils.process(substack, parser, stack);
+      }
+
+      if (parser.isStack(location) && !location.isEmpty())
+      {
+         TeXObjectList list = (TeXObjectList)location;
+
+         if (list.size() == 3)
          {
-            substack.process(parser);
-         }
-         else
-         {
-            substack.process(parser, stack);
+            TeXObject firstObj = list.firstElement();
+
+            if (firstObj instanceof ControlSequence 
+                 && ((ControlSequence)firstObj).getName().equals(
+                      "glsxtr@wrglossarylocation"))
+            {
+               location = list.lastElement();
+            }
          }
       }
 
-      parser.putControlSequence(true, new AtSecondOfTwo("glsxtr@wrglossarylocation"));
-
-      if (parser == stack)
-      {
-         location.process(parser);
-      }
-      else
-      {
-         location.process(parser, stack);
-      }
+      TeXParserUtils.process(location, parser, stack);
 
       parser.endGroup();
    }

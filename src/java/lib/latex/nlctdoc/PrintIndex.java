@@ -76,67 +76,68 @@ public class PrintIndex extends AbstractGlsCommand
             cs = listener.getControlSequence("section");
          }
 
-         String env = "texparser@block@list";
          list.add(cs);
          list.add(listener.getOther('*'));
          list.add(listener.createGroup("Index"));
          list.add(new TeXCsRef("label"));
          list.add(listener.createGroup("index"));
-         list.add(listener.getControlSequence("begin"));
-         list.add(listener.createGroup(env));
 
-         ControlSequence defCs = listener.getControlSequence("def");
-         ControlSequence itemCs = listener.getControlSequence(
-          "texparser@listitem");
-         ControlSequence itemDescCs = listener.getControlSequence(
-          "texparser@listdesc");
+         TeXParserUtils.process(list, parser, stack);
+
          ControlSequence targetCs = listener.getControlSequence("glstarget");
          ControlSequence nameCs = listener.getControlSequence("glossentryname");
-         ControlSequence descCs = listener.getControlSequence("glossentrydesc");
-         ControlSequence postDescCs = listener.getControlSequence("glspostdescription");
+
+         ControlSequence item0 = listener.getControlSequence("nlctuserguideidx0");
+         ControlSequence item1 = listener.getControlSequence("nlctuserguideidx1");
+         ControlSequence item2 = listener.getControlSequence("nlctuserguideidx2");
+         ControlSequence item3 = listener.getControlSequence("nlctuserguideidx3");
 
          for (String label : glossary)
          {
-            GlsLabel glslabel = new GlsLabel("glscurrententrylabel@"+label,
-              label, sty.getEntry(label));
+            GlossaryEntry entry = sty.getEntry(label);
 
-            list.add(defCs);
-            list.add(new TeXCsRef("glscurrententrylabel"));
-            list.add(listener.createGroup(label));
-            list.add(itemCs);
+            GlsLabel glslabel = new GlsLabel("glscurrententrylabel",
+              label, entry);
+
+            parser.putControlSequence(true, glslabel);
+
+            int level = entry.getLevel();
+
+            ControlSequence item;
+
+            switch (level)
+            {
+               case 0: item = item0; break;
+               case 1: item = item1; break;
+               case 2: item = item2; break;
+               default: item = item3;
+            }
+
+            list.add(item);
+
+            Group content = listener.createGroup();
+            list.add(content);
+
+            content.add(targetCs);
+            content.add(glslabel);
 
             Group grp = listener.createGroup();
-            list.add(grp);
+            content.add(grp);
 
-            grp.add(targetCs);
+            grp.add(nameCs);
             grp.add(glslabel);
 
-            Group subgrp = listener.createGroup();
-            grp.add(subgrp);
-            subgrp.add(nameCs);
-            subgrp.add(glslabel);
+            TeXObject loc = entry.get("location");
 
-            list.add(itemDescCs);
+            if (loc != null)
+            {
+               content.add(listener.getSpace());
+               content.add(loc);
+            }
 
-            grp = listener.createGroup();
-            list.add(grp);
-
-            grp.add(descCs);
-            grp.add(glslabel);
-            grp.add(postDescCs);
+            TeXParserUtils.process(list, parser, stack);
          }
 
-         list.add(listener.getControlSequence("end"));
-         list.add(listener.createGroup(env));
-
-         if (parser == stack || stack == null)
-         {
-            list.process(parser);
-         }
-         else
-         {
-            list.process(parser, stack);
-         }
       }
    }
 

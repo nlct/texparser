@@ -597,6 +597,31 @@ public class TeXParserUtils
    }
 
    /**
+    * Creates a stack containing the given objects. 
+    */ 
+   public static TeXObjectList createStack(TeXParser parser,
+     TeXObject... objects)
+   {
+      return createStack(parser.getListener(), objects);
+   }
+
+   /**
+    * Creates a stack containing the given objects. 
+    */ 
+   public static TeXObjectList createStack(TeXParserListener listener,
+     TeXObject... objects)
+   {
+      TeXObjectList stack = listener.createStack();
+
+      for (TeXObject obj : objects)
+      {
+         stack.add(obj);
+      }
+
+      return stack;
+   }
+
+   /**
     * Creates a group containing the given objects. 
     */ 
    public static Group createGroup(TeXParser parser,

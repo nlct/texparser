@@ -187,6 +187,10 @@ public class UserGuideSty extends LaTeXSty
       registerControlSequence(new SummaryCommandBox(defnBox, 
         rightBox, noteBox, glossariesSty));
 
+      createIndexItemBox(0);
+      createIndexItemBox(1);
+      createIndexItemBox(2);
+
       addGlsFmtTextCommand("stytext", "pkg.");
       addGlsFmtTextCommand("clstext", "cls.");
       addGlsFmtTextCommand("opttext", "opt.");
@@ -917,6 +921,16 @@ public class UserGuideSty extends LaTeXSty
       registerControlSequence(taggedBox);
 
       return taggedBox;
+   }
+
+   protected void createIndexItemBox(int level)
+   { 
+      FrameBox idxBox = new FrameBox("nlctuserguideidx"+level,
+       BorderStyle.NONE, AlignHStyle.DEFAULT, AlignVStyle.DEFAULT, false);
+
+      idxBox.setOuterMarginLeft(new UserDimension(level*20, FixedUnit.BP));
+
+      getListener().declareFrameBox(idxBox, false);
    }
 
    protected GlossariesSty glossariesSty;
