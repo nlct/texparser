@@ -480,8 +480,6 @@ public class BibEntry extends BibData
                break;
             }
 
-            surname = new TeXObjectList();
-
             for (int i = 0, lastIdx = list.size()-1; i <= lastIdx; i++)
             {
                TeXObjectList word = list.get(i);
