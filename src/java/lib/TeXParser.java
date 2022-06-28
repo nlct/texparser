@@ -47,6 +47,9 @@ import com.dickimawbooks.texparserlib.latex.LaTeXSyntaxException;
  * read from the reader until EOF. When sub-stacks run out they are
  * discarded and the main processing returns to the TeXParser stack.
  *
+ * Be careful about pushing content to a stack or the parser as it
+ * can delay processing the content.
+ *
  * The principle TeXObject sub-classes are:
  *
  * Macro: corresponds to a macro, which may be ActiveChar (an active
