@@ -114,6 +114,8 @@ public class Gls extends AbstractGlsCommand
 
       LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
 
+      TeXObjectList substack = listener.createStack();
+
       if (entry == null)
       {
          sty.undefWarnOrError(stack, 
@@ -171,22 +173,17 @@ public class Gls extends AbstractGlsCommand
             cs = listener.getControlSequence("glsentryfmt");
          }
 
-         stack.push(cs);
-         stack.push(glslabel);
+         substack.add(listener.getControlSequence("@gls@link"));
 
          if (keyValList != null)
          {
-            stack.push(keyValList);
+            substack.add(keyValList);
          }
 
-         if (stack == parser || stack == null)
-         {
-            listener.getControlSequence("@gls@link").process(parser);
-         }
-         else
-         {
-            listener.getControlSequence("@gls@link").process(parser, stack);
-         }
+         substack.add(glslabel);
+         substack.add(cs);
+
+         TeXParserUtils.process(substack, parser, stack);
 
          if (!isUnset)
          {
@@ -194,7 +191,9 @@ public class Gls extends AbstractGlsCommand
          }
       }
 
-      stack.push(listener.getControlSequence("glspostlinkhook"));
+      substack.add(listener.getControlSequence("glspostlinkhook"));
+
+      TeXParserUtils.process(substack, parser, stack);
    }
 
    public void process(TeXParser parser)

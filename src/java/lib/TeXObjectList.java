@@ -1563,6 +1563,11 @@ public class TeXObjectList extends Vector<TeXObject>
    public TeXObjectList expandonce(TeXParser parser)
      throws IOException
    {
+      if (isEmpty())
+      {
+         return this;
+      }
+
       flatten();
 
       TeXObjectList list = new TeXObjectList(size());
@@ -1636,6 +1641,11 @@ public class TeXObjectList extends Vector<TeXObject>
         TeXObjectList stack)
      throws IOException
    {
+      if (isEmpty())
+      {
+         return this;
+      }
+
       flatten();
 
       TeXObjectList list = new TeXObjectList(size());

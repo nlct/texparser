@@ -160,7 +160,7 @@ public class LaTeXGenericEnvironment extends Declaration
    {
       if (beginCode != null)
       {
-         parser.push((TeXObject)beginCode.clone(), true);
+         TeXParserUtils.process((TeXObject)beginCode.clone(), parser, parser);
       }
    }
 
@@ -169,7 +169,7 @@ public class LaTeXGenericEnvironment extends Declaration
    {
       if (beginCode != null)
       {
-         stack.push((TeXObject)beginCode.clone(), true);
+         TeXParserUtils.process((TeXObject)beginCode.clone(), parser, stack);
       }
    }
 
@@ -178,16 +178,7 @@ public class LaTeXGenericEnvironment extends Declaration
    {
       if (endCode != null)
       {
-         TeXObject obj = (TeXObject)endCode.clone();
-
-         if (stack == null || stack == parser)
-         {
-            obj.process(parser);
-         }
-         else
-         {
-            obj.process(parser, stack);
-         }
+         TeXParserUtils.process((TeXObject)endCode.clone(), parser, stack);
       }
    }
 

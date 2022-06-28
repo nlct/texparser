@@ -84,35 +84,5 @@ public class GlsPostDescription extends AbstractGlsCommand
       return list;
    }
 
-   public void process(TeXParser parser, TeXObjectList stack)
-     throws IOException
-   {
-      TeXParserListener listener = parser.getListener();
-
-      if (sty.isExtra())
-      {
-         stack.push(listener.getControlSequence("glsxtrpostdescription"));
-      }
-
-      if (punc == null)
-      {
-         stack.push(listener.getControlSequence("fi"));
-         stack.push(listener.getSpace());
-         stack.push(listener.getOther('.'));
-         stack.push(listener.getControlSequence("else"));
-         stack.push(listener.getControlSequence("ifglsnopostdot"));
-      }
-      else
-      {
-         stack.push((TeXObject)punc.clone());
-      }
-   }
-
-   public void process(TeXParser parser)
-     throws IOException
-   {
-      process(parser, parser);
-   }
-
    private TeXObject punc = null;
 }

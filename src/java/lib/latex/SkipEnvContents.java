@@ -81,10 +81,10 @@ public abstract class SkipEnvContents extends Declaration
          {
             String envName = popLabelString(parser, stack);
 
-            Group grp = parser.getListener().createGroup(envName);
-
             if (envName.equals(getName()))
             {
+               Group grp = parser.getListener().createGroup(envName);
+
                stack.push(grp);
                stack.push(object);
                break;

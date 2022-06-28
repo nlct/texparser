@@ -16,40 +16,47 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
-package com.dickimawbooks.texparserlib.latex;
+package com.dickimawbooks.texparserlib.latex.glossaries;
 
 import java.io.IOException;
 
 import com.dickimawbooks.texparserlib.*;
+import com.dickimawbooks.texparserlib.latex.*;
 
-public class NewLength extends ControlSequence
+public class AtGlsXtrWrGlossCounterMark extends Command
 {
-   public NewLength()
+   public AtGlsXtrWrGlossCounterMark()
    {
-      this("newlength");
-   }
+      this("@glsxtrwrglosscountermark");
+   } 
 
-   public NewLength(String name)
+   public AtGlsXtrWrGlossCounterMark(String name)
    {
       super(name);
+   } 
+
+   @Override
+   public TeXObject clone()
+   {
+      return new AtGlsXtrWrGlossCounterMark(getName());
    }
 
-   public Object clone()
+   @Override
+   public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
+   throws IOException
    {
-      return new NewLength(getName());
-   }
+      LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
 
-   public void process(TeXParser parser, TeXObjectList stack)
-     throws IOException
-   {
-      ControlSequence cs = popControlSequence(parser, stack);
+      TeXObject arg = popArg(parser, stack);
+      TeXObjectList expanded = parser.getListener().createStack();
 
-      parser.getSettings().newdimen(cs.getName());
-   }
+      if (listener.isInDocEnv())
+      {
+         expanded.add(listener.getControlSequence("glsxtrwrglosscountermark"));
 
-   public void process(TeXParser parser)
-     throws IOException
-   {
-      process(parser, parser);
+         expanded.add(TeXParserUtils.createGroup(parser, arg));
+      }
+
+      return expanded;
    }
 }

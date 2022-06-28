@@ -686,21 +686,25 @@ public class FrameBox extends ControlSequence
 
       TeXObject arg = popContents(parser, stack);
 
-      stack.push(new EndFrameBox(fbox));
+      TeXObjectList substack = parser.getListener().createStack();
 
-      if (suffix != null)
-      {
-         stack.push((TeXObject)suffix.clone(), true);
-      }
-
-      stack.push(arg, true);
+      substack.add(new StartFrameBox(fbox));
 
       if (prefix != null)
       {
-         stack.push((TeXObject)prefix.clone(), true);
+         substack.add((TeXObject)prefix.clone(), true);
       }
 
-      stack.push(new StartFrameBox(fbox));
+      substack.add(arg, true);
+
+      if (suffix != null)
+      {
+         substack.add((TeXObject)suffix.clone(), true);
+      }
+
+      substack.add(new EndFrameBox(fbox));
+
+      TeXParserUtils.process(substack, parser, stack);
    }
 
    protected String id;

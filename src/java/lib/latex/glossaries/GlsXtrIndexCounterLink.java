@@ -42,22 +42,11 @@ public class GlsXtrIndexCounterLink extends AbstractGlsCommand
    }
 
    @Override
-   public boolean canExpand()
-   {
-      return false;
-   }
-
-   @Override
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      return null;
-   }
+      TeXObjectList substack = parser.getListener().createStack();
 
-   @Override
-   public void process(TeXParser parser, TeXObjectList stack)
-     throws IOException
-   {
       TeXObject textArg = popArg(parser, stack);
       GlsLabel glslabel = popEntryLabel(parser, stack);
 
@@ -65,7 +54,7 @@ public class GlsXtrIndexCounterLink extends AbstractGlsCommand
 
       if (hyperrefCs == null)
       {
-         stack.push(textArg, true);
+         substack.add(textArg, true);
       }
       else
       {
@@ -73,25 +62,19 @@ public class GlsXtrIndexCounterLink extends AbstractGlsCommand
 
          if (val == null || val.isEmpty())
          {
-            stack.push(textArg, true);
+            substack.add(textArg, true);
          }
          else
          {
-            stack.push(TeXParserUtils.createGroup(parser.getListener(), textArg));
-            stack.push(parser.getListener().getOther(']'));
-            stack.push(val, true);
-            stack.push(parser.getListener().createString("wrglossary."), true);
-            stack.push(parser.getListener().getOther('['));
-            stack.push(hyperrefCs);
+            substack.add(hyperrefCs);
+            substack.add(parser.getListener().getOther('['));
+            substack.add(parser.getListener().createString("wrglossary."), true);
+            substack.add(val, true);
+            substack.add(parser.getListener().getOther(']'));
+            substack.add(TeXParserUtils.createGroup(parser.getListener(), textArg));
          }
       }
-   }
 
-   @Override
-   public void process(TeXParser parser)
-     throws IOException
-   {
-      process(parser, parser);
+      return substack;
    }
-
 }

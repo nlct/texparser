@@ -70,7 +70,7 @@ public class SummaryBox extends AbstractGlsCommand
 
       if (statusVal != null)
       {
-         String status = parser.expandToString(statusVal, parser);
+         String status = statusVal.toString(parser);
 
          if (!status.equals("default") && !status.isEmpty())
          {
@@ -96,6 +96,7 @@ public class SummaryBox extends AbstractGlsCommand
    {
       TeXObjectList list = null;
 
+/*
       TeXObject val = glslabel.getEntry().get("defaultvalue");
 
       if (val != null)
@@ -142,6 +143,7 @@ public class SummaryBox extends AbstractGlsCommand
          list.add(providedby, true);
       }
 
+*/
       return list;
    }
 
@@ -183,6 +185,9 @@ public class SummaryBox extends AbstractGlsCommand
 
       addEntryName(grp, glslabel, parser);
       addPostEntryName(list, glslabel, parser);
+
+      list.add(new TeXCsRef("glsadd"));
+      list.add(glslabel);
 
       TeXObject rightBoxContent = getRightBoxContent(glslabel, parser);
 
@@ -247,7 +252,11 @@ public class SummaryBox extends AbstractGlsCommand
 
       TeXParserListener listener = parser.getListener();
 
+      TeXObjectList substack = listener.createStack();
+      substack.add(frameBox);
+ 
       Group content = listener.createGroup();
+      substack.add(content);
 
       GlossaryEntry entry = glslabel.getEntry();
 
@@ -304,16 +313,7 @@ public class SummaryBox extends AbstractGlsCommand
          }
       }
 
-      stack.push(content);
-
-      if (parser == stack)
-      {
-         frameBox.process(parser);
-      }
-      else 
-      {
-         frameBox.process(parser, stack);
-      }
+      TeXParserUtils.process(substack, parser, stack);
    }
 
    @Override

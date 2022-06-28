@@ -272,10 +272,10 @@ public class LaTeX2LaTeX extends LaTeXParserListener
    }
 
    @Override
-   public void beginDocument()
+   public void beginDocument(TeXObjectList stack)
      throws IOException
    {
-      super.beginDocument();
+      super.beginDocument(stack);
 
       writeCodePoint(parser.getEscChar());
       write("begin");
@@ -285,7 +285,7 @@ public class LaTeX2LaTeX extends LaTeXParserListener
    }
 
    @Override
-   public void endDocument()
+   public void endDocument(TeXObjectList stack)
      throws IOException
    {
       try
@@ -297,7 +297,7 @@ public class LaTeX2LaTeX extends LaTeXParserListener
          writeCodePoint(parser.getEgChar());
          writeln();
 
-         super.endDocument();
+         super.endDocument(stack);
       }
       finally
       {

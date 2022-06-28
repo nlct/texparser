@@ -20,6 +20,7 @@ package com.dickimawbooks.texparserlib.latex.nlctdoc;
 
 import java.io.IOException;
 import java.util.Vector;
+import java.util.HashMap;
 
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.*;
@@ -56,46 +57,62 @@ public class PrintSummary extends AbstractGlsCommand
       return null;
    }
 
-   protected void processSummary(TeXObjectList list, Vector<GlsLabel> glslabels, 
-     String title, String label, ControlSequence sectionCs, String id,
+   protected void processSummary(TeXObjectList substack, Vector<GlsLabel> glslabels, 
+     String title, String label, ControlSequence sectionCs, 
      TeXParser parser, TeXObjectList stack)
    {
       TeXParserListener listener = parser.getListener();
 
-      list.add(sectionCs);
-      list.add(listener.getOther('*'));
-      list.add(listener.createGroup(title));
-      list.add(new TeXCsRef("label"));
-      list.add(listener.createGroup(label));
+      substack.add(sectionCs);
+      substack.add(listener.getOther('*'));
+      substack.add(listener.createGroup(title));
+      substack.add(new TeXCsRef("label"));
+      substack.add(listener.createGroup(label));
+
+      processSummary(substack, glslabels, parser, stack);
+   }
+
+   protected void processSummary(TeXObjectList substack, Vector<GlsLabel> glslabels, 
+     TeXParser parser, TeXObjectList stack)
+   {
+      TeXParserListener listener = parser.getListener();
 
       ControlSequence defCs = listener.getControlSequence("def");
       ControlSequence targetCs = listener.getControlSequence("glstarget");
-      ControlSequence nameCs = parser.getControlSequence("summaryglossentry"+id);
-
-      if (nameCs == null)
-      {
-         nameCs = listener.getControlSequence("summaryglossentry");
-      }
 
       ControlSequence descCs = listener.getControlSequence("glossentrydesc");
       ControlSequence postDescCs = listener.getControlSequence("glspostdescription");
 
       for (GlsLabel glslabel : glslabels)
       {
-         list.add(defCs);
-         list.add(new TeXCsRef("glscurrententrylabel"));
-         list.add(listener.createGroup(glslabel.getLabel()));
+/*
+         String category = glslabel.getCategory();
 
-         Group grp = listener.createGroup();
-         list.add(grp);
-         grp.add(nameCs);
-         grp.add(glslabel);
+         substack.add(defCs);
+         substack.add(new TeXCsRef("glscurrententrylabel"));
+         substack.add(listener.createGroup(glslabel.getLabel()));
 
-         list.add(listener.getPar());
-         list.add(descCs);
-         list.add(glslabel);
-         list.add(postDescCs);
-         list.add(listener.getPar());
+         ControlSequence nameCs = parser.getControlSequence(
+           "summaryglossentry"+category);
+
+         if (nameCs == null)
+         {
+            nameCs = listener.getControlSequence("summaryglossentry");
+         }
+
+*/
+ControlSequence nameCs = listener.getControlSequence("summaryglossentry");
+         substack.add(nameCs);
+         substack.add(glslabel);
+/*
+
+         substack.add(listener.getPar());
+         substack.add(descCs);
+         substack.add(glslabel);
+         substack.add(postDescCs);
+*/
+         substack.add(listener.getPar());
+
       }
    }
 
@@ -107,25 +124,40 @@ public class PrintSummary extends AbstractGlsCommand
 
       Glossary glossary = sty.getGlossary(type);
 
+      parser.debugMessage(1, "Writing SUMMARIES");
+
       if (glossary != null && !glossary.isEmpty())
       {
-         TeXObjectList list = parser.getListener().createStack();
+         TeXParserListener listener = parser.getListener();
 
-         ControlSequence cs = parser.getControlSequence("chapter");
+         TeXObjectList substack = listener.createStack();
 
-         if (cs == null)
+         ControlSequence sectionCs = parser.getControlSequence("chapter");
+
+         if (sectionCs == null)
          {
-            cs = parser.getListener().getControlSequence("section");
+            sectionCs = listener.getControlSequence("section");
          }
 
          Vector<GlsLabel> cmds = new Vector<GlsLabel>();
          Vector<GlsLabel> envs = new Vector<GlsLabel>();
+
+         Vector<GlsLabel> pkgList = new Vector<GlsLabel>();
+         Vector<GlsLabel> clsList = new Vector<GlsLabel>();
+
+         HashMap<String,Vector<GlsLabel>> pkgMap = new HashMap<String,Vector<GlsLabel>>();
+
          Vector<GlsLabel> pkgopts = new Vector<GlsLabel>();
          Vector<GlsLabel> clsopts = new Vector<GlsLabel>();
 
          for (String label : glossary)
          {
             GlossaryEntry entry = sty.getEntry(label);
+
+            if (entry.isFieldEmpty("description"))
+            {
+               continue;
+            }
 
             GlsLabel glslabel = new GlsLabel("glscurrententrylabel@"+label,
               label, entry);
@@ -140,10 +172,39 @@ public class PrintSummary extends AbstractGlsCommand
             {
                envs.add(glslabel);
             }
+            else if (cat.equals("package"))
+            {
+               pkgList.add(glslabel);
+
+               Vector<GlsLabel> pl = new Vector<GlsLabel>();
+               pl.add(glslabel);
+               pkgMap.put(glslabel.getLabel(), pl);
+            }
+            else if (cat.equals("class"))
+            {
+               clsList.add(glslabel);
+
+               Vector<GlsLabel> cl = new Vector<GlsLabel>();
+               cl.add(glslabel);
+               pkgMap.put(glslabel.getLabel(), cl);
+            }
             else if (cat.equals("packageoption"))
             {
                if (entry.hasParent())
                {
+                  GlossaryEntry parentEntry = entry.getParent(stack);
+                  String parentLabel = parentEntry.getLabel();
+
+                  Vector<GlsLabel> pl = pkgMap.get(parentLabel);
+
+                  if (pl == null)
+                  {
+                     pkgopts.add(glslabel);
+                  }
+                  else
+                  {
+                     pl.add(glslabel);
+                  }
                }
                else
                {
@@ -154,50 +215,135 @@ public class PrintSummary extends AbstractGlsCommand
             {
                if (entry.hasParent())
                {
+                  GlossaryEntry parentEntry = entry.getParent(stack);
+                  String parentLabel = parentEntry.getLabel();
+
+                  Vector<GlsLabel> cl = pkgMap.get(parentLabel);
+
+                  if (cl == null)
+                  {
+                     clsopts.add(glslabel);
+                  }
+                  else
+                  {
+                     cl.add(glslabel);
+                  }
                }
                else
                {
                   clsopts.add(glslabel);
                }
             }
-            else if (cat.equals("optionvalue"))
+            else if (cat.startsWith("option"))
             {
+               TeXObject rootVal = entry.get("rootancestor");
+
+               if (rootVal != null)
+               {
+                  String rootLabel = rootVal.toString(parser);
+                  GlossaryEntry rootEntry = sty.getEntry(rootLabel);
+
+                  if (rootEntry != null)
+                  {
+                     String rootCat = rootEntry.getCategory();
+
+                     if (rootCat.equals("command"))
+                     {
+                        cmds.add(glslabel);
+                     }
+                     else if (rootCat.equals("environment"))
+                     {
+                        envs.add(glslabel);
+                     }
+                     else if (rootCat.equals("package"))
+                     {
+                        Vector<GlsLabel> pl = pkgMap.get(rootLabel);
+
+                        if (pl == null)
+                        {
+                           pkgopts.add(glslabel);
+                        }
+                        else
+                        {
+                           pl.add(glslabel);
+                        }
+                     }
+                     else if (rootCat.equals("class"))
+                     {
+                        Vector<GlsLabel> cl = pkgMap.get(rootLabel);
+
+                        if (cl == null)
+                        {
+                           clsopts.add(glslabel);
+                        }
+                        else
+                        {
+                           cl.add(glslabel);
+                        }
+                     }
+                  }
+               }
             }
 
          }
 
          if (!cmds.isEmpty())
          {
-            processSummary(list, cmds, "Command Summary", "cmdsummary", cs, 
-              "command", parser, stack);
+            processSummary(substack, cmds, "Command Summary", "cmdsummary", sectionCs, 
+              parser, stack);
          }
 
          if (!envs.isEmpty())
          {
-            processSummary(list, envs, "Environmant Summary", "envsummary", cs, 
-              "environment", parser, stack);
+            processSummary(substack, envs, "Environment Summary", "envsummary", sectionCs, 
+              parser, stack);
          }
 
          if (!clsopts.isEmpty())
          {
-            processSummary(list, clsopts, "Class Option Summary", "clsoptsummary", cs, 
-              "class", parser, stack);
+            processSummary(substack, clsopts, "Class Option Summary",
+              "clsoptsummary", sectionCs, parser, stack);
+         }
+         else if (!clsList.isEmpty())
+         {
+            substack.add(sectionCs);
+            substack.add(listener.getOther('*'));
+            substack.add(listener.createGroup("Class Summary"));
+            substack.add(new TeXCsRef("label"));
+            substack.add(listener.createGroup("clsoptsummary"));
+         }
+
+         if (!clsList.isEmpty())
+         {
+            for (GlsLabel gl : clsList)
+            {
+               processSummary(substack, pkgMap.get(gl.getLabel()), parser, stack);
+            }
          }
 
          if (!pkgopts.isEmpty())
          {
-            processSummary(list, pkgopts, "Package Option Summary",
-              "styoptsummary", cs, "package", parser, stack);
+            processSummary(substack, pkgopts, "Package Option Summary",
+              "styoptsummary", sectionCs, parser, stack);
+         }
+         else if (!pkgList.isEmpty())
+         {
+            substack.add(sectionCs);
+            substack.add(listener.getOther('*'));
+            substack.add(listener.createGroup("Package Summary"));
+            substack.add(new TeXCsRef("label"));
+            substack.add(listener.createGroup("styoptsummary"));
          }
 
-         if (parser == stack || stack == null)
+         if (!pkgList.isEmpty())
          {
-            list.process(parser);
+            for (GlsLabel gl : pkgList)
+            {
+               processSummary(substack, pkgMap.get(gl.getLabel()), parser, stack);
+            }
          }
-         else
-         {
-            list.process(parser, stack);
-         }
+
+         TeXParserUtils.process(substack, parser, stack);
       }
    }
 

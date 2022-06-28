@@ -109,6 +109,9 @@ public class PrintMain extends AbstractGlsCommand
             Group grp = listener.createGroup();
             list.add(grp);
 
+            grp.add(new TeXCsRef("glsadd"));
+            grp.add(glslabel);
+
             grp.add(targetCs);
             grp.add(glslabel);
 

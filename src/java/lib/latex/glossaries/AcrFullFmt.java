@@ -149,20 +149,13 @@ public class AcrFullFmt extends AbstractGlsCommand
          grp.add(glslabel);
          grp.add(insert);
 
-         stack.push(linkText);
-         stack.push(glslabel);
-         stack.push(keyValList);
+         TeXObjectList substack = listener.createStack();
+         substack.add(listener.getControlSequence("glslink"));
+         substack.add(keyValList);
+         substack.add(glslabel);
+         substack.add(linkText);
 
-         ControlSequence cs = listener.getControlSequence("glslink");
-
-         if (stack == parser)
-         {
-            cs.process(parser);
-         }
-         else
-         {
-            cs.process(parser, stack);
-         }
+         TeXParserUtils.process(substack, parser, stack);
       }
    }
 

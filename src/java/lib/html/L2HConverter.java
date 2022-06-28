@@ -1102,7 +1102,7 @@ public class L2HConverter extends LaTeXParserListener
    }
 
    @Override
-   public void beginDocument()
+   public void beginDocument(TeXObjectList stack)
      throws IOException
    {
       TeXObject cs = getParser().getControlSequence("@title");
@@ -1147,7 +1147,7 @@ public class L2HConverter extends LaTeXParserListener
 
       writeable.writeln(">");
 
-      super.beginDocument();
+      super.beginDocument(stack);
 
       writeable.writeln("<div id=\"main\">");
 
@@ -1155,7 +1155,7 @@ public class L2HConverter extends LaTeXParserListener
    }
 
    @Override
-   public void endDocument()
+   public void endDocument(TeXObjectList stack)
      throws IOException
    {
       if (!isInDocEnv())
@@ -1171,7 +1171,7 @@ public class L2HConverter extends LaTeXParserListener
          currentSection = null;
       }
 
-      processFootnotes();
+      processFootnotes(stack);
 
       writeable.writeln("</div><!-- end of main -->");// ends <div id="main">
 
@@ -1182,7 +1182,7 @@ public class L2HConverter extends LaTeXParserListener
       {
          try
          {
-            cs.process(parser);
+            TeXParserUtils.process(cs, parser, stack);
          }
          catch (IOException e)
          {

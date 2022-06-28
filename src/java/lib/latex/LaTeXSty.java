@@ -71,47 +71,50 @@ public abstract class LaTeXSty extends LaTeXFile
             orgCurrExt = getParser().expandToString(orgCurrExtCs, getParser());
          }
 
-         stack.push(new TeXParserSetUndefAction(orgAction));
+         TeXObjectList substack = listener.createStack();
+
+         substack.add(new TeXParserSetUndefAction(Undefined.ACTION_WARN));
 
          if (orgCatCode != TeXParser.TYPE_LETTER)
          {
-            stack.push(new UserNumber(orgCatCode));
-            stack.push(listener.getOther('='));
-            stack.push(new UserNumber((int)'@'));
-            stack.push(listener.getControlSequence("catcode"));
+            substack.add(listener.getControlSequence("makeatletter"));
+         }
+
+         substack.add(listener.getControlSequence("def"));
+         substack.add(new TeXCsRef("@currname"));
+         substack.add(listener.createGroup(getName()));
+
+         substack.add(listener.getControlSequence("def"));
+         substack.add(new TeXCsRef("@currext"));
+         substack.add(listener.createGroup(getExtension()));
+         substack.add(listener.getControlSequence("input"));
+         substack.add(new TeXPathObject(this));
+
+         if (orgCurrName != null)
+         {
+            substack.add(listener.getControlSequence("def"));
+            substack.add(new TeXCsRef("@currname"));
+            substack.add(listener.createGroup(orgCurrName));
          }
 
          if (orgCurrExt != null)
          {
-            stack.push(listener.createGroup(orgCurrExt));
-            stack.push(new TeXCsRef("@currext"));
-            stack.push(listener.getControlSequence("def"));
+            substack.add(listener.getControlSequence("def"));
+            substack.add(new TeXCsRef("@currext"));
+            substack.add(listener.createGroup(orgCurrExt));
          }
-
-         if (orgCurrName != null)
-         {
-            stack.push(listener.createGroup(orgCurrName));
-            stack.push(new TeXCsRef("@currname"));
-            stack.push(listener.getControlSequence("def"));
-         }
-
-         stack.push(new TeXPathObject(this));
-         stack.push(listener.getControlSequence("input"));
-         stack.push(listener.createGroup(getExtension()));
-         stack.push(new TeXCsRef("@currext"));
-         stack.push(listener.getControlSequence("def"));
-         stack.push(listener.createGroup(getName()));
-         stack.push(new TeXCsRef("@currname"));
-         stack.push(listener.getControlSequence("def"));
 
          if (orgCatCode != TeXParser.TYPE_LETTER)
          {
-            stack.push(listener.getControlSequence("makeatletter"));
+            substack.add(new UserNumber(orgCatCode));
+            substack.add(listener.getOther('='));
+            substack.add(new UserNumber((int)'@'));
+            substack.add(listener.getControlSequence("catcode"));
          }
 
-         stack.push(new TeXParserSetUndefAction(Undefined.ACTION_WARN));
+         substack.add(new TeXParserSetUndefAction(orgAction));
 
-
+         TeXParserUtils.process(substack, getParser(), stack);
 
 /*
          ControlSequence orgCurrName = getParser().getControlSequence(

@@ -275,6 +275,26 @@ public class GlossaryEntry
       return cs != null;
    }
 
+   /**
+    * Determines whether the underlying internal control sequence
+    * associated with the field is empty or has not been set.
+    * @param fieldName the field (key) name
+    * @return true if the internal control sequence associated with
+    * the given field is empty or has not been defined
+    */
+   public boolean isFieldEmpty(String fieldName)
+   {
+      String internalField = sty.getInternalFieldName(fieldName);
+
+      String csname = String.format("glo@%s@%s", getLabel(), internalField);
+
+      ControlSequence cs = sty.getParser().getControlSequence(csname);
+
+      if (cs == null) return true;
+
+      return cs.isEmpty();
+   }
+
    public TeXObject get(String field)
    {
       String internalField = sty.getInternalFieldName(field);
@@ -302,6 +322,54 @@ public class GlossaryEntry
       }
 
       return cs;
+   }
+
+   public int getInt(String field, TeXParser parser)
+   {
+      String internalField = sty.getInternalFieldName(field);
+
+      String csname = String.format("glo@%s@%s", getLabel(), internalField);
+
+      ControlSequence cs = sty.getParser().getControlSequence(csname);
+
+      if (cs == null)
+      {
+         return 0;
+      }
+      else if (!fields.contains(field))
+      {
+         fields.add(field);
+      }
+
+      if (!fields.contains(field))
+      {
+         fields.add(field);
+      }
+
+      if (cs instanceof TeXNumber)
+      {
+         return ((TeXNumber)cs).getValue();
+      }
+
+      if (cs instanceof GenericCommand)
+      {
+         String strVal = ((GenericCommand)cs).getDefinition().toString(parser);
+
+         try
+         {
+            int num = Integer.parseInt(strVal);
+
+            parser.putControlSequence(true, 
+               new IntegerContentCommand(csname, num));
+
+            return num;
+         }
+         catch (NumberFormatException e)
+         {
+         }
+      }
+
+      return 0;
    }
 
    public int getLevel()

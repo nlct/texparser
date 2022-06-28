@@ -136,6 +136,8 @@ public class GlsXtrAbbrvField extends AbstractGlsCommand
 
       LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
 
+      TeXObjectList substack = listener.createStack();
+
       if (entry == null)
       {
          sty.undefWarnOrError(stack, 
@@ -231,29 +233,19 @@ public class GlsXtrAbbrvField extends AbstractGlsCommand
          listener.putControlSequence(true, new GenericCommand("glscustomtext",
            null, linktext));
 
-         ControlSequence cs = parser.getControlSequence(
+         ControlSequence entryFmtCs = parser.getControlSequence(
            "gls@"+entry.getType()+"@entryfmt");
 
-         if (cs == null)
+         if (entryFmtCs == null)
          {
-            cs = listener.getControlSequence("glsentryfmt");
+            entryFmtCs = listener.getControlSequence("glsentryfmt");
          }
 
-         stack.push(cs);
-         stack.push(glslabel);
-         stack.push(keyValList);
-         stack.push(listener.getControlSequence("@gls@link"));
+         substack.add(listener.getControlSequence("glssetabbrvfmt"));
+         substack.add(listener.createGroup(entry.getCategory()));
 
-         if (!isShortForm())
-         {
-            cs = parser.getControlSequence("glsxtrsetlongfirstuse");
-
-            if (cs != null)
-            {
-               stack.push(glslabel);
-               stack.push(cs);
-            }
-         }
+         substack.add(listener.getControlSequence("glsxtrsaveinsert"));
+         substack.add(glslabel);
 
          grp = listener.createGroup();
 
@@ -262,15 +254,28 @@ public class GlsXtrAbbrvField extends AbstractGlsCommand
             grp.add(insert, true);
          }
 
-         stack.push(grp);
-         stack.push(glslabel);
-         stack.push(listener.getControlSequence("glsxtrsaveinsert"));
+         substack.add(grp);
 
-         stack.push(listener.createGroup(entry.getCategory()));
-         stack.push(listener.getControlSequence("glssetabbrvfmt"));
+         if (!isShortForm())
+         {
+            ControlSequence cs = parser.getControlSequence("glsxtrsetlongfirstuse");
 
+            if (cs != null)
+            {
+               substack.add(cs);
+               substack.add(glslabel);
+            }
+         }
+
+         substack.add(listener.getControlSequence("@gls@link"));
+         substack.add(keyValList);
+         substack.add(glslabel);
+         substack.add(entryFmtCs);
       }
 
+      substack.add(listener.getControlSequence("glspostlinkhook"));
+
+      TeXParserUtils.process(substack, parser, stack);
    }
 
    @Override

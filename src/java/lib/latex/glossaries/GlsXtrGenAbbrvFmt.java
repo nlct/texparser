@@ -239,7 +239,7 @@ public class GlsXtrGenAbbrvFmt extends AbstractGlsCommand
       grp = (Group)insertGrp.clone();
       list.add(grp);
 
-      grp.push(new TeXCsRef("glscustomtext"));
+      grp.add(new TeXCsRef("glscustomtext"));
 
       return list;
    }

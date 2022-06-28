@@ -51,33 +51,39 @@ public class GlossarySection extends ControlSequence
       TeXObject tocTitle = popOptArg(parser, stack);
       TeXObject title = popArg(parser, stack);
 
-      if (isAutoLabel)
+      TeXParserListener listener = parser.getListener();
+
+      TeXObjectList substack = listener.createStack();
+
+      substack.add(listener.getControlSequence(section));
+
+      if (!isNumbered)
       {
-         Group grp = parser.getListener().createGroup();
-         grp.add(parser.getListener().getControlSequence("glsautoprefix"));
-         grp.add(parser.getListener().getControlSequence("@glo@type"));
-
-         stack.push(grp);
-         stack.push(parser.getListener().getControlSequence("label"));
-
+         substack.add(listener.getOther('*'));
+      }
+      else if (tocTitle != null)
+      {
+         substack.add(listener.getOther('['));
+         substack.add(tocTitle);
+         substack.add(listener.getOther(']'));
       }
 
       Group grp = parser.getListener().createGroup();
       grp.add(title);
-      stack.push(grp);
+      substack.add(grp);
 
-      if (!isNumbered)
+      if (isAutoLabel)
       {
-         stack.push(parser.getListener().getOther('*'));
-      }
-      else if (tocTitle != null)
-      {
-         stack.push(parser.getListener().getOther(']'));
-         stack.push(tocTitle);
-         stack.push(parser.getListener().getOther('['));
+         substack.add(listener.getControlSequence("label"));
+
+         grp = parser.getListener().createGroup();
+         grp.add(parser.getListener().getControlSequence("glsautoprefix"));
+         grp.add(parser.getListener().getControlSequence("@glo@type"));
+
+         substack.add(grp);
       }
 
-      stack.push(parser.getListener().getControlSequence(section));
+      TeXParserUtils.process(substack, parser, stack);
    }
 
    public void process(TeXParser parser)

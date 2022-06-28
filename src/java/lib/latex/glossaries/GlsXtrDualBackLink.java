@@ -63,9 +63,11 @@ public class GlsXtrDualBackLink extends AbstractGlsCommand
 
       ControlSequence hyperlinkCs = parser.getControlSequence("glshyperlink");
 
+      TeXObjectList substack = parser.getListener().createStack();
+
       if (hyperlinkCs == null)
       {
-         stack.push(textArg, true);
+         substack.add(textArg, true);
       }
       else
       {
@@ -86,17 +88,19 @@ public class GlsXtrDualBackLink extends AbstractGlsCommand
 
          if (val == null || val.isEmpty())
          {
-            stack.push(textArg, true);
+            substack.add(textArg, true);
          }
          else
          {
-            stack.push(TeXParserUtils.createGroup(parser.getListener(), val));
-            stack.push(parser.getListener().getOther(']'));
-            stack.push(textArg, true);
-            stack.push(parser.getListener().getOther('['));
-            stack.push(hyperlinkCs);
+            substack.add(hyperlinkCs);
+            substack.add(parser.getListener().getOther('['));
+            substack.add(textArg, true);
+            substack.add(parser.getListener().getOther(']'));
+            substack.add(TeXParserUtils.createGroup(parser.getListener(), val));
          }
       }
+
+      TeXParserUtils.process(substack, parser, stack);
    }
 
    @Override

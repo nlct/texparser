@@ -128,6 +128,8 @@ public class GlsXtrFull extends AbstractGlsCommand
 
       LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
 
+      TeXObjectList substack = listener.createStack();
+
       if (entry == null)
       {
          sty.undefWarnOrError(stack, 
@@ -188,19 +190,19 @@ public class GlsXtrFull extends AbstractGlsCommand
          listener.putControlSequence(true, new GenericCommand("glscustomtext",
            null, linktext));
 
-         ControlSequence cs = parser.getControlSequence(
+         ControlSequence entryFmtCs = parser.getControlSequence(
            "gls@"+entry.getType()+"@entryfmt");
 
-         if (cs == null)
+         if (entryFmtCs == null)
          {
-            cs = listener.getControlSequence("glsentryfmt");
+            entryFmtCs = listener.getControlSequence("glsentryfmt");
          }
 
-         stack.push(cs);
-         stack.push(glslabel);
-         stack.push(keyValList);
-         stack.push(listener.getControlSequence("@gls@link"));
-         stack.push(new TeXCsRef("glsxtrsetupfulldefs"));
+         substack.add(listener.getControlSequence("glssetabbrvfmt"));
+         substack.add(listener.createGroup(entry.getCategory()));
+
+         substack.add(listener.getControlSequence("glsxtrfullsaveinsert"));
+         substack.add(glslabel);
 
          grp = listener.createGroup();
 
@@ -209,15 +211,19 @@ public class GlsXtrFull extends AbstractGlsCommand
             grp.add(insert, true);
          }
 
-         stack.push(grp);
-         stack.push(glslabel);
-         stack.push(listener.getControlSequence("glsxtrfullsaveinsert"));
+         substack.add(grp);
 
-         stack.push(listener.createGroup(entry.getCategory()));
-         stack.push(listener.getControlSequence("glssetabbrvfmt"));
+         substack.add(new TeXCsRef("glsxtrsetupfulldefs"));
+         substack.add(listener.getControlSequence("@gls@link"));
+         substack.add(keyValList);
+         substack.add(glslabel);
+         substack.add(entryFmtCs);
 
       }
 
+      substack.add(listener.getControlSequence("glspostlinkhook"));
+
+      TeXParserUtils.process(substack, parser, stack);
    }
 
    @Override

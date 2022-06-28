@@ -154,7 +154,7 @@ public class IfHasField extends AbstractGlsCommand
 
       TeXObject obj = expand(glslabel, fieldLabel, parser, stack);
 
-      stack.push(obj);
+      TeXParserUtils.process(obj, parser, stack);
    }
 
    @Override

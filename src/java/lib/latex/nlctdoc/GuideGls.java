@@ -46,21 +46,18 @@ public class GuideGls extends ControlSequence
    public void process(TeXParser parser, TeXObjectList stack)
    throws IOException
    {
+      // ignore arguments
       popOptArg(parser, stack);
       popArg(parser, stack);
 
       ControlSequence cs = parser.getListener().getControlSequence("GlsXtrLoadResources");
 
-      if (parser == stack || stack == null)
-      {
-         parser.push(cs);
-         cs.process(parser);
-      }
-      else
-      {
-         stack.push(cs);
-         cs.process(parser, stack);
-      }
+      TeXObjectList substack = parser.getListener().createStack();
+
+      substack.add(cs);
+      substack.add(cs);
+
+      TeXParserUtils.process(substack, parser, stack);
    }
 
    @Override

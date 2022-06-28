@@ -208,12 +208,15 @@ public class StandaloneDef extends AbstractGlsCommand
 
       TeXParserListener listener = parser.getListener();
 
-      TeXObjectList list = listener.createStack();
+      parser.startGroup();
+
+      TeXObjectList content = listener.createStack();
+      content.add(taggedBox);
 
       GlossaryEntry entry = glslabel.getEntry();
 
-      list.add(listener.getControlSequence("glsadd"));
-      list.add(glslabel);
+      content.add(listener.getControlSequence("glsadd"));
+      content.add(glslabel);
 
       if (entry != null)
       {
@@ -263,17 +266,17 @@ public class StandaloneDef extends AbstractGlsCommand
             }
          }
 
-         addRow(list, glslabel, parser, modList);
+         addRow(content, glslabel, parser, modList);
 
          if (modEntries != null)
          {
             for (GlsLabel lb : modEntries)
             {
-               list.add(listener.getPar());
-               list.add(listener.getControlSequence("glsadd"));
-               list.add(lb);
+               content.add(listener.getPar());
+               content.add(listener.getControlSequence("glsadd"));
+               content.add(lb);
 
-               addRow(list, lb, parser, null);
+               addRow(content, lb, parser, null);
             }
          }
 
@@ -281,27 +284,20 @@ public class StandaloneDef extends AbstractGlsCommand
 
          if (note != null)
          {
-            list.add(listener.getPar());
-            list.add(new StartFrameBox(noteBox));
+            content.add(listener.getPar());
+            content.add(new StartFrameBox(noteBox));
 
-            list.add(note, true);
+            content.add(note, true);
 
-            list.add(new EndFrameBox(noteBox));
+            content.add(new EndFrameBox(noteBox));
          }
       }
 
-      list.add(taggedBox.getEndDeclaration());
+      content.add(taggedBox.getEndDeclaration());
 
-      stack.push(list, true);
+      TeXParserUtils.process(content, parser, stack);
 
-      if (parser == stack)
-      {
-         taggedBox.process(parser);
-      }
-      else 
-      {
-         taggedBox.process(parser, stack);
-      }
+      parser.endGroup();
    }
 
    @Override

@@ -53,7 +53,7 @@ public class PrintGlossaries extends AbstractGlsCommand
 
       ControlSequence cs = listener.getControlSequence("printglossary");
 
-      for (int i = types.size()-1; i >= 0; i--)
+      for (int i = 0; i < types.size(); i++)
       {
          KeyValList options = new KeyValList();
          options.put("type", listener.createDataList(types.get(i)));
@@ -65,33 +65,6 @@ public class PrintGlossaries extends AbstractGlsCommand
       }
 
       return list;
-   }
-
-   @Override
-   public void process(TeXParser parser, TeXObjectList stack)
-     throws IOException
-   {
-      TeXParserListener listener = parser.getListener();
-
-      Vector<String> types = getSty().getNonIgnoredGlossaries();
-
-      ControlSequence cs = listener.getControlSequence("printglossary");
-
-      for (int i = types.size()-1; i >= 0; i--)
-      {
-         KeyValList options = new KeyValList();
-         options.put("type", listener.createDataList(types.get(i)));
-
-         stack.push(options);
-         stack.push(cs);
-      }
-   }
-
-   @Override
-   public void process(TeXParser parser)
-     throws IOException
-   {
-      process(parser, parser);
    }
 
 }

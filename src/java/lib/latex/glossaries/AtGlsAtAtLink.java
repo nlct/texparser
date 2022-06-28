@@ -74,6 +74,8 @@ public class AtGlsAtAtLink extends AbstractGlsCommand
 
       TeXObject linkText = popArg(parser, stack);
 
+      TeXObjectList substack = listener.createStack();
+
       if (glslabel.getEntry() == null)
       {
          sty.undefWarnOrError(stack, GlossariesSty.ENTRY_NOT_DEFINED, 
@@ -85,31 +87,34 @@ public class AtGlsAtAtLink extends AbstractGlsCommand
          parser.putControlSequence(true, 
             new AssignedControlSequence("do@gls@link@checkfirsthyper", new Relax()));
 
-         if (doUnset)
-         {
-            stack.push(glslabel);
-            stack.push(listener.getControlSequence("glsunset"));
-         }
-
          if (sty.isExtra())
          {
             parser.putControlSequence(true,
               new GenericCommand(true, "glscustomtext", null, 
                     (TeXObject)linkText.clone()));
 
-            stack.push(listener.getControlSequence("@glsxtr@field@linkdefs"));
+            substack.add(listener.getControlSequence("@glsxtr@field@linkdefs"));
          }
 
+         substack.add(listener.getControlSequence("@gls@link"));
+         substack.add(options);
+         substack.add(glslabel);
+
          Group grp = listener.createGroup();
+         substack.add(grp);
          grp.add(linkText);
 
-         stack.push(glslabel);
-         stack.push(options);
+         if (doUnset)
+         {
+            substack.add(listener.getControlSequence("glsunset"));
+            substack.add(glslabel);
+         }
 
-         stack.push(listener.getControlSequence("@gls@link"));
       }
 
-      stack.push(new TeXCsRef("glspostlinkhook"));
+      substack.add(new TeXCsRef("glspostlinkhook"));
+
+      TeXParserUtils.process(substack, parser, stack);
    }
 
    public void process(TeXParser parser)

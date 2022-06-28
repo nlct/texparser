@@ -606,5 +606,18 @@ public class TeXParserUtils
 
       return grp;
    }
+
+   public static void process(TeXObject obj, TeXParser parser, TeXObjectList stack)
+    throws IOException
+   {
+      if (parser == stack || stack == null)
+      {
+         obj.process(parser);
+      }
+      else
+      {
+         obj.process(parser, stack);
+      }
+   }
 }
 

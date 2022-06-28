@@ -80,34 +80,4 @@ public class GlsTarget extends AbstractGlsCommand
       return list;
    }
 
-   @Override
-   public void process(TeXParser parser, TeXObjectList stack)
-     throws IOException
-   {
-      TeXParserListener listener = parser.getListener();
-
-      String label = popLabelString(parser, stack);
-
-      String target = parser.expandToString(
-            listener.getControlSequence("glolinkprefix"), stack)
-          + label;
-
-      Vector<String> existingTargets = sty.getTargets(label);
-
-      if (existingTargets == null || !existingTargets.contains(target))
-      {
-         stack.push(listener.createGroup(target));
-
-         stack.push(listener.getControlSequence("@glstarget"));
-
-         sty.registerTarget(label, target);
-      }
-   }
-
-   @Override
-   public void process(TeXParser parser)
-     throws IOException
-   {
-      process(parser, parser);
-   }
 }

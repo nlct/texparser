@@ -917,12 +917,7 @@ public class GlossariesSty extends LaTeXSty
       registerControlSequence(new AtGobble("glsxtr@inc@wrglossaryctr"));
 
       registerControlSequence(new AtGobble("@@glsxtrwrglosscountermark"));
-      registerControlSequence(new AtGobble("@glsxtrwrglosscountermark"));
-
-      getListener().atBeginDoc(new TeXCsRef("def"), 
-        new TeXCsRef("@@glsxtrwrglosscountermark"), 
-        TeXParserUtils.createGroup(getListener(), 
-          new TeXCsRef("@glsxtrwrglosscountermark")));
+      registerControlSequence(new AtGlsXtrWrGlossCounterMark());
 
       FrameBox wrglossCtrMark = new FrameBox("glsxtrwrglosscountermark",
         BorderStyle.NONE, AlignHStyle.DEFAULT, AlignVStyle.DEFAULT, true);
@@ -1472,9 +1467,8 @@ public class GlossariesSty extends LaTeXSty
    {
       if (debugOpt.equals("showwrgloss") || debugOpt.equals("all"))
       {
-         registerControlSequence(new GenericCommand(true,
-           "@glsxtrwrglosscountermark", null, 
-           new TeXCsRef("glsxtrwrglosscountermark")));
+          registerControlSequence(new AtGlsXtrWrGlossCounterMark(
+           "@@glsxtrwrglosscountermark"));
       }
    }
 
@@ -2362,7 +2356,7 @@ public class GlossariesSty extends LaTeXSty
 
          if (title == null)
          {
-            title = getListener().getControlSequence("glossarytitle");
+            title = getListener().getControlSequence("glossaryname");
          }
       }
 
@@ -2371,8 +2365,6 @@ public class GlossariesSty extends LaTeXSty
          getListener().putControlSequence(true, 
             new GenericCommand("glossarytitle", null, (TeXObject)title.clone()));
       }
-
-      TeXObjectList substack = getListener().createStack();
 
       if (styleObj != null)
       {
@@ -2388,7 +2380,7 @@ public class GlossariesSty extends LaTeXSty
          }
          else
          {
-            substack.add(cs);
+            TeXParserUtils.process(cs, parser, stack);
          }
       }
 

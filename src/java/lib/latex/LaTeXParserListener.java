@@ -1208,9 +1208,21 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
             def.add(obj);
          }
       }
+
+      if (getParser().getDebugLevel() > 0)
+      {
+         getParser().debugMessage(1, "AtBeginDoc: "+cs);
+      }
    }
 
+   @Deprecated
    public void beginDocument()
+     throws IOException
+   {
+      beginDocument(getParser());
+   }
+
+   public void beginDocument(TeXObjectList stack)
      throws IOException
    {
       if (isInDocEnv())
@@ -1240,11 +1252,23 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
 
       if (cs != null)
       {
-         cs.process(parser);
+         if (getParser().getDebugLevel() > 0)
+         {
+            getParser().debugMessage(1, "PROCESSING AtBeginDoc: "+cs);
+         }
+
+         TeXParserUtils.process(cs, parser, stack);
       }
    }
 
+   @Deprecated
    public void endDocument()
+     throws IOException
+   {
+      endDocument(getParser());
+   }
+
+   public void endDocument(TeXObjectList stack)
      throws IOException
    {
       if (!isInDocEnv())
@@ -1253,7 +1277,7 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
             LaTeXSyntaxException.ERROR_NO_BEGIN_DOC);
       }
 
-      processFootnotes();
+      processFootnotes(stack);
 
       ControlSequence cs = parser.getControlSequence(
         "@enddocumenthook");
@@ -1262,7 +1286,7 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       {
          try
          {
-            cs.process(parser);
+            TeXParserUtils.process(cs, parser, stack);
          }
          catch (IOException e)
          {
@@ -1275,7 +1299,14 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       throw new EOFException();
    }
 
+   @Deprecated
    public void processFootnotes()
+   throws IOException
+   {
+      processFootnotes(getParser());
+   }
+
+   public void processFootnotes(TeXObjectList stack)
    throws IOException
    {
       if (footnotes.size() > 0)
@@ -1284,8 +1315,8 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
 
          while (footnotes.size() > 0)
          {
-            footnotes.pop().process(getParser());
-            getPar().process(getParser());
+            TeXParserUtils.process(footnotes.pop(), getParser(), stack);
+            TeXParserUtils.process(getPar(), getParser(), stack);
          }
       }
 

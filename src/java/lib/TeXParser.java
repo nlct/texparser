@@ -2854,10 +2854,20 @@ public class TeXParser extends TeXObjectList
 
       csTable.put(cs.getName(), cs);
 
+      if (getDebugLevel() > 0)
+      {
+         debugMessage(1, "Globally defining "+cs);
+      }
+
       if (cs instanceof Declaration && isLetter(cs.getName().charAt(0)))
       {
          EndDeclaration endDec = new EndDeclaration(cs.getName());
          csTable.put(endDec.getName(), endDec);
+
+         if (getDebugLevel() > 0)
+         {
+            debugMessage(1, "Globally defining "+endDec);
+         }
       }
    }
 
@@ -2867,10 +2877,20 @@ public class TeXParser extends TeXObjectList
       {
          settings.putControlSequence(cs);
 
+         if (getDebugLevel() > 0)
+         {
+            debugMessage(1, "Locally defining "+cs);
+         }
+
          if (cs instanceof Declaration)
          {
             EndDeclaration endDec = new EndDeclaration(cs.getName());
             settings.putControlSequence(endDec);
+
+            if (getDebugLevel() > 0)
+            {
+               debugMessage(1, "Locally defining "+endDec);
+            }
          }
       }
       else
@@ -2980,7 +3000,14 @@ public class TeXParser extends TeXObjectList
    }
 
    public void endGroup()
+    throws TeXSyntaxException
    {
+      if (settings.getParent() == null)
+      {
+         throw new TeXSyntaxException(this,
+            TeXSyntaxException.ERROR_UNEXPECTED_EG);
+      }
+
       TeXObjectList afterGroup = settings.getAfterGroup();
       settings = settings.getParent();
 

@@ -213,11 +213,11 @@ public class PreambleParser extends LaTeXParserListener
    }
 
    @Override
-   public void beginDocument()
+   public void beginDocument(TeXObjectList stack)
      throws IOException
    {
-      super.beginDocument();
-      endDocument();
+      super.beginDocument(stack);
+      endDocument(stack);
    }
 
    private TeXApp texApp;

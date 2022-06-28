@@ -120,8 +120,7 @@ public class IndexLocation extends AbstractTeXObject
          return;
       }
 
-      if (location instanceof TeXObjectList
-      && !(location instanceof Group))
+      if (parser.isStack(location))
       {
          Group group = parser.getListener().createGroup();
 
@@ -147,8 +146,7 @@ public class IndexLocation extends AbstractTeXObject
          return;
       }
 
-      if (location instanceof TeXObjectList
-      && !(location instanceof Group))
+      if (parser.isStack(location))
       {
          Group group = parser.getListener().createGroup();
 

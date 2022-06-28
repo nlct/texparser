@@ -102,7 +102,7 @@ public class Begin extends ControlSequence
 
       if (name.equals("document"))
       {
-         listener.beginDocument();
+         listener.beginDocument(stack);
          return;
       }
 

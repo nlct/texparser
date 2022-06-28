@@ -59,32 +59,6 @@ public class GobbleOpt extends Command
       return modifiers;
    }
 
-   public TeXObjectList expandonce(TeXParser parser)
-     throws IOException
-   {
-      process(parser);
-      return new TeXObjectList();
-   }
-
-   public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
-     throws IOException
-   {
-      process(parser, stack);
-      return new TeXObjectList();
-   }
-
-   public TeXObjectList expandfully(TeXParser parser)
-     throws IOException
-   {
-      return expandonce(parser);
-   }
-
-   public TeXObjectList expandfully(TeXParser parser, TeXObjectList stack)
-     throws IOException
-   {
-      return expandonce(parser, stack);
-   }
-
    public boolean isModifier(int cp)
    {
       for (int modifier : modifiers)
@@ -98,21 +72,17 @@ public class GobbleOpt extends Command
       return false;
    }
 
-   public void process(TeXParser parser) throws IOException
+   public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
+     throws IOException
    {
       if (modifiers != null && modifiers.length > 0)
       {
-         TeXObject obj = parser.popStack();
-
-         if (!(obj instanceof CharObject && isModifier(((CharObject)obj).getCharCode())))
-         {
-            parser.push(obj);
-         }
+         popModifier(parser, stack, modifiers);
       }
 
       for (int i = 0; i < numOptional; i++)
       {
-         TeXObject obj = parser.popNextArg('[', ']');
+         TeXObject obj = popOptArg(parser, stack);
 
          if (obj == null)
          {
@@ -122,36 +92,10 @@ public class GobbleOpt extends Command
 
       for (int i = 0; i < numMandatory; i++)
       {
-         parser.popNextArg();
-      }
-   }
-
-   public void process(TeXParser parser, TeXObjectList list) throws IOException
-   {
-      if (modifiers != null && modifiers.length > 0)
-      {
-         TeXObject obj = list.pop();
-
-         if (!(obj instanceof CharObject && isModifier(((CharObject)obj).getCharCode())))
-         {
-            list.push(obj);
-         }
+         popArg(parser, stack);
       }
 
-      for (int i = 0; i < numOptional; i++)
-      {
-         TeXObject obj = list.popArg(parser, '[', ']');
-
-         if (obj == null)
-         {
-            break;
-         }
-      }
-
-      for (int i = 0; i < numMandatory; i++)
-      {
-         list.popArg(parser);
-      }
+      return parser.getListener().createStack();
    }
 
    private int numOptional, numMandatory;

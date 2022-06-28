@@ -70,14 +70,7 @@ public class GlsXtrAtIncAtWrGlossaryCtr extends ControlSequence
              "@@glsxtrwrglosscountermark"));
             substack.add(new TeXCsRef("thewrglossary"));
 
-            if (parser == stack || stack == null)
-            {
-               substack.process(parser);
-            }
-            else
-            {
-               substack.process(parser, stack);
-            }
+            TeXParserUtils.process(substack, parser, stack);
          }
       }
    }

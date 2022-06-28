@@ -59,7 +59,7 @@ public class End extends ControlSequence
 
       if (name.equals("document"))
       {
-         listener.endDocument();
+         listener.endDocument(stack);
          return;
       }
 

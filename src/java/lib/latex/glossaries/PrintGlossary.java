@@ -60,24 +60,24 @@ public class PrintGlossary extends ControlSequence
    public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
+      TeXParserListener listener = parser.getListener();
+
       parser.startGroup();
 
       initOptions(parser, stack);
-
-      TeXParserListener listener = parser.getListener();
 
       ControlSequence cs = listener.getControlSequence("jobname");
       String jobname = parser.expandToString(cs, stack);
 
       TeXPath texPath = new TeXPath(parser, jobname, ext, false);
 
+      stack.push(listener.getControlSequence("endgroup"));
+
       if (texPath.exists())
       {
          listener.addFileReference(texPath);
          listener.input(texPath, stack);
       }
-
-      parser.endGroup();
    }
 
    @Override

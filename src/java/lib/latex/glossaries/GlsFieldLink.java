@@ -203,12 +203,14 @@ public class GlsFieldLink extends GlsEntryField
          Group grp = listener.createGroup();
          grp.add(linktext, true);
 
-         stack.push(grp);
-         stack.push(glslabel);
-         stack.push(keyValList);
-         stack.push(listener.getControlSequence("@gls@field@link"));
-      }
+         TeXObjectList substack = listener.createStack();
+         substack.add(listener.getControlSequence("@gls@field@link"));
+         substack.add(keyValList);
+         substack.add(glslabel);
+         substack.add(grp);
 
+         TeXParserUtils.process(substack, parser, stack);
+      }
    }
 
    @Override

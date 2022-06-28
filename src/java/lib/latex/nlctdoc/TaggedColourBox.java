@@ -55,9 +55,18 @@ public class TaggedColourBox extends FrameBoxEnv
    public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
+      if (parser.getDebugLevel() > 0)
+      {
+         parser.debugMessage(1, "Processing " + toString(parser));
+      }
+
       TeXObject options = popOptArg(parser, stack);
 
       KeyValList keyValList = null;
+
+      TeXObjectList substack = parser.getListener().createStack();
+
+      substack.add(new StartFrameBox(fbox));
 
       TeXObject title = defaultTitle;
 
@@ -75,18 +84,23 @@ public class TaggedColourBox extends FrameBoxEnv
       {
          if (titleBox != null)
          {
-            stack.push(new EndFrameBox(titleBox));
+            substack.add(new StartFrameBox(titleBox));
          }
 
-         stack.push((TeXObject)title.clone(), true);
+         substack.add((TeXObject)title.clone(), true);
 
          if (titleBox != null)
          {
-            stack.push(new StartFrameBox(titleBox));
+            substack.add(new EndFrameBox(titleBox));
          }
       }
 
-      stack.push(new StartFrameBox(fbox));
+      if (parser.getDebugLevel() > 0)
+      {
+         parser.debugMessage(1, "TAGGED BOX content " + substack.toString(parser));
+      }
+
+      TeXParserUtils.process(substack, parser, stack);
    }
 
    @Override

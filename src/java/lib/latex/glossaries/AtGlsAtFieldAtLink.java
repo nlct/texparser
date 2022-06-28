@@ -77,7 +77,7 @@ public class AtGlsAtFieldAtLink extends AbstractGlsCommand
 
       LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
 
-      stack.push(listener.getControlSequence("glspostlinkhook"));
+      TeXObjectList substack = listener.createStack();
 
       if (entry == null)
       {
@@ -90,14 +90,19 @@ public class AtGlsAtFieldAtLink extends AbstractGlsCommand
          parser.putControlSequence(true, 
             new AssignedControlSequence("do@gls@link@checkfirsthyper", new Relax()));
 
+         substack.add(listener.getControlSequence("@gls@link"));
+         substack.add(keyValList);
+         substack.add(glslabel);
+
          Group grp = listener.createGroup();
          grp.add(text, true);
-         stack.push(grp);
+         substack.add(grp);
 
-         stack.push(glslabel);
-         stack.push(keyValList);
-         stack.push(listener.getControlSequence("@gls@link"));
       }
+
+      substack.add(listener.getControlSequence("glspostlinkhook"));
+
+      TeXParserUtils.process(substack, parser, stack);
    }
 
    public void process(TeXParser parser)

@@ -80,28 +80,6 @@ public class AtNumberOfNumber extends Command
       return expandonce(parser, stack).expandfully(parser, stack);
    }
 
-   public void process(TeXParser parser) throws IOException
-   {
-      process(parser, parser);
-   }
-
-   public void process(TeXParser parser, TeXObjectList stack) throws IOException
-   {
-      TeXObject arg = null;
-
-      for (int i = 1; i <= total; i++)
-      {
-         TeXObject obj = popArg(parser, stack);
-
-         if (i == number)
-         {
-            arg = obj;
-         }
-      }
-
-      stack.push(arg);
-   }
-
    private int number;
    private int total;
 }

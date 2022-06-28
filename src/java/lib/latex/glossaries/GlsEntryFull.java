@@ -54,41 +54,7 @@ public class GlsEntryFull extends AbstractGlsCommand
    }
 
    @Override
-   public boolean canExpand()
-   {
-      return false;
-   }
-
-   @Override
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
-     throws IOException
-   {
-      return null;
-   }
-
-   @Override
-   public TeXObjectList expandonce(TeXParser parser)
-     throws IOException
-   {
-      return null;
-   }
-
-   @Override
-   public TeXObjectList expandfully(TeXParser parser, TeXObjectList stack)
-     throws IOException
-   {
-      return null;
-   }
-
-   @Override
-   public TeXObjectList expandfully(TeXParser parser)
-     throws IOException
-   {
-      return null;
-   }
-
-   @Override
-   public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
       GlsLabel glslabel = popEntryLabel(parser, stack);
@@ -97,6 +63,8 @@ public class GlsEntryFull extends AbstractGlsCommand
 
       LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
 
+      TeXObjectList substack = listener.createStack();
+
       if (entry == null)
       {
          sty.undefWarnOrError(stack, 
@@ -104,9 +72,6 @@ public class GlsEntryFull extends AbstractGlsCommand
       }
       else
       {
-         stack.push(listener.createGroup());
-         stack.push(glslabel);
-
          ControlSequence cs;
 
          switch (caseChange)
@@ -160,22 +125,12 @@ public class GlsEntryFull extends AbstractGlsCommand
                }
          }
 
-         if (stack == parser)
-         {
-            cs.process(parser);
-         }
-         else
-         {
-            cs.process(parser, stack);
-         }
+         substack.add(cs);
+         substack.add(glslabel);
+         substack.add(listener.createGroup());
       }
-   }
 
-   @Override
-   public void process(TeXParser parser)
-     throws IOException
-   {
-      process(parser, parser);
+      return substack;
    }
 
    public boolean isPlural()

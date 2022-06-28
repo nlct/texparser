@@ -92,20 +92,16 @@ public class SubGlossEntryWithLabel extends AbstractGlsCommand
 
       listener.putControlSequence(glslabel.duplicate("glscurrententrylabel"));
 
-      stack.push(glslabel);
-      stack.push(level);
-
       ControlSequence cs =
          listener.getControlSequence("gls@org@glossarysubentryfield");
 
-      if (parser == stack || stack == null)
-      {
-         cs.process(parser);
-      }
-      else
-      {
-         cs.process(parser, stack);
-      }
+      TeXObjectList substack = listener.createStack();
+
+      substack.add(cs);
+      substack.add(level);
+      substack.add(glslabel);
+
+      TeXParserUtils.process(substack, parser, stack);
    }
 
    @Override

@@ -54,7 +54,7 @@ public class SetGlossaryStyle extends ControlSequence
             GlossariesSty.GLOSSARY_STYLE_NOT_DEFINED, styleName);
       }
 
-      stack.push(cs);
+      TeXParserUtils.process(cs, parser, stack);
    }
 
    public void process(TeXParser parser)

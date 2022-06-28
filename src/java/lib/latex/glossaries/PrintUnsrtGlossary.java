@@ -109,16 +109,11 @@ public class PrintUnsrtGlossary extends ControlSequence
 
       if (!(cs instanceof AtGobble))
       {
-         if (parser == stack || stack == null)
-         {
-            parser.push(glslabel);
-            cs.process(parser);
-         }
-         else
-         {
-            stack.push(glslabel);
-            cs.process(parser, stack);
-         }
+         TeXObjectList substack = parser.getListener().createStack();
+         substack.add(cs);
+         substack.add(glslabel);
+
+         TeXParserUtils.process(substack, parser, stack);
       }
    }
 
@@ -204,14 +199,7 @@ public class PrintUnsrtGlossary extends ControlSequence
                   grp.add(listener.getControlSequence("@glsxtr@checkgroup"));
                   grp.add(glslabel);
 
-                  if (parser == stack || stack == null)
-                  {
-                     substack.process(parser);
-                  }
-                  else
-                  {
-                     substack.process(parser, stack);
-                  }
+                  TeXParserUtils.process(substack, parser, stack);
 
                   cs = listener.getControlSequence("@glsxtr@groupheading");
 
@@ -235,14 +223,7 @@ public class PrintUnsrtGlossary extends ControlSequence
 
       list.add(new TeXCsRef("glossarypostamble"));
 
-      if (parser == stack || stack == null)
-      {
-         list.process(parser);
-      }
-      else
-      {
-         list.process(parser, stack);
-      }
+      TeXParserUtils.process(list, parser, stack);
 
       parser.endGroup();
    }

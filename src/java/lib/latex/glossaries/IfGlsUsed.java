@@ -63,11 +63,11 @@ public class IfGlsUsed extends AbstractGlsCommand
       {
          if (entry.isUnset())
          {
-            list.push(trueArg);
+            list.add(trueArg, true);
          }
          else
          {
-            list.push(falseArg);
+            list.add(falseArg, true);
          }
       }
 
@@ -92,13 +92,24 @@ public class IfGlsUsed extends AbstractGlsCommand
       }
       else
       {
+         TeXObject code;
+
          if (entry.isUnset())
          {
-            stack.push(trueArg);
+            code = trueArg;
          }
          else
          {
-            stack.push(falseArg);
+            code = falseArg;
+         }
+
+         if (parser == stack || stack == null)
+         {
+            code.process(parser);
+         }
+         else
+         {
+            code.process(parser, stack);
          }
       }
    }

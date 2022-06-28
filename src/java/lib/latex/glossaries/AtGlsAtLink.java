@@ -113,14 +113,7 @@ public class AtGlsAtLink extends AbstractGlsCommand
 
       list.add(listener.getControlSequence("glslinkpostsetkeys"));
 
-      if (parser == stack || stack == null)
-      {
-         list.process(parser);
-      }
-      else
-      {
-         list.process(parser, stack);
-      }
+      TeXParserUtils.process(list, parser, stack);
 
       boolean doIndex = true;
 
@@ -144,14 +137,7 @@ public class AtGlsAtLink extends AbstractGlsCommand
             list.add(cs);
             list.add(glslabel);
 
-            if (parser == stack || stack == null)
-            {
-               list.process(parser);
-            }
-            else
-            {
-               list.process(parser, stack);
-            }
+            TeXParserUtils.process(list, parser, stack);
          }
       }
 
@@ -201,14 +187,7 @@ public class AtGlsAtLink extends AbstractGlsCommand
       grp.add(subgrp);
       subgrp.add(linkText);
 
-      if (parser == stack || stack == null)
-      {
-         list.process(parser);
-      }
-      else
-      {
-         list.process(parser, stack);
-      }
+      TeXParserUtils.process(list, parser, stack);
    }
 
    public void process(TeXParser parser)

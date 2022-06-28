@@ -284,33 +284,11 @@ public class GlsEntryField extends AbstractGlsCommand
          fieldLabel = popLabelString(parser, stack);
       }
 
-      TeXObject value = getFieldValue(glslabel, fieldLabel);
+      TeXObjectList substack = expand(glslabel, fieldLabel, caseChange, parser, stack);
 
-      if (value != null)
+      if (!substack.isEmpty())
       {
-         switch (caseChange)
-         {
-            case SENTENCE:
-              Group grp = parser.getListener().createGroup();
-              grp.add(value, true);
-              stack.push(grp);
-              stack.push(new TeXCsRef("makefirstuc"));
-            break;
-            case TITLE:
-              grp = parser.getListener().createGroup();
-              grp.add(value, true);
-              stack.push(grp);
-              stack.push(new TeXCsRef("glsxtrfieldtitlecasecs"));
-            break;
-            case TO_UPPER:
-              grp = parser.getListener().createGroup();
-              grp.add(value);
-              stack.push(grp);
-              stack.push(new TeXCsRef("mfirstucMakeUppercase"));
-            break;
-            default:
-              stack.push(value);
-         }
+         TeXParserUtils.process(substack, parser, stack);
       }
    }
 

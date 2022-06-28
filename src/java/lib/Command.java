@@ -128,7 +128,7 @@ public abstract class Command extends ControlSequence implements Expandable
 
       if (expanded != null)
       {
-         stack.addAll(0, expanded);
+         TeXParserUtils.process(expanded, parser, stack);
       }
    }
 
@@ -139,7 +139,7 @@ public abstract class Command extends ControlSequence implements Expandable
 
       if (expanded != null)
       {
-         parser.addAll(0, expanded);
+         TeXParserUtils.process(expanded, parser, parser);
       }
    }
 
