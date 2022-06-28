@@ -71,10 +71,7 @@ public class GlsXtrSubSequentFmt extends AbstractGlsCommand
 
       TeXObjectList list = listener.createStack();
 
-      ControlSequence cs = listener.getControlSequence("ifglsxtrinsertinside");
-
-      boolean insertInside = (cs instanceof TeXBoolean 
-        && ((TeXBoolean)cs).booleanValue());
+      boolean insertInside = TeXParserUtils.isTrue("ifglsxtrinsertinside", parser);
 
       String csname;
 
@@ -90,7 +87,7 @@ public class GlsXtrSubSequentFmt extends AbstractGlsCommand
             csname = "glsaccess";
       }
 
-      if (markWords)
+      if (!markWords)
       {
          csname += "fmt";
       }
