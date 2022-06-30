@@ -2170,6 +2170,9 @@ public class L2HConverter extends LaTeXParserListener
 
       switch (fbox.getStyle())
       {
+         case NONE:
+           builder.append("border-style: none; ");
+         break;
          case SOLID:
            builder.append("border-style: solid; ");
          break;
@@ -2203,12 +2206,15 @@ public class L2HConverter extends LaTeXParserListener
          builder.append(String.format("border-color: %s; ", getHtmlColor(col)));
       }
 
-      TeXDimension borderwidth = fbox.getBorderWidth(getParser());
-
-      if (borderwidth != null)
+      if (fbox.getStyle() != BorderStyle.NONE)
       {
-         builder.append(String.format("border-width: %s; ", 
-            getHtmlDimension(borderwidth)));
+         TeXDimension borderwidth = fbox.getBorderWidth(getParser());
+
+         if (borderwidth != null)
+         {
+            builder.append(String.format("border-width: %s; ", 
+               getHtmlDimension(borderwidth)));
+         }
       }
 
       TeXDimension innersep = fbox.getInnerMargin(getParser());
