@@ -169,6 +169,7 @@ public class L2HConverter extends LaTeXParserListener
       addInternalReference("toc", new TeXCsRef("contentsname"));
 
       putControlSequence(new L2HTableOfContents());
+      putControlSequence(new L2HAtStartToc());
       putControlSequence(new L2HContentsLine());
       putControlSequence(new L2HBibItem());
       putControlSequence(new L2HMaketitle());

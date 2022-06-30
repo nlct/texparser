@@ -626,6 +626,14 @@ public class UserGuideSty extends LaTeXSty
          "examplename", "example"));
       registerControlSequence(new TextualContentCommand(
          "Examplename", "Example"));
+      registerControlSequence(new TextualContentCommand(
+         "listofexamplesname", "List of Examples"));
+
+      registerControlSequence(new GenericCommand(true,
+        "listofexampleslabel", null, TeXParserUtils.createStack(getListener(),
+          new TeXCsRef("label"), getListener().createGroup("sec:listofexamples"))));
+
+      registerControlSequence(new ListOfExamples());
 
       registerControlSequence(new GenericCommand(true,
         "nlctexampletag", null, TeXParserUtils.createStack(getListener(),
