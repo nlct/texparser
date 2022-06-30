@@ -188,15 +188,22 @@ public class TeXParserApp implements TeXApp
           boolean crop)
          throws IOException
          {
-            try
+            if (convertImages)
             {
-               return createImage(getParser(), preamble, content, mimeType, alt, 
-                 name, crop);
+               try
+               {
+                  return createImage(getParser(), preamble, content, mimeType, alt, 
+                    name, crop);
+               }
+               catch (InterruptedException e)
+               {
+                  throw new TeXSyntaxException(e, parser, 
+                    getMessage("error.interrupted"));
+               }
             }
-            catch (InterruptedException e)
+            else
             {
-               throw new TeXSyntaxException(e, parser, 
-                 getMessage("error.interrupted"));
+               return null;
             }
          }
 
@@ -234,7 +241,10 @@ public class TeXParserApp implements TeXApp
       }
       finally
       {
-         deleteTempDir();
+         if (deleteTempDirOnExit)
+         {
+            deleteTempDir();
+         }
 
          if (logWriter != null)
          {
@@ -420,13 +430,24 @@ public class TeXParserApp implements TeXApp
      String type)
      throws IOException,InterruptedException
    {
-      DefaultProcessListener processListener = 
-        new DefaultProcessListener(this, 1);
+      DefaultProcessListener processListener;
 
       String invoker = "file";
 
+      boolean isPdf = L2HConverter.MIME_TYPE_PDF.equals(type);
+
+      if (isPdf)
+      {
+         invoker = "pdfinfo";
+         processListener = new DefaultProcessListener(this, true);
+      }
+      else
+      {
+         processListener = new DefaultProcessListener(this, 1);
+      }
+
       int exitCode = execCommandAndWaitFor(
-         new String[]{invoker, file.getName()}, null, null, processListener);
+         new String[]{invoker, file.getAbsolutePath()}, null, null, processListener);
 
       Pattern pat = null;
 
@@ -438,6 +459,10 @@ public class TeXParserApp implements TeXApp
       {
          pat = JPEG_INFO;
       }
+      else if (isPdf)
+      {
+         pat = PDF_INFO;
+      }
       else
       {
          return null;
@@ -445,7 +470,7 @@ public class TeXParserApp implements TeXApp
          
       if (exitCode == 0)
       {
-         String line = processListener.getSavedLine();
+         String line = processListener.getContent();
 
          if (line == null)
          {
@@ -458,12 +483,24 @@ public class TeXParserApp implements TeXApp
          {
             try
             {
-               return new Dimension(
-                  Integer.parseInt(m.group(1)),
-                  Integer.parseInt(m.group(2)));
+               int width, height;
+
+               if (isPdf)
+               {
+                  width = (int)Math.round(Float.parseFloat(m.group(1)));
+                  height = (int)Math.round(Float.parseFloat(m.group(2)));
+               }
+               else
+               {
+                  width = Integer.parseInt(m.group(1));
+                  height = Integer.parseInt(m.group(2));
+               }
+
+               return new Dimension(width, height);
             }
             catch (NumberFormatException e)
             {// shouldn't happen, pattern ensures format correct
+               debug(e);
             }
          }
       }
@@ -694,17 +731,22 @@ public class TeXParserApp implements TeXApp
          throw new IOException(getMessage("message.no.read", src));
       }
 
-      if (!isWriteAccessAllowed(dest))
-      {
-         throw new IOException(getMessage("message.no.write", dest));
-      }
-
       File destDirFile = dest.getParentFile();
 
       if (!destDirFile.exists())
       {
+         if (!isWriteAccessAllowed(destDirFile))
+         {
+            throw new IOException(getMessage("message.no.write", destDirFile));
+         }
+
           debug(String.format("mkdir %s", destDirFile));
           Files.createDirectories(destDirFile.toPath());
+      }
+
+      if (!isWriteAccessAllowed(dest))
+      {
+         throw new IOException(getMessage("message.no.write", dest));
       }
 
       debug(String.format("%s -> %s", src, dest));
@@ -1378,6 +1420,22 @@ public class TeXParserApp implements TeXApp
 
             outCharset = Charset.forName(args[i]);
          }
+         else if (args[i].equals("--no-rm-tmp-dir"))
+         {
+            deleteTempDirOnExit = false;
+         }
+         else if (args[i].equals("--rm-tmp-dir"))
+         {
+            deleteTempDirOnExit = true;
+         }
+         else if (args[i].equals("--no-convert-images"))
+         {
+            convertImages = false;
+         }
+         else if (args[i].equals("--convert-images"))
+         {
+            convertImages = true;
+         }
          else if (args[i].charAt(0) == '-')
          {
             throw new InvalidSyntaxException(
@@ -1476,8 +1534,13 @@ public class TeXParserApp implements TeXApp
 
    private File logFile = null;
 
+   private boolean deleteTempDirOnExit = true;
+   private boolean convertImages = true;
+
    public static final Pattern PNG_INFO =
     Pattern.compile(".*: PNG image data, (\\d+) x (\\d+),.*");
    public static final Pattern JPEG_INFO =
     Pattern.compile(".*: JPEG image data, .*, (\\d+)x(\\d+),.*");
+   public static final Pattern PDF_INFO =
+    Pattern.compile(".*Page size:\\s+(\\d*\\.?\\d+) x (\\d*\\.?\\d+) pts.*", Pattern.DOTALL);
 }

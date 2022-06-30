@@ -1085,7 +1085,7 @@ public class GlossariesSty extends LaTeXSty
       getListener().requirepackage(null, "mfirstuc", false, stack);
       getListener().requirepackage(null, "ifthen", false, stack);
       getListener().requirepackage(null, "keyval", false, stack);
-      getListener().requirepackage(null, "datatool-base", true, stack);
+      getListener().requirepackage(null, "datatool-base", false, stack);
 
       if (getParser().getControlSequence("chapter") != null)
       {

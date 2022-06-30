@@ -1,6 +1,7 @@
 % arara: lualatex
 % arara: bib2gls: { group: on }
-% arara: lualatex
+% arara: lualatex: { shell: on }
+
 \documentclass[titlepage=false,oneside,
  fontsize=12pt,captions=tableheading]{scrbook}
 
@@ -235,6 +236,31 @@ An environment:
 
 A counter:
 \ctrdef{foobarctr}
+
+Some code:
+\begin{codebox}
+\gls{foobarcs}\marg{text}
+\end{codebox}
+This emphasizes \code{text}:
+\begin{resultbox}
+\emph{text}
+\end{resultbox}
+
+Side-by-side:
+\begin{coderesult}
+\gls{foobarcs}\marg{text}
+\tcblower
+\emph{text}
+\end{coderesult}
+
+An example:
+\begin{resultbox}
+\createexample[title={An example},
+ description={A document with the word `text' emphasized},
+ label={ex:sample}]
+{}
+{\emph{text}}
+\end{resultbox}
 
 \backmatter
 \printterms

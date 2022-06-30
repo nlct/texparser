@@ -610,7 +610,19 @@ public class L2HConverter extends LaTeXParserListener
    {
       if (writer == null) return;
 
-      writer.write("<a href=\""+url+"\">");
+      writer.write("<a href=\""+url+"\"");
+
+      if (text instanceof AccSuppObject)
+      {
+         AccSupp accsupp = ((AccSuppObject)text).getAccSupp();
+
+         if (accsupp.isIcon())
+         {
+            writer.write(" class=\"icon\"");
+         }
+      }
+
+      writer.write(">");
 
       text.process(parser);
 
@@ -1402,7 +1414,7 @@ public class L2HConverter extends LaTeXParserListener
 
    public static String getMimeType(String filename)
    {
-      int idx = filename.lastIndexOf(".");
+      int idx = filename.lastIndexOf(".")+1;
 
       if (idx < 0)
       {
@@ -1469,7 +1481,7 @@ public class L2HConverter extends LaTeXParserListener
       {
          n = options.size();
 
-         alt = options.getValue("alt");
+         alt = options.remove("alt");
 
          if (alt != null)
          {
@@ -1496,9 +1508,9 @@ public class L2HConverter extends LaTeXParserListener
             {
                content.append(String.format("%s={%s}", key, 
                  options.getValue(key).toString(parser)));
-            }
 
-            sep = ",";
+               sep = ",";
+            }
          }
 
          content.append("]{");
@@ -1517,7 +1529,14 @@ public class L2HConverter extends LaTeXParserListener
       {
          Dimension dim = getImageSize(file, type);
 
-         write(String.format("<object data=\"%s\"", getUri(relPath)));
+         String uri = getUri(relPath);
+
+         if (MIME_TYPE_PDF.equals("type"))
+         {
+            uri += "?#zoom=100";
+         }
+
+         write(String.format("<object data=\"%s\"", uri));
 
          if (type != null)
          {

@@ -402,7 +402,9 @@ public class KeyValList extends HashMap<String,TeXObject>
 
          if (value != null && !(value instanceof MissingValue))
          {
-            String strVal = value.toString();
+            builder.append('=');
+
+            String strVal = value.format();
 
             if (strVal.matches(".*[^\\w].*"))
             {

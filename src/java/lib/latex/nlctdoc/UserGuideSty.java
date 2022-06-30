@@ -167,6 +167,13 @@ public class UserGuideSty extends LaTeXSty
       TaggedColourBox ctrBox = addTaggedColourBox("ctrbox",
          "counter", BG_DEF, Color.BLACK);
 
+      TaggedColourBox codeBox = addTaggedColourBox("codebox",
+         "code", new TeXFontText(TeXFontFamily.VERB), BG_CODE, Color.BLACK);
+      TaggedColourBox resultBox = addTaggedColourBox("resultbox",
+         "result", null, Color.BLACK);
+
+      registerControlSequence(new CodeResult());
+
       FrameBox defnBox = addColourBox("defnbox", null, null,
         BG_DEF, Color.BLACK);
       FrameBox optionSummaryBox = addColourBox("optionsummarybox", null, null,
@@ -600,8 +607,65 @@ public class UserGuideSty extends LaTeXSty
       registerControlSequence(new GenericCommand(true,
        "badcodesym", null, def));
 
+      // unicodesym
+      def = getListener().createStack();
+      def.add(getListener().getControlSequence("texparser@overlapped"));
+      def.add(new TeXCsRef("faFileTextO"));
+      def.add(getListener().getControlSequence("texparser@overlapper"));
+      def.add(getListener().createGroup("U"));
+
+      registerControlSequence(new GenericCommand(true,
+       "unicodesym", null, def));
+
       registerControlSequence(new TextualContentCommand(
          "glsxtrpostdescdualindexabbreviation", "."));
+
+      getListener().newcounter("example");
+
+      registerControlSequence(new TextualContentCommand(
+         "examplename", "example"));
+      registerControlSequence(new TextualContentCommand(
+         "Examplename", "Example"));
+
+      registerControlSequence(new GenericCommand(true,
+        "nlctexampletag", null, TeXParserUtils.createStack(getListener(),
+          new TeXCsRef("Examplename"), getListener().getSpace(),
+          new TeXCsRef("theexample"), new TeXCsRef("space"))));
+
+      registerControlSequence(new CreateExample());
+      registerControlSequence(new ExampleFileBaseName());
+
+      registerControlSequence(new GenericCommand(true,
+        "exampleattachtexicon", null, new AccSuppObject(
+          AccSupp.createSymbol("TeX File Attachment", true),
+          TeXParserUtils.createStack(getListener(),
+          new TeXCsRef("faPaperclip"), 
+          new TeXCsRef("textsuperscript"), 
+          new TeXCsRef("faFileTextO")))));
+
+      registerControlSequence(new GenericCommand(true,
+        "exampleattachpdficon", null, new AccSuppObject(
+          AccSupp.createSymbol("PDF File Attachment", true),
+          TeXParserUtils.createStack(getListener(),
+          new TeXCsRef("faPaperclip"), 
+          new TeXCsRef("textsuperscript"), 
+          new TeXCsRef("faFilePdfO")))));
+
+      registerControlSequence(new GenericCommand(true,
+        "exampledownloadtexicon", null, new AccSuppObject(
+          AccSupp.createSymbol("Download TeX File", true),
+          TeXParserUtils.createStack(getListener(),
+          new TeXCsRef("faDownload"), 
+          new TeXCsRef("textsuperscript"), 
+          new TeXCsRef("faFileTextO")))));
+
+      registerControlSequence(new GenericCommand(true,
+        "exampledownloadpdficon", null, new AccSuppObject(
+          AccSupp.createSymbol("Download PDF", true),
+           TeXParserUtils.createStack(getListener(),
+          new TeXCsRef("faDownload"), 
+          new TeXCsRef("textsuperscript"), 
+          new TeXCsRef("faFilePdfO")))));
    }
 
    protected void addGlsFmtTextCommand(String name, String prefix)
@@ -1009,7 +1073,7 @@ public class UserGuideSty extends LaTeXSty
    public static final Color BG_DEF = new Color(1.0f, 1.0f, 0.75f);
    public static final Color BG_OPTION_DEF = new Color(1.0f, 1.0f, 0.89f);
    public static final Color BG_OPTION_VALUE_DEF = new Color(1.0f, 1.0f, 0.96f);
-   public static final Color BG_CODE = new Color(0.05f, 0.05f,0.05f);
+   public static final Color BG_CODE = new Color(0.95f, 0.95f, 0.95f);
 
    public static final Color FG_CS = new Color(0.41f,0.545f,0.41f);
    public static final Color FG_STYOPT = new Color(0.408f, 0.132f, 0.545f);

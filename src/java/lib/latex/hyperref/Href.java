@@ -45,6 +45,11 @@ public class Href extends ControlSequence
    protected void process(TeXParser parser, TeXObject url, TeXObject text)
      throws IOException
    {
+      if (parser.isStack(text) && ((TeXObjectList)text).size() == 1)
+      {
+         text = ((TeXObjectList)text).firstElement();
+      }
+
       parser.getListener().href(sty.toFullUrl(url.toString(parser)), text);
    }
 

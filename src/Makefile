@@ -65,7 +65,7 @@ tests/test-fontawesome/test-fontawesome.pdf	: tests/test-fontawesome/test-fontaw
 
 test-userguide : app tests/test-userguide/test-userguide.pdf tests/output
 	rm -f -r tests/output/test-userguide
-	bin/texparsertest --debug --in tests/test-userguide/test-userguide.tex --output tests/output/test-userguide --html
+	bin/texparsertest --no-convert-images --debug --in tests/test-userguide/test-userguide.tex --output tests/output/test-userguide --html
 
 tests/test-userguide/test-userguide.pdf	: tests/test-userguide/test-userguide.tex
 					cd tests/test-userguide; arara test-userguide
