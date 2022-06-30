@@ -62,6 +62,15 @@ public class PrintSummary extends AbstractGlsCommand
      TeXParser parser, TeXObjectList stack)
    throws IOException
    {
+      processSummary(substack, glslabels, title, label, sectionCs, null,
+        parser, stack);
+   }
+
+   protected void processSummary(TeXObjectList substack, Vector<GlsLabel> glslabels, 
+     TeXObject title, String label, ControlSequence sectionCs, 
+     TeXObject preamble, TeXParser parser, TeXObjectList stack)
+   throws IOException
+   {
       TeXParserListener listener = parser.getListener();
 
       substack.add(sectionCs);
@@ -72,6 +81,11 @@ public class PrintSummary extends AbstractGlsCommand
       {
          substack.add(new TeXCsRef("label"));
          substack.add(listener.createGroup(label));
+      }
+
+      if (preamble != null)
+      {
+         substack.add(preamble, true);
       }
 
       processSummary(substack, glslabels, parser, stack);

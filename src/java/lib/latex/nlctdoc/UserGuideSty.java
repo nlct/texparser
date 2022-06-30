@@ -192,6 +192,9 @@ public class UserGuideSty extends LaTeXSty
         rightBox, noteBox, glossariesSty));
       registerControlSequence(new SummaryCommandOptionBox(optionSummaryBox, 
         rightBox, noteBox, glossariesSty));
+      registerControlSequence(new SummaryCommandOptionBox(
+        "summaryglossentryoption", defnBox, 
+        rightBox, noteBox, glossariesSty));
       registerControlSequence(new SummaryOptionValueBox(optionValueSummaryBox, 
         rightBox, noteBox, glossariesSty));
 
@@ -236,6 +239,7 @@ public class UserGuideSty extends LaTeXSty
       registerControlSequence(new PrintMain(glossariesSty));
       registerControlSequence(new PrintSummary(glossariesSty));
       registerControlSequence(new PrintCommandOptions(glossariesSty));
+      registerControlSequence(new PrintCommonOptions(glossariesSty));
       registerControlSequence(new PrintIndex(glossariesSty));
 
       registerControlSequence(new Dgls("idx", CaseChange.NO_CHANGE, glossariesSty));

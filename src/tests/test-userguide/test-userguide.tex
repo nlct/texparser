@@ -99,6 +99,9 @@
     \deprecated
     \field{alias}{optval.foo-bar-val.optionvalue}
   }
+  \gidx{commonoption}{\name{common options}\desc{some common options}}
+  \gopt{some-option}{\parent{idx.commonoption}\desc{an option common to several commands}}
+  \gopt{some-option2}{\parent{idx.commonoption}\desc{another option common to several commands}}
   % applications
   \gapp{foobar\dhyphen cli}%
   {%
@@ -218,10 +221,16 @@ Don't use \gls{incompatiblecmd}, which is incompatible with
 A \idx{cli} application \app{foobar-cli} is invoked with:
 \appdef{foobar-cli}
 
+Some common options.
+\optiondef{some-option}
+
+\optiondef{some-option2}
+
 \backmatter
 \printterms
 \printsummary
 \printcommandoptions{foobarcs}
+\printcommonoptions{idx.commonoption}
 \printuserguideindex
 
 \end{document}
