@@ -507,6 +507,11 @@ public class GlossariesSty extends LaTeXSty
       registerControlSequence(new GenericCommand(true,
        "glsseeitemformat", null, new TeXCsRef("glsentryname")));
 
+      registerControlSequence(new GlsXtrGetGroupTitle());
+      registerControlSequence(new GlsXtrSetGroupTitle());
+      registerControlSequence(new GlsXtrSetGroupTitle(
+        "glsxtrlocalsetgrouptitle", true));
+
       registerControlSequence(new TextualContentCommand("abbreviationsname", "Abbreviations"));
 
       registerControlSequence(new GenericCommand(true, "glsxtrabbrvtype", 
