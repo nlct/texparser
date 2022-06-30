@@ -199,6 +199,8 @@ public class UserGuideSty extends LaTeXSty
       createIndexItemBox(1);
       createIndexItemBox(2);
 
+      addColourBox("nlctusernavbox", null, null, null, null);
+
       addGlsFmtTextCommand("stytext", "pkg.");
       addGlsFmtTextCommand("clstext", "cls.");
       addGlsFmtTextCommand("opttext", "opt.");

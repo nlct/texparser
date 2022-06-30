@@ -261,6 +261,12 @@ public class L2HConverter extends LaTeXParserListener
       }
    }
 
+   @Override
+   protected TeXParserSection createTeXParserSection(String sectionCsname)
+   {
+      return new L2HTeXParserSection("texparser@"+sectionCsname, sectionCsname);
+   }
+
    public void addInternalReference(String label, TeXObject object)
    {
       internalReferences.put(label, object);

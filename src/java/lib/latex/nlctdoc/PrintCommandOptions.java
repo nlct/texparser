@@ -48,17 +48,49 @@ public class PrintCommandOptions extends PrintSummary
    public void process(TeXParser parser, TeXObjectList stack)
    throws IOException
    {
-      popOptArg(parser, stack);
+      TeXParserListener listener = parser.getListener();
+
+      KeyValList options = popOptKeyValList(parser, stack);
       GlsLabel cmdLabel = popEntryLabel(parser, stack);
 
       String type = "index";
+      String sectionLabel = cmdLabel.getLabel()+"-options";
+
+      TeXObject title = null;
+
+      if (options != null)
+      {
+         TeXObject obj = options.get("type");
+
+         if (obj != null)
+         {
+            type = parser.expandToString(obj, stack);
+         }
+
+         obj = options.get("label");
+
+         if (obj != null)
+         {
+            sectionLabel = parser.expandToString(obj, stack);
+         }
+
+         title = options.get("title");
+      }
+
+      if (title == null)
+      {
+         TeXObjectList titleList = listener.createStack();
+         titleList.add(cmdLabel.getField("name"));
+         titleList.add(listener.getSpace());
+         titleList.addAll(listener.createString("options"));
+
+         title = titleList;
+      }
 
       Glossary glossary = sty.getGlossary(type);
 
       if (glossary != null && !glossary.isEmpty())
       {
-         TeXParserListener listener = parser.getListener();
-
          TeXObjectList substack = listener.createStack();
 
          ControlSequence sectionCs = parser.getControlSequence("chapter");
@@ -96,14 +128,8 @@ public class PrintCommandOptions extends PrintSummary
 
          if (!labels.isEmpty())
          {
-            TeXObjectList title = listener.createStack();
-            title.add(cmdLabel.getField("name"));
-            title.add(listener.getSpace());
-            title.addAll(listener.createString("options"));
-
             processSummary(substack, labels, title, 
-              cmdLabel.getLabel()+"-options", sectionCs, 
-              parser, stack);
+              sectionLabel, sectionCs, parser, stack);
          }
 
          // substack should be empty, but if not process anything

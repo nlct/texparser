@@ -67,8 +67,12 @@ public class PrintSummary extends AbstractGlsCommand
       substack.add(sectionCs);
       substack.add(listener.getOther('*'));
       substack.add(TeXParserUtils.createGroup(listener, title));
-      substack.add(new TeXCsRef("label"));
-      substack.add(listener.createGroup(label));
+
+      if (label != null && !label.isEmpty())
+      {
+         substack.add(new TeXCsRef("label"));
+         substack.add(listener.createGroup(label));
+      }
 
       processSummary(substack, glslabels, parser, stack);
    }

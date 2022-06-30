@@ -103,29 +103,59 @@ public class PrintIndex extends AbstractGlsCommand
    public void process(TeXParser parser, TeXObjectList stack)
    throws IOException
    {
+      TeXParserListener listener = parser.getListener();
+
+      KeyValList options = popOptKeyValList(parser, stack);
+
       String type = "index";
+      String sectionLabel = "index";
+
+      TeXObject title = null;
+
+      if (options != null)
+      {
+         TeXObject obj = options.get("type");
+
+         if (obj != null)
+         {
+            type = parser.expandToString(obj, stack);
+         }
+
+         obj = options.get("label");
+
+         if (obj != null)
+         {
+            sectionLabel = parser.expandToString(obj, stack);
+         }
+
+         title = options.get("title");
+      }
+
+      if (title == null)
+      {
+         title = listener.getControlSequence("indexname");
+      }
 
       Glossary glossary = sty.getGlossary(type);
 
       if (glossary != null && !glossary.isEmpty())
       {
-         TeXParserListener listener = parser.getListener();
          TeXObjectList list = listener.createStack();
 
          ControlSequence sectionCs = parser.getControlSequence("chapter");
-         ControlSequence subSectionCs = parser.getControlSequence("section");
+         ControlSequence subSectionCs = parser.getControlSequence("texparser@section");
 
          if (sectionCs == null)
          {
-            sectionCs = subSectionCs;
-            subSectionCs = listener.getControlSequence("subsection");
+            sectionCs = listener.getControlSequence("section");
+            subSectionCs = parser.getControlSequence("texparser@subsection");
          }
 
          list.add(sectionCs);
          list.add(listener.getOther('*'));
-         list.add(listener.createGroup("Index"));
+         list.add(TeXParserUtils.createGroup(parser, title));
          list.add(new TeXCsRef("label"));
-         list.add(listener.createGroup("index"));
+         list.add(listener.createGroup(sectionLabel));
 
          TeXParserUtils.process(list, parser, stack);
 
@@ -137,6 +167,10 @@ public class PrintIndex extends AbstractGlsCommand
          ControlSequence item3 = listener.getControlSequence("nlctuserguideidx3");
 
          String currentGrpLabel = "";
+
+         list.add(listener.getControlSequence("nlctusernavbox"));
+         TeXObjectList grpNav = listener.createGroup();
+         list.add(grpNav);
 
          for (String label : glossary)
          {
@@ -151,22 +185,32 @@ public class PrintIndex extends AbstractGlsCommand
                if (!grpLabel.equals(currentGrpLabel))
                {
                   list.add(subSectionCs);
-                  list.add(listener.getOther('*'));
 
                   ControlSequence cs = parser.getControlSequence(
                      "glsxtr@grouptitle@"+grpLabel);
+                  TeXObject grpTitle;
 
                   if (cs == null)
                   {
                      list.add(listener.createGroup(grpLabel));
+                     grpTitle = listener.createString(grpLabel);
                   }
                   else
                   {
                      list.add(cs);
+                     grpTitle = cs;
                   }
 
-                  list.add(listener.getControlSequence("label"));
                   list.add(listener.createGroup(grpLabel));
+
+                  if (!grpNav.isEmpty())
+                  {
+                     grpNav.add(listener.getSpace());
+                  }
+
+                  grpNav.add(listener.getControlSequence("hyperlink"));
+                  grpNav.add(listener.createGroup(grpLabel));
+                  grpNav.add(TeXParserUtils.createGroup(listener, grpTitle));
 
                   currentGrpLabel = grpLabel;
                }
@@ -212,9 +256,9 @@ public class PrintIndex extends AbstractGlsCommand
                content.add(loc);
             }
 
-            TeXParserUtils.process(list, parser, stack);
          }
 
+         TeXParserUtils.process(list, parser, stack);
       }
    }
 

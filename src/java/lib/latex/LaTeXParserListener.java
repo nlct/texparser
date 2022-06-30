@@ -522,6 +522,14 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       parser.putControlSequence(new Appendix());
       parser.putControlSequence(new Typeout());
 
+      parser.putControlSequence(createTeXParserSection("section"));
+      parser.putControlSequence(createTeXParserSection("chapter"));
+      parser.putControlSequence(createTeXParserSection("subsection"));
+      parser.putControlSequence(createTeXParserSection("subsubsection"));
+      parser.putControlSequence(createTeXParserSection("paragraph"));
+      parser.putControlSequence(createTeXParserSection("subparagraph"));
+      parser.putControlSequence(createTeXParserSection("part"));
+
       bibliographySection = new TeXObjectList();
       bibliographySection.add(new TeXCsRef("section"));
       bibliographySection.add(getOther('*'));
@@ -547,6 +555,9 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
         new GenericCommand("figurename", null, createString("Figure")));
       parser.putControlSequence(
         new GenericCommand("tablename", null, createString("Table")));
+
+      parser.putControlSequence(
+        new TextualContentCommand("indexname", "Index"));
 
       newlength("fboxsep", 3, TeXUnit.PT);
       newlength("fboxrule", 0.4f, TeXUnit.PT);
@@ -750,6 +761,11 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
 
       parser.putControlSequence(new GenericError());
       parser.putControlSequence(new DocumentStyle());
+   }
+
+   protected TeXParserSection createTeXParserSection(String sectionCsname)
+   {
+      return new TeXParserSection("texparser@"+sectionCsname, sectionCsname);
    }
 
    protected void addSupplementaryBoxes()

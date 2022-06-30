@@ -253,8 +253,11 @@ public class L2HSection extends Section
 
    public String getTag()
    {
-      String name = getName();
+      return getTag(getName());
+   }
 
+   public static String getTag(String name)
+   {
       for (int i = 0; i < TAGS.length; i++)
       {
          if (TAGS[i][0].equals(name))
@@ -266,7 +269,7 @@ public class L2HSection extends Section
       return null;
    }
 
-   private static final String[][] TAGS = new String[][]
+   public static final String[][] TAGS = new String[][]
    {
       new String[] {"chapter", "h1"},
       new String[] {"section", "h2"},
