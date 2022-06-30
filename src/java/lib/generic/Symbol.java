@@ -235,6 +235,7 @@ public class Symbol extends ControlSequence implements Expandable,CaseChangeable
       new Object[]{"textgreater", Integer.valueOf((int)'>')},
       new Object[]{"textless", Integer.valueOf((int)'<')},
       new Object[]{"textminus", Integer.valueOf(0x2212)},
+      new Object[]{"textnumero", Integer.valueOf(0x2116)},
       new Object[]{"textperiodcentered", Integer.valueOf(0x00B7)},
       new Object[]{"textasteriskcentered", Integer.valueOf(0xFF0A)},
       new Object[]{"textquestiondown", Integer.valueOf(0x00BF)},
