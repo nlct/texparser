@@ -159,6 +159,19 @@ public class PrintIndex extends AbstractGlsCommand
 
          TeXParserUtils.process(list, parser, stack);
 
+         parser.putControlSequence(true, 
+           new TextualContentCommand("glsxtrpostnameenvironment", 
+            " environment"));
+         parser.putControlSequence(true, 
+           new TextualContentCommand("glsxtrpostnamepackage", 
+            " package"));
+         parser.putControlSequence(true, 
+           new TextualContentCommand("glsxtrpostnameclass", 
+             " class"));
+         parser.putControlSequence(true, 
+           new TextualContentCommand("glsxtrpostnamecounter", 
+             " counter"));
+
          ControlSequence nameCs = listener.getControlSequence("glossentryname");
 
          ControlSequence item0 = listener.getControlSequence("nlctuserguideidx0");

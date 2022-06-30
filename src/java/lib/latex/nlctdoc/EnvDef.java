@@ -25,42 +25,61 @@ import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.*;
 import com.dickimawbooks.texparserlib.latex.glossaries.*;
 
-public class CmdDef extends StandaloneDef
+public class EnvDef extends StandaloneDef
 {
-   public CmdDef(TaggedColourBox taggedBox, FrameBox rightBox,
+   public EnvDef(TaggedColourBox taggedBox, FrameBox rightBox,
      FrameBox noteBox, GlossariesSty sty)
    {
-      this("cmddef", taggedBox, rightBox, noteBox, sty);
+      this("envdef", taggedBox, rightBox, noteBox, sty);
    }
 
-   public CmdDef(String name, TaggedColourBox taggedBox, FrameBox rightBox,
+   public EnvDef(String name, TaggedColourBox taggedBox, FrameBox rightBox,
      FrameBox noteBox, GlossariesSty sty)
    {
       super(name, taggedBox, rightBox, noteBox, sty);
+      setEntryLabelPrefix("env.");
    }
 
    @Override
    public Object clone()
    {
-      return new CmdDef(getName(), taggedBox, rightBox, noteBox, getSty());
+      return new EnvDef(getName(), taggedBox, rightBox, noteBox, getSty());
+   }
+
+   @Override
+   protected void addEntryName(TeXObjectList list, GlsLabel glslabel, TeXParser parser)
+   {
+      list.add(parser.getListener().getControlSequence("cbeg"));
+      Group grp = parser.getListener().createGroup();
+      list.add(grp);
+      grp.add(parser.getListener().getControlSequence("glossentryname"));
+      grp.add(glslabel);
    }
 
    @Override
    protected void addPostEntryName(TeXObjectList list, GlsLabel glslabel, TeXParser parser)
    {
+      TeXParserListener listener = parser.getListener();
+
       TeXObject syntax = glslabel.getEntry().get("syntax");
 
       if (syntax != null)
       {
          list.add(syntax, true);
       }
+
+      list.add(listener.getControlSequence("meta"));
+      list.add(listener.createGroup("content"));
+
+      list.add(listener.getControlSequence("cend"));
+      list.add(TeXParserUtils.createGroup(listener, glslabel.getField("name")));
    }
 
    @Override
    protected void postArgHook(GlsLabel glslabel, TeXParser parser, TeXObjectList stack)
    throws IOException
    {
-      TeXObject statusVal = glslabel.getEntry().get("status");
+      TeXObject statusVal = glslabel.getField("status");
       TeXObjectList title = null;
 
       if (statusVal != null)

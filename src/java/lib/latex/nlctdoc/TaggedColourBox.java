@@ -36,6 +36,7 @@ public class TaggedColourBox extends FrameBoxEnv
       super(fbox);
       this.titleBox = titleBox;
       this.defaultTitle = title;
+      this.currentTitle = title;
    }
 
    public TaggedColourBox(String name, FrameBox fbox, FrameBox titleBox, TeXObject title)
@@ -43,6 +44,7 @@ public class TaggedColourBox extends FrameBoxEnv
       super(name, fbox);
       this.titleBox = titleBox;
       this.defaultTitle = title;
+      this.currentTitle = title;
    }
 
    @Override
@@ -68,7 +70,7 @@ public class TaggedColourBox extends FrameBoxEnv
 
       substack.add(new StartFrameBox(fbox));
 
-      TeXObject title = defaultTitle;
+      TeXObject title = currentTitle;
 
       if (options != null && !options.isEmpty())
       {
@@ -112,14 +114,19 @@ public class TaggedColourBox extends FrameBoxEnv
 
    public void setTitle(TeXObject title)
    {
-      defaultTitle = title;
+      currentTitle = title;
    }
 
    public TeXObject getTitle()
    {
-      return defaultTitle;
+      return currentTitle;
    }
 
-   protected TeXObject defaultTitle;
+   public void restoreTitle()
+   {
+      currentTitle = defaultTitle;
+   }
+
+   protected TeXObject defaultTitle, currentTitle;
    protected FrameBox titleBox;
 }

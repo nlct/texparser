@@ -68,6 +68,12 @@ public class UserGuideSty extends LaTeXSty
       addSemanticCommand("filefmt", TeXFontFamily.TT);
       addSemanticCommand("extfmt", TeXFontFamily.TT);
       addSemanticCommand("deprecatedorbannedfmt", FG_DEPRECATED_OR_BANNED);
+      addSemanticCommand("summarylocfmt", TeXFontShape.IT);
+
+      addSemanticCommand("cbeg", TeXFontFamily.VERB, null, 
+        listener.createString("\\begin{"), listener.getOther('}'));
+      addSemanticCommand("cend", TeXFontFamily.VERB, null, 
+        listener.createString("\\end{"), listener.getOther('}'));
 
       registerControlSequence(new GenericCommand(true,
          "thispackagename", null, new TeXCsRef("jobname")));
@@ -158,6 +164,8 @@ public class UserGuideSty extends LaTeXSty
       TaggedColourBox terminalBox = 
         addTaggedColourBox("terminal", new TeXFontText(TeXFontFamily.VERB), 
            null, Color.BLACK);
+      TaggedColourBox ctrBox = addTaggedColourBox("ctrbox",
+         "counter", BG_DEF, Color.BLACK);
 
       FrameBox defnBox = addColourBox("defnbox", null, null,
         BG_DEF, Color.BLACK);
@@ -173,6 +181,8 @@ public class UserGuideSty extends LaTeXSty
       getListener().declareFrameBox(noteBox, false);
 
       registerControlSequence(new CmdDef(pinnedBox, rightBox, noteBox, glossariesSty));
+      registerControlSequence(new EnvDef(pinnedBox, rightBox, noteBox, glossariesSty));
+      registerControlSequence(new CtrDef(ctrBox, rightBox, noteBox, glossariesSty));
 
       TaggedColourBox settingsBox = addTaggedColourBox("settingsbox",
          "valuesetting", BG_OPTION_DEF, Color.BLACK);
@@ -723,6 +733,18 @@ public class UserGuideSty extends LaTeXSty
    {
       TeXFontText font = new TeXFontText();
       font.setWeight(weight);
+      addSemanticCommand(name, font, fg);
+   }
+
+   protected void addSemanticCommand(String name, TeXFontShape shape)
+   {
+      addSemanticCommand(name, shape, null);
+   }
+
+   protected void addSemanticCommand(String name, TeXFontShape shape, Color fg)
+   {
+      TeXFontText font = new TeXFontText();
+      font.setShape(shape);
       addSemanticCommand(name, font, fg);
    }
 

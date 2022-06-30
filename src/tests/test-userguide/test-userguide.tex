@@ -102,6 +102,10 @@
   \gidx{commonoption}{\name{common options}\desc{some common options}}
   \gopt{some-option}{\parent{idx.commonoption}\desc{an option common to several commands}}
   \gopt{some-option2}{\parent{idx.commonoption}\desc{another option common to several commands}}
+  % environments
+  \genv{foobarenv}{\syntax{\margm{text}}\desc{a sample environment}}
+  % counters
+  \gctr{foobarctr}{\desc{a sample counter}}
   % applications
   \gapp{foobar\dhyphen cli}%
   {%
@@ -225,6 +229,12 @@ Some common options.
 \optiondef{some-option}
 
 \optiondef{some-option2}
+
+An environment:
+\envdef{foobarenv}
+
+A counter:
+\ctrdef{foobarctr}
 
 \backmatter
 \printterms
