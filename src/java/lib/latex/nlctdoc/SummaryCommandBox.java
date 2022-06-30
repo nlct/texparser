@@ -47,7 +47,9 @@ public class SummaryCommandBox extends SummaryBox
    }
 
    @Override
-   protected void addPostEntryName(TeXObjectList list, GlsLabel glslabel, TeXParser parser)
+   protected void addPostEntryName(TeXObjectList list, GlsLabel glslabel,
+      TeXParser parser, TeXObjectList stack)
+   throws IOException
    {
       GlossaryEntry entry = glslabel.getEntry();
 

@@ -58,8 +58,25 @@ public class PrintSummary extends AbstractGlsCommand
    }
 
    protected void processSummary(TeXObjectList substack, Vector<GlsLabel> glslabels, 
+     TeXObject title, String label, ControlSequence sectionCs, 
+     TeXParser parser, TeXObjectList stack)
+   throws IOException
+   {
+      TeXParserListener listener = parser.getListener();
+
+      substack.add(sectionCs);
+      substack.add(listener.getOther('*'));
+      substack.add(TeXParserUtils.createGroup(listener, title));
+      substack.add(new TeXCsRef("label"));
+      substack.add(listener.createGroup(label));
+
+      processSummary(substack, glslabels, parser, stack);
+   }
+
+   protected void processSummary(TeXObjectList substack, Vector<GlsLabel> glslabels, 
      String title, String label, ControlSequence sectionCs, 
      TeXParser parser, TeXObjectList stack)
+   throws IOException
    {
       TeXParserListener listener = parser.getListener();
 
@@ -74,6 +91,7 @@ public class PrintSummary extends AbstractGlsCommand
 
    protected void processSummary(TeXObjectList substack, Vector<GlsLabel> glslabels, 
      TeXParser parser, TeXObjectList stack)
+   throws IOException
    {
       TeXParserListener listener = parser.getListener();
 
@@ -85,12 +103,9 @@ public class PrintSummary extends AbstractGlsCommand
 
       for (GlsLabel glslabel : glslabels)
       {
-/*
          String category = glslabel.getCategory();
 
-         substack.add(defCs);
-         substack.add(new TeXCsRef("glscurrententrylabel"));
-         substack.add(listener.createGroup(glslabel.getLabel()));
+         parser.putControlSequence(true, glslabel.duplicate("glscurrententrylabel"));
 
          ControlSequence nameCs = parser.getControlSequence(
            "summaryglossentry"+category);
@@ -100,19 +115,25 @@ public class PrintSummary extends AbstractGlsCommand
             nameCs = listener.getControlSequence("summaryglossentry");
          }
 
-*/
-ControlSequence nameCs = listener.getControlSequence("summaryglossentry");
          substack.add(nameCs);
          substack.add(glslabel);
-/*
 
          substack.add(listener.getPar());
          substack.add(descCs);
          substack.add(glslabel);
          substack.add(postDescCs);
-*/
+
+         TeXObject loc = glslabel.getField("primarylocations");
+
+         if (loc != null)
+         {
+            substack.add(listener.getSpace());
+            substack.add(loc);
+         }
+
          substack.add(listener.getPar());
 
+         TeXParserUtils.process(substack, parser, stack);
       }
    }
 
@@ -247,15 +268,7 @@ ControlSequence nameCs = listener.getControlSequence("summaryglossentry");
                   {
                      String rootCat = rootEntry.getCategory();
 
-                     if (rootCat.equals("command"))
-                     {
-                        cmds.add(glslabel);
-                     }
-                     else if (rootCat.equals("environment"))
-                     {
-                        envs.add(glslabel);
-                     }
-                     else if (rootCat.equals("package"))
+                     if (rootCat.equals("package"))
                      {
                         Vector<GlsLabel> pl = pkgMap.get(rootLabel);
 
@@ -343,7 +356,12 @@ ControlSequence nameCs = listener.getControlSequence("summaryglossentry");
             }
          }
 
-         TeXParserUtils.process(substack, parser, stack);
+         // substack should be empty, but if not process anything
+         // remaining
+         if (!substack.isEmpty())
+         {
+            TeXParserUtils.process(substack, parser, stack);
+         }
       }
    }
 

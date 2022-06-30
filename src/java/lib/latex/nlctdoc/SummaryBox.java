@@ -63,10 +63,10 @@ public class SummaryBox extends AbstractGlsCommand
    }
 
    protected void addPreEntryName(TeXObjectList list, GlsLabel glslabel,
-      TeXParser parser)
+      TeXParser parser, TeXObjectList stack)
    throws IOException
    {
-      TeXObject statusVal = glslabel.getEntry().get("status");
+      TeXObject statusVal = glslabel.getField("status");
 
       if (statusVal != null)
       {
@@ -87,7 +87,8 @@ public class SummaryBox extends AbstractGlsCommand
       list.add(glslabel);
    }
 
-   protected void addPostEntryName(TeXObjectList list, GlsLabel glslabel, TeXParser parser)
+   protected void addPostEntryName(TeXObjectList list, GlsLabel glslabel, TeXParser parser, TeXObjectList stack)
+   throws IOException
    {
    }
 
@@ -125,6 +126,27 @@ public class SummaryBox extends AbstractGlsCommand
          list.add(val, true);
       }
 
+      TeXObject alias = glslabel.getEntry().get("alias");
+
+      if (alias != null)
+      {
+         if (list == null)
+         {
+            list = parser.getListener().createStack();
+         }
+         else
+         {
+            list.add(parser.getListener().getOther(';'));
+            list.add(parser.getListener().getSpace());
+         }
+
+         list.add(parser.getListener().getControlSequence("summarytagfmt"));
+         list.add(parser.getListener().createGroup("alias"));
+            list.add(parser.getListener().getSpace());
+         list.add(parser.getListener().getControlSequence("glshyperlink"));
+         list.add(TeXParserUtils.createGroup(parser, alias));
+      }
+
       TeXObject providedby = glslabel.getEntry().get("providedby");
 
       if (providedby != null)
@@ -151,12 +173,15 @@ public class SummaryBox extends AbstractGlsCommand
    }
 
    protected void addRow(TeXObjectList list, GlsLabel glslabel, 
-      TeXParser parser, Vector<GlsLabel> modList)
+      TeXParser parser, TeXObjectList stack, Vector<GlsLabel> modList)
    throws IOException
    {
       TeXParserListener listener = parser.getListener();
 
-      addPreEntryName(list, glslabel, parser);
+      list.add(new TeXCsRef("glsadd"));
+      list.add(glslabel);
+
+      addPreEntryName(list, glslabel, parser, stack);
 
       Vector<String> targets = sty.getTargets(glslabel);
 
@@ -182,10 +207,7 @@ public class SummaryBox extends AbstractGlsCommand
       list.add(grp);
 
       addEntryName(grp, glslabel, parser);
-      addPostEntryName(list, glslabel, parser);
-
-      list.add(new TeXCsRef("glsadd"));
-      list.add(glslabel);
+      addPostEntryName(list, glslabel, parser, stack);
 
       TeXObject rightBoxContent = getRightBoxContent(glslabel, parser);
 
@@ -218,7 +240,7 @@ public class SummaryBox extends AbstractGlsCommand
          rightBoxContent = sublist;
       }
 
-      if (rightBoxContent != null)
+      if (rightBoxContent != null && !rightBoxContent.isEmpty())
       {
          list.add(new StartFrameBox(rightBox));
          list.add(rightBoxContent, true);
@@ -296,7 +318,7 @@ public class SummaryBox extends AbstractGlsCommand
             }
          }
 
-         addRow(content, glslabel, parser, modList);
+         addRow(content, glslabel, parser, stack, modList);
 
          TeXObject note = getNote(glslabel, parser);
 

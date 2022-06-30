@@ -161,6 +161,10 @@ public class UserGuideSty extends LaTeXSty
 
       FrameBox defnBox = addColourBox("defnbox", null, null,
         BG_DEF, Color.BLACK);
+      FrameBox optionSummaryBox = addColourBox("optionsummarybox", null, null,
+        null, null);
+      FrameBox optionValueSummaryBox = addSemanticCommand("optionvaluesummarybox",
+         new UserDimension(40, FixedUnit.BP));
 
       FrameBox rightBox = addFloatBox("floatrightbox");
 
@@ -185,6 +189,10 @@ public class UserGuideSty extends LaTeXSty
       registerControlSequence(new SummaryBox(defnBox, 
         rightBox, noteBox, glossariesSty));
       registerControlSequence(new SummaryCommandBox(defnBox, 
+        rightBox, noteBox, glossariesSty));
+      registerControlSequence(new SummaryCommandOptionBox(optionSummaryBox, 
+        rightBox, noteBox, glossariesSty));
+      registerControlSequence(new SummaryOptionValueBox(optionValueSummaryBox, 
         rightBox, noteBox, glossariesSty));
 
       createIndexItemBox(0);
@@ -222,6 +230,7 @@ public class UserGuideSty extends LaTeXSty
       registerControlSequence(new PrintIcons(glossariesSty));
       registerControlSequence(new PrintMain(glossariesSty));
       registerControlSequence(new PrintSummary(glossariesSty));
+      registerControlSequence(new PrintCommandOptions(glossariesSty));
       registerControlSequence(new PrintIndex(glossariesSty));
 
       registerControlSequence(new Dgls("idx", CaseChange.NO_CHANGE, glossariesSty));
@@ -747,6 +756,22 @@ public class UserGuideSty extends LaTeXSty
       TeXObject prefix, TeXObject suffix,
       boolean isInLine, boolean isMultiLine)
    {
+      return addSemanticCommand(name, id, font, fg, bg, frameCol, 
+      prefix, suffix, isInLine, isMultiLine, null);
+   }
+
+   protected FrameBox addSemanticCommand(String name, TeXDimension leftOuterMargin)
+   {
+      return addSemanticCommand(name, name, (TeXFontText)null, 
+      (Color)null, (Color)null, (Color)null, 
+      (TeXObject)null, (TeXObject)null, false, true, leftOuterMargin);
+   }
+
+   protected FrameBox addSemanticCommand(String name, String id, 
+    TeXFontText font, Color fg, Color bg, Color frameCol, 
+      TeXObject prefix, TeXObject suffix,
+      boolean isInLine, boolean isMultiLine, TeXDimension leftOuterMargin)
+   {
       FrameBox boxFrame = new ColourBox(name, 
        frameCol == null ? BorderStyle.NONE : BorderStyle.SOLID,
        AlignHStyle.DEFAULT, AlignVStyle.DEFAULT, isInLine, null, null);
@@ -761,6 +786,11 @@ public class UserGuideSty extends LaTeXSty
          boxFrame.setBorderColor(frameCol);
          boxFrame.setBorderWidth(new UserDimension(1, FixedUnit.BP));
          boxFrame.setInnerMargin(new UserDimension(2, FixedUnit.BP));
+      }
+
+      if (leftOuterMargin != null)
+      {
+         boxFrame.setOuterMarginLeft(leftOuterMargin);
       }
 
       boxFrame.setPrefix(prefix);

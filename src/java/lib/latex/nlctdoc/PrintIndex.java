@@ -112,14 +112,16 @@ public class PrintIndex extends AbstractGlsCommand
          TeXParserListener listener = parser.getListener();
          TeXObjectList list = listener.createStack();
 
-         ControlSequence cs = parser.getControlSequence("chapter");
+         ControlSequence sectionCs = parser.getControlSequence("chapter");
+         ControlSequence subSectionCs = parser.getControlSequence("section");
 
-         if (cs == null)
+         if (sectionCs == null)
          {
-            cs = listener.getControlSequence("section");
+            sectionCs = subSectionCs;
+            subSectionCs = listener.getControlSequence("subsection");
          }
 
-         list.add(cs);
+         list.add(sectionCs);
          list.add(listener.getOther('*'));
          list.add(listener.createGroup("Index"));
          list.add(new TeXCsRef("label"));
@@ -134,9 +136,41 @@ public class PrintIndex extends AbstractGlsCommand
          ControlSequence item2 = listener.getControlSequence("nlctuserguideidx2");
          ControlSequence item3 = listener.getControlSequence("nlctuserguideidx3");
 
+         String currentGrpLabel = "";
+
          for (String label : glossary)
          {
             GlossaryEntry entry = sty.getEntry(label);
+
+            TeXObject grpObj = entry.get("group");
+
+            if (grpObj != null)
+            {
+               String grpLabel = parser.expandToString(grpObj, stack);
+
+               if (!grpLabel.equals(currentGrpLabel))
+               {
+                  list.add(subSectionCs);
+                  list.add(listener.getOther('*'));
+
+                  ControlSequence cs = parser.getControlSequence(
+                     "glsxtr@grouptitle@"+grpLabel);
+
+                  if (cs == null)
+                  {
+                     list.add(listener.createGroup(grpLabel));
+                  }
+                  else
+                  {
+                     list.add(cs);
+                  }
+
+                  list.add(listener.getControlSequence("label"));
+                  list.add(listener.createGroup(grpLabel));
+
+                  currentGrpLabel = grpLabel;
+               }
+            }
 
             GlsLabel glslabel = new GlsLabel("glscurrententrylabel",
               label, entry);

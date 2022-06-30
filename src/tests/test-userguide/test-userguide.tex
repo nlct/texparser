@@ -1,7 +1,7 @@
 % arara: lualatex
 % arara: bib2gls: { group: on }
 % arara: lualatex
-\documentclass[titlepage=false,open=any,
+\documentclass[titlepage=false,oneside,
  fontsize=12pt,captions=tableheading]{scrbook}
 
 %\usepackage[autooneside=false]{scrlayer-scrpage}
@@ -217,6 +217,7 @@ A \idx{cli} application \app{foobar-cli} is invoked with:
 \backmatter
 \printterms
 \printsummary
+\printcommandoptions{foobarcs}
 \printuserguideindex
 
 \end{document}
