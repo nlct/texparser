@@ -62,6 +62,4 @@ public class SetGlossaryStyle extends ControlSequence
    {
       process(parser, parser);
    }
-
-   private byte overwrite;
 }
