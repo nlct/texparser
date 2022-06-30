@@ -111,17 +111,20 @@ public class PrintCommandOptions extends PrintSummary
             GlsLabel glslabel = new GlsLabel("glscurrententrylabel@"+label,
               label, entry);
 
-            TeXObject rootVal = entry.get("rootancestor");
-
-            if (rootVal != null)
+            if (!glslabel.getLabel().equals(cmdLabel.getLabel()))
             {
-               String rootLabel = rootVal.toString(parser);
-               GlossaryEntry rootEntry = sty.getEntry(rootLabel);
+               TeXObject rootVal = entry.get("rootancestor");
 
-               if (rootEntry != null 
-                  && rootEntry.getLabel().equals(cmdLabel.getLabel()))
+               if (rootVal != null)
                {
-                  labels.add(glslabel);
+                  String rootLabel = rootVal.toString(parser);
+                  GlossaryEntry rootEntry = sty.getEntry(rootLabel);
+
+                  if (rootEntry != null 
+                     && rootEntry.getLabel().equals(cmdLabel.getLabel()))
+                  {
+                     labels.add(glslabel);
+                  }
                }
             }
          }

@@ -200,6 +200,9 @@ public class UserGuideSty extends LaTeXSty
       createIndexItemBox(2);
 
       addColourBox("nlctusernavbox", null, null, null, null);
+      addSemanticCommand("texparser@abstractheader", "abstractheader", 
+        new TeXFontText(TeXFontWeight.BF), null, null, null, null, null, 
+         false, false, null, AlignHStyle.CENTER);
 
       addGlsFmtTextCommand("stytext", "pkg.");
       addGlsFmtTextCommand("clstext", "cls.");
@@ -774,9 +777,19 @@ public class UserGuideSty extends LaTeXSty
       TeXObject prefix, TeXObject suffix,
       boolean isInLine, boolean isMultiLine, TeXDimension leftOuterMargin)
    {
+      return addSemanticCommand(name, id, font, fg, bg, frameCol, 
+      prefix, suffix, isInLine, isMultiLine, leftOuterMargin, AlignHStyle.DEFAULT);
+   }
+
+   protected FrameBox addSemanticCommand(String name, String id, 
+    TeXFontText font, Color fg, Color bg, Color frameCol, 
+      TeXObject prefix, TeXObject suffix,
+      boolean isInLine, boolean isMultiLine, TeXDimension leftOuterMargin,
+      AlignHStyle halign)
+   {
       FrameBox boxFrame = new ColourBox(name, 
        frameCol == null ? BorderStyle.NONE : BorderStyle.SOLID,
-       AlignHStyle.DEFAULT, AlignVStyle.DEFAULT, isInLine, null, null);
+       halign, AlignVStyle.DEFAULT, isInLine, null, null);
 
       boxFrame.setIsMultiLine(isMultiLine);
       boxFrame.setTextFont(font);

@@ -80,20 +80,30 @@ public class AbstractDec extends Declaration
    {
       TeXObjectList substack = parser.getListener().createStack();
 
-      ControlSequence cs = parser.getControlSequence("chapter");
+      ControlSequence cs = parser.getControlSequence("texparser@abstractheader");
 
       if (cs != null)
       {
          substack.add(cs);
-         substack.add(parser.getListener().getOther('*'));
          substack.add(new TeXCsRef("abstractname"));
       }
       else
       {
-         substack.add(parser.getListener().getPar());
-         substack.add(parser.getListener().getControlSequence("textbf"));
-         substack.add(new TeXCsRef("abstractname"));
-         substack.add(parser.getListener().getPar());
+         cs = parser.getControlSequence("chapter");
+
+         if (cs != null)
+         {
+            substack.add(cs);
+            substack.add(parser.getListener().getOther('*'));
+            substack.add(new TeXCsRef("abstractname"));
+         }
+         else
+         {
+            substack.add(parser.getListener().getPar());
+            substack.add(parser.getListener().getControlSequence("textbf"));
+            substack.add(new TeXCsRef("abstractname"));
+            substack.add(parser.getListener().getPar());
+         }
       }
 
       return substack;

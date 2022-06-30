@@ -42,6 +42,11 @@ public class TeXFontText
       setSize(size);
    }
 
+   public TeXFontText(TeXFontWeight weight)
+   {
+      setWeight(weight);
+   }
+
    public void setName(String name)
    {
       this.name = name;
