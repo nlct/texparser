@@ -53,12 +53,6 @@ public class Def extends Primitive
    {
       TeXObject cs = stack.popStack(parser);
 
-      if (cs == null)
-      {
-         stack = parser;
-         cs = stack.popStack(parser);
-      }
-
       TeXObjectList syntax = new TeXObjectList();
       TeXObject nextObject = stack.popStack(parser);
 
