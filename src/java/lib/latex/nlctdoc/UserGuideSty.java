@@ -172,7 +172,34 @@ public class UserGuideSty extends LaTeXSty
       TaggedColourBox resultBox = addTaggedColourBox("resultbox",
          "result", null, Color.BLACK);
 
-      registerControlSequence(new CodeResult());
+      registerControlSequence(new FrameBoxEnv(
+        addSemanticCommand("@compactcodebox", "compactcodebox",
+        new TeXFontText(TeXFontFamily.VERB),
+        (Color)null, BG_CODE, Color.BLACK, null, null, false, true)));
+
+      FrameBox crc = addSemanticCommand("@sidebysidecode", "sidebysidecode",
+        new TeXFontText(TeXFontFamily.VERB),
+        (Color)null, BG_CODE, Color.BLACK, null, null, true, true, 
+         null, // left outer margin
+         new UserDimension(0.03, new PercentUnit()), // right outer margin
+         new UserDimension(), // top outer margin
+         null, // bottom outer margin
+         AlignHStyle.DEFAULT, AlignVStyle.TOP, 
+         new UserDimension(0.47, new PercentUnit()));
+
+      FrameBox crr = addSemanticCommand("@sidebysideresult", "sidebysideresult",
+         null, (Color)null, null, Color.BLACK, null, null, true, true, 
+         null, // left outer margin
+         null, // right outer margin
+         new UserDimension(), // top outer margin
+         null, // bottom outer margin
+         AlignHStyle.DEFAULT, AlignVStyle.TOP, 
+         new UserDimension(0.47, new PercentUnit()));
+
+      registerControlSequence(new CodeResult(
+         new ColourBox("frame@coderesult@title", BorderStyle.NONE,
+          AlignHStyle.CENTER, AlignVStyle.DEFAULT, false, true, null, null),
+        crc, crr));
 
       FrameBox defnBox = addColourBox("defnbox", null, null,
         BG_DEF, Color.BLACK);
@@ -887,9 +914,23 @@ public class UserGuideSty extends LaTeXSty
       boolean isInLine, boolean isMultiLine, TeXDimension leftOuterMargin,
       AlignHStyle halign)
    {
+      return addSemanticCommand(name, id, font, fg, bg, frameCol, 
+      prefix, suffix, isInLine, isMultiLine, leftOuterMargin,
+      null, null, null, halign, AlignVStyle.DEFAULT, null);
+   }
+
+   protected FrameBox addSemanticCommand(String name, String id, 
+    TeXFontText font, Color fg, Color bg, Color frameCol, 
+      TeXObject prefix, TeXObject suffix,
+      boolean isInLine, boolean isMultiLine, TeXDimension leftOuterMargin,
+      TeXDimension rightOuterMargin,
+      TeXDimension topOuterMargin,
+      TeXDimension bottomOuterMargin,
+      AlignHStyle halign, AlignVStyle valign, TeXDimension width)
+   {
       FrameBox boxFrame = new ColourBox(name, 
        frameCol == null ? BorderStyle.NONE : BorderStyle.SOLID,
-       halign, AlignVStyle.DEFAULT, isInLine, null, null);
+       halign, valign, isInLine, null, null);
 
       boxFrame.setIsMultiLine(isMultiLine);
       boxFrame.setTextFont(font);
@@ -903,9 +944,29 @@ public class UserGuideSty extends LaTeXSty
          boxFrame.setInnerMargin(new UserDimension(2, FixedUnit.BP));
       }
 
+      if (width != null)
+      {
+         boxFrame.setWidth(width);
+      }
+
       if (leftOuterMargin != null)
       {
          boxFrame.setOuterMarginLeft(leftOuterMargin);
+      }
+
+      if (rightOuterMargin != null)
+      {
+         boxFrame.setOuterMarginRight(rightOuterMargin);
+      }
+
+      if (topOuterMargin != null)
+      {
+         boxFrame.setOuterMarginTop(topOuterMargin);
+      }
+
+      if (bottomOuterMargin != null)
+      {
+         boxFrame.setOuterMarginBottom(bottomOuterMargin);
       }
 
       boxFrame.setPrefix(prefix);

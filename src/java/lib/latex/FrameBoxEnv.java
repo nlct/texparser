@@ -32,21 +32,44 @@ public class FrameBoxEnv extends Declaration
 
    public FrameBoxEnv(String name, FrameBox fbox)
    {
+      this(name, fbox, true);
+   }
+
+   public FrameBoxEnv(String name, FrameBox fbox, boolean popLeadingSpace)
+   {
       super(name);
       this.fbox = fbox;
+      this.popLeadingSpace = popLeadingSpace;
       setEndDeclaration(new EndDeclaration(name));
    }
 
    @Override
    public Object clone()
    {
-      return new FrameBoxEnv(getName(), fbox);
+      return new FrameBoxEnv(getName(), fbox, popLeadingSpace);
+   }
+
+   protected void preprocess(TeXParser parser, TeXObjectList stack)
+     throws IOException
+   {
+      if (popLeadingSpace)
+      {
+         TeXObject token = stack.peekStack();
+
+         while (token instanceof WhiteSpace)
+         {
+            stack.popStack(parser);
+            token = stack.peekStack();
+         }
+      }
+
    }
 
    @Override
    public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
+      preprocess(parser, stack);
       StartFrameBox obj = new StartFrameBox(fbox);
       obj.process(parser, stack);
    }
@@ -55,6 +78,7 @@ public class FrameBoxEnv extends Declaration
    public void process(TeXParser parser)
      throws IOException
    {
+      preprocess(parser, parser);
       StartFrameBox obj = new StartFrameBox(fbox);
       obj.process(parser);
    }
@@ -123,4 +147,5 @@ public class FrameBoxEnv extends Declaration
    }
 
    protected FrameBox fbox;
+   protected boolean popLeadingSpace;
 }

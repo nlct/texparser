@@ -707,6 +707,42 @@ public class FrameBox extends ControlSequence
       TeXParserUtils.process(substack, parser, stack);
    }
 
+   public void applyToSettings(TeXSettings settings)
+   {
+      if (currentFgColor != null)
+      {
+         settings.setFgColor(currentFgColor);
+      }
+
+      if (currentBgColor != null)
+      {
+         settings.setBgColor(currentBgColor);
+      }
+
+      if (textFont != null)
+      {
+         settings.setFont(textFont);
+      }
+   }
+
+   @Override
+   public String toString()
+   {
+      return String.format("%s[name=%s,id=%s,width=%s,height=%s,borderwidth=%s,innermargin=%s,borderradius=%s,outermarginleft=%s,outermarginright=%s,outermargintop=%s,outermarginbottom=%s,bordercol=%s,fg=%s,bg=%s,borderstyle=%s,halign=%s,valign=%s,float=%s,angle=%s,font=%s,prefix=%s,suffix=%s,inline=%s,multiline=%s,changeable=%s]", 
+        getClass().getSimpleName(),
+        getName(), id, currentWidth, currentHeight,
+        currentBorderWidth, currentInnerMargin, currentBorderRadius, 
+        currentOuterMarginLeft,
+        currentOuterMarginRight,
+        currentOuterMarginTop,
+        currentOuterMarginBottom,
+        currentBorderColor, currentFgColor, currentBgColor,
+        style, halign, valign, floatStyle,
+        currentAngle, textFont, prefix, suffix,
+        isInline, isMultiLine, isChangeable
+     );
+   }
+
    protected String id;
 
    protected TeXDimension currentWidth=null;

@@ -23,47 +23,57 @@ import java.io.IOException;
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.*;
 
-public class GlsNavHyperTarget extends ControlSequence
+public class AtGlsAtHypergroup extends ControlSequence
 {
-   public GlsNavHyperTarget()
+   public AtGlsAtHypergroup()
    {
-      this("glsnavhypertarget");
+      this("@gls@hypergroup");
    }
 
-   public GlsNavHyperTarget(String name)
+   public AtGlsAtHypergroup(String name)
    {
       super(name);
    }
 
    public Object clone()
    {
-      return new GlsNavHyperTarget(getName());
+      return new AtGlsAtHypergroup(getName());
    }
 
    @Override
    public void process(TeXParser parser, TeXObjectList stack)
-      throws IOException
+     throws IOException
    {
-      String type = popOptLabelString(parser, stack);
+      String type = popLabelString(parser, stack);
       String grpLabel = popLabelString(parser, stack);
-      TeXObject title = popArg(parser, stack);
 
-      TeXParserListener listener = parser.getListener();
+      String csname = "@gls@hypergrouplist@"+type;
+      ControlSequence cs = parser.getControlSequence(csname);
 
-      TeXObjectList list = listener.createStack();
-
-      list.add(listener.getControlSequence("@glsnavhypertarget"));
-      list.add(listener.createGroup(type));
-      list.add(listener.createGroup(grpLabel));
-      list.add(TeXParserUtils.createGroup(listener, title));
-
-      TeXParserUtils.process(list, parser, stack);
+      if (cs == null || cs.isEmpty())
+      {
+         cs = new TextualContentCommand(csname, grpLabel);
+         parser.putControlSequence(false, cs);
+      }
+      else if (cs instanceof TextualContentCommand)
+      {
+         TextualContentCommand tcc = (TextualContentCommand)cs;
+         String text = tcc.getText()+","+grpLabel;
+         tcc.setText(text);
+      }
+      else
+      {
+         String text = parser.expandToString(cs, stack);
+         cs = new TextualContentCommand(csname, text+","+grpLabel);
+         parser.putControlSequence(false, cs);
+      }
    }
 
    @Override
    public void process(TeXParser parser)
-      throws IOException
+     throws IOException
    {
       process(parser, parser);
    }
+
 }

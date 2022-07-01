@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -42,19 +42,42 @@ public class Eol extends WhiteSpace
       return eol;
    }
 
+   @Override
    public String toString(TeXParser parser)
    {
       return eol;
    }
 
+   @Override
    public String toString()
    {
       return eol;
    }
 
+   @Override
+   public String format()
+   {
+      return eol;
+   }
+
+   @Override
    public Object clone()
    {
       return new Eol(eol);
+   }
+
+   @Override
+   public void process(TeXParser parser, TeXObjectList stack)
+     throws IOException
+   {
+      if (parser.getSettings().getFontFamily() == TeXFontFamily.VERB)
+      {
+          parser.getListener().getWriteable().write(eol);
+      }
+      else
+      {
+         super.process(parser, stack);
+      }
    }
 
    private String eol;

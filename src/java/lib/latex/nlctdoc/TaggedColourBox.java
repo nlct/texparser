@@ -64,6 +64,8 @@ public class TaggedColourBox extends FrameBoxEnv
 
       TeXObject options = popOptArg(parser, stack);
 
+      preprocess(parser, stack);
+
       KeyValList keyValList = null;
 
       TeXObjectList substack = parser.getListener().createStack();

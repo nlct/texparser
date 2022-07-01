@@ -177,7 +177,7 @@ public class SearchTeXFiles extends LaTeXParserListener
       }
    }
 
-   public void includegraphics(KeyValList options, String imgName)
+   public void includegraphics(TeXObjectList stack, KeyValList options, String imgName)
     throws IOException
    {
       File imageFile = getImageFile(imgName);

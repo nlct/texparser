@@ -23,47 +23,52 @@ import java.io.IOException;
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.*;
 
-public class GlsNavHyperTarget extends ControlSequence
+public class AtGlsNavHyperTarget extends ControlSequence
 {
-   public GlsNavHyperTarget()
+   public AtGlsNavHyperTarget()
    {
-      this("glsnavhypertarget");
+      this("@glsnavhypertarget");
    }
 
-   public GlsNavHyperTarget(String name)
+   public AtGlsNavHyperTarget(String name)
    {
       super(name);
    }
 
    public Object clone()
    {
-      return new GlsNavHyperTarget(getName());
+      return new AtGlsNavHyperTarget(getName());
    }
 
    @Override
    public void process(TeXParser parser, TeXObjectList stack)
-      throws IOException
+     throws IOException
    {
-      String type = popOptLabelString(parser, stack);
+      String type = popLabelString(parser, stack);
       String grpLabel = popLabelString(parser, stack);
-      TeXObject title = popArg(parser, stack);
+      TeXObject textArg = popArg(parser, stack);
 
       TeXParserListener listener = parser.getListener();
+      TeXObjectList substack = listener.createStack();
 
-      TeXObjectList list = listener.createStack();
+      substack.add(listener.getControlSequence("@glstarget"));
+      Group grp = listener.createGroup();
+      substack.add(grp);
 
-      list.add(listener.getControlSequence("@glsnavhypertarget"));
-      list.add(listener.createGroup(type));
-      list.add(listener.createGroup(grpLabel));
-      list.add(TeXParserUtils.createGroup(listener, title));
+      grp.add(listener.getControlSequence("glsnavhyperlinkname"));
+      grp.add(listener.createGroup(type));
+      grp.add(listener.createGroup(grpLabel));
 
-      TeXParserUtils.process(list, parser, stack);
+      substack.add(TeXParserUtils.createGroup(listener, textArg));
+
+      TeXParserUtils.process(substack, parser, stack);
    }
 
    @Override
    public void process(TeXParser parser)
-      throws IOException
+     throws IOException
    {
       process(parser, parser);
    }
+
 }

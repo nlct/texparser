@@ -616,6 +616,68 @@ public class TeXParserUtils
       }
    }
 
+   public static float toFloat(TeXObject object, TeXParser parser, TeXObjectList stack)
+     throws IOException
+   {
+      if (object instanceof TeXNumber)
+      {
+         return (float)((TeXNumber)object).getValue();
+      }
+
+      if (object instanceof AssignedControlSequence)
+      {
+         TeXObject underlying = ((AssignedControlSequence)object).getBaseUnderlying();
+
+         if (underlying instanceof TeXNumber)
+         {
+            return (float)((TeXNumber)underlying).getValue();
+         }
+      }
+
+      String str = parser.expandToString(object, stack);
+
+      try
+      {
+         return Float.parseFloat(str);
+      }
+      catch (NumberFormatException e)
+      {
+         throw new TeXSyntaxException(e, parser,
+           TeXSyntaxException.ERROR_NUMBER_EXPECTED, str);
+      }
+   }
+
+   public static double toDouble(TeXObject object, TeXParser parser, TeXObjectList stack)
+     throws IOException
+   {
+      if (object instanceof TeXNumber)
+      {
+         return (double)((TeXNumber)object).getValue();
+      }
+
+      if (object instanceof AssignedControlSequence)
+      {
+         TeXObject underlying = ((AssignedControlSequence)object).getBaseUnderlying();
+
+         if (underlying instanceof TeXNumber)
+         {
+            return (double)((TeXNumber)underlying).getValue();
+         }
+      }
+
+      String str = parser.expandToString(object, stack);
+
+      try
+      {
+         return Double.parseDouble(str);
+      }
+      catch (NumberFormatException e)
+      {
+         throw new TeXSyntaxException(e, parser,
+           TeXSyntaxException.ERROR_NUMBER_EXPECTED, str);
+      }
+   }
+
    /**
     * Creates a stack containing the given objects. 
     */ 

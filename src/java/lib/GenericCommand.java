@@ -159,7 +159,7 @@ public class GenericCommand extends Command
       return getReplacement(parser).expandfully(parser);
    }
 
-   private TeXObjectList getReplacement(TeXParser parser,
+   protected TeXObjectList getReplacement(TeXParser parser,
      TeXObjectList remainingStack)
      throws IOException
    {
@@ -235,7 +235,7 @@ public class GenericCommand extends Command
       return stack;
    }
 
-   private TeXObjectList getReplacement(TeXParser parser)
+   protected TeXObjectList getReplacement(TeXParser parser)
      throws IOException
    {
       TeXObject[] args = (numArgs == 0 ? null : new TeXObject[numArgs]);
@@ -316,7 +316,7 @@ public class GenericCommand extends Command
       return stack;
    }
 
-   private TeXObject replaceList(TeXParser parser,
+   protected TeXObject replaceList(TeXParser parser,
      TeXObjectList list, TeXObject[] args)
    {
       TeXObjectList stack = list.createList();

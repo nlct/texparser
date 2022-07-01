@@ -296,6 +296,9 @@ public class GlossariesSty extends LaTeXSty
       registerControlSequence(new GlsSymbolNav());
       registerControlSequence(new TextualContentCommand("glshypernavsep", " | "));
 
+      registerControlSequence(new AtGlsAtHypergroup());
+      registerControlSequence(new AtGlsNavHyperTarget());
+
       registerControlSequence(new GlsAdd(this));
 
       registerControlSequence(new Gls(this));

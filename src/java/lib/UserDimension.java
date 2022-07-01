@@ -29,6 +29,11 @@ public class UserDimension extends AbstractTeXObject implements TeXDimension, Ex
       this(0, FixedUnit.PT);
    }
 
+   public UserDimension(double num, TeXUnit texUnit)
+   {
+      this((float)num, texUnit);
+   }
+
    public UserDimension(float num, TeXUnit texUnit)
    {
       value = num;

@@ -527,6 +527,29 @@ public class TeXSettings
       currentBgColor = col;
    }
 
+   public void setFont(TeXFontText font)
+   {
+      if (font.getFamily() != null)
+      {
+         setFontFamily(font.getFamily());
+      }
+
+      if (font.getShape() != null)
+      {
+         setFontShape(font.getShape());
+      }
+
+      if (font.getWeight() != null)
+      {
+         setFontWeight(font.getWeight());
+      }
+
+      if (font.getSize() != null)
+      {
+         setFontSize(font.getSize());
+      }
+   }
+
    public void setFontFamily(TeXFontFamily setting)
    {
       currentFontFamily = setting;
@@ -558,6 +581,29 @@ public class TeXSettings
            throw new IllegalArgumentException(String.format(
             "Invalid setting '%d' for TeXSettings.setFontFamily(int)",
              setting));
+      }
+   }
+
+   /**
+    * Test if the current font family or any of the ancestor font
+    * families are VERB. This allows for pseudo-verbatim
+    * environments that may have a local font change.
+    * @return true if the current font family is VERB or any
+    * ancestors have the current font family set to VERB
+    */ 
+   public boolean inVerb()
+   {
+      if (currentFontFamily == TeXFontFamily.VERB)
+      {
+         return true;
+      }
+      else if (parent == null)
+      {
+         return false;
+      }
+      else
+      {
+         return parent.inVerb();
       }
    }
 

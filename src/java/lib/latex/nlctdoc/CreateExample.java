@@ -120,15 +120,16 @@ public class CreateExample extends ControlSequence
 
       TeXParserUtils.process(substack, parser, stack);
 
-      KeyValList imgOptions = null;
+      KeyValList imgOptions = new KeyValList();
 
       if (description != null)
       {
-         imgOptions = new KeyValList();
          imgOptions.put("alt", description);
       }
 
-      listener.includegraphics(imgOptions, pdfPath);
+      imgOptions.put("scale", listener.createString("0.75"));
+
+      listener.includegraphics(stack, imgOptions, pdfPath);
    }
 
    @Override

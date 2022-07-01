@@ -537,7 +537,7 @@ public class LaTeX2LaTeX extends LaTeXParserListener
    }
 
    @Override
-   public void includegraphics(KeyValList options, String imgName)
+   public void includegraphics(TeXObjectList stack, KeyValList options, String imgName)
      throws IOException
    {
       String[] grpaths = getGraphicsPaths();

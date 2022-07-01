@@ -151,6 +151,7 @@ public class LaTeXGenericCommand extends GenericCommand
         (TeXObjectList)getDefinition().clone());
    }
 
+   @Override
    public boolean equals(Object obj)
    {
       if (obj == null || !(obj instanceof LaTeXGenericCommand)) return false;
@@ -168,31 +169,36 @@ public class LaTeXGenericCommand extends GenericCommand
            && Arrays.equals(defaultArgs, cs.defaultArgs);
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList list)
      throws IOException
    {
       return getReplacement(parser, list);
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser)
      throws IOException
    {
       return getReplacement(parser);
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser, TeXObjectList list)
      throws IOException
    {
       return getReplacement(parser, list).expandfully(parser, list);
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser)
      throws IOException
    {
       return getReplacement(parser).expandfully(parser);
    }
 
-   private TeXObjectList getReplacement(TeXParser parser,
+   @Override
+   protected TeXObjectList getReplacement(TeXParser parser,
      TeXObjectList remainingStack)
      throws IOException
    {
@@ -219,9 +225,20 @@ public class LaTeXGenericCommand extends GenericCommand
                      object = defaultArgs[optIdx++];
                   }
 
+                  if (parser.getDebugLevel() > 0)
+                  {
+                     parser.debugMessage(1, String.format("OARG[%d]: %s", i, object));
+                  }
+
                break;
                case SYNTAX_MANDATORY: 
                   object = remainingStack.popArg(parser, popStyle);
+
+                  if (parser.getDebugLevel() > 0)
+                  {
+                     parser.debugMessage(1, String.format("MARG[%d]: %s", i, object));
+                  }
+
                break;
             }
 
@@ -233,10 +250,16 @@ public class LaTeXGenericCommand extends GenericCommand
 
       addReplacements(parser, replacement, args, getDefinition());
 
+      if (parser.getDebugLevel() > 0)
+      {
+         parser.debugMessage(1, "Replacement: "+replacement);
+      }
+
       return replacement;
    }
 
-   private TeXObjectList getReplacement(TeXParser parser)
+   @Override
+   protected TeXObjectList getReplacement(TeXParser parser)
      throws IOException
    {
       TeXObject[] args = (numArgs == 0 ? null : new TeXObject[numArgs]);
@@ -267,9 +290,20 @@ public class LaTeXGenericCommand extends GenericCommand
                      object = defaultArgs[optIdx++];
                   }
 
+                  if (parser.getDebugLevel() > 0)
+                  {
+                     parser.debugMessage(1, String.format("OARG[%d]: %s", i, object));
+                  }
+
                break;
                case SYNTAX_MANDATORY: 
                   object = parser.popNextArg(popStyle);
+
+                  if (parser.getDebugLevel() > 0)
+                  {
+                     parser.debugMessage(1, String.format("MARG[%d]: %s", i, object));
+                  }
+
                break;
             }
 
@@ -281,10 +315,15 @@ public class LaTeXGenericCommand extends GenericCommand
 
       addReplacements(parser, replacement, args, getDefinition());
 
+      if (parser.getDebugLevel() > 0)
+      {
+         parser.debugMessage(1, "Replacement: "+replacement);
+      }
+
       return replacement;
    }
 
-   private void addReplacements(TeXParser parser, TeXObjectList replacement, 
+   protected void addReplacements(TeXParser parser, TeXObjectList replacement, 
      TeXObject[] args, TeXObjectList list)
    throws TeXSyntaxException
    {
@@ -325,12 +364,22 @@ public class LaTeXGenericCommand extends GenericCommand
    public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
+      if (parser.getDebugLevel() > 0)
+      {
+         parser.debugMessage(1, "Fetching arguments for "+toString());
+      }
+
       getReplacement(parser, stack).process(parser, stack);
    }
 
    public void process(TeXParser parser)
      throws IOException
    {
+      if (parser.getDebugLevel() > 0)
+      {
+         parser.debugMessage(1, "Fetching arguments for "+toString());
+      }
+
       getReplacement(parser).process(parser);
    }
 

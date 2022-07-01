@@ -175,7 +175,7 @@ public class PreambleParser extends LaTeXParserListener
    }
 
    @Override
-   public void includegraphics( 
+   public void includegraphics(TeXObjectList stack, 
      KeyValList options, String imgName)
      throws IOException
    {

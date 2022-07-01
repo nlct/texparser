@@ -118,6 +118,17 @@ public class TextualContentCommand extends ControlSequence implements Expandable
       return text;
    }
 
+   public void setText(String newText)
+   {
+      text = newText;
+   }
+
+   public void setText(String newText, Object newData)
+   {
+      text = newText;
+      data = newData;
+   }
+
    public Object getData()
    {
       return data;

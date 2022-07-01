@@ -24,7 +24,7 @@ import java.nio.file.Path;
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.*;
 
-public class L2HImage implements Expandable
+public class L2HImage extends AbstractTeXObject implements Expandable
 {
    public L2HImage(Path path)
    {
@@ -59,6 +59,7 @@ public class L2HImage implements Expandable
       }
    }
 
+   @Override
    public Object clone()
    {
       return new L2HImage(path, mimetype, width, height, 
@@ -107,6 +108,7 @@ public class L2HImage implements Expandable
       return mimetype;
    }
 
+   @Override
    public String toString()
    {
       return String.format(
@@ -115,32 +117,44 @@ public class L2HImage implements Expandable
         name, alt);
    }
 
+   @Override
    public boolean isPar()
    {
       return false;
    }
 
+   @Override
+   public String toString(TeXParser parser)
+   {
+      return alt.toString(parser);
+   }
+
+   @Override
    public TeXObjectList string(TeXParser parser) throws IOException
    {
       return alt.string(parser);
    }
 
+   @Override
    public String format()
    {
       return alt == null ? "" : alt.format();
    }
 
+   @Override
    public boolean canExpand()
    {
       return true;
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
     throws IOException
    {
       return expandonce(parser);
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser)
     throws IOException
    {
@@ -182,12 +196,14 @@ public class L2HImage implements Expandable
       return list;
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser)
     throws IOException
    {
       return expandfully(parser, parser);
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser, TeXObjectList stack)
     throws IOException
    {
@@ -231,6 +247,7 @@ public class L2HImage implements Expandable
       return list;
    }
 
+   @Override
    public void process(TeXParser parser)
     throws IOException
    {
@@ -265,6 +282,7 @@ public class L2HImage implements Expandable
       return builder.toString();
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack)
     throws IOException
    {

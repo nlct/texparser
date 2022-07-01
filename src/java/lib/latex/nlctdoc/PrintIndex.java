@@ -181,9 +181,42 @@ public class PrintIndex extends AbstractGlsCommand
 
          String currentGrpLabel = "";
 
-         list.add(listener.getControlSequence("nlctusernavbox"));
-         TeXObjectList grpNav = listener.createGroup();
-         list.add(grpNav);
+         ControlSequence navCs = parser.getControlSequence(
+           "@gls@hypergrouplist@"+type);
+
+         if (navCs != null)
+         {
+            String[] grpLabels = parser.expandToString(navCs, stack).split(",");
+
+            list.add(listener.getControlSequence("nlctusernavbox"));
+            Group grp = listener.createGroup();
+            list.add(grp);
+
+            for (int i = 0; i < grpLabels.length; i++)
+            {
+               if (i > 0)
+               {
+                  grp.add(listener.getSpace());
+               }
+
+               ControlSequence cs = parser.getControlSequence(
+                  "glsxtr@grouptitle@"+grpLabels[i]);
+               TeXObject grpTitle;
+
+               if (cs == null)
+               {
+                  grpTitle = listener.createGroup(grpLabels[i]);
+               }
+               else
+               {
+                  grpTitle = cs;
+               }
+
+               grp.add(listener.getControlSequence("hyperlink"));
+               grp.add(listener.createGroup(grpLabels[i]));
+               grp.add(grpTitle);
+            }
+         }
 
          for (String label : glossary)
          {
@@ -215,15 +248,6 @@ public class PrintIndex extends AbstractGlsCommand
                   }
 
                   list.add(listener.createGroup(grpLabel));
-
-                  if (!grpNav.isEmpty())
-                  {
-                     grpNav.add(listener.getSpace());
-                  }
-
-                  grpNav.add(listener.getControlSequence("hyperlink"));
-                  grpNav.add(listener.createGroup(grpLabel));
-                  grpNav.add(TeXParserUtils.createGroup(listener, grpTitle));
 
                   currentGrpLabel = grpLabel;
                }
@@ -269,9 +293,8 @@ public class PrintIndex extends AbstractGlsCommand
                content.add(loc);
             }
 
+            TeXParserUtils.process(list, parser, stack);
          }
-
-         TeXParserUtils.process(list, parser, stack);
       }
    }
 

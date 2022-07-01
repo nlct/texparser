@@ -1448,8 +1448,9 @@ public class L2HConverter extends LaTeXParserListener
    }
 
    @Override
-   public void includegraphics(KeyValList options, String filename)
-     throws IOException
+   public void includegraphics(TeXObjectList stack, 
+       KeyValList options, String filename)
+    throws IOException
    {
       File file = getImageFile(filename);
 
@@ -1477,6 +1478,8 @@ public class L2HConverter extends LaTeXParserListener
       L2HImage image=null;
 
       int n = 0;
+      double scale = 1;
+      int zoom = 100;
 
       if (options != null)
       {
@@ -1487,6 +1490,22 @@ public class L2HConverter extends LaTeXParserListener
          if (alt != null)
          {
             n--;
+         }
+
+         TeXObject zoomObj = options.remove("zoom");
+
+         if (zoomObj != null)
+         {
+            n--;
+
+            zoom = TeXParserUtils.toInt(zoomObj, parser, stack);
+         }
+
+         TeXObject scaleVal = options.get("scale");
+
+         if (scaleVal != null)
+         {
+            scale = TeXParserUtils.toDouble(scaleVal, parser, stack);
          }
       }
 
@@ -1524,7 +1543,7 @@ public class L2HConverter extends LaTeXParserListener
 
       if (image != null)
       {
-         image.process(parser);
+         TeXParserUtils.process(image, parser, stack);
       }
       else
       {
@@ -1534,7 +1553,7 @@ public class L2HConverter extends LaTeXParserListener
 
          if (MIME_TYPE_PDF.equals("type"))
          {
-            uri += "?#zoom=100";
+            uri += String.format("?#zoom=%d", zoom);
          }
 
          write(String.format("<object data=\"%s\"", uri));
@@ -1547,7 +1566,7 @@ public class L2HConverter extends LaTeXParserListener
          if (dim != null)
          {
             write(String.format(" width=\"%d\" height=\"%d\"",
-              dim.width, dim.height));
+              (int)Math.round(scale*dim.width), (int)Math.round(scale*dim.height)));
          }
 
          write(">");
@@ -1556,7 +1575,7 @@ public class L2HConverter extends LaTeXParserListener
          {
             if (alt != null)
             {
-               alt.process(parser);
+               TeXParserUtils.process(alt, parser, stack);
             }
          }
          finally
@@ -2000,7 +2019,7 @@ public class L2HConverter extends LaTeXParserListener
       }
       else if (unit instanceof PercentUnit)
       {
-         return String.format("%f%%", value);
+         return String.format("%f%%", 100*value);
       }
 
       return String.format("%fpt", unit.toUnit(getParser(), value, TeXUnit.BP));
@@ -2392,7 +2411,8 @@ public class L2HConverter extends LaTeXParserListener
          write("<span class=\"clearfix\"></span>");
       }
 
-      if (tag.equals("div") && !fbox.isInLine())
+      if (tag.equals("div") && !fbox.isInLine() 
+           && !getParser().getSettings().inVerb())
       {
          writeln("");
       }

@@ -225,7 +225,7 @@ public class IncludeGraphics extends ControlSequence
 
       LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
 
-      listener.includegraphics(keyValList, imgName);
+      listener.includegraphics(list, keyValList, imgName);
    }
 
    public void process(TeXParser parser, TeXObjectList list)

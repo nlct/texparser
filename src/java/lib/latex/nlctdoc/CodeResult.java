@@ -27,25 +27,32 @@ import com.dickimawbooks.texparserlib.latex.End;
 
 public class CodeResult extends GatherEnvContents
 {
-   public CodeResult()
+   public CodeResult(ControlSequence titleBoxCs, ControlSequence codeBoxCs, 
+     ControlSequence resultBoxCs)
    {
-      this("coderesult");
+      this("coderesult", titleBoxCs, codeBoxCs, resultBoxCs);
    }
 
-   public CodeResult(String name)
+   public CodeResult(String name, ControlSequence titleBoxCs, 
+     ControlSequence codeBoxCs, ControlSequence resultBoxCs)
    {
       super(name);
+      this.titleBoxCs = titleBoxCs;
+      this.codeBoxCs = codeBoxCs;
+      this.resultBoxCs = resultBoxCs;
    }
 
    @Override
    public Object clone()
    {
-      return new CodeResult(getName());
+      return new CodeResult(getName(), titleBoxCs, codeBoxCs, resultBoxCs);
    }
 
    public TeXObjectList popContents(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
+      TeXParserListener listener = parser.getListener();
+
       TeXObject object = stack.pop();
 
       TeXObjectList codeBox = parser.getListener().createStack();
@@ -98,24 +105,27 @@ public class CodeResult extends GatherEnvContents
 
       contents = parser.getListener().createStack();
 
-      contents.add(parser.getListener().getControlSequence("begin"));
-      contents.add(parser.getListener().createGroup("codebox"));
+      contents.add(titleBoxCs);
+      contents.add(TeXParserUtils.createGroup(parser, 
+       listener.getControlSequence("glssymbol"),
+       listener.createGroup("sym.code"),
+       listener.getControlSequence("glssymbol"),
+       listener.createGroup("sym.result")
+      ));
 
-      contents.addAll(codeBox);
+      contents.add(listener.getPar());
 
-      contents.add(parser.getListener().getControlSequence("end"));
-      contents.add(parser.getListener().createGroup("codebox"));
+      contents.add(codeBoxCs);
+
+      contents.add(TeXParserUtils.createGroup(parser, codeBox));
 
       if (resultBox != null)
       {
-         contents.add(parser.getListener().getControlSequence("begin"));
-         contents.add(parser.getListener().createGroup("resultbox"));
-
-         contents.addAll(resultBox);
-
-         contents.add(parser.getListener().getControlSequence("end"));
-         contents.add(parser.getListener().createGroup("resultbox"));
+         contents.add(resultBoxCs);
+         contents.add(TeXParserUtils.createGroup(parser, resultBox));
       }
+
+      contents.add(listener.getPar());
 
       return contents;
    }
@@ -142,4 +152,6 @@ public class CodeResult extends GatherEnvContents
     throws IOException
    {
    }
+
+   protected ControlSequence codeBoxCs, resultBoxCs, titleBoxCs;
 }

@@ -240,6 +240,12 @@ A counter:
 
 \section{Section About \stytext{foobarsty}}
 
+\gls{foobarcs} is defined as:
+\begin{compactcodebox}
+\comment{a comment}
+\cmd{newcommand}\marg{\gls{foobarcs}}\oarg{1}\marg{\cmd{emph}\marg{\#1}}
+\end{compactcodebox}
+
 Some code:
 \begin{codebox}
 \gls{foobarcs}\marg{text}
@@ -251,6 +257,7 @@ This emphasizes \code{text}:
 
 Side-by-side:
 \begin{coderesult}
+\comment{another comment}
 \gls{foobarcs}\marg{text}
 \tcblower
 \emph{text}
@@ -258,7 +265,8 @@ Side-by-side:
 
 An example:
 \begin{resultbox}
-\createexample[title={An example},
+\createexample[title={An example that's created on-the-fly provided
+that the shell escape is enabled},
  description={A document with the word `text' emphasized},
  label={ex:sample}]
 {}

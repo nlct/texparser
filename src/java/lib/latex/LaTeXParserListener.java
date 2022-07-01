@@ -1889,7 +1889,14 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
     String original, String replacement)
      throws IOException;
 
-   public abstract void includegraphics( 
+   @Deprecated
+   public void includegraphics(KeyValList options, String imgName)
+     throws IOException
+   {
+      includegraphics(getParser(), options, imgName);
+   }
+
+   public abstract void includegraphics(TeXObjectList stack, 
      KeyValList options, String imgName)
      throws IOException;
 

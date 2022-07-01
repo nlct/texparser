@@ -1592,7 +1592,11 @@ public class TeXObjectList extends Vector<TeXObject>
 
          TeXObjectList expanded = null;
 
-         if (!blocked && object.canExpand() && object instanceof Expandable)
+         if (object instanceof Unexpanded)
+         {
+            object = remaining.popArg(parser);
+         }
+         else if (!blocked && object.canExpand() && object instanceof Expandable)
          {
             expanded = ((Expandable)object).expandonce(parser, remaining);
          }
@@ -1687,7 +1691,11 @@ public class TeXObjectList extends Vector<TeXObject>
 
          TeXObjectList expanded = null;
 
-         if (!blocked && object.canExpand() && object instanceof Expandable)
+         if (object instanceof Unexpanded)
+         {
+            object = remaining.popArg(parser);
+         }
+         else if (!blocked && object.canExpand() && object instanceof Expandable)
          {
             expanded = ((Expandable)object).expandonce(parser, remaining);
          }
@@ -1847,6 +1855,10 @@ public class TeXObjectList extends Vector<TeXObject>
          else if (object instanceof Ignoreable)
          {// discard
          }
+         else if (object instanceof Unexpanded)
+         {
+            list.add(popArg(parser));
+         }
          else if (!object.canExpand())
          {
             list.add(object, true);
@@ -1933,7 +1945,11 @@ public class TeXObjectList extends Vector<TeXObject>
 
          TeXObjectList expanded = null;
 
-         if (!blocked && object.canExpand() && object instanceof Expandable)
+         if (object instanceof Unexpanded)
+         {
+            object = remaining.popArg(parser);
+         }
+         else if (!blocked && object.canExpand() && object instanceof Expandable)
          {
             expanded = ((Expandable)object).expandonce(parser, remaining);
          }
