@@ -92,6 +92,7 @@ public class L2HSection extends Section
       return null;
    }
 
+   @Override
    protected void unnumbered(TeXParser parser, TeXObjectList stack,
        TeXObject arg)
    throws IOException
@@ -163,8 +164,9 @@ public class L2HSection extends Section
 
    }
 
+   @Override
    protected void numbered(TeXParser parser, TeXObjectList stack,
-     TeXObject optArg, TeXObject arg)
+     TeXObject tocTitle, TeXObject title)
        throws IOException
    {
       L2HConverter listener = (L2HConverter)parser.getListener();
@@ -219,7 +221,7 @@ public class L2HSection extends Section
       list.add(listener.getOther('.'));
       list.add(listener.getSpace());
 
-      list.add(arg);
+      list.add(title);
 
       if (labelName != null)
       {
@@ -231,24 +233,12 @@ public class L2HSection extends Section
       list.add(new HtmlTag(String.format("<!-- end of %s header -->%n",
             getName())));
 
-      if (parser == stack || stack == null)
+      if (!parser.isPar(stack.peekStack(TeXObjectList.POP_IGNORE_LEADING_SPACE)))
       {
-         if (!parser.isPar(parser.peekStack()))
-         {
-            list.add(listener.getPar());
-         }
-
-         list.process(parser);
+         list.add(listener.getPar());
       }
-      else
-      {
-         if (!parser.isPar(stack.peekStack()))
-         {
-            list.add(listener.getPar());
-         }
 
-         list.process(parser, stack);
-      }
+      TeXParserUtils.process(list, parser, stack);
    }
 
    public String getTag()

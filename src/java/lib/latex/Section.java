@@ -38,38 +38,16 @@ public abstract class Section extends ControlSequence
    public void process(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
-      boolean isStar = false;
-
-      TeXObject object = stack.peekStack();
-
-      if (object == null)
-      {
-         process(parser);
-         return;
-      }
-
-      if (object instanceof CharObject)
-      {
-         if (((CharObject)object).getCharCode() == (int)'*')
-         {
-            isStar = true;
-            stack.popStack(parser);
-         }
-      }
+      boolean isStar = popModifier(parser, stack, '*') == '*';
 
       TeXObject optArg = null;
 
       if (!isStar)
       {
-         optArg = stack.popArg(parser, '[', ']');
+         optArg = popOptArg(parser, stack);
       }
 
-      TeXObject arg = stack.popStack(parser);
-
-      if (arg == null)
-      {
-         arg = parser.popStack();
-      }
+      TeXObject arg = popArg(parser, stack);
 
       ControlSequence cs = parser.getControlSequence("if@mainmatter");
 
@@ -97,49 +75,7 @@ public abstract class Section extends ControlSequence
    public void process(TeXParser parser)
       throws IOException
    {
-      boolean isStar = false;
-
-      TeXObject object = parser.peekStack();
-
-      if (object instanceof CharObject)
-      {
-         if (((CharObject)object).getCharCode() == (int)'*')
-         {
-            isStar = true;
-            parser.popStack();
-         }
-      }
-
-      TeXObject optArg = null;
-
-      if (!isStar)
-      {
-         optArg = parser.popNextArg('[', ']');
-      }
-
-      TeXObject arg = parser.popNextArg();
-
-      ControlSequence cs = parser.getControlSequence("if@mainmatter");
-
-      if (cs != null)
-      {
-         TeXBoolean bool = TeXParserUtils.toBoolean(cs, parser);
-
-         if (!bool.booleanValue())
-         {
-            isStar = true;
-         }
-      }
-
-      if (isStar)
-      {
-         unnumbered(parser, parser, arg);
-      }
-      else
-      {
-         ((LaTeXParserListener)parser.getListener()).stepcounter(getName());
-         numbered(parser, parser, optArg, arg);
-      }
+      process(parser, parser);
    }
 
    protected abstract void unnumbered(TeXParser parser, TeXObjectList stack,
