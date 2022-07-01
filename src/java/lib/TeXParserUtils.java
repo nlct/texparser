@@ -136,6 +136,26 @@ public class TeXParserUtils
    }
 
    /**
+     * Pops a mandatory argument.
+     * @param parser the TeX parser
+     * @param stack the stack or the parser or null
+     * @param popStyle the pop style
+     * @return the argument
+     */
+   public static TeXObject popArg(TeXParser parser, TeXObjectList stack, byte popStyle)
+     throws IOException
+   {
+      if (parser == stack || stack == null)
+      {
+         return parser.popNextArg(popStyle);
+      }
+      else
+      {
+         return stack.popArg(parser, popStyle);
+      }
+   }
+
+   /**
     * Pops an optional argument (delimited with <code>[</code> and <code>]</code>).
     * @param parser the TeX parser
     * @param stack the stack or the parser or null
