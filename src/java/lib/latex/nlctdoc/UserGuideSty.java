@@ -246,6 +246,8 @@ public class UserGuideSty extends LaTeXSty
       registerControlSequence(glossariesSty.createGls("cmdmod", "idx.mod."));
       registerControlSequence(glossariesSty.createGls("file", "file."));
 
+      registerControlSequence(new InlineGlsDef(glossariesSty));
+
       registerControlSequence(new GenericCommand(true, 
        "printterms", null, new TeXObject[]{ new TeXCsRef("printabbrs"),
          new TeXCsRef("printicons"), new TeXCsRef("printmain")

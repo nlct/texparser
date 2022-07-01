@@ -372,6 +372,8 @@ public class GlossariesSty extends LaTeXSty
         true, this));
       registerControlSequence(new GlsEntryField("@gls@entry@field", this));
 
+      registerControlSequence(new GlsEntryType(this));
+      registerControlSequence(new GlsEntryParent(this));
       registerControlSequence(new GlsEntryField("glsentryname", "name", this));
       registerControlSequence(new GlsEntryField("glsentrytext", "text", this));
       registerControlSequence(new GlsEntryField("glsentryplural", "plural", this));
@@ -981,6 +983,16 @@ public class GlossariesSty extends LaTeXSty
 
       registerControlSequence(new Dglslink(this));
       registerControlSequence(new Dglslink("dglsdisp", true, this));
+
+      registerControlSequence(new GlsXtrGlossEntry(this));
+      registerControlSequence(new GlsXtrStandaloneEntryName(this));
+      registerControlSequence(new GenericCommand(true,
+        "GlsXtrStandaloneGlossaryType", null, 
+        TeXParserUtils.createStack(getListener(), new TeXCsRef("glsentrytype"),
+          new TeXCsRef("glscurrententrylabel"))));
+      registerControlSequence(new GlsXtrStandaloneSubEntryItem(this));
+      registerControlSequence(new GlsXtrStandaloneEntryOther(this));
+      registerControlSequence(new GlsXtrGlossEntryOther(this));
    }
 
    protected void addGlsXtrTitleCommands(String field)

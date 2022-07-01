@@ -67,6 +67,13 @@ public class GlsLabel extends TextualContentCommand
       return entry == null ? null : entry.getCategory();
    }
 
+   public boolean hasParent()
+   throws IOException
+   {
+      GlossaryEntry entry = getEntry();
+      return entry == null ? false : entry.hasParent();
+   }
+
    public GlossaryEntry getParent(TeXObjectList stack)
    throws IOException
    {
