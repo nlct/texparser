@@ -183,7 +183,7 @@ public class GenericCommand extends Command
                   }
                   else
                   {
-                     args[n] = remainingStack.popStack(parser, popStyle);
+                     args[n] = TeXParserUtils.popArg(parser, remainingStack, popStyle);
                   }
 
                   n++;
@@ -258,7 +258,7 @@ public class GenericCommand extends Command
                   }
                   else
                   {
-                     args[n] = parser.popNextArg(popStyle);
+                     args[n] = TeXParserUtils.popArg(parser, parser, popStyle);
                   }
 
                   n++;
