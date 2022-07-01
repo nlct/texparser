@@ -86,6 +86,7 @@ public class L2HTableOfContents extends ControlSequence
 
       stack.push(new HtmlTag("<!-- end of toc -->"));
       stack.push(new EndElement("nav"));
+      stack.push(listener.getControlSequence("endgroup"));
 
       ControlSequence tagCs = new GenericCommand(true, "@toc@endtags");
       parser.putControlSequence(true, tagCs);
@@ -98,6 +99,8 @@ public class L2HTableOfContents extends ControlSequence
          stack.push(TeXParserActionObject.createInputAction(tocFile));
       }
 
+      stack.push(listener.getControlSequence("makeatletter"));
+      stack.push(listener.getControlSequence("begingroup"));
       stack.push(listener.createGroup("toc"));
       stack.push(new TeXCsRef("label"));
       stack.push(new TeXCsRef("contentsname"));

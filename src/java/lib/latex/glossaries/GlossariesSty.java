@@ -993,6 +993,15 @@ public class GlossariesSty extends LaTeXSty
       registerControlSequence(new GlsXtrStandaloneSubEntryItem(this));
       registerControlSequence(new GlsXtrStandaloneEntryOther(this));
       registerControlSequence(new GlsXtrGlossEntryOther(this));
+
+      registerControlSequence(new TextualContentCommand("glsxtrtitleopts",
+        "noindex,hyper=false"));
+
+      registerControlSequence(new GlsXtrAtTitleAtField(this));
+
+      registerControlSequence(new GenericCommand(true, 
+       "glsxtrtitletext", null, TeXParserUtils.createStack(getListener(),
+       new TeXCsRef("glsxtr@title@field"), new TeXCsRef("glstext"))));
    }
 
    protected void addGlsXtrTitleCommands(String field)

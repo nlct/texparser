@@ -117,6 +117,28 @@ public class AtGlsAtLink extends AbstractGlsCommand
 
       boolean doIndex = true;
 
+      TeXBoolean isHyper = TeXParserUtils.toBoolean("ifKV@glslink@hyper",
+        parser);
+
+      boolean doHyper = (isHyper != null && isHyper.booleanValue());
+
+      if (options != null)
+      {
+         TeXObject hyperVal = options.get("hyper");
+
+         if (hyperVal != null)
+         {
+            if (hyperVal instanceof MissingValue)
+            {
+               doHyper = true;
+            }
+            else
+            {
+               doHyper = !parser.expandToString(hyperVal, stack).equals("false");
+            }
+         }
+      }
+
       if (sty.isExtra())
       {
          TeXBoolean noIndex = TeXParserUtils.toBoolean("ifKV@glslink@noindex",
@@ -125,6 +147,23 @@ public class AtGlsAtLink extends AbstractGlsCommand
          if (noIndex != null && noIndex.booleanValue())
          {
             doIndex = false;
+         }
+
+         if (options != null)
+         {
+            TeXObject noindexVal = options.get("noindex");
+
+            if (noindexVal != null)
+            {
+               if (noindexVal instanceof MissingValue)
+               {
+                  doIndex = false;
+               }
+               else
+               {
+                  doIndex = parser.expandToString(noindexVal, stack).equals("false");
+               }
+            }
          }
       } 
 
@@ -141,10 +180,8 @@ public class AtGlsAtLink extends AbstractGlsCommand
          }
       }
 
-      TeXBoolean isHyper = TeXParserUtils.toBoolean("ifKV@glslink@hyper",
-        parser);
 
-      if (isHyper != null && isHyper.booleanValue())
+      if (doHyper)
       {
          list.add(listener.getControlSequence("@glslink"));
       }
