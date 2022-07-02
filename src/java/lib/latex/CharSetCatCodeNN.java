@@ -44,13 +44,13 @@ public class CharSetCatCodeNN extends ControlSequence
    @Override
    public void applyCatCodeChange(TeXParser parser) throws IOException
    {
-      Numerical cp = TeXParserUtils.popNumerical(parser, stack);
-      Numerical cat = TeXParserUtils.popNumerical(parser, stack);
+      Numerical cp = TeXParserUtils.popNumericalArg(parser, parser);
+      Numerical cat = TeXParserUtils.popNumericalArg(parser, parser);
 
       parser.setCatCode(true, cp.number(parser), cat.number(parser));
 
-      parser.push(TeXParserUtils.createGroup(cat));
-      parser.push(TeXParserUtils.createGroup(cp));
+      parser.push(TeXParserUtils.createGroup(parser, cat));
+      parser.push(TeXParserUtils.createGroup(parser, cp));
    }
 
    @Override
