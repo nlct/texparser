@@ -95,6 +95,8 @@ public class CreateExample extends ControlSequence
 
       if (title != null)
       {
+         substack.add(listener.getOther(':'));
+         substack.add(listener.getSpace());
          substack.add(title);
          substack.add(listener.getSpace());
       }

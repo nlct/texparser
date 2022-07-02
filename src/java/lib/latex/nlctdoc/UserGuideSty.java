@@ -238,6 +238,8 @@ public class UserGuideSty extends LaTeXSty
         rightBox, noteBox, glossariesSty));
       registerControlSequence(new SummaryCommandBox(defnBox, 
         rightBox, noteBox, glossariesSty));
+      registerControlSequence(new SummaryEnvironmentBox(defnBox, 
+        rightBox, noteBox, glossariesSty));
       registerControlSequence(new SummaryCommandOptionBox(optionSummaryBox, 
         rightBox, noteBox, glossariesSty));
       registerControlSequence(new SummaryCommandOptionBox(
@@ -671,7 +673,7 @@ public class UserGuideSty extends LaTeXSty
       registerControlSequence(new GenericCommand(true,
         "nlctexampletag", null, TeXParserUtils.createStack(getListener(),
           new TeXCsRef("Examplename"), getListener().getSpace(),
-          new TeXCsRef("theexample"), new TeXCsRef("space"))));
+          new TeXCsRef("theexample"))));
 
       registerControlSequence(new CreateExample());
       registerControlSequence(new ExampleFileBaseName());
