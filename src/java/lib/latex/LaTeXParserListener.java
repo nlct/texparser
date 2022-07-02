@@ -761,6 +761,12 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
 
       parser.putControlSequence(new GenericError());
       parser.putControlSequence(new DocumentStyle());
+
+      // LaTeX3
+      // currently just implementing enough to pick up cat code
+      // changes to allow command names to be read properly
+      parser.putControlSequence(new ExplSyntaxOn());
+      parser.putControlSequence(new CharSetCatCodeNN());
    }
 
    protected TeXParserSection createTeXParserSection(String sectionCsname)
