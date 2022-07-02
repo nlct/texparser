@@ -48,7 +48,7 @@ public class GlsXtrDisplayLocNameRef extends Command
 
       String prefix = popLabelString(parser, stack);
       String counter = popLabelString(parser, stack);
-      String csname = popLabelString(parser, stack);
+      String format = popLabelString(parser, stack);
 
       TeXObject loc = popArg(parser, stack);
 
@@ -65,39 +65,54 @@ public class GlsXtrDisplayLocNameRef extends Command
 
       if (hyperCs == null)
       {
-         expanded.add(listener.getControlSequence(csname));
+         expanded.add(listener.getControlSequence(format));
          Group grp = listener.createGroup();
          expanded.add(grp);
          grp.add(loc);
       }
       else
       {
+         ControlSequence recentAnchor = new TextualContentCommand(
+            "glsxtrrecentanchor", anchor);
+         ControlSequence locAnchor = new TextualContentCommand(
+            "glsxtrlocationanchor", counter+"."+hloc);
+
+         parser.putControlSequence(true, recentAnchor);
+         parser.putControlSequence(true, locAnchor);
+
+         expanded.add(listener.getControlSequence("glsxtrsetactualanchor"));
+         expanded.add(listener.createGroup(counter));
+
          ControlSequence cs = parser.getControlSequence("glsxtr"+counter+"locfmt");
 
          if (cs == null)
          {
-            expanded.add(listener.getControlSequence("glsxtrnamereflink"));
-            expanded.add(listener.createGroup(csname));
-
-            Group grp = listener.createGroup();
-            expanded.add(grp);
-
             if (title.isEmpty() || counter.equals("page"))
             {
+               expanded.add(listener.getControlSequence("glsxtrnamereflink"));
+               expanded.add(listener.createGroup(format));
+
+               Group grp = listener.createGroup();
+               expanded.add(grp);
+
                grp.add(loc);
+               expanded.add(new TeXCsRef("glsxtractualanchor"));
             }
             else
             {
-               grp.add(title);
+               expanded.add(listener.getControlSequence("glsxtrtitlednamereflink"));
+               expanded.add(listener.createGroup(format));
+
+               expanded.add(TeXParserUtils.createGroup(listener, loc));
+               expanded.add(TeXParserUtils.createGroup(listener, title));
             }
 
-            expanded.add(listener.createGroup(counter+"."+hloc));
             expanded.add(listener.createGroup(externalFile));
          }
          else
          {
             expanded.add(listener.getControlSequence("glsxtrnamereflink"));
-            expanded.add(listener.createGroup(csname));
+            expanded.add(listener.createGroup(format));
 
             Group grp = listener.createGroup();
             expanded.add(grp);
@@ -114,7 +129,9 @@ public class GlsXtrDisplayLocNameRef extends Command
 
             subgrp.add(title);
 
-            expanded.add(listener.createGroup(counter+"."+hloc));
+            grp = listener.createGroup();
+            expanded.add(grp);
+            grp.add(new TeXCsRef("glsxtractualanchor"));
             expanded.add(listener.createGroup(externalFile));
          }
       }

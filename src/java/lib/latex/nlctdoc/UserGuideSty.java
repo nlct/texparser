@@ -87,6 +87,10 @@ public class UserGuideSty extends LaTeXSty
 
       registerControlSequence(new GenericCommand(true, "mainfmt", null,
          new TeXCsRef("glsnumberformat")));
+      registerControlSequence(new GenericCommand(true, "termslocfmt", null,
+         new TeXCsRef("textit")));
+      registerControlSequence(new GenericCommand(true, "glsaddterm", null,
+         new TeXCsRef("glsadd")));
 
       registerControlSequence(new TextualContentCommand("dhyphen", "-"));
       registerControlSequence(new TextualContentCommand("dcolon", ":"));
