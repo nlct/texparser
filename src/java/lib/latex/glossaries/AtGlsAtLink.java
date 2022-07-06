@@ -199,7 +199,12 @@ public class AtGlsAtLink extends AbstractGlsCommand
 
       if (sty.isExtra())
       {
-         TeXObject val = options.get("textformat");
+         TeXObject val = null;
+
+         if (options != null)
+         {
+            val = options.get("textformat");
+         }
 
          if (val == null)
          {

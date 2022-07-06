@@ -974,6 +974,8 @@ public class GlossariesSty extends LaTeXSty
 
       NewIf.createConditional(true, getParser(), "ifKV@glslink@noindex", false);
 
+      registerControlSequence(new AtGlsXtrAtFieldAtLinkDefs());
+
       registerControlSequence(new AtNumberOfNumber(
         "glsxtr@wrglossarylocation", 1, 2, true));
       registerControlSequence(new GlsXtrIndexCounterLink(this));
