@@ -97,7 +97,12 @@ public class AtGlsAtAtLink extends AbstractGlsCommand
          }
 
          substack.add(listener.getControlSequence("@gls@link"));
-         substack.add(options);
+
+         if (options != null)
+         {
+            substack.add(options);
+         }
+
          substack.add(glslabel);
 
          Group grp = listener.createGroup();

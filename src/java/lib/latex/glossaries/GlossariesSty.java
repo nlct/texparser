@@ -464,6 +464,16 @@ public class GlossariesSty extends LaTeXSty
 
       registerControlSequence(new KVAtGlsLinkAtCounter());
 
+      registerControlSequence(new TextualContentCommand("glsopenbrace", "{"));
+      registerControlSequence(new TextualContentCommand("glsclosebrace", "}"));
+      registerControlSequence(new TextualContentCommand("glsbackslash", "\\"));
+      registerControlSequence(new TextualContentCommand("glspercentchar", "%"));
+      registerControlSequence(new TextualContentCommand("glstildechar", "~"));
+
+      registerControlSequence(new LaTeXGenericCommand(true, "glsquote",
+       "m", TeXParserUtils.createStack(listener,
+         listener.getOther('"'), listener.getParam(1), listener.getOther('"'))));
+
       if (extra)
       {
          addExtraDefinitions();
@@ -1007,6 +1017,10 @@ public class GlossariesSty extends LaTeXSty
       registerControlSequence(new GenericCommand(true, 
        "glsxtrtitletext", null, TeXParserUtils.createStack(getListener(),
        new TeXCsRef("glsxtr@title@field"), new TeXCsRef("glstext"))));
+
+      registerControlSequence(new TextualContentCommand("glshex", "\\u"));
+      registerControlSequence(new TextualContentCommand("glscapturedgroup", "\\$"));
+      registerControlSequence(new TextualContentCommand("glshashchar", "#"));
    }
 
    protected void addGlsXtrTitleCommands(String field)
@@ -2023,10 +2037,10 @@ public class GlossariesSty extends LaTeXSty
    {
       if (modifierOptions == null)
       {
-         modifierOptions = new HashMap<CharObject,KeyValList>();
+         modifierOptions = new HashMap<Integer,KeyValList>();
       }
 
-      modifierOptions.put(token, options);
+      modifierOptions.put(Integer.valueOf(token.getCharCode()), options);
    }
 
    public KeyValList getModifierOptions(CharObject token)
@@ -2036,7 +2050,7 @@ public class GlossariesSty extends LaTeXSty
          return null;
       }
 
-      return modifierOptions.get(token);
+      return modifierOptions.get(Integer.valueOf(token.getCharCode()));
    }
 
    public boolean isNoHyperGlossary(GlsType type)
@@ -2656,7 +2670,7 @@ public class GlossariesSty extends LaTeXSty
    private HashMap<String,String> fieldMap;
    private HashMap<String,TeXObject> fieldDefaultValues;
 
-   private HashMap<CharObject,KeyValList> modifierOptions;
+   private HashMap<Integer,KeyValList> modifierOptions;
 
    private HashMap<String,Vector<String>> innerFmtExclusions;
 
