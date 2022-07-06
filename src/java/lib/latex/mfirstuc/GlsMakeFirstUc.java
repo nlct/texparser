@@ -49,16 +49,7 @@ public class GlsMakeFirstUc extends Command
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      TeXObject arg;
-
-      if (stack == parser)
-      {
-         arg = parser.popNextArg();
-      }
-      else
-      {
-         arg = stack.popArg(parser);
-      }
+      TeXObject arg = popArg(parser, stack);
 
       TeXObjectList expanded = new TeXObjectList();
 
@@ -66,28 +57,12 @@ public class GlsMakeFirstUc extends Command
       {
          expanded.add(arg);
       }
-      else if (!(arg instanceof TeXObjectList 
-                   && ((TeXObjectList)arg).size() == 0))
+      else if (!arg.isEmpty())
       {
-         ControlSequence cs = parser.getControlSequence("MakeTextUppercase");
-
-         if (cs == null)
-         {
-            expanded.add(new TeXCsRef("MakeUppercase"));
-         }
-         else
-         {
-            expanded.add(cs);
-         }
-
-         if (arg instanceof TeXObjectList && !(arg instanceof Group))
-         {
-            expanded.addAll((TeXObjectList)arg);
-         }
-         else
-         {
-            expanded.add(arg);
-         }
+         expanded.add(parser.getListener().getControlSequence("MFUsentencecase"));
+         Group grp = parser.getListener().createGroup();
+         expanded.add(grp);
+         grp.add(arg, true);
       }
 
       return expanded;

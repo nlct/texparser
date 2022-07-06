@@ -25,19 +25,20 @@ import com.dickimawbooks.texparserlib.latex.*;
 
 public class MakeFirstUc extends Command
 {
-   public MakeFirstUc()
+   public MakeFirstUc(MfirstucSty sty)
    {
-      this("makefirstuc", EXPANSION_NONE);
+      this("makefirstuc", EXPANSION_NONE, sty);
    }
 
-   public MakeFirstUc(String name)
+   public MakeFirstUc(String name, MfirstucSty sty)
    {
-      this(name, EXPANSION_NONE);
+      this(name, EXPANSION_NONE, sty);
    }
 
-   public MakeFirstUc(String name, byte expansion)
+   public MakeFirstUc(String name, byte expansion, MfirstucSty sty)
    {
       super(name);
+      this.sty = sty;
 
       if (expansion == EXPANSION_NONE 
           || expansion == EXPANSION_ONCE
@@ -54,13 +55,124 @@ public class MakeFirstUc extends Command
 
    public Object clone()
    {
-      return new MakeFirstUc(getName(), expansion);
+      return new MakeFirstUc(getName(), expansion, sty);
    }
 
    public TeXObjectList expandonce(TeXParser parser)
      throws IOException
    {
       return expandonce(parser, parser);
+   }
+
+   protected void convert(TeXObjectList argList, TeXObjectList substack,
+     TeXParser parser)
+     throws IOException
+   {
+      if (argList.isEmpty())
+      {
+         return;
+      }
+
+      boolean done = true;
+
+      TeXObject object = argList.popStack(parser);
+
+      TeXParserListener listener = parser.getListener();
+
+      if (object instanceof TeXCsRef)
+      {
+         object = listener.getControlSequence(((TeXCsRef)object).getName());
+      }
+
+      if (object instanceof ControlSequence)
+      {
+         String csname = ((ControlSequence)object).getName();
+
+         if (csname.equals("protect"))
+         {// skip
+            done = false;
+         }
+         else if (sty.isBlocker(csname))
+         {// finish
+         }
+         else
+         {
+            TeXObject map = sty.getMapping(csname);
+
+            if (map != null)
+            {
+               substack.add(map);
+            }
+            else if (sty.isExclusion(csname))
+            {
+               substack.add(object);
+               substack.add(TeXParserUtils.createGroup(listener,
+                popArg(parser, argList)));
+
+               done = false;
+            }
+            else if (object instanceof CaseChangeable)
+            {
+               substack.add(((CaseChangeable)object).toUpperCase(parser));
+            }
+            else
+            {
+               TeXObject nextObj = argList.peekStack();
+
+               if ((nextObj instanceof Group) || parser.isBeginGroup(object) != null)
+               {
+                  nextObj = popArg(parser, argList);
+
+                  if (nextObj.isEmpty())
+                  {
+                     substack.add(object);
+                     substack.add(TeXParserUtils.createGroup(listener, nextObj));
+                  }
+                  else
+                  {
+                     substack.add(object);
+                     Group grp = listener.createGroup();
+                     substack.add(grp);
+
+                     if (parser.isStack(nextObj))
+                     {
+                        convert((TeXObjectList)nextObj, grp, parser);
+                     }
+                     else if (nextObj instanceof CaseChangeable)
+                     {
+                        grp.add(((CaseChangeable)nextObj).toUpperCase(parser));
+                     }
+                     else
+                     {
+                        grp.add(listener.getControlSequence("glsmakefirstuc"));
+                        grp.add(TeXParserUtils.createGroup(listener, nextObj));
+                     }
+                  }
+               }
+               else
+               {
+                  substack.add(object);
+               }
+            }
+         }
+
+         if (done)
+         {
+            substack.addAll(argList);
+         }
+         else if (!argList.isEmpty())
+         {
+            convert(argList, substack, parser);
+         }
+      }
+      else
+      {
+         substack.add(listener.getControlSequence("glsmakefirstuc"));
+         Group grp = listener.createGroup();
+         substack.add(grp);
+         grp.add(object);
+         grp.addAll(argList);
+      }
    }
 
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
@@ -121,78 +233,9 @@ public class MakeFirstUc extends Command
       {
          expanded.add(((Group)arg).toUpperCase(parser));
       }
-      else if (arg instanceof TeXObjectList 
-                && ((TeXObjectList)arg).size() > 0)
+      else if (parser.isStack(arg))
       {
-         TeXObjectList list = (TeXObjectList)arg;
-
-         TeXObject object = list.popStack(parser);
-
-         TeXParserListener listener = parser.getListener();
-
-         if (object instanceof TeXCsRef)
-         {
-            object = listener.getControlSequence(((TeXCsRef)object).getName());
-         }
-
-         while (object instanceof Protect)
-         {
-            expanded.add(object);
-
-            object = list.popStack(parser);
-
-            if (object instanceof TeXCsRef)
-            {
-               object = listener.getControlSequence(((TeXCsRef)object).getName());
-            }
-         }
-
-         if (object instanceof MFUskippunc)
-         {
-            object = list.popArg(parser);
-
-            expanded.add(object);
-
-            object = list.popStack(parser);
-
-            if (object instanceof TeXCsRef)
-            {
-               object = listener.getControlSequence(((TeXCsRef)object).getName());
-            }
-         }
-
-         if (object instanceof CaseChangeable)
-         {
-            expanded.add(((CaseChangeable)object).toUpperCase(parser));
-         }
-         else if (object instanceof ControlSequence)
-         {
-            ControlSequence cs = (ControlSequence)object;
-
-            object = list.popStack(parser);
-
-            if (object instanceof Group && ((Group)object).size() > 0)
-            {
-               expanded.add(cs);
-               Group grp = listener.createGroup();
-               expanded.add(grp);
-
-               grp.add(new TeXCsRef("glsmakefirstuc"));
-               grp.add(object);
-            }
-            else
-            {
-               expanded.add(new TeXCsRef("glsmakefirstuc"));
-               expanded.add(cs);
-               expanded.add(object);
-            }
-         }
-         else
-         {
-            expanded.add(object);
-         }
-
-         expanded.addAll(list);
+         convert((TeXObjectList)arg, expanded, parser);
       }
       else if (arg instanceof CaseChangeable)
       {
@@ -200,7 +243,8 @@ public class MakeFirstUc extends Command
       }
       else
       {
-         expanded.add(arg);
+         expanded.add(parser.getListener().getControlSequence("glsmakefirstuc"));
+         expanded.add(TeXParserUtils.createGroup(parser, arg));
       }
 
       return expanded;
@@ -235,4 +279,6 @@ public class MakeFirstUc extends Command
    public static final byte EXPANSION_FULL=(byte)2;
 
    private byte expansion = EXPANSION_NONE;
+
+   protected MfirstucSty sty;
 }

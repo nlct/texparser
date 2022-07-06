@@ -41,23 +41,30 @@ public class MfirstucSty extends LaTeXSty
 
       NewIf.createConditional(true, getParser(), "ifMFUhyphen", false);
 
+      registerControlSequence(new MFUsentencecase(this));
       registerControlSequence(new GlsMakeFirstUc());
-      registerControlSequence(new MakeFirstUc());
+      registerControlSequence(new MakeFirstUc(this));
       registerControlSequence(new MakeFirstUc("xmakefirstuc",
-        MakeFirstUc.EXPANSION_ONCE));
+        MakeFirstUc.EXPANSION_ONCE, this));
       registerControlSequence(new MakeFirstUc("emakefirstuc",
-        MakeFirstUc.EXPANSION_FULL));
+        MakeFirstUc.EXPANSION_FULL, this));
       registerControlSequence(new CapitaliseWords(this));
       registerControlSequence(new CapitaliseWords(this, "xcapitalisewords",
         MakeFirstUc.EXPANSION_ONCE));
       registerControlSequence(new CapitaliseWords(this, "ecapitalisewords",
         MakeFirstUc.EXPANSION_FULL));
       registerControlSequence(new CapitaliseFmtWords(this));
-      registerControlSequence(new MakeFirstUc("MFUcapword"));
+      registerControlSequence(new MakeFirstUc("MFUcapword", this));
       registerControlSequence(new MFUnocap(this));
       registerControlSequence(new MFUnocap(this, "gMFUnocap", true));
       registerControlSequence(new MFUskippunc());
       registerControlSequence(new MFUwordbreak());
+
+      registerControlSequence(new MFUexcl(this));
+      registerControlSequence(new MFUblocker(this));
+      registerControlSequence(new MFUaddmap(this));
+
+      addExclusion("MFUskippunc");
 
       // not used but implement in case it's used explicitly
 
@@ -66,6 +73,8 @@ public class MfirstucSty extends LaTeXSty
          registerControlSequence(new GenericCommand(true,
             "mfirstucMakeUppercase", null,
              new TeXObject[] { new TeXCsRef("MakeTextUppercase") }));
+
+         addExclusion("NoCaseChange");
       }
       else
       {
@@ -116,5 +125,161 @@ public class MfirstucSty extends LaTeXSty
 
       return list.contains(word);
    }
+
+   /**
+    * Tests if the given control sequence name has been marked as an
+    * exclusion.
+    * @param name control sequence name
+    * @return true if the associated control sequence is an
+    * exclusion
+    */ 
+   public boolean isExclusion(String name)
+   {
+      ControlSequence cs = getParser().getControlSequence(EXCLUSION_TL);
+
+      if (cs instanceof GenericCommand)
+      {
+         TeXObjectList def = ((GenericCommand)cs).getDefinition();
+
+         for (int i = 0; i < def.size(); i++)
+         {
+            TeXObject obj = def.get(i);
+
+            if ((obj instanceof ControlSequence) 
+                  && ((ControlSequence)obj).getName().equals(name))
+            {
+               return true;
+            }
+         }
+      }
+
+      return false;
+   }
+
+   public void addExclusion(String name)
+   {
+      ControlSequence cs = getParser().getControlSequence(EXCLUSION_TL);
+
+      if (cs instanceof GenericCommand)
+      {
+         TeXObjectList def = ((GenericCommand)cs).getDefinition();
+         def.add(new TeXCsRef(name));
+      }
+      else
+      {
+         cs = new GenericCommand(true, EXCLUSION_TL, null, new TeXCsRef(name));
+         getParser().putControlSequence(true, cs);
+      }
+   }
+
+   /**
+    * Tests if the given control sequence name has been marked as a
+    * blocker.
+    * @param name control sequence name
+    * @return true if the associated control sequence is a
+    * blocker
+    */ 
+   public boolean isBlocker(String name)
+   {
+      ControlSequence cs = getParser().getControlSequence(BLOCKER_TL);
+
+      if (cs instanceof GenericCommand)
+      {
+         TeXObjectList def = ((GenericCommand)cs).getDefinition();
+
+         for (int i = 0; i < def.size(); i++)
+         {
+            TeXObject obj = def.get(i);
+
+            if ((obj instanceof ControlSequence) 
+                  && ((ControlSequence)obj).getName().equals(name))
+            {
+               return true;
+            }
+         }
+      }
+
+      return false;
+   }
+
+   public void addBlocker(String name)
+   {
+      ControlSequence cs = getParser().getControlSequence(BLOCKER_TL);
+
+      if (cs instanceof GenericCommand)
+      {
+         TeXObjectList def = ((GenericCommand)cs).getDefinition();
+         def.add(new TeXCsRef(name));
+      }
+      else
+      {
+         cs = new GenericCommand(true, BLOCKER_TL, null, new TeXCsRef(name));
+         getParser().putControlSequence(true, cs);
+      }
+   }
+
+   public TeXObject getMapping(String key)
+   {
+      ControlSequence cs = getParser().getControlSequence(MAPPINGS_PROP);
+
+      if (cs instanceof GenericCommand)
+      {
+         TeXObjectList def = ((GenericCommand)cs).getDefinition();
+
+         TeXObject firstElem = def.firstElement();
+
+         if (firstElem instanceof KeyValList)
+         {
+            return ((KeyValList)firstElem).get(key);
+         }
+      }
+
+      return null;
+   }
+
+   public void addMapping(String key, TeXObject value)
+   {
+      ControlSequence cs = getParser().getControlSequence(MAPPINGS_PROP);
+      KeyValList mappings;
+
+      if (cs instanceof GenericCommand)
+      {
+         TeXObjectList def = ((GenericCommand)cs).getDefinition();
+
+         TeXObject firstElem = def.firstElement();
+
+         if (firstElem instanceof KeyValList)
+         {
+            mappings = (KeyValList)firstElem;
+         }
+         else
+         {
+            getParser().debugMessage(1, 
+              "KeyValList expected as definition of "+cs);
+
+            mappings = new KeyValList();
+            cs = new GenericCommand(true, MAPPINGS_PROP, null, mappings);
+            getParser().putControlSequence(true, cs);
+         }
+      }
+      else
+      {
+         if (cs != null)
+         {
+            getParser().debugMessage(1, 
+              "KeyValList expected as definition of "+cs);
+         }
+
+         mappings = new KeyValList();
+         cs = new GenericCommand(true, MAPPINGS_PROP, null, mappings);
+         getParser().putControlSequence(true, cs);
+      }
+
+      mappings.put(key, value);
+   }
+
+   public static final String EXCLUSION_TL = "l_text_case_exclude_arg_tl";
+   public static final String BLOCKER_TL = "l__mfirstuc_blocker_tl";
+   public static final String MAPPINGS_PROP = "l__mfirstuc_mappings_prop";
 
 }
