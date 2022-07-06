@@ -1772,7 +1772,14 @@ public class L2HConverter extends LaTeXParserListener
             TeXApp.MESSAGE_ENCODING, encoding));
       }
 
-      basePath = file.getParentFile().toPath();
+      File parentFile = file.getParentFile();
+
+      if (parentFile == null)
+      {
+         parentFile = new File(".");
+      }
+
+      basePath = parentFile.toPath();
 
       if (writer == null)
       {

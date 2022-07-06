@@ -94,7 +94,7 @@ public class L2HTableOfContents extends ControlSequence
 
       File tocFile = listener.getAuxFile("toc");
 
-      if (tocFile.exists())
+      if (tocFile != null && tocFile.exists())
       {
          stack.push(TeXParserActionObject.createInputAction(tocFile));
       }
