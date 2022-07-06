@@ -20,6 +20,7 @@ package com.dickimawbooks.texparserlib.latex.hyperref;
 
 import java.io.IOException;
 
+import com.dickimawbooks.texparserlib.TeXObjectList;
 import com.dickimawbooks.texparserlib.latex.*;
 import com.dickimawbooks.texparserlib.latex.etoolbox.CsDef;
 
@@ -30,6 +31,12 @@ public class HyperrefSty extends LaTeXSty
     throws IOException
    {
       super(options, "hyperref", listener, loadParentOptions);
+   }
+
+   @Override
+   protected void preOptions(TeXObjectList stack) throws IOException
+   {
+      getListener().requirepackage(null, "color", false, stack);
    }
 
    @Override
