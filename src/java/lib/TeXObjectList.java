@@ -1441,8 +1441,17 @@ public class TeXObjectList extends Vector<TeXObject>
             }
             else
             {
-               list.add(new TeXCsRef(
-                 ((ControlSequence)object).getName().toLowerCase()));
+               ControlSequence cs = parser.getControlSequence(
+                 ((ControlSequence)object).getName().toLowerCase());
+
+               if (cs == null)
+               {
+                  list.add(object);
+               }
+               else
+               {
+                  list.add(cs);
+               }
             }
          }
          else
@@ -1479,8 +1488,17 @@ public class TeXObjectList extends Vector<TeXObject>
             }
             else
             {
-               list.add(new TeXCsRef(
-                ((ControlSequence)object).getName().toUpperCase()));
+               ControlSequence cs = parser.getControlSequence(
+                 ((ControlSequence)object).getName().toUpperCase());
+
+               if (cs == null)
+               {
+                  list.add(object);
+               }
+               else
+               {
+                  list.add(cs);
+               }
             }
          }
          else
@@ -1859,6 +1877,10 @@ public class TeXObjectList extends Vector<TeXObject>
          {
             list.add(popArg(parser));
          }
+         else if (parser.isNoExpand(object))
+         {
+            list.add(popStack(parser));
+         }
          else if (!object.canExpand())
          {
             list.add(object, true);
@@ -1948,6 +1970,10 @@ public class TeXObjectList extends Vector<TeXObject>
          if (object instanceof Unexpanded)
          {
             object = remaining.popArg(parser);
+         }
+         else if (parser.isNoExpand(object))
+         {
+            list.add(remaining.popStack(parser));
          }
          else if (!blocked && object.canExpand() && object instanceof Expandable)
          {

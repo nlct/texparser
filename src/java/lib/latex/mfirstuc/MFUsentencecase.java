@@ -60,7 +60,20 @@ public class MFUsentencecase extends Command
 
          if (obj instanceof ControlSequence)
          {
-            if (sty.isExclusion(((ControlSequence)obj).getName()))
+            String csname = ((ControlSequence)obj).getName();
+
+            if (csname.equals("protect") || csname.equals("noexpand"))
+            {
+               list.add(obj);
+
+               obj = argList.popStack(parser);
+
+               if (obj != null)
+               {
+                  list.add(obj);
+               }
+            }
+            else if (sty.isExclusion(csname))
             {
                list.add(obj);
                obj = popArg(parser, argList);
@@ -85,7 +98,7 @@ public class MFUsentencecase extends Command
             list.add(((CaseChangeable)obj).toUpperCase(parser));
             done = true;
          }
-         else
+         else if (obj != null)
          {
             list.add(obj);
             done = true;

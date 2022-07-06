@@ -26,12 +26,14 @@ public class NewCommand extends Command
 {
    public NewCommand()
    {
-      this("newcommand", Overwrite.FORBID);
+      this("newcommand", Overwrite.FORBID, false);
    }
 
    public NewCommand(String name, byte overwriteNum)
    {
       super(name);
+
+      isRobust = false;
 
       switch ((int)overwriteNum)
       {
@@ -44,13 +46,19 @@ public class NewCommand extends Command
 
    public NewCommand(String name, Overwrite overwrite)
    {
+      this(name, overwrite, false);
+   }
+
+   public NewCommand(String name, Overwrite overwrite, boolean isRobust)
+   {
       super(name);
       this.overwrite = overwrite;
+      this.isRobust = isRobust;
    }
 
    public Object clone()
    {
-      return new NewCommand(getName(), getOverwrite());
+      return new NewCommand(getName(), getOverwrite(), isRobust);
    }
 
    @Override
@@ -179,7 +187,7 @@ public class NewCommand extends Command
              parser.popNextArg(popStyle) : stack.popArg(parser, popStyle));
 
       ((LaTeXParserListener)parser.getListener()).newcommand(
-         overwrite, name, csName, isStar, numParams, defValue, definition);
+         isRobust, overwrite, name, csName, isStar, numParams, defValue, definition);
    }
 
    public void process(TeXParser parser)
@@ -194,4 +202,5 @@ public class NewCommand extends Command
    }
 
    private Overwrite overwrite=Overwrite.FORBID;
+   protected boolean isRobust = false;
 }

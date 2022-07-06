@@ -40,11 +40,24 @@ public class LaTeXGenericCommand extends GenericCommand
    public LaTeXGenericCommand(boolean isShort, String name, 
        TeXObjectList definition)
    {
+      this(isShort, name, false, definition);
+   }
+
+   public LaTeXGenericCommand(boolean isShort, String name, 
+       boolean isRobust, TeXObjectList definition)
+   {
       super(isShort, name, null, definition);
       latexSyntax = null;
+      this.isRobust = isRobust;
    }
 
    public LaTeXGenericCommand(boolean isShort, String name,
+     String syntaxString, TeXObjectList definition)
+   {
+      this(isShort, name, false, syntaxString, definition);
+   }
+
+   public LaTeXGenericCommand(boolean isShort, String name, boolean isRobust,
      String syntaxString, TeXObjectList definition)
    {
       this(isShort, name, syntaxString.toCharArray(), definition, 
@@ -54,22 +67,42 @@ public class LaTeXGenericCommand extends GenericCommand
    public LaTeXGenericCommand(boolean isShort, String name,
      char[] syntaxArray, TeXObjectList definition)
    {
-      this(isShort, name, syntaxArray, definition, (TeXObjectList)null);
+      this(isShort, name, false, syntaxArray, definition);
+   }
+
+   public LaTeXGenericCommand(boolean isShort, String name,
+     boolean isRobust, char[] syntaxArray, TeXObjectList definition)
+   {
+      this(isShort, name, isRobust, syntaxArray, definition, (TeXObjectList)null);
    }
 
    public LaTeXGenericCommand(boolean isShort, String name,
      String syntaxString, TeXObjectList definition,
      TeXObjectList defaultArgList)
    {
-      this(isShort, name, syntaxString.toCharArray(), definition, 
+      this(isShort, name, false, syntaxString, definition, defaultArgList);
+   }
+
+   public LaTeXGenericCommand(boolean isShort, String name, boolean isRobust,
+     String syntaxString, TeXObjectList definition,
+     TeXObjectList defaultArgList)
+   {
+      this(isShort, name, isRobust, syntaxString.toCharArray(), definition, 
            defaultArgList);
    }
 
    public LaTeXGenericCommand(boolean isShort, String name,
      char[] syntaxArray, TeXObjectList definition, TeXObjectList defaultArgList)
    {
+      this(isShort, name, false, syntaxArray, definition, defaultArgList);
+   }
+
+   public LaTeXGenericCommand(boolean isShort, String name, boolean isRobust,
+     char[] syntaxArray, TeXObjectList definition, TeXObjectList defaultArgList)
+   {
       super(isShort, name, null, definition);
       latexSyntax = syntaxArray;
+      this.isRobust = isRobust;
 
       int numDefArgs = (defaultArgList == null ? 0 : defaultArgList.size());
 
@@ -108,8 +141,15 @@ public class LaTeXGenericCommand extends GenericCommand
    public LaTeXGenericCommand(boolean isShort, String name,
      char[] syntaxArray, TeXObjectList definition, TeXObject[] defaultArgArray)
    {
+      this(isShort, name, false, syntaxArray, definition, defaultArgArray);
+   }
+
+   public LaTeXGenericCommand(boolean isShort, String name, boolean isRobust,
+     char[] syntaxArray, TeXObjectList definition, TeXObject[] defaultArgArray)
+   {
       super(isShort, name, null, definition);
       latexSyntax = syntaxArray;
+      this.isRobust = isRobust;
 
       int numDefArgs = (defaultArgArray == null ? 0 : defaultArgArray.length);
 
@@ -147,7 +187,7 @@ public class LaTeXGenericCommand extends GenericCommand
 
    public Object clone()
    {
-      return new LaTeXGenericCommand(isShort, getName(), latexSyntax, 
+      return new LaTeXGenericCommand(isShort, getName(), isRobust, latexSyntax, 
         (TeXObjectList)getDefinition().clone());
    }
 
@@ -170,31 +210,37 @@ public class LaTeXGenericCommand extends GenericCommand
    }
 
    @Override
+   public boolean canExpand()
+   {
+      return !isRobust;
+   }
+
+   @Override
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList list)
      throws IOException
    {
-      return getReplacement(parser, list);
+      return isRobust ? null : getReplacement(parser, list);
    }
 
    @Override
    public TeXObjectList expandonce(TeXParser parser)
      throws IOException
    {
-      return getReplacement(parser);
+      return isRobust ? null : getReplacement(parser);
    }
 
    @Override
    public TeXObjectList expandfully(TeXParser parser, TeXObjectList list)
      throws IOException
    {
-      return getReplacement(parser, list).expandfully(parser, list);
+      return isRobust ? null : getReplacement(parser, list).expandfully(parser, list);
    }
 
    @Override
    public TeXObjectList expandfully(TeXParser parser)
      throws IOException
    {
-      return getReplacement(parser).expandfully(parser);
+      return isRobust ? null : getReplacement(parser).expandfully(parser);
    }
 
    @Override
@@ -395,14 +441,16 @@ public class LaTeXGenericCommand extends GenericCommand
 
    public String toString()
    {
-      return String.format("%s[name=%s,syntax=%s,definition=%s]",
-       getClass().getSimpleName(), getName(),  
+      return String.format("%s[name=%s,robust=%s,,syntax=%s,definition=%s]",
+       getClass().getSimpleName(), getName(), isRobust,  
        getLaTeXSyntaxString(), getDefinition());
    }
 
    private char[] latexSyntax;
 
    private TeXObject[] defaultArgs;
+
+   protected boolean isRobust = false;
 
    public static final char SYNTAX_OPTIONAL  = 'o';
    public static final char SYNTAX_MANDATORY = 'm';

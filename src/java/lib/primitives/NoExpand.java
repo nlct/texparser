@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -16,29 +16,28 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
-package com.dickimawbooks.texparserlib.latex;
+package com.dickimawbooks.texparserlib.primitives;
 
 import java.io.IOException;
 import java.util.Vector;
 
 import com.dickimawbooks.texparserlib.*;
-import com.dickimawbooks.texparserlib.primitives.*;
 
-public class Protect extends Command
+public class NoExpand extends Command
 {
-   public Protect()
+   public NoExpand()
    {
-      this("protect");
+      this("noexpand");
    }
 
-   public Protect(String name)
+   public NoExpand(String name)
    {
       super(name);
    }
 
    public Object clone()
    {
-      return new Protect(getName());
+      return new NoExpand(getName());
    }
 
    public TeXObjectList expandonce(TeXParser parser) throws IOException
@@ -53,7 +52,6 @@ public class Protect extends Command
 
       TeXObjectList expanded = parser.getListener().createStack();
 
-      expanded.add(this);
       expanded.add(obj);
 
       return expanded;

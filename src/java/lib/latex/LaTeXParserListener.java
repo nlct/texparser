@@ -913,9 +913,18 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
      int numParams, TeXObject defValue, TeXObject definition)
    throws IOException
    {
-      ControlSequence cs = getControlSequence(csName);
+      newcommand(false, overwrite, type, csName, isShort, numParams, defValue,
+       definition);
+   }
 
-      if (cs instanceof Undefined)
+   public void newcommand(boolean isRobust, Overwrite overwrite, 
+     String type, String csName, boolean isShort,
+     int numParams, TeXObject defValue, TeXObject definition)
+   throws IOException
+   {
+      ControlSequence cs = getParser().getControlSequence(csName);
+
+      if (cs == null)
       {
          if (overwrite == Overwrite.FORCE)
          {
@@ -939,10 +948,18 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
          }
       }
 
-      addLaTeXCommand(csName, isShort, numParams, defValue, definition);
+      addLaTeXCommand(isRobust, csName, isShort, numParams, defValue, definition);
    }
 
    public void addLaTeXCommand(String name, 
+     boolean isShort, int numParams,
+     TeXObject defValue, TeXObject definition)
+     throws IOException
+   {
+      addLaTeXCommand(false, name, isShort, numParams, defValue, definition);
+   }
+
+   public void addLaTeXCommand(boolean isRobust, String name, 
      boolean isShort, int numParams,
      TeXObject defValue, TeXObject definition)
      throws IOException
@@ -962,7 +979,7 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       if (numParams == 0)
       {
          putControlSequence(true,// local
-           new LaTeXGenericCommand(isShort, name, defList));
+           new LaTeXGenericCommand(isShort, name, isRobust, defList));
          return;
       }
 
@@ -985,12 +1002,12 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       if (defValue == null)
       {
          putControlSequence(true,// local
-           new LaTeXGenericCommand(isShort, name, syntax, defList));
+           new LaTeXGenericCommand(isShort, name, isRobust, syntax, defList));
       }
       else
       {
          putControlSequence(true,// local
-           new LaTeXGenericCommand(isShort, name, syntax, defList,
+           new LaTeXGenericCommand(isShort, name, isRobust, syntax, defList,
              new TeXObject[]{defValue}));
       }
    }

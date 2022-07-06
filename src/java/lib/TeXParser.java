@@ -31,6 +31,8 @@ import java.nio.charset.IllegalCharsetNameException;
 import java.nio.file.Files;
 
 import com.dickimawbooks.texparserlib.latex.LaTeXSyntaxException;
+import com.dickimawbooks.texparserlib.latex.Protect;
+import com.dickimawbooks.texparserlib.primitives.NoExpand;
 
 /**
  * The principle class in this library that deals with reading input
@@ -388,6 +390,11 @@ public class TeXParser extends TeXObjectList
    {
       return (obj != null && obj instanceof TeXObjectList
         && ((TeXObjectList)obj).isStack());
+   }
+
+   public boolean isNoExpand(Object obj)
+   {
+      return (obj instanceof Protect || obj instanceof NoExpand);
    }
 
    public boolean isLetter(int c)

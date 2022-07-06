@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.awt.Color;
 
 import com.dickimawbooks.texparserlib.*;
+import com.dickimawbooks.texparserlib.generic.Symbol;
 import com.dickimawbooks.texparserlib.latex.*;
 import com.dickimawbooks.texparserlib.latex.glossaries.*;
 import com.dickimawbooks.texparserlib.html.L2HConverter;
@@ -175,6 +176,8 @@ public class UserGuideSty extends LaTeXSty
          "code", new TeXFontText(TeXFontFamily.VERB), BG_CODE, Color.BLACK);
       TaggedColourBox resultBox = addTaggedColourBox("resultbox",
          "result", null, Color.BLACK);
+      addTaggedColourBox("badcodebox",
+         "badcode", new TeXFontText(TeXFontFamily.VERB), BG_CODE, Color.BLACK);
 
       registerControlSequence(new FrameBoxEnv(
         addSemanticCommand("@compactcodebox", "compactcodebox",
@@ -627,6 +630,45 @@ public class UserGuideSty extends LaTeXSty
       registerControlSequence(new TextualContentCommand("Tablename", "Table"));
       registerControlSequence(new Ref("tableref", false,
        new TeXCsRef("Tablename"), listener.getSpace()));
+
+      registerControlSequence(new Symbol("nlctopensqbracket", '['));
+      registerControlSequence(new Symbol("nlctclosesqbracket", ']'));
+
+      registerControlSequence(new Symbol("codesym", 0x1F5B9));
+      registerControlSequence(new Symbol("resultsym", 0x1F5BA));
+      registerControlSequence(new Symbol("warningsym", 0x26A0));
+      registerControlSequence(new Symbol("importantsym", 0x2139));
+      registerControlSequence(new Symbol("informationsym", 0x1F6C8));
+      registerControlSequence(new Symbol("definitionsym", 0x1F4CC));
+      registerControlSequence(new GenericCommand(true,
+        "valuesettingsym", null, new TeXCsRef("faSliders")));
+      registerControlSequence(new Symbol("novaluesettingsym", 0x1D362));
+      registerControlSequence(new GenericCommand(true,
+        "toggleonsettingsym", null, new TeXCsRef("faToggleOn")));
+      registerControlSequence(new GenericCommand(true,
+        "toggleoffsettingsym", null, new TeXCsRef("faToggleOff")));
+      registerControlSequence(new Symbol("optionvaluesym", 0x1F516));
+      registerControlSequence(new Symbol("countersym", 0x2116));
+      registerControlSequence(new GenericCommand(true,
+        "terminalsym", null, new TeXCsRef("faTerminal")));
+
+      // \deprecatedsym
+      def = getListener().createStack();
+
+      grp.add(new TeXCsRef("deprecatedorbannedfmt"));
+      grp.add(new TeXCsRef("faTrashO"));
+
+      registerControlSequence(new GenericCommand(true,
+       "deprecatedsym", null, def));
+
+      // \bannedsym
+      def = getListener().createStack();
+
+      grp.add(new TeXCsRef("deprecatedorbannedfmt"));
+      grp.add(new TeXCsRef("faBan"));
+
+      registerControlSequence(new GenericCommand(true,
+       "bannedsym", null, def));
 
       // \badcodesym
       def = getListener().createStack();
