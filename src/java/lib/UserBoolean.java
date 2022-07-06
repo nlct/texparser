@@ -59,7 +59,7 @@ public class UserBoolean extends AbstractTeXObject implements TeXBoolean
    @Override
    public String toString()
    {
-      return String.format("%s[value=%d]",
+      return String.format("%s[value=%s]",
          getClass().getSimpleName(), value);
    }
 
