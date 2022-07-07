@@ -76,10 +76,7 @@ public class L2HCaption extends ControlSequence
 
       String id = null;
 
-      if (object instanceof TeXCsRef)
-      {
-         object = listener.getControlSequence(((TeXCsRef)object).getName());
-      }
+      object = TeXParserUtils.resolve(object, parser);
 
       if (object instanceof Label)
       {
@@ -88,10 +85,7 @@ public class L2HCaption extends ControlSequence
          id = HtmlTag.getUriFragment(label);
          object = stack.popStack(parser, TeXObjectList.POP_IGNORE_LEADING_SPACE);
 
-         if (object instanceof TeXCsRef)
-         {
-            object = listener.getControlSequence(((TeXCsRef)object).getName());
-         }
+         object = TeXParserUtils.resolve(object, parser);
       }
 
       boolean isTable = "table".equals(type);
@@ -123,10 +117,7 @@ public class L2HCaption extends ControlSequence
             align = (ParAlign)object;
             object = stack.popStack(parser, TeXObjectList.POP_IGNORE_LEADING_SPACE);
 
-            if (object instanceof TeXCsRef)
-            {
-               object = listener.getControlSequence(((TeXCsRef)object).getName());
-            }
+            object = TeXParserUtils.resolve(object, parser);
          }
 
          if (object instanceof Begin)

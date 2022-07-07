@@ -57,11 +57,7 @@ public class ExpandAfter extends Primitive implements Expandable
 
       TeXObject secondArg = stack.popToken(popStyle);
 
-      if (secondArg instanceof TeXCsRef)
-      {
-         secondArg = parser.getControlSequence(
-           ((TeXCsRef)secondArg).getName());
-      }
+      secondArg = TeXParserUtils.resolve(secondArg, parser);
 
       if (parser.getDebugLevel() > 0)
       {

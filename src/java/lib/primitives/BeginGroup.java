@@ -56,11 +56,7 @@ public class BeginGroup extends Primitive implements Expandable
          throw new TeXSyntaxException(parser, TeXSyntaxException.ERROR_NO_EG);
       }
 
-      if (object instanceof TeXCsRef)
-      {
-         object = parser.getListener().getControlSequence(
-            ((TeXCsRef)object).getName());
-      }
+      object = TeXParserUtils.resolve(object, parser);
 
       if (object instanceof EndGroup || object instanceof EgChar)
       {

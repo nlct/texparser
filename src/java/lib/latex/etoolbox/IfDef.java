@@ -22,9 +22,8 @@ import java.io.IOException;
 
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.*;
-import com.dickimawbooks.texparserlib.primitives.Undefined;
 
-public class IfDef extends Command
+public class IfDef extends AbstractEtoolBoxCommand
 {
    public IfDef()
    {
@@ -33,8 +32,7 @@ public class IfDef extends Command
 
    public IfDef(String name, boolean isCsname)
    {
-      super(name);
-      this.isCsname = isCsname;
+      super(name, isCsname);
    }
 
    @Override
@@ -47,61 +45,23 @@ public class IfDef extends Command
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      ControlSequence cs = null;
-
-      if (isCsname)
-      {
-         String csname = popLabelString(parser, stack);
-         cs = parser.getControlSequence(csname);
-      }
-      else
-      {
-         TeXObject obj = popArg(parser, stack);
-
-         if (obj instanceof TeXCsRef)
-         {
-            String csname = ((TeXCsRef)obj).getName();
-            cs = parser.getControlSequence(csname);
-         }
-         else if (obj instanceof Undefined)
-         {
-            cs = null;
-         }
-         else if (obj instanceof ControlSequence)
-         {
-            cs = (ControlSequence)obj;
-         }
-      }
+      ControlSequence cs = popCsArg(parser, stack);
 
       TeXObject truePart = popArg(parser, stack);
       TeXObject falsePart = popArg(parser, stack);
 
-      if (cs != null)
+      TeXObjectList list = parser.getListener().createStack();
+
+      if (parser.isUndefined(cs))
       {
-         if (parser.isStack(truePart))
-         {
-            return (TeXObjectList)truePart;
-         }
-         else
-         {
-            TeXObjectList list = new TeXObjectList();
-            list.add(truePart);
-            return list;
-         }
+          list.add(falsePart, true);
       }
       else
       {
-         if (parser.isStack(falsePart))
-         {
-            return (TeXObjectList)falsePart;
-         }
-         else
-         {
-            TeXObjectList list = new TeXObjectList();
-            list.add(falsePart);
-            return list;
-         }
+          list.add(truePart, true);
       }
+
+      return list;
    }
 
    @Override
@@ -129,54 +89,23 @@ public class IfDef extends Command
    public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      ControlSequence cs = null;
-
-      if (isCsname)
-      {
-         String csname = popLabelString(parser, stack);
-         cs = parser.getControlSequence(csname);
-      }
-      else
-      {
-         TeXObject obj = popArg(parser, stack);
-
-         if (obj instanceof TeXCsRef)
-         {
-            String csname = ((TeXCsRef)obj).getName();
-            cs = parser.getControlSequence(csname);
-         }
-         else if (obj instanceof Undefined)
-         {
-            cs = null;
-         }
-         else if (obj instanceof ControlSequence)
-         {
-            cs = (ControlSequence)obj;
-         }
-      }
+      ControlSequence cs = popCsArg(parser, stack);
 
       TeXObject truePart = popArg(parser, stack);
       TeXObject falsePart = popArg(parser, stack);
 
       TeXObject doCode;
 
-      if (cs != null)
-      {
-         doCode = truePart;
-      }
-      else
+      if (parser.isUndefined(cs))
       {
          doCode = falsePart;
       }
-
-      if (stack == parser)
-      {
-         doCode.process(parser);
-      }
       else
       {
-         doCode.process(parser, stack);
+         doCode = truePart;
       }
+
+      TeXParserUtils.process(doCode, parser, stack);
    }
 
    @Override
@@ -186,5 +115,4 @@ public class IfDef extends Command
       process(parser, parser);
    }
 
-   private boolean isCsname;
 }

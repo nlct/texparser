@@ -202,6 +202,8 @@ public class L2HConverter extends LaTeXParserListener
       putControlSequence(new L2HAltListItem());
       putControlSequence(new L2HAltListDesc());
 
+      putControlSequence(new L2HQuote());
+
       putControlSequence(new L2HMathDeclaration("math"));
 
       MathDeclaration begMathDecl = new L2HMathDeclaration("(");

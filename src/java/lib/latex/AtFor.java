@@ -301,31 +301,57 @@ public class AtFor extends Command
       return expandonce(parser, parser);
    }
 
-   public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
-     throws IOException
+   protected CsvList argToCsvList(TeXObject arg, TeXParser parser, TeXObjectList stack)
+   throws IOException
    {
-      TeXObject arg;
+      arg = TeXParserUtils.resolve(arg, parser);
 
-      if (parser == stack)
+      CsvList csvList = null;
+
+      if (arg instanceof CsvList)
       {
-         arg = parser.popNextArg();
+         csvList = (CsvList)arg;
+      }
+      else if (arg instanceof GenericCommand)
+      {
+         TeXObjectList def = ((GenericCommand)arg).getDefinition();
+
+         if (def instanceof CsvList)
+         {
+            csvList = (CsvList)def;
+         }
+         else if (def.size() == 1 && def.firstElement() instanceof CsvList)
+         {
+            csvList = (CsvList)def.firstElement();
+         }
+         else
+         {
+            arg = (TeXObject)def.clone();
+         }
       }
       else
       {
-         arg = stack.popArg(parser);
+         arg = TeXParserUtils.expandOnce(arg, parser, stack);
       }
 
-      if (!(arg instanceof ControlSequence))
+      if (csvList == null)
       {
-         throw new LaTeXSyntaxException(parser, 
-           TeXSyntaxException.ERROR_CS_EXPECTED, arg.toString(parser),
-                arg.getClass().getSimpleName());
+         csvList = CsvList.getList(parser, arg);
       }
+
+      return csvList;
+   }
+
+   @Override
+   public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
+     throws IOException
+   {
+      ControlSequence csArg = popControlSequence(parser, stack);
       
-      GenericCommand cs = new GenericCommand(((ControlSequence)arg).getName());
+      GenericCommand cs = new GenericCommand(csArg.getName());
       parser.putControlSequence(true, cs);
 
-      arg = stack.popToken(TeXObjectList.POP_IGNORE_LEADING_SPACE);
+      TeXObject arg = stack.popToken(TeXObjectList.POP_IGNORE_LEADING_SPACE);
 
       if (!(arg instanceof CharObject
              && ((CharObject)arg).getCharCode() == ':'))
@@ -354,92 +380,30 @@ public class AtFor extends Command
          arg = list;
       }
 
-      if (arg instanceof TeXCsRef)
-      {
-         arg = parser.getListener().getControlSequence(
-           ((TeXCsRef)arg).getName());
-      }
+      CsvList csvList = argToCsvList(arg, parser, stack);
 
-      CsvList csvList = null;
-
-      if (arg instanceof CsvList)
-      {
-         csvList = (CsvList)arg;
-      }
-      else if (arg instanceof GenericCommand
-                 && ((GenericCommand)arg).getDefinition() instanceof CsvList)
-      {
-         csvList = (CsvList)((GenericCommand)arg).getDefinition();
-      }
-      else if (arg instanceof Expandable)
-      {
-         TeXObjectList expanded;
-
-         if (parser == stack)
-         {
-            expanded = ((Expandable)arg).expandonce(parser);
-         }
-         else
-         {
-            expanded = ((Expandable)arg).expandonce(parser, stack);
-         }
-
-         if (expanded != null)
-         {
-            arg = expanded;
-         }
-      }
-
-      if (csvList == null)
-      {
-         csvList = CsvList.getList(parser, arg);
-      }
-
-      TeXObject code;
-
-      if (parser == stack)
-      {
-         code = parser.popNextArg();
-      }
-      else
-      {
-         code = stack.popArg(parser);
-      }
+      TeXObject code = popArg(parser, stack);
 
       return expandLoop(parser, stack, cs, csvList, code);
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser)
      throws IOException
    {
       return expandfully(parser, parser);
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      TeXObject arg;
+      ControlSequence csArg = popControlSequence(parser, stack);
 
-      if (parser == stack)
-      {
-         arg = parser.popNextArg();
-      }
-      else
-      {
-         arg = stack.popArg(parser);
-      }
-
-      if (!(arg instanceof ControlSequence))
-      {
-         throw new LaTeXSyntaxException(parser, 
-           TeXSyntaxException.ERROR_CS_EXPECTED, arg.toString(parser),
-                arg.getClass().getSimpleName());
-      }
-      
-      GenericCommand cs = new GenericCommand(((ControlSequence)arg).getName());
+      GenericCommand cs = new GenericCommand(csArg.getName());
       parser.putControlSequence(true, cs);
 
-      arg = stack.popToken(TeXObjectList.POP_IGNORE_LEADING_SPACE);
+      TeXObject arg = stack.popToken(TeXObjectList.POP_IGNORE_LEADING_SPACE);
 
       if (!(arg instanceof CharObject
              && ((CharObject)arg).getCharCode() == ':'))
@@ -468,90 +432,28 @@ public class AtFor extends Command
          arg = list;
       }
 
-      if (arg instanceof TeXCsRef)
-      {
-         arg = parser.getListener().getControlSequence(
-           ((TeXCsRef)arg).getName());
-      }
+      CsvList csvList = argToCsvList(arg, parser, stack);
 
-      CsvList csvList = null;
-
-      if (arg instanceof CsvList)
-      {
-         csvList = (CsvList)arg;
-      }
-      else if (arg instanceof GenericCommand
-                 && ((GenericCommand)arg).getDefinition() instanceof CsvList)
-      {
-         csvList = (CsvList)((GenericCommand)arg).getDefinition();
-      }
-      else if (arg instanceof Expandable)
-      {
-         TeXObjectList expanded;
-
-         if (parser == stack)
-         {
-            expanded = ((Expandable)arg).expandonce(parser);
-         }
-         else
-         {
-            expanded = ((Expandable)arg).expandonce(parser, stack);
-         }
-
-         if (expanded != null)
-         {
-            arg = expanded;
-         }
-      }
-
-      if (csvList == null)
-      {
-         csvList = CsvList.getList(parser, arg);
-      }
-
-      TeXObject code;
-
-      if (parser == stack)
-      {
-         code = parser.popNextArg();
-      }
-      else
-      {
-         code = stack.popArg(parser);
-      }
+      TeXObject code = popArg(parser, stack);
 
       return fullyExpandLoop(parser, stack, cs, csvList, code);
    }
 
+   @Override
    public void process(TeXParser parser) throws IOException
    {
       process(parser, parser);
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack) throws IOException
    {
-      TeXObject arg;
+      ControlSequence csArg = popControlSequence(parser, stack);
 
-      if (parser == stack)
-      {
-         arg = parser.popNextArg();
-      }
-      else
-      {
-         arg = stack.popArg(parser);
-      }
-
-      if (!(arg instanceof ControlSequence))
-      {
-         throw new LaTeXSyntaxException(parser, 
-           TeXSyntaxException.ERROR_CS_EXPECTED, arg.toString(parser),
-                arg.getClass().getSimpleName());
-      }
-      
-      GenericCommand cs = new GenericCommand(((ControlSequence)arg).getName());
+      GenericCommand cs = new GenericCommand(csArg.getName());
       parser.putControlSequence(true, cs);
 
-      arg = stack.popToken(TeXObjectList.POP_IGNORE_LEADING_SPACE);
+      TeXObject arg = stack.popToken(TeXObjectList.POP_IGNORE_LEADING_SPACE);
 
       if (!(arg instanceof CharObject
              && ((CharObject)arg).getCharCode() == ':'))
@@ -580,57 +482,9 @@ public class AtFor extends Command
          arg = list;
       }
 
-      if (arg instanceof TeXCsRef)
-      {
-         arg = parser.getListener().getControlSequence(
-           ((TeXCsRef)arg).getName());
-      }
+      CsvList csvList = argToCsvList(arg, parser, stack);
 
-      CsvList csvList = null;
-
-      if (arg instanceof CsvList)
-      {
-         csvList = (CsvList)arg;
-      }
-      else if (arg instanceof GenericCommand
-                 && ((GenericCommand)arg).getDefinition() instanceof CsvList)
-      {
-         csvList = (CsvList)((GenericCommand)arg).getDefinition();
-      }
-      else if (arg instanceof Expandable)
-      {
-         TeXObjectList expanded;
-
-         if (parser == stack)
-         {
-            expanded = ((Expandable)arg).expandonce(parser);
-         }
-         else
-         {
-            expanded = ((Expandable)arg).expandonce(parser, stack);
-         }
-
-         if (expanded != null)
-         {
-            arg = expanded;
-         }
-      }
-
-      if (csvList == null)
-      {
-         csvList = CsvList.getList(parser, arg);
-      }
-
-      TeXObject code;
-
-      if (parser == stack)
-      {
-         code = parser.popNextArg();
-      }
-      else
-      {
-         code = stack.popArg(parser);
-      }
+      TeXObject code = popArg(parser, stack);
 
       processLoop(parser, stack, cs, csvList, code);
    }

@@ -270,11 +270,7 @@ public class CsvList extends DataObjectList
             break;
          }
 
-         if (object instanceof TeXCsRef)
-         {
-            object = parser.getListener().getControlSequence(
-               ((TeXCsRef)object).getName());
-         }
+         object = TeXParserUtils.resolve(object, parser);
 
          if (!(object instanceof Ignoreable))
          {
@@ -307,11 +303,7 @@ public class CsvList extends DataObjectList
       {
          TeXObject object = remove(0);
 
-         if (object instanceof TeXCsRef)
-         {
-            object = parser.getListener().getControlSequence(
-               ((TeXCsRef)object).getName());
-         }
+         object = TeXParserUtils.resolve(object, parser);
 
          if (!(object instanceof Ignoreable))
          {

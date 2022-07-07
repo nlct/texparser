@@ -166,10 +166,7 @@ public class ProbSolnData
          boolean addObject = (question && !onlySolution)
            || (!question && !onlyProblem);
 
-         if (object instanceof TeXCsRef)
-         {
-            object = listener.getControlSequence(((TeXCsRef)object).getName());
-         }
+         object = TeXParserUtils.resolve(object, parser);
 
          if (object instanceof Group && !(object instanceof MathGroup))
          {
@@ -182,9 +179,9 @@ public class ProbSolnData
                   stripSolutionEnv, onlyProblem, onlySolution);
             }
          }
-         else if (object instanceof TeXObjectList && !(object instanceof Group))
+         else if (parser.isStack(object))
          {
-            stack.addAll(0, (TeXObjectList)object);
+            stack.push(object, true);
          }
          else if (object instanceof OnlyProblem || object instanceof Question)
          {

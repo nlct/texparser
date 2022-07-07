@@ -160,16 +160,7 @@ public class Paragraph extends DataObjectList
 
          popStyle = (byte)0;
 
-         if (token instanceof TeXCsRef)
-         {
-            token = parser.getListener().getControlSequence(
-               ((TeXCsRef)token).getName());
-         }
-
-         if (token instanceof AssignedMacro)
-         {
-            token = ((AssignedMacro)token).getBaseUnderlying();
-         }
+         token = TeXParserUtils.resolve(token, parser);
 
          if (token.canExpand() && token instanceof Expandable
               && !token.isDataObject())

@@ -48,18 +48,15 @@ public class DTLcompare extends ControlSequence
       TeXObject string1 = stack.popArg(parser);
       TeXObject string2 = stack.popArg(parser);
 
-      if (cs instanceof TeXCsRef)
-      {
-         cs = parser.getListener().getControlSequence(cs.getName());
-      }
+      TeXObject csArg = TeXParserUtils.resolve(cs, parser);
 
-      if (!(cs instanceof CountRegister))
+      if (!(csArg instanceof CountRegister))
       {
          throw new TeXSyntaxException(parser,  
             TeXSyntaxException.ERROR_NUMERIC_REGISTER_EXPECTED);
       }
 
-      CountRegister reg = (CountRegister)cs;
+      CountRegister reg = (CountRegister)csArg;
 
       String str1 = string1.toString(parser);
       String str2 = string2.toString(parser);
@@ -80,18 +77,15 @@ public class DTLcompare extends ControlSequence
       TeXObject string1 = parser.popNextArg();
       TeXObject string2 = parser.popNextArg();
 
-      if (cs instanceof TeXCsRef)
-      {
-         cs = parser.getListener().getControlSequence(cs.getName());
-      }
+      TeXObject csArg = TeXParserUtils.resolve(cs, parser);
 
-      if (!(cs instanceof CountRegister))
+      if (!(csArg instanceof CountRegister))
       {
          throw new TeXSyntaxException(parser,  
             TeXSyntaxException.ERROR_NUMERIC_REGISTER_EXPECTED);
       }
 
-      CountRegister reg = (CountRegister)cs;
+      CountRegister reg = (CountRegister)csArg;
 
       String str1 = string1.toString(parser);
       String str2 = string2.toString(parser);

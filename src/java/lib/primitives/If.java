@@ -150,15 +150,9 @@ public class If extends Primitive implements Expandable
 
       TeXObject secondArg = parser.popToken(popStyle);
 
-      if (firstArg instanceof TeXCsRef)
-      {
-         firstArg = parser.getControlSequence(((TeXCsRef)firstArg).getName());
-      }
+      firstArg = TeXParserUtils.resolve(firstArg, parser);
 
-      if (secondArg instanceof TeXCsRef)
-      {
-         secondArg = parser.getControlSequence(((TeXCsRef)secondArg).getName());
-      }
+      secondArg = TeXParserUtils.resolve(secondArg, parser);
 
       if (firstArg == secondArg)
       {
@@ -168,16 +162,6 @@ public class If extends Primitive implements Expandable
       if (firstArg == null || secondArg == null)
       {
          return false;
-      }
-
-      if (firstArg instanceof AssignedMacro)
-      {
-         firstArg = ((AssignedMacro)firstArg).getUnderlying();
-      }
-
-      if (secondArg instanceof AssignedMacro)
-      {
-         secondArg = ((AssignedMacro)secondArg).getUnderlying();
       }
 
       return firstArg.equals(secondArg);
@@ -234,13 +218,7 @@ public class If extends Primitive implements Expandable
    protected void skipToFi(TeXParser parser, TeXObjectList stack)
     throws IOException
    {
-      TeXObject obj = stack.popToken();
-
-      if (obj instanceof TeXCsRef)
-      {
-         obj = parser.getListener().getControlSequence(
-           ((TeXCsRef)obj).getName());
-      }
+      TeXObject obj = TeXParserUtils.resolve(stack.popToken(), parser);
 
       if (obj == null)
       {
@@ -257,13 +235,7 @@ public class If extends Primitive implements Expandable
    protected boolean skipToElse(TeXParser parser, TeXObjectList stack)
     throws IOException
    {
-      TeXObject obj = stack.popToken();
-
-      if (obj instanceof TeXCsRef)
-      {
-         obj = parser.getListener().getControlSequence(
-           ((TeXCsRef)obj).getName());
-      }
+      TeXObject obj = TeXParserUtils.resolve(stack.popToken(), parser);
 
       if (obj == null)
       {

@@ -149,11 +149,7 @@ public class IfCase extends If
    {
       TeXObject obj = stack.popToken();
 
-      if (obj instanceof TeXCsRef)
-      {
-         obj = parser.getListener().getControlSequence(
-           ((TeXCsRef)obj).getName());
-      }
+      obj = TeXParserUtils.resolve(obj, parser);
 
       if (obj == null)
       {

@@ -25,7 +25,7 @@ import com.dickimawbooks.texparserlib.latex.*;
 import com.dickimawbooks.texparserlib.primitives.IfTrue;
 import com.dickimawbooks.texparserlib.primitives.IfFalse;
 
-public class DoListLoop extends ControlSequence
+public class DoListLoop extends AbstractEtoolBoxCommand
 {
    public DoListLoop()
    {
@@ -34,8 +34,7 @@ public class DoListLoop extends ControlSequence
 
    public DoListLoop(String name, boolean isCsname, boolean useDo)
    {
-      super(name);
-      this.isCsname = isCsname;
+      super(name, isCsname);
       this.useDo = useDo;
    }
 
@@ -43,6 +42,19 @@ public class DoListLoop extends ControlSequence
    public Object clone()
    {
       return new DoListLoop(getName(), isCsname, useDo);
+   }
+
+   @Override
+   public boolean canExpand()
+   {
+      return false;
+   }
+
+   @Override
+   public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
+     throws IOException
+   {
+      return null;
    }
 
    @Override
@@ -60,30 +72,9 @@ public class DoListLoop extends ControlSequence
          handler = popArg(parser, stack);
       }
 
-      ControlSequence cs;
+      ControlSequence cs = popCsArg(parser, stack);
 
-      if (isCsname)
-      {
-         String csname = popLabelString(parser, stack);
-
-         cs = parser.getListener().getControlSequence(csname);
-      }
-      else
-      {
-         cs = popControlSequence(parser, stack);
-
-         if (cs instanceof TeXCsRef)
-         {
-            cs = parser.getListener().getControlSequence(cs.getName());
-         }
-      }
-
-      TeXObject defn = cs;
-
-      if (cs instanceof AssignedControlSequence)
-      {
-         defn = ((AssignedControlSequence)cs).getBaseUnderlying();
-      }
+      TeXObject defn = TeXParserUtils.resolve(cs, parser);
 
       if (defn instanceof GenericCommand)
       {
@@ -136,14 +127,7 @@ public class DoListLoop extends ControlSequence
 
          grp.add((TeXObject)elist.get(i).clone());
 
-         if (parser == stack || stack == null)
-         {
-            expanded.process(parser);
-         }
-         else
-         {
-            expanded.process(parser, stack);
-         }
+         TeXParserUtils.process(expanded, parser, stack);
 
          TeXBoolean bool = TeXParserUtils.toBoolean("if@etoolbox@listbreak", parser);
 
@@ -165,5 +149,5 @@ public class DoListLoop extends ControlSequence
       process(parser, parser);
    }
 
-   private boolean useDo, isCsname;
+   private boolean useDo;
 }

@@ -46,42 +46,7 @@ public class CsLetCs extends Let
      boolean iscsname)
       throws IOException
    {
-      TeXObject arg;
-
-      if (parser == stack)
-      {
-         arg = parser.popNextArg();
-      }
-      else
-      {
-         arg = stack.popArg(parser);
-      }
-
-      if (iscsname)
-      {
-         if (arg instanceof Expandable)
-         {
-            TeXObjectList expanded;
-
-            if (parser == stack)
-            {
-               expanded = ((Expandable)arg).expandfully(parser);
-            }
-            else
-            {
-               expanded = ((Expandable)arg).expandfully(parser, stack);
-            }
-
-            if (expanded != null)
-            {
-               arg = expanded;
-            }
-         }
-
-         arg = new TeXCsRef(arg.toString(parser));
-      }
-
-      return arg;
+      return AbstractEtoolBoxCommand.popCsArg(parser, stack, iscsname);
    }
 
    public void process(TeXParser parser, TeXObjectList stack)

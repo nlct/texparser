@@ -108,10 +108,7 @@ public class SubFloat extends FrameBox
 
          while (obj != null)
          {
-            if (obj instanceof TeXCsRef)
-            {
-               obj = listener.getControlSequence(((TeXCsRef)obj).getName());
-            }
+            obj = TeXParserUtils.resolve(obj, parser);
 
             if (obj instanceof Label)
             {

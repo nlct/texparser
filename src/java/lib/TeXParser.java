@@ -31,8 +31,7 @@ import java.nio.charset.IllegalCharsetNameException;
 import java.nio.file.Files;
 
 import com.dickimawbooks.texparserlib.latex.LaTeXSyntaxException;
-import com.dickimawbooks.texparserlib.latex.Protect;
-import com.dickimawbooks.texparserlib.primitives.NoExpand;
+import com.dickimawbooks.texparserlib.primitives.Undefined;
 
 /**
  * The principle class in this library that deals with reading input
@@ -392,9 +391,9 @@ public class TeXParser extends TeXObjectList
         && ((TeXObjectList)obj).isStack());
    }
 
-   public boolean isNoExpand(Object obj)
+   public boolean isUndefined(Object obj)
    {
-      return (obj instanceof Protect || obj instanceof NoExpand);
+      return (obj == null || obj instanceof Undefined);
    }
 
    public boolean isLetter(int c)
@@ -1145,20 +1144,11 @@ public class TeXParser extends TeXObjectList
 
    public CatCodeChanger isCatCodeChanger(TeXObject obj)
    {
+      obj = TeXParserUtils.resolve(obj, this);
+
       if (obj instanceof CatCodeChanger)
       {
          return (CatCodeChanger)obj;
-      }
-
-      if (obj instanceof TeXCsRef)
-      {
-         return isCatCodeChanger(getControlSequence(
-          ((TeXCsRef)obj).getName()));
-      }
-
-      if (obj instanceof AssignedMacro)
-      {
-         return isCatCodeChanger(((AssignedMacro)obj).getUnderlying());
       }
 
       return null;
@@ -1166,20 +1156,11 @@ public class TeXParser extends TeXObjectList
 
    public EgChar isEndGroup(TeXObject obj)
    {
+      obj = TeXParserUtils.resolve(obj, this);
+
       if (obj instanceof EgChar)
       {
          return (EgChar)obj;
-      }
-
-      if (obj instanceof AssignedMacro)
-      {
-         return isEndGroup(((AssignedMacro)obj).getUnderlying());
-      }
-
-      if (obj instanceof TeXCsRef)
-      {
-         return isEndGroup(getControlSequence(
-          ((TeXCsRef)obj).getName()));
       }
 
       return null;
@@ -1187,20 +1168,11 @@ public class TeXParser extends TeXObjectList
 
    public BgChar isBeginGroup(TeXObject obj)
    {
+      obj = TeXParserUtils.resolve(obj, this);
+
       if (obj instanceof BgChar)
       {
          return (BgChar)obj;
-      }
-
-      if (obj instanceof AssignedMacro)
-      {
-         return isBeginGroup(((AssignedMacro)obj).getUnderlying());
-      }
-
-      if (obj instanceof TeXCsRef)
-      {
-         return isBeginGroup(getControlSequence(
-          ((TeXCsRef)obj).getName()));
       }
 
       return null;
@@ -2458,11 +2430,7 @@ public class TeXParser extends TeXObjectList
    {
       TeXObject object = popStack(popStyle);
 
-      if (object instanceof TeXCsRef)
-      {
-         object = getListener().getControlSequence(
-            ((TeXCsRef)object).getName());
-      }
+      object = TeXParserUtils.resolve(object, this);
 
       BgChar bgChar = isBeginGroup(object);
 

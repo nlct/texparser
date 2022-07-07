@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2018 Nicola L.C. Talbot
+    Copyright (C) 2018-2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -79,21 +79,23 @@ public class MakeFirstUc extends Command
 
       TeXParserListener listener = parser.getListener();
 
-      if (object instanceof TeXCsRef)
+      object = TeXParserUtils.resolve(object, parser);
+
+      if (object instanceof Protect)
       {
-         object = listener.getControlSequence(((TeXCsRef)object).getName());
+         substack.add(object);
+         object = argList.popStack(parser);
+         object = TeXParserUtils.resolve(object, parser);
       }
 
       if (object instanceof ControlSequence)
       {
          String csname = ((ControlSequence)object).getName();
 
-         if (csname.equals("protect"))
-         {// skip
-            done = false;
-         }
-         else if (sty.isBlocker(csname))
+         if (sty.isBlocker(csname))
          {// finish
+
+            substack.add(object);
          }
          else
          {
@@ -123,14 +125,14 @@ public class MakeFirstUc extends Command
                {
                   nextObj = popArg(parser, argList);
 
+                  substack.add(object);
+
                   if (nextObj.isEmpty())
                   {
-                     substack.add(object);
                      substack.add(TeXParserUtils.createGroup(listener, nextObj));
                   }
                   else
                   {
-                     substack.add(object);
                      Group grp = listener.createGroup();
                      substack.add(grp);
 

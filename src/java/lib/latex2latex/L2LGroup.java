@@ -61,10 +61,7 @@ public class L2LGroup extends Group
 
       TeXObject object = pop();
 
-      if (object instanceof TeXCsRef)
-      {
-         object = listener.getControlSequence(((TeXCsRef)object).getName());
-      }
+      object = TeXParserUtils.resolve(object, parser);
 
       if (parser.isMathMode() && object instanceof Obsolete)
       {

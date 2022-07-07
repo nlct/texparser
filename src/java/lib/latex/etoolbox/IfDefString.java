@@ -23,7 +23,7 @@ import java.io.IOException;
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.*;
 
-public class IfDefString extends Command
+public class IfDefString extends AbstractEtoolBoxCommand
 {
    public IfDefString()
    {
@@ -32,8 +32,7 @@ public class IfDefString extends Command
 
    public IfDefString(String name, boolean isCsname)
    {
-      super(name);
-      this.isCsname = isCsname;
+      super(name, isCsname);
    }
 
    public Object clone()
@@ -44,121 +43,36 @@ public class IfDefString extends Command
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
+      ControlSequence cs = popCsArg(parser, stack);
       TeXObject arg;
 
-      if (stack == parser)
+      if (cs instanceof GenericCommand)
       {
-         arg = parser.popNextArg();
+         arg = ((GenericCommand)cs).getDefinition();
       }
       else
       {
-         arg = stack.popArg(parser);
+         arg = TeXParserUtils.expandOnce(cs, parser, stack);
       }
 
-      if (isCsname)
+      TeXObject strArg = popArg(parser, stack);
+
+      TeXObject truePart = popArg(parser, stack);
+      TeXObject falsePart = popArg(parser, stack);
+
+      TeXObjectList list = parser.getListener().createStack();
+
+      if (!parser.isUndefined(arg)
+           && arg.toString(parser).equals(strArg.toString(parser)))
       {
-         if (arg instanceof Expandable)
-         {
-            TeXObjectList expanded;
-
-            if (stack == parser)
-            {
-               expanded = ((Expandable)arg).expandfully(parser);
-            }
-            else
-            {
-               expanded = ((Expandable)arg).expandfully(parser, stack);
-            }
-
-            if (expanded != null)
-            {
-               arg = expanded;
-            }
-         }
-
-         arg = parser.getListener().getControlSequence(arg.toString(parser));
-      }
-      else if (arg instanceof TeXCsRef)
-      {
-         arg = parser.getListener().getControlSequence(((TeXCsRef)arg).getName());
-      }
-
-      if (arg instanceof GenericCommand)
-      {
-         arg = ((GenericCommand)arg).getDefinition();
-      }
-      else if (arg instanceof Expandable)
-      {
-         TeXObjectList expanded;
-
-         if (parser == stack)
-         {
-            expanded = ((Expandable)arg).expandonce(parser);
-         }
-         else
-         {
-            expanded = ((Expandable)arg).expandonce(parser, stack);
-         }
-
-         if (expanded != null)
-         {
-            arg = expanded;
-         }
-      }
-
-      TeXObject strArg;
-
-      if (parser == stack)
-      {
-         strArg = parser.popNextArg();
+         list.add(truePart, true);
       }
       else
       {
-         strArg = stack.popArg(parser);
+         list.add(falsePart, true);
       }
 
-      TeXObject truePart;
-      TeXObject falsePart;
-
-      if (stack == parser)
-      {
-         truePart = parser.popNextArg();
-         falsePart = parser.popNextArg();
-      }
-      else
-      {
-         truePart = stack.popArg(parser);
-         falsePart = stack.popArg(parser);
-      }
-
-      if (arg.toString(parser).equals(strArg.toString(parser)))
-      {
-         if (truePart instanceof TeXObjectList 
-              && !(truePart instanceof Group))
-         {
-            return (TeXObjectList)truePart;
-         }
-         else
-         {
-            TeXObjectList list = new TeXObjectList();
-            list.add(truePart);
-            return list;
-         }
-      }
-      else
-      {
-         if (falsePart instanceof TeXObjectList 
-              && !(falsePart instanceof Group))
-         {
-            return (TeXObjectList)falsePart;
-         }
-         else
-         {
-            TeXObjectList list = new TeXObjectList();
-            list.add(falsePart);
-            return list;
-         }
-      }
+      return list;
    }
 
    public TeXObjectList expandonce(TeXParser parser)
@@ -198,5 +112,4 @@ public class IfDefString extends Command
       process(parser, parser);
    }
 
-   private boolean isCsname;
 }

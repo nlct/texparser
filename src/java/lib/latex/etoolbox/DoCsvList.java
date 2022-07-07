@@ -59,10 +59,7 @@ public class DoCsvList extends ControlSequence
 
       TeXObject defn = popArg(parser, stack);
 
-      if (defn instanceof TeXCsRef)
-      {
-         defn = parser.getListener().getControlSequence(((TeXCsRef)defn).getName());
-      }
+      defn = TeXParserUtils.resolve(defn, parser);
 
       if (defn instanceof GenericCommand)
       {
@@ -100,15 +97,7 @@ public class DoCsvList extends ControlSequence
 
          grp.add((TeXObject)csvlist.getValue(i).clone());
 
-         if (parser == stack || stack == null)
-         {
-            expanded.process(parser);
-         }
-         else
-         {
-            expanded.process(parser, stack);
-         }
-
+         TeXParserUtils.process(expanded, parser, stack);
       }
    }
 

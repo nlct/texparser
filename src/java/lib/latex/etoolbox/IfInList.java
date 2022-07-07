@@ -23,7 +23,7 @@ import java.io.IOException;
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.*;
 
-public class IfInList extends Command
+public class IfInList extends AbstractEtoolBoxCommand
 {
    public IfInList()
    {
@@ -32,9 +32,8 @@ public class IfInList extends Command
 
    public IfInList(String name, boolean expandItem, boolean isCsname)
    {
-      super(name);
+      super(name, isCsname);
       this.expandItem = expandItem;
-      this.isCsname = isCsname;
    }
 
    @Override
@@ -58,30 +57,9 @@ public class IfInList extends Command
          item = popArg(parser, stack);
       }
 
-      ControlSequence cs;
+      ControlSequence cs = popCsArg(parser, stack);
 
-      if (isCsname)
-      {
-         String csname = popLabelString(parser, stack);
-
-         cs = parser.getListener().getControlSequence(csname);
-      }
-      else
-      {
-         cs = popControlSequence(parser, stack);
-
-         if (cs instanceof TeXCsRef)
-         {
-            cs = parser.getListener().getControlSequence(cs.getName());
-         }
-      }
-
-      TeXObject defn = cs;
-
-      if (cs instanceof AssignedControlSequence)
-      {
-         defn = ((AssignedControlSequence)cs).getBaseUnderlying();
-      }
+      TeXObject defn = TeXParserUtils.resolve(cs, parser);
 
       if (defn instanceof GenericCommand)
       {
@@ -92,8 +70,7 @@ public class IfInList extends Command
          defn = TeXParserUtils.expandOnce(defn, parser, stack);
       }
 
-      if (defn instanceof TeXObjectList && ((TeXObjectList)defn).isStack()
-          && ((TeXObjectList)defn).size() == 1)
+      if (parser.isStack(defn) && ((TeXObjectList)defn).size() == 1)
       {
          defn = ((TeXObjectList)defn).firstElement();
       }
@@ -137,13 +114,13 @@ public class IfInList extends Command
 
       TeXObject obj = (cond ? truePart : falsePart);
 
-      if (obj instanceof TeXObjectList && ((TeXObjectList)obj).isStack())
+      if (parser.isStack(obj))
       {
          return (TeXObjectList)obj;
       }
       else
       {
-         TeXObjectList expanded = new TeXObjectList();
+         TeXObjectList expanded = parser.getListener().createStack();
          expanded.add(obj);
 
          return expanded;
@@ -165,30 +142,9 @@ public class IfInList extends Command
          item = popArg(parser, stack);
       }
 
-      ControlSequence cs;
+      ControlSequence cs = popCsArg(parser, stack);
 
-      if (isCsname)
-      {
-         String csname = popLabelString(parser, stack);
-
-         cs = parser.getListener().getControlSequence(csname);
-      }
-      else
-      {
-         cs = popControlSequence(parser, stack);
-
-         if (cs instanceof TeXCsRef)
-         {
-            cs = parser.getListener().getControlSequence(cs.getName());
-         }
-      }
-
-      TeXObject defn = cs;
-
-      if (cs instanceof AssignedControlSequence)
-      {
-         defn = ((AssignedControlSequence)cs).getBaseUnderlying();
-      }
+      TeXObject defn = TeXParserUtils.resolve(cs, parser);
 
       if (defn instanceof GenericCommand)
       {
@@ -199,8 +155,7 @@ public class IfInList extends Command
          defn = TeXParserUtils.expandOnce(defn, parser, stack);
       }
 
-      if (defn instanceof TeXObjectList && ((TeXObjectList)defn).isStack()
-          && ((TeXObjectList)defn).size() == 1)
+      if (parser.isStack(defn) && ((TeXObjectList)defn).size() == 1)
       {
          defn = ((TeXObjectList)defn).firstElement();
       }
@@ -235,14 +190,7 @@ public class IfInList extends Command
 
       TeXObject obj = (cond ? truePart : falsePart);
 
-      if (parser == stack || stack == null)
-      {
-         obj.process(parser);
-      }
-      else
-      {
-         obj.process(parser, stack);
-      }
+      TeXParserUtils.process(obj, parser, stack);
    }
 
    @Override
@@ -252,5 +200,5 @@ public class IfInList extends Command
       process(parser, parser);
    }
 
-   private boolean expandItem, isCsname;
+   private boolean expandItem;
 }

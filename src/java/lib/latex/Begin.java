@@ -75,14 +75,7 @@ public class Begin extends ControlSequence
    {
       ControlSequence cs = parser.getListener().getControlSequence(name);
 
-      if (stack == parser)
-      {
-         cs.process(parser);
-      }
-      else
-      {
-         cs.process(parser, stack);
-      }
+      TeXParserUtils.process(cs, parser, stack);
    }
 
    @Override
@@ -120,9 +113,9 @@ public class Begin extends ControlSequence
          {
             TeXObject object = stack.popStack(parser, TeXObjectList.POP_RETAIN_IGNOREABLES);
 
-            if (object instanceof End
-             || (object instanceof TeXCsRef
-                 && ((TeXCsRef)object).getName().equals("end")))
+            object = TeXParserUtils.resolve(object, parser);
+
+            if (object instanceof End)
             {
                TeXObject arg = stack.popStack(parser);
 

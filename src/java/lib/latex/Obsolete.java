@@ -93,10 +93,7 @@ public class Obsolete extends ControlSequence
 
             while (obj != null)
             {
-               if (obj instanceof TeXCsRef)
-               {
-                  obj = listener.getControlSequence(((TeXCsRef)obj).getName());
-               }
+               obj = TeXParserUtils.resolve(obj, parser);
 
                if ((obj instanceof Declaration
                     && ((Declaration)obj).isModeSwitcher())

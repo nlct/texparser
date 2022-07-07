@@ -45,11 +45,7 @@ public class Prefix extends Primitive
    {
       TeXObject object = stack.popToken(TeXObjectList.POP_IGNORE_LEADING_SPACE);
 
-      if (object instanceof TeXCsRef)
-      {
-         object = parser.getListener().getControlSequence(
-           ((TeXCsRef)object).getName());
-      }
+      object = TeXParserUtils.resolve(object, parser);
 
       int currentPrefix = getPrefix();
 
@@ -58,11 +54,7 @@ public class Prefix extends Primitive
          currentPrefix = currentPrefix | (int)((Prefix)object).getPrefix();
          object = stack.popToken(TeXObjectList.POP_IGNORE_LEADING_SPACE);
 
-         if (object instanceof TeXCsRef)
-         {
-            object = parser.getListener().getControlSequence(
-              ((TeXCsRef)object).getName());
-         }
+         object = TeXParserUtils.resolve(object, parser);
       }
 
       if (object instanceof Macro)

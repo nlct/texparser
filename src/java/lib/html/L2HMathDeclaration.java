@@ -71,10 +71,7 @@ public class L2HMathDeclaration extends MathDeclaration
          {
             TeXObject obj = stack.popStack(parser);
 
-            if (obj instanceof TeXCsRef)
-            {
-               obj = listener.getControlSequence(((TeXCsRef)obj).getName());
-            }
+            obj = TeXParserUtils.resolve(obj, parser);
 
             if (obj instanceof Label)
             {
@@ -101,10 +98,7 @@ public class L2HMathDeclaration extends MathDeclaration
                obj = stack.popStack(parser);
             }
 
-            if (obj instanceof TeXCsRef)
-            {
-               obj = listener.getControlSequence(((TeXCsRef)obj).getName());
-            }
+            obj = TeXParserUtils.resolve(obj, parser);
 
             if (obj instanceof End)
             {
@@ -204,10 +198,7 @@ public class L2HMathDeclaration extends MathDeclaration
          {
             TeXObject obj = parser.popStack();
 
-            if (obj instanceof TeXCsRef)
-            {
-               obj = listener.getControlSequence(((TeXCsRef)obj).getName());
-            }
+            obj = TeXParserUtils.resolve(obj, parser);
 
             if (obj instanceof Label)
             {
@@ -234,10 +225,7 @@ public class L2HMathDeclaration extends MathDeclaration
                obj = parser.popStack();
             }
 
-            if (obj instanceof TeXCsRef)
-            {
-               obj = listener.getControlSequence(((TeXCsRef)obj).getName());
-            }
+            obj = TeXParserUtils.resolve(obj, parser);
 
             if (obj instanceof End)
             {

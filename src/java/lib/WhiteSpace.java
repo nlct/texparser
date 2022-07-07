@@ -30,20 +30,7 @@ public abstract class WhiteSpace extends AbstractTeXObject
    {
       TeXObject obj = stack.peekStack();
 
-      if (obj instanceof TeXCsRef)
-      {
-         ControlSequence cs = parser.getControlSequence(((TeXCsRef)obj).getName());
-
-         if (cs != null)
-         {
-            obj = cs;
-         }
-      }
-
-      if (obj instanceof AssignedMacro)
-      {
-         obj = ((AssignedMacro)obj).getBaseUnderlying();
-      }
+      obj = TeXParserUtils.resolve(obj, parser);
 
       if (!(obj instanceof UnSkip))
       {

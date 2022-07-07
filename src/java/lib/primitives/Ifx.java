@@ -57,19 +57,11 @@ public class Ifx extends If
          return true;
       }
 
-      if (firstArg instanceof TeXCsRef)
-      {
-         firstArg = parser.getListener().getControlSequence(
-            ((TeXCsRef)firstArg).getName());
-      }
+      firstArg = TeXParserUtils.resolve(firstArg, parser);
 
-      if (secondArg instanceof TeXCsRef)
-      {
-         secondArg = parser.getListener().getControlSequence(
-            ((TeXCsRef)secondArg).getName());
-      }
+      secondArg = TeXParserUtils.resolve(secondArg, parser);
 
-      if (firstArg instanceof Expandable)
+      if (firstArg instanceof Expandable && firstArg.canExpand())
       {
          TeXObjectList expanded;
 

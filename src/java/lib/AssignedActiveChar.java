@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -25,6 +25,11 @@ public class AssignedActiveChar extends ActiveChar implements AssignedMacro
 {
    public AssignedActiveChar(int charCode, TeXObject underlying)
    {
+      this(charCode, underlying, false);
+   }
+
+   public AssignedActiveChar(int charCode, TeXObject underlying, boolean isRobust)
+   {
       this.charCode = charCode;
       this.underlying = underlying;
 
@@ -38,22 +43,26 @@ public class AssignedActiveChar extends ActiveChar implements AssignedMacro
       }
    }
 
+   @Override
    public int getCharCode()
    {
       return charCode;
    }
 
+   @Override
    public Object clone()
    {
       return new AssignedActiveChar(getCharCode(), 
-        (TeXObject)underlying.clone());
+        (TeXObject)underlying.clone(), isRobust);
    }
 
+   @Override
    public boolean isPar()
    {
       return underlying.isPar();
    }
 
+   @Override
    public boolean isEmpty()
    {
       return underlying.isEmpty();
@@ -79,6 +88,7 @@ public class AssignedActiveChar extends ActiveChar implements AssignedMacro
       }
    }
 
+   @Override
    public boolean equals(Object obj)
    {
       if (obj == null || !(obj instanceof TeXObject))
@@ -94,12 +104,14 @@ public class AssignedActiveChar extends ActiveChar implements AssignedMacro
       return underlying.equals(obj);
    }
 
+   @Override
    public void process(TeXParser parser)
       throws IOException
    {
       underlying.process(parser);
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
@@ -109,12 +121,15 @@ public class AssignedActiveChar extends ActiveChar implements AssignedMacro
    @Override
    public boolean canExpand()
    {
-      return underlying.canExpand();
+      return !isRobust && underlying.canExpand();
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser)
       throws IOException
    {
+      if (isRobust) return null;
+
       if (!(underlying instanceof Expandable))
       {
          return null;
@@ -123,9 +138,12 @@ public class AssignedActiveChar extends ActiveChar implements AssignedMacro
       return ((Expandable)underlying).expandonce(parser);
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
+      if (isRobust) return null;
+
       if (!(underlying instanceof Expandable))
       {
          return null;
@@ -134,9 +152,12 @@ public class AssignedActiveChar extends ActiveChar implements AssignedMacro
       return ((Expandable)underlying).expandonce(parser, stack);
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser)
       throws IOException
    {
+      if (isRobust) return null;
+
       if (!(underlying instanceof Expandable))
       {
          return null;
@@ -145,9 +166,12 @@ public class AssignedActiveChar extends ActiveChar implements AssignedMacro
       return ((Expandable)underlying).expandfully(parser);
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
+      if (isRobust) return null;
+
       if (!(underlying instanceof Expandable))
       {
          return null;
@@ -156,16 +180,22 @@ public class AssignedActiveChar extends ActiveChar implements AssignedMacro
       return ((Expandable)underlying).expandfully(parser, stack);
    }
 
+   @Override
    public String toString(TeXParser parser)
-   {
-      return toString();
-   }
-
-   public String toString()
    {
       return new String(Character.toChars(charCode));
    }
 
+   @Override
+   public String toString()
+   {
+      return String.format("%s[cp=%d,char=%s,robust=%s,underlying=%s]", 
+        getClass().getSimpleName(),
+        charCode, new String(Character.toChars(charCode)), isRobust,
+        underlying);
+   }
+
+   @Override
    public TeXObjectList string(TeXParser parser)
      throws IOException
    {
@@ -174,11 +204,13 @@ public class AssignedActiveChar extends ActiveChar implements AssignedMacro
       return list;
    }
 
+   @Override
    public TeXObject getUnderlying()
    {
       return underlying;
    }
 
+   @Override
    public TeXObject getBaseUnderlying()
    {
       if (underlying instanceof AssignedMacro)
@@ -189,6 +221,20 @@ public class AssignedActiveChar extends ActiveChar implements AssignedMacro
       return underlying;
    }
 
+   @Override
+   public TeXObject resolve(TeXParser parser)
+   {
+      TeXObject obj = getBaseUnderlying();
+
+      if (obj instanceof Resolvable)
+      {
+         return ((Resolvable)obj).resolve(parser);
+      }
+
+      return obj;
+   }
+
    private TeXObject underlying;
    private int charCode;
+   protected boolean isRobust = false;
 }

@@ -23,7 +23,7 @@ import java.io.IOException;
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.*;
 
-public class IfDefEmpty extends Command
+public class IfDefEmpty extends AbstractEtoolBoxCommand
 {
    public IfDefEmpty()
    {
@@ -32,8 +32,7 @@ public class IfDefEmpty extends Command
 
    public IfDefEmpty(String name, boolean isCsname)
    {
-      super(name);
-      this.isCsname = isCsname;
+      super(name, isCsname);
    }
 
    public Object clone()
@@ -44,93 +43,25 @@ public class IfDefEmpty extends Command
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      TeXObject arg = (stack == parser ? parser.popNextArg():stack.popArg(parser));
+      ControlSequence cs = popCsArg(parser, stack);
 
-      if (isCsname)
+      TeXObject truePart = popArg(parser, stack);
+      TeXObject falsePart = popArg(parser, stack);
+
+      TeXObjectList list = parser.getListener().createStack();
+
+      TeXObject arg = TeXParserUtils.resolve(cs, parser);
+
+      if (arg.isEmpty())
       {
-         if (arg instanceof Expandable)
-         {
-            TeXObjectList expanded;
-
-            if (stack == parser)
-            {
-               expanded = ((Expandable)arg).expandfully(parser);
-            }
-            else
-            {
-               expanded = ((Expandable)arg).expandfully(parser, stack);
-            }
-
-            if (expanded != null)
-            {
-               arg = expanded;
-            }
-         }
-
-         arg = parser.getListener().getControlSequence(arg.toString(parser));
-      }
-
-      TeXObject truePart;
-      TeXObject falsePart;
-
-      if (stack == parser)
-      {
-         truePart = parser.popNextArg();
-         falsePart = parser.popNextArg();
+         list.add(truePart, true);
       }
       else
       {
-         truePart = stack.popArg(parser);
-         falsePart = stack.popArg(parser);
+         list.add(falsePart, true);
       }
 
-      if (arg instanceof Expandable)
-      {
-         TeXObjectList expanded;
-
-         if (stack == parser)
-         {
-            expanded = ((Expandable)arg).expandfully(parser);
-         }
-         else
-         {
-            expanded = ((Expandable)arg).expandfully(parser, stack);
-         }
-
-         if (expanded != null)
-         {
-            arg = expanded;
-         }
-      }
-
-      if (arg.toString(parser).isEmpty())
-      {
-         if (truePart instanceof TeXObjectList 
-              && !(truePart instanceof Group))
-         {
-            return (TeXObjectList)truePart;
-         }
-         else
-         {
-            TeXObjectList list = new TeXObjectList();
-            list.add(truePart);
-            return list;
-         }
-      }
-      else
-      {
-         if (falsePart instanceof TeXObjectList 
-              && !(falsePart instanceof Group))
-         {
-            return (TeXObjectList)falsePart;
-         }
-         else
-         {
-            TeXObjectList list = new TeXObjectList();
-            list.add(falsePart);
-            return list;
-         }
-      }
+      return list;
    }
 
    public TeXObjectList expandonce(TeXParser parser)
@@ -154,68 +85,16 @@ public class IfDefEmpty extends Command
    public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      TeXObject arg = (stack == parser ? parser.popNextArg():stack.popArg(parser));
+      ControlSequence cs = popCsArg(parser, stack);
 
-      if (isCsname)
-      {
-         if (arg instanceof Expandable)
-         {
-            TeXObjectList expanded;
+      TeXObject truePart = popArg(parser, stack);
+      TeXObject falsePart = popArg(parser, stack);
 
-            if (stack == parser)
-            {
-               expanded = ((Expandable)arg).expandfully(parser);
-            }
-            else
-            {
-               expanded = ((Expandable)arg).expandfully(parser, stack);
-            }
-
-            if (expanded != null)
-            {
-               arg = expanded;
-            }
-         }
-
-         arg = parser.getListener().getControlSequence(arg.toString(parser));
-      }
-
-      TeXObject truePart;
-      TeXObject falsePart;
-
-      if (stack == parser)
-      {
-         truePart = parser.popNextArg();
-         falsePart = parser.popNextArg();
-      }
-      else
-      {
-         truePart = stack.popArg(parser);
-         falsePart = stack.popArg(parser);
-      }
-
-      if (arg instanceof Expandable)
-      {
-         TeXObjectList expanded;
-
-         if (stack == parser)
-         {
-            expanded = ((Expandable)arg).expandfully(parser);
-         }
-         else
-         {
-            expanded = ((Expandable)arg).expandfully(parser, stack);
-         }
-
-         if (expanded != null)
-         {
-            arg = expanded;
-         }
-      }
+      TeXObject arg = TeXParserUtils.resolve(cs, parser);
 
       TeXObject doCode;
 
-      if (arg.toString(parser).isEmpty())
+      if (arg.isEmpty())
       {
          doCode = truePart;
       }
@@ -224,14 +103,7 @@ public class IfDefEmpty extends Command
          doCode = falsePart;
       }
 
-      if (stack == parser)
-      {
-         doCode.process(parser);
-      }
-      else
-      {
-         doCode.process(parser, stack);
-      }
+      TeXParserUtils.process(doCode, parser, stack);
    }
 
    public void process(TeXParser parser)
@@ -240,5 +112,4 @@ public class IfDefEmpty extends Command
       process(parser, parser);
    }
 
-   private boolean isCsname;
 }

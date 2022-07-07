@@ -474,6 +474,8 @@ public class GlossariesSty extends LaTeXSty
        "m", TeXParserUtils.createStack(listener,
          listener.getOther('"'), listener.getParam(1), listener.getOther('"'))));
 
+      registerControlSequence(new GlsSeeItemFormat(this));
+
       if (extra)
       {
          addExtraDefinitions();
@@ -507,9 +509,6 @@ public class GlossariesSty extends LaTeXSty
          registerControlSequence(new AtGlsAcrAtStyleDefsAtLongShort(this));
 
          registerControlSequence(new GlsGenAcFmt(this));
-
-         registerControlSequence(new GenericCommand(true,
-          "glsseeitemformat", null, new TeXCsRef("glsentrytext")));
       }
    }
 
@@ -519,8 +518,6 @@ public class GlossariesSty extends LaTeXSty
       listener.newtoks(true, "glslongpltok");
 
       registerControlSequence(new TextualContentCommand("seealsoname", "see also"));
-      registerControlSequence(new GenericCommand(true,
-       "glsseeitemformat", null, new TeXCsRef("glsentryname")));
 
       registerControlSequence(new GlsXtrGetGroupTitle());
       registerControlSequence(new GlsXtrSetGroupTitle());
@@ -1023,6 +1020,11 @@ public class GlossariesSty extends LaTeXSty
       registerControlSequence(new TextualContentCommand("glshex", "\\u"));
       registerControlSequence(new TextualContentCommand("glscapturedgroup", "\\$"));
       registerControlSequence(new TextualContentCommand("glshashchar", "#"));
+
+      registerControlSequence(new GlsXtrUseSee(this));
+      registerControlSequence(new GlsXtrUseSeeFormat());
+      registerControlSequence(new GlsXtrUseSeeAlso(this));
+      registerControlSequence(new GlsXtrUseSeeAlsoFormat());
    }
 
    protected void addGlsXtrTitleCommands(String field)

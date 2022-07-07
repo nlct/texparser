@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -16,60 +16,46 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
-package com.dickimawbooks.texparserlib.latex.etoolbox;
+package com.dickimawbooks.texparserlib.latex.glossaries;
 
 import java.io.IOException;
 
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.*;
 
-public class Undef extends AbstractEtoolBoxCommand
+public class GlsXtrUseSeeAlsoFormat extends Command
 {
-   public Undef()
+   public GlsXtrUseSeeAlsoFormat()
    {
-      this("undef", false, false);
+      this("glsxtruseseealsoformat");
    }
 
-   public Undef(String name, boolean isGlobal, boolean isCsname)
+   public GlsXtrUseSeeAlsoFormat(String name)
    {
-      super(name, isCsname);
-      this.isGlobal = isGlobal;
+      super(name);
    }
 
    public Object clone()
    {
-      return new Undef(getName(), isGlobal, isCsname);
-   }
-
-   @Override
-   public boolean canExpand()
-   {
-      return false;
+      return new GlsXtrUseSeeAlsoFormat(getName());
    }
 
    @Override
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      return null;
+      TeXObjectList expanded = parser.getListener().createStack();
+
+      TeXObject arg = popArg(parser, stack);
+
+      expanded.add(parser.getListener().getControlSequence("glsseeformat"));
+      expanded.add(parser.getListener().getOther('['));
+      expanded.add(parser.getListener().getControlSequence("seealsoname"));
+      expanded.add(parser.getListener().getOther(']'));
+      expanded.add(TeXParserUtils.createGroup(parser, arg));
+      expanded.add(parser.getListener().createGroup());
+
+      return expanded;
    }
 
-   @Override
-   public void process(TeXParser parser, TeXObjectList stack)
-     throws IOException
-   {
-      ControlSequence cs = popCsArg(parser, stack);
-      String csname = cs.getName();
-
-      parser.removeControlSequence(!isGlobal, csname);
-   }
-
-   @Override
-   public void process(TeXParser parser)
-     throws IOException
-   {
-      process(parser, parser);
-   }
-
-   private boolean isGlobal;
 }

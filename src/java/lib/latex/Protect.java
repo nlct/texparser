@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -24,7 +24,7 @@ import java.util.Vector;
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.primitives.*;
 
-public class Protect extends Command
+public class Protect extends NoExpand
 {
    public Protect()
    {
@@ -36,16 +36,19 @@ public class Protect extends Command
       super(name);
    }
 
+   @Override
    public Object clone()
    {
       return new Protect(getName());
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser) throws IOException
    {
       return expandonce(parser, parser);
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
    throws IOException
    {
@@ -53,30 +56,51 @@ public class Protect extends Command
 
       TeXObjectList expanded = parser.getListener().createStack();
 
-      expanded.add(this);
-      expanded.add(obj);
+      expanded.add(new AssignedControlSequence(getName()+" ", this, true));
+
+      if (obj.canExpand())
+      {
+         String csname;
+
+         if (obj instanceof ControlSequence)
+         {
+            csname = ((ControlSequence)obj).getName()+" ";
+         }
+         else
+         {
+            csname = obj.format()+" ";
+         }
+
+         expanded.add(new AssignedControlSequence(csname, this, true));
+      }
+      else
+      {
+         expanded.add(obj);
+      }
 
       return expanded;
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser) throws IOException
    {
       return expandonce(parser);
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser, TeXObjectList stack)
    throws IOException
    {
       return expandonce(parser, stack);
    }
 
-
+   @Override
    public void process(TeXParser parser) throws IOException
    {
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList list) throws IOException
    {
    }
-
 }

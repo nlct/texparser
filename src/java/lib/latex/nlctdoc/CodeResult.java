@@ -62,16 +62,13 @@ public class CodeResult extends GatherEnvContents
 
       while (object != null)
       {
+         object = TeXParserUtils.resolve(object, parser);
+
          String csname = null;
 
          if (object instanceof ControlSequence)
          {
-            csname = ((TeXCsRef)object).getName();
-
-            if (object instanceof TeXCsRef && !csname.equals("tcblower"))
-            {
-               object = parser.getListener().getControlSequence(csname);
-            }
+            csname = ((ControlSequence)object).getName();
          }
 
          if (object instanceof End)

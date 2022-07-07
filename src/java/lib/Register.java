@@ -78,22 +78,9 @@ public abstract class Register extends ControlSequence implements InternalQuanti
          object = stack.popToken(TeXObjectList.POP_IGNORE_LEADING_SPACE);
       }
 
-      if (object instanceof TeXCsRef)
-      {
-         ControlSequence cs = parser.getControlSequence(
-          ((TeXCsRef)object).getName());
+      object = TeXParserUtils.resolve(object, parser);
 
-         if (cs instanceof Register)
-         {
-            object = cs;
-         }
-         else
-         {
-            stack.push(object);
-            object = popValue(parser, stack);
-         }
-      }
-      else if (!(object instanceof Register))
+      if (!(object instanceof Register))
       {
          stack.push(object);
          object = popValue(parser, stack);

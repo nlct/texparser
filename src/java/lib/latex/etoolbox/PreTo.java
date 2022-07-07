@@ -23,7 +23,7 @@ import java.io.IOException;
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.*;
 
-public class PreTo extends ControlSequence
+public class PreTo extends AbstractEtoolBoxCommand
 {
    public PreTo()
    {
@@ -39,51 +39,38 @@ public class PreTo extends ControlSequence
    public PreTo(String name, boolean isGlobal, boolean isPre, 
       boolean expandCode, boolean isCsname, boolean isInternalList)
    {
-      super(name);
+      super(name, isCsname);
       this.isGlobal = isGlobal;
       this.isPre = isPre;
       this.expandCode = expandCode;
-      this.isCsname = isCsname;
       this.isInternalList = isInternalList;
    }
 
+   @Override
    public Object clone()
    {
       return new PreTo(getName(), isGlobal, isPre, expandCode, isCsname, isInternalList);
    }
 
+   @Override
+   public boolean canExpand()
+   {
+      return false;
+   }
+
+   @Override
+   public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
+     throws IOException
+   {
+      return null;
+   }
+
+   @Override
    public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      TeXObject arg = popArg(parser, stack);
-
-      String csname;
-      ControlSequence cs;
-
-      if (isCsname)
-      {
-         csname = parser.expandToString(arg, stack);
-
-         cs = parser.getListener().getControlSequence(csname);
-      }
-      else
-      {
-         if (arg instanceof TeXCsRef)
-         {
-            arg = parser.getListener().getControlSequence(((TeXCsRef)arg).getName());
-         }
-
-         if (!(arg instanceof ControlSequence))
-         {
-            throw new LaTeXSyntaxException(parser,
-              LaTeXSyntaxException.ERROR_UNACCESSIBLE,
-              arg.toString(parser));
-         }
-
-         cs = (ControlSequence)arg;
-
-         csname = cs.getName();
-      }
+      ControlSequence cs = popCsArg(parser, stack);
+      String csname = cs.getName();
 
       TeXObject code = popArg(parser, stack);
 
@@ -107,7 +94,7 @@ public class PreTo extends ControlSequence
       }
       else
       {
-         defn = new TeXObjectList();
+         defn = parser.getListener().createStack();
       }
 
       if (isPre)
@@ -115,12 +102,7 @@ public class PreTo extends ControlSequence
          defn.add(code, true);
       }
 
-      TeXObject hook = cs;
-
-      if (cs instanceof AssignedControlSequence)
-      {
-         hook = ((AssignedControlSequence)cs).getBaseUnderlying();
-      }
+      TeXObject hook = TeXParserUtils.resolve(cs, parser);
 
       TeXObject origDef = hook;
 
@@ -172,11 +154,12 @@ public class PreTo extends ControlSequence
       parser.putControlSequence(!isGlobal, cs);
    }
 
+   @Override
    public void process(TeXParser parser)
      throws IOException
    {
       process(parser, parser);
    }
 
-   private boolean isGlobal, isPre, expandCode, isCsname, isInternalList;
+   private boolean isGlobal, isPre, expandCode, isInternalList;
 }

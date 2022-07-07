@@ -70,10 +70,7 @@ public class L2HSection extends Section
          }
       }
 
-      if (object instanceof TeXCsRef)
-      {
-         object = listener.getControlSequence(((TeXCsRef)object).getName());
-      }
+      object = TeXParserUtils.resolve(object, parser);
 
       if (object instanceof Label)
       {

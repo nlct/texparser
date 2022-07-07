@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -16,29 +16,30 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
-package com.dickimawbooks.texparserlib.latex.etoolbox;
+package com.dickimawbooks.texparserlib.html;
 
 import java.io.IOException;
+import java.util.Vector;
 
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.*;
 
-public class Undef extends AbstractEtoolBoxCommand
+public class L2HQuote extends Declaration
 {
-   public Undef()
+   public L2HQuote()
    {
-      this("undef", false, false);
+      this("quote");
    }
 
-   public Undef(String name, boolean isGlobal, boolean isCsname)
+   public L2HQuote(String name)
    {
-      super(name, isCsname);
-      this.isGlobal = isGlobal;
+      super(name);
    }
 
+   @Override
    public Object clone()
    {
-      return new Undef(getName(), isGlobal, isCsname);
+      return new L2HQuote(getName());
    }
 
    @Override
@@ -48,28 +49,36 @@ public class Undef extends AbstractEtoolBoxCommand
    }
 
    @Override
+   public boolean isModeSwitcher()
+   {
+      return false;
+   }
+
+   @Override
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
-     throws IOException
+    throws IOException
    {
       return null;
    }
 
    @Override
    public void process(TeXParser parser, TeXObjectList stack)
-     throws IOException
+    throws IOException
    {
-      ControlSequence cs = popCsArg(parser, stack);
-      String csname = cs.getName();
-
-      parser.removeControlSequence(!isGlobal, csname);
+      parser.getListener().getWriteable().write("<blockquote>");
    }
 
    @Override
    public void process(TeXParser parser)
-     throws IOException
+    throws IOException
    {
       process(parser, parser);
    }
 
-   private boolean isGlobal;
+   @Override
+   public void end(TeXParser parser, TeXObjectList stack)
+    throws IOException
+   {
+      parser.getListener().getWriteable().write("</blockquote>");
+   }
 }

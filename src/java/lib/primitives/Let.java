@@ -74,11 +74,7 @@ public class Let extends Primitive
    protected void doAssignment(TeXParser parser,
      TeXObject firstArg, TeXObject secondArg)
    {
-      if (secondArg instanceof TeXCsRef)
-      {
-         secondArg = parser.getListener().getControlSequence(
-           ((TeXCsRef)secondArg).getName());
-      }
+      secondArg = TeXParserUtils.resolve(secondArg, parser);
 
       TeXObject underlying = (TeXObject)secondArg.clone();
 

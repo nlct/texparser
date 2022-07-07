@@ -71,11 +71,7 @@ public abstract class SkipEnvContents extends Declaration
 
       while (object != null)
       {
-         if (object instanceof TeXCsRef)
-         {
-            object = parser.getListener().getControlSequence(
-              ((TeXCsRef)object).getName());
-         }
+         object = TeXParserUtils.resolve(object, parser);
 
          if (object instanceof End)
          {

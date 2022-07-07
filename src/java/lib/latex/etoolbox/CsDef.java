@@ -50,35 +50,7 @@ public class CsDef extends Def
    public void process(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
-      TeXObject csname;
-
-      if (stack == parser)
-      {
-         csname = parser.popNextArg();
-      }
-      else
-      {
-         csname = stack.popArg(parser);
-      }
-
-      if (csname instanceof Expandable)
-      {
-         TeXObjectList expanded;
-
-         if (stack == parser)
-         {
-            expanded = ((Expandable)csname).expandfully(parser);
-         }
-         else
-         {
-            expanded = ((Expandable)csname).expandfully(parser, stack);
-         }
-
-         if (expanded != null)
-         {
-            csname = expanded;
-         }
-      }
+      String csname = popLabelString(parser, stack);
 
       TeXObjectList syntax = new TeXObjectList();
       TeXObject nextObject = stack.popStack(parser);
@@ -111,8 +83,7 @@ public class CsDef extends Def
       }
 
       parser.putControlSequence(isLocal(),
-        new GenericCommand(isShort(), csname.toString(parser),
-             syntax, definition));
+        new GenericCommand(isShort(), csname, syntax, definition));
    }
 
    public void process(TeXParser parser)

@@ -23,7 +23,7 @@ import java.io.IOException;
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.*;
 
-public class ListRemove extends ControlSequence
+public class ListRemove extends AbstractEtoolBoxCommand
 {
    public ListRemove()
    {
@@ -32,9 +32,8 @@ public class ListRemove extends ControlSequence
 
    public ListRemove(String name, boolean isGlobal, boolean isCsname)
    {
-      super(name);
+      super(name, isCsname);
       this.isGlobal = isGlobal;
-      this.isCsname = isCsname;
    }
 
    @Override
@@ -44,36 +43,26 @@ public class ListRemove extends ControlSequence
    }
 
    @Override
+   public boolean canExpand()
+   {
+      return false;
+   }
+
+   @Override
+   public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
+     throws IOException
+   {
+      return null;
+   }
+
+   @Override
    public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      ControlSequence cs;
-      String csname;
+      ControlSequence cs = popCsArg(parser, stack);
+      String csname = cs.getName();
 
-      if (isCsname)
-      {
-         csname = popLabelString(parser, stack);
-
-         cs = parser.getListener().getControlSequence(csname);
-      }
-      else
-      {
-         cs = popControlSequence(parser, stack);
-
-         csname = cs.getName();
-
-         if (cs instanceof TeXCsRef)
-         {
-            cs = parser.getListener().getControlSequence(csname);
-         }
-      }
-
-      TeXObject defn = cs;
-
-      if (cs instanceof AssignedControlSequence)
-      {
-         defn = ((AssignedControlSequence)cs).getBaseUnderlying();
-      }
+      TeXObject defn = TeXParserUtils.resolve(cs, parser);
 
       if (defn instanceof GenericCommand)
       {
@@ -84,8 +73,7 @@ public class ListRemove extends ControlSequence
          defn = TeXParserUtils.expandOnce(defn, parser, stack);
       }
 
-      if (defn instanceof TeXObjectList && ((TeXObjectList)defn).isStack()
-          && ((TeXObjectList)defn).size() == 1)
+      if (parser.isStack(defn) && ((TeXObjectList)defn).size() == 1)
       {
          defn = ((TeXObjectList)defn).firstElement();
       }
@@ -129,5 +117,5 @@ public class ListRemove extends ControlSequence
       process(parser, parser);
    }
 
-   private boolean isGlobal, isCsname;
+   private boolean isGlobal;
 }

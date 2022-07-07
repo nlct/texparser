@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -20,7 +20,9 @@ package com.dickimawbooks.texparserlib;
 
 import java.io.IOException;
 
-public class TeXCsRef extends ControlSequence implements Expandable
+import com.dickimawbooks.texparserlib.primitives.Undefined;
+
+public class TeXCsRef extends ControlSequence implements Expandable,Resolvable
 {
    public TeXCsRef(String name)
    {
@@ -33,12 +35,38 @@ public class TeXCsRef extends ControlSequence implements Expandable
       return true;
    }
 
-   public TeXObjectList expandonce(TeXParser parser)
-      throws IOException
+   public ControlSequence getControlSequenceIfDefined(TeXParser parser)
    {
       ControlSequence cs = parser.getListener().getControlSequence(getName());
 
-      if (cs == null) return null;
+      if (cs == null || (cs instanceof Undefined))
+      {
+         return this;
+      }
+
+      return cs;
+   }
+
+   @Override
+   public TeXObject resolve(TeXParser parser)
+   {
+      ControlSequence cs = getControlSequenceIfDefined(parser);
+
+      if (cs instanceof AssignedMacro)
+      {
+         return ((AssignedMacro)cs).resolve(parser);
+      }
+
+      return cs;
+   }
+
+   @Override
+   public TeXObjectList expandonce(TeXParser parser)
+      throws IOException
+   {
+      ControlSequence cs = getControlSequenceIfDefined(parser);
+
+      if (cs == this) return null;
 
       if (!(cs instanceof Expandable))
       {
@@ -50,12 +78,13 @@ public class TeXCsRef extends ControlSequence implements Expandable
       return ((Expandable)cs).expandonce(parser);
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
-      ControlSequence cs = parser.getListener().getControlSequence(getName());
+      ControlSequence cs = getControlSequenceIfDefined(parser);
 
-      if (cs == null) return null;
+      if (cs == this) return null;
 
       if (!(cs instanceof Expandable))
       {
@@ -67,12 +96,13 @@ public class TeXCsRef extends ControlSequence implements Expandable
       return ((Expandable)cs).expandonce(parser, stack);
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser)
       throws IOException
    {
-      ControlSequence cs = parser.getListener().getControlSequence(getName());
+      ControlSequence cs = getControlSequenceIfDefined(parser);
 
-      if (cs == null) return null;
+      if (cs == this) return null;
 
       if (!(cs instanceof Expandable))
       {
@@ -84,12 +114,13 @@ public class TeXCsRef extends ControlSequence implements Expandable
       return ((Expandable)cs).expandfully(parser);
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
-      ControlSequence cs = parser.getListener().getControlSequence(getName());
+      ControlSequence cs = getControlSequenceIfDefined(parser);
 
-      if (cs == null) return null;
+      if (cs == this) return null;
 
       if (!(cs instanceof Expandable))
       {
@@ -101,6 +132,7 @@ public class TeXCsRef extends ControlSequence implements Expandable
       return ((Expandable)cs).expandfully(parser, stack);
    }
 
+   @Override
    public void process(TeXParser parser)
       throws IOException
    {
@@ -109,6 +141,7 @@ public class TeXCsRef extends ControlSequence implements Expandable
       cs.process(parser);
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
@@ -117,11 +150,13 @@ public class TeXCsRef extends ControlSequence implements Expandable
       cs.process(parser, stack);
    }
 
+   @Override
    public Object clone()
    {
       return new TeXCsRef(getName());
    }
 
+   @Override
    public boolean equals(Object other)
    {
       if (this == other) return true;

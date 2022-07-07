@@ -51,11 +51,7 @@ public class L2Hhfill extends ControlSequence
 
       TeXObject object = parser.pop();
 
-      if (object instanceof TeXCsRef)
-      {
-         object = parser.getListener().getControlSequence(
-           ((TeXCsRef)object).getName());
-      }
+      object = TeXParserUtils.resolve(object, parser);
 
       while (object != null
          && !(object instanceof Par)
@@ -65,11 +61,7 @@ public class L2Hhfill extends ControlSequence
 
          object = parser.pop();
 
-         if (object instanceof TeXCsRef)
-         {
-            object = parser.getListener().getControlSequence(
-              ((TeXCsRef)object).getName());
-         }
+         object = TeXParserUtils.resolve(object, parser);
       }
 
       parser.push(object);
@@ -88,11 +80,7 @@ public class L2Hhfill extends ControlSequence
 
       TeXObject object = stack.pop();
 
-      if (object instanceof TeXCsRef)
-      {
-         object = parser.getListener().getControlSequence(
-           ((TeXCsRef)object).getName());
-      }
+      object = TeXParserUtils.resolve(object, parser);
 
       while (object != null
          && !(object instanceof Par)
@@ -102,11 +90,7 @@ public class L2Hhfill extends ControlSequence
 
          object = stack.pop();
 
-         if (object instanceof TeXCsRef)
-         {
-            object = parser.getListener().getControlSequence(
-              ((TeXCsRef)object).getName());
-         }
+         object = TeXParserUtils.resolve(object, parser);
       }
 
       stack.push(object);

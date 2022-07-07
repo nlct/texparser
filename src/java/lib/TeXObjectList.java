@@ -90,16 +90,7 @@ public class TeXObjectList extends Vector<TeXObject>
          popStyle = (byte)(popStyle^POP_IGNORE_LEADING_SPACE);
       }
 
-      if (object instanceof TeXCsRef)
-      {
-         object = parser.getListener().getControlSequence(
-            ((TeXCsRef)object).getName());
-      }
-
-      if (object instanceof AssignedMacro)
-      {
-         object = ((AssignedMacro)object).getBaseUnderlying();
-      }
+      object = TeXParserUtils.resolve(object, parser);
 
       if (object instanceof EndCs || object instanceof InternalQuantity
            || !object.canExpand())
@@ -163,16 +154,7 @@ public class TeXObjectList extends Vector<TeXObject>
 
       object = popStack(parser, popStyle);
 
-      if (object instanceof TeXCsRef)
-      {
-         object = parser.getListener().getControlSequence(
-            ((TeXCsRef)object).getName());
-      }
-
-      if (object instanceof AssignedMacro)
-      {
-         object = ((AssignedMacro)object).getBaseUnderlying();
-      }
+      object = TeXParserUtils.resolve(object, parser);
 
       return object;
    }
@@ -574,18 +556,14 @@ public class TeXObjectList extends Vector<TeXObject>
             TeXSyntaxException.ERROR_INTERNAL_QUANTITY_EXPECTED);
       }
 
-      if (object instanceof TeXCsRef)
-      {
-         object = parser.getListener().getControlSequence(
-          ((TeXCsRef)object).getName());
-      }
+      object = TeXParserUtils.resolve(object, parser);
 
       if (object instanceof InternalQuantity)
       {
          return (InternalQuantity)object;
       }
 
-      if (object instanceof Expandable)
+      if (object instanceof Expandable && object.canExpand())
       {
          TeXObjectList expanded;
 
@@ -626,11 +604,7 @@ public class TeXObjectList extends Vector<TeXObject>
             TeXSyntaxException.ERROR_REGISTER_EXPECTED);
       }
 
-      if (object instanceof TeXCsRef)
-      {
-         object = parser.getListener().getControlSequence(
-          ((TeXCsRef)object).getName());
-      }
+      object = TeXParserUtils.resolve(object, parser);
 
       if (object instanceof Register)
       {
@@ -1422,11 +1396,7 @@ public class TeXObjectList extends Vector<TeXObject>
 
       for (TeXObject object : this)
       {
-         if (object instanceof TeXCsRef)
-         {
-            object = parser.getListener().getControlSequence(
-              ((TeXCsRef)object).getName());
-         }
+         object = TeXParserUtils.resolve(object, parser);
 
          if (object instanceof CaseChangeable)
          {
@@ -1469,11 +1439,7 @@ public class TeXObjectList extends Vector<TeXObject>
 
       for (TeXObject object : this)
       {
-         if (object instanceof TeXCsRef)
-         {
-            object = parser.getListener().getControlSequence(
-              ((TeXCsRef)object).getName());
-         }
+         object = TeXParserUtils.resolve(object, parser);
 
          if (object instanceof CaseChangeable)
          {
@@ -1597,11 +1563,7 @@ public class TeXObjectList extends Vector<TeXObject>
       {
          TeXObject object = remaining.pop();
 
-         if (object instanceof TeXCsRef)
-         {
-            object = parser.getListener().getControlSequence(
-               ((TeXCsRef)object).getName());
-         }
+         object = TeXParserUtils.resolve(object, parser);
 
          if (object.isExpansionBlocker())
          {
@@ -1629,11 +1591,7 @@ public class TeXObjectList extends Vector<TeXObject>
             {
                object = expanded.get(i);
 
-               if (object instanceof TeXCsRef)
-               {
-                  object = parser.getListener().getControlSequence(
-                     ((TeXCsRef)object).getName());
-               }
+               object = TeXParserUtils.resolve(object, parser);
 
                if (object.isExpansionBlocker())
                {
@@ -1696,11 +1654,7 @@ public class TeXObjectList extends Vector<TeXObject>
             break;
          }
 
-         if (object instanceof TeXCsRef)
-         {
-            object = parser.getListener().getControlSequence(
-               ((TeXCsRef)object).getName());
-         }
+         object = TeXParserUtils.resolve(object, parser);
 
          if (object.isExpansionBlocker())
          {
@@ -1728,11 +1682,7 @@ public class TeXObjectList extends Vector<TeXObject>
             {
                object = expanded.get(i);
 
-               if (object instanceof TeXCsRef)
-               {
-                  object = parser.getListener().getControlSequence(
-                     ((TeXCsRef)object).getName());
-               }
+               object = TeXParserUtils.resolve(object, parser);
 
                if (object.equals(marker))
                {
@@ -1850,16 +1800,7 @@ public class TeXObjectList extends Vector<TeXObject>
 
          prevObj = object;
 
-         if (object instanceof TeXCsRef)
-         {
-            object = parser.getListener().getControlSequence(
-               ((TeXCsRef)object).getName());
-         }
-
-         if (object instanceof AssignedMacro)
-         {
-            object = ((AssignedMacro)object).getBaseUnderlying();
-         }
+         object = TeXParserUtils.resolve(object, parser);
 
          if (object.isExpansionBlocker())
          {
@@ -1877,22 +1818,13 @@ public class TeXObjectList extends Vector<TeXObject>
          {
             list.add(popArg(parser));
          }
-         else if (parser.isNoExpand(object))
-         {
-            list.add(popStack(parser));
-         }
-         else if (!object.canExpand())
-         {
-            list.add(object, true);
-         }
-         else if (object instanceof TeXObjectList
-                   && ((TeXObjectList)object).isStack())
+         else if (parser.isStack(object))
          {
             push(object, true);
          }
          else if (object instanceof Expandable)
          {
-            TeXObjectList expanded = ((Expandable)object).expandonce(parser, this);
+            TeXObjectList expanded = ((Expandable)object).expandfully(parser, this);
 
             if (expanded == null)
             {
@@ -1900,7 +1832,7 @@ public class TeXObjectList extends Vector<TeXObject>
             }
             else if (!expanded.isEmpty())
             {
-               push(expanded, true);
+               list.add(expanded, true);
             }
          }
          else
@@ -1954,11 +1886,7 @@ public class TeXObjectList extends Vector<TeXObject>
             continue;
          }
 
-         if (object instanceof TeXCsRef)
-         {
-            object = parser.getListener().getControlSequence(
-               ((TeXCsRef)object).getName());
-         }
+         object = TeXParserUtils.resolve(object, parser);
 
          if (object.isExpansionBlocker())
          {
@@ -1971,13 +1899,9 @@ public class TeXObjectList extends Vector<TeXObject>
          {
             object = remaining.popArg(parser);
          }
-         else if (parser.isNoExpand(object))
-         {
-            list.add(remaining.popStack(parser));
-         }
          else if (!blocked && object.canExpand() && object instanceof Expandable)
          {
-            expanded = ((Expandable)object).expandonce(parser, remaining);
+            expanded = ((Expandable)object).expandfully(parser, remaining);
          }
 
          if (expanded == null)
@@ -1986,7 +1910,7 @@ public class TeXObjectList extends Vector<TeXObject>
          }
          else
          {
-            remaining.push(expanded, true);
+            list.add(expanded, true);
          }
       }
 
@@ -2017,11 +1941,7 @@ public class TeXObjectList extends Vector<TeXObject>
             parser.logMessage("POPPED "+object);
          }
 
-         if (object instanceof TeXCsRef)
-         {
-            object = parser.getListener().getControlSequence(
-               ((TeXCsRef)object).getName());
-         }
+         object = TeXParserUtils.resolve(object, parser);
 
          if (object instanceof Declaration)
          {
@@ -2091,11 +2011,7 @@ public class TeXObjectList extends Vector<TeXObject>
             break;
          }
 
-         if (object instanceof TeXCsRef)
-         {
-            object = parser.getListener().getControlSequence(
-               ((TeXCsRef)object).getName());
-         }
+         object = TeXParserUtils.resolve(object, parser);
 
          if (object instanceof Declaration)
          {
@@ -2159,11 +2075,7 @@ public class TeXObjectList extends Vector<TeXObject>
             break;
          }
 
-         if (object instanceof TeXCsRef)
-         {
-            object = parser.getListener().getControlSequence(
-               ((TeXCsRef)object).getName());
-         }
+         object = TeXParserUtils.resolve(object, parser);
 
          if (object == null)
          {
@@ -2205,11 +2117,7 @@ public class TeXObjectList extends Vector<TeXObject>
                break;
             }
 
-            if (object instanceof TeXCsRef)
-            {
-               object = parser.getListener().getControlSequence(
-                  ((TeXCsRef)object).getName());
-            }
+            object = TeXParserUtils.resolve(object, parser);
 
             if (object instanceof Declaration)
             {

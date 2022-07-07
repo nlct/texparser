@@ -740,5 +740,15 @@ public class TeXParserUtils
          obj.process(parser, stack);
       }
    }
+
+   public static TeXObject resolve(TeXObject object, TeXParser parser)
+   {
+      if (object != null && object instanceof Resolvable)
+      {
+         object = ((Resolvable)object).resolve(parser);
+      }
+
+      return object;
+   }
 }
 

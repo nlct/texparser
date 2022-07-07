@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -18,13 +18,8 @@
 */
 package com.dickimawbooks.texparserlib;
 
-import java.io.IOException;
-import java.util.Vector;
-
-public interface AssignedMacro extends TeXObject,Resolvable
+public interface Resolvable
 {
-   public TeXObject getUnderlying();
-
-   // If nested assigned macros, get the deepest underlying non-AssignedMacro
-   public TeXObject getBaseUnderlying();
+   public TeXObject resolve(TeXParser parser);
 }
+

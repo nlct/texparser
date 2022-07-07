@@ -52,11 +52,7 @@ public class SetLength extends ControlSequence
          obj = popArg(parser, stack);
       }
 
-      if (obj instanceof TeXCsRef)
-      {
-         obj = parser.getListener().getControlSequence(
-          ((TeXCsRef)obj).getName());
-      }
+      obj = TeXParserUtils.resolve(obj, parser);
 
       TeXDimension value = popDimensionArg(parser, stack);
 

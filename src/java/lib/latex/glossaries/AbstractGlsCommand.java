@@ -51,10 +51,7 @@ public abstract class AbstractGlsCommand extends Command
    protected GlsLabel expandToEntryLabel(TeXObject object, TeXParser parser, TeXObjectList stack)
    throws IOException
    {
-      if (object instanceof TeXCsRef)
-      {
-         object = parser.getListener().getControlSequence(((TeXCsRef)object).getName());
-      }
+      object = TeXParserUtils.resolve(object, parser);
 
       if (object instanceof TeXObjectList && ((TeXObjectList)object).size()==1)
       {

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -26,8 +26,14 @@ public class AssignedControlSequence extends Command
 {
    public AssignedControlSequence(String name, TeXObject underlying)
    {
+      this(name, underlying, false);
+   }
+
+   public AssignedControlSequence(String name, TeXObject underlying, boolean isRobust)
+   {
       super(name);
       this.underlying = underlying;
+      this.isRobust = isRobust;
 
       if (underlying instanceof Macro)
       {
@@ -39,17 +45,20 @@ public class AssignedControlSequence extends Command
       }
    }
 
+   @Override
    public Object clone()
    {
       return new AssignedControlSequence(getName(), 
-        (TeXObject)underlying.clone());
+        (TeXObject)underlying.clone(), isRobust);
    }
 
+   @Override
    public boolean isPar()
    {
       return underlying.isPar();
    }
 
+   @Override
    public boolean isEmpty()
    {
       return underlying.isEmpty();
@@ -73,6 +82,7 @@ public class AssignedControlSequence extends Command
       }
    }
 
+   @Override
    public boolean equals(Object obj)
    {
       if (obj == null || !(obj instanceof TeXObject))
@@ -88,6 +98,7 @@ public class AssignedControlSequence extends Command
       return underlying.equals(obj);
    }
 
+   @Override
    public void process(TeXParser parser)
       throws IOException
    {
@@ -99,6 +110,7 @@ public class AssignedControlSequence extends Command
       underlying.process(parser);
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
@@ -113,7 +125,7 @@ public class AssignedControlSequence extends Command
    @Override
    public boolean canExpand()
    {
-      return underlying.canExpand();
+      return !isRobust && underlying.canExpand();
    }
 
    @Override
@@ -122,9 +134,12 @@ public class AssignedControlSequence extends Command
       return underlying.isExpansionBlocker();
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser)
       throws IOException
    {
+      if (isRobust) return null;
+
       TeXObject base = getBaseUnderlying();
 
       if (!(base instanceof Expandable))
@@ -135,9 +150,12 @@ public class AssignedControlSequence extends Command
       return ((Expandable)base).expandonce(parser);
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
+      if (isRobust) return null;
+
       TeXObject base = getBaseUnderlying();
 
       if (!(base instanceof Expandable))
@@ -148,9 +166,12 @@ public class AssignedControlSequence extends Command
       return ((Expandable)base).expandonce(parser, stack);
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser)
       throws IOException
    {
+      if (isRobust) return null;
+
       TeXObject base = getBaseUnderlying();
 
       if (!(base instanceof Expandable))
@@ -161,9 +182,12 @@ public class AssignedControlSequence extends Command
       return ((Expandable)base).expandfully(parser);
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
+      if (isRobust) return null;
+
       TeXObject base = getBaseUnderlying();
 
       if (!(base instanceof Expandable))
@@ -174,11 +198,13 @@ public class AssignedControlSequence extends Command
       return ((Expandable)base).expandfully(parser, stack);
    }
 
+   @Override
    public TeXObject getUnderlying()
    {
       return underlying;
    }
 
+   @Override
    public TeXObject getBaseUnderlying()
    {
       if (underlying instanceof AssignedMacro)
@@ -190,11 +216,25 @@ public class AssignedControlSequence extends Command
    }
 
    @Override
+   public TeXObject resolve(TeXParser parser)
+   {
+      TeXObject obj = getBaseUnderlying();
+
+      if (obj instanceof Resolvable)
+      {
+         return ((Resolvable)obj).resolve(parser);
+      }
+
+      return obj;
+   }
+
+   @Override
    public String toString()
    {
-      return String.format("%s[name=%s,underlying=%s]", 
-        getClass().getSimpleName(), getName(), underlying);
+      return String.format("%s[name=%s,robust=%s,underlying=%s]", 
+        getClass().getSimpleName(), getName(), isRobust, underlying);
    }
 
    private TeXObject underlying;
+   protected boolean isRobust = false;
 }
