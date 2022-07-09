@@ -37,23 +37,27 @@ public class Citet extends Cite
       this.sty = sty;
    }
 
+   @Override
    public Object clone()
    {
       return new Citet(getName(), getSty());
    }
 
+   @Override
    public void addPreCite(TeXParser parser, TeXObjectList list,
        boolean isStar, TeXObject opt1, TeXObject opt2)
    throws IOException
    {
    }
 
+   @Override
    public void addPostCite(TeXParser parser, TeXObjectList list, 
       boolean isStar, TeXObject opt1, TeXObject opt2)
    throws IOException
    {
    }
 
+   @Override
    public void addCiteSep(TeXParser parser, TeXObjectList list,
        boolean isStar, int index, int numCites)
     throws IOException
@@ -65,6 +69,7 @@ public class Citet extends Cite
       }
    }
 
+   @Override
    public TeXObject expandCitation(TeXParser parser, boolean isStar,
      TeXObject opt1, TeXObject opt2, TeXObject arg)
    throws IOException

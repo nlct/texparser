@@ -23,7 +23,7 @@ import java.io.EOFException;
 
 import com.dickimawbooks.texparserlib.*;
 
-public class Ref extends Command
+public class Ref extends ControlSequence
 {
    public Ref()
    {
@@ -53,30 +53,6 @@ public class Ref extends Command
       return new Ref(getName(), noHyperOnStar, tags);
    }
 
-   @Override
-   public TeXObjectList expandonce(TeXParser parser)
-      throws IOException
-   {
-      return expandonce(parser, parser);
-   }
-
-   @Override
-   public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
-      throws IOException
-   {
-      LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
-
-      boolean hyper = listener.isStyLoaded("hyperref");
-      boolean isStar = (popModifier(parser, stack, '*') != -1);
-
-      if (isStar && noHyperOnStar)
-      {
-         hyper = false;
-      }
-
-      return expandref(parser, popLabelString(parser, stack), hyper);
-   }
-
    @Deprecated
    protected TeXObjectList expandref(TeXParser parser, TeXObject arg)
    throws IOException
@@ -92,9 +68,7 @@ public class Ref extends Command
 
       TeXObject ref = listener.getReference(label);
 
-      if (ref == null) return null;
-
-      TeXObjectList list = new TeXObjectList();
+      TeXObjectList list = listener.createStack();
 
       if (tags != null)
       {
@@ -104,7 +78,11 @@ public class Ref extends Command
          }
       }
 
-      if (hyper)
+      if (ref == null)
+      {
+         list.add(listener.createUnknownReference(label));
+      }
+      else if (hyper)
       {
          list.add(parser.getListener().createLink(label, ref));
       }
@@ -120,24 +98,28 @@ public class Ref extends Command
    public void process(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
-      TeXObjectList expanded = expandonce(parser, stack);
+      LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
 
-      if (expanded != null)
+      boolean hyper = listener.isStyLoaded("hyperref");
+      boolean isStar = (popModifier(parser, stack, '*') == '*');
+
+      if (isStar && noHyperOnStar)
       {
-         expanded.process(parser, stack);
+         hyper = false;
       }
+
+      String label = popLabelString(parser, stack);
+
+      TeXObjectList expanded = expandref(parser, label, hyper);
+
+      TeXParserUtils.process(expanded, parser, stack);
    }
 
    @Override
    public void process(TeXParser parser)
       throws IOException
    {
-      TeXObjectList expanded = expandonce(parser);
-
-      if (expanded != null)
-      {
-         expanded.process(parser);
-      }
+      process(parser, parser);
    }
 
    protected TeXObject[] tags;

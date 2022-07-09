@@ -23,7 +23,7 @@ import java.io.EOFException;
 
 import com.dickimawbooks.texparserlib.*;
 
-public class Cite extends Command
+public class Cite extends ControlSequence
 {
    public Cite()
    {
@@ -42,45 +42,7 @@ public class Cite extends Command
    }
 
    @Override
-   public TeXObjectList expandonce(TeXParser parser)
-      throws IOException
-   {
-      boolean isStar = (popModifier(parser, parser, '*') == '*');
-
-      TeXObject opt1 = popOptArg(parser, parser);
-
-      TeXObject opt2 = null;
-
-      if (opt1 != null)
-      {
-         opt2 = popOptArg(parser, parser);
-      }
-
-      TeXObject arg = popArgExpandFully(parser, parser);
-
-      CsvList csvList = CsvList.getList(parser, arg);
-
-      TeXObjectList list = new TeXObjectList();
-
-      addPreCite(parser, list, isStar, opt1, opt2);
-
-      for (int i = 0, n = csvList.size(); i < n; i++)
-      {
-         TeXObject cite = csvList.get(i);
-
-         addCiteSep(parser, list, isStar, i, n);
-
-         addLinkCitation(parser, list, isStar, cite, 
-            expandCitation(parser, isStar, opt1, opt2, cite));
-      }
-
-      addPostCite(parser, list, isStar, opt1, opt2);
-
-      return list;
-   }
-
-   @Override
-   public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
+   public void process(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
       boolean isStar = (popModifier(parser, stack, '*') == '*');
@@ -114,31 +76,14 @@ public class Cite extends Command
 
       addPostCite(parser, list, isStar, opt1, opt2);
 
-      return list;
-   }
-
-   @Override
-   public void process(TeXParser parser, TeXObjectList stack)
-      throws IOException
-   {
-      TeXObjectList expanded = expandonce(parser, stack);
-
-      if (expanded != null)
-      {
-         stack.addAll(0, expanded);
-      }
+      TeXParserUtils.process(list, parser, stack);
    }
 
    @Override
    public void process(TeXParser parser)
       throws IOException
    {
-      TeXObjectList expanded = expandonce(parser);
-
-      if (expanded != null)
-      {
-         parser.addAll(0, expanded);
-      }
+      process(parser, parser);
    }
 
    public void addPreCite(TeXParser parser, TeXObjectList list, boolean isStar,

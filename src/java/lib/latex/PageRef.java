@@ -49,11 +49,13 @@ public class PageRef extends Ref
 
       TeXObject ref = listener.getPageReference(label);
 
-      if (ref == null) return null;
+      TeXObjectList list = listener.createStack();
 
-      TeXObjectList list = new TeXObjectList();
-
-      if (hyper)
+      if (ref == null)
+      {
+         list.add(listener.createUnknownReference(label));
+      }
+      else if (hyper)
       {
          list.add(parser.getListener().createLink(label, ref));
       }
