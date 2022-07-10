@@ -546,6 +546,8 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       parser.putControlSequence(new AbstractDec());
 
       parser.putControlSequence(new Today());
+      parser.putControlSequence(new TextualContentCommand("@title", ""));
+      parser.putControlSequence(new TextualContentCommand("@author", ""));
       parser.putControlSequence(new StoreDataCs("title"));
       parser.putControlSequence(new StoreDataCs("author"));
       parser.putControlSequence(new StoreDataCs("date"));
@@ -1280,10 +1282,20 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
 
          if (auxFile != null && auxFile.exists())
          {
+            parser.debugMessage(1, "Parsing AUX file: "+auxFile);
+
             AuxParser auxListener = new AuxParser(getTeXApp(), getCharSet());
             auxListener.parseAuxFile(auxFile);
             auxData = auxListener.getAuxData();
          }
+         else
+         {
+            parser.debugMessage(1, "No AUX file: "+auxFile);
+         }
+      }
+      else
+      {
+         parser.debugMessage(1, "AUX parser not enabled");
       }
 
       ControlSequence cs = parser.getControlSequence(
@@ -2199,11 +2211,16 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
 
       File dir = getParser().getCurrentParentFile();
 
-      if (dir == null) return null;
-
       String jobname = parser.getJobname();
 
-      return new File(dir, jobname+"."+ext);
+      if (dir == null)
+      {
+         return new File(jobname+"."+ext);
+      }
+      else
+      {
+         return new File(dir, jobname+"."+ext);
+      }
    }
 
    public void newcounter(String name)

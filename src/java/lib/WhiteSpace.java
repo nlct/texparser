@@ -66,6 +66,12 @@ public abstract class WhiteSpace extends AbstractTeXObject
       return " ";
    }
 
+   @Override
+   public String purified()
+   {
+      return format();
+   }
+
    public abstract Object clone();
 }
 

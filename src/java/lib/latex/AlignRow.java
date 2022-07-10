@@ -42,6 +42,7 @@ public class AlignRow extends DataObjectList
       parse(parser, stack);
    }
 
+   @Override
    public TeXObjectList createList()
    {
       return new AlignRow(capacity());
@@ -56,7 +57,7 @@ public class AlignRow extends DataObjectList
 
       while (true)
       {
-         TeXObject span = stack.expandedPopStack(parser);
+         TeXObject span = TeXParserUtils.resolve(stack.popStack(parser), parser);
 
          if (span instanceof WhiteSpace)
          {
@@ -85,7 +86,7 @@ public class AlignRow extends DataObjectList
 
       while (true)
       {
-         TeXObject obj = stack.expandedPopStack(parser);
+         TeXObject obj = TeXParserUtils.resolve(stack.popStack(parser), parser);
 
          if (obj instanceof Tab)
          {
@@ -142,30 +143,14 @@ public class AlignRow extends DataObjectList
          }
          else if (obj instanceof MultiCell)
          {
-            TeXObjectList expanded;
-
-            if (parser == stack)
-            {
-               expanded = ((MultiCell)obj).expandonce(parser);
-            }
-            else
-            {
-               expanded = ((MultiCell)obj).expandonce(parser, stack);
-            }
+            TeXObject expanded = TeXParserUtils.expandOnce(obj, parser, stack);
 
             if (group == null)
             {
                group = listener.createGroup();
             }
 
-            if (expanded == null)
-            {
-               group.add(obj);
-            }
-            else
-            {
-               group.addAll(expanded);
-            }
+            group.add(expanded, true);
          }
          else
          {
@@ -213,7 +198,7 @@ public class AlignRow extends DataObjectList
 
       while (size() > 0)
       {
-         TeXObject obj = pop();
+         TeXObject obj = TeXParserUtils.resolve(pop(), parser);
 
          if (obj instanceof TabularNewline)
          {
@@ -221,14 +206,7 @@ public class AlignRow extends DataObjectList
 
             doEnd = false;
 
-            if (stack == null || stack == parser)
-            {
-               obj.process(parser);
-            }
-            else
-            {
-               obj.process(parser, stack);
-            }
+            TeXParserUtils.process(obj, parser, stack);
          }
          else
          {

@@ -49,7 +49,7 @@ public class AppDef extends StandaloneDef
    @Override
    protected void addPostEntryName(TeXObjectList list, GlsLabel glslabel, TeXParser parser)
    {
-      TeXObject syntax = glslabel.getEntry().get("syntax");
+      TeXObject syntax = glslabel.getField("syntax");
 
       if (syntax != null)
       {

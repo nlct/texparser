@@ -9,6 +9,8 @@
 
 \usepackage[debug=showwrgloss]{nlctuserguide}
 
+\renewcommand*{\thispackagename}{foobarsty}
+
 \nlctuserguidegls
 {
 % commands
@@ -131,7 +133,8 @@
      prompt or terminal}}%
   }%
   % terms
-  \gterm{someterm}{\name{some term}\desc{an example term}}
+  \gterm{someterm}{\name{some term}\desc{an example term, see
+   \sectionref{ch:sample}}}
 }
 
 \title{Sample Document}
@@ -171,6 +174,7 @@ Cross-references: \sectionref{sec:defs}, \tableref{tab:sample}.
 
 First use: \idx{html}, next use: \idx{html}.
 First use: \idx{xml}, next use: \idx{xml}.
+\Idx{someterm}.
 
 \section{Semantic Markup}\label{sec:semantic}
 

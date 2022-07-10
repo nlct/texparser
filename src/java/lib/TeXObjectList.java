@@ -2450,6 +2450,19 @@ public class TeXObjectList extends Vector<TeXObject>
       return this;
    }
 
+   @Override
+   public String purified()
+   {
+      StringBuilder builder = new StringBuilder();
+
+      for (int i = 0; i < size(); i++)
+      {
+         builder.append(get(i).purified());
+      }
+
+      return builder.toString();
+   }
+
    private Vector<Declaration> declarations
      = new Vector<Declaration>();
 

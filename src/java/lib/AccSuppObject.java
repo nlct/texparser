@@ -63,6 +63,12 @@ public class AccSuppObject extends AbstractTeXObject
    }
 
    @Override
+   public String purified()
+   {
+      return object.purified();
+   }
+
+   @Override
    public String toString(TeXParser parser)
    {
       return object.toString(parser);

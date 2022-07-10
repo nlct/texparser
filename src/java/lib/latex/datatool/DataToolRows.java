@@ -272,6 +272,19 @@ public class DataToolRows extends Vector<DataToolEntryRow>
    }
 
    @Override
+   public String purified()
+   {
+      try
+      {
+         return expandonce(sty.getListener().getParser()).purified();
+      }
+      catch (IOException e)
+      {
+         return "";
+      }
+   }
+
+   @Override
    public boolean isPar()
    {
       return false;

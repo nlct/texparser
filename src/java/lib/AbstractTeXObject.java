@@ -53,5 +53,11 @@ public abstract class AbstractTeXObject implements TeXObject
    {
       return false;
    }
+
+   @Override
+   public String purified()
+   {
+      return "";
+   }
 }
 

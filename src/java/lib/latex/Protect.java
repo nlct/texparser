@@ -71,7 +71,7 @@ public class Protect extends NoExpand
             csname = obj.format()+" ";
          }
 
-         expanded.add(new AssignedControlSequence(csname, this, true));
+         expanded.add(new AssignedControlSequence(csname, obj, true));
       }
       else
       {

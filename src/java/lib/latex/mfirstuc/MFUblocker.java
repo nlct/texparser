@@ -47,8 +47,8 @@ public class MFUblocker extends ControlSequence
       {
          String csname = ((ControlSequence)arg).getName();
 
-         sty.addBlocker(name);
-         sty.addExclusion(name);
+         sty.addBlocker(csname);
+         sty.addExclusion(csname);
       }
       else if (arg instanceof TeXObjectList)
       {

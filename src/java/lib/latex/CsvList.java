@@ -209,12 +209,14 @@ public class CsvList extends DataObjectList
       return true;
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
     throws IOException
    {
       return expandonce(parser);
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser)
     throws IOException
    {
@@ -233,18 +235,21 @@ public class CsvList extends DataObjectList
       return list;
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser, TeXObjectList stack)
     throws IOException
    {
       return expandonce(parser, stack).expandfully(parser, stack);
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser)
     throws IOException
    {
       return expandonce(parser).expandfully(parser);
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack)
     throws IOException
    {
@@ -294,6 +299,7 @@ public class CsvList extends DataObjectList
       }
    }
 
+   @Override
    public void process(TeXParser parser)
     throws IOException
    {
@@ -321,6 +327,7 @@ public class CsvList extends DataObjectList
       }
    }
 
+   @Override
    public String toString(TeXParser parser)
    {
       StringBuilder builder = new StringBuilder();
@@ -341,6 +348,58 @@ public class CsvList extends DataObjectList
          }
 
          builder.append(obj.toString(parser));
+      }
+
+      return builder.toString();
+   }
+
+   @Override
+   public String format()
+   {
+      StringBuilder builder = new StringBuilder();
+      boolean isFirst = true;
+
+      for (TeXObject obj : this)
+      {
+         if (!(obj instanceof Ignoreable))
+         {
+            if (isFirst)
+            {
+               isFirst = false;
+            }
+            else
+            {
+               builder.append(',');
+            }
+         }
+
+         builder.append(obj.format());
+      }
+
+      return builder.toString();
+   }
+
+   @Override
+   public String purified()
+   {
+      StringBuilder builder = new StringBuilder();
+      boolean isFirst = true;
+
+      for (TeXObject obj : this)
+      {
+         if (!(obj instanceof Ignoreable))
+         {
+            if (isFirst)
+            {
+               isFirst = false;
+            }
+            else
+            {
+               builder.append(',');
+            }
+         }
+
+         builder.append(obj.purified());
       }
 
       return builder.toString();

@@ -989,6 +989,7 @@ public class L2HConverter extends LaTeXParserListener
       writeTabularCss("center", null);
       writeTabularCss("right", null);
 
+      writeln("pre { overflow: auto; }");
       writeln("div.figure { display: block; text-align: center; }");
       writeln("div.caption { display: block; text-align: center; }");
       writeln("div.marginpar { float: right; }");
@@ -1126,22 +1127,14 @@ public class L2HConverter extends LaTeXParserListener
    public void beginDocument(TeXObjectList stack)
      throws IOException
    {
-      TeXObject cs = getParser().getControlSequence("@title");
+      TeXObject cs = getControlSequence("@title");
 
-      if (!(cs instanceof Undefined) && cs != null)
+      if (!(cs instanceof Undefined) && !cs.isEmpty())
       {
-         if (cs instanceof Expandable)
-         {
-            TeXObjectList expanded = ((Expandable)cs).expandfully(getParser());
-
-            if (expanded != null)
-            {
-               cs = expanded;
-            }
-         }
+         TeXObject title = TeXParserUtils.expandFully(cs, parser, stack);
 
          writeable.write("<title>");
-         writeable.write(cs.toString(getParser()));
+         writeable.write(title.purified());
          writeable.writeln("</title>");
       }
 

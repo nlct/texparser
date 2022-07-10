@@ -58,7 +58,7 @@ public class PrintIndex extends AbstractGlsCommand
 
    protected void addStatus(TeXObjectList content, GlsLabel glslabel, TeXParser parser)
    {
-      TeXObject statusVal = glslabel.getEntry().get("status");
+      TeXObject statusVal = glslabel.getField("status");
 
       if (statusVal != null)
       {
@@ -157,20 +157,9 @@ public class PrintIndex extends AbstractGlsCommand
          list.add(new TeXCsRef("label"));
          list.add(listener.createGroup(sectionLabel));
 
-         TeXParserUtils.process(list, parser, stack);
+         list.add(listener.getControlSequence("nlctguideindexinitpostnamehooks"));
 
-         parser.putControlSequence(true, 
-           new TextualContentCommand("glsxtrpostnameenvironment", 
-            " environment"));
-         parser.putControlSequence(true, 
-           new TextualContentCommand("glsxtrpostnamepackage", 
-            " package"));
-         parser.putControlSequence(true, 
-           new TextualContentCommand("glsxtrpostnameclass", 
-             " class"));
-         parser.putControlSequence(true, 
-           new TextualContentCommand("glsxtrpostnamecounter", 
-             " counter"));
+         TeXParserUtils.process(list, parser, stack);
 
          ControlSequence nameCs = listener.getControlSequence("glossentryname");
 

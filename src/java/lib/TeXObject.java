@@ -44,6 +44,8 @@ public interface TeXObject extends Cloneable
 
    public String format();
 
+   public String purified();
+
    public boolean isPar();
 
    public boolean isEmpty();

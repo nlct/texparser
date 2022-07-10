@@ -153,7 +153,12 @@ public class MakeFirstUc extends Command
                }
                else
                {
-                  substack.add(object);
+                  substack.add(listener.getControlSequence("glsmakefirstuc"));
+                  Group grp = listener.createGroup();
+                  substack.add(grp);
+                  grp.add(object);
+                  grp.addAll(argList);
+                  argList.clear();
                }
             }
          }
@@ -184,45 +189,29 @@ public class MakeFirstUc extends Command
 
       if (expansion == EXPANSION_ONCE)
       {
-         if (arg instanceof Expandable)
+         if (parser.isStack(arg) && !arg.isEmpty())
          {
-            TeXObjectList list;
+            TeXObjectList expanded = parser.getListener().createStack();
 
-            if (parser == stack)
-            {
-               list = ((Expandable)arg).expandonce(parser);
-            }
-            else
-            {
-               list = ((Expandable)arg).expandonce(parser, stack);
-            }
+            TeXObjectList argList = (TeXObjectList)arg;
 
-            if (list != null)
-            {
-               arg = list;
-            }
+            TeXObject obj = argList.popStack(parser);
+
+            obj = TeXParserUtils.resolve(obj, parser);
+
+            expanded.add(TeXParserUtils.expandOnce(obj, parser, argList), true);
+            expanded.addAll(argList);
+
+            arg = expanded;
+         }
+         else
+         {
+            arg = TeXParserUtils.expandOnce(arg, parser, stack);
          }
       }
       else if (expansion == EXPANSION_FULL)
       {
-         if (arg instanceof Expandable)
-         {
-            TeXObjectList list;
-
-            if (parser == stack)
-            {
-               list = ((Expandable)arg).expandfully(parser);
-            }
-            else
-            {
-               list = ((Expandable)arg).expandfully(parser, stack);
-            }
-
-            if (list != null)
-            {
-               arg = list;
-            }
-         }
+         arg = TeXParserUtils.expandFully(arg, parser, stack);
       }
 
       TeXObjectList expanded = new TeXObjectList();

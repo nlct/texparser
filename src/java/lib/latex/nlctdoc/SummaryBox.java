@@ -97,7 +97,7 @@ public class SummaryBox extends AbstractGlsCommand
    {
       TeXObjectList list = null;
 
-      TeXObject val = glslabel.getEntry().get("defaultvalue");
+      TeXObject val = glslabel.getField("defaultvalue");
 
       if (val != null)
       {
@@ -107,7 +107,7 @@ public class SummaryBox extends AbstractGlsCommand
          list.add(val, true);
       }
 
-      val = glslabel.getEntry().get("initvalue");
+      val = glslabel.getField("initvalue");
 
       if (val != null)
       {
@@ -126,7 +126,7 @@ public class SummaryBox extends AbstractGlsCommand
          list.add(val, true);
       }
 
-      TeXObject alias = glslabel.getEntry().get("alias");
+      TeXObject alias = glslabel.getField("alias");
 
       if (alias != null)
       {
@@ -147,7 +147,7 @@ public class SummaryBox extends AbstractGlsCommand
          list.add(TeXParserUtils.createGroup(parser, alias));
       }
 
-      TeXObject providedby = glslabel.getEntry().get("providedby");
+      TeXObject providedby = glslabel.getField("providedby");
 
       if (providedby != null)
       {
@@ -169,7 +169,7 @@ public class SummaryBox extends AbstractGlsCommand
 
    protected TeXObject getNote(GlsLabel glslabel, TeXParser parser)
    {
-      return glslabel.getEntry().get("note");
+      return glslabel.getField("note");
    }
 
    protected void addRow(TeXObjectList list, GlsLabel glslabel, 

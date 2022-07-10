@@ -428,6 +428,12 @@ public class KeyValList extends HashMap<String,TeXObject>
    }
 
    @Override
+   public String purified()
+   {
+      return format();
+   }
+
+   @Override
    public boolean isPar()
    {
       return false;

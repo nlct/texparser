@@ -61,7 +61,7 @@ public class EnvDef extends StandaloneDef
    {
       TeXParserListener listener = parser.getListener();
 
-      TeXObject syntax = glslabel.getEntry().get("syntax");
+      TeXObject syntax = glslabel.getField("syntax");
 
       if (syntax != null)
       {

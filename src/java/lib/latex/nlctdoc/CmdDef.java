@@ -48,7 +48,7 @@ public class CmdDef extends StandaloneDef
    @Override
    protected void addPostEntryName(TeXObjectList list, GlsLabel glslabel, TeXParser parser)
    {
-      TeXObject syntax = glslabel.getEntry().get("syntax");
+      TeXObject syntax = glslabel.getField("syntax");
 
       if (syntax != null)
       {
@@ -60,7 +60,7 @@ public class CmdDef extends StandaloneDef
    protected void postArgHook(GlsLabel glslabel, TeXParser parser, TeXObjectList stack)
    throws IOException
    {
-      TeXObject statusVal = glslabel.getEntry().get("status");
+      TeXObject statusVal = glslabel.getField("status");
       TeXObjectList title = null;
 
       if (statusVal != null)

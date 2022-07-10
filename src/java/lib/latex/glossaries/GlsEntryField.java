@@ -275,28 +275,14 @@ public class GlsEntryField extends AbstractGlsCommand
    public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      GlsLabel glslabel = popEntryLabel(parser, stack);
-
-      String fieldLabel = field;
-
-      if (field == null)
-      {
-         fieldLabel = popLabelString(parser, stack);
-      }
-
-      TeXObjectList substack = expand(glslabel, fieldLabel, caseChange, parser, stack);
-
-      if (!substack.isEmpty())
-      {
-         TeXParserUtils.process(substack, parser, stack);
-      }
+      expandonce(parser, stack).process(parser, stack);
    }
 
    @Override
    public void process(TeXParser parser)
      throws IOException
    {
-      process(parser, parser);
+      expandonce(parser).process(parser);
    }
 
    public String getField()

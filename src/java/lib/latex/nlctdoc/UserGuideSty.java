@@ -163,7 +163,7 @@ public class UserGuideSty extends LaTeXSty
 
       addTaggedColourBox("important", null, Color.RED);
       addTaggedColourBox("warning", null, Color.RED);
-      addTaggedColourBox("information", null, Color.BLUE);
+      addTaggedColourBox("information", null, FRAME_COL_INFO);
       TaggedColourBox pinnedBox = addTaggedColourBox("pinnedbox",
          "definition", BG_DEF, Color.BLACK);
       TaggedColourBox terminalBox = 
@@ -185,7 +185,7 @@ public class UserGuideSty extends LaTeXSty
         (Color)null, BG_CODE, Color.BLACK, null, null, false, true)));
 
       FrameBox crc = addSemanticCommand("@sidebysidecode", "sidebysidecode",
-        new TeXFontText(TeXFontFamily.VERB),
+        new TeXFontText(TeXFontFamily.VERB, TeXFontSize.SMALL),
         (Color)null, BG_CODE, Color.BLACK, null, null, true, true, 
          null, // left outer margin
          new UserDimension(0.03, new PercentUnit()), // right outer margin
@@ -296,6 +296,8 @@ public class UserGuideSty extends LaTeXSty
       registerControlSequence(new PrintCommandOptions(glossariesSty));
       registerControlSequence(new PrintCommonOptions(glossariesSty));
       registerControlSequence(new PrintIndex(glossariesSty));
+      registerControlSequence(new IndexInitPostNameHooks());
+      registerControlSequence(new AbbrPostNameHook(glossariesSty));
 
       registerControlSequence(new Dgls("idx", CaseChange.NO_CHANGE, glossariesSty));
       registerControlSequence(new Dgls("idxpl", 
@@ -655,8 +657,8 @@ public class UserGuideSty extends LaTeXSty
       // \deprecatedsym
       def = getListener().createStack();
 
-      grp.add(new TeXCsRef("deprecatedorbannedfmt"));
-      grp.add(new TeXCsRef("faTrashO"));
+      def.add(new TeXCsRef("deprecatedorbannedfmt"));
+      def.add(TeXParserUtils.createGroup(getListener(), new TeXCsRef("faTrashO")));
 
       registerControlSequence(new GenericCommand(true,
        "deprecatedsym", null, def));
@@ -664,8 +666,8 @@ public class UserGuideSty extends LaTeXSty
       // \bannedsym
       def = getListener().createStack();
 
-      grp.add(new TeXCsRef("deprecatedorbannedfmt"));
-      grp.add(new TeXCsRef("faBan"));
+      def.add(new TeXCsRef("deprecatedorbannedfmt"));
+      def.add(TeXParserUtils.createGroup(getListener(), new TeXCsRef("faBan")));
 
       registerControlSequence(new GenericCommand(true,
        "bannedsym", null, def));
@@ -1199,4 +1201,6 @@ public class UserGuideSty extends LaTeXSty
    public static final Color FG_CSOPT = new Color(0.408f, 0.132f, 0.545f);
    public static final Color FG_COMMENT = Color.GRAY;
    public static final Color FG_DEPRECATED_OR_BANNED = Color.RED;
+
+   public static final Color FRAME_COL_INFO = new Color(0f,0.5f,0.5f);
 }

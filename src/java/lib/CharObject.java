@@ -57,6 +57,12 @@ public abstract class CharObject extends AbstractTeXObject
    }
 
    @Override
+   public String purified()
+   {
+      return format();
+   }
+
+   @Override
    public TeXObjectList string(TeXParser parser)
      throws IOException
    {

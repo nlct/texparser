@@ -254,6 +254,9 @@ public class GlossariesSty extends LaTeXSty
         "glsseelastsep", null, TeXParserUtils.createStack(listener,
         new TeXCsRef("space"), new TeXCsRef("andname"), new TeXCsRef("space"))));
 
+      registerControlSequence(new GenericCommand(true,
+        "andname", null, new TeXCsRef("&")));
+
       registerControlSequence(new NewGlossaryEntry(this));
       registerControlSequence(new LongNewGlossaryEntry(this));
       registerControlSequence(new LoadGlsEntries());
@@ -634,7 +637,7 @@ public class GlossariesSty extends LaTeXSty
 
       registerControlSequence(new GlossEntryField("glossentrynameother", this));
 
-      registerControlSequence(new GlsAddStorageKey("providestoragekey",
+      registerControlSequence(new GlsAddStorageKey("glsxtrprovidestoragekey",
         Overwrite.SKIP, this));
 
       registerControlSequence(new AtGobble("glsxtrnewabbrevpresetkeyhook", 3));

@@ -80,14 +80,7 @@ public class GlsXtrPostNameHook extends AbstractGlsCommand
             list.add(cs);
          }
 
-         if (parser == stack || stack == null)
-         {
-            list.process(parser);
-         }
-         else
-         {
-            list.process(parser, stack);
-         }
+         TeXParserUtils.process(list, parser, stack);
       }
    }
 

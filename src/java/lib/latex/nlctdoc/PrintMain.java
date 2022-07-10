@@ -86,14 +86,14 @@ public class PrintMain extends AbstractGlsCommand
          String env = "texparser@block@list";
          list.add(listener.createGroup(env));
 
-         ControlSequence defCs = listener.getControlSequence("def");
+         ControlSequence defCs = listener.getControlSequence("csdef");
          ControlSequence itemCs = listener.getControlSequence(
           "texparser@listitem");
          ControlSequence itemDescCs = listener.getControlSequence(
           "texparser@listdesc");
          ControlSequence targetCs = listener.getControlSequence("glstarget");
          ControlSequence nameCs = listener.getControlSequence("Glossentryname");
-         ControlSequence descCs = listener.getControlSequence("Glossentrydesc");
+         ControlSequence descCs = listener.getControlSequence("glossentrydesc");
          ControlSequence postDescCs = listener.getControlSequence("glspostdescription");
 
          for (String label : glossary)
@@ -102,7 +102,7 @@ public class PrintMain extends AbstractGlsCommand
               label, sty.getEntry(label));
 
             list.add(defCs);
-            list.add(new TeXCsRef("glscurrententrylabel"));
+            list.add(listener.createGroup("glscurrententrylabel"));
             list.add(listener.createGroup(label));
             list.add(itemCs);
 
@@ -110,7 +110,7 @@ public class PrintMain extends AbstractGlsCommand
             list.add(grp);
 
             grp.add(new TeXCsRef("glsadd"));
-            grp.add(glslabel);
+            grp.add(TeXParserUtils.createGroup(listener, glslabel));
 
             grp.add(targetCs);
             grp.add(glslabel);
@@ -118,7 +118,7 @@ public class PrintMain extends AbstractGlsCommand
             Group subgrp = listener.createGroup();
             grp.add(subgrp);
             subgrp.add(nameCs);
-            subgrp.add(glslabel);
+            subgrp.add(TeXParserUtils.createGroup(listener, glslabel));
 
             list.add(itemDescCs);
 
@@ -126,7 +126,7 @@ public class PrintMain extends AbstractGlsCommand
             list.add(grp);
 
             grp.add(descCs);
-            grp.add(glslabel);
+            grp.add(TeXParserUtils.createGroup(listener, glslabel));
             grp.add(postDescCs);
          }
 

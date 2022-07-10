@@ -56,24 +56,25 @@ public class MFUsentencecase extends Command
 
       while (!argList.isEmpty() && !done)
       {
-         TeXObject obj = argList.popStack(parser);
+         TeXObject obj = TeXParserUtils.resolve(argList.popStack(parser), parser);
 
          if (obj instanceof ControlSequence)
          {
             String csname = ((ControlSequence)obj).getName();
 
-            if (csname.equals("protect") || csname.equals("noexpand"))
+            if (csname.equals("protect"))
             {
                list.add(obj);
 
-               obj = argList.popStack(parser);
-
-               if (obj != null)
-               {
-                  list.add(obj);
-               }
+               obj = TeXParserUtils.resolve(argList.popStack(parser), parser);
             }
-            else if (sty.isExclusion(csname))
+         }
+
+         if (obj instanceof ControlSequence)
+         {
+            String csname = ((ControlSequence)obj).getName();
+
+            if (sty.isExclusion(csname))
             {
                list.add(obj);
                obj = popArg(parser, argList);
@@ -87,7 +88,24 @@ public class MFUsentencecase extends Command
             else
             {
                list.add(obj);
+
+               obj = argList.popStack(parser);
+
+               if (obj instanceof Group)
+               {
+                  Group grp = parser.getListener().createGroup();
+                  list.add(grp);
+                  done = toSentenceCase((TeXObjectList)obj, grp, parser);
+               }
+               else
+               {
+                  argList.push(obj);
+               }
             }
+         }
+         else if (obj instanceof Other || obj instanceof WhiteSpace)
+         {// punctuation or space
+            list.add(obj);
          }
          else if (parser.isStack(obj))
          {
@@ -101,7 +119,6 @@ public class MFUsentencecase extends Command
          else if (obj != null)
          {
             list.add(obj);
-            done = true;
          }
       }
 

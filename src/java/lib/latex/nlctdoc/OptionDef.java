@@ -49,7 +49,7 @@ public class OptionDef extends StandaloneDef
    @Override
    protected void addPostEntryName(TeXObjectList list, GlsLabel glslabel, TeXParser parser)
    {
-      TeXObject syntax = glslabel.getEntry().get("syntax");
+      TeXObject syntax = glslabel.getField("syntax");
 
       if (syntax != null)
       {
@@ -62,12 +62,7 @@ public class OptionDef extends StandaloneDef
    protected void postArgHook(GlsLabel glslabel, TeXParser parser, TeXObjectList stack)
    throws IOException
    {
-      TeXObject syntax = null;
-
-      if (glslabel != null && glslabel.getEntry() != null)
-      {
-         syntax = glslabel.getEntry().get("syntax");
-      }
+      TeXObject syntax = glslabel.getField("syntax");
 
       TeXObjectList title = parser.getListener().createStack();
       title.add(parser.getListener().getControlSequence("glssymbol"));
@@ -82,7 +77,7 @@ public class OptionDef extends StandaloneDef
 
          if (syntaxVal.equals("\\meta{boolean}"))
          {
-            TeXObject val = glslabel.getEntry().get("initvalue");
+            TeXObject val = glslabel.getField("initvalue");
             String toggle = "off";
 
             if (val != null)

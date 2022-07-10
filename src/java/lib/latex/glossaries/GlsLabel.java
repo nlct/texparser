@@ -61,6 +61,16 @@ public class GlsLabel extends TextualContentCommand
       return (GlossaryEntry)getData();
    }
 
+   public GlossaryEntry getEntry(GlossariesSty sty)
+   {
+      if (getData() == null)
+      {
+         refresh(sty);
+      }
+
+      return (GlossaryEntry)getData();
+   }
+
    public String getCategory()
    {
       GlossaryEntry entry = getEntry();
