@@ -58,6 +58,17 @@ public class ColorSty extends LaTeXSty
       putColor("red", Color.RED);
       putColor("white", Color.WHITE);
       putColor("yellow", Color.YELLOW);
+
+      putColor("brown", new Color(0.75f,0.5f,0.25f));
+      putColor("lime", new Color(0.75f,1.0f,0.0f));
+      putColor("purple", new Color(0.75f,0.0f,0.25f));
+      putColor("teal", new Color(0.0f,0.5f,0.5f));
+      putColor("violet", new Color(0.5f,0.0f,0.5f));
+
+      putColor("olive", new Color(0.5f,0.5f,0.0f));
+
+      putColor("darkgray", new Color(0.25f,0.25f,0.25f));
+      putColor("lightgray", new Color(0.75f,0.75f,0.75f));
    }
 
    public void putColor(String name, Color color)
@@ -82,6 +93,44 @@ public class ColorSty extends LaTeXSty
    public Color getColor(TeXParser parser, String model, String specs)
      throws IOException
    {
+      return getColor(parser, model, specs, true);
+   }
+
+   public Color getColor(TeXParser parser, String model, String specs,
+      boolean checkMixture)
+     throws IOException
+   {
+      if (checkMixture)
+      {
+         String[] splitSpecs = specs.split("!");
+
+         if (splitSpecs.length > 1)
+         {
+            int red = 0;
+            int green = 0;
+            int blue = 0;
+
+            for (String s : splitSpecs)
+            {
+               Color col = getColor(parser, model, s, false);
+
+               red += col.getRed();
+               green += col.getGreen();
+               blue += col.getBlue();
+            }
+
+            return new Color(red/splitSpecs.length, 
+              green/splitSpecs.length, blue/splitSpecs.length);
+         }
+      }
+
+      // model lists not yet implemented
+      String[] models = model.split("/");
+      model = models[0];
+
+      String[] specList = specs.split("/");
+      specs = specList[0];
+
       if (model.equals("named"))
       {
          Color col = definedColors.get(specs);

@@ -153,6 +153,7 @@ public abstract class DefaultTeXParserListener extends TeXParserListener
       parser.putControlSequence(new Skip("vskip", Direction.VERTICAL));
       parser.putControlSequence(new Active());
       parser.putControlSequence(new NoExpand());
+      parser.putControlSequence(new DirectLua());
 
       parser.putControlSequence(new MathAccent("vec", 8407));
       parser.putControlSequence(new MathAccent("hat", 0x0302, 0x02C6));

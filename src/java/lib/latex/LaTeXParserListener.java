@@ -619,6 +619,8 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       newcounter("footnote");
       newcounter("mpfootnote");
 
+      newcounter("secnumdepth", 3);
+      newcounter("tocdepth", 3);
 
       parser.getSettings().newcount("@listdepth");
       parser.getSettings().newcount("@enumdepth");
@@ -1692,6 +1694,11 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       return fontEncSty;
    }
 
+   public ColorSty getColorSty()
+   {
+      return colorSty;
+   }
+
    protected LaTeXSty getLaTeXSty(KeyValList options, String styName, 
       boolean loadParentOptions, TeXObjectList stack)
    throws IOException
@@ -1732,9 +1739,20 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
          return new BpChemSty(options, this, loadParentOptions);
       }
 
-      if (styName.equals("color") || styName.equals("xcolor"))
+      if (styName.equals("color"))
       {
-         return new ColorSty(options, styName, this, loadParentOptions);
+         colorSty = new ColorSty(options, styName, this, loadParentOptions);
+         return colorSty;
+      }
+
+      if (styName.equals("xcolor"))
+      {
+         if (colorSty == null)
+         {
+            colorSty = new ColorSty(options, styName, this, loadParentOptions);
+         }
+
+         return new XColorSty(options, styName, this, loadParentOptions, colorSty);
       }
 
       if (styName.equals("datatool"))
@@ -1854,7 +1872,12 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
 
       if (styName.equals("nlctuserguide"))
       {
-         return new UserGuideSty(options, this, loadParentOptions);
+         if (colorSty == null)
+         {
+            colorSty = new ColorSty(options, styName, this, loadParentOptions);
+         }
+
+         return new UserGuideSty(options, this, loadParentOptions, colorSty);
       }
 
       if (styName.equals("pifont"))
@@ -2228,6 +2251,11 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       newcounter(name, null);
    }
 
+   public void newcounter(String name, int value)
+   {
+      newcounter(name, null, "number", value);
+   }
+
    public void newcounter(String name, String parent)
    {
       newcounter(name, parent, "number");
@@ -2235,8 +2263,14 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
 
    public void newcounter(String name, String parent, String format)
    {
+      newcounter(name, parent, format, 0);
+   }
+
+   public void newcounter(String name, String parent, String format, int value)
+   {
       // counters are global
-      parser.getSettings().newcount(false, "c@"+name);
+      CountRegister reg = parser.getSettings().newcount(false, "c@"+name);
+      reg.setValue(value);
 
       if (parent == null)
       {
@@ -2755,6 +2789,8 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
    private String inputEncoding = null;
 
    private FontEncSty fontEncSty = null;
+
+   private ColorSty colorSty = null;
 
    private boolean parseAux = false;
 

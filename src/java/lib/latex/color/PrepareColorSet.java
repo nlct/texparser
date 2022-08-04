@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -25,14 +25,14 @@ import java.awt.Color;
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.*;
 
-public class DefineColor extends ControlSequence
+public class PrepareColorSet extends ControlSequence
 {
-   public DefineColor(ColorSty sty)
+   public PrepareColorSet(ColorSty sty)
    {
       this(sty, "definecolor");
    }
 
-   public DefineColor(ColorSty sty, String name)
+   public PrepareColorSet(ColorSty sty, String name)
    {
       super(name);
       this.sty = sty;
@@ -40,7 +40,7 @@ public class DefineColor extends ControlSequence
 
    public Object clone()
    {
-      return new DefineColor(sty, getName());
+      return new PrepareColorSet(sty, getName());
    }
 
    public void process(TeXParser parser) throws IOException
@@ -50,13 +50,22 @@ public class DefineColor extends ControlSequence
 
    public void process(TeXParser parser, TeXObjectList stack) throws IOException
    {
-      String colorName = popLabelString(parser, stack).trim();
+      String type = popOptLabelString(parser, stack);
       String model = popLabelString(parser, stack).trim();
-      String spec = popLabelString(parser, stack).trim();
+      TeXObject head = popArg(parser, stack);
+      TeXObject tail = popArg(parser, stack);
+      String set = popLabelString(parser, stack).trim();
 
-      Color color = sty.getColor(parser, model, spec);
+      String[] specs = set.split(" *; *");
 
-      sty.putColor(colorName, color);
+      for (String spec : specs)
+      {
+         String[] params = spec.split(" *, *", 1);
+
+         Color color = sty.getColor(parser, model, params[1]);
+
+         sty.putColor(params[0], color);
+      }
    }
 
    private ColorSty sty;

@@ -25,15 +25,17 @@ import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.generic.Symbol;
 import com.dickimawbooks.texparserlib.latex.*;
 import com.dickimawbooks.texparserlib.latex.glossaries.*;
+import com.dickimawbooks.texparserlib.latex.color.ColorSty;
 import com.dickimawbooks.texparserlib.html.L2HConverter;
 
 public class UserGuideSty extends LaTeXSty
 {
    public UserGuideSty(KeyValList options, LaTeXParserListener listener, 
-     boolean loadParentOptions)
+     boolean loadParentOptions, ColorSty colorSty)
    throws IOException
    {
       super(options, "nlctuserguide", listener, loadParentOptions);
+      this.colorSty = colorSty;
    }
 
    @Override
@@ -45,6 +47,16 @@ public class UserGuideSty extends LaTeXSty
       {
          ((L2HConverter)listener).addCssStyle("dfn { font-style: normal; font-weight: bold; } a.icon { text-decoration: none; }");
       }
+
+      colorSty.putColor("cs", FG_CS);
+      colorSty.putColor("styopt", FG_STYOPT);
+      colorSty.putColor("csopt", FG_CSOPT);
+      colorSty.putColor("comment", FG_COMMENT);
+
+      colorSty.putColor("style1", new Color(0.32f,0.545f,0.545f));// DarkSlateGray4
+      colorSty.putColor("style2", new Color(0.21f,0.392f,0.545f));// SteelBlue4
+      colorSty.putColor("style3", new Color(0f,0f,0.545f));// Blue4
+      colorSty.putColor("style4", new Color(0.332f,0.1f,0.545f));// Purple4
 
       registerControlSequence(new GuideGls());
 
@@ -753,6 +765,15 @@ public class UserGuideSty extends LaTeXSty
           new TeXCsRef("faDownload"), 
           new TeXCsRef("textsuperscript"), 
           new TeXCsRef("faFilePdfO")))));
+
+      // provide these commands in case they are redefined in the
+      // document, but they're for bib2gls so they can be ignored
+      registerControlSequence(new GenericCommand("nlctuserguidecustomentryaliases"));
+      registerControlSequence(new GenericCommand("nlctuserguideignoredpuncrules"));
+      registerControlSequence(new GenericCommand("nlctuserguidepuncrules"));
+      registerControlSequence(new GenericCommand("nlctuserguidepreletterrules"));
+      registerControlSequence(new GenericCommand("nlctuserguideletterrules"));
+      registerControlSequence(new GenericCommand("nlctuserguideextrarules"));
    }
 
    protected void addGlsFmtTextCommand(String name, String prefix)
@@ -909,7 +930,7 @@ public class UserGuideSty extends LaTeXSty
       addSemanticCommand(name, (TeXFontText)null, fg, null, null);
    }
 
-   protected FrameBox addSemanticCommand(String name, 
+   public FrameBox addSemanticCommand(String name, 
     TeXFontText font, Color fg, TeXObject prefix, TeXObject suffix)
    {
       return addSemanticCommand(name, name, font, fg, prefix, suffix);
@@ -1190,14 +1211,15 @@ public class UserGuideSty extends LaTeXSty
    }
 
    protected GlossariesSty glossariesSty;
+   protected ColorSty colorSty;
 
    public static final Color BG_DEF = new Color(1.0f, 1.0f, 0.75f);
    public static final Color BG_OPTION_DEF = new Color(1.0f, 1.0f, 0.89f);
    public static final Color BG_OPTION_VALUE_DEF = new Color(1.0f, 1.0f, 0.96f);
    public static final Color BG_CODE = new Color(0.95f, 0.95f, 0.95f);
 
-   public static final Color FG_CS = new Color(0.41f,0.545f,0.41f);
-   public static final Color FG_STYOPT = new Color(0.408f, 0.132f, 0.545f);
+   public static final Color FG_CS = new Color(0.41f,0.545f,0.41f);// DarkSeaGreen4
+   public static final Color FG_STYOPT = new Color(0.408f, 0.132f, 0.545f);// DarkOrchid4
    public static final Color FG_CSOPT = new Color(0.408f, 0.132f, 0.545f);
    public static final Color FG_COMMENT = Color.GRAY;
    public static final Color FG_DEPRECATED_OR_BANNED = Color.RED;
