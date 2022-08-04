@@ -1210,6 +1210,11 @@ public class UserGuideSty extends LaTeXSty
       getListener().declareFrameBox(idxBox, false);
    }
 
+   public ColorSty getColorSty()
+   {
+      return colorSty;
+   }
+
    protected GlossariesSty glossariesSty;
    protected ColorSty colorSty;
 

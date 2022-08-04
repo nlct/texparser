@@ -50,6 +50,13 @@ public class DefSemanticCmd extends ControlSequence
       String colSpec = popOptLabelString(parser, stack);
       Color fg = null;
 
+      if (colSpec != null && !colSpec.isEmpty())
+      {
+         String model = colSpec.contains(",") ? "rgb" : "named";
+
+         fg = sty.getColorSty().getColor(parser, model, colSpec);
+      }
+
       ControlSequence cs = popControlSequence(parser, stack);
       ControlSequence fontCs = popControlSequence(parser, stack);
 

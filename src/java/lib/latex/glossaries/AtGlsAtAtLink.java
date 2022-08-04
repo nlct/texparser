@@ -45,7 +45,22 @@ public class AtGlsAtAtLink extends AbstractGlsCommand
 
    public Object clone()
    {
-      return new AtGlsAtAtLink(getName(), getSty(), checkModifier, doUnset);
+      AtGlsAtAtLink cs = new AtGlsAtAtLink(getName(), getSty(), checkModifier, doUnset);
+
+      cs.setEntryLabelPrefix(getEntryLabelPrefix());
+      cs.setDefaultOptions(defaultOptions);
+
+      return cs;
+   }
+
+   public void setDefaultOptions(KeyValList options)
+   {
+      this.defaultOptions = options;
+   }
+
+   public KeyValList getDefaultOptions()
+   {
+      return defaultOptions;
    }
 
    @Override
@@ -68,7 +83,26 @@ public class AtGlsAtAtLink extends AbstractGlsCommand
    {
       LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
 
-      KeyValList options = popOptKeyValList(parser, stack, checkModifier);
+      KeyValList keyValList = null;
+
+      if (defaultOptions != null)
+      {
+         keyValList = (KeyValList)defaultOptions.clone();
+      }
+
+      KeyValList options = popOptKeyValList(parser, stack, true);
+
+      if (options != null)
+      {
+         if (keyValList == null)
+         {
+            keyValList = options;
+         }
+         else
+         {
+            keyValList.putAll(options);
+         }
+      }
 
       GlsLabel glslabel = popEntryLabel(parser, stack);
 
@@ -98,9 +132,9 @@ public class AtGlsAtAtLink extends AbstractGlsCommand
 
          substack.add(listener.getControlSequence("@gls@link"));
 
-         if (options != null)
+         if (keyValList != null)
          {
-            substack.add(options);
+            substack.add(keyValList);
          }
 
          substack.add(glslabel);
@@ -129,4 +163,5 @@ public class AtGlsAtAtLink extends AbstractGlsCommand
    }
 
    protected boolean checkModifier, doUnset;
+   private KeyValList defaultOptions;
 }

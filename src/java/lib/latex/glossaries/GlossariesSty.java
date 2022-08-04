@@ -1028,6 +1028,13 @@ public class GlossariesSty extends LaTeXSty
       registerControlSequence(new GlsXtrUseSeeFormat());
       registerControlSequence(new GlsXtrUseSeeAlso(this));
       registerControlSequence(new GlsXtrUseSeeAlsoFormat());
+
+      registerControlSequence(new GlsXtrNewGls(this));
+      registerControlSequence(new GlsXtrNewGlsLike(this));
+      registerControlSequence(new GlsXtrNewGLSLike(this));
+
+      registerControlSequence(new GlsXtrNewGlsLink(this));
+      registerControlSequence(new GlsXtrNewGlsLink("glsxtrnewglsdisp", true, this));
    }
 
    protected void addGlsXtrTitleCommands(String field)
