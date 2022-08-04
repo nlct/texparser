@@ -112,6 +112,8 @@ public class UserGuideSty extends LaTeXSty
       registerControlSequence(new TextualContentCommand("dfullstop", "."));
       registerControlSequence(new TextualContentCommand("longswitch", "--"));
       registerControlSequence(new TextualContentCommand("shortswitch", "-"));
+      registerControlSequence(new TextualContentCommand("dunderscore", "_"));
+      registerControlSequence(new TextualContentCommand("dsb", "_"));
 
       addSemanticCommand("longargfmt", TeXFontFamily.TT,
         null, new TeXCsRef("longswitch"), null);
@@ -186,15 +188,23 @@ public class UserGuideSty extends LaTeXSty
 
       TaggedColourBox codeBox = addTaggedColourBox("codebox",
          "code", new TeXFontText(TeXFontFamily.VERB), BG_CODE, Color.BLACK);
+
+      registerControlSequence(new DuplicateEnv("codebox*", codeBox));
+
       TaggedColourBox resultBox = addTaggedColourBox("resultbox",
          "result", null, Color.BLACK);
       addTaggedColourBox("badcodebox",
          "badcode", new TeXFontText(TeXFontFamily.VERB), BG_CODE, Color.BLACK);
+      addTaggedColourBox("unicodebox",
+         "unicode", new TeXFontText(TeXFontFamily.VERB), BG_CODE, Color.BLACK);
 
-      registerControlSequence(new FrameBoxEnv(
+      FrameBoxEnv compactcodeBox = new FrameBoxEnv(
         addSemanticCommand("@compactcodebox", "compactcodebox",
         new TeXFontText(TeXFontFamily.VERB),
-        (Color)null, BG_CODE, Color.BLACK, null, null, false, true)));
+        (Color)null, BG_CODE, Color.BLACK, null, null, false, true));
+
+      registerControlSequence(compactcodeBox);
+      registerControlSequence(new DuplicateEnv("compactcodebox*", compactcodeBox));
 
       FrameBox crc = addSemanticCommand("@sidebysidecode", "sidebysidecode",
         new TeXFontText(TeXFontFamily.VERB, TeXFontSize.SMALL),
@@ -215,10 +225,14 @@ public class UserGuideSty extends LaTeXSty
          AlignHStyle.DEFAULT, AlignVStyle.TOP, 
          new UserDimension(0.47, new PercentUnit()));
 
-      registerControlSequence(new CodeResult(
+      CodeResult codeResult = new CodeResult(
          new ColourBox("frame@coderesult@title", BorderStyle.NONE,
           AlignHStyle.CENTER, AlignVStyle.DEFAULT, false, true, null, null),
-        crc, crr));
+        crc, crr);
+
+      registerControlSequence(codeResult);
+
+      registerControlSequence(new DuplicateEnv("coderesult*", codeResult));
 
       FrameBox defnBox = addColourBox("defnbox", null, null,
         BG_DEF, Color.BLACK);
