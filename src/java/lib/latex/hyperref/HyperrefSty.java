@@ -59,6 +59,7 @@ public class HyperrefSty extends LaTeXSty
       registerControlSequence(new GobbleOpt("subpdfbookmark", 0, 2));
       registerControlSequence(new GobbleOpt("belowpdfbookmark", 0, 2));
       registerControlSequence(new AtGobble("thispdfpagelabel"));
+      registerControlSequence(new AtGobble("hypersetup"));
       registerControlSequence(new LaTeXGenericEnvironment("HoHyper"));
       // make pdfstringdef simply behave like csdef
       registerControlSequence(new CsDef("pdfstringdef"));
