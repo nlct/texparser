@@ -1964,7 +1964,10 @@ public class TeXParser extends TeXObjectList
                {
                   debugMessage(1, "EOF while processing object "+object);
 
-                  closeReader(reader);
+                  if (reader != null)
+                  {
+                     closeReader(reader);
+                  }
 
                   reader = this.reader;
 
