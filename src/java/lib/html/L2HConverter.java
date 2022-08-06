@@ -989,7 +989,7 @@ public class L2HConverter extends LaTeXParserListener
       writeTabularCss("center", null);
       writeTabularCss("right", null);
 
-      writeln("pre { overflow: auto; }");
+      writeln("pre { white-space: pre-wrap; }");
       writeln("div.figure { display: block; text-align: center; }");
       writeln("div.caption { display: block; text-align: center; }");
       writeln("div.marginpar { float: right; }");
