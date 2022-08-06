@@ -48,7 +48,7 @@ public class GlsXtrNameRefLink extends ControlSequence
 
       String csname = popLabelString(parser, stack);
       TeXObject title = popArg(parser, stack);
-      String anchor = popLabelString(parser, stack);
+      TeXObject anchor = popArg(parser, stack);
       String externalFile = popLabelString(parser, stack);
 
       parser.startGroup();
@@ -60,7 +60,7 @@ public class GlsXtrNameRefLink extends ControlSequence
       if (externalFile.isEmpty())
       {
          substack.add(listener.getControlSequence("glsxtrfmtinternalnameref"));
-         substack.add(listener.createGroup(anchor));
+         substack.add(TeXParserUtils.createGroup(listener, anchor));
          substack.add(listener.createGroup(csname));
 
          Group grp = listener.createGroup();
@@ -71,7 +71,7 @@ public class GlsXtrNameRefLink extends ControlSequence
       else
       {
          substack.add(listener.getControlSequence("glsxtrfmtexternalnameref"));
-         substack.add(listener.createGroup(anchor));
+         substack.add(TeXParserUtils.createGroup(listener, anchor));
          substack.add(listener.createGroup(csname));
 
          Group grp = listener.createGroup();

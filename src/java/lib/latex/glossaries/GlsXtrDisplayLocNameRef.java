@@ -35,6 +35,7 @@ public class GlsXtrDisplayLocNameRef extends Command
       super(name);
    }
 
+   @Override
    public Object clone()
    {
       return new GlsXtrDisplayLocNameRef(getName());
@@ -79,6 +80,9 @@ public class GlsXtrDisplayLocNameRef extends Command
 
          parser.putControlSequence(true, recentAnchor);
          parser.putControlSequence(true, locAnchor);
+
+         parser.putControlSequence(true, new TextualContentCommand(
+            "glsxtractualanchor", counter+"."+hloc));
 
          expanded.add(listener.getControlSequence("glsxtrsetactualanchor"));
          expanded.add(listener.createGroup(counter));

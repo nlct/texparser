@@ -137,6 +137,13 @@ public class AtNumberOfNumber extends Command
       process(parser, parser);
    }
 
+   @Override
+   public String toString()
+   {
+      return String.format("%s[name=%s,number=%d,total=%d]",
+       getClass().getSimpleName(), getName(), number, total);
+   }
+
    private int number;
    private int total;
 

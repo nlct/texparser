@@ -958,7 +958,6 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
    public void addLaTeXCommand(String name, 
      boolean isShort, int numParams,
      TeXObject defValue, TeXObject definition)
-     throws IOException
    {
       addLaTeXCommand(false, name, isShort, numParams, defValue, definition);
    }
@@ -966,7 +965,6 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
    public void addLaTeXCommand(boolean isRobust, String name, 
      boolean isShort, int numParams,
      TeXObject defValue, TeXObject definition)
-     throws IOException
    {
       TeXObjectList defList;
 
@@ -1052,7 +1050,6 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
 
    public void addLaTeXEnvironment(String name, int numParams,
      TeXObject defValue, TeXObject definition, TeXObject endDefinition)
-     throws IOException
    {
       if (numParams == 0)
       {

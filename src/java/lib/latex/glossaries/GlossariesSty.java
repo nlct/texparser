@@ -952,7 +952,7 @@ public class GlossariesSty extends LaTeXSty
       registerControlSequence(new GlsXtrNameRefLink());
       registerControlSequence(new GlsXtrFmtInternalNameRef());
       registerControlSequence(new GlsXtrFmtExternalNameRef());
-      registerControlSequence(new GlsXtrSetActualAnchor());
+      registerControlSequence(new AtGobble("glsxtrsetactualanchor"));
       registerControlSequence(new GlsXtrTitledNameRefLink());
 
       registerControlSequence(new GlsXtrInternalLocationHyperlink());

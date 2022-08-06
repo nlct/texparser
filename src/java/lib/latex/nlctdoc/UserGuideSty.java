@@ -100,10 +100,31 @@ public class UserGuideSty extends LaTeXSty
 
       registerControlSequence(new GenericCommand(true, "mainfmt", null,
          new TeXCsRef("glsnumberformat")));
-      registerControlSequence(new GenericCommand(true, "termslocfmt", null,
-         new TeXCsRef("textit")));
+
+      addSemanticCommand("termslocfmt", TeXFontShape.IT);
+
       registerControlSequence(new GenericCommand(true, "glsaddterm", null,
          new TeXCsRef("glsadd")));
+
+      listener.addLaTeXCommand("seclocfmt", true, 2, null, 
+        TeXParserUtils.createStack(listener, 
+         listener.getOther(0xA7),
+         listener.getParam(1),
+         listener.getSpace(), listener.getOther('('),
+         listener.getParam(2), listener.getOther(')')));
+
+      registerControlSequence(new GenericCommand(true,
+        "glsxtrchapterlocfmt", null, new TeXCsRef("seclocfmt")));
+      registerControlSequence(new GenericCommand(true,
+        "glsxtrsectionlocfmt", null, new TeXCsRef("seclocfmt")));
+      registerControlSequence(new GenericCommand(true,
+        "glsxtrsubsectionlocfmt", null, new TeXCsRef("seclocfmt")));
+      registerControlSequence(new GenericCommand(true,
+        "glsxtrsubsubsectionlocfmt", null, new TeXCsRef("seclocfmt")));
+      registerControlSequence(new GenericCommand(true,
+        "glsxtrparagraphlocfmt", null, new TeXCsRef("seclocfmt")));
+      registerControlSequence(new GenericCommand(true,
+        "glsxtrsubparagraphlocfmt", null, new TeXCsRef("seclocfmt")));
 
       registerControlSequence(new TextualContentCommand("dhyphen", "-"));
       registerControlSequence(new TextualContentCommand("dcolon", ":"));

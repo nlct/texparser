@@ -61,22 +61,7 @@ public class GlsXtrWrGlossaryLocFmt extends ControlSequence
          TeXParserUtils.process(substack, parser, stack);
       }
 
-      if (parser.isStack(location) && !location.isEmpty())
-      {
-         TeXObjectList list = (TeXObjectList)location;
-
-         if (list.size() == 3)
-         {
-            TeXObject firstObj = list.firstElement();
-
-            if (firstObj instanceof ControlSequence 
-                 && ((ControlSequence)firstObj).getName().equals(
-                      "glsxtr@wrglossarylocation"))
-            {
-               location = list.lastElement();
-            }
-         }
-      }
+      parser.putControlSequence(true, new AtSecondOfTwo("glsxtr@wrglossarylocation"));
 
       TeXParserUtils.process(location, parser, stack);
 

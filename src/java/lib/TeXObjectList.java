@@ -1929,6 +1929,7 @@ public class TeXObjectList extends Vector<TeXObject>
 
       if (parser.getDebugLevel() > 0)
       {
+         parser.logMessage("PROCESSING STACK TeX Code: "+toString(parser));
          parser.logMessage("PROCESSING STACK "+toString());
       }
 
@@ -1983,6 +1984,7 @@ public class TeXObjectList extends Vector<TeXObject>
 
       if (parser.getDebugLevel() > 0)
       {
+         parser.logMessage("PROCESSING STACK TeX Code: "+toString(parser) + " SUBSTACK TeX Code: "+stack.toString(parser));
          parser.logMessage("PROCESSING STACK "+toString()+" SUBSTACK: "+stack);
       }
 

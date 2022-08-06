@@ -46,7 +46,7 @@ public class GlsXtrFmtInternalNameRef extends ControlSequence
    {
       TeXParserListener listener = parser.getListener();
 
-      String target = popLabelString(parser, stack);
+      TeXObject target = popArg(parser, stack);
       String csname = popLabelString(parser, stack);
       TeXObject title = popArg(parser, stack);
 
@@ -68,7 +68,7 @@ public class GlsXtrFmtInternalNameRef extends ControlSequence
       }
 
       arg.add(listener.getControlSequence("glsdohyperlink"));
-      arg.add(listener.createGroup(target));
+      arg.add(TeXParserUtils.createGroup(listener, target));
 
       Group grp = listener.createGroup();
       arg.add(grp);
