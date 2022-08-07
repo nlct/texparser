@@ -25,25 +25,25 @@ import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.*;
 import com.dickimawbooks.texparserlib.latex.glossaries.*;
 
-public class EnvDef extends StandaloneDef
+public class ClsDef extends StandaloneDef
 {
-   public EnvDef(TaggedColourBox taggedBox, FrameBox rightBox,
+   public ClsDef(TaggedColourBox taggedBox, FrameBox rightBox,
      FrameBox noteBox, GlossariesSty sty)
    {
-      this("envdef", taggedBox, rightBox, noteBox, sty);
+      this("clsdef", taggedBox, rightBox, noteBox, sty);
    }
 
-   public EnvDef(String name, TaggedColourBox taggedBox, FrameBox rightBox,
+   public ClsDef(String name, TaggedColourBox taggedBox, FrameBox rightBox,
      FrameBox noteBox, GlossariesSty sty)
    {
       super(name, taggedBox, rightBox, noteBox, sty);
-      setEntryLabelPrefix("env.");
+      setEntryLabelPrefix("cls.");
    }
 
    @Override
    public Object clone()
    {
-      return new EnvDef(getName(), taggedBox, rightBox, noteBox, getSty());
+      return new ClsDef(getName(), taggedBox, rightBox, noteBox, getSty());
    }
 
    @Override
@@ -52,7 +52,16 @@ public class EnvDef extends StandaloneDef
       TeXParserListener listener = parser.getListener();
 
       list.add(listener.getControlSequence("cmd"));
-      list.add(parser.getListener().createGroup("begin"));
+      list.add(parser.getListener().createGroup("documentclass"));
+
+      TeXObject syntax = glslabel.getField("syntax");
+
+      if (syntax != null)
+      {
+         list.add(listener.getOther('['));
+         list.add(syntax, true);
+         list.add(listener.getOther(']'));
+      }
 
       list.add(listener.getOther('{'));
    }
@@ -60,22 +69,7 @@ public class EnvDef extends StandaloneDef
    @Override
    protected void addPostEntryName(TeXObjectList list, GlsLabel glslabel, TeXParser parser)
    {
-      TeXParserListener listener = parser.getListener();
-
-      list.add(listener.getOther('}'));
-
-      TeXObject syntax = glslabel.getField("syntax");
-
-      if (syntax != null)
-      {
-         list.add(syntax, true);
-      }
-
-      list.add(listener.getControlSequence("meta"));
-      list.add(listener.createGroup("content"));
-
-      list.add(listener.getControlSequence("cend"));
-      list.add(TeXParserUtils.createGroup(listener, glslabel.getField("name")));
+      list.add(parser.getListener().getOther('}'));
    }
 
    @Override

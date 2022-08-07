@@ -271,6 +271,8 @@ public class UserGuideSty extends LaTeXSty
       registerControlSequence(new CmdDef(pinnedBox, rightBox, noteBox, glossariesSty));
       registerControlSequence(new EnvDef(pinnedBox, rightBox, noteBox, glossariesSty));
       registerControlSequence(new CtrDef(ctrBox, rightBox, noteBox, glossariesSty));
+      registerControlSequence(new PkgDef(pinnedBox, rightBox, noteBox, glossariesSty));
+      registerControlSequence(new ClsDef(pinnedBox, rightBox, noteBox, glossariesSty));
 
       TaggedColourBox settingsBox = addTaggedColourBox("settingsbox",
          "valuesetting", BG_OPTION_DEF, Color.BLACK);

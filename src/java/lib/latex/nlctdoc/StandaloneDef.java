@@ -56,6 +56,10 @@ public class StandaloneDef extends AbstractGlsCommand
       return null;
    }
 
+   protected void addPreEntryName(TeXObjectList list, GlsLabel glslabel, TeXParser parser)
+   {
+   }
+
    protected void addEntryName(TeXObjectList list, GlsLabel glslabel, TeXParser parser)
    {
       list.add(parser.getListener().getControlSequence("glossentryname"));
@@ -130,20 +134,38 @@ public class StandaloneDef extends AbstractGlsCommand
       return glslabel.getEntry().get("note");
    }
 
+   protected String getDefinitionCsName()
+   {
+      return "code";
+   }
+
    protected void addRow(TeXObjectList list, GlsLabel glslabel, 
       TeXParser parser, Vector<GlsLabel> modList)
    throws IOException
    {
       TeXParserListener listener = parser.getListener();
 
-      list.add(listener.getControlSequence("glstarget"));
-      list.add(glslabel);
+      String csname = getDefinitionCsName();
+      TeXObjectList defnList = list;
+
+      if (csname != null)
+      {
+         ControlSequence cs = listener.getControlSequence(csname);
+         list.add(cs);
+         defnList = listener.createGroup();
+         list.add(defnList);
+      }
+
+      addPreEntryName(defnList, glslabel, parser);
+
+      defnList.add(listener.getControlSequence("glstarget"));
+      defnList.add(glslabel);
 
       Group grp = listener.createGroup();
-      list.add(grp);
+      defnList.add(grp);
 
       addEntryName(grp, glslabel, parser);
-      addPostEntryName(list, glslabel, parser);
+      addPostEntryName(defnList, glslabel, parser);
 
       TeXObject rightBoxContent = getRightBoxContent(glslabel, parser);
 
