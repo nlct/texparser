@@ -101,41 +101,47 @@ public class Begin extends ControlSequence
 
       if (listener.isVerbEnv(name))
       {
-         ControlSequence cs = listener.getControlSequence(name);
+         ControlSequence verbCs = listener.getControlSequence(name);
 
          TeXObjectList contents = new TeXObjectList();
-         String endEnv = String.format("%s%s%s",
-            new String(Character.toChars(parser.getBgChar())), 
-            name, 
-            new String(Character.toChars(parser.getEgChar())));
 
          while (true)
          {
-            TeXObject object = stack.popStack(parser, TeXObjectList.POP_RETAIN_IGNOREABLES);
+            TeXObject token = stack.pop();
 
-            object = TeXParserUtils.resolve(object, parser);
-
-            if (object instanceof End)
+            if (token == null)
             {
-               TeXObject arg = stack.popStack(parser);
+               parser.debugMessage(1, 
+                 "End of stack found while peeking in "+name);
+            }
 
-               if (endEnv.equals(arg.toString(parser)))
+            if (token instanceof ControlSequence
+              && ((ControlSequence)token).getName().equals("end"))
+            {
+               ControlSequence cs = (ControlSequence)token;
+               token = stack.peekStack();
+
+               if (parser.isBeginGroup(token) != null)
                {
-                  break;
+                  TeXObject arg = popArg(parser, stack);
+
+                  if (name.equals(arg.toString(parser)))
+                  {
+                     break;
+                  }
                }
                else
                {
-                  contents.add(object);
-                  contents.add(arg);
+                  contents.add(cs);
                }
             }
             else
             {
-               contents.add(object);
+               contents.add(token);
             }
          }
 
-         cs.process(parser, contents);
+         verbCs.process(parser, contents);
 
          return;
       }

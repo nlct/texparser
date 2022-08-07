@@ -1343,6 +1343,16 @@ public class L2HConverter extends LaTeXParserListener
       write("</code>");
    }
 
+   public void beginVerbatim() throws IOException
+   {
+      write("<pre>");
+   }
+
+   public void endVerbatim() throws IOException
+   {
+      write("</pre>");
+   }
+
    public String getImagePreamble() throws IOException
    {
       String preamble = null;

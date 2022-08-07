@@ -366,6 +366,14 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       return false;
    }
 
+   public void beginVerbatim() throws IOException
+   {
+   }
+
+   public void endVerbatim() throws IOException
+   {
+   }
+
    protected void addPredefined()
    {
       super.addPredefined();

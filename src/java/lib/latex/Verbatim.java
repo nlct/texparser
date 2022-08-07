@@ -84,11 +84,11 @@ public class Verbatim extends Declaration
    public void process(TeXParser parser, TeXObjectList stack)
     throws IOException
    {
-      TeXSettings settings = parser.getSettings();
-      orgFamily = settings.getCurrentFontFamily();
-      settings.setFontFamily(TeXFontFamily.VERB);
+      LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
 
-      Writeable writeable = parser.getListener().getWriteable();
+      listener.beginVerbatim();
+
+      Writeable writeable = listener.getWriteable();
 
       boolean isStar = (getName().endsWith("*"));
 
@@ -103,13 +103,13 @@ public class Verbatim extends Declaration
             writeable.write(object.toString(parser));
          }
       }
+
+      listener.endVerbatim();
    }
 
    @Override
    public void end(TeXParser parser, TeXObjectList stack) throws IOException
    {
-      TeXSettings settings = parser.getSettings();
-      settings.setFontFamily(orgFamily);
    }
 
    @Override
