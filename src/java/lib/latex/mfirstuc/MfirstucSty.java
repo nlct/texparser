@@ -57,6 +57,7 @@ public class MfirstucSty extends LaTeXSty
       registerControlSequence(new MakeFirstUc("MFUcapword", this));
       registerControlSequence(new MFUnocap(this));
       registerControlSequence(new MFUnocap(this, "gMFUnocap", true));
+      registerControlSequence(new MFUclear(this));
       registerControlSequence(new MFUskippunc());
       registerControlSequence(new MFUwordbreak());
 
@@ -106,6 +107,17 @@ public class MfirstucSty extends LaTeXSty
 
       getParser().putControlSequence(!global, 
         new GenericCommand("@mfu@nocaplist", null, list));
+   }
+
+   public void clearExceptions()
+   {
+      clearExceptions(false);
+   }
+
+   public void clearExceptions(boolean global)
+   {
+      getParser().putControlSequence(!global,
+         new GenericCommand("@mfu@nocaplist"));
    }
 
    public boolean isException(TeXObject word)

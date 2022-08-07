@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2018 Nicola L.C. Talbot
+    Copyright (C) 2018-2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -55,6 +55,7 @@ public class CapitaliseWords extends Command
       this.sty = sty;
    }
 
+   @Override
    public Object clone()
    {
       return new CapitaliseWords(sty, getName(), expansion);
@@ -68,11 +69,8 @@ public class CapitaliseWords extends Command
 
    public boolean isWordBoundary(TeXParser parser, TeXObject object)
    {
-      ControlSequence cs = parser.getControlSequence("ifMFUhyphen");
-
-      if (cs instanceof IfTrue 
-           && object instanceof CharObject
-           && ((CharObject)object).getCharCode() == '-')
+      if (hyphen && object instanceof CharObject
+             && ((CharObject)object).getCharCode() == '-')
       {
          return true;
       }
@@ -86,67 +84,28 @@ public class CapitaliseWords extends Command
        && !Character.isAlphabetic(((CharObject)object).getCharCode());
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser)
      throws IOException
    {
       return expandonce(parser, parser);
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      TeXObject arg;
+      hyphen = TeXParserUtils.isTrue("ifMFUhyphen", parser);
 
-      if (stack == parser)
-      {
-         arg = parser.popNextArg();
-      }
-      else
-      {
-         arg = stack.popArg(parser);
-      }
+      TeXObject arg = popArg(parser, stack);
 
       if (expansion == MakeFirstUc.EXPANSION_ONCE)
       {
-         if (arg instanceof Expandable)
-         {
-            TeXObjectList list;
-
-            if (parser == stack)
-            {
-               list = ((Expandable)arg).expandonce(parser);
-            }
-            else
-            {
-               list = ((Expandable)arg).expandonce(parser, stack);
-            }
-
-            if (list != null)
-            {
-               arg = list;
-            }
-         }
+         arg = TeXParserUtils.expandOnce(arg, parser, stack);
       }
       else if (expansion == MakeFirstUc.EXPANSION_FULL)
       {
-         if (arg instanceof Expandable)
-         {
-            TeXObjectList list;
-
-            if (parser == stack)
-            {
-               list = ((Expandable)arg).expandfully(parser);
-            }
-            else
-            {
-               list = ((Expandable)arg).expandfully(parser, stack);
-            }
-
-            if (list != null)
-            {
-               arg = list;
-            }
-         }
+         arg = TeXParserUtils.expandFully(arg, parser, stack);
       }
 
       TeXObjectList expanded = new TeXObjectList();
@@ -160,8 +119,7 @@ public class CapitaliseWords extends Command
          expanded.add(new TeXCsRef("MFUcapword"));
          expanded.add(arg);
       }
-      else if (arg instanceof TeXObjectList 
-                && ((TeXObjectList)arg).size() > 0)
+      else if (parser.isStack(arg) && !arg.isEmpty())
       {
          TeXObjectList list = (TeXObjectList)arg;
 
@@ -232,24 +190,28 @@ public class CapitaliseWords extends Command
       return expanded;
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser)
      throws IOException
    {
       return expandonce(parser).expandfully(parser);
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
       return expandonce(parser, stack).expandfully(parser, stack);
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
       expandonce(parser, stack).process(parser, stack);
    }
 
+   @Override
    public void process(TeXParser parser)
      throws IOException
    {
@@ -258,4 +220,5 @@ public class CapitaliseWords extends Command
 
    protected byte expansion = MakeFirstUc.EXPANSION_NONE;
    protected MfirstucSty sty;
+   protected boolean hyphen = false;
 }
