@@ -69,12 +69,6 @@ public class CapitaliseWords extends Command
 
    public boolean isWordBoundary(TeXParser parser, TeXObject object)
    {
-      if (hyphen && object instanceof CharObject
-             && ((CharObject)object).getCharCode() == '-')
-      {
-         return true;
-      }
-
       return (object instanceof Space || isWordBreakCs(object));
    }
 
@@ -95,8 +89,6 @@ public class CapitaliseWords extends Command
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      hyphen = TeXParserUtils.isTrue("ifMFUhyphen", parser);
-
       TeXObject arg = popArg(parser, stack);
 
       if (expansion == MakeFirstUc.EXPANSION_ONCE)
@@ -108,7 +100,20 @@ public class CapitaliseWords extends Command
          arg = TeXParserUtils.expandFully(arg, parser, stack);
       }
 
+      ControlSequence wordCs;
+
+      if (TeXParserUtils.isTrue("ifMFUhyphen", parser))
+      {
+         wordCs = parser.getListener().getControlSequence("MFUhyphencapword");
+      }
+      else
+      {
+         wordCs = parser.getListener().getControlSequence("MFUcapword");
+      }
+
       TeXObjectList expanded = new TeXObjectList();
+      boolean isStart = true;
+      boolean spaceFound = false;
 
       if (arg instanceof MathGroup)
       {
@@ -116,7 +121,7 @@ public class CapitaliseWords extends Command
       }
       else if (arg instanceof Group)
       {
-         expanded.add(new TeXCsRef("MFUcapword"));
+         expanded.add(wordCs);
          expanded.add(arg);
       }
       else if (parser.isStack(arg) && !arg.isEmpty())
@@ -127,8 +132,6 @@ public class CapitaliseWords extends Command
 
          TeXObject object;
 
-         int wordIdx = 0;
-
          do
          {
             object = list.peekStack();
@@ -137,6 +140,11 @@ public class CapitaliseWords extends Command
                     (isPunctuation(object) || isWordBoundary(parser, object)))
             {
                object = list.popStack(parser);
+
+               if (!spaceFound)
+               {
+                  spaceFound = (object instanceof Space);
+               }
 
                if (isWordBreakCs(object))
                {
@@ -162,19 +170,27 @@ public class CapitaliseWords extends Command
                object = list.peekStack();
             }
 
-            if (wordIdx > 0 && sty.isException(word))
+            if (!spaceFound)
+            {
+               spaceFound = (object instanceof Space);
+            }
+
+            if (!isStart && sty.isException(word))
             {
                expanded.addAll(word);
             }
             else
             {
-               expanded.add(new TeXCsRef("MFUcapword"));
+               expanded.add(wordCs);
                Group grp = listener.createGroup();
                grp.addAll(word);
                expanded.add(grp);
             }
 
-            wordIdx++;
+            if (spaceFound)
+            {
+               isStart = false;
+            }
          }
          while (object != null);
       }
@@ -220,5 +236,4 @@ public class CapitaliseWords extends Command
 
    protected byte expansion = MakeFirstUc.EXPANSION_NONE;
    protected MfirstucSty sty;
-   protected boolean hyphen = false;
 }
