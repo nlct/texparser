@@ -771,6 +771,9 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
          new TeXObject[]{new TeXCsRef("space"), new TeXCsRef("space"),
           new TeXCsRef("space"), new TeXCsRef("space")}));
 
+      parser.putControlSequence(new TextualContentCommand("obeyedspace", " "));
+      parser.putControlSequence(new ObeySpaces());
+
       parser.putControlSequence(new GenericError());
       parser.putControlSequence(new DocumentStyle());
 
