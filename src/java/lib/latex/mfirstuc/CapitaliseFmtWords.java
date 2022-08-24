@@ -119,6 +119,17 @@ public class CapitaliseFmtWords extends CapitaliseWords
          }
       }
 
+      ControlSequence wordCs;
+
+      if (TeXParserUtils.isTrue("ifMFUhyphen", parser))
+      {
+         wordCs = parser.getListener().getControlSequence("MFUhyphencapword");
+      }
+      else
+      {
+         wordCs = parser.getListener().getControlSequence("MFUcapword");
+      }
+
       TeXObjectList expanded = new TeXObjectList();
 
       if (arg instanceof MathGroup)
@@ -127,7 +138,7 @@ public class CapitaliseFmtWords extends CapitaliseWords
       }
       else if (arg instanceof Group)
       {
-         expanded.add(new TeXCsRef("MFUcapword"));
+         expanded.add(wordCs);
          expanded.add(arg);
       }
       else if (arg instanceof TeXObjectList 
@@ -193,7 +204,7 @@ public class CapitaliseFmtWords extends CapitaliseWords
                }
                else
                {
-                  expanded.add(new TeXCsRef("MFUcapword"));
+                  expanded.add(wordCs);
                   Group grp = listener.createGroup();
                   grp.addAll(word);
                   expanded.add(grp);
