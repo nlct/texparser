@@ -178,7 +178,13 @@ public class CapitaliseFmtWords extends CapitaliseWords
                Group grp = listener.createGroup();
                expanded.add(grp);
 
-               grp.add(new TeXCsRef("capitalisewords"));
+               grp.add(new TeXCsRef("capitalisefmtwords"));
+
+               if (isStar)
+               {
+                  grp.add(listener.getOther('*'));
+               }
+
                object = list.popStack(parser);
 
                if (object != null)
