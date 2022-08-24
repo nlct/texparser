@@ -843,6 +843,8 @@ public class TeXParser extends TeXObjectList
 
       SkippedSpaces skipped = null;
 
+      boolean inVerb = settings.inVerb();
+
       while ((c = read()) != -1)
       {
          if (!isCatCode(TYPE_SPACE, c))
@@ -851,14 +853,23 @@ public class TeXParser extends TeXObjectList
             break;
          }
 
-         if (skipped == null)
-         {
-            skipped = listener.createSkippedSpaces();
-         }
-
          Space space = listener.getSpace();
          space.setSpace(c);
-         skipped.add(space);
+
+         if (inVerb)
+         {// assume pseudo-verbatim
+
+            list.add(space);
+         }
+         else
+         {
+            if (skipped == null)
+            {
+               skipped = listener.createSkippedSpaces();
+            }
+
+            skipped.add(space);
+         }
 
          mark(1);
       }
