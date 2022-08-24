@@ -811,6 +811,9 @@ public class UserGuideSty extends LaTeXSty
       registerControlSequence(new GenericCommand("nlctuserguidepreletterrules"));
       registerControlSequence(new GenericCommand("nlctuserguideletterrules"));
       registerControlSequence(new GenericCommand("nlctuserguideextrarules"));
+
+      registerControlSequence(new TextualContentCommand("codepar", 
+       String.format("%n")));
    }
 
    protected void addGlsFmtTextCommand(String name, String prefix)
