@@ -119,15 +119,17 @@ public class CapitaliseFmtWords extends CapitaliseWords
          }
       }
 
+      TeXParserListener listener = parser.getListener();
+
       ControlSequence wordCs;
 
       if (TeXParserUtils.isTrue("ifMFUhyphen", parser))
       {
-         wordCs = parser.getListener().getControlSequence("MFUhyphencapword");
+         wordCs = listener.getControlSequence("MFUhyphencapword");
       }
       else
       {
-         wordCs = parser.getListener().getControlSequence("MFUcapword");
+         wordCs = listener.getControlSequence("MFUcapword");
       }
 
       TeXObjectList expanded = new TeXObjectList();
@@ -145,8 +147,6 @@ public class CapitaliseFmtWords extends CapitaliseWords
                 && ((TeXObjectList)arg).size() > 0)
       {
          TeXObjectList list = (TeXObjectList)arg;
-
-         TeXParserListener listener = parser.getListener();
 
          TeXObject object;
 
@@ -178,7 +178,7 @@ public class CapitaliseFmtWords extends CapitaliseWords
                Group grp = listener.createGroup();
                expanded.add(grp);
 
-               grp.add(new TeXCsRef("capitalisefmtwords"));
+               grp.add(this);
 
                if (isStar)
                {
@@ -207,6 +207,13 @@ public class CapitaliseFmtWords extends CapitaliseWords
                if (wordIdx > 0 && sty.isException(word))
                {
                   expanded.addAll(word);
+               }
+               else if (word.size() == 1 && word.firstElement() instanceof Group)
+               {
+                  Group grp = listener.createGroup();
+                  expanded.add(grp);
+                  grp.add(wordCs);
+                  grp.add(word.firstElement());
                }
                else
                {
