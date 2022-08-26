@@ -132,6 +132,10 @@ public class AtGlsAtLink extends AbstractGlsCommand
             {
                doHyper = true;
             }
+            else if (hyperVal instanceof UserBoolean)
+            {
+               doHyper = ((UserBoolean)hyperVal).booleanValue();
+            }
             else
             {
                doHyper = !parser.expandToString(hyperVal, stack).equals("false");

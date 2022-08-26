@@ -442,8 +442,8 @@ public class GlossariesSty extends LaTeXSty
 
       LaTeXParserListener listener = (LaTeXParserListener)getParser().getListener();
 
-      setModifier(listener.getOther('*'), "hyper", new UserBoolean(true));
-      setModifier(listener.getOther('+'), "hyper", new UserBoolean(false));
+      setModifier(listener.getOther('*'), "hyper", new UserBoolean(false));
+      setModifier(listener.getOther('+'), "hyper", new UserBoolean(true));
 
       registerControlSequence(new GobbleOpt("makeglossaries", 1, 0));
 
