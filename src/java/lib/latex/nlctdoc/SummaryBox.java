@@ -312,7 +312,7 @@ public class SummaryBox extends AbstractGlsCommand
                   }
                   else
                   {
-                     modList.add(new GlsLabel("modlabel", modTokenEntry));
+                     modList.add(new GlsLabel("modlabel", modTokenLabel, modTokenEntry));
                   }
                }
             }
@@ -327,7 +327,8 @@ public class SummaryBox extends AbstractGlsCommand
             content.add(listener.getPar());
             content.add(new StartFrameBox(noteBox));
 
-            content.add(note, true);
+            content.add(listener.getControlSequence("summarynotefmt"));
+            content.add(TeXParserUtils.createGroup(listener, note));
 
             content.add(new EndFrameBox(noteBox));
          }

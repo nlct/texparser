@@ -103,10 +103,15 @@ public class CreateExample extends ControlSequence
 
       String dir = parser.expandToString(listener.getControlSequence("examplesdir"),
          stack);
-      String base = parser.expandToString(
-         listener.getControlSequence("nlctexamplefilebasename"), stack);
 
-      substack.add(listener.getControlSequence("href"));
+      TeXObject baseObj = listener.getControlSequence("nlctexamplefilebasename");
+
+      baseObj = TeXParserUtils.expandOnce(baseObj, parser, stack);
+      String base = parser.expandToString(baseObj, stack);
+
+      ControlSequence hrefCs = listener.getControlSequence("href");
+
+      substack.add(hrefCs);
       substack.add(listener.createGroup(dir+"/"+base+".tex"));
       substack.add(listener.getControlSequence("exampledownloadtexicon"));
 
@@ -114,7 +119,7 @@ public class CreateExample extends ControlSequence
 
       String pdfPath = dir+"/"+base+".pdf";
 
-      substack.add(listener.getControlSequence("href"));
+      substack.add(hrefCs);
       substack.add(listener.createGroup(pdfPath));
       substack.add(listener.getControlSequence("exampledownloadpdficon"));
 

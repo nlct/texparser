@@ -58,11 +58,14 @@ public class ExampleFileBaseName extends Command
             LaTeXSyntaxException.ERROR_UNDEFINED_COUNTER, "example");
       }
 
+      int exNum = reg.number(parser);
+
       TeXObjectList expanded = listener.createStack();
 
-      expanded.add(listener.getControlSequence("jobname"));
-      expanded.addAll(listener.createString(String.format("-example%03d", 
-        reg.number(parser))));
+      ControlSequence jobnameCs = listener.getControlSequence("jobname");
+
+      expanded.add(TeXParserUtils.expandOnce(jobnameCs, parser, stack), true);
+      expanded.addAll(listener.createString(String.format("-example%03d", exNum)));
 
       return expanded;
    }

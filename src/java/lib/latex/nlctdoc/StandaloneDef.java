@@ -129,9 +129,32 @@ public class StandaloneDef extends AbstractGlsCommand
       return list;
    }
 
+   protected ControlSequence getNoteFmt(TeXParser parser)
+   {
+      return null;
+   }
+
    protected TeXObject getNote(GlsLabel glslabel, TeXParser parser)
    {
-      return glslabel.getEntry().get("note");
+      TeXObject note = glslabel.getEntry().get("note");
+
+      if (note == null)
+      {
+         return null;
+      }
+
+      ControlSequence cs = getNoteFmt(parser);
+
+      if (cs == null)
+      {
+         return note;
+      }
+
+      TeXObjectList list = parser.getListener().createStack();
+      list.add(cs);
+      list.add(TeXParserUtils.createGroup(parser, note));
+
+      return list;
    }
 
    protected String getDefinitionCsName()
@@ -273,7 +296,7 @@ public class StandaloneDef extends AbstractGlsCommand
                   }
                   else
                   {
-                     modList.add(new GlsLabel("modlabel", modTokenEntry));
+                     modList.add(new GlsLabel("modlabel", modTokenLabel, modTokenEntry));
                   }
                }
                else

@@ -85,4 +85,10 @@ public class CmdDef extends StandaloneDef
       }
    }
 
+   @Override
+   protected ControlSequence getNoteFmt(TeXParser parser)
+   {
+      return parser.getControlSequence("cmdnotefmt");
+   }
+
 }

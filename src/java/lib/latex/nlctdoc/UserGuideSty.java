@@ -48,6 +48,12 @@ public class UserGuideSty extends LaTeXSty
          ((L2HConverter)listener).addCssStyle("dfn { font-style: normal; font-weight: bold; } a.icon { text-decoration: none; }");
       }
 
+      glossariesSty.setModifier(listener.getOther('+'), "format",
+        listener.createString("glsnumberformat"));
+
+      glossariesSty.setModifier(listener.getOther('!'), "format",
+        listener.createString("glsignore"));
+
       colorSty.putColor("cs", FG_CS);
       colorSty.putColor("styopt", FG_STYOPT);
       colorSty.putColor("csopt", FG_CSOPT);
@@ -151,6 +157,10 @@ public class UserGuideSty extends LaTeXSty
       addNestedSemanticCommand("meta", new TeXFontText(TeXFontShape.EM),
         new TeXFontText(TeXFontFamily.RM),
         Color.BLACK, listener.getOther(0x2329), listener.getOther(0x232A));
+
+      addNestedSemanticCommand("valuevariesfmt", new TeXFontText(TeXFontShape.EM),
+        new TeXFontText(TeXFontFamily.RM),
+        Color.BLACK, null, null);
 
       addSemanticCommand("summarytagfmt", "summarytag", 
         new TeXFontText(TeXFontShape.IT),
@@ -569,6 +579,20 @@ public class UserGuideSty extends LaTeXSty
       registerControlSequence(new LaTeXGenericCommand(true,
        "ctanmirror", "mm", def));
 
+      // \ctanmirrordocnofn use .html instead of .pdf
+      def = getListener().createStack();
+      def.add(new TeXCsRef("href"));
+      grp = getListener().createGroup("http://mirrors.ctan.org/");
+      def.add(grp);
+      grp.add(getListener().getParam(1));
+      grp.addAll(getListener().createString(".html"));
+      grp = getListener().createGroup();
+      def.add(grp);
+      grp.add(getListener().getParam(2));
+
+      registerControlSequence(new LaTeXGenericCommand(true,
+       "ctanmirrordocnofn", "mm", def));
+
       // \ctanpkgmirror
       def = getListener().createStack();
       def.add(new TeXCsRef("href"));
@@ -745,6 +769,33 @@ public class UserGuideSty extends LaTeXSty
       registerControlSequence(new GenericCommand(true,
        "unicodesym", null, def));
 
+      // \cmdnotefmt
+      registerControlSequence(new AtFirstOfOne("cmdnotefmt"));
+
+      // \conditionsyntax
+      def = getListener().createStack();
+      def.add(getListener().getSpace());
+      def.add(new TeXCsRef("meta"));
+      def.add(getListener().createGroup("true"));
+      def.add(new TeXCsRef("csfmt"));
+      def.add(getListener().createGroup("else"));
+      def.add(new TeXCsRef("meta"));
+      def.add(getListener().createGroup("false"));
+      def.add(new TeXCsRef("csfmt"));
+      def.add(getListener().createGroup("fi"));
+
+      registerControlSequence(new GenericCommand(true,
+       "conditionsyntax", null, def));
+
+      // \summarynotefmt
+      def = getListener().createStack();
+      def.add(getListener().getOther('('));
+      def.add(getListener().getParam(1));
+      def.add(getListener().getOther(')'));
+
+      registerControlSequence(new LaTeXGenericCommand(true,
+       "summarynotefmt", "m", def));
+
       registerControlSequence(new TextualContentCommand(
          "glsxtrpostdescdualindexabbreviation", "."));
 
@@ -814,6 +865,11 @@ public class UserGuideSty extends LaTeXSty
 
       registerControlSequence(new TextualContentCommand("codepar", 
        String.format("%n")));
+
+      registerControlSequence(new DefSemanticCmd(this));
+
+      registerControlSequence(new SymbolGroupLabel("bibglsothergroup"));
+      registerControlSequence(new SymbolGroupTitle("bibglsothergrouptitle"));
    }
 
    protected void addGlsFmtTextCommand(String name, String prefix)
