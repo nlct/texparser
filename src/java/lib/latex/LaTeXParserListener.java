@@ -602,7 +602,7 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
 
       newtoks(true, "toks@");
 
-      newcounter("part");
+      newcounter("part", null, "@Roman");
       newcounter("section");
       newcounter("subsection", "section");
       newcounter("subsubsection", "subsection");
@@ -1480,6 +1480,13 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
             newcounter("chapter*");
             addtoreset("section", "chapter");
             addtoreset("section*", "chapter*");
+
+            parser.putControlSequence(new GenericCommand(true, "thesection", null,
+             new TeXObject[] {
+               new TeXCsRef("thechapter"),
+               getOther('.'),
+               new TeXCsRef("number"),
+               new TeXCsRef("c@section")}));
 
             NewIf.createConditional(true, parser, "if@mainmatter", true);
             parser.putControlSequence(new FrontMatter());
