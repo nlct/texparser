@@ -29,6 +29,7 @@ import com.dickimawbooks.texparserlib.primitives.IfFalse;
 import com.dickimawbooks.texparserlib.primitives.IfTrue;
 import com.dickimawbooks.texparserlib.primitives.Undefined;
 import com.dickimawbooks.texparserlib.generic.TeXParserSetUndefAction;
+import com.dickimawbooks.texparserlib.generic.Symbol;
 import com.dickimawbooks.texparserlib.latex.*;
 import com.dickimawbooks.texparserlib.latex.hyperref.HyperTarget;
 import com.dickimawbooks.texparserlib.latex.hyperref.HyperLink;
@@ -467,6 +468,11 @@ public class GlossariesSty extends LaTeXSty
 
       registerControlSequence(new KVAtGlsLinkAtCounter());
 
+      registerControlSequence(new GlsUnset(this));
+      registerControlSequence(new GlsUnset("glslocalunset", false, this));
+      registerControlSequence(new GlsReset(this));
+      registerControlSequence(new GlsReset("glslocalreset", false, this));
+
       registerControlSequence(new TextualContentCommand("glsopenbrace", "{"));
       registerControlSequence(new TextualContentCommand("glsclosebrace", "}"));
       registerControlSequence(new TextualContentCommand("glsbackslash", "\\"));
@@ -478,6 +484,20 @@ public class GlossariesSty extends LaTeXSty
          listener.getOther('"'), listener.getParam(1), listener.getOther('"'))));
 
       registerControlSequence(new GlsSeeItemFormat(this));
+
+      FrameBox fbox = new FrameBox("glsshowtargetfont", BorderStyle.NONE,
+       AlignHStyle.DEFAULT, AlignVStyle.DEFAULT, true, null, null);
+
+      fbox.setTextFont(new TeXFontText(TeXFontFamily.TT, TeXFontSize.FOOTNOTE));
+
+      getListener().declareFrameBox(fbox, false);
+
+      fbox = new FrameBox("textsmaller", BorderStyle.NONE,
+       AlignHStyle.DEFAULT, AlignVStyle.DEFAULT, true, null, null);
+
+      fbox.setTextFont(new TeXFontText(TeXFontFamily.INHERIT, TeXFontSize.SMALLER));
+
+      getListener().declareFrameBox(fbox, false);
 
       if (extra)
       {
@@ -517,6 +537,10 @@ public class GlossariesSty extends LaTeXSty
 
    protected void addExtraDefinitions()
    {
+      registerControlSequence(new GlsXtrSetStarModifier(this));
+      registerControlSequence(new GlsXtrSetPlusModifier(this));
+      registerControlSequence(new GlsXtrSetAltModifier(this));
+
       listener.newtoks(true, "glsshortpltok");
       listener.newtoks(true, "glslongpltok");
 
@@ -1035,6 +1059,8 @@ public class GlossariesSty extends LaTeXSty
 
       registerControlSequence(new GlsXtrNewGlsLink(this));
       registerControlSequence(new GlsXtrNewGlsLink("glsxtrnewglsdisp", true, this));
+
+      registerControlSequence(new Symbol("glsxtrwrglossmark", 0x00B7));
    }
 
    protected void addGlsXtrTitleCommands(String field)
