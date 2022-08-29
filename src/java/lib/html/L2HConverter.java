@@ -135,22 +135,16 @@ public class L2HConverter extends LaTeXParserListener
 
       putControlSequence(new HCode());
 
-      parser.putControlSequence(new GenericCommand("TeX", null,
-        createString("TeX")));
-      parser.putControlSequence(new GenericCommand("LaTeX", null,
-        createString("LaTeX")));
-      parser.putControlSequence(new GenericCommand("eTeX", null,
-        createString("eTeX")));
-      parser.putControlSequence(new GenericCommand("XeTeX", null,
-        createString("XeTeX")));
-      parser.putControlSequence(new GenericCommand("LuaTeX", null,
-        createString("LuaTeX")));
-      parser.putControlSequence(new GenericCommand("pdfTeX", null,
-        createString("pdfTeX")));
-      parser.putControlSequence(new GenericCommand("pdfLaTeX", null,
-        createString("pdfLaTeX")));
-      parser.putControlSequence(new GenericCommand("BibTeX", null,
-        createString("BibTeX")));
+      parser.putControlSequence(new TextualContentCommand("TeX", "TeX"));
+      parser.putControlSequence(new TextualContentCommand("LaTeX", "LaTeX"));
+      parser.putControlSequence(new TextualContentCommand("eTeX", "eTeX"));
+      parser.putControlSequence(new TextualContentCommand("XeTeX", "XeTeX"));
+      parser.putControlSequence(new TextualContentCommand("XeLaTeX", "XeLaTeX"));
+      parser.putControlSequence(new TextualContentCommand("LuaTeX", "LuaTeX"));
+      parser.putControlSequence(new TextualContentCommand("LuaLaTeX", "LuaLaTeX"));
+      parser.putControlSequence(new TextualContentCommand("pdfTeX", "pdfTeX"));
+      parser.putControlSequence(new TextualContentCommand("pdfLaTeX", "pdfLaTeX"));
+      parser.putControlSequence(new TextualContentCommand("BibTeX", "BibTeX"));
 
       parser.putControlSequence(new GenericCommand("indexspace", null,
         new HtmlTag("<div class=\"indexspace\"></div>")));
@@ -251,6 +245,11 @@ public class L2HConverter extends LaTeXParserListener
       /* indent/noindent not implemented */
       putControlSequence(new Relax("indent"));
       putControlSequence(new Relax("noindent"));
+
+      putControlSequence(new Relax("allowbreak"));
+
+      putControlSequence(new GenericCommand(true, "newline", null,
+       new HtmlTag("<br>")));
 
       putControlSequence(new AtGobble("pagenumbering"));
       putControlSequence(new Input("include"));
@@ -535,6 +534,13 @@ public class L2HConverter extends LaTeXParserListener
    {
       if (writer == null) return;
 
+      if (inPreamble && !Character.isWhitespace(codePoint))
+      {
+         parser.debugMessage(1, "Unexpected character found in preamble, codepoint: "
+           + codePoint);
+         return;
+      }
+
       if (codePoint == '<')
       {
          writer.write("&lt;");
@@ -569,6 +575,13 @@ public class L2HConverter extends LaTeXParserListener
    {
       if (writer == null) return;
 
+      if (inPreamble && !str.trim().isEmpty())
+      {
+         parser.debugMessage(1, "Unexpected string found in preamble: "
+           + str);
+         return;
+      }
+
 /*
       String style = getStyle();
 
@@ -594,6 +607,13 @@ public class L2HConverter extends LaTeXParserListener
    {
       if (writer == null) return;
 
+      if (inPreamble && !Character.isWhitespace(c))
+      {
+         parser.debugMessage(1, "Unexpected character found in preamble: "
+           + c);
+         return;
+      }
+
       write(String.format("%c", c));
    }
 
@@ -602,6 +622,13 @@ public class L2HConverter extends LaTeXParserListener
      throws IOException
    {
       if (writer == null) return;
+
+      if (inPreamble && !str.trim().isEmpty())
+      {
+         parser.debugMessage(1, "Unexpected line found in preamble: "
+           + str);
+         return;
+      }
 
       write(String.format("%s%n", str));
       writer.flush();
@@ -999,15 +1026,17 @@ public class L2HConverter extends LaTeXParserListener
       writeln("div.date { display: block; text-align: center; font-size: medium;}");
       writeln("div.bibliography { display: block; margin-left: 4em; }");
       writeln("div.bibitem { display: inline; float: left; text-indent: -3em; }");
-      writeln("span.numberline { display: inline-block; width: 3em; }");
+      writeln("span.numberline { display: inline-block; width: 2em; }");
       writeln("nav ul { list-style-type: none; }");
-      writeln("div.toc-part { padding-left: .5em; padding-bottom: 2ex; font-weight: bold; font-size: large;}");
+      writeln("div.toc-part { padding-left: 0em; padding-bottom: 2ex; font-weight: bold; font-size: large;}");
       writeln("div.toc-chapter { padding-left: .5em; padding-bottom: 2ex; font-weight: bold; font-size: large;}");
       writeln("div.toc-section { padding-left: 1em; font-weight: bold;}");
       writeln("div.toc-subsection { padding-left: 1.5em; }");
       writeln("div.toc-subsubsection { padding-left: 2em; }");
       writeln("div.toc-paragraph { padding-left: 2.5em; }");
       writeln("div.toc-subparagraph { padding-left: 3em; }");
+
+      writeln("div.part { font-size: x-large; font-weight: bold; }");
 
       writeln("div.bigskip { padding-left: 0pt; padding-right: 0pt; padding-top: 0pt; padding-bottom: 2ex;}");
       writeln("div.medskip { padding-left: 0pt; padding-right: 0pt; padding-top: 0pt; padding-bottom: 1ex;}");
@@ -1121,12 +1150,16 @@ public class L2HConverter extends LaTeXParserListener
             writeable.writeln(content);
          }
       }
+
+      inPreamble = true;
    }
 
    @Override
    public void beginDocument(TeXObjectList stack)
      throws IOException
    {
+      inPreamble = false;
+
       TeXObject cs = getControlSequence("@title");
 
       if (!(cs instanceof Undefined) && !cs.isEmpty())
@@ -1136,6 +1169,10 @@ public class L2HConverter extends LaTeXParserListener
          writeable.write("<title>");
          writeable.write(title.purified());
          writeable.writeln("</title>");
+      }
+      else
+      {
+         writeable.writeln("<!-- no title found -->");
       }
 
       writeable.writeln("<style type=\"text/css\">");
@@ -1459,7 +1496,7 @@ public class L2HConverter extends LaTeXParserListener
    {
       File file = getImageFile(filename);
 
-      if (!file.exists())
+      if (file == null || !file.exists())
       {
          throw new TeXSyntaxException(parser, 
           TeXSyntaxException.ERROR_FILE_NOT_FOUND, filename);
@@ -1482,65 +1519,70 @@ public class L2HConverter extends LaTeXParserListener
       String type=getMimeType(file.getName());
       L2HImage image=null;
 
-      int n = 0;
       double scale = 1;
       int zoom = 100;
 
+      StringBuilder optionsBuilder = new StringBuilder();
+
       if (options != null)
       {
-         n = options.size();
-
-         alt = options.remove("alt");
-
-         if (alt != null)
-         {
-            n--;
-         }
-
-         TeXObject zoomObj = options.remove("zoom");
-
-         if (zoomObj != null)
-         {
-            n--;
-
-            zoom = TeXParserUtils.toInt(zoomObj, parser, stack);
-         }
-
-         TeXObject scaleVal = options.get("scale");
-
-         if (scaleVal != null)
-         {
-            scale = TeXParserUtils.toDouble(scaleVal, parser, stack);
-         }
-      }
-
-      if (n > 0)
-      {
-         StringBuilder content = new StringBuilder("\\includegraphics[");
-         String sep = null;
-
          for (Iterator<String> it = options.getOrderedKeyIterator();
               it.hasNext();)
          {
             String key = it.next();
+            TeXObject value = options.get(key);
 
-            if (sep != null)
+            if (key.equals("alt"))
             {
-               content.append(sep);
+               alt = value;
             }
-
-            if (!key.equals("alt"))
+            else if (key.equals("scale"))
             {
-               content.append(String.format("%s={%s}", key, 
-                 options.getValue(key).toString(parser)));
+               if (value != null)
+               {
+                  scale = TeXParserUtils.toDouble(value, parser, stack);
+               }
+            }
+            else if (key.equals("zoom"))
+            {
+               if (value != null)
+               {
+                  zoom = TeXParserUtils.toInt(value, parser, stack);
+               }
+            }
+            else
+            {
+               if (optionsBuilder.length() > 0)
+               {
+                  optionsBuilder.append(',');
+               }
 
-               sep = ",";
+               optionsBuilder.append(key);
+
+               if (value != null && !value.isEmpty())
+               {
+                  optionsBuilder.append('=');
+                  optionsBuilder.append(value.toString(parser));
+               }
             }
          }
+      }
+
+      if (optionsBuilder.length() > 0)
+      {
+         StringBuilder content = new StringBuilder("\\includegraphics[");
+         String sep = null;
+
+         content.append(optionsBuilder);
 
          content.append("]{");
          content.append(filename);
          content.append('}');
+
+         if (getParser().getDebugLevel() > 0)
+         {
+            getParser().logMessage("Creating image "+content.toString());
+         }
 
          image = toImage(getImagePreamble(),
           content.toString(), type, alt, null, true);
@@ -2681,6 +2723,8 @@ public class L2HConverter extends LaTeXParserListener
    private int indexLoc = 0;
 
    private Writer writer;
+
+   protected boolean inPreamble = false;
 
    private Charset htmlCharSet = null;
 
