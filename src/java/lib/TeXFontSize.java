@@ -23,7 +23,8 @@ import java.io.IOException;
 public enum TeXFontSize
 {
     USER(-2), INHERIT(-1), NORMAL(0), LARGE(1), XLARGE(2), XXLARGE(3), HUGE(4),
-    XHUGE(5), XXHUGE(6), SMALL(7), FOOTNOTE(8), SCRIPT(9), TINY(10);
+    XHUGE(5), XXHUGE(6), SMALL(7), FOOTNOTE(8), SCRIPT(9), TINY(10),
+    SMALLER(11), LARGER(12);
 
    TeXFontSize(int id)
    {

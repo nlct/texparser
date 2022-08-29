@@ -217,6 +217,41 @@ public class TeXSettings
          return parent.getFontSize();
       }
 
+      if (currentFontSize == TeXFontSize.SMALLER 
+       || currentFontSize == TeXFontSize.LARGER)
+      {
+         boolean smaller = (currentFontSize == TeXFontSize.SMALLER);
+
+         TeXFontSize parentSize = TeXFontSize.NORMAL;
+
+         if (parent != null)
+         {
+            parentSize = parent.getFontSize();
+         }
+
+         switch (parentSize)
+         {
+            case NORMAL:
+              return smaller ? TeXFontSize.SMALL : TeXFontSize.LARGE;
+            case LARGE:
+              return smaller ? TeXFontSize.NORMAL : TeXFontSize.XLARGE;
+            case XLARGE:
+              return smaller ? TeXFontSize.LARGE : TeXFontSize.XXLARGE;
+            case XXLARGE:
+              return smaller ? TeXFontSize.XLARGE : TeXFontSize.HUGE;
+            case HUGE:
+              return smaller ? TeXFontSize.XXLARGE : TeXFontSize.HUGE;
+            case SMALL:
+              return smaller ? TeXFontSize.FOOTNOTE : TeXFontSize.NORMAL;
+            case FOOTNOTE:
+              return smaller ? TeXFontSize.SCRIPT : TeXFontSize.SMALL;
+            case SCRIPT:
+              return smaller ? TeXFontSize.TINY : TeXFontSize.FOOTNOTE;
+            case TINY:
+              return smaller ? TeXFontSize.TINY : TeXFontSize.SCRIPT;
+         }
+      }
+
       return currentFontSize;
    }
 

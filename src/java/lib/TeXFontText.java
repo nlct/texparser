@@ -110,6 +110,77 @@ public class TeXFontText
 
       TeXSettings settings = parser.getSettings();
 
+      if (size == TeXFontSize.SMALLER || size == TeXFontSize.LARGER)
+      {
+         TeXFontSize currentSize = settings.getFontSize();
+         boolean smaller = (size == TeXFontSize.SMALLER);
+         double bp;
+         TeXFontSize newSize;
+
+         switch (currentSize)
+         {
+            case USER:
+              if (userSize != null)
+              {
+                 TeXUnit unit = userSize.getUnit();
+                 bp = unit.toUnit(parser, userSize.getValue(), TeXUnit.BP);
+              }
+            // fall through
+            case NORMAL:
+               newSize = smaller ? TeXFontSize.SMALL : TeXFontSize.LARGE;
+               bp = newSize.deriveSize(normal);
+            break;
+            case LARGE:
+               newSize = smaller ? TeXFontSize.NORMAL : TeXFontSize.XLARGE;
+               bp = newSize.deriveSize(normal);
+            break;
+            case XLARGE:
+               newSize = smaller ? TeXFontSize.LARGE : TeXFontSize.XXLARGE;
+               bp = newSize.deriveSize(normal);
+            break;
+            case XXLARGE:
+               newSize = smaller ? TeXFontSize.XLARGE : TeXFontSize.HUGE;
+               bp = newSize.deriveSize(normal);
+            break;
+            case SMALL:
+               newSize = smaller ? TeXFontSize.FOOTNOTE : TeXFontSize.NORMAL;
+               bp = newSize.deriveSize(normal);
+            break;
+            case FOOTNOTE:
+               newSize = smaller ? TeXFontSize.SCRIPT : TeXFontSize.SMALL;
+               bp = newSize.deriveSize(normal);
+            break;
+            case SCRIPT:
+               newSize = smaller ? TeXFontSize.TINY : TeXFontSize.FOOTNOTE;
+               bp = newSize.deriveSize(normal);
+            break;
+            case TINY:
+               newSize = smaller ? TeXFontSize.TINY : TeXFontSize.SCRIPT;
+               bp = newSize.deriveSize(normal);
+            break;
+            case HUGE:
+               if (smaller)
+               {
+                  newSize = TeXFontSize.XXLARGE;
+                  bp = newSize.deriveSize(normal);
+               }
+            // fall through
+            default:
+               bp = currentSize.deriveSize(normal)*PT_TO_BP;
+         }
+
+         if (smaller)
+         {
+            bp *= 0.8;
+         }
+         else
+         {
+            bp *= 1.2;
+         }
+
+         return (int)Math.round(bp);
+      }
+
       TeXFontSize currentSize = size;
 
       if (size == TeXFontSize.INHERIT)
@@ -317,6 +388,12 @@ public class TeXFontText
          break;
          case XXLARGE:
             builder.append("font-size: xx-large; ");
+         break;
+         case SMALLER:
+            builder.append("font-size: smaller; ");
+         break;
+         case LARGER:
+            builder.append("font-size: larger; ");
          break;
          default:
             builder.append(String.format("font-size: %fpt; ", deriveSize(parser)));
