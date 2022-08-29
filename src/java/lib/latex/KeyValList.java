@@ -50,6 +50,11 @@ public class KeyValList extends HashMap<String,TeXObject>
    public static KeyValList getList(TeXParser parser, TeXObject object)
      throws IOException
    {
+      if (object == null)
+      {
+         throw new NullPointerException();
+      }
+
       KeyValList keyValList = new KeyValList();
 
       if (object instanceof TeXObjectList)
