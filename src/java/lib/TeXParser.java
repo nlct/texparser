@@ -3110,7 +3110,7 @@ public class TeXParser extends TeXObjectList
    public TeXObject expandfully(TeXObject object, TeXObjectList stack)
     throws IOException
    {
-      if (object instanceof Expandable)
+      if (object instanceof Expandable && object.canExpand())
       {
          TeXObjectList expanded;
 
