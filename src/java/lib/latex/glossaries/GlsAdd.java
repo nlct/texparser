@@ -94,7 +94,7 @@ public class GlsAdd extends AbstractGlsCommand
 
          if (optArg != null)
          {
-            options = KeyValList.getList(parser, options);
+            options = KeyValList.getList(parser, optArg);
          }
 
          if (options != null && !options.isEmpty())
