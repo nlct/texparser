@@ -1927,7 +1927,7 @@ public class TeXObjectList extends Vector<TeXObject>
    {
       flatten();
 
-      if (parser.getDebugLevel() > 0)
+      if (parser.getDebugLevel() > 2)
       {
          parser.logMessage("PROCESSING STACK TeX Code: "+toString(parser));
          parser.logMessage("PROCESSING STACK "+toString());
@@ -1967,7 +1967,7 @@ public class TeXObjectList extends Vector<TeXObject>
 
          if (!(object instanceof Ignoreable))
          {
-            if (parser.getDebugLevel() > 0)
+            if (parser.getDebugLevel() > 1)
             {
                parser.logMessage("PROCESSING "+object);
             }
@@ -1982,7 +1982,7 @@ public class TeXObjectList extends Vector<TeXObject>
    {
       flatten();
 
-      if (parser.getDebugLevel() > 0)
+      if (parser.getDebugLevel() > 1)
       {
          parser.logMessage("PROCESSING STACK TeX Code: "+toString(parser) + " SUBSTACK TeX Code: "+stack.toString(parser));
          parser.logMessage("PROCESSING STACK "+toString()+" SUBSTACK: "+stack);
@@ -2038,7 +2038,7 @@ public class TeXObjectList extends Vector<TeXObject>
 
          if (!(object instanceof Ignoreable))
          {
-            if (parser.getDebugLevel() > 0)
+            if (parser.getDebugLevel() > 1)
             {
                parser.logMessage("PROCESSING "+object);
             }

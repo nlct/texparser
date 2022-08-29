@@ -38,7 +38,7 @@ There is NO WARRANTY, to the extent permitted by law.</entry>
 <entry key="syntax.in">{0} (or {1}) &lt;TeX file&gt;		Parse &lt;TeX file&gt;.</entry>
 <entry key="syntax.version">{0} (or {1})		Print version and exit.</entry>
 <entry key="syntax.help">{0} (or {1})			Print this help message and exit.</entry>
-<entry key="syntax.debug">{0}				Switch on debug mode.</entry>
+<entry key="syntax.debug">{0} [&lt;level&gt;]			Switch on debug mode.</entry>
 <entry key="syntax.nodebug">{0}			Switch off debug mode. (Default.)</entry>
 <entry key="syntax.log">{0} &lt;file&gt;				Set log file.</entry>
 <entry key="syntax.nolog">{0}				Don''t log (default).</entry>

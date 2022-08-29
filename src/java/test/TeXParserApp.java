@@ -152,7 +152,7 @@ public class TeXParserApp implements TeXApp
       if (logFile != null)
       {
          logWriter = new PrintWriter(logFile);
-         parser.setDebugLevel(1, logWriter);
+         parser.setDebugLevel(debugMode, logWriter);
       }
 
       try
@@ -232,7 +232,7 @@ public class TeXParserApp implements TeXApp
       if (logFile != null)
       {
          logWriter = new PrintWriter(logFile);
-         parser.setDebugLevel(1, logWriter);
+         parser.setDebugLevel(debugMode, logWriter);
       }
 
       try
@@ -322,10 +322,17 @@ public class TeXParserApp implements TeXApp
             invoker = "pdflatex";
          }
 
+         File dir = inFileName.getParentFile();
+
+         if (dir == null)
+         {
+            dir = new File(".");
+         }
+
          int exitCode = execCommandAndWaitFor(
             new String[]{invoker, name}, 
             new String[]{String.format("TEXINPUTS=%s%c", 
-              inFileName.getParentFile().getAbsolutePath(),
+              dir.getAbsolutePath(),
               File.pathSeparatorChar)}, tmpDir);
 
          if (exitCode != 0)
@@ -915,7 +922,7 @@ public class TeXParserApp implements TeXApp
          execName = execName.substring(idx+1);
       }
 
-      if (debugMode)
+      if (debugMode > 0)
       {
          System.out.println("Running:");
 
@@ -1095,7 +1102,7 @@ public class TeXParserApp implements TeXApp
       {
          errorListener.error(((TeXSyntaxException)e).getMessage(this));
 
-         if (debugMode)
+         if (debugMode > 0)
          {
             e.printStackTrace();
          }
@@ -1108,7 +1115,7 @@ public class TeXParserApp implements TeXApp
 
    public void debug(String message)
    {
-      if (debugMode)
+      if (debugMode > 0)
       {
          System.err.println(String.format("%s: %s", APP_NAME, message));
       }
@@ -1116,7 +1123,7 @@ public class TeXParserApp implements TeXApp
 
    public void debug(Exception e)
    {
-      if (debugMode)
+      if (debugMode > 0)
       {
          System.err.println(String.format("%s:", APP_NAME));
          e.printStackTrace();
@@ -1362,11 +1369,28 @@ public class TeXParserApp implements TeXApp
          }
          else if (args[i].equals("--debug"))
          {
-            debugMode = true;
+            debugMode = 1;
+
+            if (i < args.length - 1)
+            {
+               try
+               {
+                  int val = Integer.parseInt(args[i+1]);
+
+                  if (val >= 0)
+                  {
+                     debugMode = val;
+                     i++;
+                  }
+               }
+               catch (NumberFormatException e)
+               {
+               }
+            }
          }
          else if (args[i].equals("--nodebug"))
          {
-            debugMode = false;
+            debugMode = 0;
          }
          else if (args[i].equals("-timeout"))
          {
@@ -1506,7 +1530,7 @@ public class TeXParserApp implements TeXApp
 
    public static long MAX_PROCESS_TIME=0L;
 
-   private boolean debugMode = false;
+   private int debugMode = 0;
 
    private TeXParserAppSettings settings;
 
