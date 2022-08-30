@@ -541,6 +541,12 @@ public class GlossariesSty extends LaTeXSty
       registerControlSequence(new GlsXtrSetPlusModifier(this));
       registerControlSequence(new GlsXtrSetAltModifier(this));
 
+      registerControlSequence(new GlsAddEach());
+      registerControlSequence(new TextualContentCommand("glsxtrnopostpunc", ""));
+      registerControlSequence(new Symbol("glsxtrshowtargetsymbolright", 0x25B7));
+      registerControlSequence(new Symbol("glsxtrshowtargetsymbolleft", 0x25C1));
+      registerControlSequence(new Symbol("glsshowtargetsymbol", 0x25C1));
+
       listener.newtoks(true, "glsshortpltok");
       listener.newtoks(true, "glslongpltok");
 
@@ -1061,6 +1067,62 @@ public class GlossariesSty extends LaTeXSty
       registerControlSequence(new GlsXtrNewGlsLink("glsxtrnewglsdisp", true, this));
 
       registerControlSequence(new Symbol("glsxtrwrglossmark", 0x00B7));
+
+      registerControlSequence(new TextualContentCommand(
+        "GlsXtrNoGlsWarningEmptyStart", 
+        "This has probably happened because there are no entries defined in this glossary."));
+
+      registerControlSequence(new TextualContentCommand(
+        "GlsXtrNoGlsWarningEmptyMain", 
+        "If you don't want this glossary, add nomain to your package option list when you load glossaries-extra.sty. For example:"));
+
+      registerControlSequence(new TextualContentCommand("GlsXtrNoGlsWarningTail", 
+        "This message will be removed once the problem has been fixed."));
+
+      registerControlSequence(new TextualContentCommand("GlsXtrNoGlsWarningMisMatch", 
+        "You need to either replace \\makenoidxglossaries with \\makeglossaries or replace \\printglossary (or \\printglossaries) with \\printnoidxglossary and then rebuild this document."));
+
+      // \GlsXtrNoGlsWarningEmptyNotMain
+      TeXObjectList def = getListener().createString(
+       "Did you forget to use type=");
+
+      def.add(getListener().getParam(1));
+      def.addAll(getListener().createString(" when you defined your entries? If you tried to load entries into this glossary with \\loadglsentries did you remember to use ["));
+      def.add(getListener().getParam(1));
+      def.addAll(getListener().createString("] as the optional argument? If you did, check that the definitions in the file you loaded all had the type set to \\glsdefaulttype"));
+
+      registerControlSequence(new LaTeXGenericCommand(true, 
+        "GlsXtrNoGlsWarningEmptyNotMain",
+        "m", def));
+
+      // \GlsXtrNoGlsWarningCheckFile
+      def = getListener().createString(
+       "Check the contents of the file ");
+      def.add(getListener().getParam(1));
+      def.addAll(getListener().createString(
+        ". If it's empty, that means you haven't indexed any of your entries in this glossary (using commands like \\gls) or \\glsadd) so this list can't be generated. If the file isn't empty, the document build process hasn't been completed."));
+
+      registerControlSequence(new LaTeXGenericCommand(true, 
+        "GlsXtrNoGlsWarningCheckFile",
+        "m", def));
+
+      // \GlsXtrNoGlsWarningHead
+      def = getListener().createString(
+       "This document is incomplete. The external file associated with the glossary `");
+
+      def.add(getListener().getParam(1));
+
+      def.addAll(getListener().createString("' (which should be called "));
+
+      def.add(getListener().getParam(2));
+
+      def.addAll(getListener().createString(") hasn't been created."));
+
+      registerControlSequence(new LaTeXGenericCommand(true, 
+        "GlsXtrNoGlsWarningHead",
+        "mm", def));
+
+      registerControlSequence(new GlsXtrNoGlsWarningAutoMake());
    }
 
    protected void addGlsXtrTitleCommands(String field)
@@ -1177,6 +1239,9 @@ public class GlossariesSty extends LaTeXSty
    protected void postOptions(TeXObjectList stack) throws IOException
    {
       super.postOptions(stack);
+
+      NewIf.createConditional(true, getParser(), "ifglsxindy", 
+        indexingOption == IndexingOption.XINDY);
 
       if (indexcounter)
       {
@@ -1394,7 +1459,7 @@ public class GlossariesSty extends LaTeXSty
       {
          indexingOption = IndexingOption.MAKEINDEX;
       }
-      else if (option.equals("xindy"))
+      else if (option.equals("xindy") || option.equals("xindygloss"))
       {
          indexingOption = IndexingOption.XINDY;
       }
@@ -1977,7 +2042,7 @@ public class GlossariesSty extends LaTeXSty
                   val = TeXParserUtils.expandFully(val, getParser(), stack);
                }
 
-               if (getParser().getDebugLevel() > 0)
+               if (getParser().getDebugLevel() >= TeXParser.DEBUG_STY_DATA)
                {
                   getParser().logMessage("ADDING DEFAULT FIELD "+field 
                     + " -> "+val.toString(getParser()));
@@ -2000,7 +2065,7 @@ public class GlossariesSty extends LaTeXSty
             {
                TeXObject val = (TeXObjectList)name.clone();
 
-               if (getParser().getDebugLevel() > 0)
+               if (getParser().getDebugLevel() >= TeXParser.DEBUG_STY_DATA)
                {
                   getParser().logMessage("ADDING DEFAULT sort FIELD" 
                     + " -> "+val.toString(getParser()));
