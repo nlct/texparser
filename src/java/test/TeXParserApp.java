@@ -558,7 +558,17 @@ public class TeXParserApp implements TeXApp
 
    public void warning(TeXParser parser, String message)
    {
-      System.err.println(APP_NAME+": "+message);
+      File file = parser.getCurrentFile();
+      int lineNum = parser.getLineNumber();
+
+      if (file != null && lineNum > 0)
+      {
+         System.err.format("%s:%d: %s%n", file.getName(), lineNum, message);
+      }
+      else
+      {
+         System.err.println(message);
+      }
    }
 
    public String tag(String string)
