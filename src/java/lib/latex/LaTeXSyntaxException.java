@@ -37,6 +37,8 @@ public class LaTeXSyntaxException extends TeXSyntaxException
 
    public static final String ERROR_MULTI_BEGIN_DOC = 
       "latex.error.multi_begin_doc";
+   public static final String ERROR_MISSING_BEGIN_DOC =
+      "latex.error.missing_begin_doc";
    public static final String ERROR_NO_BEGIN_DOC = 
       "latex.error.no_begin_doc";
    public static final String ERROR_MULTI_CLS = 

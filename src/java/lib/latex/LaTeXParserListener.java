@@ -1260,9 +1260,9 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
          }
       }
 
-      if (getParser().getDebugLevel() > 0)
+      if (getParser().getDebugLevel() >= TeXParser.DEBUG_PROCESSING)
       {
-         getParser().debugMessage(1, "AtBeginDoc: "+cs);
+         getParser().logMessage("AtBeginDoc: "+cs);
       }
    }
 
@@ -1292,7 +1292,7 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
 
          if (auxFile != null && auxFile.exists())
          {
-            parser.debugMessage(1, "Parsing AUX file: "+auxFile);
+            parser.debugMessage(TeXParser.DEBUG_IO, "Parsing AUX file: "+auxFile);
 
             AuxParser auxListener = new AuxParser(getTeXApp(), getCharSet());
             auxListener.parseAuxFile(auxFile);
@@ -1300,12 +1300,12 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
          }
          else
          {
-            parser.debugMessage(1, "No AUX file: "+auxFile);
+            parser.debugMessage(TeXParser.DEBUG_IO, "No AUX file: "+auxFile);
          }
       }
       else
       {
-         parser.debugMessage(1, "AUX parser not enabled");
+         parser.debugMessage(TeXParser.DEBUG_IO, "AUX parser not enabled");
       }
 
       ControlSequence cs = parser.getControlSequence(
@@ -1313,9 +1313,9 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
 
       if (cs != null)
       {
-         if (getParser().getDebugLevel() > 0)
+         if (getParser().getDebugLevel() >= TeXParser.DEBUG_PROCESSING)
          {
-            getParser().debugMessage(1, "PROCESSING AtBeginDoc: "+cs);
+            getParser().logMessage("PROCESSING AtBeginDoc: "+cs);
          }
 
          TeXParserUtils.process(cs, parser, stack);
@@ -1545,7 +1545,7 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
     boolean loadParentOptions, boolean enforceParse, TeXObjectList stack)
    throws IOException
    {
-      parser.debugMessage(1, "Loading package "+name);
+      parser.debugMessage(TeXParser.DEBUG_IO, "Loading package "+name);
 
       LaTeXSty sty = getLoadedPackage(name);
 
@@ -1592,7 +1592,7 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       addFileReference(sty);
       loadedPackages.add(sty);
 
-      parser.debugMessage(1, "Requiring package "+name);
+      parser.debugMessage(TeXParser.DEBUG_IO, "Requiring package "+name);
 
       if (sty instanceof UnknownSty)
       {
@@ -1658,7 +1658,7 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
    {
       if (!isStyLoaded(styName))
       {
-         parser.debugMessage(1, "Use package "+styName);
+         parser.debugMessage(TeXParser.DEBUG_IO, "Use package "+styName);
          LaTeXSty sty = getLaTeXSty(options, styName, loadParentOptions, stack);
 
          addFileReference(sty);
@@ -1673,7 +1673,7 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
             sty.processOptions(stack);
          }
 
-         parser.debugMessage(1, "Finished use package "+styName);
+         parser.debugMessage(TeXParser.DEBUG_IO, "Finished use package "+styName);
 
          return sty;
       }
