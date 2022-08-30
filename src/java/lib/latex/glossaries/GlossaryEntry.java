@@ -42,7 +42,7 @@ public class GlossaryEntry
 
       TeXParser parser = sty.getParser();
 
-      if (parser.getDebugLevel() > 0)
+      if (parser.getDebugLevel() >= TeXParser.DEBUG_STY_DATA)
       {
          parser.logMessage("Defining GlossaryEntry "+label);
       }
@@ -62,7 +62,7 @@ public class GlossaryEntry
             value = options.getValue(key);
          }
 
-         if (parser.getDebugLevel() > 0)
+         if (parser.getDebugLevel() >= TeXParser.DEBUG_STY_DATA)
          {
             parser.logMessage("FIELD "+key+" -> "+value.toString(parser));
          }

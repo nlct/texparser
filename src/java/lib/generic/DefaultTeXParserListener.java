@@ -395,7 +395,7 @@ public abstract class DefaultTeXParserListener extends TeXParserListener
    {
       TeXObjectList stack = new TeXObjectList();
 
-      if (getParser().getDebugLevel() > 0)
+      if (getParser().getDebugLevel() >= TeXParser.DEBUG_PROCESSING_STACK)
       {
          getParser().logMessage("CREATED STACK "+stack);
       }

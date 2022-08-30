@@ -344,7 +344,7 @@ public class ProbSolnData
    {
       TeXObjectList data = getData(parser, params, contents);
 
-      if (parser.getDebugLevel() > 0)
+      if (parser.getDebugLevel() >= TeXParser.DEBUG_STY_DATA)
       {
          parser.logMessage("UseProblem Content: "+contents.toString(parser));
 

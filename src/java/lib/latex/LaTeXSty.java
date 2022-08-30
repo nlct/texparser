@@ -124,7 +124,7 @@ public abstract class LaTeXSty extends LaTeXFile
    @Override
    protected void postOptions(TeXObjectList stack) throws IOException
    {
-      if (getParser().getDebugLevel() > 0)
+      if (getParser().getDebugLevel() >= TeXParser.DEBUG_CS)
       {
          getParser().logMessage("Adding definitions for "+getName());
       }

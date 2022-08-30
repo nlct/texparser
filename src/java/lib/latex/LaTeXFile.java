@@ -168,7 +168,7 @@ public class LaTeXFile extends TeXPath
 
    public void processOptions(TeXObjectList stack) throws IOException
    {
-      if (getParser().getDebugLevel() > 0)
+      if (getParser().getDebugLevel() >= TeXParser.DEBUG_PROCESSING)
       {
          getParser().logMessage("Processing options for "+getName());
       }
@@ -193,7 +193,7 @@ public class LaTeXFile extends TeXPath
       {
          listener.setCurrentSty(prevSty, getExtension());
 
-         if (getParser().getDebugLevel() > 0)
+         if (getParser().getDebugLevel() >= TeXParser.DEBUG_PROCESSING)
          {
             getParser().logMessage("Finished processing options for "+getName());
          }

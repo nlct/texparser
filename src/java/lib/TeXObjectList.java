@@ -1927,17 +1927,21 @@ public class TeXObjectList extends Vector<TeXObject>
    {
       flatten();
 
-      if (parser.getDebugLevel() > 2)
+      if (parser.getDebugLevel() >= TeXParser.DEBUG_PROCESSING_STACK)
       {
          parser.logMessage("PROCESSING STACK TeX Code: "+toString(parser));
-         parser.logMessage("PROCESSING STACK "+toString());
+
+         if (parser.getDebugLevel() >= TeXParser.DEBUG_PROCESSING_EXTRA)
+         {
+            parser.logMessage("PROCESSING STACK "+toString());
+         }
       }
 
       while (size() > 0)
       {
          TeXObject object = remove(0);
 
-         if (parser.getDebugLevel() > 0)
+         if (parser.getDebugLevel() >= TeXParser.DEBUG_POPPED)
          {
             parser.logMessage("POPPED "+object);
          }
@@ -1946,7 +1950,7 @@ public class TeXObjectList extends Vector<TeXObject>
 
          if (object instanceof Declaration)
          {
-            if (parser.getDebugLevel() > 0)
+            if (parser.getDebugLevel() >= TeXParser.DEBUG_DECL)
             {
                parser.logMessage("PUSHING DECLARATION "+object);
             }
@@ -1957,7 +1961,7 @@ public class TeXObjectList extends Vector<TeXObject>
          {
             Declaration decl = ((EndDeclaration)object).getDeclaration(parser);
 
-            if (parser.getDebugLevel() > 0)
+            if (parser.getDebugLevel() >= TeXParser.DEBUG_DECL)
             {
                parser.logMessage("POPPING DECLARATION "+decl);
             }
@@ -1967,7 +1971,7 @@ public class TeXObjectList extends Vector<TeXObject>
 
          if (!(object instanceof Ignoreable))
          {
-            if (parser.getDebugLevel() > 1)
+            if (parser.getDebugLevel() >= TeXParser.DEBUG_PROCESSING)
             {
                parser.logMessage("PROCESSING "+object);
             }
@@ -1982,10 +1986,15 @@ public class TeXObjectList extends Vector<TeXObject>
    {
       flatten();
 
-      if (parser.getDebugLevel() > 1)
+      if (parser.getDebugLevel() >= TeXParser.DEBUG_PROCESSING_STACK)
       {
-         parser.logMessage("PROCESSING STACK TeX Code: "+toString(parser) + " SUBSTACK TeX Code: "+stack.toString(parser));
-         parser.logMessage("PROCESSING STACK "+toString()+" SUBSTACK: "+stack);
+         parser.logMessage("PROCESSING STACK TeX Code: "+toString(parser)
+            + " SUBSTACK TeX Code: "+stack.toString(parser));
+
+         if (parser.getDebugLevel() >= TeXParser.DEBUG_PROCESSING_EXTRA)
+         {
+            parser.logMessage("PROCESSING STACK "+toString()+" SUBSTACK: "+stack);
+         }
       }
 
       StackMarker marker = null;
@@ -2003,7 +2012,7 @@ public class TeXObjectList extends Vector<TeXObject>
       {
          TeXObject object = remove(0);
 
-         if (parser.getDebugLevel() > 0)
+         if (parser.getDebugLevel() >= TeXParser.DEBUG_POPPED)
          {
             parser.logMessage("POPPED "+object);
          }
@@ -2017,7 +2026,7 @@ public class TeXObjectList extends Vector<TeXObject>
 
          if (object instanceof Declaration)
          {
-            if (parser.getDebugLevel() > 0)
+            if (parser.getDebugLevel() >= TeXParser.DEBUG_DECL)
             {
                parser.logMessage("PUSHING DECLARATION "+object);
             }
@@ -2028,7 +2037,7 @@ public class TeXObjectList extends Vector<TeXObject>
          {
             Declaration decl = ((EndDeclaration)object).getDeclaration(parser);
 
-            if (parser.getDebugLevel() > 0)
+            if (parser.getDebugLevel() >= TeXParser.DEBUG_DECL)
             {
                parser.logMessage("POPPING DECLARATION "+decl);
             }
@@ -2038,7 +2047,7 @@ public class TeXObjectList extends Vector<TeXObject>
 
          if (!(object instanceof Ignoreable))
          {
-            if (parser.getDebugLevel() > 1)
+            if (parser.getDebugLevel() >= TeXParser.DEBUG_PROCESSING)
             {
                parser.logMessage("PROCESSING "+object);
             }
@@ -2109,7 +2118,7 @@ public class TeXObjectList extends Vector<TeXObject>
          {
             TeXObject object = remove(0);
 
-            if (parser.getDebugLevel() > 0)
+            if (parser.getDebugLevel() >= TeXParser.DEBUG_PROCESSING)
             {
                parser.logMessage("PROCESS LIST OBJ: "+object);
             }
@@ -2123,7 +2132,7 @@ public class TeXObjectList extends Vector<TeXObject>
 
             if (object instanceof Declaration)
             {
-               if (parser.getDebugLevel() > 0)
+               if (parser.getDebugLevel() >= TeXParser.DEBUG_DECL)
                {
                   parser.logMessage("PUSHING DECLARATION "+object);
                }
@@ -2134,7 +2143,7 @@ public class TeXObjectList extends Vector<TeXObject>
             {
                Declaration decl = ((EndDeclaration)object).getDeclaration(parser);
 
-               if (parser.getDebugLevel() > 0)
+               if (parser.getDebugLevel() >= TeXParser.DEBUG_DECL)
                {
                   parser.logMessage("POPPING DECLARATION "+decl);
                }

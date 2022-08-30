@@ -424,7 +424,7 @@ public class TeXParser extends TeXObjectList
 
    public void terminate()
    {
-      if (debugLevel > 0)
+      if (debugLevel > DEBUG_IO)
       {
          logMessage("TERMINATE closing all open readers");
       }
@@ -474,7 +474,7 @@ public class TeXParser extends TeXObjectList
          otherReader.setParent(reader);
          reader = otherReader;
 
-         if (debugLevel > 0)
+         if (debugLevel > DEBUG_IO)
          {
             logMessage("READLINE switch to "+otherReader+" PENDING: "+pending);
          }
@@ -510,7 +510,7 @@ public class TeXParser extends TeXObjectList
          reader = orgReader;
          otherReader.setParent(orgParent);
 
-         if (debugLevel > 0)
+         if (debugLevel > DEBUG_IO)
          {
             logMessage("READLINE switching back to "+reader+" PENDING: "+pending);
          }
@@ -1852,14 +1852,14 @@ public class TeXParser extends TeXObjectList
 
          if (this.reader != null)
          {
-            if (getDebugLevel() > 0)
+            if (getDebugLevel() > DEBUG_IO)
             {
                logMessage("CURRENT READER "+this.reader);
             }
 
             if (this.reader == reader.getParent())
             {
-               if (getDebugLevel() > 0)
+               if (getDebugLevel() > DEBUG_IO)
                {
                   logMessage("MOVING DOWN TO NESTED FILE "+reader);
                }
@@ -1868,14 +1868,14 @@ public class TeXParser extends TeXObjectList
             {
                down = false;
 
-               if (getDebugLevel() > 0)
+               if (getDebugLevel() > DEBUG_IO)
                {
                   logMessage("MOVING UP TO PARENT FILE "+reader);
                }
             }
             else
             {
-               if (getDebugLevel() > 0)
+               if (getDebugLevel() > DEBUG_IO)
                {
                   logMessage("MOVING SIDEWAYS(??) TO NESTED FILE "+reader);
                }
@@ -1911,7 +1911,7 @@ public class TeXParser extends TeXObjectList
             reader.setPending(null);
          }
 
-         if (debugLevel > 0)
+         if (debugLevel > DEBUG_IO)
          {
             logMessage("PARSE switching from "+this.reader + " to "+reader);
          }
@@ -1919,7 +1919,7 @@ public class TeXParser extends TeXObjectList
          this.reader = reader;
       }
 
-      if (debugLevel > 0)
+      if (debugLevel > DEBUG_IO)
       {
          logMessage("PARSE setting mode: "+mode);
       }
@@ -1934,7 +1934,7 @@ public class TeXParser extends TeXObjectList
          {
             boolean eof = (!fetchNext() || isEmpty());
 
-            if (debugLevel > 0)
+            if (debugLevel > DEBUG_IO)
             {
                if (eof)
                {
@@ -1962,7 +1962,7 @@ public class TeXParser extends TeXObjectList
             {
                TeXObject object = pop();
 
-               if (debugLevel > 1)
+               if (debugLevel >= DEBUG_POPPED)
                {
                   logMessage("PARSE POPPED "+object);
                }
@@ -1973,7 +1973,7 @@ public class TeXParser extends TeXObjectList
                }
                catch (EOFException e)
                {
-                  debugMessage(1, "EOF while processing object "+object);
+                  debugMessage(DEBUG_IO, "EOF while processing object "+object);
 
                   if (reader != null)
                   {
@@ -1991,7 +1991,7 @@ public class TeXParser extends TeXObjectList
                {
                   listener.getTeXApp().error(e);
 
-                  if (debugLevel > 0)
+                  if (debugLevel >= DEBUG_IO)
                   {
                      logMessage("PARSE ERROR" + e.getMessage());
                   }
@@ -2001,7 +2001,7 @@ public class TeXParser extends TeXObjectList
       }
       catch (EOFException e)
       {
-         debugMessage(1, "EOF while fetching next from "+this.reader);
+         debugMessage(DEBUG_IO, "EOF while fetching next from "+this.reader);
 
          closeReader(this.reader);
       }
@@ -2020,7 +2020,7 @@ public class TeXParser extends TeXObjectList
 
       while (this.reader != null)
       {
-         if (debugLevel > 0)
+         if (debugLevel >= DEBUG_IO)
          {
             logMessage("CLOSE READER switching from child "+ reader
               + " to parent "+this.reader);
@@ -2053,7 +2053,7 @@ public class TeXParser extends TeXObjectList
 
       if (pending != null)
       {
-         if (debugLevel > 0)
+         if (debugLevel >= DEBUG_IO)
          {
             logMessage("CLOSE READER processing pending");
          }
@@ -2066,7 +2066,7 @@ public class TeXParser extends TeXObjectList
    public void process(TeXParser parser)
       throws IOException
    {
-      if (debugLevel > 0)
+      if (debugLevel >= DEBUG_PROCESSING)
       {
          logMessage("PROCESS "+toString());
       }
@@ -2076,7 +2076,7 @@ public class TeXParser extends TeXObjectList
    public void process(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
-      if (debugLevel > 0)
+      if (debugLevel >= DEBUG_PROCESSING)
       {
          logMessage("PROCESS "+toString()+" SUBSTACK: "+stack);
       }
@@ -2137,7 +2137,7 @@ public class TeXParser extends TeXObjectList
 
       try
       {
-         debugMessage(1, "PARSE FILE: "+file);
+         debugMessage(DEBUG_IO, "PARSE FILE: "+file);
          listener.beginParse(file, charset);
 
          TeXReader nextReader = new TeXReader(this.reader, file, charset);
@@ -2147,13 +2147,13 @@ public class TeXParser extends TeXObjectList
             nextReader.setPending(stack);
          }
 
-         debugMessage(1, "READER: "+nextReader);
+         debugMessage(DEBUG_IO, "READER: "+nextReader);
 
          parse(nextReader);
       }
       catch (EOFException e)
       {
-         if (debugLevel > 0)
+         if (debugLevel >= DEBUG_IO)
          {
             logMessage("EOF parsing file: "+file);
             logMessage("Current reader: "+reader);
@@ -2848,7 +2848,7 @@ public class TeXParser extends TeXObjectList
 
       if (getDebugLevel() > 0)
       {
-         debugMessage(1, "Globally defining "+cs);
+         debugMessage(DEBUG_CS, "Globally defining "+cs);
       }
 
       if (cs instanceof Declaration && isLetter(cs.getName().charAt(0)))
@@ -2858,7 +2858,7 @@ public class TeXParser extends TeXObjectList
 
          if (getDebugLevel() > 0)
          {
-            debugMessage(1, "Globally defining "+endDec);
+            debugMessage(DEBUG_CS, "Globally defining "+endDec);
          }
       }
    }
@@ -2871,7 +2871,7 @@ public class TeXParser extends TeXObjectList
 
          if (getDebugLevel() > 0)
          {
-            debugMessage(1, "Locally defining "+cs);
+            debugMessage(DEBUG_CS, "Locally defining "+cs);
          }
 
          if (cs instanceof Declaration)
@@ -2881,7 +2881,7 @@ public class TeXParser extends TeXObjectList
 
             if (getDebugLevel() > 0)
             {
-               debugMessage(1, "Locally defining "+endDec);
+               debugMessage(DEBUG_CS, "Locally defining "+endDec);
             }
          }
       }
@@ -2897,7 +2897,7 @@ public class TeXParser extends TeXObjectList
 
       if (cs != null)
       {
-         if (getDebugLevel() > 0)
+         if (getDebugLevel() >= DEBUG_CS)
          {
             logMessage("Fetched LOCAL control sequence: "+cs);
          }
@@ -2907,7 +2907,7 @@ public class TeXParser extends TeXObjectList
 
       cs = csTable.get(name);
 
-      if (getDebugLevel() > 0)
+      if (getDebugLevel() >= DEBUG_CS)
       {
          if (cs == null)
          {
@@ -3367,6 +3367,16 @@ public class TeXParser extends TeXObjectList
 
    private Charset currentInputCharset = null;
 
+   public static final int DEBUG_IO = 1;
+   public static final int DEBUG_POPPED = 2;
+   public static final int DEBUG_DECL = 3;
+   public static final int DEBUG_STY_DATA = 4;
+   public static final int DEBUG_EXPANSION = 4;
+   public static final int DEBUG_PROCESSING = 4;
+   public static final int DEBUG_PROCESSING_STACK = 5;
+   public static final int DEBUG_PROCESSING_EXTRA = 6;
+   public static final int DEBUG_CS = 7;
+
    public static final String VERSION = "0.9.2.7b";
-   public static final String VERSION_DATE = "2021-11-11";
+   public static final String VERSION_DATE = "2022-08-30";
 }

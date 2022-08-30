@@ -86,7 +86,7 @@ public class Begin extends ControlSequence
 
       String name = popLabelString(parser, stack);
 
-      if (parser.getDebugLevel() > 0)
+      if (parser.getDebugLevel() >= TeXParser.DEBUG_DECL)
       {
          parser.logMessage("BEGIN ENV: "+name);
       }

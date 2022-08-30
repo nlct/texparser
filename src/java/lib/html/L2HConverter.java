@@ -1579,7 +1579,7 @@ public class L2HConverter extends LaTeXParserListener
          content.append(filename);
          content.append('}');
 
-         if (getParser().getDebugLevel() > 0)
+         if (getParser().getDebugLevel() >= TeXParser.DEBUG_IO)
          {
             getParser().logMessage("Creating image "+content.toString());
          }

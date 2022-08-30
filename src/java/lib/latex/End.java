@@ -52,7 +52,7 @@ public class End extends ControlSequence
 
       String name = popLabelString(parser, stack);
 
-      if (parser.getDebugLevel() > 0)
+      if (parser.getDebugLevel() >= TeXParser.DEBUG_DECL)
       {
          parser.logMessage("END: "+name);
       }
