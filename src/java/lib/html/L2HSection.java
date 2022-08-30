@@ -256,6 +256,24 @@ public class L2HSection extends Section
       return null;
    }
 
+   public int getLevel()
+   {
+      return getLevel(getName());
+   }
+
+   public int getLevel(String name)
+   {
+      for (int i = 0; i < TAGS.length; i++)
+      {
+         if (TAGS[i][0].equals(name))
+         {
+            return i;
+         }
+      }
+
+      return -1;
+   }
+
    public static final String[][] TAGS = new String[][]
    {
       new String[] {"chapter", "h1"},
