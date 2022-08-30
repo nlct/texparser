@@ -64,11 +64,18 @@ public abstract class Section extends ControlSequence
       if (isStar)
       {
          unnumbered(parser, stack, arg);
+
+         parser.putControlSequence(true,
+          new TextualContentCommand("texparser@currentsection", 
+            getName()+"*"));
       }
       else
       {
          ((LaTeXParserListener)parser.getListener()).stepcounter(getName());
          numbered(parser, stack, optArg, arg);
+
+         parser.putControlSequence(true,
+          new TextualContentCommand("texparser@currentsection", getName()));
       }
    }
 
