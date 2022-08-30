@@ -142,6 +142,14 @@ public class UserGuideSty extends LaTeXSty
       registerControlSequence(new TextualContentCommand("dunderscore", "_"));
       registerControlSequence(new TextualContentCommand("dsb", "_"));
 
+      registerControlSequence(new TextualContentCommand("texparser@currentsection",
+        "chapter"));
+
+      registerControlSequence(new GenericCommand(true, 
+        "currentcounter", null, new TeXCsRef("texparser@currentsection")));
+
+      registerControlSequence(new MainGlsAdd(glossariesSty));
+
       addSemanticCommand("longargfmt", TeXFontFamily.TT,
         null, new TeXCsRef("longswitch"), null);
 
@@ -550,6 +558,19 @@ public class UserGuideSty extends LaTeXSty
       registerControlSequence(new LaTeXGenericCommand(true,
        "CTANpkg", "m", def));
 
+      // \ctanpkg
+      def = getListener().createStack();
+      def.add(new TeXCsRef("href"));
+      grp = getListener().createGroup("https://ctan.org/pkg/");
+      def.add(grp);
+      grp.add(getListener().getParam(1));
+      grp = getListener().createGroup("ctan.org/pkg/");
+      def.add(grp);
+      grp.add(getListener().getParam(1));
+
+      registerControlSequence(new LaTeXGenericCommand(true,
+       "ctanpkg", "m", def));
+
       // \ctanref
       def = getListener().createStack();
       def.add(new TeXCsRef("href"));
@@ -700,6 +721,9 @@ public class UserGuideSty extends LaTeXSty
 
       // \sectionref
       registerControlSequence(new Ref("sectionref", new TeXCsRef("S")));
+
+      // \exampleref
+      registerControlSequence(new Ref("exampleref", false, new TeXCsRef("Example ")));
 
       // \tableref
       registerControlSequence(new TextualContentCommand("Tablename", "Table"));
@@ -853,6 +877,57 @@ public class UserGuideSty extends LaTeXSty
           new TeXCsRef("faDownload"), 
           new TeXCsRef("textsuperscript"), 
           new TeXCsRef("faFilePdfO")))));
+
+      // \filedownloadlink
+      def = listener.createStack();
+      def.add(new TeXCsRef("href"));
+      grp = listener.createGroup("samples/");
+      def.add(grp);
+      grp.add(listener.getParam(1));
+      grp = listener.createGroup();
+      def.add(grp);
+      grp.add(new TeXCsRef("faDownload"));
+
+      registerControlSequence(new LaTeXGenericCommand(true, "filedownloadlink",
+       "m", def));
+
+      // \filetag
+      def = listener.createStack();
+      def.add(new TeXCsRef("faFileO"));
+      def.add(new TeXCsRef("filedownloadlink"));
+      grp = listener.createGroup();
+      def.add(grp);
+      grp.add(listener.getParam(1));
+      def.add(new TeXCsRef("space"));
+
+      registerControlSequence(new LaTeXGenericCommand(true, "filetag",
+       "m", def));
+
+      // \filedef
+      FrameBox fileDefBox = addSemanticCommand("@filedefbox", "filedef",
+       new TeXFontText(TeXFontFamily.TT), null, null, null, null, null,
+       false, true, null, AlignHStyle.LEFT);
+
+      registerControlSequence(fileDefBox);
+
+      def = listener.createStack();
+      def.add(fileDefBox);
+      grp = listener.createGroup();
+      def.add(grp);
+      grp.add(new TeXCsRef("filetag"));
+      grp.add(TeXParserUtils.createGroup(listener, listener.getParam(1)));
+      grp.add(new TeXCsRef("mainglsadd"));
+      subgrp = getListener().createGroup("file.");
+      grp.add(subgrp);
+      subgrp.add(listener.getParam(1));
+      grp.add(listener.createGroup("filedef"));
+      grp.add(new TeXCsRef("glsxtrglossentry"));
+      subgrp = getListener().createGroup("file.");
+      grp.add(subgrp);
+      subgrp.add(listener.getParam(1));
+
+      registerControlSequence(new LaTeXGenericCommand(true, "filedef",
+       "m", def));
 
       // provide these commands in case they are redefined in the
       // document, but they're for bib2gls so they can be ignored

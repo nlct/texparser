@@ -239,6 +239,11 @@ public class StandaloneDef extends AbstractGlsCommand
    {
    }
 
+   protected String getMainTag()
+   {
+      return "";
+   }
+
    @Override
    public void process(TeXParser parser, TeXObjectList stack)
    throws IOException
@@ -260,8 +265,9 @@ public class StandaloneDef extends AbstractGlsCommand
 
       GlossaryEntry entry = glslabel.getEntry();
 
-      content.add(listener.getControlSequence("glsadd"));
+      content.add(listener.getControlSequence("mainglsadd"));
       content.add(glslabel);
+      content.add(listener.createGroup(getMainTag()));
 
       if (entry != null)
       {
