@@ -271,18 +271,18 @@ public class LaTeXGenericCommand extends GenericCommand
                      object = defaultArgs[optIdx++];
                   }
 
-                  if (parser.getDebugLevel() > 0)
+                  if (parser.getDebugLevel() >= TeXParser.DEBUG_EXPANSION)
                   {
-                     parser.debugMessage(1, String.format("OARG[%d]: %s", i, object));
+                     parser.logMessage(String.format("OARG[%d]: %s", i, object));
                   }
 
                break;
                case SYNTAX_MANDATORY: 
                   object = remainingStack.popArg(parser, popStyle);
 
-                  if (parser.getDebugLevel() > 0)
+                  if (parser.getDebugLevel() >= TeXParser.DEBUG_EXPANSION)
                   {
-                     parser.debugMessage(1, String.format("MARG[%d]: %s", i, object));
+                     parser.logMessage(String.format("MARG[%d]: %s", i, object));
                   }
 
                break;
@@ -296,9 +296,9 @@ public class LaTeXGenericCommand extends GenericCommand
 
       addReplacements(parser, replacement, args, getDefinition());
 
-      if (parser.getDebugLevel() > 0)
+      if (parser.getDebugLevel() >= TeXParser.DEBUG_EXPANSION)
       {
-         parser.debugMessage(1, "Replacement: "+replacement);
+         parser.logMessage("Replacement: "+replacement);
       }
 
       return replacement;
@@ -336,18 +336,18 @@ public class LaTeXGenericCommand extends GenericCommand
                      object = defaultArgs[optIdx++];
                   }
 
-                  if (parser.getDebugLevel() > 0)
+                  if (parser.getDebugLevel() >= TeXParser.DEBUG_EXPANSION)
                   {
-                     parser.debugMessage(1, String.format("OARG[%d]: %s", i, object));
+                     parser.logMessage(String.format("OARG[%d]: %s", i, object));
                   }
 
                break;
                case SYNTAX_MANDATORY: 
                   object = parser.popNextArg(popStyle);
 
-                  if (parser.getDebugLevel() > 0)
+                  if (parser.getDebugLevel() >= TeXParser.DEBUG_EXPANSION)
                   {
-                     parser.debugMessage(1, String.format("MARG[%d]: %s", i, object));
+                     parser.logMessage(String.format("MARG[%d]: %s", i, object));
                   }
 
                break;
@@ -361,9 +361,9 @@ public class LaTeXGenericCommand extends GenericCommand
 
       addReplacements(parser, replacement, args, getDefinition());
 
-      if (parser.getDebugLevel() > 0)
+      if (parser.getDebugLevel() >= TeXParser.DEBUG_EXPANSION)
       {
-         parser.debugMessage(1, "Replacement: "+replacement);
+         parser.logMessage("Replacement: "+replacement);
       }
 
       return replacement;
@@ -410,9 +410,9 @@ public class LaTeXGenericCommand extends GenericCommand
    public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      if (parser.getDebugLevel() > 0)
+      if (parser.getDebugLevel() >= TeXParser.DEBUG_PROCESSING)
       {
-         parser.debugMessage(1, "Fetching arguments for "+toString());
+         parser.logMessage("Fetching arguments for "+toString());
       }
 
       getReplacement(parser, stack).process(parser, stack);
@@ -421,9 +421,9 @@ public class LaTeXGenericCommand extends GenericCommand
    public void process(TeXParser parser)
      throws IOException
    {
-      if (parser.getDebugLevel() > 0)
+      if (parser.getDebugLevel() >= TeXParser.DEBUG_PROCESSING)
       {
-         parser.debugMessage(1, "Fetching arguments for "+toString());
+         parser.logMessage("Fetching arguments for "+toString());
       }
 
       getReplacement(parser).process(parser);
@@ -441,7 +441,7 @@ public class LaTeXGenericCommand extends GenericCommand
 
    public String toString()
    {
-      return String.format("%s[name=%s,robust=%s,,syntax=%s,definition=%s]",
+      return String.format("%s[name=%s,robust=%s,syntax=%s,definition=%s]",
        getClass().getSimpleName(), getName(), isRobust,  
        getLaTeXSyntaxString(), getDefinition());
    }

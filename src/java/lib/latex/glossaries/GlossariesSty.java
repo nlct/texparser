@@ -485,6 +485,8 @@ public class GlossariesSty extends LaTeXSty
 
       registerControlSequence(new GlsSeeItemFormat(this));
 
+      registerControlSequence(new Symbol("glsshowtargetsymbol", 0x25C1));
+
       FrameBox fbox = new FrameBox("glsshowtargetfont", BorderStyle.NONE,
        AlignHStyle.DEFAULT, AlignVStyle.DEFAULT, true, null, null);
 
@@ -545,7 +547,9 @@ public class GlossariesSty extends LaTeXSty
       registerControlSequence(new TextualContentCommand("glsxtrnopostpunc", ""));
       registerControlSequence(new Symbol("glsxtrshowtargetsymbolright", 0x25B7));
       registerControlSequence(new Symbol("glsxtrshowtargetsymbolleft", 0x25C1));
-      registerControlSequence(new Symbol("glsshowtargetsymbol", 0x25C1));
+
+      registerControlSequence(new TextualContentCommand("glsxtrhiernamesep", 
+        "\u2006\u25C1\u2006"));
 
       listener.newtoks(true, "glsshortpltok");
       listener.newtoks(true, "glslongpltok");
@@ -1121,6 +1125,17 @@ public class GlossariesSty extends LaTeXSty
       registerControlSequence(new LaTeXGenericCommand(true, 
         "GlsXtrNoGlsWarningHead",
         "mm", def));
+
+      // \GlsXtrNoGlsWarningNoOut
+      def = getListener().createString(
+       "The file ");
+
+      def.add(getListener().getParam(1));
+
+      def.addAll(getListener().createString(" doesn't exist. This most likely means you haven't used \\makeglossaries or you have used \\nofiles. If this is just a draft version of the document, you can suppress this message using the nomissingglstext ackage option."));
+
+      registerControlSequence(new LaTeXGenericCommand(true, 
+        "GlsXtrNoGlsWarningNoOut", "m", def));
 
       registerControlSequence(new GlsXtrNoGlsWarningAutoMake());
    }
@@ -1755,11 +1770,19 @@ public class GlossariesSty extends LaTeXSty
 
       KeyValList options = null;
 
-      TeXObject arg = stack.peek();
+      TeXObject arg = (stack == null ? parser.peek() : stack.peek());
 
       if (arg instanceof KeyValList)
       {
-         stack.pop();
+         if (stack == null)
+         {
+            parser.pop();
+         }
+         else
+         {
+            stack.pop();
+         }
+
          options = (KeyValList)arg;
       }
       else
@@ -1801,7 +1824,7 @@ public class GlossariesSty extends LaTeXSty
 
          texApp.warning(parser, texApp.getMessage(messageTag, params));
 
-         if (((LaTeXParserListener)parser.getListener()).isInDocEnv())
+         if (getListener().isInDocEnv())
          {
             stack.push(new TeXCsRef("glsxtrundeftag"));
          }

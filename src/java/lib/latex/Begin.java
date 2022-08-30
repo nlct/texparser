@@ -111,7 +111,7 @@ public class Begin extends ControlSequence
 
             if (token == null)
             {
-               parser.debugMessage(1, 
+               parser.debugMessage(TeXParser.DEBUG_IO, 
                  "End of stack found while peeking in "+name);
             }
 

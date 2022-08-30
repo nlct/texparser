@@ -267,7 +267,7 @@ public class MfirstucSty extends LaTeXSty
          }
          else
          {
-            getParser().debugMessage(1, 
+            getParser().debugMessage(TeXParser.DEBUG_STY_DATA, 
               "KeyValList expected as definition of "+cs);
 
             mappings = new KeyValList();
@@ -279,7 +279,7 @@ public class MfirstucSty extends LaTeXSty
       {
          if (cs != null)
          {
-            getParser().debugMessage(1, 
+            getParser().debugMessage(TeXParser.DEBUG_STY_DATA, 
               "KeyValList expected as definition of "+cs);
          }
 

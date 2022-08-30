@@ -536,9 +536,9 @@ public class L2HConverter extends LaTeXParserListener
 
       if (inPreamble && !Character.isWhitespace(codePoint))
       {
-         parser.debugMessage(1, "Unexpected character found in preamble, codepoint: "
-           + codePoint);
-         return;
+         throw new LaTeXSyntaxException(getParser(),
+           LaTeXSyntaxException.ERROR_MISSING_BEGIN_DOC, 
+             new String(Character.toChars(codePoint)));
       }
 
       if (codePoint == '<')
@@ -577,9 +577,8 @@ public class L2HConverter extends LaTeXParserListener
 
       if (inPreamble && !str.trim().isEmpty())
       {
-         parser.debugMessage(1, "Unexpected string found in preamble: "
-           + str);
-         return;
+         throw new LaTeXSyntaxException(getParser(),
+           LaTeXSyntaxException.ERROR_MISSING_BEGIN_DOC, str);
       }
 
 /*
@@ -609,9 +608,8 @@ public class L2HConverter extends LaTeXParserListener
 
       if (inPreamble && !Character.isWhitespace(c))
       {
-         parser.debugMessage(1, "Unexpected character found in preamble: "
-           + c);
-         return;
+         throw new LaTeXSyntaxException(getParser(),
+           LaTeXSyntaxException.ERROR_MISSING_BEGIN_DOC, c);
       }
 
       write(String.format("%c", c));
@@ -625,9 +623,8 @@ public class L2HConverter extends LaTeXParserListener
 
       if (inPreamble && !str.trim().isEmpty())
       {
-         parser.debugMessage(1, "Unexpected line found in preamble: "
-           + str);
-         return;
+         throw new LaTeXSyntaxException(getParser(),
+           LaTeXSyntaxException.ERROR_MISSING_BEGIN_DOC, str);
       }
 
       write(String.format("%s%n", str));

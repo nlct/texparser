@@ -534,7 +534,7 @@ public abstract class DefaultTeXParserListener extends TeXParserListener
    public TeXObject createAnchor(String anchorName, TeXObject text)
     throws IOException
    {
-      getParser().debugMessage(1,
+      getParser().debugMessage(TeXParser.DEBUG_PROCESSING,
         "No hyperlink anchor supported. Anchor: "+anchorName);
       return text;
    }
@@ -550,7 +550,7 @@ public abstract class DefaultTeXParserListener extends TeXParserListener
    public TeXObject createLink(String anchorName, TeXObject text)
     throws IOException
    {
-      getParser().debugMessage(1,
+      getParser().debugMessage(TeXParser.DEBUG_PROCESSING,
        "No hyperlink supported. Anchor: "+anchorName);
       return text;
    }

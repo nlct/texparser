@@ -163,7 +163,7 @@ public class PrintSummary extends AbstractGlsCommand
 
       Glossary glossary = sty.getGlossary(type);
 
-      parser.debugMessage(1, "Writing SUMMARIES");
+      parser.debugMessage(TeXParser.DEBUG_PROCESSING, "Writing SUMMARIES");
 
       if (glossary != null && !glossary.isEmpty())
       {

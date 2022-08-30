@@ -1327,7 +1327,7 @@ public class TeXObjectList extends Vector<TeXObject>
 
       throw new TeXSyntaxException(parser,
                TeXSyntaxException.ERROR_MISSING_CLOSING,
-               closeDelim);
+               ""+closeDelim);
    }
 
    public Numerical popNumericalArg(TeXParser parser)
