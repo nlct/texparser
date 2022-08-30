@@ -373,6 +373,8 @@ public class UserGuideSty extends LaTeXSty
       registerControlSequence(new Dgls("Idxpl", CaseChange.SENTENCE, true, glossariesSty));
       registerControlSequence(new Dglslink("idxc", false, glossariesSty));
 
+      registerControlSequence(new Idxn(glossariesSty));
+
       // dual prefix list
       def = getListener().createString("dual.,idx.,");
         def.add(getListener().getControlSequence("empty"));
@@ -723,7 +725,8 @@ public class UserGuideSty extends LaTeXSty
       registerControlSequence(new Ref("sectionref", new TeXCsRef("S")));
 
       // \exampleref
-      registerControlSequence(new Ref("exampleref", false, new TeXCsRef("Example ")));
+      registerControlSequence(new Ref("exampleref", false, 
+         new TeXCsRef("Examplename"), listener.getSpace()));
 
       // \tableref
       registerControlSequence(new TextualContentCommand("Tablename", "Table"));
