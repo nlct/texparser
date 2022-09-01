@@ -83,42 +83,12 @@ public abstract class Command extends ControlSequence implements Expandable
 
       TeXObjectList expanded = expandonce(parser, stack);
 
-      if (expanded == null)
+      if (expanded == null || !expanded.canExpand())
       {
-         return null;
+         return expanded;
       }
 
-      stack.addAll(0, expanded);
-
-      TeXObjectList list = new TeXObjectList();
-
-      while (stack.size() > 0)
-      {
-         TeXObject object = stack.remove(0);
-
-         if (object instanceof Ignoreable)
-         {
-         }
-         else if (object instanceof Expandable)
-         {
-            expanded = ((Expandable)object).expandfully(parser, stack);
-
-            if (expanded == null)
-            {
-               list.add(object);
-            }
-            else
-            {
-               list.addAll(expanded);
-            }
-         }
-         else
-         {
-            list.add(object);
-         }
-      }
-
-      return list;
+      return expanded.expandfully(parser, stack);
    }
 
    public void process(TeXParser parser, TeXObjectList stack)
