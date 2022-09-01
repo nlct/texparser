@@ -433,7 +433,7 @@ public class LaTeX2LaTeX extends LaTeXParserListener
          }
          catch (LaTeXSyntaxException e)
          {
-            getTeXApp().error(e);
+            getParser().error(e);
          }
 
          return sty;
@@ -571,7 +571,7 @@ public class LaTeX2LaTeX extends LaTeXParserListener
       }
       catch (InterruptedException e)
       {
-         getTeXApp().error(e);
+         getParser().error(e);
       }
 
       if (isReplaceGraphicsPathEnabled() && imagePath != null)
@@ -679,7 +679,7 @@ public class LaTeX2LaTeX extends LaTeXParserListener
              }
              catch (InterruptedException e)
              {
-                getTeXApp().error(e);
+                getParser().error(e);
              }
          }
       }
@@ -704,7 +704,7 @@ public class LaTeX2LaTeX extends LaTeXParserListener
       }
       else
       {
-         getTeXApp().warning(getParser(), "null writer");
+         getParser().warning("null writer");
       }
    }
 
@@ -717,7 +717,7 @@ public class LaTeX2LaTeX extends LaTeXParserListener
       }
       else
       {
-         getTeXApp().warning(getParser(), "null writer");
+         getParser().warning("null writer");
       }
    }
 
@@ -730,7 +730,7 @@ public class LaTeX2LaTeX extends LaTeXParserListener
       }
       else
       {
-         getTeXApp().warning(getParser(), "null writer");
+         getParser().warning("null writer");
       }
    }
 
@@ -743,7 +743,7 @@ public class LaTeX2LaTeX extends LaTeXParserListener
       }
       else
       {
-         getTeXApp().warning(getParser(), "null writer");
+         getParser().warning("null writer");
       }
    }
 
@@ -755,7 +755,7 @@ public class LaTeX2LaTeX extends LaTeXParserListener
       }
       else
       {
-         getTeXApp().warning(getParser(), "null writer");
+         getParser().warning("null writer");
       }
    }
 
@@ -767,7 +767,7 @@ public class LaTeX2LaTeX extends LaTeXParserListener
       }
       else
       {
-         getTeXApp().warning(getParser(), "null writer");
+         getParser().warning("null writer");
       }
    }
 
@@ -974,13 +974,11 @@ public class LaTeX2LaTeX extends LaTeXParserListener
    public void beginParse(File file, Charset encoding)
      throws IOException
    {
-      getTeXApp().message(getTeXApp().getMessage(
-         TeXApp.MESSAGE_READING, file));
+      getParser().message(TeXApp.MESSAGE_READING, file);
 
       if (encoding != null)
       {
-         getTeXApp().message(getTeXApp().getMessage(
-            TeXApp.MESSAGE_ENCODING, encoding));
+         getParser().message(TeXApp.MESSAGE_ENCODING, encoding);
       }
 
       basePath = file.getParentFile().toPath();
@@ -991,8 +989,7 @@ public class LaTeX2LaTeX extends LaTeXParserListener
 
          File outFile = new File(outPath.toFile(), getOutFileName(file));
 
-         getTeXApp().message(getTeXApp().getMessage(
-            TeXApp.MESSAGE_WRITING, outFile));
+         getParser().message(TeXApp.MESSAGE_WRITING, outFile);
 
          if (outCharset == null)
          {
@@ -1000,8 +997,7 @@ public class LaTeX2LaTeX extends LaTeXParserListener
          }
          else
          {
-            getTeXApp().message(getTeXApp().getMessage(
-               TeXApp.MESSAGE_ENCODING, outCharset));
+            getParser().message(TeXApp.MESSAGE_ENCODING, outCharset);
 
             writer = new PrintWriter(outFile, outCharset.name());
          }

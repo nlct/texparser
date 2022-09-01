@@ -59,9 +59,15 @@ public class ExpandAfter extends Primitive implements Expandable
 
       secondArg = TeXParserUtils.resolve(secondArg, parser);
 
-      if (parser.getDebugLevel() >= TeXParser.DEBUG_EXPANSION)
+      if (parser.isDebugMode(TeXParser.DEBUG_EXPANSION_LIST))
       {
          parser.logMessage("EXPANDAFTER: FIRST: "+firstArg+". SECOND: "+secondArg);
+      }
+
+      if (parser.isDebugMode(TeXParser.DEBUG_EXPANSION))
+      {
+         parser.logMessage("EXPANDAFTER: FIRST: "+firstArg.toString(parser)
+            +". SECOND: "+secondArg.toString(parser));
       }
 
       TeXObject expanded = TeXParserUtils.expandOnce(secondArg, parser, stack);
@@ -70,7 +76,12 @@ public class ExpandAfter extends Primitive implements Expandable
 
       list.push(firstArg);
 
-      if (parser.getDebugLevel() >= TeXParser.DEBUG_EXPANSION)
+      if (parser.isDebugMode(TeXParser.DEBUG_EXPANSION_LIST))
+      {
+         parser.logMessage("EXPANDED: "+list);
+      }
+
+      if (parser.isDebugMode(TeXParser.DEBUG_EXPANSION))
       {
          parser.logMessage("EXPANDED: "+list.toString(parser));
       }

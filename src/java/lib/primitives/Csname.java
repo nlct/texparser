@@ -55,7 +55,8 @@ public class Csname extends Primitive implements Expandable
 
       String name = csname(parser, stack);
 
-      if (parser.getDebugLevel() >= TeXParser.DEBUG_EXPANSION)
+      if (parser.isDebugMode(TeXParser.DEBUG_EXPANSION)
+          || parser.isDebugMode(TeXParser.DEBUG_EXPANSION_LIST))
       {
          parser.logMessage("CSNAME: "+name);
       }

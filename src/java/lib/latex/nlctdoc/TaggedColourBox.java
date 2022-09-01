@@ -57,7 +57,7 @@ public class TaggedColourBox extends FrameBoxEnv
    public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      if (parser.getDebugLevel() >= TeXParser.DEBUG_PROCESSING)
+      if (parser.isDebugMode(TeXParser.DEBUG_PROCESSING))
       {
          parser.logMessage("Processing " + toString(parser));
       }
@@ -99,7 +99,7 @@ public class TaggedColourBox extends FrameBoxEnv
          }
       }
 
-      if (parser.getDebugLevel() >= TeXParser.DEBUG_PROCESSING)
+      if (parser.isDebugMode(TeXParser.DEBUG_PROCESSING))
       {
          parser.logMessage("TAGGED BOX content " + substack.toString(parser));
       }

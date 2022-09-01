@@ -232,6 +232,16 @@ public class GenericCommand extends Command
          }
       }
 
+      if (parser.isDebugMode(TeXParser.DEBUG_EXPANSION_ONCE_LIST))
+      {
+         parser.logMessage("Expansion: "+stack);
+      }
+
+      if (parser.isDebugMode(TeXParser.DEBUG_EXPANSION_ONCE))
+      {
+         parser.logMessage("Expansion: "+stack.toString(parser));
+      }
+
       return stack;
    }
 
@@ -313,6 +323,16 @@ public class GenericCommand extends Command
          }
       }
 
+      if (parser.isDebugMode(TeXParser.DEBUG_EXPANSION_ONCE_LIST))
+      {
+         parser.logMessage("Expansion: "+stack);
+      }
+
+      if (parser.isDebugMode(TeXParser.DEBUG_EXPANSION_ONCE))
+      {
+         parser.logMessage("Expansion: "+stack.toString(parser));
+      }
+
       return stack;
    }
 
@@ -348,7 +368,13 @@ public class GenericCommand extends Command
    public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
+      if (parser.isDebugMode(TeXParser.DEBUG_PROCESSING_GENERIC_CS))
+      {
+         parser.logMessage("Processing "+toString());
+      }
+
       TeXObjectList repl = getReplacement(parser, stack);
+
       repl.process(parser, stack);
    }
 
@@ -356,7 +382,13 @@ public class GenericCommand extends Command
    public void process(TeXParser parser)
      throws IOException
    {
+      if (parser.isDebugMode(TeXParser.DEBUG_PROCESSING_GENERIC_CS))
+      {
+         parser.logMessage("Processing "+toString());
+      }
+
       TeXObjectList repl = getReplacement(parser);
+
       repl.process(parser);
    }
 

@@ -271,18 +271,30 @@ public class LaTeXGenericCommand extends GenericCommand
                      object = defaultArgs[optIdx++];
                   }
 
-                  if (parser.getDebugLevel() >= TeXParser.DEBUG_EXPANSION)
+                  if (parser.isDebugMode(TeXParser.DEBUG_EXPANSION_LIST))
                   {
                      parser.logMessage(String.format("OARG[%d]: %s", i, object));
+                  }
+
+                  if (parser.isDebugMode(TeXParser.DEBUG_EXPANSION))
+                  {
+                     parser.logMessage(String.format("OARG[%d]: %s", i, 
+                       object.toString(parser)));
                   }
 
                break;
                case SYNTAX_MANDATORY: 
                   object = remainingStack.popArg(parser, popStyle);
 
-                  if (parser.getDebugLevel() >= TeXParser.DEBUG_EXPANSION)
+                  if (parser.isDebugMode(TeXParser.DEBUG_EXPANSION_LIST))
                   {
                      parser.logMessage(String.format("MARG[%d]: %s", i, object));
+                  }
+
+                  if (parser.isDebugMode(TeXParser.DEBUG_EXPANSION))
+                  {
+                     parser.logMessage(String.format("MARG[%d]: %s", i, 
+                        object.toString(parser)));
                   }
 
                break;
@@ -296,9 +308,14 @@ public class LaTeXGenericCommand extends GenericCommand
 
       addReplacements(parser, replacement, args, getDefinition());
 
-      if (parser.getDebugLevel() >= TeXParser.DEBUG_EXPANSION)
+      if (parser.isDebugMode(TeXParser.DEBUG_EXPANSION_LIST))
       {
          parser.logMessage("Replacement: "+replacement);
+      }
+
+      if (parser.isDebugMode(TeXParser.DEBUG_EXPANSION))
+      {
+         parser.logMessage("Replacement: "+replacement.toString(parser));
       }
 
       return replacement;
@@ -336,18 +353,30 @@ public class LaTeXGenericCommand extends GenericCommand
                      object = defaultArgs[optIdx++];
                   }
 
-                  if (parser.getDebugLevel() >= TeXParser.DEBUG_EXPANSION)
+                  if (parser.isDebugMode(TeXParser.DEBUG_EXPANSION_LIST))
                   {
                      parser.logMessage(String.format("OARG[%d]: %s", i, object));
+                  }
+
+                  if (parser.isDebugMode(TeXParser.DEBUG_EXPANSION))
+                  {
+                     parser.logMessage(String.format("OARG[%d]: %s", i, 
+                       object.toString(parser)));
                   }
 
                break;
                case SYNTAX_MANDATORY: 
                   object = parser.popNextArg(popStyle);
 
-                  if (parser.getDebugLevel() >= TeXParser.DEBUG_EXPANSION)
+                  if (parser.isDebugMode(TeXParser.DEBUG_EXPANSION_LIST))
                   {
                      parser.logMessage(String.format("MARG[%d]: %s", i, object));
+                  }
+
+                  if (parser.isDebugMode(TeXParser.DEBUG_EXPANSION))
+                  {
+                     parser.logMessage(String.format("MARG[%d]: %s", i, 
+                       object.toString(parser)));
                   }
 
                break;
@@ -361,9 +390,14 @@ public class LaTeXGenericCommand extends GenericCommand
 
       addReplacements(parser, replacement, args, getDefinition());
 
-      if (parser.getDebugLevel() >= TeXParser.DEBUG_EXPANSION)
+      if (parser.isDebugMode(TeXParser.DEBUG_EXPANSION_LIST))
       {
          parser.logMessage("Replacement: "+replacement);
+      }
+
+      if (parser.isDebugMode(TeXParser.DEBUG_EXPANSION))
+      {
+         parser.logMessage("Replacement: "+replacement.toString(parser));
       }
 
       return replacement;
@@ -405,28 +439,6 @@ public class LaTeXGenericCommand extends GenericCommand
             replacement.add((TeXObject)object.clone());
          }
       }
-   }
-
-   public void process(TeXParser parser, TeXObjectList stack)
-     throws IOException
-   {
-      if (parser.getDebugLevel() >= TeXParser.DEBUG_PROCESSING)
-      {
-         parser.logMessage("Fetching arguments for "+toString());
-      }
-
-      getReplacement(parser, stack).process(parser, stack);
-   }
-
-   public void process(TeXParser parser)
-     throws IOException
-   {
-      if (parser.getDebugLevel() >= TeXParser.DEBUG_PROCESSING)
-      {
-         parser.logMessage("Fetching arguments for "+toString());
-      }
-
-      getReplacement(parser).process(parser);
    }
 
    public char[] getLaTeXSyntax()

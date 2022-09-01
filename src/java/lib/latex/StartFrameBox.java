@@ -43,7 +43,7 @@ public class StartFrameBox extends AbstractTeXObject
 
       parser.startGroup();
 
-      if (parser.getDebugLevel() >= TeXParser.DEBUG_PROCESSING)
+      if (parser.isDebugMode(TeXParser.DEBUG_PROCESSING))
       {
          parser.logMessage("Applying settings for "+fbox);
       }
@@ -60,7 +60,7 @@ public class StartFrameBox extends AbstractTeXObject
 
       parser.startGroup();
 
-      if (parser.getDebugLevel() >= TeXParser.DEBUG_PROCESSING)
+      if (parser.isDebugMode(TeXParser.DEBUG_PROCESSING))
       {
          parser.logMessage("Applying settings for "+fbox);
       }

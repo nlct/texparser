@@ -152,7 +152,7 @@ public class TeXParserApp implements TeXApp
       if (logFile != null)
       {
          logWriter = new PrintWriter(logFile);
-         parser.setDebugLevel(debugMode, logWriter);
+         parser.setDebugMode(debugMode, logWriter);
       }
 
       try
@@ -232,7 +232,7 @@ public class TeXParserApp implements TeXApp
       if (logFile != null)
       {
          logWriter = new PrintWriter(logFile);
-         parser.setDebugLevel(debugMode, logWriter);
+         parser.setDebugMode(debugMode, logWriter);
       }
 
       try
@@ -1379,7 +1379,7 @@ public class TeXParserApp implements TeXApp
          }
          else if (args[i].equals("--debug"))
          {
-            debugMode = 1;
+            debugMode = Integer.MAX_VALUE;
 
             if (i < args.length - 1)
             {
@@ -1395,6 +1395,97 @@ public class TeXParserApp implements TeXApp
                }
                catch (NumberFormatException e)
                {
+               }
+            }
+         }
+         else if (args[i].equals("--debug-mode"))
+         {
+            i++;
+
+            if (i == args.length)
+            {
+               throw new InvalidSyntaxException(
+                 getMessage("error.syntax.missing_mode", args[i-1]));
+            }
+
+            try
+            {
+               int val = Integer.parseInt(args[i]);
+
+               if (val >= 0)
+               {
+                  debugMode = val;
+               }
+            }
+            catch (NumberFormatException e)
+            {
+               debugMode = 0;
+
+               String[] split = args[i].split(",");
+
+               for (String mode : split)
+               {
+                  if (mode.equals("all"))
+                  {
+                     debugMode = Integer.MAX_VALUE;
+                  }
+                  else if (mode.equals("io"))
+                  {
+                     debugMode = debugMode | TeXParser.DEBUG_IO;
+                  }
+                  else if (mode.equals("popped"))
+                  {
+                     debugMode = debugMode | TeXParser.DEBUG_POPPED;
+                  }
+                  else if (mode.equals("decl"))
+                  {
+                     debugMode = debugMode | TeXParser.DEBUG_DECL;
+                  }
+                  else if (mode.equals("sty-data"))
+                  {
+                     debugMode = debugMode | TeXParser.DEBUG_STY_DATA;
+                  }
+                  else if (mode.equals("expansion"))
+                  {
+                     debugMode = debugMode | TeXParser.DEBUG_EXPANSION;
+                  }
+                  else if (mode.equals("expansion-list"))
+                  {
+                     debugMode = debugMode | TeXParser.DEBUG_EXPANSION_LIST;
+                  }
+                  else if (mode.equals("expansion-once"))
+                  {
+                     debugMode = debugMode | TeXParser.DEBUG_EXPANSION_ONCE;
+                  }
+                  else if (mode.equals("expansion-once-list"))
+                  {
+                     debugMode = debugMode | TeXParser.DEBUG_EXPANSION_ONCE_LIST;
+                  }
+                  else if (mode.equals("process"))
+                  {
+                     debugMode = debugMode | TeXParser.DEBUG_PROCESSING;
+                  }
+                  else if (mode.equals("process-stack"))
+                  {
+                     debugMode = debugMode | TeXParser.DEBUG_PROCESSING_STACK;
+                  }
+                  else if (mode.equals("process-stack-list"))
+                  {
+                     debugMode = debugMode | TeXParser.DEBUG_PROCESSING_STACK_LIST;
+                  }
+                  else if (mode.equals("cs"))
+                  {
+                     debugMode = debugMode | TeXParser.DEBUG_CS;
+                  }
+                  else if (mode.equals("process-generic-cs"))
+                  {
+                     debugMode = debugMode | TeXParser.DEBUG_PROCESSING_GENERIC_CS;
+                  }
+                  else
+                  {
+                     throw new InvalidSyntaxException(
+                       getMessage("error.syntax.unknown_debug_mode", mode));
+                  }
                }
             }
          }
@@ -1534,9 +1625,9 @@ public class TeXParserApp implements TeXApp
 
    // TeXParser class now has its own version and date.
    // As from 0.9.2.2b these now refer to the test application only.
-   public static final String APP_VERSION = "0.9.2.2b";
+   public static final String APP_VERSION = "0.9.2.3b";
    public static final String APP_NAME = "texparsertest";
-   public static final String APP_DATE = "2020-03-23";
+   public static final String APP_DATE = "2020-08-31";
 
    public static long MAX_PROCESS_TIME=0L;
 

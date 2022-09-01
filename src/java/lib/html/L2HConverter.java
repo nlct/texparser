@@ -304,7 +304,7 @@ public class L2HConverter extends LaTeXParserListener
       }
       catch (IOException e)
       {
-         getTeXApp().error(e);
+         getParser().error(e);
       }
 
       return super.createUnknownReference(label);
@@ -1234,7 +1234,7 @@ public class L2HConverter extends LaTeXParserListener
          }
          catch (IOException e)
          {
-            getTeXApp().error(e);
+            getParser().error(e);
          }
       }
 
@@ -1576,7 +1576,7 @@ public class L2HConverter extends LaTeXParserListener
          content.append(filename);
          content.append('}');
 
-         if (getParser().getDebugLevel() >= TeXParser.DEBUG_IO)
+         if (getParser().isDebugMode(TeXParser.DEBUG_IO))
          {
             getParser().logMessage("Creating image "+content.toString());
          }
@@ -1635,7 +1635,7 @@ public class L2HConverter extends LaTeXParserListener
          }
          catch (InterruptedException e)
          {
-            getTeXApp().error(e);
+            getParser().error(e);
          }
       }
    }
@@ -1807,13 +1807,11 @@ public class L2HConverter extends LaTeXParserListener
    public void beginParse(File file, Charset encoding)
     throws IOException
    {
-      getTeXApp().message(getTeXApp().getMessage(
-         TeXApp.MESSAGE_READING, file));
+      getParser().message(TeXApp.MESSAGE_READING, file);
 
       if (encoding != null)
       {
-         getTeXApp().message(getTeXApp().getMessage(
-            TeXApp.MESSAGE_ENCODING, encoding));
+         getParser().message(TeXApp.MESSAGE_ENCODING, encoding);
       }
 
       File parentFile = file.getParentFile();
@@ -1840,8 +1838,7 @@ public class L2HConverter extends LaTeXParserListener
 
          File outFile = new File(outPath.toFile(), baseName+"."+getSuffix());
 
-         getTeXApp().message(getTeXApp().getMessage(
-            TeXApp.MESSAGE_WRITING, outFile));
+         getParser().message(TeXApp.MESSAGE_WRITING, outFile);
 
          if (htmlCharSet == null)
          {
@@ -1849,8 +1846,7 @@ public class L2HConverter extends LaTeXParserListener
          }
          else
          {
-            getTeXApp().message(getTeXApp().getMessage(
-               TeXApp.MESSAGE_ENCODING, htmlCharSet));
+            getParser().message(TeXApp.MESSAGE_ENCODING, htmlCharSet);
 
             writer = new PrintWriter(outFile, htmlCharSet.name());
          }
@@ -2109,7 +2105,7 @@ public class L2HConverter extends LaTeXParserListener
       }
       catch (URISyntaxException e)
       {
-         getTeXApp().error(e);
+         getParser().error(e);
          return str;
       }
    }
@@ -2204,7 +2200,7 @@ public class L2HConverter extends LaTeXParserListener
          }
          catch (IOException e)
          {
-            getTeXApp().warning(getParser(), e.getMessage());
+            getParser().warning(e);
          }
       }
    }
@@ -2494,7 +2490,7 @@ public class L2HConverter extends LaTeXParserListener
          }
          catch (IOException e)
          {
-            getTeXApp().error(e);
+            getParser().error(e);
          }
       }
 

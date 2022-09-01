@@ -623,10 +623,7 @@ public class FrameBox extends ControlSequence
          }
          else
          {
-            TeXApp texApp = parser.getListener().getTeXApp();
-
-            texApp.warning(parser, texApp.getMessage(
-              LaTeXSyntaxException.ILLEGAL_ARG_TYPE, val));
+            parser.warningMessage(LaTeXSyntaxException.ILLEGAL_ARG_TYPE, val);
          }
       }
 

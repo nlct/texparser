@@ -473,11 +473,11 @@ public class GlossariesSty extends LaTeXSty
       registerControlSequence(new GlsReset(this));
       registerControlSequence(new GlsReset("glslocalreset", false, this));
 
-      registerControlSequence(new TextualContentCommand("glsopenbrace", "{"));
-      registerControlSequence(new TextualContentCommand("glsclosebrace", "}"));
-      registerControlSequence(new TextualContentCommand("glsbackslash", "\\"));
-      registerControlSequence(new TextualContentCommand("glspercentchar", "%"));
-      registerControlSequence(new TextualContentCommand("glstildechar", "~"));
+      registerControlSequence(new Symbol("glsopenbrace", '{'));
+      registerControlSequence(new Symbol("glsclosebrace", '}'));
+      registerControlSequence(new Symbol("glsbackslash", '\\'));
+      registerControlSequence(new Symbol("glspercentchar", '%'));
+      registerControlSequence(new Symbol("glstildechar", '~'));
 
       registerControlSequence(new LaTeXGenericCommand(true, "glsquote",
        "m", TeXParserUtils.createStack(listener,
@@ -2065,7 +2065,7 @@ public class GlossariesSty extends LaTeXSty
                   val = TeXParserUtils.expandFully(val, getParser(), stack);
                }
 
-               if (getParser().getDebugLevel() >= TeXParser.DEBUG_STY_DATA)
+               if (getParser().isDebugMode(TeXParser.DEBUG_STY_DATA))
                {
                   getParser().logMessage("ADDING DEFAULT FIELD "+field 
                     + " -> "+val.toString(getParser()));
@@ -2088,7 +2088,7 @@ public class GlossariesSty extends LaTeXSty
             {
                TeXObject val = (TeXObjectList)name.clone();
 
-               if (getParser().getDebugLevel() >= TeXParser.DEBUG_STY_DATA)
+               if (getParser().isDebugMode(TeXParser.DEBUG_STY_DATA))
                {
                   getParser().logMessage("ADDING DEFAULT sort FIELD" 
                     + " -> "+val.toString(getParser()));

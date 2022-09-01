@@ -948,6 +948,7 @@ public class UserGuideSty extends LaTeXSty
 
       registerControlSequence(new SymbolGroupLabel("bibglsothergroup"));
       registerControlSequence(new SymbolGroupTitle("bibglsothergrouptitle"));
+
    }
 
    protected void addGlsFmtTextCommand(String name, String prefix)

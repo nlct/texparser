@@ -1260,7 +1260,7 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
          }
       }
 
-      if (getParser().getDebugLevel() >= TeXParser.DEBUG_PROCESSING)
+      if (getParser().isDebugMode(TeXParser.DEBUG_PROCESSING))
       {
          getParser().logMessage("AtBeginDoc: "+cs);
       }
@@ -1313,7 +1313,7 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
 
       if (cs != null)
       {
-         if (getParser().getDebugLevel() >= TeXParser.DEBUG_PROCESSING)
+         if (getParser().isDebugMode(TeXParser.DEBUG_PROCESSING))
          {
             getParser().logMessage("PROCESSING AtBeginDoc: "+cs);
          }
@@ -1351,7 +1351,7 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
          }
          catch (IOException e)
          {
-            getTeXApp().error(e);
+            parser.error(e);
          }
       }
 
@@ -2042,7 +2042,7 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
          }
          catch (IllegalCharsetNameException e)
          {
-            getTeXApp().error(e);
+            parser.error(e);
             charset = null;
          }
       }
@@ -2200,7 +2200,7 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       }
       catch (InterruptedException e)
       {
-         getTeXApp().error(e);
+         parser.error(e);
       }
 
       return null;
@@ -2441,7 +2441,7 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
 
    public float emToPt(float emValue)
    {
-      getTeXApp().warning(getParser(),
+      getParser().warning(
         "Can't convert from em to pt, no font information loaded");
 
       // approximate
@@ -2480,7 +2480,7 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
 
    public float exToPt(float exValue)
    {
-      getTeXApp().warning(getParser(),
+      getParser().warning(
         "Can't convert from ex to pt, no font information loaded");
 
       // approximate!!!
@@ -2656,8 +2656,8 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
 
             if (ext == null)
             {
-               getTeXApp().warning(parser, getTeXApp().getMessage(
-                    TeXSyntaxException.ERROR_UNEXPANDABLE, "@currext"));
+               getParser().warningMessage(
+                    TeXSyntaxException.ERROR_UNEXPANDABLE, "@currext");
 
                ext = "sty";
             }

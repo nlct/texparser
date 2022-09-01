@@ -50,20 +50,18 @@ public class Undefined extends Primitive
    public void process(TeXParser parser)
       throws IOException
    {
-      TeXApp texApp = parser.getListener().getTeXApp();
-
       switch (action)
       {
          case ACTION_ERROR:
             throw new TeXSyntaxException(parser, 
             TeXSyntaxException.ERROR_UNDEFINED, getName());
          case ACTION_WARN:
-            texApp.warning(parser, 
-              texApp.getMessage(TeXSyntaxException.ERROR_UNDEFINED, getName()));
+            parser.warningMessage( 
+              TeXSyntaxException.ERROR_UNDEFINED, getName());
          break;
          case ACTION_MESSAGE:
-            texApp.message( 
-              texApp.getMessage(TeXSyntaxException.ERROR_UNDEFINED, getName()));
+            parser.message( 
+              TeXSyntaxException.ERROR_UNDEFINED, getName());
          break;
       }
    }

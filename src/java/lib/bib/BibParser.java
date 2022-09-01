@@ -196,13 +196,11 @@ public class BibParser extends DefaultTeXParserListener
    public void beginParse(File file, Charset encoding)
       throws IOException
    {
-      getTeXApp().message(getTeXApp().getMessage(
-         TeXApp.MESSAGE_READING, file));
+      getParser().message(TeXApp.MESSAGE_READING, file);
 
       if (encoding != null)
       {
-         getTeXApp().message(getTeXApp().getMessage(
-            TeXApp.MESSAGE_ENCODING, encoding));
+         getParser().message(TeXApp.MESSAGE_ENCODING, encoding);
       }
    }
 
@@ -257,7 +255,7 @@ public class BibParser extends DefaultTeXParserListener
    // shouldn't be needed in bibFile
    public float emToPt(float emValue)
    {
-      getTeXApp().warning(getParser(),
+      getParser().warning(
          "Can't convert from em to pt, no font information loaded");
 
       return 9.5f*emValue;
@@ -266,7 +264,7 @@ public class BibParser extends DefaultTeXParserListener
    // shouldn't be needed in bibFile
    public float exToPt(float exValue)
    {
-      getTeXApp().warning(getParser(),
+      getParser().warning(
          "Can't convert from ex to pt, no font information loaded");
 
       return 4.4f*exValue;

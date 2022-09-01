@@ -395,7 +395,7 @@ public abstract class DefaultTeXParserListener extends TeXParserListener
    {
       TeXObjectList stack = new TeXObjectList();
 
-      if (getParser().getDebugLevel() >= TeXParser.DEBUG_PROCESSING_STACK)
+      if (getParser().isDebugMode(TeXParser.DEBUG_PROCESSING_STACK))
       {
          getParser().logMessage("CREATED STACK "+stack);
       }
@@ -631,8 +631,7 @@ public abstract class DefaultTeXParserListener extends TeXParserListener
    public TeXObjectList directlua(String luacode)
      throws IOException
    {
-      getTeXApp().warning(getParser(), 
-       getTeXApp().getMessage("warning.unsupported.generic", "\\directlua"));
+      getParser().warningMessage("warning.unsupported.generic", "\\directlua");
 
       return null;
    }

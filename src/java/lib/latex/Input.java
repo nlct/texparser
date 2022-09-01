@@ -65,11 +65,8 @@ public class Input extends ControlSequence
          {
             case NOT_FOUND_ACTION_WARN:
 
-              TeXApp texapp = parser.getListener().getTeXApp();
-
-              texapp.warning(parser, texapp.getMessage(
-                 TeXSyntaxException.ERROR_FILE_NOT_FOUND, 
-                  arg.toString(parser)));
+              parser.warningMessage(TeXSyntaxException.ERROR_FILE_NOT_FOUND, 
+                  arg.toString(parser));
             break;
             case NOT_FOUND_ACTION_ERROR:
                throw new TeXSyntaxException(parser,

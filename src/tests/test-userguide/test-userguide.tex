@@ -135,6 +135,15 @@
   % terms
   \gterm{someterm}{\name{some term}\desc{an example term, see
    \sectionref{ch:sample}}}
+  % indexed symbols
+  \gpunc{sym.hash}{\name{\code{\#}}}
+  % nbsp
+  \gidx{nbsp}{\name{non-breaking space (\code{\textasciitilde})}
+    \field{symbol}{\code{\textasciitilde}}
+  }
+  \gpunc{sym.nbsp}{\name{\code{\textasciitilde} (non-breaking space)}
+    \field{see}{idx.nbsp}
+  }
 }
 
 \title{Sample Document}
@@ -174,7 +183,7 @@ Cross-references: \sectionref{sec:defs}, \tableref{tab:sample}.
 
 First use: \idx{html}, next use: \idx{html}.
 First use: \idx{xml}, next use: \idx{xml}.
-\Idx{someterm}.
+\Idx{someterm}. Something about a \idx{nbsp} and \idx{sym.hash}.
 
 \section{Semantic Markup}\label{sec:semantic}
 

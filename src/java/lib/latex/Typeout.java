@@ -54,7 +54,7 @@ public class Typeout extends ControlSequence
          }
       }
 
-      parser.getListener().getTeXApp().message(arg.toString(parser));
+      parser.message(arg);
    }
 
    public void process(TeXParser parser, TeXObjectList stack) throws IOException
@@ -71,7 +71,7 @@ public class Typeout extends ControlSequence
          }
       }
 
-      parser.getListener().getTeXApp().message(arg.toString(parser));
+      parser.message(arg);
    }
 
 }

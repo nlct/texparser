@@ -30,7 +30,7 @@ public class SymbolGroupTitle extends Command
 {
    public SymbolGroupTitle()
    {
-      this("nlctdoc@symbolgrouptitle");
+      this("nlctdocsymbolgrouptitle");
    }
 
    public SymbolGroupTitle(String name)
@@ -50,13 +50,13 @@ public class SymbolGroupTitle extends Command
    {
       TeXParserListener listener = parser.getListener();
 
-      String arg1 = popLabelString(parser, stack);
+      TeXObject arg1 = popArg(parser, stack);
       popArg(parser, stack);
       popArg(parser, stack);
 
       TeXObjectList expanded = listener.createStack();
 
-      if (arg1.equals("@"))
+      if (arg1.toString(parser).equals("@"))
       {
          expanded.add(listener.getOther('@'));
       }

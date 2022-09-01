@@ -63,8 +63,6 @@ public class L2HUndefined extends Undefined
       }
       else
       {
-         TeXApp texApp = listener.getTeXApp();
-
          try
          {
             throw new TeXSyntaxException(parser, 
@@ -76,13 +74,13 @@ public class L2HUndefined extends Undefined
             switch (getAction())
             {
                case ACTION_ERROR:
-                  texApp.error(e);
+                  parser.error(e);
                break;
                case ACTION_WARN:
-                  texApp.warning(parser, e.getMessage(texApp));
+                  parser.warning(e);
                break;
                case ACTION_MESSAGE:
-                  texApp.message(e.getMessage(texApp));
+                  parser.message(e);
                break;
             }
          }

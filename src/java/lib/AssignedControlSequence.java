@@ -102,7 +102,7 @@ public class AssignedControlSequence extends Command
    public void process(TeXParser parser)
       throws IOException
    {
-      if (parser.getDebugLevel() >= TeXParser.DEBUG_PROCESSING)
+      if (parser.isDebugMode(TeXParser.DEBUG_PROCESSING))
       {
          parser.logMessage("PROCESSING "+toString());
       }
@@ -114,7 +114,7 @@ public class AssignedControlSequence extends Command
    public void process(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
-      if (parser.getDebugLevel() >= TeXParser.DEBUG_PROCESSING)
+      if (parser.isDebugMode(TeXParser.DEBUG_PROCESSING))
       {
          parser.logMessage("PROCESSING "+toString());
       }

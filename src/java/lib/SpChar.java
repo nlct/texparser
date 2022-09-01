@@ -61,7 +61,7 @@ public class SpChar extends Macro
       {
          stack.push(parser.getListener().createGroup());
 
-         parser.getListener().getTeXApp().error(new TeXSyntaxException(
+         parser.error(new TeXSyntaxException(
            parser, TeXSyntaxException.ERROR_DOUBLE_SUPERSCRIPT, 
                object.toString(parser)));
       }
@@ -80,7 +80,7 @@ public class SpChar extends Macro
       {
          parser.push(parser.getListener().createGroup());
 
-         parser.getListener().getTeXApp().error(new TeXSyntaxException(
+         parser.error(new TeXSyntaxException(
            parser, TeXSyntaxException.ERROR_DOUBLE_SUPERSCRIPT, 
                object.toString(parser)));
       }

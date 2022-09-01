@@ -177,51 +177,13 @@ public class TeXParserUtils
    public static TeXObject expandOnce(TeXObject arg, TeXParser parser, TeXObjectList stack)
     throws IOException
    {
-      if (arg.canExpand() && arg instanceof Expandable)
-      {
-         TeXObjectList expanded = null;
-
-         if (stack == parser || stack == null)
-         {
-            expanded = ((Expandable)arg).expandonce(parser);
-         }
-         else
-         {
-            expanded = ((Expandable)arg).expandonce(parser, stack);
-         }
-
-         if (expanded != null)
-         {
-            arg = expanded;
-         }
-      }
-
-      return arg;
+      return parser.expandonce(arg, stack);
    }
 
    public static TeXObject expandFully(TeXObject arg, TeXParser parser, TeXObjectList stack)
     throws IOException
    {
-      if (arg.canExpand() && arg instanceof Expandable)
-      {
-         TeXObjectList expanded = null;
-
-         if (stack == parser || stack == null)
-         {
-            expanded = ((Expandable)arg).expandfully(parser);
-         }
-         else
-         {
-            expanded = ((Expandable)arg).expandfully(parser, stack);
-         }
-
-         if (expanded != null)
-         {
-            arg = expanded;
-         }
-      }
-
-      return arg;
+      return parser.expandfully(arg, stack);
    }
 
    /**

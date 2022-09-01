@@ -30,7 +30,7 @@ public class SymbolGroupLabel extends Command
 {
    public SymbolGroupLabel()
    {
-      this("nlctdoc@symbolgrouplabel");
+      this("nlctdocsymbolgrouplabel");
    }
 
    public SymbolGroupLabel(String name)
@@ -50,18 +50,31 @@ public class SymbolGroupLabel extends Command
    {
       TeXParserListener listener = parser.getListener();
 
-      String arg1 = popLabelString(parser, stack);
-      popArg(parser, stack);
-      popArg(parser, stack);
+      TeXObject arg1 = popArg(parser, stack);
+      TeXObject arg2 = popArg(parser, stack);
+      TeXObject arg3 = popArg(parser, stack);
 
-      if (arg1.equals("@"))
+      if (arg1.toString(parser).equals("@"))
       {
          return listener.createString("@");
       }
       else
       {
-         return listener.createString("glssymbol");
+         return listener.createString("glssymbols");
       }
    }
 
+   @Override
+   public TeXObjectList expandfully(TeXParser parser, TeXObjectList stack)
+   throws IOException
+   {
+      return expandonce(parser, stack);
+   }
+
+   @Override
+   public TeXObjectList expandfully(TeXParser parser)
+   throws IOException
+   {
+      return expandonce(parser, parser);
+   }
 }
