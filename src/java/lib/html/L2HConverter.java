@@ -254,6 +254,8 @@ public class L2HConverter extends LaTeXParserListener
       putControlSequence(new AtGobble("pagenumbering"));
       putControlSequence(new Input("include"));
 
+      putControlSequence(new L2HNewFontFamily());
+
       try
       {
          LaTeXSty sty = requirepackage("hyperref", getParser());
@@ -1024,6 +1026,10 @@ public class L2HConverter extends LaTeXParserListener
       writeln("div.bibliography { display: block; margin-left: 4em; }");
       writeln("div.bibitem { display: inline; float: left; text-indent: -3em; }");
       writeln("span.numberline { display: inline-block; width: 2em; }");
+      writeln(".toc-subsection span.numberline { display: inline-block; width: 3em; }");
+      writeln(".toc-subsubsection span.numberline { display: inline-block; width: 4em; }");
+      writeln(".toc-paragraph span.numberline { display: inline-block; width: 5em; }");
+      writeln(".toc-subparagraph span.numberline { display: inline-block; width: 6em; }");
       writeln("nav ul { list-style-type: none; }");
       writeln("div.toc-part { padding-left: 0em; padding-bottom: 2ex; font-weight: bold; font-size: large;}");
       writeln("div.toc-chapter { padding-left: .5em; padding-bottom: 2ex; font-weight: bold; font-size: large;}");
@@ -1506,9 +1512,13 @@ public class L2HConverter extends LaTeXParserListener
       {
          relPath = basePath.relativize(imagePath);
       }
-      else
+      else if (imagePath.isAbsolute())
       {
          relPath = imagePath.getName(imagePath.getNameCount()-1);
+      }
+      else
+      {
+         relPath = imagePath;
       }
 
       TeXObject alt = null;
@@ -1591,11 +1601,13 @@ public class L2HConverter extends LaTeXParserListener
       }
       else
       {
+         Path dest = (outPath == null ? relPath : outPath.resolve(relPath));
+
          Dimension dim = getImageSize(file, type);
 
          String uri = getUri(relPath);
 
-         if (MIME_TYPE_PDF.equals("type"))
+         if (MIME_TYPE_PDF.equals(type))
          {
             uri += String.format("?#zoom=%d", zoom);
          }
@@ -1626,8 +1638,6 @@ public class L2HConverter extends LaTeXParserListener
          {
             write("</object>");
          }
-
-         Path dest = (outPath == null ? relPath : outPath.resolve(relPath));
 
          try
          {

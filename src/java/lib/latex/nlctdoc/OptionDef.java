@@ -99,4 +99,33 @@ public class OptionDef extends StandaloneDef
       taggedBox.setTitle(title);
    }
 
+   protected TeXObject getRightBoxContent(GlsLabel glslabel, TeXParser parser)
+   throws IOException
+   {
+      TeXObjectList list = (TeXObjectList)super.getRightBoxContent(glslabel, parser);
+
+      TeXObject aliasVal = glslabel.getEntry().get("alias");
+
+      if (aliasVal != null)
+      {
+         String alias = parser.expandToString(aliasVal, parser);
+
+         if (list == null)
+         {
+            list = parser.getListener().createStack();
+         }
+         else
+         {
+            list.add(parser.getListener().getOther(';'));
+            list.add(parser.getListener().getSpace());
+         }
+
+         list.add(parser.getListener().getControlSequence("summarytagfmt"));
+         list.add(parser.getListener().createGroup("alias"));
+         list.add(parser.getListener().getControlSequence("gls"));
+         list.add(parser.getListener().createGroup(alias));
+      }
+
+      return list;
+   }
 }

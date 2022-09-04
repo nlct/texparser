@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.util.Vector;
 
 import com.dickimawbooks.texparserlib.*;
+import com.dickimawbooks.texparserlib.latex.LaTeXSyntaxException;
 
 public class L2HOther extends Other
 {
@@ -52,7 +53,20 @@ public class L2HOther extends Other
    {
       L2HConverter listener = (L2HConverter)parser.getListener();
 
-      if (listener.isInDocEnv())
+      if (!listener.isInDocEnv())
+      {
+         if (!Character.isWhitespace(getCharCode()))
+         {
+            throw new LaTeXSyntaxException(parser,
+              LaTeXSyntaxException.ERROR_MISSING_BEGIN_DOC,
+                new String(Character.toChars(getCharCode())));
+         }
+      }
+      else if (parser.getSettings().inVerb())
+      {
+         listener.writeCodePoint(getCharCode());
+      }
+      else
       {
          int c = getMappedCharCode(parser);
 

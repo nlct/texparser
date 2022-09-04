@@ -50,17 +50,17 @@ public class SymbolGroupLabel extends Command
    {
       TeXParserListener listener = parser.getListener();
 
-      TeXObject arg1 = popArg(parser, stack);
+      String symbol = popLabelString(parser, stack);
       TeXObject arg2 = popArg(parser, stack);
-      TeXObject arg3 = popArg(parser, stack);
+      String type = popLabelString(parser, stack);
 
-      if (arg1.toString(parser).equals("@"))
+      if (symbol.equals("@"))
       {
-         return listener.createString("@");
+         return listener.createString(type+"@");
       }
       else
       {
-         return listener.createString("glssymbols");
+         return listener.createString(type+"glssymbols");
       }
    }
 

@@ -37,6 +37,12 @@ public interface TeXApp
    public void wmftoeps(File wmfFile, File epsFile)
      throws IOException,InterruptedException;
 
+   // Runs convert [inOptions] inFile [outOptions] outFile
+   // This method should check read and write permissions
+   public void convertimage(int inPage, String[] inOptions, File inFile,
+     String[] outOptions, File outFile)
+     throws IOException,InterruptedException;
+
    public void substituting(TeXParser parser, String original, String replacement);
 
    public String getMessage(String label, Object... params);

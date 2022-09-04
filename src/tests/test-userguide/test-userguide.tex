@@ -7,7 +7,9 @@
 
 %\usepackage[autooneside=false]{scrlayer-scrpage}
 
-\usepackage[debug=showwrgloss]{nlctuserguide}
+\usepackage
+ %[debug=showwrgloss]
+{nlctuserguide}
 
 \renewcommand*{\thispackagename}{foobarsty}
 
@@ -216,7 +218,8 @@ This takes a value, which may be one of the following:
 
 \optionvaldef{foo-bar-val}{deprecatedvalue}
 This is a deprecated synonym of
-\opteqvalref{foo-bar-val}{optionvalue}.
+\opteqvalref{foo-bar-val}{optionvalue} so don't use it in new
+documents.
 
 Command with starred version:
 
@@ -289,7 +292,7 @@ Side-by-side:
 An example:
 \begin{resultbox}
 \createexample[title={An example that's created on-the-fly provided
-that the shell escape is enabled},
+that the \cmd{write18} shell escape is enabled},
  description={A document with the word `text' emphasized},
  label={ex:sample}]
 {}

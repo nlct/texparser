@@ -2829,5 +2829,13 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
    public static final UserNumber ONE = new UserNumber(1);
    public static final UserNumber MINUS_ONE = new UserNumber(-1);
 
+   public static final UserNumber PART_LEVEL = MINUS_ONE;
+   public static final UserNumber CHAPTER_LEVEL = ZERO;
+   public static final UserNumber SECTION_LEVEL = ONE;
+   public static final UserNumber SUBSECTION_LEVEL = new UserNumber(2);
+   public static final UserNumber SUBSUBSECTION_LEVEL = new UserNumber(3);
+   public static final UserNumber PARAGRAPH_LEVEL = new UserNumber(4);
+   public static final UserNumber SUBPARAGRAPH_LEVEL = new UserNumber(5);
+
    public static final Pattern PTSIZE_PATTERN = Pattern.compile("(\\d+)pt");
 }

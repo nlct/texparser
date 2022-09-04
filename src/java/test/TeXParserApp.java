@@ -180,7 +180,7 @@ public class TeXParserApp implements TeXApp
             "error.exists", outDir.getAbsolutePath()));
       }
 
-      L2HConverter listener = new L2HConverter(this, true, outDir, null, true,
+      L2HConverter listener = new L2HConverter(this, mathJax, outDir, null, true,
         outCharset, true)
       {
          public L2HImage toImage(String preamble, 
@@ -671,6 +671,16 @@ public class TeXParserApp implements TeXApp
    {
       int exitCode = -1;
 
+      if (!isReadAccessAllowed(file))
+      {
+         throw new IOException(getMessage("message.no.read", file));
+      }
+
+      if (!isWriteAccessAllowed(pdfFile))
+      {
+         throw new IOException(getMessage("message.no.write", pdfFile));
+      }
+
       String fileName = file.getAbsolutePath();
 
       exitCode = execCommandAndWaitFor(new String[]{app, 
@@ -695,6 +705,16 @@ public class TeXParserApp implements TeXApp
    {
       int exitCode = -1;
 
+      if (!isReadAccessAllowed(file))
+      {
+         throw new IOException(getMessage("message.no.read", file));
+      }
+
+      if (!isWriteAccessAllowed(epsFile))
+      {
+         throw new IOException(getMessage("message.no.write", epsFile));
+      }
+
       String fileName = file.getAbsolutePath();
 
       exitCode = execCommandAndWaitFor(new String[]{app, 
@@ -705,6 +725,67 @@ public class TeXParserApp implements TeXApp
       {
          throw new IOException(getMessage("error.app_failed",
            String.format("%s \"%s\"", app, fileName), exitCode));
+      }
+   }
+
+   public void convertimage(int inPage, String[] inOptions, File inFile,
+     String[] outOptions, File outFile)
+     throws IOException,InterruptedException
+   {
+      convertimage(inPage, inOptions, inFile, outOptions, outFile, "convert");
+   }
+
+   public void convertimage(int inPage, String[] inOptions, File inFile,
+     String[] outOptions, File outFile, String app)
+     throws IOException,InterruptedException
+   {
+      int exitCode = -1;
+
+      if (!isReadAccessAllowed(inFile))
+      {
+         throw new IOException(getMessage("message.no.read", inFile));
+      }
+
+      if (!isWriteAccessAllowed(outFile))
+      {
+         throw new IOException(getMessage("message.no.write", outFile));
+      }
+
+      int numInOpts = (inOptions == null ? 0 : inOptions.length);
+      int numOutOpts = (outOptions == null ? 0 : outOptions.length);
+
+      String[] args = new String[3+numInOpts+numOutOpts];
+
+      int idx = 0;
+      args[idx++] = app;
+
+      for (int i = 0; i < numInOpts; i++)
+      {
+         args[idx++] = inOptions[i];
+      }
+
+      if (inPage > 0)
+      {
+         args[idx++] = String.format("%s[%d]", inFile.getAbsolutePath(), inPage-1);
+      }
+      else
+      {
+         args[idx++] = inFile.getAbsolutePath();
+      }
+
+      for (int i = 0; i < numOutOpts; i++)
+      {
+         args[idx++] = outOptions[i];
+      }
+
+      args[idx++] = outFile.getAbsolutePath();
+
+      exitCode = execCommandAndWaitFor(args);
+
+      if (exitCode != 0)
+      {
+         throw new IOException(getMessage("error.app_failed",
+           String.format("%s \"%s\" \"%s\"", app, inFile, outFile), exitCode));
       }
    }
 
@@ -1365,6 +1446,14 @@ public class TeXParserApp implements TeXApp
          {
             outputFormat = "html";
          }
+         else if (args[i].equals("--nomathjax"))
+         {
+            mathJax = false;
+         }
+         else if (args[i].equals("--mathjax"))
+         {
+            mathJax = true;
+         }
          else if (args[i].equals("--head"))
          {
             i++;
@@ -1627,7 +1716,7 @@ public class TeXParserApp implements TeXApp
    // As from 0.9.2.2b these now refer to the test application only.
    public static final String APP_VERSION = "0.9.2.3b";
    public static final String APP_NAME = "texparsertest";
-   public static final String APP_DATE = "2020-08-31";
+   public static final String APP_DATE = "2020-09-02";
 
    public static long MAX_PROCESS_TIME=0L;
 
@@ -1661,6 +1750,7 @@ public class TeXParserApp implements TeXApp
 
    private boolean deleteTempDirOnExit = true;
    private boolean convertImages = true;
+   private boolean mathJax = true;
 
    public static final Pattern PNG_INFO =
     Pattern.compile(".*: PNG image data, (\\d+) x (\\d+),.*");

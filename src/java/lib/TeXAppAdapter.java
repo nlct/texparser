@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -37,6 +37,12 @@ public class TeXAppAdapter implements TeXApp
    }
 
    public void wmftoeps(File wmfFile, File epsFile)
+     throws IOException,InterruptedException
+   {
+   }
+
+   public void convertimage(int inPage, String[] inOptions, File inFile,
+     String[] outOptions, File outFile)
      throws IOException,InterruptedException
    {
    }

@@ -132,7 +132,7 @@ public class PrintCommandOptions extends PrintSummary
          if (!labels.isEmpty())
          {
             processSummary(substack, labels, title, 
-              sectionLabel, sectionCs, parser, stack);
+              sectionLabel, sectionCs, null, false, parser, stack);
          }
 
          // substack should be empty, but if not process anything

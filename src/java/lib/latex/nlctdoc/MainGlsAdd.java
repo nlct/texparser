@@ -69,33 +69,15 @@ public class MainGlsAdd extends AbstractGlsCommand
 
       TeXObjectList content = listener.createStack();
 
-      if (tag.isEmpty())
-      {
-         parser.putControlSequence(true, 
-           new TextualContentCommand("mainglsaddcounter", ""));
-      }
-      else
-      {
-         ControlSequence cs = parser.getControlSequence(tag+"counter");
-
-         if (cs == null)
-         {
-            cs = listener.getControlSequence("currentcounter");
-         }
-
-         String counter = parser.expandToString(cs, stack);
-
-         if (!counter.isEmpty())
-         {
-            content.add(listener.getControlSequence("glsadd"));
-            content.add(listener.getOther('['));
-            content.addAll(listener.createString("counter="+counter));
-            content.add(listener.getOther(']'));
-            content.add(glslabel);
-         }
-      }
-
       content.add(listener.getControlSequence("glsadd"));
+
+      if (optArg != null)
+      {
+         content.add(listener.getOther('['));
+         content.add(optArg, true);
+         content.add(listener.getOther(']'));
+      }
+
       content.add(glslabel);
 
       TeXParserUtils.process(content, parser, stack);

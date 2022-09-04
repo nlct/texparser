@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.awt.Color;
 
 import com.dickimawbooks.texparserlib.*;
+import com.dickimawbooks.texparserlib.primitives.NewIf;
 import com.dickimawbooks.texparserlib.generic.Symbol;
 import com.dickimawbooks.texparserlib.latex.*;
 import com.dickimawbooks.texparserlib.latex.glossaries.*;
@@ -166,7 +167,7 @@ public class UserGuideSty extends LaTeXSty
         new TeXFontText(TeXFontFamily.RM),
         Color.BLACK, listener.getOther(0x2329), listener.getOther(0x232A));
 
-      addNestedSemanticCommand("valuevariesfmt", new TeXFontText(TeXFontShape.EM),
+      addNestedSemanticCommand("initvalnotefmt", new TeXFontText(TeXFontShape.EM),
         new TeXFontText(TeXFontFamily.RM),
         Color.BLACK, null, null);
 
@@ -675,9 +676,8 @@ public class UserGuideSty extends LaTeXSty
       // \gallery
       def = getListener().createStack();
       def.add(new TeXCsRef("dickimawhref"));
-      grp = getListener().createGroup("gallery");
-      def.add(grp);
-      grp.add(getListener().getParam(1));
+      def.add(getListener().createGroup("gallery"));
+      def.add(TeXParserUtils.createGroup(getListener(), getListener().getParam(1)));
 
       registerControlSequence(new LaTeXGenericCommand(true,
        "gallery", "m", def));
@@ -949,6 +949,7 @@ public class UserGuideSty extends LaTeXSty
       registerControlSequence(new SymbolGroupLabel("bibglsothergroup"));
       registerControlSequence(new SymbolGroupTitle("bibglsothergrouptitle"));
 
+      NewIf.createConditional(true, getParser(), "ifshowsummarytopgroupheaders", true);
    }
 
    protected void addGlsFmtTextCommand(String name, String prefix)
@@ -1002,7 +1003,15 @@ public class UserGuideSty extends LaTeXSty
    public void processOption(String option, TeXObject value)
     throws IOException
    {
-      glossariesSty.processOption(option, value);
+      if (option.equals("deephierarchy"))
+      {
+         getListener().setcounter("secnumdepth", 
+          LaTeXParserListener.SUBPARAGRAPH_LEVEL);
+      }
+      else
+      {
+         glossariesSty.processOption(option, value);
+      }
    }
 
    @Override
