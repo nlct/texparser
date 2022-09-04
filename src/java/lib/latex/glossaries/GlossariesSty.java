@@ -487,7 +487,7 @@ public class GlossariesSty extends LaTeXSty
 
       registerControlSequence(new Symbol("glsshowtargetsymbol", 0x25C1));
 
-      FrameBox fbox = new FrameBox("glsshowtargetfont", BorderStyle.NONE,
+      FrameBox fbox = new FrameBox("glsshowtargetfonttext", BorderStyle.NONE,
        AlignHStyle.DEFAULT, AlignVStyle.DEFAULT, true, null, null);
 
       fbox.setTextFont(new TeXFontText(TeXFontFamily.TT, TeXFontSize.FOOTNOTE));
