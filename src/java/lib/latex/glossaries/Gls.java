@@ -108,7 +108,7 @@ public class Gls extends AbstractGlsCommand
 
       GlsLabel glslabel = popEntryLabel(parser, stack);
 
-      TeXObject insert = popOptArg(parser, stack);
+      TeXObject insert = popOptArg(TeXObjectList.POP_SHORT, parser, stack);
 
       GlossaryEntry entry = glslabel.getEntry();
 
