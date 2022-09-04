@@ -174,6 +174,27 @@ public class TeXParserUtils
       }
    }
 
+   /**
+    * Pops an optional argument (delimited with <code>[</code> and <code>]</code>).
+    * @param popStyle pop style (use 0 or TeXObjectList.POP_SHORT to retain leading space)
+    * @param parser the TeX parser
+    * @param stack the stack or the parser or null
+    * @return the argument or null if not present
+    */ 
+   public static TeXObject popOptArg(byte popStyle,
+      TeXParser parser, TeXObjectList stack)
+     throws IOException
+   {
+      if (parser == stack || stack == null)
+      {
+         return parser.popNextArg(popStyle, '[', ']');
+      }
+      else
+      {
+         return stack.popArg(parser, popStyle, '[', ']');
+      }
+   }
+
    public static TeXObject expandOnce(TeXObject arg, TeXParser parser, TeXObjectList stack)
     throws IOException
    {

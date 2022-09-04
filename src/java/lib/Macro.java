@@ -217,6 +217,14 @@ public abstract class Macro extends AbstractTeXObject
       return TeXParserUtils.popOptArg(parser, stack);
    }
 
+   // pops an optional argument
+   // returns null if not present
+   protected TeXObject popOptArg(byte popStyle, TeXParser parser, TeXObjectList stack)
+     throws IOException
+   {
+      return TeXParserUtils.popOptArg(popStyle, parser, stack);
+   }
+
    // pops an argument and then fully expands it
    protected TeXObject popArgExpandFully(TeXParser parser, TeXObjectList stack)
     throws IOException
