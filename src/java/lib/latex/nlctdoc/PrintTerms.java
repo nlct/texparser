@@ -22,37 +22,23 @@ import java.io.IOException;
 
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.*;
-import com.dickimawbooks.texparserlib.latex.glossaries.*;
 
-public class MainGlsAdd extends AbstractGlsCommand
+public class PrintTerms extends ControlSequence
 {
-   public MainGlsAdd(GlossariesSty sty)
+   public PrintTerms()
    {
-      this("mainglsadd", sty);
+      this("printterms");
    }
 
-   public MainGlsAdd(String name, GlossariesSty sty)
+   public PrintTerms(String name)
    {
-      super(name, sty);
+      super(name);
    }
 
    @Override
    public Object clone()
    {
-      return new MainGlsAdd(getName(), getSty());
-   }
-
-   @Override
-   public boolean canExpand()
-   {
-      return false;
-   }
-
-   @Override
-   public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
-   throws IOException
-   {
-      return null;
+      return new PrintTerms(getName());
    }
 
    @Override
@@ -62,12 +48,12 @@ public class MainGlsAdd extends AbstractGlsCommand
       TeXParserListener listener = parser.getListener();
 
       TeXObject optArg = popOptArg(parser, stack);
-      GlsLabel glslabel = popEntryLabel(parser, stack);
-      String tag = popLabelString(parser, stack);
 
       TeXObjectList content = listener.createStack();
 
-      content.add(listener.getControlSequence("glsadd"));
+      content.add(listener.getControlSequence("printabbrs"));
+      content.add(listener.getControlSequence("printicons"));
+      content.add(listener.getControlSequence("printmain"));
 
       if (optArg != null)
       {
@@ -75,8 +61,6 @@ public class MainGlsAdd extends AbstractGlsCommand
          content.add(optArg, true);
          content.add(listener.getOther(']'));
       }
-
-      content.add(glslabel);
 
       TeXParserUtils.process(content, parser, stack);
    }

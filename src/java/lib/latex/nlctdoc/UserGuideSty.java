@@ -352,10 +352,7 @@ public class UserGuideSty extends LaTeXSty
 
       registerControlSequence(new InlineGlsDef(glossariesSty));
 
-      registerControlSequence(new GenericCommand(true, 
-       "printterms", null, new TeXObject[]{ new TeXCsRef("printabbrs"),
-         new TeXCsRef("printicons"), new TeXCsRef("printmain")
-       }));
+      registerControlSequence(new PrintTerms());
 
       registerControlSequence(new PrintAbbrs(glossariesSty));
       registerControlSequence(new PrintIcons(glossariesSty));
@@ -789,7 +786,7 @@ public class UserGuideSty extends LaTeXSty
       // unicodesym
       def = getListener().createStack();
       def.add(getListener().getControlSequence("texparser@overlapped"));
-      def.add(new TeXCsRef("faFileTextO"));
+      def.add(new TeXCsRef("faFileO"));
       def.add(getListener().getControlSequence("texparser@overlapper"));
       def.add(getListener().createGroup("U"));
 

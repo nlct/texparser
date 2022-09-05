@@ -62,10 +62,19 @@ public class PrintMain extends AbstractGlsCommand
    {
       String type = "main";
 
+      KeyValList options = TeXParserUtils.popOptKeyValList(parser, stack);
+
       Glossary glossary = sty.getGlossary(type);
 
       if (glossary != null && !glossary.isEmpty())
       {
+         TeXObject title = null;
+
+         if (options != null)
+         {
+            title = options.getValue("title");
+         }
+
          TeXParserListener listener = parser.getListener();
          TeXObjectList list = listener.createStack();
 
@@ -78,7 +87,16 @@ public class PrintMain extends AbstractGlsCommand
 
          list.add(cs);
          list.add(listener.getOther('*'));
-         list.add(listener.getControlSequence("glossaryname"));
+
+         if (title == null)
+         {
+            list.add(listener.getControlSequence("glossaryname"));
+         }
+         else
+         {
+            list.add(TeXParserUtils.createGroup(listener, title));
+         }
+
          list.add(new TeXCsRef("label"));
          list.add(listener.createGroup("glossary"));
          list.add(listener.getControlSequence("begin"));
