@@ -225,10 +225,22 @@ public class Footnote extends ControlSequence
    {
       LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
 
+      ControlSequence spCs = listener.getControlSequence("textsuperscript");
+
+      TeXObjectList textList = listener.createStack();
+      textList.add(spCs);
+
+      TeXObjectList fnList = new TeXObjectList();
+      fnList.add(spCs);
+
       Group grp = listener.createGroup();
+      textList.add(grp);
+
       Group insGrp = listener.createGroup();
+      fnList.add(insGrp);
 
       ControlSequence hyperlink = parser.getControlSequence("hyperlink");
+      ControlSequence hypertarget = parser.getControlSequence("hypertarget");
 
       if (hyperlink == null)
       {
@@ -237,13 +249,21 @@ public class Footnote extends ControlSequence
       }
       else
       {
+         String backTarget = "fnback-"+targetName;
+
+         grp.add(hypertarget);
+         grp.add(listener.createGroup(backTarget));
+         grp.add(listener.createGroup());
+
          grp.add(hyperlink);
-         insGrp.add(new TeXCsRef("hypertarget"));
+         insGrp.add(hypertarget);
+         insGrp.add(listener.createGroup(targetName));
 
-         Group target = listener.createGroup(targetName);
+         grp.add(listener.createGroup(targetName));
+         insGrp.add(listener.createGroup());
 
-         grp.add(target);
-         insGrp.add((Group)target.clone());
+         insGrp.add(hyperlink);
+         insGrp.add(listener.createGroup(backTarget));
 
          if (thempfn instanceof Group)
          {
@@ -260,24 +280,10 @@ public class Footnote extends ControlSequence
          }
       }
 
-      TeXObjectList list = new TeXObjectList();
-      list.add(new TeXCsRef("textsuperscript"));
-      list.add(insGrp);
-      list.add(arg);
+      TeXParserUtils.process(textList, parser, stack);
 
-      listener.addFootnote(list);
+      fnList.add(arg);
 
-      ControlSequence cs = listener.getControlSequence("textsuperscript");
-
-      if (parser == stack || stack == null)
-      {
-         parser.push(grp);
-         cs.process(parser);
-      }
-      else
-      {
-         stack.push(grp);
-         cs.process(parser, stack);
-      }
+      listener.addFootnote(fnList, stack);
    }
 }

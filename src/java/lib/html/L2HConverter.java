@@ -405,6 +405,7 @@ public class L2HConverter extends LaTeXParserListener
    public void setWriter(Writer writer)
    {
       this.writer = writer;
+      currentWriter = writer;
    }
 
    public Writer getWriter()
@@ -534,7 +535,15 @@ public class L2HConverter extends LaTeXParserListener
    public void writeCodePoint(int codePoint)
      throws IOException
    {
-      if (writer == null) return;
+      if (currentWriter == null)
+      {
+         currentWriter = writer;
+
+         if (currentWriter == null)
+         {
+            throw new IOException("No writer available");
+         }
+      }
 
       if (inPreamble && !Character.isWhitespace(codePoint))
       {
@@ -545,19 +554,19 @@ public class L2HConverter extends LaTeXParserListener
 
       if (codePoint == '<')
       {
-         writer.write("&lt;");
+         currentWriter.write("&lt;");
       }
       else if (codePoint == '>')
       {
-         writer.write("&gt;");
+         currentWriter.write("&gt;");
       }
       else if (codePoint == '&')
       {
-         writer.write("&amp;");
+         currentWriter.write("&amp;");
       }
       else if (codePoint <= 0xFFFF)
       {
-         writer.write((char)codePoint);
+         currentWriter.write((char)codePoint);
       }
       else
       {
@@ -565,7 +574,7 @@ public class L2HConverter extends LaTeXParserListener
 
          for (char c : chars)
          {
-            writer.write(c);
+            currentWriter.write(c);
          }
       }
 
@@ -575,7 +584,15 @@ public class L2HConverter extends LaTeXParserListener
    public void write(String str)
      throws IOException
    {
-      if (writer == null) return;
+      if (currentWriter == null)
+      {
+         currentWriter = writer;
+
+         if (currentWriter == null)
+         {
+            throw new IOException("No writer available");
+         }
+      }
 
       if (inPreamble && !str.trim().isEmpty())
       {
@@ -583,30 +600,22 @@ public class L2HConverter extends LaTeXParserListener
            LaTeXSyntaxException.ERROR_MISSING_BEGIN_DOC, str);
       }
 
-/*
-      String style = getStyle();
-
-      if (!style.isEmpty())
-      {
-         writer.write("<span style=\""+style+"\">");
-      }
-*/
-
-      writer.write(str);
-
-/*
-      if (!style.isEmpty())
-      {
-         writer.write("</span>");
-      }
-*/
+      currentWriter.write(str);
    }
 
    @Override
    public void write(char c)
      throws IOException
    {
-      if (writer == null) return;
+      if (currentWriter == null)
+      {
+         currentWriter = writer;
+
+         if (currentWriter == null)
+         {
+            throw new IOException("No writer available");
+         }
+      }
 
       if (inPreamble && !Character.isWhitespace(c))
       {
@@ -621,7 +630,15 @@ public class L2HConverter extends LaTeXParserListener
    public void writeln(String str)
      throws IOException
    {
-      if (writer == null) return;
+      if (currentWriter == null)
+      {
+         currentWriter = writer;
+
+         if (currentWriter == null)
+         {
+            throw new IOException("No writer available");
+         }
+      }
 
       if (inPreamble && !str.trim().isEmpty())
       {
@@ -630,16 +647,24 @@ public class L2HConverter extends LaTeXParserListener
       }
 
       write(String.format("%s%n", str));
-      writer.flush();
+      currentWriter.flush();
    }
 
    @Override
    public void href(String url, TeXObject text)
      throws IOException
    {
-      if (writer == null) return;
+      if (currentWriter == null)
+      {
+         currentWriter = writer;
 
-      writer.write("<a href=\""+url+"\"");
+         if (currentWriter == null)
+         {
+            throw new IOException("No writer available");
+         }
+      }
+
+      currentWriter.write("<a href=\""+url+"\"");
 
       if (text instanceof AccSuppObject)
       {
@@ -647,15 +672,15 @@ public class L2HConverter extends LaTeXParserListener
 
          if (accsupp.isIcon())
          {
-            writer.write(" class=\"icon\"");
+            currentWriter.write(" class=\"icon\"");
          }
       }
 
-      writer.write(">");
+      currentWriter.write(">");
 
       text.process(parser);
 
-      writer.write("</a>");
+      currentWriter.write("</a>");
    }
 
    public boolean isIcon(AccSupp accsupp)
@@ -1251,6 +1276,38 @@ public class L2HConverter extends LaTeXParserListener
       writer.close();
 
       throw new EOFException();
+   }
+
+   @Override
+   public void addFootnote(TeXObject footnote, TeXObjectList stack)
+   throws IOException
+   {
+      if (footnoteWriter == null)
+      {
+         footnoteWriter = new StringWriter();
+      }
+
+      try
+      {
+         currentWriter = footnoteWriter;
+         TeXParserUtils.process(footnote, getParser(), stack);
+      }
+      finally
+      {
+         currentWriter = writer;
+      }
+   }
+
+   @Override
+   public void processFootnotes(TeXObjectList stack)
+   throws IOException
+   {
+      if (footnoteWriter != null)
+      {
+         doFootnoteRule();
+
+         writer.write(footnoteWriter.toString());
+      }
    }
 
    @Override
@@ -2725,7 +2782,9 @@ public class L2HConverter extends LaTeXParserListener
 
    private int indexLoc = 0;
 
-   private Writer writer;
+   private Writer writer, currentWriter;
+
+   private StringWriter footnoteWriter = null;
 
    protected boolean inPreamble = false;
 

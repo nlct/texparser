@@ -2381,7 +2381,14 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       bibliographySection.add(object);
    }
 
+   @Deprecated
    public void addFootnote(TeXObject footnote)
+   {
+      footnotes.add(footnote);
+   }
+
+   public void addFootnote(TeXObject footnote, TeXObjectList stack)
+    throws IOException
    {
       footnotes.add(footnote);
    }
