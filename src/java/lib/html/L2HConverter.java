@@ -541,7 +541,13 @@ public class L2HConverter extends LaTeXParserListener
 
          if (currentWriter == null)
          {
-            throw new IOException("No writer available");
+            if (!Character.isWhitespace(codePoint))
+            {
+               parser.debugMessage(TeXParser.DEBUG_IO, 
+                 "No writer available. writeCodePoint: "+codePoint);
+            }
+
+            return;
          }
       }
 
@@ -590,7 +596,13 @@ public class L2HConverter extends LaTeXParserListener
 
          if (currentWriter == null)
          {
-            throw new IOException("No writer available");
+            if (!str.trim().isEmpty())
+            {
+               parser.debugMessage(TeXParser.DEBUG_IO, 
+                  "No writer available. write: "+str);
+            }
+
+            return;
          }
       }
 
@@ -613,7 +625,13 @@ public class L2HConverter extends LaTeXParserListener
 
          if (currentWriter == null)
          {
-            throw new IOException("No writer available");
+            if (!Character.isWhitespace(c))
+            {
+               parser.debugMessage(TeXParser.DEBUG_IO, 
+                 "No writer available. write(char): "+c);
+            }
+
+            return;
          }
       }
 
@@ -636,7 +654,13 @@ public class L2HConverter extends LaTeXParserListener
 
          if (currentWriter == null)
          {
-            throw new IOException("No writer available");
+            if (!str.trim().isEmpty())
+            {
+               parser.debugMessage(TeXParser.DEBUG_IO, 
+                 "No writer available. writeln: "+str);
+            }
+
+            return;
          }
       }
 
@@ -1934,6 +1958,11 @@ public class L2HConverter extends LaTeXParserListener
    public ControlSequence createUndefinedCs(String name)
    {
       return new L2HUndefined(name, getUndefinedAction());
+   }
+
+   public ActiveChar getUndefinedActiveChar(int charCode)
+   {
+      return new UndefinedActiveChar(charCode, getUndefinedAction());
    }
 
    public void marginpar(TeXObject leftText, TeXObject rightText)

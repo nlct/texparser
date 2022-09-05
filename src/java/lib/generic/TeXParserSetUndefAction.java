@@ -26,46 +26,98 @@ public class TeXParserSetUndefAction extends ControlSequence
 {
    public TeXParserSetUndefAction()
    {
-      this(-1);
+      this(UndefAction.UNKNOWN);
    }
 
-   public TeXParserSetUndefAction(int action)
+   public TeXParserSetUndefAction(UndefAction action)
    {
       this("TeXParserSetUndefAction", action);
    }
 
-   public TeXParserSetUndefAction(String name, int action)
+   public TeXParserSetUndefAction(String name, UndefAction action)
    {
       super(name);
       this.action = action;
    }
 
+   @Deprecated
+   public TeXParserSetUndefAction(int action)
+   {
+      this("TeXParserSetUndefAction", action);
+   }
+
+   @Deprecated
+   public TeXParserSetUndefAction(String name, int actionId)
+   {
+      super(name);
+
+      switch (actionId)
+      {
+         case 0:
+           action = UndefAction.ERROR;
+         break;
+         case 1:
+           action = UndefAction.WARN;
+         break;
+         case 2:
+           action = UndefAction.MESSAGE;
+         break;
+         case 3:
+           action = UndefAction.IGNORE;
+         break;
+         default:
+            action = UndefAction.UNKNOWN;
+      }
+   }
+
+   @Override
    public Object clone()
    {
       return new TeXParserSetUndefAction(getName(), action);
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
-      byte currentAction = (byte)action;
+      UndefAction currentAction = action;
 
-      if (action == -1)
+      if (action == UndefAction.UNKNOWN)
       {
          Numerical num = popNumericalArg(parser, stack);
 
-         currentAction = (byte)num.number(parser);
+         int id = num.number(parser);
+
+         switch (id)
+         {
+            case 0:
+              currentAction = UndefAction.ERROR;
+            break;
+            case 1:
+              currentAction = UndefAction.WARN;
+            break;
+            case 2:
+              currentAction = UndefAction.MESSAGE;
+            break;
+            case 3:
+              currentAction = UndefAction.IGNORE;
+            break;
+            default:
+              throw new TeXSyntaxException(parser, 
+               TeXSyntaxException.ERROR_GENERIC, "Invalid undef action: "+id);
+         }
       }
 
       ((DefaultTeXParserListener)parser.getListener()).setUndefinedAction(currentAction);
    }
 
+   @Override
    public void process(TeXParser parser)
       throws IOException
    {
       process(parser, parser);
    }
 
-   private int action=-1;
+   private UndefAction action=UndefAction.UNKNOWN;
 }
 

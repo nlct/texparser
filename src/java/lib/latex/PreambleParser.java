@@ -45,7 +45,19 @@ public class PreambleParser extends LaTeXParserListener
       this(texApp, Undefined.ACTION_IGNORE);
    }
 
+   @Deprecated
    public PreambleParser(TeXApp texApp, byte undefAction)
+     throws IOException
+   {
+      super(null);
+      this.texApp = texApp;
+
+      setWriteable(this);
+
+      setUndefinedAction(undefAction);
+   }
+
+   public PreambleParser(TeXApp texApp, UndefAction undefAction)
      throws IOException
    {
       super(null);

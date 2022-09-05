@@ -74,12 +74,12 @@ public class XColorSty extends LaTeXSty
 
       if (loadX11 || loadSvg)
       {
-         byte orgAction = listener.getUndefinedAction();
+         UndefAction orgAction = listener.getUndefinedAction();
          int orgCatCode = getParser().getCatCode('@');
 
          TeXObjectList substack = getListener().createStack();
 
-         substack.add(new TeXParserSetUndefAction(Undefined.ACTION_WARN));
+         substack.add(new TeXParserSetUndefAction(UndefAction.WARN));
 
          if (orgCatCode != TeXParser.TYPE_LETTER)
          {

@@ -228,14 +228,34 @@ public abstract class DefaultTeXParserListener extends TeXParserListener
       getParser().putControlSequence(isLocal, cs);
    }
 
-   public byte getUndefinedAction()
+   public UndefAction getUndefinedAction()
    {
       return undefAction;
    }
 
-   public void setUndefinedAction(byte action)
+   public void setUndefinedAction(UndefAction action)
    {
       undefAction = action;
+   }
+
+   @Deprecated
+   public void setUndefinedAction(byte action)
+   {
+      switch (action)
+      {
+         case 0:
+            undefAction = UndefAction.ERROR;
+         break;
+         case 1:
+            undefAction = UndefAction.WARN;
+         break;
+         case 2:
+            undefAction = UndefAction.MESSAGE;
+         break;
+         case 3:
+            undefAction = UndefAction.IGNORE;
+         break;
+      }
    }
 
    public ControlSequence createUndefinedCs(String name)
@@ -315,7 +335,19 @@ public abstract class DefaultTeXParserListener extends TeXParserListener
    // Gets active character identified by charCode.
    public ActiveChar getActiveChar(int charCode)
    {
-      return getParser().getActiveChar(Integer.valueOf(charCode));
+      ActiveChar obj = getParser().getActiveChar(Integer.valueOf(charCode));
+
+      if (obj == null)
+      {
+         obj = getUndefinedActiveChar(charCode);
+      }
+
+      return obj;
+   }
+
+   public ActiveChar getUndefinedActiveChar(int charCode)
+   {
+      return new UndefinedActiveChar(charCode);
    }
 
    public void putActiveChar(ActiveChar activeChar)
@@ -856,7 +888,7 @@ public abstract class DefaultTeXParserListener extends TeXParserListener
    public static final IfTrue IFTRUE = new IfTrue();
    public static final IfFalse IFFALSE = new IfFalse();
 
-   protected byte undefAction = Undefined.ACTION_ERROR;
+   protected UndefAction undefAction = UndefAction.ERROR;
 
    protected HashMap<Integer,Float> pageDimensions;
 }

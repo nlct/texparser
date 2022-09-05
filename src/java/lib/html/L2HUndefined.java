@@ -33,25 +33,34 @@ public class L2HUndefined extends Undefined
 
    public L2HUndefined(String name)
    {
-      this(name, ACTION_ERROR);
+      this(name, UndefAction.ERROR);
    }
 
-   public L2HUndefined(String name, byte action)
+   public L2HUndefined(String name, UndefAction action)
    {
       super(name, action);
    }
 
+   @Deprecated
+   public L2HUndefined(String name, byte actionId)
+   {
+      super(name, actionId);
+   }
+
+   @Override
    public Object clone()
    {
       return new L2HUndefined(getName(), getAction());
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
       process(parser);
    }
 
+   @Override
    public void process(TeXParser parser)
       throws IOException
    {
@@ -73,13 +82,13 @@ public class L2HUndefined extends Undefined
          {
             switch (getAction())
             {
-               case ACTION_ERROR:
+               case ERROR:
                   parser.error(e);
                break;
-               case ACTION_WARN:
+               case WARN:
                   parser.warning(e);
                break;
-               case ACTION_MESSAGE:
+               case MESSAGE:
                   parser.message(e);
                break;
             }

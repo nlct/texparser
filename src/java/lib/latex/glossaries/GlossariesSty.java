@@ -1335,12 +1335,12 @@ public class GlossariesSty extends LaTeXSty
 
       boolean loadStyles = (loadList || loadTree || extra);
 
-      byte orgAction = listener.getUndefinedAction();
+      UndefAction orgAction = listener.getUndefinedAction();
       int orgCatCode = getParser().getCatCode('@');
 
       if (loadStyles)
       {
-         substack.add(new TeXParserSetUndefAction(Undefined.ACTION_WARN));
+         substack.add(new TeXParserSetUndefAction(UndefAction.WARN));
 
          if (orgCatCode != TeXParser.TYPE_LETTER)
          {

@@ -27,10 +27,35 @@ public class Undefined extends Primitive
 {
    public Undefined()
    {
-      this("undefined", ACTION_ERROR);
+      this("undefined", UndefAction.ERROR);
    }
 
-   public Undefined(String name, byte action)
+   @Deprecated
+   public Undefined(String name, byte actionId)
+   {
+      super(name);
+
+      switch (actionId)
+      {
+         case 0:
+           setAction(UndefAction.ERROR);
+         break;
+         case 1:
+           setAction(UndefAction.WARN);
+         break;
+         case 2:
+           setAction(UndefAction.MESSAGE);
+         break;
+         case 3:
+           setAction(UndefAction.IGNORE);
+         break;
+         default:
+           throw new IllegalArgumentException(
+              "Invalid undefined action "+actionId);
+      }
+   }
+
+   public Undefined(String name, UndefAction action)
    {
       super(name);
       setAction(action);
@@ -52,29 +77,41 @@ public class Undefined extends Primitive
    {
       switch (action)
       {
-         case ACTION_ERROR:
+         case ERROR:
             throw new TeXSyntaxException(parser, 
             TeXSyntaxException.ERROR_UNDEFINED, getName());
-         case ACTION_WARN:
+         case WARN:
             parser.warningMessage( 
               TeXSyntaxException.ERROR_UNDEFINED, getName());
          break;
-         case ACTION_MESSAGE:
+         case MESSAGE:
             parser.message( 
               TeXSyntaxException.ERROR_UNDEFINED, getName());
          break;
       }
    }
 
+   public void setAction(UndefAction newAction)
+   {
+      action = newAction;
+   }
+
+   @Deprecated
    public void setAction(byte newAction)
    {
       switch (newAction)
       {
-         case ACTION_ERROR:
-         case ACTION_WARN:
-         case ACTION_MESSAGE:
-         case ACTION_IGNORE:
-            action = newAction;
+         case 0:
+           setAction(UndefAction.ERROR);
+         break;
+         case 1:
+           setAction(UndefAction.WARN);
+         break;
+         case 2:
+           setAction(UndefAction.MESSAGE);
+         break;
+         case 3:
+           setAction(UndefAction.IGNORE);
          break;
          default:
            throw new IllegalArgumentException(
@@ -82,12 +119,12 @@ public class Undefined extends Primitive
       }
    }
 
-   public byte getAction()
+   public UndefAction getAction()
    {
       return action;
    }
 
-   private byte action=ACTION_ERROR;
+   private UndefAction action=UndefAction.ERROR;
    public static final byte ACTION_ERROR=0;
    public static final byte ACTION_WARN=1;
    public static final byte ACTION_MESSAGE=2;

@@ -50,7 +50,7 @@ public abstract class LaTeXSty extends LaTeXFile
          // This may not work if the package is too
          // complicated.
 
-         byte orgAction = listener.getUndefinedAction();
+         UndefAction orgAction = listener.getUndefinedAction();
          int orgCatCode = getParser().getCatCode('@');
 
          ControlSequence orgCurrNameCs = getParser().getControlSequence(
@@ -73,7 +73,7 @@ public abstract class LaTeXSty extends LaTeXFile
 
          TeXObjectList substack = listener.createStack();
 
-         substack.add(new TeXParserSetUndefAction(Undefined.ACTION_WARN));
+         substack.add(new TeXParserSetUndefAction(UndefAction.WARN));
 
          if (orgCatCode != TeXParser.TYPE_LETTER)
          {
