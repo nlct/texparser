@@ -215,14 +215,14 @@ public class UserGuideSty extends LaTeXSty
       registerControlSequence(new LaTeXGenericCommand(true, "oargm",
         "m", def));
 
-      addTaggedColourBox("important", null, Color.RED);
-      addTaggedColourBox("warning", null, Color.RED);
-      addTaggedColourBox("information", null, FRAME_COL_INFO);
+      addTaggedColourBox("important", BG_IMPORTANT, FRAME_COL_IMPORTANT);
+      addTaggedColourBox("warning", BG_WARNING, FRAME_COL_WARNING);
+      addTaggedColourBox("information", BG_INFO, FRAME_COL_INFO);
       TaggedColourBox pinnedBox = addTaggedColourBox("pinnedbox",
          "definition", BG_DEF, Color.BLACK);
       TaggedColourBox terminalBox = 
         addTaggedColourBox("terminal", new TeXFontText(TeXFontFamily.VERB), 
-           null, Color.BLACK);
+           BG_TERMINAL, Color.BLACK);
       TaggedColourBox ctrBox = addTaggedColourBox("ctrbox",
          "counter", BG_DEF, Color.BLACK);
 
@@ -277,7 +277,7 @@ public class UserGuideSty extends LaTeXSty
       FrameBox defnBox = addColourBox("defnbox", null, null,
         BG_DEF, Color.BLACK);
       FrameBox optionSummaryBox = addColourBox("optionsummarybox", null, null,
-        null, null);
+        BG_DEF, Color.BLACK);
       FrameBox optionValueSummaryBox = addSemanticCommand("optionvaluesummarybox",
          new UserDimension(40, FixedUnit.BP));
 
@@ -351,6 +351,8 @@ public class UserGuideSty extends LaTeXSty
       registerControlSequence(glossariesSty.createGls("file", "file."));
 
       registerControlSequence(new InlineGlsDef(glossariesSty));
+      registerControlSequence(new CmdDefSyntax(glossariesSty));
+      registerControlSequence(new OptDefSyntax(glossariesSty));
 
       registerControlSequence(new PrintTerms());
 
@@ -468,8 +470,8 @@ public class UserGuideSty extends LaTeXSty
       def.add(new TeXCsRef("meta"));
       def.add(getListener().createGroup("boolean"));
 
-      registerControlSequence(new LaTeXGenericCommand(true,
-       "metaboolean", "m", def));
+      registerControlSequence(new GenericCommand(true,
+       "metaboolean", null, def));
 
       // \keyval
       def = getListener().createStack();
@@ -479,8 +481,16 @@ public class UserGuideSty extends LaTeXSty
       def.add(new TeXCsRef("meta"));
       def.add(getListener().createGroup("value"));
 
-      registerControlSequence(new LaTeXGenericCommand(true,
-       "keyval", "m", def));
+      registerControlSequence(new GenericCommand(true,
+       "keyval", null, def));
+
+      // \keyvallist
+      def = getListener().createStack();
+      def.add(new TeXCsRef("meta"));
+      def.add(getListener().createGroup("key=value list"));
+
+      registerControlSequence(new GenericCommand(true,
+       "keyvallist", null, def));
 
       // \metafilefmt
       def = getListener().createStack();
@@ -718,6 +728,11 @@ public class UserGuideSty extends LaTeXSty
       registerControlSequence(new LaTeXGenericCommand(true,
        "faqitem", "mm", def));
 
+      registerControlSequence(new XrSectionRef());
+      registerControlSequence(new DocRef());
+      registerControlSequence(new DocRef("qtdocref", true, false));
+      registerControlSequence(new DocRef("altdocref", false, true));
+
       // \sectionref
       registerControlSequence(new Ref("sectionref", new TeXCsRef("S")));
 
@@ -943,8 +958,11 @@ public class UserGuideSty extends LaTeXSty
 
       registerControlSequence(new DefSemanticCmd(this));
 
-      registerControlSequence(new SymbolGroupLabel("bibglsothergroup"));
-      registerControlSequence(new SymbolGroupTitle("bibglsothergrouptitle"));
+      if (atSymGroup)
+      {
+         registerControlSequence(new SymbolGroupLabel("bibglsothergroup"));
+         registerControlSequence(new SymbolGroupTitle("bibglsothergrouptitle"));
+      }
 
       NewIf.createConditional(true, getParser(), "ifshowsummarytopgroupheaders", true);
    }
@@ -1004,6 +1022,14 @@ public class UserGuideSty extends LaTeXSty
       {
          getListener().setcounter("secnumdepth", 
           LaTeXParserListener.SUBPARAGRAPH_LEVEL);
+      }
+      else if (option.equals("atsymgroup"))
+      {
+         atSymGroup = true;
+      }
+      else if (option.equals("noatsymgroup"))
+      {
+         atSymGroup = false;
       }
       else
       {
@@ -1399,10 +1425,14 @@ public class UserGuideSty extends LaTeXSty
    protected GlossariesSty glossariesSty;
    protected ColorSty colorSty;
 
+   protected boolean atSymGroup = true;
+
    public static final Color BG_DEF = new Color(1.0f, 1.0f, 0.75f);
    public static final Color BG_OPTION_DEF = new Color(1.0f, 1.0f, 0.89f);
    public static final Color BG_OPTION_VALUE_DEF = new Color(1.0f, 1.0f, 0.96f);
    public static final Color BG_CODE = new Color(0.95f, 0.95f, 0.95f);
+
+   public static final Color BG_TERMINAL = new Color(0.96f, 0.96f, 0.96f);
 
    public static final Color FG_CS = new Color(0.41f,0.545f,0.41f);// DarkSeaGreen4
    public static final Color FG_STYOPT = new Color(0.408f, 0.132f, 0.545f);// DarkOrchid4
@@ -1410,5 +1440,12 @@ public class UserGuideSty extends LaTeXSty
    public static final Color FG_COMMENT = Color.GRAY;
    public static final Color FG_DEPRECATED_OR_BANNED = Color.RED;
 
+   public static final Color FRAME_COL_WARNING = Color.RED;
+   public static final Color BG_WARNING = new Color(1.0f,0.92f,0.92f);
+
+   public static final Color FRAME_COL_IMPORTANT = Color.RED;
+   public static final Color BG_IMPORTANT = new Color(1.0f,0.92f,0.92f);
+
    public static final Color FRAME_COL_INFO = new Color(0f,0.5f,0.5f);
+   public static final Color BG_INFO = new Color(0.94f,1.0f,1.0f);
 }
