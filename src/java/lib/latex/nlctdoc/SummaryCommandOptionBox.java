@@ -65,31 +65,24 @@ public class SummaryCommandOptionBox extends SummaryBox
       }
    }
 
-   protected TeXObject getRightBoxContent(GlsLabel glslabel, TeXParser parser)
+   protected TeXObjectList addStatus(TeXObjectList contentList, 
+     GlsLabel glslabel, TeXParser parser)
    throws IOException
    {
-      TeXObject content = super.getRightBoxContent(glslabel, parser);
-      TeXObjectList contentList;
-
-      if (content == null)
-      {
-         contentList = parser.getListener().createStack();
-      }
-      else if (parser.isStack(content))
-      {
-         contentList = (TeXObjectList)content;
-      }
-      else
-      {
-         contentList = parser.getListener().createStack();
-         contentList.add(content);
-      }
-
       TeXObject syntax = null;
 
       if (glslabel != null && glslabel.getEntry() != null)
       {
          syntax = glslabel.getEntry().get("syntax");
+      }
+
+      if (contentList == null)
+      {
+         contentList = parser.getListener().createStack();
+      }
+      else
+      {
+         contentList.add(parser.getListener().getSpace());
       }
 
       contentList.add(parser.getListener().getControlSequence("glssymbol"));
@@ -104,12 +97,13 @@ public class SummaryCommandOptionBox extends SummaryBox
 
          if (syntaxVal.equals("\\meta{boolean}"))
          {
-            TeXObject val = glslabel.getEntry().get("initvalue");
+            TeXObject initVal = glslabel.getEntry().get("initvalue");
+
             String toggle = "off";
 
-            if (val != null)
+            if (initVal != null)
             {
-               if (val.toString(parser).equals("true"))
+               if (initVal.toString(parser).equals("true"))
                {
                   toggle = "on";
                }

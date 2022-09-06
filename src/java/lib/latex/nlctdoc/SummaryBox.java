@@ -147,6 +147,12 @@ public class SummaryBox extends AbstractGlsCommand
          list.add(TeXParserUtils.createGroup(parser, alias));
       }
 
+      int n = (list == null ? 0 : list.size());
+
+      list = addStatus(list, glslabel, parser);
+
+      boolean statusAdded = (n < (list == null ? 0 : list.size()));
+
       TeXObject providedby = glslabel.getField("providedby");
 
       if (providedby != null)
@@ -157,7 +163,11 @@ public class SummaryBox extends AbstractGlsCommand
          }
          else
          {
-            list.add(parser.getListener().getOther(';'));
+            if (!statusAdded)
+            {
+               list.add(parser.getListener().getOther(';'));
+            }
+
             list.add(parser.getListener().getSpace());
          }
 
@@ -165,6 +175,13 @@ public class SummaryBox extends AbstractGlsCommand
       }
 
       return list;
+   }
+
+   protected TeXObjectList addStatus(TeXObjectList contentList, 
+     GlsLabel glslabel, TeXParser parser)
+   throws IOException
+   {
+      return contentList;
    }
 
    protected TeXObject getNote(GlsLabel glslabel, TeXParser parser)
