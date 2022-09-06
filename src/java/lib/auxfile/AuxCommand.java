@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -38,8 +38,14 @@ public class AuxCommand extends ControlSequence
 {
    public AuxCommand(String name, int numArgs)
    {
+      this(name, numArgs, null);
+   }
+
+   public AuxCommand(String name, int numArgs, String labelPrefix)
+   {
       super(name);
       this.numArgs = numArgs;
+      this.labelPrefix = labelPrefix;
    }
 
    public int getNumArgs()
@@ -49,7 +55,7 @@ public class AuxCommand extends ControlSequence
 
    public AuxCommand clone()
    {
-      return new AuxCommand(getName(), getNumArgs());
+      return new AuxCommand(getName(), getNumArgs(), labelPrefix);
    }
 
    public void process(TeXParser parser, TeXObjectList stack)
@@ -61,12 +67,27 @@ public class AuxCommand extends ControlSequence
 
       for (int i = 0; i < numArgs; i++)
       {
-         args[i] = stack.popArg(parser);
+         args[i] = popArg(parser, stack);
 
          if (args[i] == null)
          {
             throw new NullPointerException(String.format(
               "null arg %d for %s", i, getName()));
+         }
+
+         if (i == 0 && labelPrefix != null && !labelPrefix.isEmpty())
+         {
+            if (args[i] instanceof TeXObjectList)
+            {
+               ((TeXObjectList)args[i]).push(auxParser.createString(labelPrefix), true);
+            }
+            else
+            {
+               TeXObjectList list = auxParser.createString(labelPrefix);
+               list.add(args[i]);
+
+               args[i] = list;
+            }
          }
       }
 
@@ -76,23 +97,9 @@ public class AuxCommand extends ControlSequence
    public void process(TeXParser parser)
      throws IOException
    {
-      AuxParser auxParser = (AuxParser)parser.getListener();
-
-      TeXObject[] args = new TeXObject[numArgs];
-
-      for (int i = 0; i < numArgs; i++)
-      {
-         args[i] = parser.popNextArg();
-
-         if (args[i] == null)
-         {
-            throw new NullPointerException(String.format(
-              "null arg %d for %s", i, getName()));
-         }
-      }
-
-      auxParser.addAuxData(new AuxData(getName(), args));
+      process(parser, parser);
    }
 
    private int numArgs;
+   private String labelPrefix;
 }

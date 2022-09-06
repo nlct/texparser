@@ -777,6 +777,8 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       parser.putControlSequence(new GenericError());
       parser.putControlSequence(new DocumentStyle());
 
+      parser.putControlSequence(new ExternalDocument());
+
       // LaTeX3
       // currently just implementing enough to pick up cat code
       // changes to allow command names to be read properly
@@ -1266,6 +1268,45 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       }
    }
 
+   public void parseAux(File auxFile) throws IOException
+   {
+      parseAux(null, auxFile);
+   }
+
+   public void parseAux(String prefix, File auxFile) throws IOException
+   {
+      if (isParseAuxEnabled())
+      {
+         if (auxFile != null && auxFile.exists())
+         {
+            parser.debugMessage(TeXParser.DEBUG_IO, "Parsing AUX file: "+auxFile);
+
+            AuxParser auxListener = new AuxParser(getTeXApp(), getCharSet(), prefix);
+            auxListener.parseAuxFile(auxFile);
+
+            Vector<AuxData> data = auxListener.getAuxData();
+
+            if (auxData == null)
+            {
+               auxData = data;
+            }
+            else if (data != null)
+            {
+               auxData.addAll(data);
+            }
+         }
+         else
+         {
+            parser.debugMessage(TeXParser.DEBUG_IO, "No AUX file: "+auxFile);
+         }
+      }
+      else
+      {
+         parser.debugMessage(TeXParser.DEBUG_IO, "AUX parser not enabled");
+      }
+
+   }
+
    @Deprecated
    public void beginDocument()
      throws IOException
@@ -1286,27 +1327,7 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
 
       setIsInDocEnv(true);
 
-      if (isParseAuxEnabled())
-      {
-         File auxFile = getAuxFile();
-
-         if (auxFile != null && auxFile.exists())
-         {
-            parser.debugMessage(TeXParser.DEBUG_IO, "Parsing AUX file: "+auxFile);
-
-            AuxParser auxListener = new AuxParser(getTeXApp(), getCharSet());
-            auxListener.parseAuxFile(auxFile);
-            auxData = auxListener.getAuxData();
-         }
-         else
-         {
-            parser.debugMessage(TeXParser.DEBUG_IO, "No AUX file: "+auxFile);
-         }
-      }
-      else
-      {
-         parser.debugMessage(TeXParser.DEBUG_IO, "AUX parser not enabled");
-      }
+      parseAux(getAuxFile());
 
       ControlSequence cs = parser.getControlSequence(
         "@begindocumenthook");

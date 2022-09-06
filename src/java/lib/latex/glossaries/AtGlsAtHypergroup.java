@@ -58,14 +58,23 @@ public class AtGlsAtHypergroup extends ControlSequence
       else if (cs instanceof TextualContentCommand)
       {
          TextualContentCommand tcc = (TextualContentCommand)cs;
-         String text = tcc.getText()+","+grpLabel;
-         tcc.setText(text);
+         String text = tcc.getText();
+
+         if (!(text.equals(grpLabel) || text.endsWith(","+grpLabel)))
+         {
+            text += ","+grpLabel;
+            tcc.setText(text);
+         }
       }
       else
       {
          String text = parser.expandToString(cs, stack);
-         cs = new TextualContentCommand(csname, text+","+grpLabel);
-         parser.putControlSequence(false, cs);
+
+         if (!(text.equals(grpLabel) || text.endsWith(","+grpLabel)))
+         {
+            cs = new TextualContentCommand(csname, text+","+grpLabel);
+            parser.putControlSequence(false, cs);
+         }
       }
    }
 

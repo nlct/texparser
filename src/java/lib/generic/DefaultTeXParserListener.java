@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -175,6 +175,8 @@ public abstract class DefaultTeXParserListener extends TeXParserListener
         null, new TeXObject[]{getOther('\'')}));
       parser.putControlSequence(new GenericCommand(true, ",", 
         null, new TeXObject[]{getOther(0x2006)}));
+
+      parser.putControlSequence(new GenericCommand(true, "@"));
 
       // TeX font changing declarations
 

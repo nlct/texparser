@@ -1310,6 +1310,10 @@ public class L2HConverter extends LaTeXParserListener
       {
          footnoteWriter = new StringWriter();
       }
+      else
+      {
+         footnoteWriter.write("<p>");
+      }
 
       try
       {

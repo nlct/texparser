@@ -49,9 +49,16 @@ public class AuxParser extends DefaultTeXParserListener
    public AuxParser(TeXApp texApp, Charset charset)
      throws IOException
    {
+      this(texApp, charset, null);
+   }
+
+   public AuxParser(TeXApp texApp, Charset charset, String labelPrefix)
+     throws IOException
+   {
       super(null);
       this.texApp = texApp;
       this.charset = charset;
+      this.labelPrefix = labelPrefix;
 
       setWriteable(this);
 
@@ -87,17 +94,18 @@ public class AuxParser extends DefaultTeXParserListener
       return parser;
    }
 
+   @Override
    protected void addPredefined()
    {
       super.addPredefined();
 
       putControlSequence(new Input("@input", Input.NOT_FOUND_ACTION_WARN));
 
-      addAuxCommand("newlabel", 2);
+      addAuxCommand("newlabel", 2, labelPrefix);
       addAuxCommand("bibstyle", 1);
       addAuxCommand("citation", 1);
       addAuxCommand("bibdata", 1);
-      addAuxCommand("bibcite", 2);
+      addAuxCommand("bibcite", 2, labelPrefix);
 
       putControlSequence(new AuxProvideCommand());
 
@@ -109,7 +117,12 @@ public class AuxParser extends DefaultTeXParserListener
 
    public void addAuxCommand(String name, int numArgs)
    {
-      putControlSequence(new AuxCommand(name, numArgs));
+      addAuxCommand(name, numArgs, null);
+   }
+
+   public void addAuxCommand(String name, int numArgs, String prefix)
+   {
+      putControlSequence(new AuxCommand(name, numArgs, prefix));
    }
 
    /*
@@ -265,4 +278,5 @@ public class AuxParser extends DefaultTeXParserListener
    private TeXApp texApp;
 
    private Charset charset=null;
+   private String labelPrefix = null;
 }

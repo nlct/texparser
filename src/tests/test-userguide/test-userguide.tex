@@ -106,7 +106,9 @@
   }
   \gidx{commonoption}{\name{common options}\desc{some common options}}
   \gopt{some-option}{\parent{idx.commonoption}\desc{an option common to several commands}}
-  \gopt{some-option2}{\parent{idx.commonoption}\desc{another option common to several commands}}
+  \gopt{some-option2}{\parent{idx.commonoption}
+    \syntax{\meta{boolean}}\defval{true}\initval{false}
+    \desc{another option common to several commands}}
   % environments
   \genv{foobarenv}{\syntax{\margm{text}}\desc{a sample environment}}
   % counters
@@ -157,6 +159,10 @@
 \begin{important}
 Something important.
 \end{important}
+
+\begin{information}
+Some information.
+\end{information}
 
 \begin{abstract}
 An abstract.
