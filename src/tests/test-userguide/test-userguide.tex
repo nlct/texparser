@@ -1,6 +1,8 @@
 % arara: lualatex
 % arara: bib2gls: { group: on }
 % arara: lualatex: { shell: on }
+% arara: bib2gls: { group: on } if found ("log", "Glossary entry `sym.")
+% arara: lualatex if found ("log", "Rerun to")
 
 \documentclass[titlepage=false,oneside,
  fontsize=12pt,captions=tableheading]{scrbook}

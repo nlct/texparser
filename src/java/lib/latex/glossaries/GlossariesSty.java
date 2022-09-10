@@ -30,6 +30,7 @@ import com.dickimawbooks.texparserlib.primitives.IfTrue;
 import com.dickimawbooks.texparserlib.primitives.Undefined;
 import com.dickimawbooks.texparserlib.generic.TeXParserSetUndefAction;
 import com.dickimawbooks.texparserlib.generic.Symbol;
+import com.dickimawbooks.texparserlib.generic.ParCs;
 import com.dickimawbooks.texparserlib.latex.*;
 import com.dickimawbooks.texparserlib.latex.hyperref.HyperTarget;
 import com.dickimawbooks.texparserlib.latex.hyperref.HyperLink;
@@ -118,6 +119,8 @@ public class GlossariesSty extends LaTeXSty
    @Override
    public void addDefinitions()
    {
+      registerControlSequence(new ParCs("glspar"));
+
       registerControlSequence(new TextualContentCommand("glssymbolsgroupname",
         "Symbols"));
       registerControlSequence(new TextualContentCommand("glsnumbersgroupname",
@@ -542,6 +545,10 @@ public class GlossariesSty extends LaTeXSty
       registerControlSequence(new GlsXtrSetStarModifier(this));
       registerControlSequence(new GlsXtrSetPlusModifier(this));
       registerControlSequence(new GlsXtrSetAltModifier(this));
+
+      registerControlSequence(new GlsXtrTaggedList());
+      registerControlSequence(new GenericCommand(true, "glsxtrtaggedlistsep",
+         null, new TeXCsRef("space")));
 
       registerControlSequence(new GlsAddEach());
       registerControlSequence(new TextualContentCommand("glsxtrnopostpunc", ""));

@@ -16,38 +16,29 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
-package com.dickimawbooks.texparserlib.latex.nlctdoc;
+package com.dickimawbooks.texparserlib.html;
 
 import java.io.IOException;
-import java.awt.Color;
-import java.util.Vector;
+import java.io.EOFException;
 
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.*;
-import com.dickimawbooks.texparserlib.latex.glossaries.*;
 
-public class InlineGlsDef extends AbstractGlsCommand
+public class L2HAltListDescEnv extends Declaration
 {
-   public InlineGlsDef(GlossariesSty sty)
+   public L2HAltListDescEnv()
    {
-      this("inlineglsdef", sty);
+      this("texparser@listdescenv");
    }
 
-   public InlineGlsDef(String name, GlossariesSty sty)
+   public L2HAltListDescEnv(String name)
    {
-      super(name, sty);
+      super(name);
    }
 
-   public InlineGlsDef(String name, String prefix, GlossariesSty sty)
-   {
-      super(name, sty);
-      setEntryLabelPrefix(prefix);
-   }
-
-   @Override
    public Object clone()
    {
-      return new InlineGlsDef(getName(), getEntryLabelPrefix(), getSty());
+      return new L2HAltListDescEnv(getName());
    }
 
    @Override
@@ -64,28 +55,37 @@ public class InlineGlsDef extends AbstractGlsCommand
    }
 
    @Override
-   public void process(TeXParser parser, TeXObjectList stack)
-   throws IOException
+   public void process(TeXParser parser) throws IOException
    {
-      TeXParserListener listener = parser.getListener();
-
-      TeXObject optArg = popOptArg(parser, stack);
-      GlsLabel glslabel = popEntryLabel(parser, stack);
-
-      TeXObjectList content = listener.createStack();
-
-      content.add(listener.getControlSequence("glsadd"));
-      content.add(glslabel);
-      content.add(listener.getControlSequence("glsxtrglossentry"));
-      content.add(glslabel);
-
-      TeXParserUtils.process(content, parser, stack);
+      process(parser, parser);
    }
 
    @Override
-   public void process(TeXParser parser)
-   throws IOException
+   public void process(TeXParser parser, TeXObjectList stack) throws IOException
    {
-      process(parser, parser);
+      L2HConverter listener = (L2HConverter)parser.getListener();
+
+      listener.writeln("");
+      listener.write("<dd>");
+   }
+
+   @Override
+   public void end(TeXParser parser, TeXObjectList stack)
+    throws IOException
+   {
+      L2HConverter listener = (L2HConverter)parser.getListener();
+
+      listener.writeln("</dd>");
+   }
+
+   @Override
+   public boolean isModeSwitcher()
+   {
+      return false;
+   }
+
+   public boolean isInLine()
+   {
+      return false;
    }
 }

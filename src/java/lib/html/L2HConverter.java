@@ -195,6 +195,7 @@ public class L2HConverter extends LaTeXParserListener
       putControlSequence(new L2HDescriptionItem());
       putControlSequence(new L2HAltListItem());
       putControlSequence(new L2HAltListDesc());
+      putControlSequence(new L2HAltListDescEnv());
 
       putControlSequence(new L2HQuote());
 

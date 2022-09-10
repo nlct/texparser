@@ -19,67 +19,56 @@
 package com.dickimawbooks.texparserlib.latex.nlctdoc;
 
 import java.io.IOException;
-import java.awt.Color;
-import java.util.Vector;
 
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.*;
-import com.dickimawbooks.texparserlib.latex.glossaries.*;
 
-public class InlineGlsDef extends AbstractGlsCommand
+public class Options extends ControlSequence
 {
-   public InlineGlsDef(GlossariesSty sty)
+   public Options()
    {
-      this("inlineglsdef", sty);
+      this("options", "and");
    }
 
-   public InlineGlsDef(String name, GlossariesSty sty)
+   public Options(String name, String andText)
    {
-      super(name, sty);
-   }
-
-   public InlineGlsDef(String name, String prefix, GlossariesSty sty)
-   {
-      super(name, sty);
-      setEntryLabelPrefix(prefix);
+      super(name);
+      this.andText = andText;
    }
 
    @Override
    public Object clone()
    {
-      return new InlineGlsDef(getName(), getEntryLabelPrefix(), getSty());
-   }
-
-   @Override
-   public boolean canExpand()
-   {
-      return false;
-   }
-
-   @Override
-   public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
-   throws IOException
-   {
-      return null;
+      return new Options(getName(), andText);
    }
 
    @Override
    public void process(TeXParser parser, TeXObjectList stack)
    throws IOException
    {
-      TeXParserListener listener = parser.getListener();
+      String label = popLabelString(parser, stack);
 
-      TeXObject optArg = popOptArg(parser, stack);
-      GlsLabel glslabel = popEntryLabel(parser, stack);
+      LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
+
+      parser.startGroup();
+
+      parser.putControlSequence(true, new TextualContentCommand("andname", andText));
+
+      parser.putControlSequence(true, new AssignedControlSequence(
+           "glsseeitemformat", listener.getControlSequence("optionlistitemformat")));
 
       TeXObjectList content = listener.createStack();
 
-      content.add(listener.getControlSequence("glsadd"));
-      content.add(glslabel);
-      content.add(listener.getControlSequence("glsxtrglossentry"));
-      content.add(glslabel);
+      content.add(listener.getControlSequence("glsxtrtaggedlist"));
+
+      content.add(listener.getControlSequence("optionlisttag"));
+      content.add(listener.getControlSequence("optionlisttags"));
+      content.add(listener.getControlSequence("optionlistprefix"));
+      content.add(listener.createGroup(label));
 
       TeXParserUtils.process(content, parser, stack);
+
+      parser.endGroup();
    }
 
    @Override
@@ -88,4 +77,6 @@ public class InlineGlsDef extends AbstractGlsCommand
    {
       process(parser, parser);
    }
+
+   protected String andText;
 }

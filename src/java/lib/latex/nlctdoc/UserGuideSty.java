@@ -351,6 +351,7 @@ public class UserGuideSty extends LaTeXSty
       registerControlSequence(glossariesSty.createGls("file", "file."));
 
       registerControlSequence(new InlineGlsDef(glossariesSty));
+      registerControlSequence(new InlineGlsDef("inlineidxdef", "idx.", glossariesSty));
       registerControlSequence(new CmdDefSyntax(glossariesSty));
       registerControlSequence(new OptDefSyntax(glossariesSty));
 
@@ -965,6 +966,25 @@ public class UserGuideSty extends LaTeXSty
       }
 
       NewIf.createConditional(true, getParser(), "ifshowsummarytopgroupheaders", true);
+
+      registerControlSequence(new DefListDec());
+      registerControlSequence(new ItemDesc());
+
+      registerControlSequence(new TextualContentCommand("optionlistprefix", "opt."));
+      registerControlSequence(new TextualContentCommand("optionlisttag", "Option"));
+      registerControlSequence(new TextualContentCommand("optionlisttags", "Options"));
+
+      // \optionlistitemformat
+      def = listener.createStack();
+      def.add(new TeXCsRef("glsentrytext"));
+      def.add(TeXParserUtils.createGroup(listener, listener.getParam(1)));
+
+      registerControlSequence(new LaTeXGenericCommand(true, "optionlistitemformat",
+       "m", def));
+
+      registerControlSequence(new Option());
+      registerControlSequence(new Options());
+      registerControlSequence(new Options("optionsor", "or"));
    }
 
    protected void addGlsFmtTextCommand(String name, String prefix)

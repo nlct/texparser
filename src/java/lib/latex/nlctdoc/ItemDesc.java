@@ -19,35 +19,25 @@
 package com.dickimawbooks.texparserlib.latex.nlctdoc;
 
 import java.io.IOException;
-import java.awt.Color;
-import java.util.Vector;
 
 import com.dickimawbooks.texparserlib.*;
-import com.dickimawbooks.texparserlib.latex.*;
-import com.dickimawbooks.texparserlib.latex.glossaries.*;
 
-public class InlineGlsDef extends AbstractGlsCommand
+public class ItemDesc extends Declaration
 {
-   public InlineGlsDef(GlossariesSty sty)
+   public ItemDesc()
    {
-      this("inlineglsdef", sty);
+      this("itemdesc");
    }
 
-   public InlineGlsDef(String name, GlossariesSty sty)
+   public ItemDesc(String name)
    {
-      super(name, sty);
-   }
-
-   public InlineGlsDef(String name, String prefix, GlossariesSty sty)
-   {
-      super(name, sty);
-      setEntryLabelPrefix(prefix);
+      super(name);
    }
 
    @Override
    public Object clone()
    {
-      return new InlineGlsDef(getName(), getEntryLabelPrefix(), getSty());
+      return new ItemDesc(getName());
    }
 
    @Override
@@ -64,28 +54,42 @@ public class InlineGlsDef extends AbstractGlsCommand
    }
 
    @Override
-   public void process(TeXParser parser, TeXObjectList stack)
-   throws IOException
+   public void process(TeXParser parser) throws IOException
    {
-      TeXParserListener listener = parser.getListener();
+      process(parser, parser);
+   }
 
-      TeXObject optArg = popOptArg(parser, stack);
-      GlsLabel glslabel = popEntryLabel(parser, stack);
+   @Override
+   public void process(TeXParser parser, TeXObjectList stack) throws IOException
+   {
+      TeXObjectList content = parser.getListener().createStack();
 
-      TeXObjectList content = listener.createStack();
-
-      content.add(listener.getControlSequence("glsadd"));
-      content.add(glslabel);
-      content.add(listener.getControlSequence("glsxtrglossentry"));
-      content.add(glslabel);
+      content.add(parser.getListener().getControlSequence("begin"));
+      content.add(parser.getListener().createGroup("texparser@listdescenv"));
 
       TeXParserUtils.process(content, parser, stack);
    }
 
    @Override
-   public void process(TeXParser parser)
-   throws IOException
+   public void end(TeXParser parser, TeXObjectList stack)
+    throws IOException
    {
-      process(parser, parser);
+      TeXObjectList content = parser.getListener().createStack();
+
+      content.add(parser.getListener().getControlSequence("end"));
+      content.add(parser.getListener().createGroup("texparser@listdescenv"));
+
+      TeXParserUtils.process(content, parser, stack);
+   }
+
+   @Override
+   public boolean isModeSwitcher()
+   {
+      return false;
+   }
+
+   public boolean isInLine()
+   {
+      return false;
    }
 }

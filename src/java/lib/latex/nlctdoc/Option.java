@@ -19,65 +19,53 @@
 package com.dickimawbooks.texparserlib.latex.nlctdoc;
 
 import java.io.IOException;
-import java.awt.Color;
-import java.util.Vector;
 
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.*;
-import com.dickimawbooks.texparserlib.latex.glossaries.*;
 
-public class InlineGlsDef extends AbstractGlsCommand
+public class Option extends ControlSequence
 {
-   public InlineGlsDef(GlossariesSty sty)
+   public Option()
    {
-      this("inlineglsdef", sty);
+      this("option");
    }
 
-   public InlineGlsDef(String name, GlossariesSty sty)
+   public Option(String name)
    {
-      super(name, sty);
-   }
-
-   public InlineGlsDef(String name, String prefix, GlossariesSty sty)
-   {
-      super(name, sty);
-      setEntryLabelPrefix(prefix);
+      super(name);
    }
 
    @Override
    public Object clone()
    {
-      return new InlineGlsDef(getName(), getEntryLabelPrefix(), getSty());
-   }
-
-   @Override
-   public boolean canExpand()
-   {
-      return false;
-   }
-
-   @Override
-   public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
-   throws IOException
-   {
-      return null;
+      return new Option(getName());
    }
 
    @Override
    public void process(TeXParser parser, TeXObjectList stack)
    throws IOException
    {
-      TeXParserListener listener = parser.getListener();
+      String label = popLabelString(parser, stack);
 
-      TeXObject optArg = popOptArg(parser, stack);
-      GlsLabel glslabel = popEntryLabel(parser, stack);
+      LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
+
+      String prefix = parser.expandToString(
+        listener.getControlSequence("optionlistprefix"), stack);
+
+      label = prefix+label;
 
       TeXObjectList content = listener.createStack();
 
-      content.add(listener.getControlSequence("glsadd"));
-      content.add(glslabel);
-      content.add(listener.getControlSequence("glsxtrglossentry"));
-      content.add(glslabel);
+      content.add(listener.getControlSequence("glslink"));
+      content.add(listener.createGroup(label));
+
+      Group grp = listener.createGroup();
+      content.add(grp);
+
+      grp.add(listener.getControlSequence("optionlisttag"));
+      grp.add(listener.getControlSequence("glsxtrtaggedlistsep"));
+      grp.add(listener.getControlSequence("optionlistitemformat"));
+      grp.add(listener.createGroup(label));
 
       TeXParserUtils.process(content, parser, stack);
    }

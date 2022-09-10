@@ -79,8 +79,24 @@ public class PrintCommandOptions extends PrintSummary
 
       if (title == null)
       {
+         TeXObject nameObj = cmdLabel.getField("name");
+
          TeXObjectList titleList = listener.createStack();
-         titleList.add(cmdLabel.getField("name"));
+
+         if (nameObj == null)
+         {
+            parser.warningMessage(GlossariesSty.FIELD_NOT_DEFINED, "name");
+            parser.debugMessage(TeXParser.DEBUG_STY_DATA, 
+              "No name for entry: "+cmdLabel);
+
+            titleList.add(listener.getOther('?'));
+            titleList.add(listener.getOther('?'));
+         }
+         else
+         {
+            titleList.add(nameObj);
+         }
+
          titleList.add(listener.getSpace());
          titleList.addAll(listener.createString("options"));
 
