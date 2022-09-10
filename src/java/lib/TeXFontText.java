@@ -42,6 +42,11 @@ public class TeXFontText
       setSize(size);
    }
 
+   public TeXFontText(TeXFontSize size)
+   {
+      setSize(size);
+   }
+
    public TeXFontText(TeXFontWeight weight)
    {
       setWeight(weight);

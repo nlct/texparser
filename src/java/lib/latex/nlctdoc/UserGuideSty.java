@@ -46,7 +46,7 @@ public class UserGuideSty extends LaTeXSty
 
       if (listener instanceof L2HConverter)
       {
-         ((L2HConverter)listener).addCssStyle("dfn { font-style: normal; font-weight: bold; } a.icon { text-decoration: none; }");
+         ((L2HConverter)listener).addCssStyle("dfn { font-style: normal; font-weight: bold; } a { text-decoration: none; }");
       }
 
       glossariesSty.setModifier(listener.getOther('+'), "format",
@@ -745,6 +745,15 @@ public class UserGuideSty extends LaTeXSty
       registerControlSequence(new TextualContentCommand("Tablename", "Table"));
       registerControlSequence(new Ref("tableref", false,
        new TeXCsRef("Tablename"), listener.getSpace()));
+      registerControlSequence(new Ref("Tableref", false,
+       new TeXCsRef("Tablename"), listener.getSpace()));
+
+      // \figureref
+      registerControlSequence(new TextualContentCommand("Figurename", "Figure"));
+      registerControlSequence(new Ref("figureref", false,
+       new TeXCsRef("Figurename"), listener.getSpace()));
+      registerControlSequence(new Ref("Figureref", false,
+       new TeXCsRef("Figurename"), listener.getSpace()));
 
       registerControlSequence(new Symbol("nlctopensqbracket", '['));
       registerControlSequence(new Symbol("nlctclosesqbracket", ']'));
@@ -985,6 +994,38 @@ public class UserGuideSty extends LaTeXSty
       registerControlSequence(new Option());
       registerControlSequence(new Options());
       registerControlSequence(new Options("optionsor", "or"));
+
+      // \tablefnmark
+      def = listener.createStack();
+      def.add(new TeXCsRef("textsuperscript"));
+      def.add(TeXParserUtils.createGroup(listener, listener.getParam(1)));
+
+      registerControlSequence(new LaTeXGenericCommand(true, "tablefnmark",
+       "m", def));
+
+      // \tablefntext
+      def = listener.createStack();
+      def.add(new TeXCsRef("tablefnfmt"));
+      grp = listener.createGroup();
+      def.add(grp);
+
+      grp.add(new TeXCsRef("tablefnmark"));
+      grp.add(TeXParserUtils.createGroup(listener, listener.getParam(1)));
+      grp.add(listener.getParam(2));
+
+      registerControlSequence(new LaTeXGenericCommand(true, "tablefntext",
+       "mm", def));
+
+      addSemanticCommand("tablefnfmt", "tablefn", 
+       new TeXFontText(TeXFontSize.FOOTNOTE), null, null, null, null, null,
+       false, true);
+
+      // \araraline
+      def = listener.createString("% arara: ");
+      def.add(listener.getParam(1));
+
+      registerControlSequence(new LaTeXGenericCommand(true, "araraline",
+       "m", def));
    }
 
    protected void addGlsFmtTextCommand(String name, String prefix)
