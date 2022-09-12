@@ -64,8 +64,12 @@ public class UserGuideSty extends LaTeXSty
       colorSty.putColor("style2", new Color(0.21f,0.392f,0.545f));// SteelBlue4
       colorSty.putColor("style3", new Color(0f,0f,0.545f));// Blue4
       colorSty.putColor("style4", new Color(0.332f,0.1f,0.545f));// Purple4
+      colorSty.putColor("style5", new Color(0.28f,0.235f,0.545f));// SlateBlue4
 
       registerControlSequence(new GuideGls());
+
+      addSemanticCommand("sidenote", 
+       new TeXFontText(TeXFontSize.FOOTNOTE), false, true, FloatBoxStyle.RIGHT);
 
       addSemanticCommand("strong", TeXFontWeight.STRONG);
       addSemanticCommand("code", TeXFontFamily.VERB);
@@ -132,6 +136,9 @@ public class UserGuideSty extends LaTeXSty
         "glsxtrparagraphlocfmt", null, new TeXCsRef("seclocfmt")));
       registerControlSequence(new GenericCommand(true,
         "glsxtrsubparagraphlocfmt", null, new TeXCsRef("seclocfmt")));
+
+      registerControlSequence(new TextualContentCommand("TeXLive", "TeX Live"));
+      registerControlSequence(new TextualContentCommand("MikTeX", "MikTeX"));
 
       registerControlSequence(new TextualContentCommand("dhyphen", "-"));
       registerControlSequence(new TextualContentCommand("dcolon", ":"));
@@ -493,6 +500,24 @@ public class UserGuideSty extends LaTeXSty
       registerControlSequence(new GenericCommand(true,
        "keyvallist", null, def));
 
+      // \keyeqvalue
+      def = getListener().createStack();
+      def.add(listener.getParam(1));
+      def.add(getListener().getOther('='));
+      def.add(listener.getParam(2));
+
+      registerControlSequence(new LaTeXGenericCommand(true,
+       "keyeqvalue", "mm", def));
+
+      // \keyeqvaluem
+      def = getListener().createStack();
+      def.add(getListener().getParam(1));
+      def.add(getListener().getOther('='));
+      def.add(TeXParserUtils.createGroup(getListener(), getListener().getParam(2)));
+
+      registerControlSequence(new LaTeXGenericCommand(true,
+       "keyeqvaluem", "mm", def));
+
       // \metafilefmt
       def = getListener().createStack();
       def.add(new TeXCsRef("filefmt"));
@@ -651,6 +676,19 @@ public class UserGuideSty extends LaTeXSty
       registerControlSequence(new LaTeXGenericCommand(true,
        "ctansupportmirror", "mm", def));
 
+      // \texseref
+      def = getListener().createStack();
+      def.add(new TeXCsRef("href"));
+      grp = getListener().createGroup("https://tex.stackexchange.com/");
+      def.add(grp);
+      grp.add(getListener().getParam(1));
+      grp = getListener().createGroup();
+      def.add(grp);
+      grp.add(getListener().getParam(2));
+
+      registerControlSequence(new LaTeXGenericCommand(true,
+       "texseref", "mm", def));
+
       // \dickimawhrefnofn and \dickimawhref
       // (Treat identically.)
       def = getListener().createStack();
@@ -690,6 +728,40 @@ public class UserGuideSty extends LaTeXSty
       registerControlSequence(new LaTeXGenericCommand(true,
        "gallery", "m", def));
 
+      // \galleryref
+      def = getListener().createStack();
+      def.add(new TeXCsRef("dickimawhref"));
+
+      grp = getListener().createGroup("gallery/");
+      grp.add(getListener().getParam(1));
+      def.add(grp);
+      def.add(TeXParserUtils.createGroup(getListener(), getListener().getParam(2)));
+
+      registerControlSequence(new LaTeXGenericCommand(true,
+       "galleryref", "mm", def));
+
+      // \gallerytopic
+      def = getListener().createStack();
+      def.add(new TeXCsRef("dickimawhref"));
+
+      grp = getListener().createGroup("gallery/#");
+      grp.add(getListener().getParam(1));
+      def.add(grp);
+
+      grp = getListener().createGroup();
+      def.add(grp);
+
+      grp.add(new TeXCsRef("styfmt"));
+ 
+      grp.add(TeXParserUtils.createGroup(getListener(), 
+        getListener().getParam(2)));
+
+      grp.add(getListener().getSpace());
+      grp.add(getListener().createString("gallery"));
+
+      registerControlSequence(new LaTeXGenericCommand(true,
+       "gallerytopic", "m", def));
+
       // \gallerypage
       def = getListener().createStack();
       def.add(new TeXCsRef("dickimawhref"));
@@ -702,6 +774,26 @@ public class UserGuideSty extends LaTeXSty
 
       registerControlSequence(new LaTeXGenericCommand(true,
        "gallerypage", "mm", def));
+
+      // \faqspkg
+      def = getListener().createStack();
+      def.add(new TeXCsRef("dickimawhref"));
+      grp = getListener().createGroup("faqs/");
+      def.add(grp);
+      grp.add(getListener().getParam(1));
+      grp.add(getListener().createString("faq.html"));
+
+      grp = getListener().createGroup();
+      def.add(grp);
+
+      grp.add(new TeXCsRef("styfmt"));
+      grp.add(TeXParserUtils.createGroup(getListener(), 
+         getListener().getParam(1)));
+      grp.add(getListener().getSpace());
+      grp.add(getListener().createString("FAQ"));
+
+      registerControlSequence(new LaTeXGenericCommand(true,
+       "faqpage", "mm", def));
 
       // \faqpage
       def = getListener().createStack();
@@ -1258,6 +1350,16 @@ public class UserGuideSty extends LaTeXSty
       null, null, null, halign, AlignVStyle.DEFAULT, null);
    }
 
+   protected FrameBox addSemanticCommand(String name, TeXFontText font, 
+      boolean isInLine, boolean isMultiLine,
+    FloatBoxStyle floatStyle)
+   {
+      return addSemanticCommand(name, name, font, null, null, null, 
+      null, null, isInLine, isMultiLine, null,
+      null, null, null, AlignHStyle.DEFAULT, AlignVStyle.DEFAULT, null, 
+      floatStyle);
+   }
+
    protected FrameBox addSemanticCommand(String name, String id, 
     TeXFontText font, Color fg, Color bg, Color frameCol, 
       TeXObject prefix, TeXObject suffix,
@@ -1267,6 +1369,22 @@ public class UserGuideSty extends LaTeXSty
       TeXDimension bottomOuterMargin,
       AlignHStyle halign, AlignVStyle valign, TeXDimension width)
    {
+      return addSemanticCommand(name, id, font, fg, bg, frameCol, 
+      prefix, suffix, isInLine, isMultiLine, leftOuterMargin,
+      rightOuterMargin, topOuterMargin, bottomOuterMargin,
+      halign, valign, width, null);
+   }
+
+   protected FrameBox addSemanticCommand(String name, String id, 
+    TeXFontText font, Color fg, Color bg, Color frameCol, 
+      TeXObject prefix, TeXObject suffix,
+      boolean isInLine, boolean isMultiLine, TeXDimension leftOuterMargin,
+      TeXDimension rightOuterMargin,
+      TeXDimension topOuterMargin,
+      TeXDimension bottomOuterMargin,
+      AlignHStyle halign, AlignVStyle valign, TeXDimension width,
+      FloatBoxStyle floatStyle)
+   {
       FrameBox boxFrame = new ColourBox(name, 
        frameCol == null ? BorderStyle.NONE : BorderStyle.SOLID,
        halign, valign, isInLine, null, null);
@@ -1275,6 +1393,11 @@ public class UserGuideSty extends LaTeXSty
       boxFrame.setTextFont(font);
       boxFrame.setForegroundColor(fg);
       boxFrame.setBackgroundColor(bg);
+
+      if (floatStyle != null)
+      {
+         boxFrame.setFloatStyle(floatStyle);
+      }
 
       if (frameCol != null)
       {
