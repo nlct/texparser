@@ -69,6 +69,7 @@ import com.dickimawbooks.texparserlib.latex.tcilatex.*;
 import com.dickimawbooks.texparserlib.latex.textcase.*;
 import com.dickimawbooks.texparserlib.latex.textcomp.*;
 import com.dickimawbooks.texparserlib.latex.tipa.*;
+import com.dickimawbooks.texparserlib.latex.twemojis.*;
 import com.dickimawbooks.texparserlib.latex.upgreek.*;
 import com.dickimawbooks.texparserlib.latex.wasysym.*;
 import com.dickimawbooks.texparserlib.latex.xfor.*;
@@ -568,6 +569,16 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
 
       parser.putControlSequence(
         new TextualContentCommand("indexname", "Index"));
+
+      parser.putControlSequence(
+        new GenericCommand("listtablename", null, createString("List of Tables")));
+      parser.putControlSequence(
+        new GenericCommand("listfigurename", null, createString("List of Figures")));
+
+      parser.putControlSequence(new ListOfFloats("listoftables", 
+        "listtablename", "lot"));
+      parser.putControlSequence(new ListOfFloats("listoffigures", 
+        "listfigurename", "lof"));
 
       newlength("fboxsep", 3, TeXUnit.PT);
       newlength("fboxrule", 0.4f, TeXUnit.PT);
@@ -1954,6 +1965,11 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       if (styName.equals("tipa"))
       {
          return new TipaSty(options, this, loadParentOptions);
+      }
+
+      if (styName.equals("twemojis"))
+      {
+         return new TwemojisSty(options, this, loadParentOptions);
       }
 
       if (styName.equals("upgreek"))
