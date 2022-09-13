@@ -58,35 +58,55 @@ public class DefSemanticCmd extends ControlSequence
       }
 
       ControlSequence cs = popControlSequence(parser, stack);
-      ControlSequence fontCs = popControlSequence(parser, stack);
+
+      TeXObject csArg = popArg(parser, stack);
+
+      ControlSequence fontCs = null;
+
+      if (!csArg.isEmpty())
+      {
+         if (csArg instanceof ControlSequence)
+         {
+            fontCs = (ControlSequence)csArg;
+         }
+         else if (parser.isStack(csArg))
+         {
+            fontCs = popControlSequence(parser, (TeXObjectList)csArg);
+         }
+      }
 
       TeXObject prefix = popArg(parser, stack);
 
-      TeXFontText font = new TeXFontText();
+      TeXFontText font = null;
 
-      if (fontCs.getName().equals("texttt"))
+      if (fontCs != null)
       {
-         font.setFamily(TeXFontFamily.VERB);
-      }
-      else if (fontCs.getName().equals("textsf"))
-      {
-         font.setFamily(TeXFontFamily.SF);
-      }
-      else if (fontCs.getName().equals("textit"))
-      {
-         font.setShape(TeXFontShape.IT);
-      }
-      else if (fontCs.getName().equals("textsc"))
-      {
-         font.setShape(TeXFontShape.SC);
-      }
-      else if (fontCs.getName().equals("emph"))
-      {
-         font.setShape(TeXFontShape.EM);
-      }
-      else if (fontCs.getName().equals("textbf"))
-      {
-         font.setWeight(TeXFontWeight.BF);
+         font = new TeXFontText();
+
+         if (fontCs.getName().equals("texttt"))
+         {
+            font.setFamily(TeXFontFamily.VERB);
+         }
+         else if (fontCs.getName().equals("textsf"))
+         {
+            font.setFamily(TeXFontFamily.SF);
+         }
+         else if (fontCs.getName().equals("textit"))
+         {
+            font.setShape(TeXFontShape.IT);
+         }
+         else if (fontCs.getName().equals("textsc"))
+         {
+            font.setShape(TeXFontShape.SC);
+         }
+         else if (fontCs.getName().equals("emph"))
+         {
+            font.setShape(TeXFontShape.EM);
+         }
+         else if (fontCs.getName().equals("textbf"))
+         {
+            font.setWeight(TeXFontWeight.BF);
+         }
       }
 
       sty.addSemanticCommand(cs.getName(), font, fg, prefix, null);

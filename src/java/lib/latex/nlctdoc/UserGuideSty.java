@@ -55,6 +55,8 @@ public class UserGuideSty extends LaTeXSty
       glossariesSty.setModifier(listener.getOther('!'), "format",
         listener.createString("glsignore"));
 
+      registerControlSequence(new MainMatterOnly());
+
       colorSty.putColor("cs", FG_CS);
       colorSty.putColor("styopt", FG_STYOPT);
       colorSty.putColor("csopt", FG_CSOPT);
@@ -65,11 +67,15 @@ public class UserGuideSty extends LaTeXSty
       colorSty.putColor("style3", new Color(0f,0f,0.545f));// Blue4
       colorSty.putColor("style4", new Color(0.332f,0.1f,0.545f));// Purple4
       colorSty.putColor("style5", new Color(0.28f,0.235f,0.545f));// SlateBlue4
+      colorSty.putColor("style6", new Color(0.518f,0.44f,1.0f));// LightSlateBlue
 
       registerControlSequence(new GuideGls());
 
       addSemanticCommand("sidenote", 
        new TeXFontText(TeXFontSize.FOOTNOTE), false, true, FloatBoxStyle.RIGHT);
+
+      addSemanticCommand("advantagefmt", "advantage", null, Color.GREEN, null, null);
+      addSemanticCommand("disadvantagefmt", "disadvantage", null, Color.RED, null, null);
 
       addSemanticCommand("strong", TeXFontWeight.STRONG);
       addSemanticCommand("code", TeXFontFamily.VERB);
@@ -80,6 +86,8 @@ public class UserGuideSty extends LaTeXSty
         listener.getOther('\\'), null);
       addSemanticCommand("csfmtfont", TeXFontFamily.TT);
       addSemanticCommand("csfmtcolourfont", TeXFontFamily.TT, FG_CS);
+      addSemanticCommand("cmdfmt", TeXFontFamily.VERB, null, 
+        listener.getOther('\\'), null);
       addSemanticCommand("appfmt", TeXFontFamily.TT);
       addSemanticCommand("styfmt", TeXFontFamily.TT);
       addSemanticCommand("clsfmt", TeXFontFamily.TT);
@@ -149,6 +157,7 @@ public class UserGuideSty extends LaTeXSty
       registerControlSequence(new TextualContentCommand("shortswitch", "-"));
       registerControlSequence(new TextualContentCommand("dunderscore", "_"));
       registerControlSequence(new TextualContentCommand("dsb", "_"));
+      registerControlSequence(new TextualContentCommand("codebackslash", "\\"));
 
       registerControlSequence(new TextualContentCommand("texparser@currentsection",
         "chapter"));
@@ -292,7 +301,7 @@ public class UserGuideSty extends LaTeXSty
 
       FrameBox noteBox = new ColourBox("noteBox", BorderStyle.NONE,
         AlignHStyle.DEFAULT, AlignVStyle.DEFAULT, false, null, null);
-      getListener().declareFrameBox(noteBox, false);
+      listener.declareFrameBox(noteBox, false);
 
       registerControlSequence(new CmdDef(pinnedBox, rightBox, noteBox, glossariesSty));
       registerControlSequence(new EnvDef(pinnedBox, rightBox, noteBox, glossariesSty));
@@ -384,252 +393,282 @@ public class UserGuideSty extends LaTeXSty
       registerControlSequence(new Idxn(glossariesSty));
 
       // dual prefix list
-      def = getListener().createString("dual.,idx.,");
-        def.add(getListener().getControlSequence("empty"));
+      def = listener.createString("dual.,idx.,");
+        def.add(listener.getControlSequence("empty"));
       registerControlSequence(new GenericCommand(true, "@glsxtr@labelprefixes",
        null, def));
 
       // \optval
-      def = getListener().createStack();
+      def = listener.createStack();
       def.add(new TeXCsRef("gls"));
 
-      grp = getListener().createGroup("opt.");
+      grp = listener.createGroup("opt.");
       def.add(grp);
-      grp.add(getListener().getParam(1));
+      grp.add(listener.getParam(1));
 
       def.add(new TeXCsRef("optfmt"));
-      grp = getListener().createGroup("=");
+      grp = listener.createGroup("=");
       def.add(grp);
-      grp.add(getListener().getParam(2));
+      grp.add(listener.getParam(2));
 
       registerControlSequence(new LaTeXGenericCommand(true,
        "optval", "mm", def));
 
       // \optvalm
-      def = getListener().createStack();
+      def = listener.createStack();
       def.add(new TeXCsRef("gls"));
 
-      grp = getListener().createGroup("opt.");
+      grp = listener.createGroup("opt.");
       def.add(grp);
-      grp.add(getListener().getParam(1));
+      grp.add(listener.getParam(1));
 
       def.add(new TeXCsRef("optfmt"));
-      grp = getListener().createGroup("=");
+      grp = listener.createGroup("=");
       def.add(grp);
 
       grp.add(new TeXCsRef("marg"));
 
-      subgrp = getListener().createGroup();
+      subgrp = listener.createGroup();
       grp.add(subgrp);
-      subgrp.add(getListener().getParam(2));
+      subgrp.add(listener.getParam(2));
 
       registerControlSequence(new LaTeXGenericCommand(true,
        "optvalm", "mm", def));
 
       // \opteqvalref
-      def = getListener().createStack();
+      def = listener.createStack();
       def.add(new TeXCsRef("gls"));
 
-      grp = getListener().createGroup("opt.");
+      grp = listener.createGroup("opt.");
       def.add(grp);
-      grp.add(getListener().getParam(1));
+      grp.add(listener.getParam(1));
 
       def.add(new TeXCsRef("optfmt"));
-      grp = getListener().createGroup("=");
+      grp = listener.createGroup("=");
       def.add(grp);
 
       def.add(new TeXCsRef("gls"));
 
-      grp = getListener().createGroup("optval.");
+      grp = listener.createGroup("optval.");
       def.add(grp);
-      grp.add(getListener().getParam(1));
-      grp.add(getListener().getOther('.'));
-      grp.add(getListener().getParam(2));
+      grp.add(listener.getParam(1));
+      grp.add(listener.getOther('.'));
+      grp.add(listener.getParam(2));
 
       registerControlSequence(new LaTeXGenericCommand(true,
        "opteqvalref", "mm", def));
 
       // \optvalref
-      def = getListener().createStack();
+      def = listener.createStack();
       def.add(new TeXCsRef("gls"));
 
-      grp = getListener().createGroup("optval.");
+      grp = listener.createGroup("optval.");
       def.add(grp);
-      grp.add(getListener().getParam(1));
-      grp.add(getListener().getOther('.'));
-      grp.add(getListener().getParam(2));
+      grp.add(listener.getParam(1));
+      grp.add(listener.getOther('.'));
+      grp.add(listener.getParam(2));
 
       registerControlSequence(new LaTeXGenericCommand(true,
        "optvalref", "mm", def));
 
       // \fmtorcode
-      def = getListener().createStack();
-      def.add(getListener().getParam(1));
+      def = listener.createStack();
+      def.add(listener.getParam(1));
 
-      grp = getListener().createGroup();
+      grp = listener.createGroup();
       def.add(grp);
-      grp.add(getListener().getParam(2));
+      grp.add(listener.getParam(2));
 
       registerControlSequence(new LaTeXGenericCommand(true,
        "fmtorcode", "mm", def));
 
       // \metaboolean
-      def = getListener().createStack();
+      def = listener.createStack();
       def.add(new TeXCsRef("meta"));
-      def.add(getListener().createGroup("boolean"));
+      def.add(listener.createGroup("boolean"));
 
       registerControlSequence(new GenericCommand(true,
        "metaboolean", null, def));
 
       // \keyval
-      def = getListener().createStack();
+      def = listener.createStack();
       def.add(new TeXCsRef("meta"));
-      def.add(getListener().createGroup("key"));
-      def.add(getListener().getOther('='));
+      def.add(listener.createGroup("key"));
+      def.add(listener.getOther('='));
       def.add(new TeXCsRef("meta"));
-      def.add(getListener().createGroup("value"));
+      def.add(listener.createGroup("value"));
 
       registerControlSequence(new GenericCommand(true,
        "keyval", null, def));
 
       // \keyvallist
-      def = getListener().createStack();
+      def = listener.createStack();
       def.add(new TeXCsRef("meta"));
-      def.add(getListener().createGroup("key=value list"));
+      def.add(listener.createGroup("key=value list"));
 
       registerControlSequence(new GenericCommand(true,
        "keyvallist", null, def));
 
       // \keyeqvalue
-      def = getListener().createStack();
+      def = listener.createStack();
       def.add(listener.getParam(1));
-      def.add(getListener().getOther('='));
+      def.add(listener.getOther('='));
       def.add(listener.getParam(2));
 
       registerControlSequence(new LaTeXGenericCommand(true,
        "keyeqvalue", "mm", def));
 
       // \keyeqvaluem
-      def = getListener().createStack();
-      def.add(getListener().getParam(1));
-      def.add(getListener().getOther('='));
-      def.add(TeXParserUtils.createGroup(getListener(), getListener().getParam(2)));
+      def = listener.createStack();
+      def.add(listener.getParam(1));
+      def.add(listener.getOther('='));
+      def.add(TeXParserUtils.createGroup(listener, listener.getParam(2)));
 
       registerControlSequence(new LaTeXGenericCommand(true,
        "keyeqvaluem", "mm", def));
 
       // \metafilefmt
-      def = getListener().createStack();
+      def = listener.createStack();
       def.add(new TeXCsRef("filefmt"));
-      grp = getListener().createGroup();
+      grp = listener.createGroup();
       def.add(grp);
-      grp.add(getListener().getParam(1));
+      grp.add(listener.getParam(1));
 
       def.add(new TeXCsRef("meta"));
-      grp = getListener().createGroup();
+      grp = listener.createGroup();
       def.add(grp);
-      grp.add(getListener().getParam(2));
+      grp.add(listener.getParam(2));
 
       def.add(new TeXCsRef("filefmt"));
-      grp = getListener().createGroup();
+      grp = listener.createGroup();
       def.add(grp);
-      grp.add(getListener().getParam(3));
+      grp.add(listener.getParam(3));
 
       registerControlSequence(new LaTeXGenericCommand(true,
        "metafilefmt", "mmm", def));
 
       // \metametafilefmt
-      def = getListener().createStack();
+      def = listener.createStack();
       def.add(new TeXCsRef("filefmt"));
-      grp = getListener().createGroup();
+      grp = listener.createGroup();
       def.add(grp);
-      grp.add(getListener().getParam(1));
+      grp.add(listener.getParam(1));
 
       def.add(new TeXCsRef("meta"));
-      grp = getListener().createGroup();
+      grp = listener.createGroup();
       def.add(grp);
-      grp.add(getListener().getParam(2));
+      grp.add(listener.getParam(2));
 
       def.add(new TeXCsRef("filefmt"));
-      grp = getListener().createGroup();
+      grp = listener.createGroup();
       def.add(grp);
-      grp.add(getListener().getParam(3));
+      grp.add(listener.getParam(3));
 
       def.add(new TeXCsRef("meta"));
-      grp = getListener().createGroup();
+      grp = listener.createGroup();
       def.add(grp);
-      grp.add(getListener().getParam(4));
+      grp.add(listener.getParam(4));
 
       def.add(new TeXCsRef("filefmt"));
-      grp = getListener().createGroup();
+      grp = listener.createGroup();
       def.add(grp);
-      grp.add(getListener().getParam(5));
+      grp.add(listener.getParam(5));
 
       registerControlSequence(new LaTeXGenericCommand(true,
        "metametafilefmt", "mmmmm", def));
 
       // \texdocref
-      def = getListener().createStack();
+      def = listener.createStack();
       def.add(new TeXCsRef("begin"));
-      def.add(getListener().createGroup("terminal"));
+      def.add(listener.createGroup("terminal"));
       def.add(new TeXCsRef("href"));
-      def.add(getListener().createGroup("https://www.tug.org/texdoc/"));
-      def.add(getListener().createGroup("texdoc"));
-      def.add(getListener().getSpace());
-      def.add(getListener().getParam(1));
+      def.add(listener.createGroup("https://www.tug.org/texdoc/"));
+      def.add(listener.createGroup("texdoc"));
+      def.add(listener.getSpace());
+      def.add(listener.getParam(1));
       def.add(new TeXCsRef("end"));
-      def.add(getListener().createGroup("terminal"));
+      def.add(listener.createGroup("terminal"));
 
       registerControlSequence(new LaTeXGenericCommand(true,
        "texdocref", "m", def));
 
-      // \CTANpkg
-      def = getListener().createStack();
+      // \tugboat
+      def = listener.createStack();
       def.add(new TeXCsRef("href"));
-      grp = getListener().createGroup("https://ctan.org/pkg/");
+      grp = listener.createGroup("https://tug.org/TUGboat/tb");
       def.add(grp);
-      grp.add(getListener().getParam(1));
-      def.add(getListener().createGroup("CTAN"));
+      grp.add(listener.getParam(2));
+      grp.add(listener.getOther('-'));
+      grp.add(listener.getParam(4));
+      grp.add(listener.getOther('/'));
+      grp.add(listener.getParam(5));
+
+      grp = listener.createGroup();
+      def.add(grp);
+      grp.add(new TeXCsRef("qt"));
+      grp.add(TeXParserUtils.createGroup(listener, 
+        listener.getParam(1)));
+      grp.add(listener.getSpace());
+      grp.add(new TeXCsRef("emph"));
+      grp.add(listener.createGroup("TUGboat"));
+      grp.addAll(listener.createString(", Volume "));
+      grp.add(listener.getParam(3));
+      grp.add(listener.getSpace());
+      grp.add(listener.getOther('('));
+      grp.add(listener.getParam(2));
+      grp.add(listener.createString("), No. "));
+      grp.add(listener.getParam(4));
+
+      registerControlSequence(new LaTeXGenericCommand(true,
+       "tugboat", "mmmmm", def));
+
+      // \CTANpkg
+      def = listener.createStack();
+      def.add(new TeXCsRef("href"));
+      grp = listener.createGroup("https://ctan.org/pkg/");
+      def.add(grp);
+      grp.add(listener.getParam(1));
+      def.add(listener.createGroup("CTAN"));
 
       registerControlSequence(new LaTeXGenericCommand(true,
        "CTANpkg", "m", def));
 
       // \ctanpkg
-      def = getListener().createStack();
+      def = listener.createStack();
       def.add(new TeXCsRef("href"));
-      grp = getListener().createGroup("https://ctan.org/pkg/");
+      grp = listener.createGroup("https://ctan.org/pkg/");
       def.add(grp);
-      grp.add(getListener().getParam(1));
-      grp = getListener().createGroup("ctan.org/pkg/");
+      grp.add(listener.getParam(1));
+      grp = listener.createGroup("ctan.org/pkg/");
       def.add(grp);
-      grp.add(getListener().getParam(1));
+      grp.add(listener.getParam(1));
 
       registerControlSequence(new LaTeXGenericCommand(true,
        "ctanpkg", "m", def));
 
       // \ctanref
-      def = getListener().createStack();
+      def = listener.createStack();
       def.add(new TeXCsRef("href"));
-      grp = getListener().createGroup("https://ctan.org/");
+      grp = listener.createGroup("https://ctan.org/");
       def.add(grp);
-      grp.add(getListener().getParam(1));
-      grp = getListener().createGroup();
+      grp.add(listener.getParam(1));
+      grp = listener.createGroup();
       def.add(grp);
-      grp.add(getListener().getParam(2));
+      grp.add(listener.getParam(2));
 
       registerControlSequence(new LaTeXGenericCommand(true,
        "ctanref", "mm", def));
 
       // \ctanmirrornofn and \ctanmirror
       // (Treat identically.)
-      def = getListener().createStack();
+      def = listener.createStack();
       def.add(new TeXCsRef("href"));
-      grp = getListener().createGroup("http://mirrors.ctan.org/");
+      grp = listener.createGroup("http://mirrors.ctan.org/");
       def.add(grp);
-      grp.add(getListener().getParam(1));
-      grp = getListener().createGroup();
+      grp.add(listener.getParam(1));
+      grp = listener.createGroup();
       def.add(grp);
-      grp.add(getListener().getParam(2));
+      grp.add(listener.getParam(2));
 
       registerControlSequence(new LaTeXGenericCommand(true,
        "ctanmirrornofn", "mm", def));
@@ -637,68 +676,68 @@ public class UserGuideSty extends LaTeXSty
        "ctanmirror", "mm", def));
 
       // \ctanmirrordocnofn use .html instead of .pdf
-      def = getListener().createStack();
+      def = listener.createStack();
       def.add(new TeXCsRef("href"));
-      grp = getListener().createGroup("http://mirrors.ctan.org/");
+      grp = listener.createGroup("http://mirrors.ctan.org/");
       def.add(grp);
-      grp.add(getListener().getParam(1));
-      grp.addAll(getListener().createString(".html"));
-      grp = getListener().createGroup();
+      grp.add(listener.getParam(1));
+      grp.addAll(listener.createString(".html"));
+      grp = listener.createGroup();
       def.add(grp);
-      grp.add(getListener().getParam(2));
+      grp.add(listener.getParam(2));
 
       registerControlSequence(new LaTeXGenericCommand(true,
        "ctanmirrordocnofn", "mm", def));
 
       // \ctanpkgmirror
-      def = getListener().createStack();
+      def = listener.createStack();
       def.add(new TeXCsRef("href"));
-      grp = getListener().createGroup("http://mirrors.ctan.org/pkg/");
+      grp = listener.createGroup("http://mirrors.ctan.org/pkg/");
       def.add(grp);
-      grp.add(getListener().getParam(1));
-      grp = getListener().createGroup();
+      grp.add(listener.getParam(1));
+      grp = listener.createGroup();
       def.add(grp);
-      grp.add(getListener().getParam(2));
+      grp.add(listener.getParam(2));
 
       registerControlSequence(new LaTeXGenericCommand(true,
        "ctanpkgmirror", "mm", def));
 
       // \ctansupportmirror
-      def = getListener().createStack();
+      def = listener.createStack();
       def.add(new TeXCsRef("href"));
-      grp = getListener().createGroup("http://mirrors.ctan.org/support/");
+      grp = listener.createGroup("http://mirrors.ctan.org/support/");
       def.add(grp);
-      grp.add(getListener().getParam(1));
-      grp = getListener().createGroup();
+      grp.add(listener.getParam(1));
+      grp = listener.createGroup();
       def.add(grp);
-      grp.add(getListener().getParam(2));
+      grp.add(listener.getParam(2));
 
       registerControlSequence(new LaTeXGenericCommand(true,
        "ctansupportmirror", "mm", def));
 
       // \texseref
-      def = getListener().createStack();
+      def = listener.createStack();
       def.add(new TeXCsRef("href"));
-      grp = getListener().createGroup("https://tex.stackexchange.com/");
+      grp = listener.createGroup("https://tex.stackexchange.com/");
       def.add(grp);
-      grp.add(getListener().getParam(1));
-      grp = getListener().createGroup();
+      grp.add(listener.getParam(1));
+      grp = listener.createGroup();
       def.add(grp);
-      grp.add(getListener().getParam(2));
+      grp.add(listener.getParam(2));
 
       registerControlSequence(new LaTeXGenericCommand(true,
        "texseref", "mm", def));
 
       // \dickimawhrefnofn and \dickimawhref
       // (Treat identically.)
-      def = getListener().createStack();
+      def = listener.createStack();
       def.add(new TeXCsRef("href"));
-      grp = getListener().createGroup("https://www.dickimaw-books.com/");
+      grp = listener.createGroup("https://www.dickimaw-books.com/");
       def.add(grp);
-      grp.add(getListener().getParam(1));
-      grp = getListener().createGroup();
+      grp.add(listener.getParam(1));
+      grp = listener.createGroup();
       def.add(grp);
-      grp.add(getListener().getParam(2));
+      grp.add(listener.getParam(2));
 
       registerControlSequence(new LaTeXGenericCommand(true,
        "dickimawhrefnofn", "mm", def));
@@ -707,116 +746,116 @@ public class UserGuideSty extends LaTeXSty
        "dickimawhref", "mm", def));
 
       // \blog
-      def = getListener().createStack();
+      def = listener.createStack();
       def.add(new TeXCsRef("dickimawhref"));
-      grp = getListener().createGroup("blog/");
+      grp = listener.createGroup("blog/");
       def.add(grp);
-      grp.add(getListener().getParam(1));
-      grp = getListener().createGroup();
+      grp.add(listener.getParam(1));
+      grp = listener.createGroup();
       def.add(grp);
-      grp.add(getListener().getParam(2));
+      grp.add(listener.getParam(2));
 
       registerControlSequence(new LaTeXGenericCommand(true,
        "blog", "mm", def));
 
       // \gallery
-      def = getListener().createStack();
+      def = listener.createStack();
       def.add(new TeXCsRef("dickimawhref"));
-      def.add(getListener().createGroup("gallery"));
-      def.add(TeXParserUtils.createGroup(getListener(), getListener().getParam(1)));
+      def.add(listener.createGroup("gallery"));
+      def.add(TeXParserUtils.createGroup(listener, listener.getParam(1)));
 
       registerControlSequence(new LaTeXGenericCommand(true,
        "gallery", "m", def));
 
       // \galleryref
-      def = getListener().createStack();
+      def = listener.createStack();
       def.add(new TeXCsRef("dickimawhref"));
 
-      grp = getListener().createGroup("gallery/");
-      grp.add(getListener().getParam(1));
+      grp = listener.createGroup("gallery/");
+      grp.add(listener.getParam(1));
       def.add(grp);
-      def.add(TeXParserUtils.createGroup(getListener(), getListener().getParam(2)));
+      def.add(TeXParserUtils.createGroup(listener, listener.getParam(2)));
 
       registerControlSequence(new LaTeXGenericCommand(true,
        "galleryref", "mm", def));
 
       // \gallerytopic
-      def = getListener().createStack();
+      def = listener.createStack();
       def.add(new TeXCsRef("dickimawhref"));
 
-      grp = getListener().createGroup("gallery/#");
-      grp.add(getListener().getParam(1));
+      grp = listener.createGroup("gallery/#");
+      grp.add(listener.getParam(1));
       def.add(grp);
 
-      grp = getListener().createGroup();
+      grp = listener.createGroup();
       def.add(grp);
 
       grp.add(new TeXCsRef("styfmt"));
  
-      grp.add(TeXParserUtils.createGroup(getListener(), 
-        getListener().getParam(2)));
+      grp.add(TeXParserUtils.createGroup(listener, 
+        listener.getParam(1)));
 
-      grp.add(getListener().getSpace());
-      grp.add(getListener().createString("gallery"));
+      grp.add(listener.getSpace());
+      grp.add(listener.createString("gallery"));
 
       registerControlSequence(new LaTeXGenericCommand(true,
        "gallerytopic", "m", def));
 
       // \gallerypage
-      def = getListener().createStack();
+      def = listener.createStack();
       def.add(new TeXCsRef("dickimawhref"));
-      grp = getListener().createGroup("gallery/index.php?label=");
+      grp = listener.createGroup("gallery/index.php?label=");
       def.add(grp);
-      grp.add(getListener().getParam(1));
-      grp = getListener().createGroup();
+      grp.add(listener.getParam(1));
+      grp = listener.createGroup();
       def.add(grp);
-      grp.add(getListener().getParam(2));
+      grp.add(listener.getParam(2));
 
       registerControlSequence(new LaTeXGenericCommand(true,
        "gallerypage", "mm", def));
 
       // \faqspkg
-      def = getListener().createStack();
+      def = listener.createStack();
       def.add(new TeXCsRef("dickimawhref"));
-      grp = getListener().createGroup("faqs/");
+      grp = listener.createGroup("faqs/");
       def.add(grp);
-      grp.add(getListener().getParam(1));
-      grp.add(getListener().createString("faq.html"));
+      grp.add(listener.getParam(1));
+      grp.add(listener.createString("faq.html"));
 
-      grp = getListener().createGroup();
+      grp = listener.createGroup();
       def.add(grp);
 
       grp.add(new TeXCsRef("styfmt"));
-      grp.add(TeXParserUtils.createGroup(getListener(), 
-         getListener().getParam(1)));
-      grp.add(getListener().getSpace());
-      grp.add(getListener().createString("FAQ"));
+      grp.add(TeXParserUtils.createGroup(listener, 
+         listener.getParam(1)));
+      grp.add(listener.getSpace());
+      grp.add(listener.createString("FAQ"));
 
       registerControlSequence(new LaTeXGenericCommand(true,
-       "faqpage", "mm", def));
+       "faqspkg", "m", def));
 
       // \faqpage
-      def = getListener().createStack();
+      def = listener.createStack();
       def.add(new TeXCsRef("dickimawhref"));
-      grp = getListener().createGroup("faq.php?category=");
+      grp = listener.createGroup("faq.php?category=");
       def.add(grp);
-      grp.add(getListener().getParam(1));
-      grp = getListener().createGroup();
+      grp.add(listener.getParam(1));
+      grp = listener.createGroup();
       def.add(grp);
-      grp.add(getListener().getParam(2));
+      grp.add(listener.getParam(2));
 
       registerControlSequence(new LaTeXGenericCommand(true,
        "faqpage", "mm", def));
 
       // \faqitem
-      def = getListener().createStack();
+      def = listener.createStack();
       def.add(new TeXCsRef("dickimawhref"));
-      grp = getListener().createGroup("faq.php?itemlabel=");
+      grp = listener.createGroup("faq.php?itemlabel=");
       def.add(grp);
-      grp.add(getListener().getParam(1));
-      grp = getListener().createGroup();
+      grp.add(listener.getParam(1));
+      grp = listener.createGroup();
       def.add(grp);
-      grp.add(getListener().getParam(2));
+      grp.add(listener.getParam(2));
 
       registerControlSequence(new LaTeXGenericCommand(true,
        "faqitem", "mm", def));
@@ -847,6 +886,11 @@ public class UserGuideSty extends LaTeXSty
       registerControlSequence(new Ref("Figureref", false,
        new TeXCsRef("Figurename"), listener.getSpace()));
 
+      registerControlSequence(new Symbol("unlimited", 0x221E));
+      registerControlSequence(new Symbol("tick", 0x2713));
+      registerControlSequence(new Symbol("yes", 0x2714));
+      registerControlSequence(new Symbol("no", 0x2716));
+
       registerControlSequence(new Symbol("nlctopensqbracket", '['));
       registerControlSequence(new Symbol("nlctclosesqbracket", ']'));
 
@@ -869,29 +913,29 @@ public class UserGuideSty extends LaTeXSty
         "terminalsym", null, new TeXCsRef("faTerminal")));
 
       // \deprecatedsym
-      def = getListener().createStack();
+      def = listener.createStack();
 
       def.add(new TeXCsRef("deprecatedorbannedfmt"));
-      def.add(TeXParserUtils.createGroup(getListener(), new TeXCsRef("faTrashO")));
+      def.add(TeXParserUtils.createGroup(listener, new TeXCsRef("faTrashO")));
 
       registerControlSequence(new GenericCommand(true,
        "deprecatedsym", null, def));
 
       // \bannedsym
-      def = getListener().createStack();
+      def = listener.createStack();
 
       def.add(new TeXCsRef("deprecatedorbannedfmt"));
-      def.add(TeXParserUtils.createGroup(getListener(), new TeXCsRef("faBan")));
+      def.add(TeXParserUtils.createGroup(listener, new TeXCsRef("faBan")));
 
       registerControlSequence(new GenericCommand(true,
        "bannedsym", null, def));
 
       // \badcodesym
-      def = getListener().createStack();
-      def.add(getListener().getControlSequence("texparser@overlapped"));
+      def = listener.createStack();
+      def.add(listener.getControlSequence("texparser@overlapped"));
       def.add(new TeXCsRef("faFileTextO"));
-      def.add(getListener().getControlSequence("texparser@overlapper"));
-      grp = getListener().createGroup();
+      def.add(listener.getControlSequence("texparser@overlapper"));
+      grp = listener.createGroup();
       def.add(grp);
 
       grp.add(new TeXCsRef("deprecatedorbannedfmt"));
@@ -901,11 +945,11 @@ public class UserGuideSty extends LaTeXSty
        "badcodesym", null, def));
 
       // unicodesym
-      def = getListener().createStack();
-      def.add(getListener().getControlSequence("texparser@overlapped"));
+      def = listener.createStack();
+      def.add(listener.getControlSequence("texparser@overlapped"));
       def.add(new TeXCsRef("faFileO"));
-      def.add(getListener().getControlSequence("texparser@overlapper"));
-      def.add(getListener().createGroup("U"));
+      def.add(listener.getControlSequence("texparser@overlapper"));
+      def.add(listener.createGroup("U"));
 
       registerControlSequence(new GenericCommand(true,
        "unicodesym", null, def));
@@ -914,25 +958,42 @@ public class UserGuideSty extends LaTeXSty
       registerControlSequence(new AtFirstOfOne("cmdnotefmt"));
 
       // \conditionsyntax
-      def = getListener().createStack();
-      def.add(getListener().getSpace());
+      def = listener.createStack();
+      def.add(listener.getSpace());
       def.add(new TeXCsRef("meta"));
-      def.add(getListener().createGroup("true"));
+      def.add(listener.createGroup("true"));
       def.add(new TeXCsRef("csfmt"));
-      def.add(getListener().createGroup("else"));
+      def.add(listener.createGroup("else"));
       def.add(new TeXCsRef("meta"));
-      def.add(getListener().createGroup("false"));
+      def.add(listener.createGroup("false"));
       def.add(new TeXCsRef("csfmt"));
-      def.add(getListener().createGroup("fi"));
+      def.add(listener.createGroup("fi"));
 
       registerControlSequence(new GenericCommand(true,
        "conditionsyntax", null, def));
 
+      // \proyes
+      registerControlSequence(new GenericCommand(true, "proyes", null, 
+         new TeXObject[] { new TeXCsRef("advantagefmt"), new TeXCsRef("yes")}));
+
+      // \prono
+      registerControlSequence(new GenericCommand(true, "prono", null, 
+         new TeXObject[] { new TeXCsRef("disadvantagefmt"), new TeXCsRef("no")}));
+
+      // \conno
+      registerControlSequence(new GenericCommand(true, "conno", null, 
+         new TeXObject[] { new TeXCsRef("advantagefmt"), new TeXCsRef("no")}));
+
+      // \conyes
+      registerControlSequence(new GenericCommand(true, "conyes", null, 
+         new TeXObject[] { new TeXCsRef("disadvantagefmt"), new TeXCsRef("yes")}));
+
+
       // \summarynotefmt
-      def = getListener().createStack();
-      def.add(getListener().getOther('('));
-      def.add(getListener().getParam(1));
-      def.add(getListener().getOther(')'));
+      def = listener.createStack();
+      def.add(listener.getOther('('));
+      def.add(listener.getParam(1));
+      def.add(listener.getOther(')'));
 
       registerControlSequence(new LaTeXGenericCommand(true,
        "summarynotefmt", "m", def));
@@ -940,7 +1001,7 @@ public class UserGuideSty extends LaTeXSty
       registerControlSequence(new TextualContentCommand(
          "glsxtrpostdescdualindexabbreviation", "."));
 
-      getListener().newcounter("example");
+      listener.newcounter("example");
 
       registerControlSequence(new TextualContentCommand(
          "examplename", "example"));
@@ -950,14 +1011,14 @@ public class UserGuideSty extends LaTeXSty
          "listofexamplesname", "List of Examples"));
 
       registerControlSequence(new GenericCommand(true,
-        "listofexampleslabel", null, TeXParserUtils.createStack(getListener(),
-          new TeXCsRef("label"), getListener().createGroup("sec:listofexamples"))));
+        "listofexampleslabel", null, TeXParserUtils.createStack(listener,
+          new TeXCsRef("label"), listener.createGroup("sec:listofexamples"))));
 
       registerControlSequence(new ListOfExamples());
 
       registerControlSequence(new GenericCommand(true,
-        "nlctexampletag", null, TeXParserUtils.createStack(getListener(),
-          new TeXCsRef("Examplename"), getListener().getSpace(),
+        "nlctexampletag", null, TeXParserUtils.createStack(listener,
+          new TeXCsRef("Examplename"), listener.getSpace(),
           new TeXCsRef("theexample"))));
 
       registerControlSequence(new CreateExample());
@@ -966,7 +1027,7 @@ public class UserGuideSty extends LaTeXSty
       registerControlSequence(new GenericCommand(true,
         "exampleattachtexicon", null, new AccSuppObject(
           AccSupp.createSymbol("TeX File Attachment", true),
-          TeXParserUtils.createStack(getListener(),
+          TeXParserUtils.createStack(listener,
           new TeXCsRef("faPaperclip"), 
           new TeXCsRef("textsuperscript"), 
           new TeXCsRef("faFileTextO")))));
@@ -974,7 +1035,7 @@ public class UserGuideSty extends LaTeXSty
       registerControlSequence(new GenericCommand(true,
         "exampleattachpdficon", null, new AccSuppObject(
           AccSupp.createSymbol("PDF File Attachment", true),
-          TeXParserUtils.createStack(getListener(),
+          TeXParserUtils.createStack(listener,
           new TeXCsRef("faPaperclip"), 
           new TeXCsRef("textsuperscript"), 
           new TeXCsRef("faFilePdfO")))));
@@ -982,7 +1043,7 @@ public class UserGuideSty extends LaTeXSty
       registerControlSequence(new GenericCommand(true,
         "exampledownloadtexicon", null, new AccSuppObject(
           AccSupp.createSymbol("Download TeX File", true),
-          TeXParserUtils.createStack(getListener(),
+          TeXParserUtils.createStack(listener,
           new TeXCsRef("faDownload"), 
           new TeXCsRef("textsuperscript"), 
           new TeXCsRef("faFileTextO")))));
@@ -990,7 +1051,7 @@ public class UserGuideSty extends LaTeXSty
       registerControlSequence(new GenericCommand(true,
         "exampledownloadpdficon", null, new AccSuppObject(
           AccSupp.createSymbol("Download PDF", true),
-           TeXParserUtils.createStack(getListener(),
+           TeXParserUtils.createStack(listener,
           new TeXCsRef("faDownload"), 
           new TeXCsRef("textsuperscript"), 
           new TeXCsRef("faFilePdfO")))));
@@ -1034,12 +1095,12 @@ public class UserGuideSty extends LaTeXSty
       grp.add(new TeXCsRef("filetag"));
       grp.add(TeXParserUtils.createGroup(listener, listener.getParam(1)));
       grp.add(new TeXCsRef("mainglsadd"));
-      subgrp = getListener().createGroup("file.");
+      subgrp = listener.createGroup("file.");
       grp.add(subgrp);
       subgrp.add(listener.getParam(1));
       grp.add(listener.createGroup("filedef"));
       grp.add(new TeXCsRef("glsxtrglossentry"));
-      subgrp = getListener().createGroup("file.");
+      subgrp = listener.createGroup("file.");
       grp.add(subgrp);
       subgrp.add(listener.getParam(1));
 
@@ -1086,6 +1147,7 @@ public class UserGuideSty extends LaTeXSty
       registerControlSequence(new Option());
       registerControlSequence(new Options());
       registerControlSequence(new Options("optionsor", "or"));
+      registerControlSequence(new OptionsTo());
 
       // \tablefnmark
       def = listener.createStack();
@@ -1108,9 +1170,47 @@ public class UserGuideSty extends LaTeXSty
       registerControlSequence(new LaTeXGenericCommand(true, "tablefntext",
        "mm", def));
 
+      // \tablefnfmt
       addSemanticCommand("tablefnfmt", "tablefn", 
        new TeXFontText(TeXFontSize.FOOTNOTE), null, null, null, null, null,
        false, true);
+
+      // \tablefnline
+      registerControlSequence(new GenericCommand(true, "tablefnline",
+       null, listener.getDivider("tablefnline")));
+
+      // \fnsymtext
+      def = listener.createStack();
+      def.add(new TeXCsRef("tablefntext"));
+      grp = listener.createGroup();
+      def.add(grp);
+
+      grp.add(new TeXCsRef("fnsymmarker"));
+      grp.add(TeXParserUtils.createGroup(listener, listener.getParam(1)));
+
+      def.add(TeXParserUtils.createGroup(listener, listener.getParam(2)));
+
+      registerControlSequence(new LaTeXGenericCommand(true, "fnsymtext",
+       "mm", def));
+
+      // \fnsym
+      def = listener.createStack();
+      def.add(new TeXCsRef("tablefnmark"));
+      grp = listener.createGroup();
+      def.add(grp);
+
+      grp.add(new TeXCsRef("fnsymmark"));
+      grp.add(TeXParserUtils.createGroup(listener, 
+         new TeXCsRef("fnsymmarker"), 
+         TeXParserUtils.createGroup(listener, listener.getParam(1))));
+
+      registerControlSequence(new LaTeXGenericCommand(true, "fnsym",
+       "m", def));
+
+      // \fnsymmark
+      registerControlSequence(new AtFirstOfOne("fnsymmark"));
+
+      registerControlSequence(new FnSymMarker());
 
       // \araraline
       def = listener.createString("% arara: ");

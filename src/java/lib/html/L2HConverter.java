@@ -238,6 +238,9 @@ public class L2HConverter extends LaTeXParserListener
       putControlSequence(new GenericCommand(true, "qquad", null, 
        new TeXObject[] {new HtmlTag("<span class=\"qquad\"></span>")}));
 
+      // ignore \\addvspace
+      putControlSequence(new AtGobble("addvspace"));
+
       putControlSequence(new L2HNormalFont());
 
       putControlSequence(new GenericCommand(true, "labelitemii", null,
@@ -366,6 +369,12 @@ public class L2HConverter extends LaTeXParserListener
    public Spacer getSpacer(Direction direction, TeXDimension size, boolean inline)
    {
       return new L2HSpacer(direction, size, inline);
+   }
+
+   @Override
+   public TeXObject getDivider(String name)
+   {
+      return new HtmlTag(String.format("<div class=\"%s\"><hr></div>", name));
    }
 
    @Override

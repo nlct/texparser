@@ -778,6 +778,9 @@ public class GlossariesSty extends LaTeXSty
       registerControlSequence(new GenericCommand(true,
        "abbrvpluralsuffix", null, new TeXCsRef("glsxtrabbrvpluralsuffix")));
 
+      registerControlSequence(new AtFirstOfOne("glsxtrdefaultrevert"));
+      registerControlSequence(new AtFirstOfOne("glsxtrrevert"));
+
       registerControlSequence(new GlsInnerFmtFont("glsfirstinnerfmtabbrvfont"));
       registerControlSequence(new GlsInnerFmtFont("glsinnerfmtabbrvfont"));
       registerControlSequence(new GlsInnerFmtFont("glsfirstinnerfmtlongfont"));

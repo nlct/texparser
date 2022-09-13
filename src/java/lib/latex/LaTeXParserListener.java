@@ -261,6 +261,11 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       return AuxData.getLabelForLink(auxData, getParser(), link);
    }
 
+   public TeXObject getDivider(String name)
+   {
+      return getControlSequence("hrulefill");
+   }
+
    public void addVerbEnv(String name)
    {
       verbEnv.add(name);
