@@ -865,6 +865,8 @@ public class UserGuideSty extends LaTeXSty
       registerControlSequence(new DocRef("qtdocref", true, false));
       registerControlSequence(new DocRef("altdocref", false, true));
 
+      registerControlSequence(new Plabel());
+
       // \sectionref
       registerControlSequence(new Ref("sectionref", new TeXCsRef("S")));
 
@@ -890,6 +892,8 @@ public class UserGuideSty extends LaTeXSty
       registerControlSequence(new Symbol("tick", 0x2713));
       registerControlSequence(new Symbol("yes", 0x2714));
       registerControlSequence(new Symbol("no", 0x2716));
+
+      registerControlSequence(new Symbol("dash", 0x2015));
 
       registerControlSequence(new Symbol("nlctopensqbracket", '['));
       registerControlSequence(new Symbol("nlctclosesqbracket", ']'));
