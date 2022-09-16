@@ -332,6 +332,11 @@ public class TeXParser extends TeXObjectList
          }
          else
          {
+            if (e instanceof TeXSyntaxException)
+            {
+               logWriter.println(((TeXSyntaxException)e).getMessage(getListener().getTeXApp()));
+            }
+
             e.printStackTrace(logWriter);
          }
       }
@@ -3586,5 +3591,5 @@ public class TeXParser extends TeXObjectList
    public static final int DEBUG_EXPANSION_ONCE_LIST = 8192;
 
    public static final String VERSION = "0.9.2.7b";
-   public static final String VERSION_DATE = "2022-09-12";
+   public static final String VERSION_DATE = "2022-09-16";
 }

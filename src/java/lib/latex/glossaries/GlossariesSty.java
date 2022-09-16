@@ -497,13 +497,6 @@ public class GlossariesSty extends LaTeXSty
 
       getListener().declareFrameBox(fbox, false);
 
-      fbox = new FrameBox("textsmaller", BorderStyle.NONE,
-       AlignHStyle.DEFAULT, AlignVStyle.DEFAULT, true, null, null);
-
-      fbox.setTextFont(new TeXFontText(TeXFontFamily.INHERIT, TeXFontSize.SMALLER));
-
-      getListener().declareFrameBox(fbox, false);
-
       if (extra)
       {
          addExtraDefinitions();
@@ -1046,11 +1039,16 @@ public class GlossariesSty extends LaTeXSty
       registerControlSequence(new Dglslink("dglsdisp", true, this));
 
       registerControlSequence(new GlsXtrGlossEntry(this));
+      registerControlSequence(new AtGlsXtrGlossEntry(this));
       registerControlSequence(new GlsXtrStandaloneEntryName(this));
       registerControlSequence(new GenericCommand(true,
         "GlsXtrStandaloneGlossaryType", null, 
         TeXParserUtils.createStack(getListener(), new TeXCsRef("glsentrytype"),
           new TeXCsRef("glscurrententrylabel"))));
+      registerControlSequence(new LaTeXGenericCommand(true,
+        "GlsXtrStandaloneEntryHeadName", "m", 
+        TeXParserUtils.createStack(getListener(), new TeXCsRef("glsentryname"),
+          getListener().getParam(1))));
       registerControlSequence(new GlsXtrStandaloneSubEntryItem(this));
       registerControlSequence(new GlsXtrStandaloneEntryOther(this));
       registerControlSequence(new GlsXtrGlossEntryOther(this));

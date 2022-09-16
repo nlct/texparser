@@ -68,6 +68,18 @@ public class Group extends TeXObjectList
    public void process(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
+      if (parser.isDebugMode(TeXParser.DEBUG_PROCESSING_STACK))
+      {
+         parser.logMessage(String.format("PROCESSING %s: %s SUBSTACK: ",
+          getClass().getSimpleName(), toString(parser),
+           stack.toString(parser)));
+      }
+
+      if (parser.isDebugMode(TeXParser.DEBUG_PROCESSING_STACK_LIST))
+      {
+         parser.logMessage("PROCESSING GROUP: %s" + toString()+stack);
+      }
+
       StackMarker marker = new StackMarker();
 
       stack.push(marker);
@@ -84,6 +96,17 @@ public class Group extends TeXObjectList
    public void process(TeXParser parser)
     throws IOException
    {
+      if (parser.isDebugMode(TeXParser.DEBUG_PROCESSING_STACK))
+      {
+         parser.logMessage(String.format("PROCESSING %s: %s",
+          getClass().getSimpleName(), toString(parser)));
+      }
+
+      if (parser.isDebugMode(TeXParser.DEBUG_PROCESSING_STACK_LIST))
+      {
+         parser.logMessage("PROCESSING GROUP: %s" + toString());
+      }
+
       StackMarker marker = new StackMarker();
       TeXObjectList stack = toList();
       stack.add(marker);

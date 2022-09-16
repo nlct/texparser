@@ -59,6 +59,14 @@ public class AlignRow extends DataObjectList
       {
          TeXObject span = TeXParserUtils.resolve(stack.popStack(parser), parser);
 
+         if (span == null)
+         {
+            parser.debugMessage(TeXParser.DEBUG_IO,
+             "Unexpected null pointer while parsing AlignRow for span. STACK: "+stack
+               + " PARSER: "+parser);
+            break;
+         }
+
          if (span instanceof WhiteSpace)
          {
             continue;
@@ -87,6 +95,14 @@ public class AlignRow extends DataObjectList
       while (true)
       {
          TeXObject obj = TeXParserUtils.resolve(stack.popStack(parser), parser);
+
+         if (obj == null)
+         {
+            parser.debugMessage(TeXParser.DEBUG_IO,
+             "Unexpected null pointer while parsing AlignRow. STACK: "+stack
+               + " PARSER: "+parser);
+            break;
+         }
 
          if (obj instanceof Tab)
          {

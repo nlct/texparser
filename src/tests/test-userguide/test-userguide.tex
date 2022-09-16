@@ -183,11 +183,13 @@ Cross-references: \sectionref{sec:defs}, \tableref{tab:sample}.
 \caption{Sample Table}
 \label{tab:sample}
 \centering
-\begin{tabular}{ll}
+\begin{tabular}{llp{0.5\textwidth}}
 \bfseries Column 1 &
-\bfseries Column 2 \\
+\bfseries Column 2 &
+\bfseries Column 3\\
 \inlineglsdef{ab} &
-\inlineglsdef{yz}
+\inlineglsdef{yz} &
+Some text that requires a wider column and possibly multiple lines
 \end{tabular}
 \end{table}
 

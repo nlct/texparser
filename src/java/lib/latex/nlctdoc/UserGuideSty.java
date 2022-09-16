@@ -46,7 +46,7 @@ public class UserGuideSty extends LaTeXSty
 
       if (listener instanceof L2HConverter)
       {
-         ((L2HConverter)listener).addCssStyle("dfn { font-style: normal; font-weight: bold; } a { text-decoration: none; }");
+         ((L2HConverter)listener).addCssStyle("dfn { font-style: normal; font-weight: bold; } a { text-decoration: none; } div.tablefns { border-top: solid; }");
       }
 
       glossariesSty.setModifier(listener.getOther('+'), "format",
@@ -56,6 +56,7 @@ public class UserGuideSty extends LaTeXSty
         listener.createString("glsignore"));
 
       registerControlSequence(new MainMatterOnly());
+      registerControlSequence(new MainMatterOnly("@@mainmatteronly"));
 
       colorSty.putColor("cs", FG_CS);
       colorSty.putColor("styopt", FG_STYOPT);
@@ -1179,9 +1180,11 @@ public class UserGuideSty extends LaTeXSty
        new TeXFontText(TeXFontSize.FOOTNOTE), null, null, null, null, null,
        false, true);
 
-      // \tablefnline
-      registerControlSequence(new GenericCommand(true, "tablefnline",
-       null, listener.getDivider("tablefnline")));
+      // \tablefn
+      addSemanticCommand("tablefns", "tablefns", null, null, null, null,
+        null, null, false, true, null, null, null, null,
+        AlignHStyle.LEFT, AlignVStyle.DEFAULT, 
+        new UserDimension(0.8f, new PercentUnit(PercentUnit.LINE_WIDTH)));
 
       // \fnsymtext
       def = listener.createStack();
@@ -1222,6 +1225,11 @@ public class UserGuideSty extends LaTeXSty
 
       registerControlSequence(new LaTeXGenericCommand(true, "araraline",
        "m", def));
+
+      registerControlSequence(new AtFirstOfOne("settabcolsep"));
+
+      registerControlSequence(new AtFirstOfOne("textsmaller"));
+      registerControlSequence(new AtFirstOfOne("textlarger"));
    }
 
    protected void addGlsFmtTextCommand(String name, String prefix)

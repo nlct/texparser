@@ -2176,7 +2176,7 @@ public class L2HConverter extends LaTeXParserListener
       }
       else if (unit instanceof PercentUnit)
       {
-         return String.format("%f%%", 100*value);
+         return String.format("%f%%", value);
       }
 
       return String.format("%fpt", unit.toUnit(getParser(), value, TeXUnit.BP));
@@ -2736,6 +2736,34 @@ public class L2HConverter extends LaTeXParserListener
       css.put("padding-right", colSep);
 
       addDefaultStyle("cell-noborder-bothsep-r", css);
+
+      css = createCellCss("left");
+      css.put("padding-left", colSep);
+      css.put("padding-right", colSep);
+      css.put("width", "50.000000%");
+
+      addDefaultStyle("cell-noborder-bothsep-halfwidth", css);
+
+      css = createCellCss("left");
+      css.put("padding-left", colSep);
+      css.put("padding-right", colSep);
+      css.put("width", "25.000000%");
+
+      addDefaultStyle("cell-noborder-bothsep-quarterwidth", css);
+
+      css = createCellCss("left");
+      css.put("padding-left", colSep);
+      css.put("padding-right", colSep);
+      css.put("width", "75.000000%");
+
+      addDefaultStyle("cell-noborder-bothsep-threequarterwidth", css);
+
+      css = createCellCss("left");
+      css.put("padding-left", colSep);
+      css.put("padding-right", colSep);
+      css.put("width", "80.000000%");
+
+      addDefaultStyle("cell-noborder-bothsep-eightypc", css);
 
    }
 

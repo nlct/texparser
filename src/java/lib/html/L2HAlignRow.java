@@ -153,6 +153,7 @@ public class L2HAlignRow extends AlignRow
 
    protected void getAlignStyle(TeXParser parser, TeXCellAlign alignCell,
     TeXDimension defaultColSep, HashMap<String,String> css)
+   throws IOException
    {
       int preRules = alignCell.preRuleCount();
       int postRules = alignCell.postRuleCount();
@@ -204,13 +205,13 @@ public class L2HAlignRow extends AlignRow
 
       if (width != null)
       {
-         css.put("width", width.toString(parser));
+         css.put("width", ((L2HConverter)parser.getListener()).getHtmlDimension(width));
       }
 
       switch (alignCell.getAlign())
       {
          case 'c': css.put("text-align", "center"); break;
-         case 'l': css.put("text-align", "left"); break;
+         case 'l': case 'p': css.put("text-align", "left"); break;
          case 'r': css.put("text-align", "right"); break;
       }
    }
