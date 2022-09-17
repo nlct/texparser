@@ -1061,11 +1061,17 @@ public class UserGuideSty extends LaTeXSty
           new TeXCsRef("textsuperscript"), 
           new TeXCsRef("faFilePdfO")))));
 
+      NewIf.createConditional(true, getParser(), "ifnlctdownloadlinks", true);
+
+      registerControlSequence(new TextualContentCommand("filedownloadsubpath",
+        "samples/"));
+
       // \filedownloadlink
       def = listener.createStack();
       def.add(new TeXCsRef("href"));
-      grp = listener.createGroup("samples/");
+      grp = listener.createGroup();
       def.add(grp);
+      grp.add(new TeXCsRef("filedownloadsubpath"));
       grp.add(listener.getParam(1));
       grp = listener.createGroup();
       def.add(grp);
@@ -1077,10 +1083,12 @@ public class UserGuideSty extends LaTeXSty
       // \filetag
       def = listener.createStack();
       def.add(new TeXCsRef("faFileO"));
+      def.add(new TeXCsRef("ifnlctdownloadlinks"));
       def.add(new TeXCsRef("filedownloadlink"));
       grp = listener.createGroup();
       def.add(grp);
       grp.add(listener.getParam(1));
+      def.add(new TeXCsRef("fi"));
       def.add(new TeXCsRef("space"));
 
       registerControlSequence(new LaTeXGenericCommand(true, "filetag",
