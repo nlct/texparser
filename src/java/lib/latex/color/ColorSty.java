@@ -102,26 +102,77 @@ public class ColorSty extends LaTeXSty
    {
       if (checkMixture)
       {
+         int idx = specs.lastIndexOf("!!");
+
+         if (idx >= 0)
+         {// ignoring postfix
+            specs = specs.substring(0, idx);
+         }
+
+         boolean complement = false;
+
+         if (specs.startsWith("-"))
+         {
+            complement = true;
+
+            for (int i = 1; i < specs.length(); i++)
+            {
+               if (specs.charAt(i) != '-')
+               {
+                  if (i%2 == 1)
+                  {
+                     complement = false;
+                  }
+
+                  specs = specs.substring(i+1);
+
+                  break;
+               }
+            }
+         }
+
          String[] splitSpecs = specs.split("!");
 
-         if (splitSpecs.length > 1)
+         // this only covers simple cases
+
+         Color col = getColor(parser, model, splitSpecs[0], false);
+
+         if (complement)
          {
-            int red = 0;
-            int green = 0;
-            int blue = 0;
-
-            for (String s : splitSpecs)
-            {
-               Color col = getColor(parser, model, s, false);
-
-               red += col.getRed();
-               green += col.getGreen();
-               blue += col.getBlue();
-            }
-
-            return new Color(red/splitSpecs.length, 
-              green/splitSpecs.length, blue/splitSpecs.length);
+            col = new Color(255-col.getRed(), 255-col.getGreen(), 255-col.getBlue());
          }
+
+         float red = col.getRed()/255.0f;
+         float green = col.getGreen()/255.0f;
+         float blue = col.getBlue()/255.0f;
+
+
+         for (int i = 1; i < splitSpecs.length; i+=2)
+         {
+            try
+            {
+               float p = Float.parseFloat(splitSpecs[i]) * 0.01f;
+
+               red = red * p;
+               green = green * p;
+               blue = blue * p;
+
+               col = getColor(parser, model, splitSpecs[i+1], false);
+
+               p = 1.0f-p;
+
+               red = 0.5f*(red + p*col.getRed()/255.0f);
+               green = 0.5f*(green + p*col.getGreen()/255.0f);
+               blue = 0.5f*(blue + p*col.getBlue()/255.0f);
+            }
+            catch (NumberFormatException e)
+            {
+               throw new LaTeXSyntaxException(e, parser, 
+                 ColorSty.INVALID_SPECS, specs, model);
+            }
+         }
+
+         return new Color(red, green, blue);
       }
 
       // model lists not yet implemented
@@ -194,4 +245,5 @@ public class ColorSty extends LaTeXSty
    public static final String INVALID_SPECS = 
       "color.invalid.specs";
    public static final String UNKNOWN = "color.unknown";
+
 }
