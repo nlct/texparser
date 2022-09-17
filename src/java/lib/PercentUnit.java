@@ -51,7 +51,7 @@ public class PercentUnit extends TeXUnit
      TeXUnit otherUnit)
    throws TeXSyntaxException
    {
-      float bpValue = parser.getListener().getPageDimension(type)*value*0.01f;
+      float bpValue = parser.getListener().getPageDimension(type)*value;
 
       return TeXUnit.BP.toUnit(parser, bpValue, otherUnit);
    }
@@ -62,7 +62,7 @@ public class PercentUnit extends TeXUnit
    {
       float bpValue = TeXUnit.BP.fromUnit(parser, value, otherUnit);
 
-      return 100*bpValue/parser.getListener().getPageDimension(type)*value;
+      return bpValue/parser.getListener().getPageDimension(type)*value;
    }
 
    public int getType()

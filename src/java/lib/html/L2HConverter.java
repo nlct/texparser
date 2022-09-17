@@ -1874,12 +1874,12 @@ public class L2HConverter extends LaTeXParserListener
 
       if (width != null)
       {
-         write(String.format(" width: %s;", width.format()));
+         write(String.format(" width: %s;", getHtmlDimension(width)));
       }
 
       if (height != null)
       {
-         write(String.format(" height: %s;", height.format()));
+         write(String.format(" height: %s;", getHtmlDimension(height)));
       }
 
       write("\">");
@@ -2176,7 +2176,7 @@ public class L2HConverter extends LaTeXParserListener
       }
       else if (unit instanceof PercentUnit)
       {
-         return String.format("%f%%", value);
+         return String.format("%f%%", value*100);
       }
 
       return String.format("%fpt", unit.toUnit(getParser(), value, TeXUnit.BP));
