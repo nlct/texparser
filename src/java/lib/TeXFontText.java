@@ -352,13 +352,16 @@ public class TeXFontText
          break;
       }
 
-      if (weight.isBold())
+      if (weight != TeXFontWeight.INHERIT)
       {
-         builder.append("font-weight: bold; ");
-      }
-      else
-      {
-         builder.append("font-weight: normal; ");
+         if (weight.isBold())
+         {
+            builder.append("font-weight: bold; ");
+         }
+         else
+         {
+            builder.append("font-weight: normal; ");
+         }
       }
 
       switch (size)

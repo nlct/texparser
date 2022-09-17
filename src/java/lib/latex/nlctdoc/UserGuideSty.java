@@ -82,8 +82,7 @@ public class UserGuideSty extends LaTeXSty
       addSemanticCommand("code", TeXFontFamily.VERB);
       addSemanticCommand("cmd", listener.getOther('\\'));
       addSemanticCommand("comment", FG_COMMENT, listener.createString("% "));
-      addSemanticCommand("csfmt", TeXFontFamily.VERB, 
-        new Color(0.41f, 0.545f, 0.41f), 
+      addSemanticCommand("csfmt", TeXFontFamily.VERB, FG_CS, 
         listener.getOther('\\'), null);
       addSemanticCommand("csfmtfont", TeXFontFamily.TT);
       addSemanticCommand("csfmtcolourfont", TeXFontFamily.TT, FG_CS);
@@ -889,10 +888,14 @@ public class UserGuideSty extends LaTeXSty
       registerControlSequence(new Ref("Figureref", false,
        new TeXCsRef("Figurename"), listener.getSpace()));
 
-      registerControlSequence(new Symbol("unlimited", 0x221E));
-      registerControlSequence(new Symbol("tick", 0x2713));
-      registerControlSequence(new Symbol("yes", 0x2714));
-      registerControlSequence(new Symbol("no", 0x2716));
+      registerControlSequence(AccSuppObject.createSymbol(
+        listener, "unlimited", 0x221E));
+      registerControlSequence(AccSuppObject.createSymbol(
+        listener, "tick", 0x2713));
+      registerControlSequence(AccSuppObject.createSymbol(
+        listener, "yes", 0x2714));
+      registerControlSequence(AccSuppObject.createSymbol(
+        listener, "no", 0x2716));
 
       registerControlSequence(new Symbol("dash", 0x2015));
 
@@ -1734,15 +1737,15 @@ public class UserGuideSty extends LaTeXSty
    public static final Color BG_DEF = new Color(1.0f, 1.0f, 0.75f);
    public static final Color BG_OPTION_DEF = new Color(1.0f, 1.0f, 0.89f);
    public static final Color BG_OPTION_VALUE_DEF = new Color(1.0f, 1.0f, 0.96f);
-   public static final Color BG_CODE = new Color(0.95f, 0.95f, 0.95f);
+   public static final Color BG_CODE = new Color(0.98f, 0.98f, 0.98f);
 
-   public static final Color BG_TERMINAL = new Color(0.96f, 0.96f, 0.96f);
+   public static final Color BG_TERMINAL = new Color(0.98f, 0.98f, 0.98f);
 
-   public static final Color FG_CS = new Color(0.41f,0.545f,0.41f);// DarkSeaGreen4
+   public static final Color FG_CS = new Color(0.328f,0.436f,0.1f);
    public static final Color FG_STYOPT = new Color(0.408f, 0.132f, 0.545f);// DarkOrchid4
    public static final Color FG_CSOPT = new Color(0.408f, 0.132f, 0.545f);
-   public static final Color FG_COMMENT = Color.GRAY;
-   public static final Color FG_DEPRECATED_OR_BANNED = Color.RED;
+   public static final Color FG_COMMENT = new Color(0.37f,0.37f,0.37f);
+   public static final Color FG_DEPRECATED_OR_BANNED = new Color(0.8f,0f,0f);
 
    public static final Color FRAME_COL_WARNING = Color.RED;
    public static final Color BG_WARNING = new Color(1.0f,0.92f,0.92f);
