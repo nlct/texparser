@@ -93,7 +93,6 @@ public class Tabular extends Declaration
 
       listener.putControlSequence(new TabularNewline());
 
-
       settings.setAlignmentList(listener.createTeXCellAlignList(columnSpecs));
       settings.startAlignment();
    }

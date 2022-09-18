@@ -115,9 +115,9 @@ public class TeXCellAlignList extends Vector<TeXCellAlign>
                }
                else
                {
-                  throw new TeXSyntaxException(parser,
-                    TeXSyntaxException.ERROR_ILLEGAL_ALIGN,
-                    alignSpecs.toString(parser));
+                  add(cellAlign);
+                  cellAlign = new TeXCellAlign(-1);
+                  cellAlign.addPreShift(arg);
                }
             }
          }
