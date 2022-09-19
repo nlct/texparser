@@ -28,6 +28,7 @@ import com.dickimawbooks.texparserlib.latex.*;
 import com.dickimawbooks.texparserlib.latex.glossaries.*;
 import com.dickimawbooks.texparserlib.latex.color.ColorSty;
 import com.dickimawbooks.texparserlib.html.L2HConverter;
+import com.dickimawbooks.texparserlib.html.WidgetMenu;
 
 public class UserGuideSty extends LaTeXSty
 {
@@ -68,7 +69,7 @@ public class UserGuideSty extends LaTeXSty
       colorSty.putColor("style3", new Color(0f,0f,0.545f));// Blue4
       colorSty.putColor("style4", new Color(0.332f,0.1f,0.545f));// Purple4
       colorSty.putColor("style5", new Color(0.28f,0.235f,0.545f));// SlateBlue4
-      colorSty.putColor("style6", new Color(0.518f,0.44f,1.0f));// LightSlateBlue
+      colorSty.putColor("style6", new Color(0.545f,0.352f,0.17f));// Tan4
 
       registerControlSequence(new GuideGls());
 
@@ -101,6 +102,11 @@ public class UserGuideSty extends LaTeXSty
       addSemanticCommand("extfmt", TeXFontFamily.TT);
       addSemanticCommand("deprecatedorbannedfmt", FG_DEPRECATED_OR_BANNED);
       addSemanticCommand("summarylocfmt", TeXFontShape.IT);
+
+      registerControlSequence(AccSuppObject.createSymbol(
+        listener, "menusep", 0x279C, "menu separator", true));
+      addSemanticCommand("menufmt", TeXFontFamily.TT);
+      registerControlSequence(new WidgetMenu("menu", "menusep"));
 
       addSemanticCommand("cbeg", TeXFontFamily.VERB, null, 
         listener.createString("\\begin{"), listener.getOther('}'));
@@ -320,6 +326,7 @@ public class UserGuideSty extends LaTeXSty
       registerControlSequence(new OptionValDef(optValBox, rightBox, noteBox, glossariesSty));
 
       registerControlSequence(new AppDef(terminalBox, rightBox, noteBox, glossariesSty));
+      registerControlSequence(new SwitchDef(settingsBox, rightBox, noteBox, glossariesSty));
 
       registerControlSequence(new SummaryBox(defnBox, 
         rightBox, noteBox, glossariesSty));
@@ -368,6 +375,7 @@ public class UserGuideSty extends LaTeXSty
 
       registerControlSequence(new InlineGlsDef(glossariesSty));
       registerControlSequence(new InlineGlsDef("inlineidxdef", "idx.", glossariesSty));
+      registerControlSequence(new InlineGlsDef("inlineswitchdef", "switch.", glossariesSty));
       registerControlSequence(new CmdDefSyntax(glossariesSty));
       registerControlSequence(new OptDefSyntax(glossariesSty));
 
@@ -1237,7 +1245,7 @@ public class UserGuideSty extends LaTeXSty
       registerControlSequence(new LaTeXGenericCommand(true, "araraline",
        "m", def));
 
-      registerControlSequence(new AtFirstOfOne("settabcolsep"));
+      registerControlSequence(new AtGobble("settabcolsep"));
 
       registerControlSequence(new AtFirstOfOne("textsmaller"));
       registerControlSequence(new AtFirstOfOne("textlarger"));
