@@ -80,6 +80,13 @@ public abstract class LaTeXFloat extends Declaration
          new GenericCommand("@captype", null, 
           parser.getListener().createString(getName())));
 
+      ControlSequence cs = parser.getControlSequence("texparser@float@hook");
+
+      if (cs != null)
+      {
+         cs.process(parser, stack);
+      }
+
       startFloat(placement, parser, stack);
    }
 
@@ -91,6 +98,13 @@ public abstract class LaTeXFloat extends Declaration
       parser.putControlSequence(true, 
          new GenericCommand("@captype", null, 
            parser.getListener().createString(getName())));
+
+      ControlSequence cs = parser.getControlSequence("texparser@float@hook");
+
+      if (cs != null)
+      {
+         cs.process(parser);
+      }
 
       startFloat(placement, parser);
    }

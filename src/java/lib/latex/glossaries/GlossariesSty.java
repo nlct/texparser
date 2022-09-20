@@ -1148,6 +1148,44 @@ public class GlossariesSty extends LaTeXSty
       registerControlSequence(new GlsXtrNoGlsWarningAutoMake());
    }
 
+   protected void addFloatsHook()
+   {
+      ControlSequence condCs = getParser().getControlSequence("if@glsxtr@floats");
+
+      if (condCs == null)
+      {
+         ControlSequence cs = getParser().getControlSequence("texparser@float@hook");
+         TeXObjectList def;
+
+         if (cs instanceof GenericCommand)
+         {
+            def = ((GenericCommand)cs).getDefinition();
+         }
+         else
+         {
+            def = getListener().createStack();
+            cs = new GenericCommand(true, "texparser@float@hook", null, def);
+            registerControlSequence(cs);
+         }
+
+         def.add(new TeXCsRef("if@glsxtr@floats"));
+         def.add(new TeXCsRef("let"));
+         def.add(new TeXCsRef("glscounter"));
+         def.add(new TeXCsRef("@captype"));
+         def.add(new TeXCsRef("fi"));
+
+         NewIf.createConditional(true, getParser(), "if@glsxtr@floats", floatsCounter);
+      }
+      else if (floatsCounter)
+      {
+         registerControlSequence(new IfTrue("if@glsxtr@floats"));
+      }
+      else
+      {
+         registerControlSequence(new IfFalse("if@glsxtr@floats"));
+      }
+   }
+
    protected void addGlsXtrTitleCommands(String field)
    {
       addGlsXtrTitleCommands(field, field);
@@ -1520,7 +1558,7 @@ public class GlossariesSty extends LaTeXSty
       }
       else if (option.equals("stylemods"))
       {
-         if (value == null)
+         if (value == null || value.isEmpty())
          {
             stylemods = "";
          }
@@ -1622,7 +1660,7 @@ public class GlossariesSty extends LaTeXSty
       {
          String valStr = "true";
 
-         if (value != null)
+         if (value != null && !value.isEmpty())
          {
             valStr = parser.expandToString(value, parser);
          }
@@ -1635,7 +1673,7 @@ public class GlossariesSty extends LaTeXSty
       {
          String valStr = "";
 
-         if (value != null)
+         if (value != null && !value.isEmpty())
          {
             valStr = parser.expandToString(value, parser);
          }
@@ -1656,6 +1694,18 @@ public class GlossariesSty extends LaTeXSty
          }
 
          registerControlSequence(new GlsPostDescription(value, this));
+      }
+      else if (extra && option.equals("floats"))
+      {
+         String valStr = "true";
+
+         if (value != null && !value.isEmpty())
+         {
+            valStr = parser.expandToString(value, parser).trim();
+         }
+
+         floatsCounter = valStr.isEmpty() || valStr.equals("true"); 
+         addFloatsHook();
       }
    }
 
@@ -2830,6 +2880,8 @@ public class GlossariesSty extends LaTeXSty
    private String stylemods = null;
 
    private boolean nostyleWarningIssued = false;
+
+   private boolean floatsCounter = false;
 
    private IndexingOption indexingOption = IndexingOption.MAKEINDEX;
    private String record = "off";

@@ -1280,6 +1280,7 @@ public class UserGuideSty extends LaTeXSty
       options.put("indexcounter", null);
       options.put("index", null);
       options.put("symbols", null);
+      options.put("floats", null);
       options.put("nosuper", null);
       options.put("stylemods", getListener().createString("mcols,bookindex,topic,longextra"));
 

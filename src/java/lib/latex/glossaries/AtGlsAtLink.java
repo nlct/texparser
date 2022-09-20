@@ -64,6 +64,13 @@ public class AtGlsAtLink extends AbstractGlsCommand
 
       KeyValList options = popOptKeyValList(parser, stack, checkModifier);
 
+      TeXObject counterOpt = null;
+
+      if (options != null)
+      {
+         counterOpt = options.get("counter");
+      }
+
       GlsLabel glslabel = popEntryLabel(parser, stack);
       GlossaryEntry entry = glslabel.getEntry();
 
@@ -72,11 +79,15 @@ public class AtGlsAtLink extends AbstractGlsCommand
       TeXObject linkText = popArg(parser, stack);
 
       parser.putControlSequence(true, glslabel.duplicate("@gls@link@label"));
-   
-      parser.putControlSequence(true, new TextualContentCommand(
-        "@gls@counter", parser.expandToString(
-            listener.getControlSequence("glscounter"), stack)));
 
+      String counter = null;
+
+      if (counterOpt == null)
+      {
+         counter = parser.expandToString(
+           listener.getControlSequence("glscounter"), stack);
+      }
+   
       if (entry == null)
       {
          parser.putControlSequence(true, new GlsType("glstype", "main"));
@@ -87,17 +98,24 @@ public class AtGlsAtLink extends AbstractGlsCommand
 
          Glossary glossary = sty.getGlossary(entry);
 
-         if (glossary != null)
+         if (counterOpt == null && glossary != null)
          {
-            String counter = glossary.getCounter();
+            String counterName = glossary.getCounter();
 
-            if (counter != null)
+            if (counterName != null)
             {
-               parser.putControlSequence(true, new TextualContentCommand(
-                  "@gls@counter", counter));
+               counter = counterName;
             }
          }
       }
+
+      if (counterOpt != null)
+      {
+         counter = parser.expandToString(counterOpt, stack);
+      }
+
+      parser.putControlSequence(true, new TextualContentCommand(
+        "@gls@counter", counter));
 
       TeXObjectList list = new TeXObjectList();
       //list.add(listener.getControlSequence("@gls@setdefault@glslink@opts"));
