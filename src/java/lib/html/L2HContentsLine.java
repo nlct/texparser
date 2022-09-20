@@ -59,6 +59,11 @@ public class L2HContentsLine extends ContentsLine
 
       CountRegister reg = (CountRegister)settings.getNumericRegister("@curr@toclevel@"+typeStr);
 
+      if (reg == null && typeStr.equals("part"))
+      {// use chapter register instead
+         reg = (CountRegister)settings.getNumericRegister("@curr@toclevel@chapter");
+      }
+
       StartElement startElem;
       int currLevel = -1;
       int prevLevel = -1;

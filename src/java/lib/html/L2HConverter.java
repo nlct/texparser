@@ -1090,15 +1090,15 @@ public class L2HConverter extends LaTeXParserListener
       writeln(".toc-paragraph span.numberline { display: inline-block; width: 5em; }");
       writeln(".toc-subparagraph span.numberline { display: inline-block; width: 6em; }");
       writeln("nav ul { list-style-type: none; }");
-      writeln("div.toc-part { padding-left: 0em; padding-bottom: 2ex; font-weight: bold; font-size: large;}");
-      writeln("div.toc-chapter { padding-left: .5em; padding-bottom: 2ex; font-weight: bold; font-size: large;}");
-      writeln("div.toc-section { padding-left: 1em; font-weight: bold;}");
-      writeln("div.toc-subsection { padding-left: 1.5em; }");
-      writeln("div.toc-subsubsection { padding-left: 2em; }");
-      writeln("div.toc-paragraph { padding-left: 2.5em; }");
-      writeln("div.toc-subparagraph { padding-left: 3em; }");
+      writeln(".toc-part { padding-left: 0em; padding-bottom: 1ex; padding-top: 1ex; font-weight: bold; font-size: large;}");
+      writeln(".toc-chapter { padding-left: 0em; padding-bottom: .25ex; padding-top: .25ex; font-weight: bold; }");
+      writeln(".toc-section { padding-left: .5em; }");
+      writeln(".toc-subsection { padding-left: 1.5em; }");
+      writeln(".toc-subsubsection { padding-left: 2em; }");
+      writeln(".toc-paragraph { padding-left: 2.5em; }");
+      writeln(".toc-subparagraph { padding-left: 3em; }");
 
-      writeln("div.part { font-size: x-large; font-weight: bold; }");
+      writeln(".part { font-size: x-large; font-weight: bold; }");
 
       writeln("div.bigskip { padding-left: 0pt; padding-right: 0pt; padding-top: 0pt; padding-bottom: 2ex;}");
       writeln("div.medskip { padding-left: 0pt; padding-right: 0pt; padding-top: 0pt; padding-bottom: 1ex;}");
@@ -2571,7 +2571,7 @@ public class L2HConverter extends LaTeXParserListener
       if (tag.equals("div") && !fbox.isInLine() 
            && !getParser().getSettings().inVerb())
       {
-         writeln("");
+         writeln(String.format("<!-- end of %s -->", fbox.getId()));
       }
    }
 
@@ -2584,7 +2584,7 @@ public class L2HConverter extends LaTeXParserListener
 
    public void endTheorem(String name) throws IOException
    {
-      write("</div>");
+      write(String.format("</div><!-- end of %s -->", name));
    }
 
    public HtmlTag createLinkBox(String label)
