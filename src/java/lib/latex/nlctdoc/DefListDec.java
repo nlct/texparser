@@ -42,20 +42,33 @@ public class DefListDec extends DescriptionDec
    }
 
    @Override
-   public void setup(TeXParser parser, TeXObjectList stack)
-      throws IOException
+   public void setup(TeXParser parser, TeXObjectList stack,
+    TeXObject labelCs, TeXObject settings)
+   throws IOException
    {
-      super.setup(parser, stack);
+      TeXParserListener listener = parser.getListener();
 
-      LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
+      TeXObjectList listsettings;
 
-      TeXObjectList listsettings = new TeXObjectList();
+      if (settings instanceof TeXObjectList)
+      {
+         listsettings = (TeXObjectList)settings;
+      }
+      else
+      {
+         listsettings = listener.createStack();
+
+         if (settings != null)
+         {
+            listsettings.add(settings);
+         }
+      }
 
       listsettings.add(listener.getControlSequence("let"));
       listsettings.add(new TeXCsRef("itemtitle"));
       listsettings.add(listener.getControlSequence("texparser@listitem"));
 
-      setup(parser, stack, new TeXObjectList(), listsettings);
+      super.setup(parser, stack, labelCs, listsettings);
    }
 
 }
