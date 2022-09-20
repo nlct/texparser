@@ -400,6 +400,8 @@ public class UserGuideSty extends LaTeXSty
 
       registerControlSequence(new Idxn(glossariesSty));
 
+      registerControlSequence(new MirrorSampleFile());
+
       // dual prefix list
       def = listener.createString("dual.,idx.,");
         def.add(listener.getControlSequence("empty"));
