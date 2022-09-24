@@ -171,6 +171,8 @@ public class UserGuideSty extends LaTeXSty
       registerControlSequence(new GenericCommand(true, 
         "currentcounter", null, new TeXCsRef("texparser@currentsection")));
 
+      registerControlSequence(new TextualContentCommand("cmddefbookmarkleveloffset", "1"));
+
       registerControlSequence(new MainGlsAdd(glossariesSty));
 
       addSemanticCommand("longargfmt", TeXFontFamily.TT,
@@ -242,9 +244,15 @@ public class UserGuideSty extends LaTeXSty
       addTaggedColourBox("information", BG_INFO, FRAME_COL_INFO);
       TaggedColourBox pinnedBox = addTaggedColourBox("pinnedbox",
          "definition", BG_DEF, Color.BLACK);
+
       TaggedColourBox terminalBox = 
         addTaggedColourBox("terminal", new TeXFontText(TeXFontFamily.VERB), 
            BG_TERMINAL, Color.BLACK);
+
+      TaggedColourBox transcriptBox = 
+        addTaggedColourBox("transcript", new TeXFontText(TeXFontFamily.VERB), 
+           BG_TERMINAL, Color.BLACK);
+
       TaggedColourBox ctrBox = addTaggedColourBox("ctrbox",
          "counter", BG_DEF, Color.BLACK);
 
@@ -373,6 +381,9 @@ public class UserGuideSty extends LaTeXSty
       registerControlSequence(glossariesSty.createGls("cmdmod", "idx.mod."));
       registerControlSequence(glossariesSty.createGls("file", "file."));
 
+      registerControlSequence(new Dglsfield("sym", glossariesSty, CaseChange.NO_CHANGE,
+        "symbol"));
+
       registerControlSequence(new InlineGlsDef(glossariesSty));
       registerControlSequence(new InlineGlsDef("inlineidxdef", "idx.", glossariesSty));
       registerControlSequence(new InlineGlsDef("inlineswitchdef", "switch.", glossariesSty));
@@ -481,6 +492,23 @@ public class UserGuideSty extends LaTeXSty
       registerControlSequence(new LaTeXGenericCommand(true,
        "optvalref", "mm", def));
 
+      // \optvalrefeq
+      def = listener.createStack();
+      def.add(new TeXCsRef("gls"));
+
+      grp = listener.createGroup("optval.");
+      def.add(grp);
+      grp.add(listener.getParam(1));
+      grp.add(listener.getOther('.'));
+      grp.add(listener.getParam(2));
+
+      def.add(new TeXCsRef("optfmt"));
+      def.add(TeXParserUtils.createGroup(listener,
+         listener.getOther('='), listener.getParam(3)));
+
+      registerControlSequence(new LaTeXGenericCommand(true,
+       "optvalrefeq", "mmm", def));
+
       // \fmtorcode
       def = listener.createStack();
       def.add(listener.getParam(1));
@@ -536,6 +564,38 @@ public class UserGuideSty extends LaTeXSty
 
       registerControlSequence(new LaTeXGenericCommand(true,
        "keyeqvaluem", "mm", def));
+
+      // \csmetafmt
+      def = listener.createStack();
+      def.add(new TeXCsRef("csfmt"));
+      grp = listener.createGroup();
+      def.add(grp);
+
+      grp.add(listener.getParam(1));
+      grp.add(new TeXCsRef("meta"));
+      grp.add(TeXParserUtils.createGroup(listener, listener.getParam(2)));
+      grp.add(listener.getParam(3));
+
+      registerControlSequence(new LaTeXGenericCommand(true,
+       "csmetafmt", "mmm", def));
+
+      // \csmetametafmt
+      def = listener.createStack();
+      def.add(new TeXCsRef("csfmt"));
+      grp = listener.createGroup();
+      def.add(grp);
+
+      grp.add(listener.getParam(1));
+      grp.add(new TeXCsRef("meta"));
+      grp.add(TeXParserUtils.createGroup(listener, listener.getParam(2)));
+      grp.add(listener.getParam(3));
+
+      grp.add(new TeXCsRef("meta"));
+      grp.add(TeXParserUtils.createGroup(listener, listener.getParam(4)));
+      grp.add(listener.getParam(5));
+
+      registerControlSequence(new LaTeXGenericCommand(true,
+       "csmetametafmt", "mmmmm", def));
 
       // \metafilefmt
       def = listener.createStack();
@@ -631,6 +691,15 @@ public class UserGuideSty extends LaTeXSty
 
       registerControlSequence(new LaTeXGenericCommand(true,
        "tugboat", "mmmmm", def));
+
+      // urlfootref
+      def = listener.createStack();
+      def.add(new TeXCsRef("href"));
+      def.add(TeXParserUtils.createGroup(listener, listener.getParam(1)));
+      def.add(TeXParserUtils.createGroup(listener, listener.getParam(2)));
+
+      registerControlSequence(new LaTeXGenericCommand(true,
+       "urlfootref", "mm", def));
 
       // \CTANpkg
       def = listener.createStack();
@@ -929,6 +998,8 @@ public class UserGuideSty extends LaTeXSty
       registerControlSequence(new Symbol("countersym", 0x2116));
       registerControlSequence(new GenericCommand(true,
         "terminalsym", null, new TeXCsRef("faTerminal")));
+
+      registerControlSequence(new Symbol("terminalsym", 0x1F50E));
 
       // \deprecatedsym
       def = listener.createStack();
@@ -1240,12 +1311,35 @@ public class UserGuideSty extends LaTeXSty
 
       registerControlSequence(new FnSymMarker());
 
+      // \starredcs
+      def = listener.createStack();
+      def.add(new TeXCsRef("glslink"));
+      def.add(TeXParserUtils.createGroup(listener, listener.getParam(1)));
+      grp = listener.createGroup();
+      def.add(grp);
+      grp.add(new TeXCsRef("csfmt"));
+      grp.add(TeXParserUtils.createGroup(listener, listener.getParam(1),
+        listener.getOther('*')));
+
+      registerControlSequence(new LaTeXGenericCommand(true, "starredcs",
+       "m", def));
+
       // \araraline
       def = listener.createString("% arara: ");
       def.add(listener.getParam(1));
 
       registerControlSequence(new LaTeXGenericCommand(true, "araraline",
        "m", def));
+
+      // \araracont
+      def = listener.createStack();
+      def.add(new TeXCsRef("araraline"));
+      def.add(TeXParserUtils.createGroup(listener, 
+       new TeXCsRef("longswitch"), listener.getOther('>'), 
+       listener.getSpace()));
+
+      registerControlSequence(new GenericCommand(true, "araracont",
+       null, def));
 
       registerControlSequence(new AtGobble("settabcolsep"));
 
@@ -1273,6 +1367,7 @@ public class UserGuideSty extends LaTeXSty
    @Override
    protected void preOptions(TeXObjectList stack) throws IOException
    {
+      getListener().requirepackage(null, "twemoji", false, stack);
       getListener().requirepackage(null, "fontawesome", false, stack);
       getListener().requirepackage(null, "hyperref", false, stack);
 

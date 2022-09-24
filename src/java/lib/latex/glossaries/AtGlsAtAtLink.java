@@ -38,14 +38,21 @@ public class AtGlsAtAtLink extends AbstractGlsCommand
 
    public AtGlsAtAtLink(String name, GlossariesSty sty, boolean checkModifier, boolean doUnset)
    {
+      this(name, sty, checkModifier, doUnset, CaseChange.NO_CHANGE);
+   }
+
+   public AtGlsAtAtLink(String name, GlossariesSty sty, boolean checkModifier, boolean doUnset, CaseChange caseChange)
+   {
       super(name, sty);
       this.checkModifier = checkModifier;
       this.doUnset = doUnset;
+      this.caseChange = caseChange;
    }
 
    public Object clone()
    {
-      AtGlsAtAtLink cs = new AtGlsAtAtLink(getName(), getSty(), checkModifier, doUnset);
+      AtGlsAtAtLink cs = new AtGlsAtAtLink(getName(), getSty(),
+         checkModifier, doUnset, caseChange);
 
       cs.setEntryLabelPrefix(getEntryLabelPrefix());
       cs.setDefaultOptions(defaultOptions);
@@ -77,6 +84,13 @@ public class AtGlsAtAtLink extends AbstractGlsCommand
       return null;
    }
 
+   protected TeXObject getLinkText(GlsLabel glslabel, 
+      TeXParser parser, TeXObjectList stack)
+     throws IOException
+   {
+      return popArg(parser, stack);
+   }
+
    // leave indexing/recording to TeX
    public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
@@ -106,9 +120,27 @@ public class AtGlsAtAtLink extends AbstractGlsCommand
 
       GlsLabel glslabel = popEntryLabel(parser, stack);
 
-      TeXObject linkText = popArg(parser, stack);
+      TeXObject linkText = getLinkText(glslabel, parser, stack);
 
-      TeXObjectList substack = listener.createStack();
+      TeXObjectList substack;
+
+      switch (caseChange)
+      {
+         case SENTENCE:
+           substack = listener.createStack();
+           substack.add(listener.getControlSequence("glssentencecase"));
+           substack.add(TeXParserUtils.createGroup(listener, linkText));
+           linkText = substack;
+         break;
+         case TO_UPPER:
+           substack = listener.createStack();
+           substack.add(listener.getControlSequence("mfirstucMakeUppercase"));
+           substack.add(TeXParserUtils.createGroup(listener, linkText));
+           linkText = substack;
+         break;
+      }
+
+      substack = listener.createStack();
 
       if (glslabel.getEntry() == null)
       {
@@ -163,5 +195,6 @@ public class AtGlsAtAtLink extends AbstractGlsCommand
    }
 
    protected boolean checkModifier, doUnset;
+   protected CaseChange caseChange;
    private KeyValList defaultOptions;
 }
