@@ -85,7 +85,7 @@ public class Dglsfield extends AtGlsAtAtLink
       }
       else
       {
-         return new GlsLabel("@@glslabel@"+label, entry);
+         return new GlsLabel("@@glslabel@"+label, entry.getLabel(), entry);
       }
    }
 

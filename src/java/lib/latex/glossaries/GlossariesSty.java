@@ -122,6 +122,8 @@ public class GlossariesSty extends LaTeXSty
    {
       registerControlSequence(new ParCs("glspar"));
 
+      registerControlSequence(new AtNumberOfNumber("glstexorpdfstring", 1, 2));
+
       registerControlSequence(new TextualContentCommand("glssymbolsgroupname",
         "Symbols"));
       registerControlSequence(new TextualContentCommand("glsnumbersgroupname",
@@ -962,6 +964,9 @@ public class GlossariesSty extends LaTeXSty
       addGlsXtrTitleFullCommands(false);
       addGlsXtrTitleFullCommands(true);
 
+      registerControlSequence(new AtNumberOfNumber("glsxtrtitleorpdforheading",
+       1, 3));
+
       registerControlSequence(new GlsXtrP(this));
       registerControlSequence(new GlsXtrP("glsxtrp", this));
 
@@ -1066,6 +1071,7 @@ public class GlossariesSty extends LaTeXSty
       registerControlSequence(new GlsXtrStandaloneSubEntryItem(this));
       registerControlSequence(new GlsXtrStandaloneEntryOther(this));
       registerControlSequence(new GlsXtrGlossEntryOther(this));
+      registerControlSequence(new GlsXtrStandaloneEntryHeadOther(this));
 
       registerControlSequence(new TextualContentCommand("glsxtrtitleopts",
         "noindex,hyper=false"));
@@ -1788,9 +1794,11 @@ public class GlossariesSty extends LaTeXSty
       postOptions(stack);
    }
 
-   public TeXObject popOptArg(TeXParser parser, TeXObjectList stack)
+   public TeXObject popOptArg(TeXObjectList stack)
      throws IOException
    {
+      TeXParser parser = getParser();
+
       if (parser == stack || stack == null)
       {
          return parser.popNextArg('[', ']');
@@ -1801,9 +1809,11 @@ public class GlossariesSty extends LaTeXSty
       }
    }
 
-   public KeyValList popModifier(TeXParser parser, TeXObjectList stack)
+   public KeyValList popModifier(TeXObjectList stack)
     throws IOException
    {
+      TeXParser parser = getParser();
+
       TeXObject object;
 
       if (stack == null)
@@ -1837,21 +1847,23 @@ public class GlossariesSty extends LaTeXSty
       return null;
    }
 
-   public KeyValList popOptKeyValList(TeXParser parser, TeXObjectList stack)
+   public KeyValList popOptKeyValList(TeXObjectList stack)
      throws IOException
    {
-      return popOptKeyValList(parser, stack, false);
+      return popOptKeyValList(stack, false);
    }
 
-   public KeyValList popOptKeyValList(TeXParser parser, TeXObjectList stack,
+   public KeyValList popOptKeyValList(TeXObjectList stack,
      boolean checkModifier)
      throws IOException
    {
+      TeXParser parser = getParser();
+
       KeyValList modOptions = null;
 
       if (checkModifier)
       {
-         modOptions = popModifier(parser, stack);
+         modOptions = popModifier(stack);
       }
 
       KeyValList options = null;
@@ -1873,7 +1885,7 @@ public class GlossariesSty extends LaTeXSty
       }
       else
       {
-         arg = popOptArg(parser, stack);
+         arg = popOptArg(stack);
 
          if (arg != null)
          {
@@ -1934,7 +1946,9 @@ public class GlossariesSty extends LaTeXSty
 
       if (cs != null)
       {
-         String[] list = getParser().expandToString(cs, getParser()).trim().split(",");
+         String prefixlist = getParser().expandToString(cs, getParser());
+
+         String[] list = prefixlist.split(",");
 
          for (String prefix : list)
          {

@@ -125,7 +125,7 @@ public class PrintUnsrtGlossary extends ControlSequence
 
       parser.startGroup();
 
-      KeyValList options = sty.popOptKeyValList(parser, stack);
+      KeyValList options = sty.popOptKeyValList(stack);
 
       if (isStar)
       {

@@ -106,23 +106,23 @@ public abstract class AbstractGlsCommand extends Command
       return value;
    }
 
-   protected KeyValList popModifier(TeXParser parser, TeXObjectList stack)
+   protected KeyValList popModifier(TeXObjectList stack)
     throws IOException
    {
-      return sty.popModifier(parser, stack);
+      return sty.popModifier(stack);
    }
 
-   protected KeyValList popOptKeyValList(TeXParser parser, TeXObjectList stack)
+   protected KeyValList popOptKeyValList(TeXObjectList stack)
      throws IOException
    {
-      return sty.popOptKeyValList(parser, stack);
+      return sty.popOptKeyValList(stack);
    }
 
-   protected KeyValList popOptKeyValList(TeXParser parser, TeXObjectList stack,
+   protected KeyValList popOptKeyValList(TeXObjectList stack,
      boolean checkModifier)
      throws IOException
    {
-      return sty.popOptKeyValList(parser, stack, checkModifier);
+      return sty.popOptKeyValList(stack, checkModifier);
    }
 
    protected KeyValList popKeyValList(TeXParser parser, TeXObjectList stack)

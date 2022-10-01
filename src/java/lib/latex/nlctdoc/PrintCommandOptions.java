@@ -50,7 +50,7 @@ public class PrintCommandOptions extends PrintSummary
    {
       TeXParserListener listener = parser.getListener();
 
-      KeyValList options = popOptKeyValList(parser, stack);
+      KeyValList options = popOptKeyValList(stack);
       GlsLabel cmdLabel = popEntryLabel(parser, stack);
 
       String type = "index";

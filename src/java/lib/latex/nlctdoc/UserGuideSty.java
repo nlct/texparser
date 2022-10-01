@@ -422,7 +422,7 @@ public class UserGuideSty extends LaTeXSty
       registerControlSequence(new MirrorSampleFile());
 
       // dual prefix list
-      def = listener.createString("dual.,idx.,");
+      def = listener.createString("dual.,idx.,idx.sym.,");
         def.add(listener.getControlSequence("empty"));
       registerControlSequence(new GenericCommand(true, "@glsxtr@labelprefixes",
        null, def));

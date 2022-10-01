@@ -87,7 +87,7 @@ public class Gls extends AbstractGlsCommand
          keyValList = (KeyValList)defaultOptions.clone();
       }
 
-      KeyValList options = popOptKeyValList(parser, stack, true);
+      KeyValList options = popOptKeyValList(stack, true);
 
       if (options != null)
       {

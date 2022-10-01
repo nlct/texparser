@@ -105,7 +105,7 @@ public class PrintIndex extends AbstractGlsCommand
    {
       TeXParserListener listener = parser.getListener();
 
-      KeyValList options = popOptKeyValList(parser, stack);
+      KeyValList options = popOptKeyValList(stack);
 
       String type = "index";
       String sectionLabel = "index";

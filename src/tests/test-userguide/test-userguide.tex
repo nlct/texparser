@@ -150,6 +150,10 @@
   \gpunc{sym.nbsp}{\name{\code{\textasciitilde} (non-breaking space)}
     \field{see}{idx.nbsp}
   }
+  \gpunccmd{cs.bksl}{\glsbackslash}{}% \\
+  \gpunc{sym.bksl}{\name{\code{\glsbackslash} (literal backslash)}
+    \field{symbol}{\code{\glsbackslash}}
+  }
 }
 
 \title{Sample Document}
@@ -196,7 +200,8 @@ Some text that requires a wider column and possibly multiple lines
 First use: \idx{html}, next use: \idx{html}.
 First use: \idx{xml}, next use: \idx{xml}.
 \Idx{someterm}. Something about a \idx{nbsp} and \idx{sym.hash}.
-A footnote\footnote{Footnote text}.
+A footnote\footnote{Footnote text}. A double backslash \gls{cs.bksl}
+(control symbol) verses a literal backslash \sym+{bksl}.
 
 \section{Semantic Markup}\label{sec:semantic}
 

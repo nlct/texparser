@@ -44,7 +44,7 @@ public class PrintGlossary extends ControlSequence
    protected void initOptions(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      KeyValList options = sty.popOptKeyValList(parser, stack);
+      KeyValList options = sty.popOptKeyValList(stack);
 
       Glossary glossary = sty.initPrintGloss(options, stack);
 

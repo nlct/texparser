@@ -100,7 +100,7 @@ public class GlsFieldLink extends GlsEntryField
 
       KeyValList defOptions = createDefaultOptions(parser, stack);
 
-      KeyValList keyValList = popOptKeyValList(parser, stack, true);
+      KeyValList keyValList = popOptKeyValList(stack, true);
 
       if (keyValList == null)
       {

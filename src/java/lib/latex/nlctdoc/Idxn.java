@@ -54,7 +54,7 @@ public class Idxn extends AbstractGlsCommand
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
    throws IOException
    {
-      KeyValList options = popOptKeyValList(parser, stack, false);
+      KeyValList options = popOptKeyValList(stack, false);
       GlsLabel glslabel = popEntryLabel(parser, stack);
 
       String dualLabel = "dual."+glslabel.getLabel();

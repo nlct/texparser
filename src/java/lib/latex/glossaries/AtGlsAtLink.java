@@ -62,7 +62,7 @@ public class AtGlsAtLink extends AbstractGlsCommand
    {
       LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
 
-      KeyValList options = popOptKeyValList(parser, stack, checkModifier);
+      KeyValList options = popOptKeyValList(stack, checkModifier);
 
       TeXObject counterOpt = null;
 
