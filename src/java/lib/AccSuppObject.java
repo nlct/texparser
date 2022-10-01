@@ -51,6 +51,12 @@ public class AccSuppObject extends AbstractTeXObject
    }
 
    public static ControlSequence createSymbol(TeXParserListener listener,
+    String csname, int charCode, String description)
+   {
+      return createSymbol(listener, csname, charCode, description, true);
+   }
+
+   public static ControlSequence createSymbol(TeXParserListener listener,
     String csname, int charCode, String description, boolean isIcon)
    {
       AccSupp accsupp = AccSupp.createSymbol(description, isIcon);
