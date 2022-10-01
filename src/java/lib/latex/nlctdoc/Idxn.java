@@ -35,13 +35,19 @@ public class Idxn extends AbstractGlsCommand
 
    public Idxn(String name, GlossariesSty sty)
    {
+      this(name, "name", sty);
+   }
+
+   public Idxn(String name, String field, GlossariesSty sty)
+   {
       super(name, sty);
+      this.field = field;
    }
 
    @Override
    public Object clone()
    {
-      return new Idxn(getName(), getSty());
+      return new Idxn(getName(), field, getSty());
    }
 
    @Override
@@ -58,7 +64,7 @@ public class Idxn extends AbstractGlsCommand
       TeXParserListener listener = parser.getListener();
 
       TeXObjectList expanded = listener.createStack();
-      expanded.add(listener.getControlSequence("glsname"));
+      expanded.add(listener.getControlSequence("gls"+field));
 
       if (options != null)
       {
@@ -93,4 +99,5 @@ public class Idxn extends AbstractGlsCommand
       return expanded;
    }
 
+   protected String field;
 }

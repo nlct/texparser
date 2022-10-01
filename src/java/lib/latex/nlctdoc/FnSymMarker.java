@@ -45,30 +45,32 @@ public class FnSymMarker extends ControlSequence
    public void process(TeXParser parser, TeXObjectList stack)
    throws IOException
    {
-      LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
+      TeXParserListener listener = parser.getListener();
 
       int num = popInt(parser, stack);
 
-      String marker;
+      TeXObject marker = null;
 
       switch (num)
       {
-         case 0: marker = ""; break;
-         case 1: marker = "\u2217"; break;// centred asterisk
-         case 2: marker = "\u2020"; break;// dagger
-         case 3: marker = "\u2021"; break;// double dagger
-         case 4: marker = "\u00A7"; break;// section
-         case 5: marker = "\u29EB"; break;// lozenge
-         case 6: marker = "\u00B6"; break;// pilcrow
-         case 7: marker = "#"; break;
-         case 8: marker = "\u203B"; break;// reference mark
-         case 9: marker = "\u2051"; break;// vertical double asterisk
-         case 10: marker = "\u2605"; break;// star
-         case 11: marker = "\u273E"; break;// six petalled B&W florette
-         default: marker = ""+num;
+         case 1: marker = listener.getControlSequence("asteriskmarker"); break;
+         case 2: marker = listener.getControlSequence("daggermarker"); break;
+         case 3: marker = listener.getControlSequence("doubledaggermarker"); break;
+         case 4: marker = listener.getControlSequence("sectionmarker"); break;
+         case 5: marker = listener.getControlSequence("lozengemarker"); break;
+         case 6: marker = listener.getControlSequence("pilcrowmarker"); break;
+         case 7: marker = listener.getControlSequence("hashmarker"); break;
+         case 8: marker = listener.getControlSequence("referencemarker"); break;
+         case 9: marker = listener.getControlSequence("vdoubleasteriskmarker"); break;
+         case 10: marker = listener.getControlSequence("starmarker"); break;
+         case 11: marker = listener.getControlSequence("florettemarker"); break;
+         default: marker = listener.createString(""+num);
       }
 
-      listener.getWriteable().write(marker);
+      if (marker != null)
+      {
+         TeXParserUtils.process(marker, parser, stack);
+      }
    }
 
    @Override

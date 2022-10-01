@@ -47,7 +47,7 @@ public class UserGuideSty extends LaTeXSty
 
       if (listener instanceof L2HConverter)
       {
-         ((L2HConverter)listener).addCssStyle("dfn { font-style: normal; font-weight: bold; } a { text-decoration: none; } div.tablefns { border-top: solid; }");
+         ((L2HConverter)listener).addCssStyle("dfn { font-style: normal; font-weight: bold; } a { text-decoration: none; } div.tablefns { border-top: solid; } div.example { border-bottom: solid silver; padding: 20px; } div.example div.title { font-weight: bold; font-size: large; }");
       }
 
       glossariesSty.setModifier(listener.getOther('+'), "format",
@@ -80,6 +80,7 @@ public class UserGuideSty extends LaTeXSty
       addSemanticCommand("disadvantagefmt", "disadvantage", null, Color.RED, null, null);
 
       addSemanticCommand("strong", TeXFontWeight.STRONG);
+      addSemanticCommand("booktitle", TeXFontShape.EM);
       addSemanticCommand("code", TeXFontFamily.VERB);
       addSemanticCommand("cmd", listener.getOther('\\'));
       addSemanticCommand("comment", FG_COMMENT, listener.createString("% "));
@@ -386,6 +387,8 @@ public class UserGuideSty extends LaTeXSty
 
       registerControlSequence(new InlineGlsDef(glossariesSty));
       registerControlSequence(new InlineGlsDef("inlineidxdef", "idx.", glossariesSty));
+      registerControlSequence(new InlineGlsDef("inlineidxfdef", "idx.",
+        "first", true, glossariesSty));
       registerControlSequence(new InlineGlsDef("inlineswitchdef", "switch.", glossariesSty));
       registerControlSequence(new CmdDefSyntax(glossariesSty));
       registerControlSequence(new OptDefSyntax(glossariesSty));
@@ -410,6 +413,7 @@ public class UserGuideSty extends LaTeXSty
       registerControlSequence(new Dglslink("idxc", false, glossariesSty));
 
       registerControlSequence(new Idxn(glossariesSty));
+      registerControlSequence(new Idxn("idxf", "first", glossariesSty));
 
       registerControlSequence(new MirrorSampleFile());
 
@@ -976,6 +980,50 @@ public class UserGuideSty extends LaTeXSty
       registerControlSequence(AccSuppObject.createSymbol(
         listener, "no", 0x2716));
 
+      registerControlSequence(AccSuppObject.createSymbol(
+        listener, "asteriskmarker", 0x2217, // centred asterisk
+        "asterisk marker"));
+
+      registerControlSequence(AccSuppObject.createSymbol(
+        listener, "daggermarker", 0x2020, // dagger
+        "dagger marker"));
+
+      registerControlSequence(AccSuppObject.createSymbol(
+        listener, "doubledaggermarker", 0x2021, // double dagger
+        "double dagger marker"));
+
+      registerControlSequence(AccSuppObject.createSymbol(
+        listener, "sectionmarker", 0x00A7, // section
+        "section marker"));
+
+      registerControlSequence(AccSuppObject.createSymbol(
+        listener, "lozengemarker", 0x29EB, // lozenge
+        "lozenge marker"));
+
+      registerControlSequence(AccSuppObject.createSymbol(
+        listener, "pilcrowmarker", 0x00B6, // pilcrow
+        "pilcrow marker"));
+
+      registerControlSequence(AccSuppObject.createSymbol(
+        listener, "hashmarker", '#', // hash
+        "hash marker"));
+
+      registerControlSequence(AccSuppObject.createSymbol(
+        listener, "referencemarker", 0x203B, // reference mark
+        "reference marker"));
+
+      registerControlSequence(AccSuppObject.createSymbol(
+        listener, "vdoubleasteriskmarker", 0x2051,
+        "vertical double asterisk marker"));
+
+      registerControlSequence(AccSuppObject.createSymbol(
+        listener, "starmarker", 0x2605, // star
+        "star marker"));
+
+      registerControlSequence(AccSuppObject.createSymbol(
+        listener, "florettemarker", 0x273E, // six petalled B&W florette
+        "florette marker"));
+
       registerControlSequence(new Symbol("dash", 0x2015));
 
       registerControlSequence(new Symbol("nlctopensqbracket", '['));
@@ -998,6 +1046,7 @@ public class UserGuideSty extends LaTeXSty
       registerControlSequence(new Symbol("countersym", 0x2116));
       registerControlSequence(new GenericCommand(true,
         "terminalsym", null, new TeXCsRef("faTerminal")));
+      registerControlSequence(new Symbol("transcriptsym", 0x1F50E));
 
       registerControlSequence(new Symbol("terminalsym", 0x1F50E));
 
@@ -1112,6 +1161,7 @@ public class UserGuideSty extends LaTeXSty
 
       registerControlSequence(new CreateExample());
       registerControlSequence(new ExampleFileBaseName());
+      registerControlSequence(new ExampleEnv());
 
       registerControlSequence(new GenericCommand(true,
         "exampleattachtexicon", null, new AccSuppObject(
@@ -1367,7 +1417,7 @@ public class UserGuideSty extends LaTeXSty
    @Override
    protected void preOptions(TeXObjectList stack) throws IOException
    {
-      getListener().requirepackage(null, "twemoji", false, stack);
+      getListener().requirepackage(null, "twemojis", false, stack);
       getListener().requirepackage(null, "fontawesome", false, stack);
       getListener().requirepackage(null, "hyperref", false, stack);
 

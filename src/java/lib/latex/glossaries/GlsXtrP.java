@@ -21,24 +21,30 @@ package com.dickimawbooks.texparserlib.latex.glossaries;
 import java.io.IOException;
 
 import com.dickimawbooks.texparserlib.*;
+import com.dickimawbooks.texparserlib.primitives.Relax;
 import com.dickimawbooks.texparserlib.latex.*;
 
-public class GlsXtrGlossEntryOther extends AbstractGlsCommand
+public class GlsXtrP extends AbstractGlsCommand
 {
-   public GlsXtrGlossEntryOther(GlossariesSty sty)
+   public GlsXtrP(GlossariesSty sty)
    {
-      this("glsxtrglossentryother", sty);
+      this("@glsxtrp", sty);
    }
 
-   public GlsXtrGlossEntryOther(String name, GlossariesSty sty)
+   public GlsXtrP(String name, GlossariesSty sty)
+   {
+      this(name, CaseChange.NO_CHANGE, sty);
+   }
+
+   public GlsXtrP(String name, CaseChange caseChange, GlossariesSty sty)
    {
       super(name, sty);
+      this.caseChange = caseChange;
    }
 
-   @Override
    public Object clone()
    {
-      return new GlsXtrGlossEntryOther(getName(), getSty());
+      return new GlsXtrP(getName(), caseChange, getSty());
    }
 
    @Override
@@ -47,6 +53,7 @@ public class GlsXtrGlossEntryOther extends AbstractGlsCommand
       return false;
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
@@ -57,40 +64,51 @@ public class GlsXtrGlossEntryOther extends AbstractGlsCommand
      throws IOException
    {
       TeXParserListener listener = parser.getListener();
-      TeXObjectList content = listener.createStack();
 
-      popArg(parser, stack);// ignore (header)
       GlsLabel glslabel = popEntryLabel(parser, stack);
       String field = popLabelString(parser, stack);
 
-      parser.startGroup();
+      String gls = (caseChange == CaseChange.SENTENCE ? "Gls" : "gls");
 
-      parser.putControlSequence(true, glslabel.duplicate("glscurrententrylabel"));
+      ControlSequence cs = parser.getControlSequence(gls+field);
 
-      String type = parser.expandToString(listener.getControlSequence(
-        "GlsXtrStandaloneGlossaryType"), stack);
-
-      parser.putControlSequence(true, new GlsType("currentglossary",
-        type, sty.getGlossary(type)));
-
-      if (glslabel.hasParent())
+      if (cs == null)
       {
-         content.add(listener.getControlSequence("GlsXtrStandaloneSubEntryItem"));
+         cs = parser.getControlSequence(gls+"xtr"+field);
+      }
+
+      if (cs == null)
+      {
+         throw new LaTeXSyntaxException(parser,
+           GlossariesSty.UNRECOGNISED, field, getName());
       }
       else
       {
-         content.add(listener.getControlSequence("glsentryitem"));
+         parser.startGroup();
+
+         TeXObjectList content = listener.createStack();
+
+         parser.putControlSequence(true, new Relax("glspostlinkhook"));
+
+         content.add(cs);
+
+         ControlSequence optCs = parser.getControlSequence("@glsxtrp@opt");
+
+         if (optCs != null)
+         {
+            content.add(listener.getOther('['));
+
+            content.add(parser.expandonce(optCs, stack));
+
+            content.add(listener.getOther(']'));
+         }
+
+         content.add(glslabel);
+
+         TeXParserUtils.process(content, parser, stack);
+
+         parser.endGroup();
       }
-
-      content.add(glslabel);
-
-      content.add(listener.getControlSequence("GlsXtrStandaloneEntryNameOther"));
-      content.add(glslabel);
-      content.add(listener.createGroup(field));
-
-      TeXParserUtils.process(content, parser, stack);
-
-      parser.endGroup();
    }
 
    public void process(TeXParser parser)
@@ -98,4 +116,6 @@ public class GlsXtrGlossEntryOther extends AbstractGlsCommand
    {
       process(parser, parser);
    }
+
+   protected CaseChange caseChange;
 }

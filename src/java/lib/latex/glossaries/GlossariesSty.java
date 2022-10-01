@@ -473,10 +473,15 @@ public class GlossariesSty extends LaTeXSty
 
       if (extra)
       {
+         registerControlSequence(new GenericCommand("@gls@preglossaryhook",
+           null, new TeXCsRef("glossxtrsetpopts")));
+
          addExtraDefinitions();
       }
       else
       {
+         registerControlSequence(new GenericCommand("@gls@preglossaryhook"));
+
          KeyValList keyValList = new KeyValList();
          TeXObjectList val = listener.createStack();
          val.add(new TeXCsRef("the"));
@@ -956,6 +961,34 @@ public class GlossariesSty extends LaTeXSty
 
       addGlsXtrTitleFullCommands(false);
       addGlsXtrTitleFullCommands(true);
+
+      registerControlSequence(new GlsXtrP(this));
+      registerControlSequence(new GlsXtrP("glsxtrp", this));
+
+      registerControlSequence(new GlsXtrP("@Glsxtrp", CaseChange.SENTENCE, this));
+      registerControlSequence(new GlsXtrP("Glsxtrp", CaseChange.SENTENCE, this));
+
+      registerControlSequence(new TextualContentCommand("@glsxtrp@opt",
+        "hyper=false,noindex"));
+
+      registerControlSequence(new LaTeXGenericCommand(true, "glsxtrsetpopts",
+        "m", TeXParserUtils.createStack(listener, 
+         new TeXCsRef("renewcommand"), new TeXCsRef("@glsxtrp@opt"),
+          TeXParserUtils.createGroup(listener, listener.getParam(1)))));
+
+      registerControlSequence(new GenericCommand("glossxtrsetpopts",
+        null, TeXParserUtils.createStack(listener, 
+         new TeXCsRef("glsxtrsetpopts"), listener.createGroup("noindex"))));
+
+      registerControlSequence(new LaTeXGenericCommand(true, "glsps",
+        "m", TeXParserUtils.createStack(listener,
+          new TeXCsRef("glsxtrp"), listener.createGroup("short"),
+           TeXParserUtils.createGroup(listener, listener.getParam(1)))));
+
+      registerControlSequence(new LaTeXGenericCommand(true, "glspt",
+        "m", TeXParserUtils.createStack(listener,
+          new TeXCsRef("glsxtrp"), listener.createGroup("text"),
+           TeXParserUtils.createGroup(listener, listener.getParam(1)))));
 
       registerControlSequence(new GlsXtrDisplayLocNameRef());
       registerControlSequence(new GlsXtrEquationLocFmt());
@@ -2664,6 +2697,9 @@ public class GlossariesSty extends LaTeXSty
       getListener().putControlSequence(true,
         new SubGlossEntryWithLabel(this));
 
+      TeXParserUtils.process( 
+        getListener().getControlSequence("@gls@preglossaryhook"), parser, stack);
+
       return glossary;
    }
 
@@ -2939,4 +2975,6 @@ public class GlossariesSty extends LaTeXSty
     = "glossaries.abbreviation.style.not.defined";
    public static final String ABBREVIATION_STYLE_FILE_NOT_FOUND 
     = "glossaries.abbreviation.style.file.not.found";
+   public static final String UNRECOGNISED 
+    = "glossaries.unrecognised";
 }

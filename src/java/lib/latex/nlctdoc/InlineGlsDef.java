@@ -35,19 +35,28 @@ public class InlineGlsDef extends AbstractGlsCommand
 
    public InlineGlsDef(String name, GlossariesSty sty)
    {
-      super(name, sty);
+      this(name, "", sty);
    }
 
    public InlineGlsDef(String name, String prefix, GlossariesSty sty)
    {
+      this(name, prefix, null, false, sty);
+   }
+
+   public InlineGlsDef(String name, String prefix, String field,
+     boolean doUnset, GlossariesSty sty)
+   {
       super(name, sty);
       setEntryLabelPrefix(prefix);
+      this.field = field;
+      this.doUnset = doUnset;
    }
 
    @Override
    public Object clone()
    {
-      return new InlineGlsDef(getName(), getEntryLabelPrefix(), getSty());
+      return new InlineGlsDef(getName(), getEntryLabelPrefix(),
+        field, doUnset, getSty());
    }
 
    @Override
@@ -76,8 +85,25 @@ public class InlineGlsDef extends AbstractGlsCommand
 
       content.add(listener.getControlSequence("glsadd"));
       content.add(glslabel);
-      content.add(listener.getControlSequence("glsxtrglossentry"));
-      content.add(glslabel);
+
+      if (field == null)
+      {
+         content.add(listener.getControlSequence("glsxtrglossentry"));
+         content.add(glslabel);
+      }
+      else
+      {
+         content.add(listener.getControlSequence("glsxtrglossentryother"));
+         content.add(listener.createGroup());
+         content.add(glslabel);
+         content.add(listener.createGroup(field));
+      }
+
+      if (doUnset)
+      {
+         content.add(listener.getControlSequence("glsunset"));
+         content.add(glslabel);
+      }
 
       TeXParserUtils.process(content, parser, stack);
    }
@@ -88,4 +114,7 @@ public class InlineGlsDef extends AbstractGlsCommand
    {
       process(parser, parser);
    }
+
+   protected String field;
+   protected boolean doUnset;
 }
