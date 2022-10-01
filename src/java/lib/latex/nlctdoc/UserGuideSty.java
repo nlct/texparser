@@ -192,6 +192,10 @@ public class UserGuideSty extends LaTeXSty
         new TeXFontText(TeXFontFamily.RM),
         Color.BLACK, listener.getOther(0x2329), listener.getOther(0x232A));
 
+      registerControlSequence(new LaTeXGenericCommand(true,
+        "texmeta", "m", TeXParserUtils.createStack(listener, 
+         new TeXCsRef("meta"), listener.getParam(1))));
+
       addNestedSemanticCommand("initvalnotefmt", new TeXFontText(TeXFontShape.EM),
         new TeXFontText(TeXFontFamily.RM),
         Color.BLACK, null, null);
