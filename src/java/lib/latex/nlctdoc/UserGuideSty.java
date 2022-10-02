@@ -802,6 +802,19 @@ public class UserGuideSty extends LaTeXSty
       registerControlSequence(new LaTeXGenericCommand(true,
        "ctansupportmirror", "mm", def));
 
+      // \texfaq
+      def = listener.createStack();
+      def.add(new TeXCsRef("href"));
+      grp = listener.createGroup("https://texfaq.org/");
+      def.add(grp);
+      grp.add(listener.getParam(1));
+      grp = listener.createGroup();
+      def.add(grp);
+      grp.add(listener.getParam(2));
+
+      registerControlSequence(new LaTeXGenericCommand(true,
+       "texfaq", "mm", def));
+
       // \texseref
       def = listener.createStack();
       def.add(new TeXCsRef("href"));
@@ -1032,6 +1045,9 @@ public class UserGuideSty extends LaTeXSty
 
       registerControlSequence(new Symbol("nlctopensqbracket", '['));
       registerControlSequence(new Symbol("nlctclosesqbracket", ']'));
+
+      registerControlSequence(new Symbol("nlctopenparen", '('));
+      registerControlSequence(new Symbol("nlctcloseparen", ')'));
 
       registerControlSequence(new Symbol("codesym", 0x1F5B9));
       registerControlSequence(new Symbol("resultsym", 0x1F5BA));
