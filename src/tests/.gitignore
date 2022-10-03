@@ -12,3 +12,5 @@ test*.pdf
 *.idx
 *.ist
 *.glstex
+*.sty
+*.def
