@@ -393,6 +393,8 @@ public class UserGuideSty extends LaTeXSty
       registerControlSequence(new InlineGlsDef("inlineidxdef", "idx.", glossariesSty));
       registerControlSequence(new InlineGlsDef("inlineidxfdef", "idx.",
         "first", true, glossariesSty));
+      registerControlSequence(new InlineGlsDef("inlineidxpdef", "idx.",
+        "plural", true, glossariesSty));
       registerControlSequence(new InlineGlsDef("inlineswitchdef", "switch.", glossariesSty));
       registerControlSequence(new CmdDefSyntax(glossariesSty));
       registerControlSequence(new OptDefSyntax(glossariesSty));
