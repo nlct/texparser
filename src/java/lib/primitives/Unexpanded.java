@@ -49,12 +49,12 @@ public class Unexpanded extends Primitive implements Expandable
    public TeXObjectList expandonce(TeXParser parser)
      throws IOException
    {
-      TeXObject arg1 = parser.popNextArg();
+      TeXObject arg = parser.popNextArg();
 
-      if (arg1 instanceof TeXObjectList) return (TeXObjectList)arg1;
+      if (parser.isStack(arg)) return (TeXObjectList)arg;
 
-      TeXObjectList list = new TeXObjectList();
-      list.add(arg1);
+      TeXObjectList list = parser.getListener().createStack();
+      list.add(arg);
 
       return list;
    }
@@ -62,12 +62,12 @@ public class Unexpanded extends Primitive implements Expandable
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      TeXObject arg1 = stack.popArg(parser);
+      TeXObject arg = stack.popArg(parser);
 
-      if (arg1 instanceof TeXObjectList) return (TeXObjectList)arg1;
+      if (parser.isStack(arg)) return (TeXObjectList)arg;
 
-      TeXObjectList list = new TeXObjectList();
-      list.add(arg1);
+      TeXObjectList list = parser.getListener().createStack();
+      list.add(arg);
 
       return list;
    }
@@ -87,12 +87,12 @@ public class Unexpanded extends Primitive implements Expandable
    public void process(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
-      stack.addAll(0, expandonce(parser, stack));
+      TeXParserUtils.process(popArg(parser, stack), parser, stack);
    }
 
    public void process(TeXParser parser)
       throws IOException
    {
-      parser.addAll(0, expandonce(parser));
+      process(parser, parser);
    }
 }

@@ -32,12 +32,18 @@ public class GlsMakeFirstUc extends Command
 
    public GlsMakeFirstUc(String name)
    {
+      this(name, false);
+   }
+
+   public GlsMakeFirstUc(String name, boolean expand)
+   {
       super(name);
+      this.expand = expand;
    }
 
    public Object clone()
    {
-      return new GlsMakeFirstUc(getName());
+      return new GlsMakeFirstUc(getName(), expand);
    }
 
    public TeXObjectList expandonce(TeXParser parser)
@@ -62,7 +68,19 @@ public class GlsMakeFirstUc extends Command
          expanded.add(parser.getListener().getControlSequence("MFUsentencecase"));
          Group grp = parser.getListener().createGroup();
          expanded.add(grp);
-         grp.add(arg, true);
+
+         if (expand)
+         {
+            grp.add(arg, true);
+         }
+         else
+         {
+            grp.add(parser.getListener().getControlSequence("unexpanded"));
+
+            Group subGrp = parser.getListener().createGroup();
+            grp.add(subGrp);
+            subGrp.add(arg, true);
+         }
       }
 
       return expanded;
@@ -92,4 +110,5 @@ public class GlsMakeFirstUc extends Command
       expandonce(parser).process(parser);
    }
 
+   private boolean expand = false;
 }

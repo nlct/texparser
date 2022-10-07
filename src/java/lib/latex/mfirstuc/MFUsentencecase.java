@@ -80,27 +80,9 @@ public class MFUsentencecase extends Command
                obj = popArg(parser, argList);
                list.add(TeXParserUtils.createGroup(parser, obj));
             }
-            else if (obj instanceof CaseChangeable)
-            {
-               list.add(((CaseChangeable)obj).toUpperCase(parser));
-               done = true;
-            }
             else
             {
                list.add(obj);
-
-               obj = argList.popStack(parser);
-
-               if (obj instanceof Group)
-               {
-                  Group grp = parser.getListener().createGroup();
-                  list.add(grp);
-                  done = toSentenceCase((TeXObjectList)obj, grp, parser);
-               }
-               else
-               {
-                  argList.push(obj);
-               }
             }
          }
          else if (obj instanceof Other || obj instanceof WhiteSpace)

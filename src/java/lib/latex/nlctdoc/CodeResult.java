@@ -36,16 +36,24 @@ public class CodeResult extends GatherEnvContents
    public CodeResult(String name, ControlSequence titleBoxCs, 
      ControlSequence codeBoxCs, ControlSequence resultBoxCs)
    {
+      this(name, titleBoxCs, codeBoxCs, resultBoxCs, "code");
+   }
+
+   public CodeResult(String name, ControlSequence titleBoxCs, 
+     ControlSequence codeBoxCs, ControlSequence resultBoxCs, String codeTag)
+   {
       super(name);
       this.titleBoxCs = titleBoxCs;
       this.codeBoxCs = codeBoxCs;
       this.resultBoxCs = resultBoxCs;
+      this.codeTag = codeTag;
    }
 
    @Override
    public Object clone()
    {
-      return new CodeResult(getName(), titleBoxCs, codeBoxCs, resultBoxCs);
+      return new CodeResult(getName(), titleBoxCs, codeBoxCs, resultBoxCs,
+       codeTag);
    }
 
    public TeXObjectList popContents(TeXParser parser, TeXObjectList stack)
@@ -105,7 +113,7 @@ public class CodeResult extends GatherEnvContents
       contents.add(titleBoxCs);
       contents.add(TeXParserUtils.createGroup(parser, 
        listener.getControlSequence("glssymbol"),
-       listener.createGroup("sym.code"),
+       listener.createGroup("sym."+codeTag),
        listener.getControlSequence("glssymbol"),
        listener.createGroup("sym.result")
       ));
@@ -151,4 +159,6 @@ public class CodeResult extends GatherEnvContents
    }
 
    protected ControlSequence codeBoxCs, resultBoxCs, titleBoxCs;
+
+   protected String codeTag="code";
 }
