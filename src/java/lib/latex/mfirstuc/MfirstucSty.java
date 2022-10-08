@@ -43,6 +43,8 @@ public class MfirstucSty extends LaTeXSty
 
       registerControlSequence(new MFUsentencecase(this));
       registerControlSequence(new GlsMakeFirstUc());
+      registerControlSequence(new GlsMakeFirstUc(
+       "mfugrabfirstuc", GlsMakeFirstUc.GRABFIRST));
       registerControlSequence(new MakeFirstUc(this));
       registerControlSequence(new MakeFirstUc("xmakefirstuc",
         MakeFirstUc.EXPANSION_ONCE, this));
