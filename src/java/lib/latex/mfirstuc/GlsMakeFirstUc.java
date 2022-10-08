@@ -27,23 +27,23 @@ public class GlsMakeFirstUc extends Command
 {
    public GlsMakeFirstUc()
    {
-      this("glsmakefirstuc");
+      this("glsmakefirstuc", UNEXPANDED);
    }
 
-   public GlsMakeFirstUc(String name)
+   public GlsMakeFirstUc(int setting)
    {
-      this(name, false);
+      this("glsmakefirstuc", setting);
    }
 
-   public GlsMakeFirstUc(String name, boolean expand)
+   public GlsMakeFirstUc(String name, int setting)
    {
       super(name);
-      this.expand = expand;
+      this.setting = setting;
    }
 
    public Object clone()
    {
-      return new GlsMakeFirstUc(getName(), expand);
+      return new GlsMakeFirstUc(getName(), setting);
    }
 
    public TeXObjectList expandonce(TeXParser parser)
@@ -65,21 +65,29 @@ public class GlsMakeFirstUc extends Command
       }
       else if (!arg.isEmpty())
       {
-         expanded.add(parser.getListener().getControlSequence("MFUsentencecase"));
-         Group grp = parser.getListener().createGroup();
-         expanded.add(grp);
-
-         if (expand)
+         if (setting == GRABFIRST)
          {
-            grp.add(arg, true);
+            expanded.add(parser.getListener().getControlSequence("MakeUppercase"));
+            expanded.add(arg, true);
          }
          else
          {
-            grp.add(parser.getListener().getControlSequence("unexpanded"));
+            expanded.add(parser.getListener().getControlSequence("MFUsentencecase"));
+            Group grp = parser.getListener().createGroup();
+            expanded.add(grp);
 
-            Group subGrp = parser.getListener().createGroup();
-            grp.add(subGrp);
-            subGrp.add(arg, true);
+            if (setting == EXPANDED)
+            {
+               grp.add(arg, true);
+            }
+            else
+            {
+               grp.add(parser.getListener().getControlSequence("unexpanded"));
+
+               Group subGrp = parser.getListener().createGroup();
+               grp.add(subGrp);
+               subGrp.add(arg, true);
+            }
          }
       }
 
@@ -110,5 +118,9 @@ public class GlsMakeFirstUc extends Command
       expandonce(parser).process(parser);
    }
 
-   private boolean expand = false;
+   public static final int UNEXPANDED=0;
+   public static final int EXPANDED=1;
+   public static final int GRABFIRST=2;
+
+   private int setting = UNEXPANDED;
 }

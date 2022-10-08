@@ -43,7 +43,6 @@ public class MfirstucSty extends LaTeXSty
 
       registerControlSequence(new MFUsentencecase(this));
       registerControlSequence(new GlsMakeFirstUc());
-      registerControlSequence(new GlsMakeFirstUc("mfugrabfirstuc"));
       registerControlSequence(new MakeFirstUc(this));
       registerControlSequence(new MakeFirstUc("xmakefirstuc",
         MakeFirstUc.EXPANSION_ONCE, this));
@@ -91,11 +90,15 @@ public class MfirstucSty extends LaTeXSty
    {
       if (option.equals("expanded"))
       {
-         registerControlSequence(new GlsMakeFirstUc("glsmakefirstuc", true));
+         registerControlSequence(new GlsMakeFirstUc(GlsMakeFirstUc.EXPANDED));
       }
-      else if (option.equals("unexpanded") || option.equals("grabfirst"))
+      else if (option.equals("unexpanded"))
       {
-         registerControlSequence(new GlsMakeFirstUc());
+         registerControlSequence(new GlsMakeFirstUc(GlsMakeFirstUc.UNEXPANDED));
+      }
+      else if (option.equals("grabfirst"))
+      {
+         registerControlSequence(new GlsMakeFirstUc(GlsMakeFirstUc.GRABFIRST));
       }
    }
 
