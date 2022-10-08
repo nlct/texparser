@@ -69,21 +69,8 @@ public class MfirstucSty extends LaTeXSty
       registerControlSequence(new MFUaddmap(this));
 
       addExclusion("MFUskippunc");
-
-      // not used but implement in case it's used explicitly
-
-      if (listener.isStyLoaded("textcase") || listener.isStyLoaded("glossaries"))
-      {
-         registerControlSequence(new GenericCommand(true,
-            "mfirstucMakeUppercase", null,
-             new TeXObject[] { new TeXCsRef("MakeTextUppercase") }));
-
-         addExclusion("NoCaseChange");
-      }
-      else
-      {
-         registerControlSequence(new Uppercase("mfirstucMakeUppercase"));
-      }
+      addExclusion("NoCaseChange");
+      addExclusion("ensuremath");
    }
 
    @Override

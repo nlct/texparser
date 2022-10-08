@@ -85,13 +85,21 @@ public class MFUsentencecase extends Command
                list.add(obj);
             }
          }
+         else if (obj instanceof MathGroup)
+         {
+            list.add(obj);
+         }
          else if (obj instanceof Other || obj instanceof WhiteSpace)
          {// punctuation or space
             list.add(obj);
          }
-         else if (parser.isStack(obj))
+         else if (obj instanceof TeXObjectList)
          {
-            done = toSentenceCase((TeXObjectList)obj, list, parser);
+            TeXObjectList sublist = ((TeXObjectList)obj).createList();
+
+            done = toSentenceCase((TeXObjectList)obj, sublist, parser);
+
+            list.add(sublist, true);
          }
          else if (obj instanceof CaseChangeable)
          {
