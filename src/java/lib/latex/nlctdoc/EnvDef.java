@@ -47,6 +47,12 @@ public class EnvDef extends StandaloneDef
    }
 
    @Override
+   protected ControlSequence getNoteFmt(TeXParser parser)
+   {
+      return parser.getControlSequence("cmdnotefmt");
+   }
+
+   @Override
    protected void addPreEntryName(TeXObjectList list, GlsLabel glslabel, TeXParser parser)
    {
       TeXParserListener listener = parser.getListener();

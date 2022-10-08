@@ -19,49 +19,62 @@
 package com.dickimawbooks.texparserlib.latex.nlctdoc;
 
 import java.io.IOException;
-import java.awt.Color;
 
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.*;
-import com.dickimawbooks.texparserlib.latex.glossaries.*;
 
-public class AppDef extends StandaloneDef
+public class InlineCode extends ControlSequence
 {
-   public AppDef(TaggedColourBox taggedBox, FrameBox rightBox,
-     FrameBox noteBox, GlossariesSty sty)
+   public InlineCode()
    {
-      this("appdef", taggedBox, rightBox, noteBox, sty);
+      this("code");
    }
 
-   public AppDef(String name, TaggedColourBox taggedBox, FrameBox rightBox,
-     FrameBox noteBox, GlossariesSty sty)
+   public InlineCode(String name)
    {
-      super(name, taggedBox, rightBox, noteBox, sty);
-      setEntryLabelPrefix("app.");
+      super(name);
    }
 
    @Override
    public Object clone()
    {
-      return new AppDef(getName(), taggedBox, rightBox, noteBox, getSty());
+      return new InlineCode(getName());
    }
 
    @Override
-   protected ControlSequence getNoteFmt(TeXParser parser)
+   public void process(TeXParser parser, TeXObjectList stack)
+   throws IOException
    {
-      return parser.getControlSequence("appnotefmt");
-   }
+      TeXObject arg = popArg(parser, stack);
 
-   @Override
-   protected void addPostEntryName(TeXObjectList list, GlsLabel glslabel, TeXParser parser)
-   {
-      TeXObject syntax = glslabel.getField("syntax");
+      TeXParserListener listener = parser.getListener();
+      ControlSequence cs = parser.getControlSequence("setupcodeenvfmts");
 
-      if (syntax != null)
+      TeXObjectList content = listener.createStack();
+
+      parser.startGroup();
+
+      if (cs != null)
       {
-         list.add(parser.getListener().getSpace());
-         list.add(syntax, true);
+         parser.putControlSequence(true, cs);
       }
+
+      content.add(new TeXCsRef("let"));
+      content.add(new TeXCsRef("cmd"));
+      content.add(new TeXCsRef("cmdfmt"));
+
+      content.add(new TeXCsRef("@code"));
+      content.add(TeXParserUtils.createGroup(listener, arg));
+
+      TeXParserUtils.process(content, parser, stack);
+
+      parser.endGroup();
    }
 
+   @Override
+   public void process(TeXParser parser)
+   throws IOException
+   {
+      process(parser, parser);
+   }
 }

@@ -47,6 +47,12 @@ public class SwitchDef extends StandaloneDef
    }
 
    @Override
+   protected ControlSequence getNoteFmt(TeXParser parser)
+   {
+      return parser.getControlSequence("switchnotefmt");
+   }
+
+   @Override
    protected void addPostEntryName(TeXObjectList list, GlsLabel glslabel, TeXParser parser)
    {
       TeXObject syntax = glslabel.getField("syntax");

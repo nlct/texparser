@@ -47,6 +47,12 @@ public class OptionValDef extends StandaloneDef
    }
 
    @Override
+   protected ControlSequence getNoteFmt(TeXParser parser)
+   {
+      return parser.getControlSequence("optnotefmt");
+   }
+
+   @Override
    protected void preArgHook(TeXParser parser, TeXObjectList stack)
    throws IOException
    {

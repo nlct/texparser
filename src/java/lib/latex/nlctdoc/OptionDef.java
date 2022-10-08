@@ -47,6 +47,12 @@ public class OptionDef extends StandaloneDef
    }
 
    @Override
+   protected ControlSequence getNoteFmt(TeXParser parser)
+   {
+      return parser.getControlSequence("optnotefmt");
+   }
+
+   @Override
    protected void addPostEntryName(TeXObjectList list, GlsLabel glslabel, TeXParser parser)
    {
       TeXObject syntax = glslabel.getField("syntax");

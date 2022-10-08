@@ -81,15 +81,19 @@ public class UserGuideSty extends LaTeXSty
 
       addSemanticCommand("strong", TeXFontWeight.STRONG);
       addSemanticCommand("booktitle", TeXFontShape.EM);
-      addSemanticCommand("code", TeXFontFamily.VERB);
-      addSemanticCommand("cmd", listener.getOther('\\'));
+
+      addSemanticCommand("@code", "code", 
+        new TeXFontText(TeXFontFamily.VERB), null, null, null);
+      addSemanticCommand("cmd", TeXFontFamily.VERB, null, listener.getOther('\\'), null);
+      addSemanticCommand("cmdfmt", TeXFontFamily.TT, null, 
+        listener.getOther('\\'), null);
+      registerControlSequence(new InlineCode());
+
       addSemanticCommand("comment", FG_COMMENT, listener.createString("% "));
       addSemanticCommand("csfmt", TeXFontFamily.VERB, FG_CS, 
         listener.getOther('\\'), null);
       addSemanticCommand("csfmtfont", TeXFontFamily.TT);
       addSemanticCommand("csfmtcolourfont", TeXFontFamily.TT, FG_CS);
-      addSemanticCommand("cmdfmt", TeXFontFamily.VERB, null, 
-        listener.getOther('\\'), null);
       addSemanticCommand("appfmt", TeXFontFamily.TT);
       addSemanticCommand("styfmt", TeXFontFamily.TT);
       addSemanticCommand("clsfmt", TeXFontFamily.TT);
@@ -1157,6 +1161,20 @@ public class UserGuideSty extends LaTeXSty
       registerControlSequence(new GenericCommand(true, "conyes", null, 
          new TeXObject[] { new TeXCsRef("disadvantagefmt"), new TeXCsRef("yes")}));
 
+      // \cmdnotefmt
+      registerControlSequence(new AtFirstOfOne("cmdnotefmt"));
+
+      // \pkgnotefmt
+      registerControlSequence(new AtFirstOfOne("pkgnotefmt"));
+
+      // \optnotefmt
+      registerControlSequence(new AtFirstOfOne("optnotefmt"));
+
+      // \appnotefmt
+      registerControlSequence(new AtFirstOfOne("appnotefmt"));
+
+      // \switchnotefmt
+      registerControlSequence(new AtFirstOfOne("switchnotefmt"));
 
       // \summarynotefmt
       def = listener.createStack();
@@ -1505,18 +1523,44 @@ public class UserGuideSty extends LaTeXSty
    {
       super.postOptions(stack);
 
-      TeXObjectList list = getListener().createStack();
-      list.add(getListener().getControlSequence("setabbreviationstyle"));
-      list.add(getListener().getOther('['));
-      list.add(getListener().createString("termabbreviation"), true);
-      list.add(getListener().getOther(']'));
-      list.add(getListener().createGroup("long-short-desc"));
+      TeXParserListener listener = getListener();
 
-      list.add(getListener().getControlSequence("setabbreviationstyle"));
-      list.add(getListener().getOther('['));
-      list.add(getListener().createString("termacronym"), true);
-      list.add(getListener().getOther(']'));
-      list.add(getListener().createGroup("short-nolong-desc"));
+      TeXObjectList list = listener.createStack();
+      list.add(listener.getControlSequence("setabbreviationstyle"));
+      list.add(listener.getOther('['));
+      list.add(listener.createString("termabbreviation"), true);
+      list.add(listener.getOther(']'));
+      list.add(listener.createGroup("long-short-desc"));
+
+      list.add(listener.getControlSequence("setabbreviationstyle"));
+      list.add(listener.getOther('['));
+      list.add(listener.createString("termacronym"), true);
+      list.add(listener.getOther(']'));
+      list.add(listener.createGroup("short-nolong-desc"));
+
+      // redefine glsxtrshortdescname
+      list.add(new TeXCsRef("renewcommand"));
+      list.add(new TeXCsRef("glsxtrshortdescname"));
+
+      Group def = listener.createGroup();
+      list.add(def);
+
+      def.add(new TeXCsRef("protect"));
+      def.add(new TeXCsRef("glslongfont"));
+      def.add(TeXParserUtils.createGroup(listener,
+        new TeXCsRef("the"), new TeXCsRef("glslongtok")));
+
+      def.add(new TeXCsRef("protect"));
+      def.add(new TeXCsRef("glsxtrfullsep"));
+      def.add(TeXParserUtils.createGroup(listener,
+        new TeXCsRef("the"), new TeXCsRef("glslabeltok")));
+
+      def.add(new TeXCsRef("protect"));
+      def.add(new TeXCsRef("glsxtrparen"));
+      def.add(TeXParserUtils.createGroup(listener,
+        new TeXCsRef("protect"), new TeXCsRef("glsabbrvfont"),
+        TeXParserUtils.createGroup(listener, 
+          new TeXCsRef("the"), new TeXCsRef("glsshorttok"))));
 
       if (stack == null || stack == getParser())
       {
