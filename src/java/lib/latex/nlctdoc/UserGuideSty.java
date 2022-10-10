@@ -982,26 +982,76 @@ public class UserGuideSty extends LaTeXSty
 
       registerControlSequence(new Plabel());
 
+      registerControlSequence(new Symbol("sectionrefprefix", 0x00A7));
+      registerControlSequence(new TextualContentCommand(
+        "sectionsrefprefix", "\u00A7\u00A7"));
+
+      registerControlSequence(new TextualContentCommand(
+        "refslistsep", ", "));
+
+      registerControlSequence(new TextualContentCommand(
+        "refslistlastsep", " & "));
+
       // \sectionref
-      registerControlSequence(new Ref("sectionref", new TeXCsRef("S")));
+      registerControlSequence(new Ref("sectionref", new TeXCsRef("sectionrefprefix")));
+
+      registerControlSequence(new RefsList("sectionsref",
+        new TeXCsRef("sectionsrefprefix"), 
+        new TeXCsRef("refslistsep"),
+        new TeXCsRef("refslistlastsep")
+      ));
 
       // \exampleref
       registerControlSequence(new Ref("exampleref", false, 
          new TeXCsRef("Examplename"), listener.getSpace()));
 
       // \tableref
-      registerControlSequence(new TextualContentCommand("Tablename", "Table"));
+      registerControlSequence(new TextualContentCommand("tablerefprefix", "Table "));
+      registerControlSequence(new TextualContentCommand("Tablerefprefix", "Table "));
+
       registerControlSequence(new Ref("tableref", false,
-       new TeXCsRef("Tablename"), listener.getSpace()));
+       new TeXCsRef("tablerefprefix")));
       registerControlSequence(new Ref("Tableref", false,
-       new TeXCsRef("Tablename"), listener.getSpace()));
+       new TeXCsRef("Tablerefprefix")));
+
+      registerControlSequence(new TextualContentCommand("tablesrefprefix", "Tables "));
+      registerControlSequence(new TextualContentCommand("Tablesrefprefix", "Tables "));
+
+      registerControlSequence(new RefsList("tablesref",
+        new TeXCsRef("tablesrefprefix"), 
+        new TeXCsRef("refslistsep"),
+        new TeXCsRef("refslistlastsep")
+      ));
+
+      registerControlSequence(new RefsList("Tablesref",
+        new TeXCsRef("Tablesrefprefix"), 
+        new TeXCsRef("refslistsep"),
+        new TeXCsRef("refslistlastsep")
+      ));
 
       // \figureref
-      registerControlSequence(new TextualContentCommand("Figurename", "Figure"));
+      registerControlSequence(new TextualContentCommand("figurerefprefix", "Figure "));
+      registerControlSequence(new TextualContentCommand("Figurerefprefix", "Figure "));
+
       registerControlSequence(new Ref("figureref", false,
-       new TeXCsRef("Figurename"), listener.getSpace()));
+       new TeXCsRef("figurerefprefix")));
       registerControlSequence(new Ref("Figureref", false,
-       new TeXCsRef("Figurename"), listener.getSpace()));
+       new TeXCsRef("Figurerefprefix")));
+
+      registerControlSequence(new TextualContentCommand("figuresrefprefix", "Figures "));
+      registerControlSequence(new TextualContentCommand("Figuresrefprefix", "Figures "));
+
+      registerControlSequence(new RefsList("figuresref",
+        new TeXCsRef("figuresrefprefix"), 
+        new TeXCsRef("refslistsep"),
+        new TeXCsRef("refslistlastsep")
+      ));
+
+      registerControlSequence(new RefsList("Figuresref",
+        new TeXCsRef("Figuresrefprefix"), 
+        new TeXCsRef("refslistsep"),
+        new TeXCsRef("refslistlastsep")
+      ));
 
       registerControlSequence(AccSuppObject.createSymbol(
         listener, "unlimited", 0x221E));
