@@ -45,6 +45,7 @@ public class SIunitxSty extends LaTeXSty
    public void addDefinitions()
    {
       registerControlSequence(new Si(this));
+      registerControlSequence(new Si("unit", this));
    }
 
    public TeXObject parseUnit(TeXParser parser, TeXObject arg)
