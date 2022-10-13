@@ -112,4 +112,11 @@ public class GlsLabel extends TextualContentCommand
          data = sty.getEntry(getLabel());
       }
    }
+
+   @Override
+   public boolean equals(Object other)
+   {
+      return (other instanceof GlsLabel)
+          && getLabel().equals(((GlsLabel)other).getLabel());
+   }
 }
