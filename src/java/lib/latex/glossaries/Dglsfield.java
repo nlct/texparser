@@ -93,7 +93,10 @@ public class Dglsfield extends AtGlsAtAtLink
       TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      TeXObject fieldVal = glslabel.getField(field);
+      String fieldLabel = parser.expandToString(
+        parser.getControlSequence("dglsfieldactualfieldlabel"), stack);
+
+      TeXObject fieldVal = glslabel.getField(fieldLabel);
 
       if (fieldVal == null)
       {
