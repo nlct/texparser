@@ -60,7 +60,16 @@ public class GlsHyperlink extends Command
          ((TeXObjectList)linkText).add(listener.createGroup(label));
       }
 
-      expanded.add(new TeXCsRef("@glslink"));
+      ControlSequence linkCs = listener.getControlSequence("glsxtr@org@dohyperlink");
+
+      if (linkCs == null)
+      {
+         expanded.add(new TeXCsRef("@glslink"));
+      }
+      else
+      {
+         expanded.add(linkCs);
+      }
 
       Group grp = listener.createGroup();
       expanded.add(grp);

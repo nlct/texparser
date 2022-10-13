@@ -140,6 +140,8 @@ public class AtGlsAtLink extends AbstractGlsCommand
 
       boolean doHyper = (isHyper != null && isHyper.booleanValue());
 
+      ControlSequence orgPrefixCs = null;
+
       if (options != null)
       {
          TeXObject hyperVal = options.get("hyper");
@@ -158,6 +160,18 @@ public class AtGlsAtLink extends AbstractGlsCommand
             {
                doHyper = !parser.expandToString(hyperVal, stack).equals("false");
             }
+         }
+
+         TeXObject val = options.get("prefix");
+
+         if (val != null)
+         {
+            String targetPrefix = parser.expandToString(val, stack);
+
+            orgPrefixCs = parser.getControlSequence("glolinkprefix");
+
+            parser.putControlSequence(true, 
+             new TextualContentCommand("glolinkprefix", targetPrefix));
          }
       }
 
@@ -252,6 +266,11 @@ public class AtGlsAtLink extends AbstractGlsCommand
       subgrp.add(linkText);
 
       TeXParserUtils.process(list, parser, stack);
+
+      if (orgPrefixCs != null)
+      {
+         parser.putControlSequence(true, orgPrefixCs);
+      }
    }
 
    public void process(TeXParser parser)

@@ -10,7 +10,7 @@
 %\usepackage[autooneside=false]{scrlayer-scrpage}
 
 \usepackage
- %[debug=showwrgloss]
+ [debug=showwrgloss]
 {nlctuserguide}
 
 \renewcommand*{\thispackagename}{foobarsty}
@@ -72,7 +72,28 @@
     \note{or \code{\csfmt{usepackage}[foobar]\marg{baz}}}%
     \syntax{\meta{options}}
   }
-% options
+% package options
+  \gstyopt{styopt}
+  {
+    \inpackage{foobarsty}
+    \syntax{\meta{value}}
+    \defval{default}
+    \desc{sample package option}
+  }
+% package option value
+  \goptval{styopt}{value1}
+  {
+    \desc{some value}
+  }
+  \goptval{styopt}{value2}
+  {
+    \desc{another value}
+  }
+  \goptval{styopt}{default}
+  {
+    \desc{default value}
+  }
+% command options
   \gcsopt{foo\dhyphen bar}%
   {%
     \parent{foobarcs}%
@@ -105,6 +126,7 @@
   {
     \deprecated
     \field{alias}{optval.foo-bar-val.optionvalue}
+    \desc{some deprecated value}
   }
   \gidx{commonoption}{\name{common options}\desc{some common options}}
   \gopt{some-option}{\parent{idx.commonoption}\desc{an option common to several commands}}
@@ -213,6 +235,20 @@ File: \metafilefmt{filename}{tag}{.txt},
 
 \pkgdef{foobarsty}
 
+Package options.
+
+\optiondef{styopt}
+This option may take the following values.
+
+\optionvaldef{styopt}{value1}
+Does something.
+
+\optionvaldef{styopt}{value2}
+Does something else.
+
+\optionvaldef{styopt}{default}
+Some default setting.
+
 Command: \gls{foobarcs} defined in \sty{foobarsty}.
 
 \cmddef{foobarcs}
@@ -263,6 +299,9 @@ Don't use \gls{incompatiblecmd}, which is incompatible with
 
 A \idx{cli} application \app{foobar-cli} is invoked with:
 \appdef{foobar-cli}
+Where \meta{options} may be:
+\switchdef{long-switch}
+\switch{s} is a short synonym.
 
 Some common options.
 \optiondef{some-option}
@@ -317,9 +356,9 @@ that the \cmd{write18} shell escape is enabled},
 
 \backmatter
 \printterms[title={Terms}]
-\printsummary
 \printcommandoptions{foobarcs}
 \printcommonoptions{idx.commonoption}
+\printsummary
 \printuserguideindex
 
 \end{document}

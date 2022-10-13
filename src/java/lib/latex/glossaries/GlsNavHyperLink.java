@@ -60,7 +60,14 @@ public class GlsNavHyperLink extends ControlSequence
 
       TeXObjectList list = listener.createStack();
 
-      list.add(listener.getControlSequence("@glslink"));
+      ControlSequence linkCs = listener.getControlSequence("glsxtr@org@dohyperlink");
+
+      if (linkCs == null)
+      {
+         linkCs = listener.getControlSequence("@glslink");
+      }
+
+      list.add(linkCs);
       Group grp = listener.createGroup();
       list.add(grp);
 

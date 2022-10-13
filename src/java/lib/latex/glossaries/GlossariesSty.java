@@ -199,7 +199,23 @@ public class GlossariesSty extends LaTeXSty
       if (isHyper)
       {
          registerControlSequence(new AtGlsTarget());
-         registerControlSequence(new HyperLink("@glslink"));
+
+         if (extra)
+         {
+            registerControlSequence(new HyperLink("glsxtr@org@dohyperlink"));
+            registerControlSequence(new LaTeXGenericCommand(true,
+              "@glslink", "mm", 
+              TeXParserUtils.createStack(listener, 
+              new TeXCsRef("glsxtrdohyperlink"),
+              TeXParserUtils.createGroup(listener, listener.getParam(1)),
+              TeXParserUtils.createGroup(listener, listener.getParam(2))
+            )));
+            registerControlSequence(new GlsXtrDoHyperLink(this));
+         }
+         else
+         {
+            registerControlSequence(new HyperLink("@glslink"));
+         }
 
          registerControlSequence(new GenericCommand(true, "glsifhyperon", null,
            new TeXObject[]{new TeXCsRef("ifKV@glslink@hyper"), 
@@ -224,7 +240,7 @@ public class GlossariesSty extends LaTeXSty
               new TeXCsRef("KV@glslink@hypertrue"),
               new TeXCsRef("let"),
               new TeXCsRef("@glslink"),
-              new TeXCsRef("glsdohyperlink"),
+              new TeXCsRef(extra ? "glsxtrdohyperlink" : "glsdohyperlink"),
               new TeXCsRef("let"),
               new TeXCsRef("@glstarget"),
               new TeXCsRef("glsdohypertarget")
@@ -240,6 +256,11 @@ public class GlossariesSty extends LaTeXSty
          registerControlSequence(new AtSecondOfTwo("@glslink"));
          registerControlSequence(new GenericCommand("glsdisablehyper"));
          registerControlSequence(new GenericCommand("glsenablehyper"));
+
+         if (extra)
+         {
+            registerControlSequence(new AtSecondOfTwo("glsxtr@org@dohyperlink"));
+         }
       }
 
       registerControlSequence(new AtSecondOfTwo("glsdonohypertarget"));
@@ -516,6 +537,8 @@ public class GlossariesSty extends LaTeXSty
 
    protected void addExtraDefinitions()
    {
+      registerControlSequence(new HyperLink("glsxtrhyperlink"));
+
       registerControlSequence(new GlsXtrSetStarModifier(this));
       registerControlSequence(new GlsXtrSetPlusModifier(this));
       registerControlSequence(new GlsXtrSetAltModifier(this));
@@ -1049,6 +1072,15 @@ public class GlossariesSty extends LaTeXSty
 
       registerControlSequence(new Dglslink(this));
       registerControlSequence(new Dglslink("dglsdisp", true, this));
+
+      registerControlSequence(
+         new TextualContentCommand("dglsfieldcurrentfieldlabel", ""));
+
+      registerControlSequence(
+         new TextualContentCommand("dglsfieldactualfieldlabel", ""));
+
+      registerControlSequence(
+         new TextualContentCommand("dglsfieldfallbackfieldlabel", "text"));
 
       registerControlSequence(new Dglsfield("dglsfield", this));
       registerControlSequence(new Dglsfield("dGlsfield", this, CaseChange.SENTENCE));
@@ -1944,6 +1976,27 @@ public class GlossariesSty extends LaTeXSty
    {
       ControlSequence cs = getParser().getControlSequence("@glsxtr@labelprefixes");
 
+      String fallbackField = null;
+
+      if (field != null)
+      {
+         getParser().putControlSequence(true, 
+          new TextualContentCommand("dglsfieldcurrentfieldlabel", field));
+
+         getParser().putControlSequence(true, 
+          new TextualContentCommand("dglsfieldactualfieldlabel", field));
+
+         ControlSequence fieldCs =
+            getParser().getControlSequence("dglsfieldfallbackfieldlabel");
+
+         if (fieldCs != null)
+         {
+            fallbackField = getParser().expandToString(fieldCs, getParser());
+         }
+      }
+
+      GlossaryEntry fallbackEntry = null;
+
       if (cs != null)
       {
          String prefixlist = getParser().expandToString(cs, getParser());
@@ -1962,7 +2015,20 @@ public class GlossariesSty extends LaTeXSty
                {
                   return entry;
                }
+               else if (fallbackEntry == null && fallbackField != null
+                         && entry.hasField(fallbackField))
+               {
+                  fallbackEntry = entry;
+               }
             }
+         }
+
+         if (fallbackEntry != null)
+         {
+            getParser().putControlSequence(true, 
+               new TextualContentCommand("dglsfieldactualfieldlabel", field));
+
+            return fallbackEntry;
          }
       }
 
