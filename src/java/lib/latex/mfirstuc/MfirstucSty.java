@@ -257,6 +257,11 @@ public class MfirstucSty extends LaTeXSty
       return null;
    }
 
+   public void addMapping(String csname1, String csname2)
+   {
+      addMapping(csname1, new TeXCsRef(csname2));
+   }
+
    public void addMapping(String key, TeXObject value)
    {
       ControlSequence cs = getParser().getControlSequence(MAPPINGS_PROP);
