@@ -43,20 +43,33 @@ public class InlineGlsDef extends AbstractGlsCommand
       this(name, prefix, null, false, sty);
    }
 
+   public InlineGlsDef(String name, String prefix, CaseChange caseChange,
+     GlossariesSty sty)
+   {
+      this(name, prefix, null, false, caseChange, sty);
+   }
+
    public InlineGlsDef(String name, String prefix, String field,
      boolean doUnset, GlossariesSty sty)
+   {
+      this(name, prefix, field, doUnset, CaseChange.NO_CHANGE, sty);
+   }
+
+   public InlineGlsDef(String name, String prefix, String field,
+     boolean doUnset, CaseChange caseChange, GlossariesSty sty)
    {
       super(name, sty);
       setEntryLabelPrefix(prefix);
       this.field = field;
       this.doUnset = doUnset;
+      this.caseChange = caseChange;
    }
 
    @Override
    public Object clone()
    {
       return new InlineGlsDef(getName(), getEntryLabelPrefix(),
-        field, doUnset, getSty());
+        field, doUnset, caseChange, getSty());
    }
 
    @Override
@@ -81,7 +94,16 @@ public class InlineGlsDef extends AbstractGlsCommand
       TeXObject optArg = popOptArg(parser, stack);
       GlsLabel glslabel = popEntryLabel(parser, stack);
 
+      parser.startGroup();
+
       TeXObjectList content = listener.createStack();
+
+      if (caseChange == CaseChange.SENTENCE)
+      {
+         content.add(listener.getControlSequence("let"));
+         content.add(new TeXCsRef("glossentryname"));
+         content.add(listener.getControlSequence("Glossentryname"));
+      }
 
       content.add(listener.getControlSequence("glsadd"));
       content.add(glslabel);
@@ -106,6 +128,8 @@ public class InlineGlsDef extends AbstractGlsCommand
       }
 
       TeXParserUtils.process(content, parser, stack);
+
+      parser.endGroup();
    }
 
    @Override
@@ -117,4 +141,5 @@ public class InlineGlsDef extends AbstractGlsCommand
 
    protected String field;
    protected boolean doUnset;
+   protected CaseChange caseChange;
 }
