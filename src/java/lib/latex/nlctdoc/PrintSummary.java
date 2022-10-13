@@ -288,6 +288,11 @@ public class PrintSummary extends AbstractGlsCommand
 
                   if (pl == null)
                   {
+                     if (!pkgopts.contains(parentLabel))
+                     {
+                        pkgopts.add(new GlsLabel(sty.getEntry(parentLabel)));
+                     }
+
                      pkgopts.add(glslabel);
                   }
                   else
@@ -311,6 +316,11 @@ public class PrintSummary extends AbstractGlsCommand
 
                   if (cl == null)
                   {
+                     if (!clsopts.contains(parentLabel))
+                     {
+                        clsopts.add(new GlsLabel(sty.getEntry(parentLabel)));
+                     }
+
                      clsopts.add(glslabel);
                   }
                   else

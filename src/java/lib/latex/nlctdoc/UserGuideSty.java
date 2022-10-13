@@ -23,6 +23,7 @@ import java.awt.Color;
 
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.primitives.NewIf;
+import com.dickimawbooks.texparserlib.primitives.Relax;
 import com.dickimawbooks.texparserlib.generic.Symbol;
 import com.dickimawbooks.texparserlib.latex.*;
 import com.dickimawbooks.texparserlib.latex.glossaries.*;
@@ -356,16 +357,35 @@ public class UserGuideSty extends LaTeXSty
 
       registerControlSequence(new SummaryBox(defnBox, 
         rightBox, noteBox, glossariesSty));
+
       registerControlSequence(new SummaryCommandBox(defnBox, 
         rightBox, noteBox, glossariesSty));
+
       registerControlSequence(new SummaryEnvironmentBox(defnBox, 
         rightBox, noteBox, glossariesSty));
+
       registerControlSequence(new SummaryCommandOptionBox(optionSummaryBox, 
         rightBox, noteBox, glossariesSty));
+
       registerControlSequence(new SummaryCommandOptionBox(
         "summaryglossentryoption", defnBox, 
         rightBox, noteBox, glossariesSty));
+
+      registerControlSequence(new SummaryCommandOptionBox(
+        "summaryglossentrypackageoption", defnBox, 
+        rightBox, noteBox, glossariesSty));
+
+      registerControlSequence(new SummaryCommandOptionBox(
+        "summaryglossentryclassoption", defnBox, 
+        rightBox, noteBox, glossariesSty));
+
       registerControlSequence(new SummaryOptionValueBox(optionValueSummaryBox, 
+        rightBox, noteBox, glossariesSty));
+
+      registerControlSequence(new SummaryPackageBox(defnBox, 
+        rightBox, noteBox, glossariesSty));
+
+      registerControlSequence(new SummaryClassBox(defnBox, 
         rightBox, noteBox, glossariesSty));
 
       createIndexItemBox(0);
@@ -408,6 +428,10 @@ public class UserGuideSty extends LaTeXSty
         "first", true, glossariesSty));
       registerControlSequence(new InlineGlsDef("inlineidxpdef", "idx.",
         "plural", true, glossariesSty));
+
+      registerControlSequence(new InlineGlsDef("Inlineidxdef", "idx.",
+        CaseChange.SENTENCE, glossariesSty));
+
       registerControlSequence(new InlineGlsDef("inlineswitchdef", "switch.", glossariesSty));
       registerControlSequence(new CmdDefSyntax(glossariesSty));
       registerControlSequence(new OptDefSyntax(glossariesSty));
@@ -986,6 +1010,10 @@ public class UserGuideSty extends LaTeXSty
       registerControlSequence(new TextualContentCommand(
         "sectionsrefprefix", "\u00A7\u00A7"));
 
+      registerControlSequence(new Symbol("Sectionrefprefix", 0x00A7));
+      registerControlSequence(new TextualContentCommand(
+        "Sectionsrefprefix", "\u00A7\u00A7"));
+
       registerControlSequence(new TextualContentCommand(
         "refslistsep", ", "));
 
@@ -1001,9 +1029,40 @@ public class UserGuideSty extends LaTeXSty
         new TeXCsRef("refslistlastsep")
       ));
 
+      // \Sectionref
+      registerControlSequence(new Ref("Sectionref", new TeXCsRef("Sectionrefprefix")));
+
+      registerControlSequence(new RefsList("Sectionsref",
+        new TeXCsRef("Sectionsrefprefix"), 
+        new TeXCsRef("refslistsep"),
+        new TeXCsRef("refslistlastsep")
+      ));
+
+      registerControlSequence(new TextualContentCommand("examplerefprefix", "Example "));
+      registerControlSequence(new TextualContentCommand("Examplerefprefix", "Example "));
+
       // \exampleref
       registerControlSequence(new Ref("exampleref", false, 
-         new TeXCsRef("Examplename"), listener.getSpace()));
+         new TeXCsRef("examplerefprefix")));
+
+      // \Exampleref
+      registerControlSequence(new Ref("Exampleref", false, 
+         new TeXCsRef("Examplerefprefix")));
+
+      registerControlSequence(new TextualContentCommand("examplesrefprefix", "Examples "));
+      registerControlSequence(new TextualContentCommand("Examplesrefprefix", "Examples "));
+
+      registerControlSequence(new RefsList("examplesref",
+        new TeXCsRef("examplesrefprefix"), 
+        new TeXCsRef("refslistsep"),
+        new TeXCsRef("refslistlastsep")
+      ));
+
+      registerControlSequence(new RefsList("Examplesref",
+        new TeXCsRef("Examplesrefprefix"), 
+        new TeXCsRef("refslistsep"),
+        new TeXCsRef("refslistlastsep")
+      ));
 
       // \tableref
       registerControlSequence(new TextualContentCommand("tablerefprefix", "Table "));
@@ -1241,9 +1300,7 @@ public class UserGuideSty extends LaTeXSty
       listener.newcounter("example");
 
       registerControlSequence(new TextualContentCommand(
-         "examplename", "example"));
-      registerControlSequence(new TextualContentCommand(
-         "Examplename", "Example"));
+         "examplename", "Example"));
       registerControlSequence(new TextualContentCommand(
          "listofexamplesname", "List of Examples"));
 
@@ -1255,7 +1312,7 @@ public class UserGuideSty extends LaTeXSty
 
       registerControlSequence(new GenericCommand(true,
         "nlctexampletag", null, TeXParserUtils.createStack(listener,
-          new TeXCsRef("Examplename"), listener.getSpace(),
+          new TeXCsRef("examplename"), listener.getSpace(),
           new TeXCsRef("theexample"))));
 
       registerControlSequence(new CreateExample());
@@ -1494,6 +1551,9 @@ public class UserGuideSty extends LaTeXSty
 
       registerControlSequence(new AtFirstOfOne("textsmaller"));
       registerControlSequence(new AtFirstOfOne("textlarger"));
+
+      registerControlSequence(new Relax("nlctnovref"));
+      registerControlSequence(new Relax("nlctusevref"));
    }
 
    protected void addGlsFmtTextCommand(String name, String prefix)
