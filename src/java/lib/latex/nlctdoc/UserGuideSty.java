@@ -573,6 +573,24 @@ public class UserGuideSty extends LaTeXSty
       registerControlSequence(new LaTeXGenericCommand(true,
        "optvalrefeq", "mmm", def));
 
+      // \childoptval
+      def = listener.createStack();
+      def.add(new TeXCsRef("gls"));
+
+      grp = listener.createGroup("optval.");
+      def.add(grp);
+      grp.add(listener.getParam(1));
+      grp.add(listener.getOther('.'));
+      grp.add(listener.getParam(2));
+
+      def.add(new TeXCsRef("optfmt"));
+      grp = listener.createGroup("=");
+      def.add(grp);
+      grp.add(listener.getParam(3));
+
+      registerControlSequence(new LaTeXGenericCommand(true,
+       "childoptval", "mmm", def));
+
       // \fmtorcode
       def = listener.createStack();
       def.add(listener.getParam(1));
@@ -922,6 +940,21 @@ public class UserGuideSty extends LaTeXSty
 
       registerControlSequence(new LaTeXGenericCommand(true,
        "gallery", "m", def));
+
+      // \galleryurl
+      def = listener.createStack();
+      def.add(new TeXCsRef("dickimawhref"));
+
+      grp = listener.createGroup("gallery/");
+      grp.add(listener.getParam(1));
+      def.add(grp);
+
+      grp = listener.createGroup("dickimaw-books.com/gallery/");
+      grp.add(listener.getParam(1));
+      def.add(grp);
+
+      registerControlSequence(new LaTeXGenericCommand(true,
+       "galleryurl", "m", def));
 
       // \galleryref
       def = listener.createStack();
@@ -1575,6 +1608,8 @@ public class UserGuideSty extends LaTeXSty
       registerControlSequence(new Relax("htmlavailable"));
 
       registerControlSequence(new AtGobble("nlctdocatnum"));
+
+      registerControlSequence(new AtGobble("GetTitleStringSetup"));
    }
 
    protected void addGlsFmtTextCommand(String name, String prefix)
