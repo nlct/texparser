@@ -66,6 +66,7 @@
   {%
     \desc{another minor command}
   }
+  \gcmd{@internal@foo}{\desc{an internal command}}
 % package
   \gpkg{foobarsty}
   {%
@@ -296,6 +297,9 @@ Don't use \gls{incompatiblecmd}, which is incompatible with
 \begin{badcodebox}
 \gls{incompatiblecmd}
 \end{badcodebox}
+
+\cmddef{@internal@foo}
+An internal command.
 
 A \idx{cli} application \app{foobar-cli} is invoked with:
 \appdef{foobar-cli}
