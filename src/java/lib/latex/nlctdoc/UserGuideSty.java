@@ -1263,6 +1263,7 @@ public class UserGuideSty extends LaTeXSty
       def.add(listener.createGroup("true"));
       def.add(new TeXCsRef("csfmt"));
       def.add(listener.createGroup("else"));
+      def.add(listener.getSpace());
       def.add(new TeXCsRef("meta"));
       def.add(listener.createGroup("false"));
       def.add(new TeXCsRef("csfmt"));
