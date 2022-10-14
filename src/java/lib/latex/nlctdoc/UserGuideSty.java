@@ -157,6 +157,23 @@ public class UserGuideSty extends LaTeXSty
       registerControlSequence(new GenericCommand(true,
         "glsxtrsubparagraphlocfmt", null, new TeXCsRef("seclocfmt")));
 
+      listener.addLaTeXCommand("glsxtrtablelocfmt", true, 2, null, 
+        TeXParserUtils.createStack(listener, 
+         new TeXCsRef("tablename"), listener.getSpace(),
+         listener.getParam(1),
+         listener.getSpace(), listener.getOther('('),
+         listener.getParam(2), listener.getOther(')')));
+
+      listener.addLaTeXCommand("glsxtrfigurelocfmt", true, 2, null, 
+        TeXParserUtils.createStack(listener, 
+         new TeXCsRef("figurename"), listener.getSpace(),
+         listener.getParam(1),
+         listener.getSpace(), listener.getOther('('),
+         listener.getParam(2), listener.getOther(')')));
+
+      registerControlSequence(new TextualContentCommand("bibglslocationgroupsep",
+       "; "));
+
       registerControlSequence(new TextualContentCommand("TeXLive", "TeX Live"));
       registerControlSequence(new TextualContentCommand("MikTeX", "MikTeX"));
 
@@ -1554,6 +1571,9 @@ public class UserGuideSty extends LaTeXSty
 
       registerControlSequence(new Relax("nlctnovref"));
       registerControlSequence(new Relax("nlctusevref"));
+      registerControlSequence(new Relax("htmlavailable"));
+
+      registerControlSequence(new AtGobble("nlctdocatnum"));
    }
 
    protected void addGlsFmtTextCommand(String name, String prefix)

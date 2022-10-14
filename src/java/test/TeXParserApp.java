@@ -1714,9 +1714,9 @@ public class TeXParserApp implements TeXApp
 
    // TeXParser class now has its own version and date.
    // As from 0.9.2.2b these now refer to the test application only.
-   public static final String APP_VERSION = "0.9.2.3b";
+   public static final String APP_VERSION = "0.9.2.4b";
    public static final String APP_NAME = "texparsertest";
-   public static final String APP_DATE = "2020-09-02";
+   public static final String APP_DATE = "2022-10-14";
 
    public static long MAX_PROCESS_TIME=0L;
 
