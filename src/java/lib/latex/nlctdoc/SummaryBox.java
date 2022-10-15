@@ -143,7 +143,7 @@ public class SummaryBox extends AbstractGlsCommand
          list.add(parser.getListener().getControlSequence("summarytagfmt"));
          list.add(parser.getListener().createGroup("alias"));
             list.add(parser.getListener().getSpace());
-         list.add(parser.getListener().getControlSequence("glshyperlink"));
+         list.add(parser.getListener().getControlSequence("gls"));
          list.add(TeXParserUtils.createGroup(parser, alias));
       }
 
