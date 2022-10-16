@@ -288,10 +288,12 @@ public class PrintSummary extends AbstractGlsCommand
 
                   if (pl == null)
                   {
+/*
                      if (!pkgopts.contains(parentLabel))
                      {
-                        pkgopts.add(new GlsLabel(sty.getEntry(parentLabel)));
+                        pkgopts.add(new GlsLabel(parentEntry));
                      }
+*/
 
                      pkgopts.add(glslabel);
                   }
@@ -424,17 +426,19 @@ public class PrintSummary extends AbstractGlsCommand
          {
             substack.add(sectionCs);
             substack.add(listener.getOther('*'));
-            substack.add(listener.createGroup("Package Summary"));
+            substack.add(listener.createGroup("Package Option Summary"));
             substack.add(new TeXCsRef("label"));
             substack.add(listener.createGroup("styoptsummary"));
-         }
 
-         if (!pkgList.isEmpty())
-         {
             for (GlsLabel gl : pkgList)
             {
-               processSummary(substack, pkgMap.get(gl.getLabel()),
-                 subsectionCs, showGroupHeaders, parser, stack);
+               Vector<GlsLabel> pl = pkgMap.get(gl.getLabel());
+
+               if (pl.size() > 1)
+               {
+                  processSummary(substack, pl,
+                    subsectionCs, showGroupHeaders, parser, stack);
+               }
             }
          }
 

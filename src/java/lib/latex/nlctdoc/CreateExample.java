@@ -29,20 +29,21 @@ import com.dickimawbooks.texparserlib.latex.glossaries.*;
 
 public class CreateExample extends ControlSequence
 {
-   public CreateExample()
+   public CreateExample(UserGuideSty sty)
    {
-      this("createexample");
+      this("createexample", sty);
    }
 
-   public CreateExample(String name)
+   public CreateExample(String name, UserGuideSty sty)
    {
       super(name);
+      this.sty = sty;
    }
 
    @Override
    public Object clone()
    {
-      return new CreateExample(getName());
+      return new CreateExample(getName(), sty);
    }
 
    @Override
@@ -146,113 +147,123 @@ public class CreateExample extends ControlSequence
          substack.add(listener.getSpace());
       }
 
-      String dir = parser.expandToString(listener.getControlSequence("examplesdir"),
-         stack);
-
-      TeXObject baseObj = listener.getControlSequence("nlctexamplefilebasename");
-
-      baseObj = TeXParserUtils.expandOnce(baseObj, parser, stack);
-      String base = parser.expandToString(baseObj, stack);
-
-      ControlSequence hrefCs = listener.getControlSequence("href");
-
-      substack.add(hrefCs);
-      substack.add(listener.createGroup(dir+"/"+base+".tex"));
-      substack.add(listener.getControlSequence("exampledownloadtexicon"));
-
-      substack.add(listener.getSpace());
-
-      String pdfPath = dir+"/"+base+".pdf";
-      String imgPath = pdfPath;
-      File pdfFile = new File(dir, base+".pdf");
-
-      substack.add(hrefCs);
-      substack.add(listener.createGroup(pdfPath));
-      substack.add(listener.getControlSequence("exampledownloadpdficon"));
-
-      File croppedPdfFile = new File(dir, base+"-crop.pdf");
-
-      if (croppedPdfFile.exists())
+      if (sty.isDraft())
       {
-         pdfFile = croppedPdfFile;
-         imgPath = dir+"/"+pdfFile.getName();
-      }
+         substack.add(listener.getPar());
+         substack.add(listener.createString("[DRAFT MODE ON]"));
 
-      substack.add(listener.getPar());
-
-      TeXParserUtils.process(substack, parser, stack);
-
-      KeyValList imgOptions = new KeyValList();
-
-      if (description != null)
-      {
-         imgOptions.put("alt", description);
-      }
-
-      if (pageList == null)
-      {
-         try
-         {
-            File pngFile = new File(dir, base+".png");
-
-            if (!pngFile.exists())
-            {
-               listener.getTeXApp().convertimage(-1, null, pdfFile, null, pngFile);
-            }
-
-            if (pngFile.exists())
-            {
-               imgPath = dir+"/"+base+".png";
-            }
-         }
-         catch (IOException | InterruptedException e)
-         {
-            parser.logMessage(e);
-         }
-
-         listener.includegraphics(stack, imgOptions, imgPath);
+         TeXParserUtils.process(substack, parser, stack);
       }
       else
       {
-         for (int i = 0; i < pageList.length; i++)
-         {
-            imgPath = null;
+         String dir = parser.expandToString(listener.getControlSequence("examplesdir"),
+            stack);
 
+         TeXObject baseObj = listener.getControlSequence("nlctexamplefilebasename");
+
+         baseObj = TeXParserUtils.expandOnce(baseObj, parser, stack);
+         String base = parser.expandToString(baseObj, stack);
+
+         ControlSequence hrefCs = listener.getControlSequence("href");
+
+         substack.add(hrefCs);
+         substack.add(listener.createGroup(dir+"/"+base+".tex"));
+         substack.add(listener.getControlSequence("exampledownloadtexicon"));
+
+         substack.add(listener.getSpace());
+
+         String pdfPath = dir+"/"+base+".pdf";
+         String imgPath = pdfPath;
+         File pdfFile = new File(dir, base+".pdf");
+
+         substack.add(hrefCs);
+         substack.add(listener.createGroup(pdfPath));
+         substack.add(listener.getControlSequence("exampledownloadpdficon"));
+
+         File croppedPdfFile = new File(dir, base+"-crop.pdf");
+
+         if (croppedPdfFile.exists())
+         {
+            pdfFile = croppedPdfFile;
+            imgPath = dir+"/"+pdfFile.getName();
+         }
+
+         substack.add(listener.getPar());
+
+         TeXParserUtils.process(substack, parser, stack);
+
+         KeyValList imgOptions = new KeyValList();
+
+         if (description != null)
+         {
+            imgOptions.put("alt", description);
+         }
+
+         if (pageList == null)
+         {
             try
             {
-               String basename = String.format("%s-page%d.png", base, pageList[i]);
-               File pngFile = new File(dir, basename);
+               File pngFile = new File(dir, base+".png");
 
                if (!pngFile.exists())
                {
-                  listener.getTeXApp().convertimage(
-                     pageList[i], null, pdfFile, null, pngFile);
+                  listener.getTeXApp().convertimage(-1, null, pdfFile, null, pngFile);
                }
 
                if (pngFile.exists())
                {
-                  imgPath = dir+"/"+basename;
+                  imgPath = dir+"/"+base+".png";
                }
             }
             catch (IOException | InterruptedException e)
             {
-               throw new LaTeXSyntaxException(e, parser, 
-                 LaTeXSyntaxException.CLASS_ERROR, e.getMessage());
+               parser.logMessage(e);
             }
 
-            if (imgPath != null)
+            listener.includegraphics(stack, imgOptions, imgPath);
+         }
+         else
+         {
+            for (int i = 0; i < pageList.length; i++)
             {
-               TeXObjectList altList = listener.createString(
-                    "Page "+pageList[i]+". ");
+               imgPath = null;
 
-               if (description != null)
+               try
                {
-                  altList.add((TeXObject)description.clone(), true);
+                  String basename = String.format("%s-page%d.png", base, pageList[i]);
+                  File pngFile = new File(dir, basename);
+
+                  if (!pngFile.exists())
+                  {
+                     listener.getTeXApp().convertimage(
+                        pageList[i], null, pdfFile, null, pngFile);
+                  }
+
+                  if (pngFile.exists())
+                  {
+                     imgPath = dir+"/"+basename;
+                  }
+               }
+               catch (IOException | InterruptedException e)
+               {
+                  throw new LaTeXSyntaxException(e, parser, 
+                    LaTeXSyntaxException.CLASS_ERROR, e.getMessage());
                }
 
-               imgOptions.put("alt", altList);
+               if (imgPath != null)
+               {
+                  TeXObjectList altList = listener.createString(
+                       "Page "+pageList[i]+". ");
 
-               listener.includegraphics(stack, imgOptions, imgPath);
+                  if (description != null)
+                  {
+                     altList.add((TeXObject)description.clone(), true);
+                  }
+
+                  imgOptions.put("alt", altList);
+
+                  listener.includegraphics(stack, imgOptions, imgPath);
+               }
             }
          }
       }
@@ -264,4 +275,6 @@ public class CreateExample extends ControlSequence
    {
       process(parser, parser);
    }
+
+   private UserGuideSty sty;
 }

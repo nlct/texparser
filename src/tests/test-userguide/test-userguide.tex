@@ -72,6 +72,7 @@
   {%
     \note{or \code{\csfmt{usepackage}[foobar]\marg{baz}}}%
     \syntax{\meta{options}}
+    \desc{main package this documentation is describing}
   }
 % package options
   \gstyopt{styopt}
@@ -82,17 +83,34 @@
     \desc{sample package option}
   }
 % package option value
-  \goptval{styopt}{value1}
+  \goptval{styopt}{value1}% styopt=value1
   {
     \desc{some value}
   }
-  \goptval{styopt}{value2}
+  \goptval{styopt}{value2}% styopt=value2
   {
     \desc{another value}
   }
-  \goptval{styopt}{default}
+  \goptval{styopt}{default}% styopt=default
   {
     \desc{default value}
+  }
+  \gpkg{foobarsty-suppl}%
+  {%
+    \desc{a supplemental package that doesn't have any options}
+  }
+  % another package option
+  \gstyopt{anotherstyopt}
+  {
+    \inpackage{foobarsty}
+    \desc{sample package option without a value}
+  }
+  % an aliased package option
+  \gstyopt{aliasedstyopt}
+  {
+    \inpackage{foobarsty}
+    \desc{sample package option that's a synonym}
+    \field{alias}{opt.styopt}
   }
 % command options
   \gcsopt{foo\dhyphen bar}%
@@ -249,6 +267,15 @@ Does something else.
 
 \optionvaldef{styopt}{default}
 Some default setting.
+
+\optiondef{anotherstyopt}
+Another option.
+
+\optiondef{aliasedstyopt}
+This option is just an alias.
+
+\pkgdef{foobarsty-suppl}
+Some remark about supplemental package.
 
 Command: \gls{foobarcs} defined in \sty{foobarsty}.
 

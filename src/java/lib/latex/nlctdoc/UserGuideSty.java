@@ -1366,7 +1366,7 @@ public class UserGuideSty extends LaTeXSty
           new TeXCsRef("examplename"), listener.getSpace(),
           new TeXCsRef("theexample"))));
 
-      registerControlSequence(new CreateExample());
+      registerControlSequence(new CreateExample(this));
       registerControlSequence(new ExampleFileBaseName());
       registerControlSequence(new ExampleEnv());
 
@@ -1677,6 +1677,14 @@ public class UserGuideSty extends LaTeXSty
       else if (option.equals("noatsymgroup"))
       {
          atSymGroup = false;
+      }
+      else if (option.equals("draft"))
+      {
+         draft = true;
+      }
+      else if (option.equals("final"))
+      {
+         draft = false;
       }
       else
       {
@@ -2126,8 +2134,15 @@ public class UserGuideSty extends LaTeXSty
       return colorSty;
    }
 
+   public boolean isDraft()
+   {
+      return draft;
+   }
+
    protected GlossariesSty glossariesSty;
    protected ColorSty colorSty;
+
+   protected boolean draft=false;
 
    protected boolean atSymGroup = true;
 

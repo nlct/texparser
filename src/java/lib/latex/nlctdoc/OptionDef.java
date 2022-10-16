@@ -128,7 +128,7 @@ public class OptionDef extends StandaloneDef
 
          list.add(parser.getListener().getControlSequence("summarytagfmt"));
          list.add(parser.getListener().createGroup("alias"));
-         list.add(parser.getListener().getControlSequence("gls"));
+         list.add(parser.getListener().getControlSequence("glsfmtname"));
          list.add(parser.getListener().createGroup(alias));
       }
 

@@ -73,11 +73,13 @@ public class SummaryEnvironmentBox extends SummaryBox
          grp.add(syntax);
       }
 
+/*
       list.add(parser.getListener().getControlSequence("meta"));
       list.add(parser.getListener().createGroup("content"));
       list.add(parser.getListener().getControlSequence("cend"));
       list.add(TeXParserUtils.createGroup(parser,
        parser.getListener().getControlSequence("glsentryname"), glslabel));
+*/
    }
 
    protected FrameBox frameBox, rightBox, noteBox;
