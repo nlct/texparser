@@ -5,6 +5,7 @@ output
 *.out
 *.blg
 *.toc
+*.lot
 test*.pdf
 *.glo
 *.gls
