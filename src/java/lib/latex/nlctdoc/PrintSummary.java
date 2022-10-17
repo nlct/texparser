@@ -263,11 +263,17 @@ public class PrintSummary extends AbstractGlsCommand
             }
             else if (cat.equals("package"))
             {
+               if (!entry.isFieldEmpty("childlist"))
+               {
+                  pkgopts.add(glslabel);
+               }
+/*
                pkgList.add(glslabel);
 
                Vector<GlsLabel> pl = new Vector<GlsLabel>();
                pl.add(glslabel);
                pkgMap.put(glslabel.getLabel(), pl);
+*/
             }
             else if (cat.equals("class"))
             {
@@ -279,6 +285,7 @@ public class PrintSummary extends AbstractGlsCommand
             }
             else if (cat.equals("packageoption"))
             {
+/*
                if (entry.hasParent())
                {
                   GlossaryEntry parentEntry = entry.getParent(stack);
@@ -288,12 +295,10 @@ public class PrintSummary extends AbstractGlsCommand
 
                   if (pl == null)
                   {
-/*
                      if (!pkgopts.contains(parentLabel))
                      {
                         pkgopts.add(new GlsLabel(parentEntry));
                      }
-*/
 
                      pkgopts.add(glslabel);
                   }
@@ -306,6 +311,8 @@ public class PrintSummary extends AbstractGlsCommand
                {
                   pkgopts.add(glslabel);
                }
+*/
+               pkgopts.add(glslabel);
             }
             else if (cat.equals("classoption"))
             {

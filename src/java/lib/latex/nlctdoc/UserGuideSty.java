@@ -137,12 +137,29 @@ public class UserGuideSty extends LaTeXSty
       registerControlSequence(new GenericCommand(true, "glsaddterm", null,
          new TeXCsRef("glsadd")));
 
+      addSemanticCommand("crossreftag", TeXFontShape.IT);
+
+      addSemanticCommand("crossref", "crossref", null, null, null, null,
+       null, null, false, true, new UserDimension(1, FixedUnit.EM), null,
+       null, null, AlignHStyle.DEFAULT, AlignVStyle.DEFAULT, null, null
+      );
+
+      listener.addLaTeXCommand(true, "glsseeformat", true,
+       3, new TeXCsRef("seename"), TeXParserUtils.createStack(listener,
+        new TeXCsRef("crossref"), 
+        TeXParserUtils.createGroup(listener, 
+          new TeXCsRef("crossreftag"), 
+           TeXParserUtils.createGroup(listener, listener.getParam(1)),
+          listener.getSpace(),
+          new TeXCsRef("glsseelist"), 
+           TeXParserUtils.createGroup(listener, listener.getParam(2))
+        )
+      ));
+
       listener.addLaTeXCommand("seclocfmt", true, 2, null, 
         TeXParserUtils.createStack(listener, 
          listener.getOther(0xA7),
-         listener.getParam(1),
-         listener.getSpace(), listener.getOther('('),
-         listener.getParam(2), listener.getOther(')')));
+         listener.getParam(1)));
 
       registerControlSequence(new GenericCommand(true,
         "glsxtrchapterlocfmt", null, new TeXCsRef("seclocfmt")));
@@ -160,16 +177,12 @@ public class UserGuideSty extends LaTeXSty
       listener.addLaTeXCommand("glsxtrtablelocfmt", true, 2, null, 
         TeXParserUtils.createStack(listener, 
          new TeXCsRef("tablename"), listener.getSpace(),
-         listener.getParam(1),
-         listener.getSpace(), listener.getOther('('),
-         listener.getParam(2), listener.getOther(')')));
+         listener.getParam(1)));
 
       listener.addLaTeXCommand("glsxtrfigurelocfmt", true, 2, null, 
         TeXParserUtils.createStack(listener, 
          new TeXCsRef("figurename"), listener.getSpace(),
-         listener.getParam(1),
-         listener.getSpace(), listener.getOther('('),
-         listener.getParam(2), listener.getOther(')')));
+         listener.getParam(1)));
 
       registerControlSequence(new TextualContentCommand("bibglslocationgroupsep",
        "; "));
@@ -1238,11 +1251,10 @@ public class UserGuideSty extends LaTeXSty
         "toggleoffsettingsym", null, new TeXCsRef("faToggleOff")));
       registerControlSequence(new Symbol("optionvaluesym", 0x1F516));
       registerControlSequence(new Symbol("countersym", 0x2116));
-      registerControlSequence(new GenericCommand(true,
-        "terminalsym", null, new TeXCsRef("faTerminal")));
-      registerControlSequence(new Symbol("transcriptsym", 0x1F50E));
 
       registerControlSequence(new Symbol("terminalsym", 0x1F50E));
+      registerControlSequence(new Symbol("transcriptsym", 0x1F50E));
+
 
       // \deprecatedsym
       def = listener.createStack();

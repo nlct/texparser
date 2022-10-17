@@ -162,6 +162,7 @@ public class L2HConverter extends LaTeXParserListener
       addInternalReference("bib", new TeXCsRef("refname"));
       addInternalReference("toc", new TeXCsRef("contentsname"));
 
+      putControlSequence(new AtSecondOfTwo("texparser@ifintoc"));
       putControlSequence(new L2HTableOfContents());
       putControlSequence(new L2HAtStartToc());
       putControlSequence(new L2HContentsLine());
@@ -1084,7 +1085,7 @@ public class L2HConverter extends LaTeXParserListener
       writeln("div.date { display: block; text-align: center; font-size: medium;}");
       writeln("div.bibliography { display: block; margin-left: 4em; }");
       writeln("div.bibitem { display: inline; float: left; text-indent: -3em; }");
-      writeln("span.numberline { display: inline-block; width: 2em; }");
+      writeln("span.numberline { display: inline-block; width: 3em; }");
       writeln(".toc-subsection span.numberline { display: inline-block; width: 3em; }");
       writeln(".toc-subsubsection span.numberline { display: inline-block; width: 4em; }");
       writeln(".toc-paragraph span.numberline { display: inline-block; width: 5em; }");

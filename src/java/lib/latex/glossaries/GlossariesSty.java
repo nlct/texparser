@@ -987,8 +987,7 @@ public class GlossariesSty extends LaTeXSty
       addGlsXtrTitleFullCommands(false);
       addGlsXtrTitleFullCommands(true);
 
-      registerControlSequence(new AtNumberOfNumber("glsxtrtitleorpdforheading",
-       1, 3));
+      registerControlSequence(new GlsXtrTitleOrPdfOrHeading());
 
       registerControlSequence(new GlsXtrP(this));
       registerControlSequence(new GlsXtrP("glsxtrp", this));

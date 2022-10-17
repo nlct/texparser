@@ -102,6 +102,19 @@ public class OptionDef extends StandaloneDef
          }
       }
 
+      TeXObject statusVal = glslabel.getField("status");
+
+      if (statusVal != null)
+      {
+         String status = parser.expandToString(statusVal, parser);
+
+         if (!status.equals("default"))
+         {
+            title.add(parser.getListener().getControlSequence("glssymbol"));
+            title.add(parser.getListener().createGroup("sym."+status));
+         }
+      }
+
       taggedBox.setTitle(title);
    }
 

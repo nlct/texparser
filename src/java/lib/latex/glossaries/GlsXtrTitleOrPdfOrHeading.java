@@ -16,66 +16,62 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
-package com.dickimawbooks.texparserlib.html;
+package com.dickimawbooks.texparserlib.latex.glossaries;
 
 import java.io.IOException;
-import java.io.File;
-import java.util.Vector;
 
 import com.dickimawbooks.texparserlib.*;
-import com.dickimawbooks.texparserlib.primitives.*;
 import com.dickimawbooks.texparserlib.latex.*;
 
-public class L2HAtStartToc extends ControlSequence
+public class GlsXtrTitleOrPdfOrHeading extends ControlSequence
 {
-   public L2HAtStartToc()
+   public GlsXtrTitleOrPdfOrHeading()
    {
-      this("@starttoc");
+      this("glsxtrtitleorpdforheading");
    }
 
-   public L2HAtStartToc(String name)
+   public GlsXtrTitleOrPdfOrHeading(String name)
    {
       super(name);
    }
 
-   @Override
    public Object clone()
    {
-      return new L2HAtStartToc(getName());
+      return new GlsXtrTitleOrPdfOrHeading(getName());
    }
 
    @Override
    public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      L2HConverter listener = (L2HConverter)parser.getListener();
+      TeXObject titleArg = popArg(parser, stack);
+      TeXObject pdfArg = popArg(parser, stack);
+      TeXObject headingArg = popArg(parser, stack);
 
-      String ext = popLabelString(parser, stack);
+      LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
 
-      stack.push(new HtmlTag(String.format("<!-- end of %s -->", ext)));
-      stack.push(new EndElement("div"));
-      stack.push(listener.getControlSequence("endgroup"));
+      ControlSequence cs = parser.getControlSequence("texparser@ifintoc");
 
-      File tocFile = listener.getAuxFile(ext);
+      TeXObjectList list = listener.createStack();
 
-      if (tocFile.exists())
+      if (cs == null)
       {
-         stack.push(TeXParserActionObject.createInputAction(tocFile));
+         list.add(titleArg);
       }
       else
       {
-         parser.warningMessage(TeXSyntaxException.ERROR_FILE_NOT_FOUND, tocFile);
+         list.add(cs);
+
+         Group grp = listener.createGroup();
+         list.add(grp);
+         grp.add(headingArg);
+
+         grp = listener.createGroup();
+         list.add(grp);
+         grp.add(titleArg);
       }
 
-      stack.push(listener.getControlSequence("@firstoftwo"));
-      stack.push(new TeXCsRef("texparser@ifintoc"));
-      stack.push(listener.getControlSequence("let"));
-
-      stack.push(listener.getControlSequence("makeatletter"));
-      stack.push(listener.getControlSequence("begingroup"));
-      StartElement elem = new StartElement("div");
-      elem.putAttribute("class", ext);
-      stack.push(elem);
+      TeXParserUtils.process(list, parser, stack);
    }
 
    @Override
@@ -85,3 +81,4 @@ public class L2HAtStartToc extends ControlSequence
       process(parser, parser);
    }
 }
+
