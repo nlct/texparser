@@ -82,7 +82,7 @@ public class StandaloneDef extends AbstractGlsCommand
          list = parser.getListener().createStack();
          list.add(parser.getListener().getControlSequence("summarytagfmt"));
          list.add(parser.getListener().createGroup("default"));
-         list.add(val, true);
+         list.add(val);
       }
 
       val = glslabel.getEntry().get("initvalue");
@@ -101,7 +101,7 @@ public class StandaloneDef extends AbstractGlsCommand
 
          list.add(parser.getListener().getControlSequence("summarytagfmt"));
          list.add(parser.getListener().createGroup("initial"));
-         list.add(val, true);
+         list.add(val);
       }
 
       TeXObject statusVal = glslabel.getEntry().get("status");

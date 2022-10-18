@@ -98,8 +98,8 @@ public class EnvDef extends StandaloneDef
          if (!status.equals("default"))
          {
             title = parser.getListener().createStack();
-            title.add(parser.getListener().getControlSequence("glssymbol"));
-            title.add(parser.getListener().createGroup("sym."+status));
+            title.add(parser.getListener().getControlSequence("icon"));
+            title.add(parser.getListener().createGroup(status));
          }
       }
 

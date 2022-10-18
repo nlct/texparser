@@ -112,10 +112,10 @@ public class CodeResult extends GatherEnvContents
 
       contents.add(titleBoxCs);
       contents.add(TeXParserUtils.createGroup(parser, 
-       listener.getControlSequence("glssymbol"),
-       listener.createGroup("sym."+codeTag),
-       listener.getControlSequence("glssymbol"),
-       listener.createGroup("sym.result")
+       listener.getControlSequence("icon"),
+       listener.createGroup(codeTag),
+       listener.getControlSequence("icon"),
+       listener.createGroup("result")
       ));
 
       contents.add(listener.getPar());

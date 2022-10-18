@@ -85,11 +85,11 @@ public class SummaryCommandOptionBox extends SummaryBox
          contentList.add(parser.getListener().getSpace());
       }
 
-      contentList.add(parser.getListener().getControlSequence("glssymbol"));
+      contentList.add(parser.getListener().getControlSequence("icon"));
 
       if (syntax == null)
       {
-         contentList.add(parser.getListener().createGroup("sym.novaluesetting"));
+         contentList.add(parser.getListener().createGroup("novaluesetting"));
       }
       else
       {
@@ -109,11 +109,11 @@ public class SummaryCommandOptionBox extends SummaryBox
                }
             }
 
-            contentList.add(parser.getListener().createGroup("sym.toggle"+toggle+"setting"));
+            contentList.add(parser.getListener().createGroup("toggle"+toggle+"setting"));
          }
          else
          {
-            contentList.add(parser.getListener().createGroup("sym.valuesetting"));
+            contentList.add(parser.getListener().createGroup("valuesetting"));
          }
       }
 

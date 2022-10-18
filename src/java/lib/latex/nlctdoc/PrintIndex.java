@@ -66,8 +66,8 @@ public class PrintIndex extends AbstractGlsCommand
 
          if (!status.equals("default") && !status.isEmpty())
          {
-            content.add(parser.getListener().getControlSequence("glssymbol"));
-            content.add(parser.getListener().createGroup("sym."+status));
+            content.add(parser.getListener().getControlSequence("icon"));
+            content.add(parser.getListener().createGroup(status));
             content.add(parser.getListener().getSpace());
          }
       }

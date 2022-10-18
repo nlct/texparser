@@ -1254,6 +1254,46 @@ public class UserGuideSty extends LaTeXSty
       registerControlSequence(new TextualContentCommand("terminalsym", "\u232A_"));
       registerControlSequence(new Symbol("transcriptsym", 0x1F50E));
 
+      registerControlSequence(new InitValRef(glossariesSty));
+      registerControlSequence(new InitValOpt(glossariesSty));
+
+      // \aliasref
+      def = listener.createStack();
+      def.add(new TeXCsRef("glshyperlink"));
+      grp = listener.createGroup();
+      def.add(grp);
+      grp.add(listener.getParam(1));
+
+      registerControlSequence(new LaTeXGenericCommand(true,
+       "aliasref", "m", def));
+
+      listener.newcounter("icon");
+
+      // \icon
+      def = listener.createStack();
+      def.add(new TeXCsRef("stepcounter"));
+      def.add(listener.createGroup("icon"));
+      def.add(new TeXCsRef("glssymbol"));
+      def.addAll(listener.createString("[counter=icon]"));
+      grp = listener.createGroup("sym.");
+      def.add(grp);
+      grp.add(listener.getParam(1));
+
+      registerControlSequence(new LaTeXGenericCommand(true,
+       "icon", "m", def));
+
+      // \icontext
+      def = listener.createStack();
+      def.add(new TeXCsRef("stepcounter"));
+      def.add(listener.createGroup("icon"));
+      def.add(new TeXCsRef("glstext"));
+      def.addAll(listener.createString("[counter=icon]"));
+      grp = listener.createGroup("sym.");
+      def.add(grp);
+      grp.add(listener.getParam(1));
+
+      registerControlSequence(new LaTeXGenericCommand(true,
+       "icontext", "m", def));
 
       // \deprecatedsym
       def = listener.createStack();
@@ -2082,8 +2122,8 @@ public class UserGuideSty extends LaTeXSty
       Color bg, Color frameCol)
    {
       TeXObjectList list = listener.createStack();
-      list.add(new TeXCsRef("glssymbol"));
-      list.add(listener.createGroup("sym."+tag));
+      list.add(new TeXCsRef("icon"));
+      list.add(listener.createGroup(tag));
 
       return addTaggedColourBox(name, false, font, null, bg, frameCol, list);
    }

@@ -74,8 +74,8 @@ public class SummaryBox extends AbstractGlsCommand
 
          if (!status.equals("default") && !status.isEmpty())
          {
-            list.add(parser.getListener().getControlSequence("glssymbol"));
-            list.add(parser.getListener().createGroup("sym."+status));
+            list.add(parser.getListener().getControlSequence("icon"));
+            list.add(parser.getListener().createGroup(status));
             list.add(parser.getListener().getSpace());
          }
       }

@@ -89,8 +89,8 @@ public class SummaryOptionValueBox extends SummaryBox
 
          if (!status.equals("default") && !status.isEmpty())
          {
-            contentList.add(parser.getListener().getControlSequence("glssymbol"));
-            contentList.add(parser.getListener().createGroup("sym."+status));
+            contentList.add(parser.getListener().getControlSequence("icon"));
+            contentList.add(parser.getListener().createGroup(status));
             contentList.add(parser.getListener().getSpace());
          }
       }

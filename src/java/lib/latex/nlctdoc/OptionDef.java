@@ -71,11 +71,11 @@ public class OptionDef extends StandaloneDef
       TeXObject syntax = glslabel.getField("syntax");
 
       TeXObjectList title = parser.getListener().createStack();
-      title.add(parser.getListener().getControlSequence("glssymbol"));
+      title.add(parser.getListener().getControlSequence("icon"));
 
       if (syntax == null)
       {
-         title.add(parser.getListener().createGroup("sym.novaluesetting"));
+         title.add(parser.getListener().createGroup("novaluesetting"));
       }
       else
       {
@@ -94,11 +94,11 @@ public class OptionDef extends StandaloneDef
                }
             }
 
-            title.add(parser.getListener().createGroup("sym.toggle"+toggle+"setting"));
+            title.add(parser.getListener().createGroup("toggle"+toggle+"setting"));
          }
          else
          {
-            title.add(parser.getListener().createGroup("sym.valuesetting"));
+            title.add(parser.getListener().createGroup("valuesetting"));
          }
       }
 
@@ -110,8 +110,8 @@ public class OptionDef extends StandaloneDef
 
          if (!status.equals("default"))
          {
-            title.add(parser.getListener().getControlSequence("glssymbol"));
-            title.add(parser.getListener().createGroup("sym."+status));
+            title.add(parser.getListener().getControlSequence("icon"));
+            title.add(parser.getListener().createGroup(status));
          }
       }
 
