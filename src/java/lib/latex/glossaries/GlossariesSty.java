@@ -1362,6 +1362,152 @@ public class GlossariesSty extends LaTeXSty
                   GlossaryStyleSty.STATUS_IMPLEMENTED));
    }
 
+   protected GlossaryStyleSty addTableStyle() throws IOException
+   {
+      TeXParser parser = getParser();
+      LaTeXParserListener listener = getListener();
+
+      CountRegister reg = parser.getSettings().newcount(true,
+        "glstableblockperrowcount");
+      reg.setValue(2);
+
+      parser.getSettings().newcount(true, "glstablecurrentblockindex");
+
+      parser.getSettings().newcount(true, "glstabletotalcols");
+
+      reg = parser.getSettings().newcount(true,
+        "glstablecolsperblock");
+      reg.setValue(2);
+
+      registerControlSequence(new GenericCommand(true,
+       "glstablenameheader", null, new TeXCsRef("entryname")));
+
+      registerControlSequence(new GenericCommand(true,
+       "glstabledescheader", null, new TeXCsRef("descriptionname")));
+
+      registerControlSequence(new GenericCommand(true,
+       "glstablesymbolheader", null, new TeXCsRef("symbolname")));
+
+      registerControlSequence(new GenericCommand(true, "glstableotherfield"));
+
+      registerControlSequence(new GenericCommand(true,
+       "glstableotherheader", null, TeXParserUtils.createStack(
+        listener, new TeXCsRef("MFUsentencecase"), 
+         new TeXCsRef("glstableotherfield"))));
+
+      NewIf.createConditional(true, getParser(), "ifKV@printglosstable@header", true);
+      NewIf.createConditional(true, getParser(), "ifKV@printglosstable@rules", true);
+
+      registerControlSequence(new TextualContentCommand("glstable@blockalignsep",
+        "|"));
+
+      registerControlSequence(new GenericCommand(true,
+       "glstablePreChildren", null, TeXParserUtils.createStack(listener,
+         new TeXCsRef("glstableifpar"), new TeXCsRef("par"))));
+
+      registerControlSequence(new GenericCommand(true,
+       "glstableblocksubentrysep", null, new TeXCsRef("tabularnewline")));
+
+      registerControlSequence(new AtNumberOfNumber("glstable@parcase",
+        1, 3));
+
+      registerControlSequence(new LaTeXGenericCommand(true,
+        "glstableifpar", "m", TeXParserUtils.createStack(listener,
+       new TeXCsRef("glstable@parcase"), 
+       listener.createGroup(),
+       TeXParserUtils.createGroup(listener, listener.getParam(1)),
+       TeXParserUtils.createGroup(listener, listener.getParam(1))
+      )));
+
+      // \glstableleftalign
+      TeXObjectList def = listener.createStack();
+      def.add(new TeXCsRef("glstable@parcase"));
+      def.add(listener.createGroup("l"));
+
+      Group grp = listener.createGroup("p");
+      def.add(grp);
+      grp.add(TeXParserUtils.createGroup(listener, listener.getParam(1)));
+
+      grp = listener.createGroup(">");
+      def.add(grp);
+      grp.add(TeXParserUtils.createGroup(listener, new TeXCsRef("raggedright")));
+      grp.add(listener.getOther('p'));
+      grp.add(TeXParserUtils.createGroup(listener, listener.getParam(1)));
+
+      registerControlSequence(new LaTeXGenericCommand(true,
+       "glstableleftalign", "m", def));
+
+      // \glstablerightalign
+      def = listener.createStack();
+      def.add(new TeXCsRef("glstable@parcase"));
+      def.add(listener.createGroup("r"));
+
+      grp = listener.createGroup("p");
+      def.add(grp);
+      grp.add(TeXParserUtils.createGroup(listener, listener.getParam(1)));
+
+      grp = listener.createGroup(">");
+      def.add(grp);
+      grp.add(TeXParserUtils.createGroup(listener, new TeXCsRef("raggedleft")));
+      grp.add(listener.getOther('p'));
+      grp.add(TeXParserUtils.createGroup(listener, listener.getParam(1)));
+
+      registerControlSequence(new LaTeXGenericCommand(true,
+       "glstablerightalign", "m", def));
+
+      // \glstablecenteralign
+      def = listener.createStack();
+      def.add(new TeXCsRef("glstable@parcase"));
+      def.add(listener.createGroup("c"));
+
+      grp = listener.createGroup("p");
+      def.add(grp);
+      grp.add(TeXParserUtils.createGroup(listener, listener.getParam(1)));
+
+      grp = listener.createGroup(">");
+      def.add(grp);
+      grp.add(TeXParserUtils.createGroup(listener, new TeXCsRef("centering")));
+      grp.add(listener.getOther('p'));
+      grp.add(TeXParserUtils.createGroup(listener, listener.getParam(1)));
+
+      registerControlSequence(new LaTeXGenericCommand(true,
+       "glstablecenteralign", "m", def));
+
+      // glstablenamecolalign
+      registerControlSequence(new GenericCommand(
+       "glstablenamecolalign", null, 
+       TeXParserUtils.createStack(listener,
+       new TeXCsRef("glstableleftalign"), new TeXCsRef("glstablenamewidth"))));
+
+      // glstabledesccolalign
+      registerControlSequence(new GenericCommand(
+       "glstabledesccolalign", null, 
+       TeXParserUtils.createStack(listener,
+       new TeXCsRef("glstableleftalign"), new TeXCsRef("glstabledescwidth"))));
+
+      // glstablesymbolcolalign
+      registerControlSequence(new GenericCommand(
+       "glstablesymbolcolalign", null, 
+       TeXParserUtils.createStack(listener,
+       new TeXCsRef("glstablecenteralign"), new TeXCsRef("glstablesymbolwidth"))));
+
+      // \glstableNameTarget
+      def = listener.createStack();
+      def.add(new TeXCsRef("glstarget"));
+      def.add(TeXParserUtils.createGroup(listener, listener.getParam(1)));
+
+      grp = listener.createGroup();
+      def.add(grp);
+      grp.add(new TeXCsRef("glstableNameFmt"));
+      grp.add(TeXParserUtils.createGroup(listener, listener.getParam(1)));
+
+      registerControlSequence(new LaTeXGenericCommand(true,
+        "glstableNameTarget", "m", def));
+
+      return new GlossaryStyleSty(this, "table",
+           GlossaryStyleSty.STATUS_IMPLEMENTED);
+   }
+
    @Override
    protected void preOptions(TeXObjectList stack) throws IOException
    {
@@ -1493,6 +1639,10 @@ public class GlossariesSty extends LaTeXSty
             {
                loadTree = true;
                loadStyles = true;
+            }
+            else if (style.equals("table"))
+            {
+               listener.addPackage(addTableStyle());
             }
             else
             {
@@ -1836,6 +1986,11 @@ public class GlossariesSty extends LaTeXSty
    public LaTeXSty loadStylePackage(String tag, TeXObjectList stack)
    throws IOException
    {
+      if (tag.equals("table"))
+      {
+         return addTableStyle();
+      }
+
       String filename = "glossary-"+tag+".sty";
 
       TeXPath texPath = new TeXPath(getParser(), filename);
