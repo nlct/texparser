@@ -118,6 +118,9 @@ public class StandaloneDef extends AbstractGlsCommand
             list.add(parser.getListener().getSpace());
          }
 
+         list.add(parser.getListener().getControlSequence("summarytagfmt"));
+         list.add(parser.getListener().createGroup("alias"));
+
          list.add(parser.getListener().getControlSequence("aliasref"));
          list.add(parser.getListener().createGroup(val.toString(parser)));
       }
