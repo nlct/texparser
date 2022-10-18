@@ -243,7 +243,7 @@ public class PrintSummary extends AbstractGlsCommand
          {
             GlossaryEntry entry = sty.getEntry(label);
 
-            if (entry.isFieldEmpty("description"))
+            if (entry.isFieldEmpty("description") && entry.isFieldEmpty("alias"))
             {
                continue;
             }
