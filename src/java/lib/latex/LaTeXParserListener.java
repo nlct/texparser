@@ -1659,6 +1659,12 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       loadedPackages.add(sty);
    }
 
+   public void addPackage(LaTeXSty sty)
+   {
+      addFileReference(sty);
+      loadedPackages.add(sty);
+   }
+
    public boolean isParsePackageSupportOn()
    {
       return parsePackages;
@@ -1850,21 +1856,44 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
 
       if (styName.equals("glossaries"))
       {
-         return new GlossariesSty(options, styName, this, loadParentOptions);
+         if (glossariesSty == null)
+         {
+            glossariesSty =
+               new GlossariesSty(options, styName, this, loadParentOptions);
+
+            return glossariesSty;
+         }
+         else
+         {
+            return new GlossaryStyleSty("glossaries", this);
+         }
       }
 
       if (styName.equals("glossaries-extra"))
       {
-         LaTeXSty sty = getLoadedPackage("glossaries");
+         if (glossariesSty != null)
+         {
+            removePackage(glossariesSty);
+         }
 
-         if (sty == null || !(sty instanceof GlossariesSty))
+         glossariesSty = new GlossariesSty(options, styName, this, loadParentOptions);
+
+         addPackage(new GlossaryStyleSty("glossaries", this));
+
+         return glossariesSty;
+      }
+
+      if (styName.startsWith("glossary-"))
+      {
+         if (glossariesSty == null)
          {
-            return new GlossariesSty(options, styName, this, loadParentOptions);
+            glossariesSty =
+               new GlossariesSty(options, "glossaries", this, loadParentOptions);
+
+            addPackage(glossariesSty);
          }
-         else
-         {
-            ((GlossariesSty)sty).addExtra(styName, options, stack);
-         }
+
+         return glossariesSty.loadStylePackage(styName.substring(9), stack);
       }
 
       if (styName.equals("hyperref"))
@@ -2855,6 +2884,8 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
    private FontEncSty fontEncSty = null;
 
    private ColorSty colorSty = null;
+
+   private GlossariesSty glossariesSty = null;
 
    private boolean parseAux = false;
 

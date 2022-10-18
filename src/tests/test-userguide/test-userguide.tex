@@ -48,6 +48,16 @@
     \syntax{\oargm{options}\margm{text}\margm{another arg}}%
     \desc{starred command}
   }
+  \gcmd{foo\-name}
+  {
+    \initval{Foo}
+    \desc{language sensitive command}
+  }
+  \gcmd{another\-cmd}
+  {
+    \initval{\gls{fooname}}
+    \desc{another command}
+  }
   \gcmd{deprecated\-cmd}
   {\deprecated
     \syntax{\margm{text}}
@@ -315,6 +325,12 @@ Command with starred version that has different syntax:
 \cmddef{cswithstarredothersyntax}
 
 Something about \gls{cswithstarredothersyntax*}.
+
+\cmddef{anothercmd}
+Another command.
+
+\cmddef{fooname}
+A language-sensitive command.
 
 A deprecated command:
 

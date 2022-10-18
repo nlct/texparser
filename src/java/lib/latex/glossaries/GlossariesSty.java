@@ -1444,10 +1444,44 @@ public class GlossariesSty extends LaTeXSty
       getListener().putControlSequence(true, 
         new GlossarySection(section, isNumberedSection, isAutoLabel));
 
+      if (loadList && listener.isStyLoaded("glossary-list"))
+      {
+         loadList = false;
+      }
+
+      if (loadTree && listener.isStyLoaded("glossary-tree"))
+      {
+         loadTree = false;
+      }
+
       boolean loadStyles = (loadList || loadTree || extra);
 
       UndefAction orgAction = listener.getUndefinedAction();
       int orgCatCode = getParser().getCatCode('@');
+
+      if (stylemods != null && !stylemods.isEmpty())
+      {
+         String[] styles = stylemods.trim().split(" *, *");
+
+         for (String style : styles)
+         {
+            if (style.equals("list"))
+            {
+               loadList = true;
+               loadStyles = true;
+            }
+            else if (style.equals("tree"))
+            {
+               loadTree = true;
+               loadStyles = true;
+            }
+            else
+            {
+               listener.addPackage(new GlossaryStyleSty(getListener(), style,
+                  GlossaryStyleSty.STATUS_NOT_LOADED));
+            }
+         }
+      }
 
       if (loadStyles)
       {
@@ -1465,6 +1499,9 @@ public class GlossariesSty extends LaTeXSty
            getParser(), "glossary-list.sty")); 
 
          loadList = false;
+
+         listener.addPackage(new GlossaryStyleSty(getListener(), "list",
+           GlossaryStyleSty.STATUS_PARSED));
       }
 
       if (loadTree)
@@ -1473,6 +1510,9 @@ public class GlossariesSty extends LaTeXSty
            getParser(), "glossary-tree.sty")); 
 
          loadTree = false;
+
+         listener.addPackage(new GlossaryStyleSty(getListener(), "tree",
+           GlossaryStyleSty.STATUS_PARSED));
       }
 
       if (extra)
@@ -1772,6 +1812,52 @@ public class GlossariesSty extends LaTeXSty
          floatsCounter = valStr.isEmpty() || valStr.equals("true"); 
          addFloatsHook();
       }
+   }
+
+   public LaTeXSty loadStylePackage(String tag, TeXObjectList stack)
+   throws IOException
+   {
+      String filename = "glossary-"+tag+".sty";
+
+      TeXPath texPath = new TeXPath(getParser(), filename);
+
+      if (!texPath.exists())
+      {
+         getParser().warningMessage(TeXSyntaxException.ERROR_FILE_NOT_FOUND,
+                  filename);
+
+         return new GlossaryStyleSty(getListener(), tag,
+           GlossaryStyleSty.STATUS_NOT_LOADED);
+      }
+
+      TeXObjectList substack = getListener().createStack();
+
+      UndefAction orgAction = listener.getUndefinedAction();
+      int orgCatCode = getParser().getCatCode('@');
+
+      substack.add(new TeXParserSetUndefAction(UndefAction.WARN));
+
+      if (orgCatCode != TeXParser.TYPE_LETTER)
+      {
+         substack.add(listener.getControlSequence("makeatletter"));
+      }
+
+      substack.add(TeXParserActionObject.createInputAction(texPath)); 
+
+      if (orgCatCode != TeXParser.TYPE_LETTER)
+      {
+         substack.add(listener.getControlSequence("catcode"));
+         substack.add(new UserNumber((int)'@'));
+         substack.add(listener.getOther('='));
+         substack.add(new UserNumber(orgCatCode));
+      }
+
+      substack.add(new TeXParserSetUndefAction(orgAction));
+
+      TeXParserUtils.process(substack, getParser(), stack);
+
+      return new GlossaryStyleSty(getListener(), tag,
+           GlossaryStyleSty.STATUS_PARSED);
    }
 
    public void setDebug(String debugOpt)
