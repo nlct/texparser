@@ -1019,10 +1019,9 @@ public class UserGuideSty extends LaTeXSty
       // \faqspkg
       def = listener.createStack();
       def.add(new TeXCsRef("dickimawhref"));
-      grp = listener.createGroup("faqs/");
+      grp = listener.createGroup("faqs.php?category=");
       def.add(grp);
       grp.add(listener.getParam(1));
-      grp.add(listener.createString("faq.html"));
 
       grp = listener.createGroup();
       def.add(grp);
@@ -1252,7 +1251,7 @@ public class UserGuideSty extends LaTeXSty
       registerControlSequence(new Symbol("optionvaluesym", 0x1F516));
       registerControlSequence(new Symbol("countersym", 0x2116));
 
-      registerControlSequence(new Symbol("terminalsym", 0x1F50E));
+      registerControlSequence(new TextualContentCommand("terminalsym", "\u232A_"));
       registerControlSequence(new Symbol("transcriptsym", 0x1F50E));
 
 
