@@ -121,8 +121,8 @@ public class StandaloneDef extends AbstractGlsCommand
                list.add(parser.getListener().getSpace());
             }
 
-            list.add(parser.getListener().getControlSequence("gls"));
-            list.add(parser.getListener().createGroup("sym."+status));
+            list.add(parser.getListener().getControlSequence("icontext"));
+            list.add(parser.getListener().createGroup(status));
          }
       }
 
