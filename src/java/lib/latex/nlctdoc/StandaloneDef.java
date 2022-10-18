@@ -104,6 +104,24 @@ public class StandaloneDef extends AbstractGlsCommand
          list.add(val);
       }
 
+      val = glslabel.getEntry().get("alias");
+
+      if (val != null)
+      {
+         if (list == null)
+         {
+            list = parser.getListener().createStack();
+         }
+         else
+         {
+            list.add(parser.getListener().getOther(';'));
+            list.add(parser.getListener().getSpace());
+         }
+
+         list.add(parser.getListener().getControlSequence("aliasref"));
+         list.add(parser.getListener().createGroup(val.toString(parser)));
+      }
+
       TeXObject statusVal = glslabel.getEntry().get("status");
 
       if (statusVal != null)
@@ -121,7 +139,7 @@ public class StandaloneDef extends AbstractGlsCommand
                list.add(parser.getListener().getSpace());
             }
 
-            list.add(parser.getListener().getControlSequence("icontext"));
+            list.add(parser.getListener().getControlSequence("icon"));
             list.add(parser.getListener().createGroup(status));
          }
       }
