@@ -1865,7 +1865,7 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
          }
          else
          {
-            return new GlossaryStyleSty("glossaries", this);
+            return new GlossaryStyleSty("glossaries", glossariesSty);
          }
       }
 
@@ -1878,7 +1878,7 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
 
          glossariesSty = new GlossariesSty(options, styName, this, loadParentOptions);
 
-         addPackage(new GlossaryStyleSty("glossaries", this));
+         addPackage(new GlossaryStyleSty("glossaries", glossariesSty));
 
          return glossariesSty;
       }
