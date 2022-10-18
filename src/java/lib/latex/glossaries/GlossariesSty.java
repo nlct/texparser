@@ -494,6 +494,8 @@ public class GlossariesSty extends LaTeXSty
 
       getListener().declareFrameBox(fbox, false);
 
+      addHyperNav();
+
       if (extra)
       {
          registerControlSequence(new GenericCommand("@gls@preglossaryhook",
@@ -1345,6 +1347,23 @@ public class GlossariesSty extends LaTeXSty
 
    }
 
+   protected void addHyperNav()
+   {// TODO
+
+      LaTeXParserListener listener = getListener();
+
+      TeXObjectList def = listener.createString("glsn:");
+      def.add(listener.getParam(1));
+      def.add(listener.getOther('@'));
+      def.add(listener.getParam(2));
+
+      registerControlSequence(new LaTeXGenericCommand(true,
+        "glsnavhyperlinkname", "mm", def));
+
+      listener.addPackage(new GlossaryStyleSty(this, "hypernav",
+                  GlossaryStyleSty.STATUS_IMPLEMENTED));
+   }
+
    @Override
    protected void preOptions(TeXObjectList stack) throws IOException
    {
@@ -1477,7 +1496,7 @@ public class GlossariesSty extends LaTeXSty
             }
             else
             {
-               listener.addPackage(new GlossaryStyleSty(getListener(), style,
+               listener.addPackage(new GlossaryStyleSty(this, style,
                   GlossaryStyleSty.STATUS_NOT_LOADED));
             }
          }
@@ -1500,7 +1519,7 @@ public class GlossariesSty extends LaTeXSty
 
          loadList = false;
 
-         listener.addPackage(new GlossaryStyleSty(getListener(), "list",
+         listener.addPackage(new GlossaryStyleSty(this, "list",
            GlossaryStyleSty.STATUS_PARSED));
       }
 
@@ -1511,7 +1530,7 @@ public class GlossariesSty extends LaTeXSty
 
          loadTree = false;
 
-         listener.addPackage(new GlossaryStyleSty(getListener(), "tree",
+         listener.addPackage(new GlossaryStyleSty(this, "tree",
            GlossaryStyleSty.STATUS_PARSED));
       }
 
@@ -1826,7 +1845,7 @@ public class GlossariesSty extends LaTeXSty
          getParser().warningMessage(TeXSyntaxException.ERROR_FILE_NOT_FOUND,
                   filename);
 
-         return new GlossaryStyleSty(getListener(), tag,
+         return new GlossaryStyleSty(this, tag,
            GlossaryStyleSty.STATUS_NOT_LOADED);
       }
 
@@ -1856,7 +1875,7 @@ public class GlossariesSty extends LaTeXSty
 
       TeXParserUtils.process(substack, getParser(), stack);
 
-      return new GlossaryStyleSty(getListener(), tag,
+      return new GlossaryStyleSty(this, tag,
            GlossaryStyleSty.STATUS_PARSED);
    }
 

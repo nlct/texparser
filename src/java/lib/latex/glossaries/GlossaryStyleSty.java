@@ -42,23 +42,30 @@ import com.dickimawbooks.texparserlib.latex.mfirstuc.MfirstucSty;
 
 public class GlossaryStyleSty extends LaTeXSty
 {
-   public GlossaryStyleSty(String name, LaTeXParserListener listener)
+   public GlossaryStyleSty(String name, GlossariesSty sty)
    throws IOException
    {
-      super(null, name, listener, false);
+      super(null, name, sty.getListener(), false);
       status = STATUS_IMPLEMENTED;
+      glossariesSty = sty;
    }
 
-   public GlossaryStyleSty(LaTeXParserListener listener, String tag, int status)
+   public GlossaryStyleSty(GlossariesSty sty, String tag, int status)
    throws IOException
    {
-      super(null, "glossary-"+tag, listener, false);
+      super(null, "glossary-"+tag, sty.getListener(), false);
       this.status = status;
+      glossariesSty = sty;
    }
 
    public int getStatus()
    {
       return status;
+   }
+
+   public GlossariesSty getGlossariesSty()
+   {
+      return glossariesSty;
    }
 
    @Override
@@ -71,4 +78,6 @@ public class GlossaryStyleSty extends LaTeXSty
    public static final int STATUS_IMPLEMENTED=2;
 
    protected int status = STATUS_NOT_LOADED;
+
+   protected GlossariesSty glossariesSty;
 }
