@@ -494,8 +494,6 @@ public class GlossariesSty extends LaTeXSty
 
       getListener().declareFrameBox(fbox, false);
 
-      addHyperNav();
-
       if (extra)
       {
          registerControlSequence(new GenericCommand("@gls@preglossaryhook",
@@ -1347,7 +1345,7 @@ public class GlossariesSty extends LaTeXSty
 
    }
 
-   protected void addHyperNav()
+   protected void addHyperNav() throws IOException
    {// TODO
 
       LaTeXParserListener listener = getListener();
@@ -1384,6 +1382,8 @@ public class GlossariesSty extends LaTeXSty
    protected void postOptions(TeXObjectList stack) throws IOException
    {
       super.postOptions(stack);
+
+      addHyperNav();
 
       NewIf.createConditional(true, getParser(), "ifglsxindy", 
         indexingOption == IndexingOption.XINDY);
