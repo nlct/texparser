@@ -46,25 +46,25 @@ public class L2HSpacer extends Spacer
    public void process(TeXParser parser)
     throws IOException
    {
-      parser.getListener().getWriteable().write("<div style=\"");
+      parser.getListener().getWriteable().writeliteral("<div style=\"");
 
       if (direction == Direction.HORIZONTAL)
       {
-         parser.getListener().getWriteable().write(
+         parser.getListener().getWriteable().writeliteral(
            "width: " + getSize().format() + "; ");
       }
       else
       {
-         parser.getListener().getWriteable().write(
+         parser.getListener().getWriteable().writeliteral(
            "height: " + getSize().format() + "; ");
       }
 
       if (isInLine())
       {
-         parser.getListener().getWriteable().write("display: inline-block; ");
+         parser.getListener().getWriteable().writeliteral("display: inline-block; ");
       }
 
-      parser.getListener().getWriteable().write("\"></div>");
+      parser.getListener().getWriteable().writeliteral("\"></div>");
    }
 
    @Override

@@ -132,7 +132,7 @@ public class L2HAlignRow extends AlignRow
    @Override
    protected void endRow(TeXParser parser, TeXObjectList stack) throws IOException
    {// don't push onto stack
-      parser.getListener().getWriteable().write("</tr>");
+      parser.getListener().getWriteable().writeliteral("</tr>");
    }
 
    public TeXDimension getDefaultColSep(TeXParser parser)
@@ -221,8 +221,6 @@ public class L2HAlignRow extends AlignRow
       TeXCellAlign alignCell, Group cellContents)
      throws IOException
    {
-      Writeable writeable = parser.getListener().getWriteable();
-
       TeXDimension defaultColSep = getDefaultColSep(parser);
 
       if (defaultColSep instanceof TeXGlue)
@@ -320,14 +318,13 @@ public class L2HAlignRow extends AlignRow
     throws IOException
    {
       L2HConverter listener = (L2HConverter)parser.getListener();
-      Writeable writeable = listener.getWriteable();
-      writeable.write(String.format("<%s%s>", tag, listener.getStyleOrClass(css)));
+      listener.writeliteral(String.format("<%s%s>", tag, listener.getStyleOrClass(css)));
    }
 
    // don't push to stack
    protected void endCell(TeXParser parser, TeXObjectList stack) throws IOException
    {
-      parser.getListener().getWriteable().writeln(String.format("</%s>", tag));
+      parser.getListener().getWriteable().writeliteralln(String.format("</%s>", tag));
    }
 
    private int[] hlines;

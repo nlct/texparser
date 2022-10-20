@@ -66,7 +66,7 @@ public class L2HAltListDescEnv extends Declaration
       L2HConverter listener = (L2HConverter)parser.getListener();
 
       listener.writeln("");
-      listener.write("<dd>");
+      listener.writeliteral("<dd>");
    }
 
    @Override
@@ -75,7 +75,7 @@ public class L2HAltListDescEnv extends Declaration
    {
       L2HConverter listener = (L2HConverter)parser.getListener();
 
-      listener.writeln("</dd>");
+      listener.writeliteralln("</dd>");
    }
 
    @Override

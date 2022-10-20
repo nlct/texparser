@@ -47,9 +47,9 @@ public class L2HDescriptionLabel extends ControlSequence
 
       L2HConverter listener = (L2HConverter)parser.getListener();
 
-      listener.write("<span class=\"descitem\">");
+      listener.writeliteral("<span class=\"descitem\">");
       arg.process(parser, stack);
-      listener.write("</span>");
+      listener.writeliteral("</span>");
    }
 
    public void process(TeXParser parser) throws IOException
@@ -58,8 +58,8 @@ public class L2HDescriptionLabel extends ControlSequence
 
       L2HConverter listener = (L2HConverter)parser.getListener();
 
-      listener.write("<span class=\"descitem\">");
+      listener.writeliteral("<span class=\"descitem\">");
       arg.process(parser);
-      listener.write("</span>");
+      listener.writeliteral("</span>");
    }
 }

@@ -53,11 +53,11 @@ public class L2HFloat extends LaTeXFloat
 
       if (getName().equals("figure"))
       {
-         listener.write("<figure>");
+         listener.writeliteral("<figure>");
       }
       else
       {
-         listener.write("<div class=\""+getName()+"\">");
+         listener.writeliteral("<div class=\""+getName()+"\">");
       }
    }
 
@@ -69,11 +69,11 @@ public class L2HFloat extends LaTeXFloat
 
       if (getName().equals("figure"))
       {
-         listener.write("</figure>");
+         listener.writeliteral("</figure>");
       }
       else
       {
-         listener.write("</div>");
+         listener.writeliteral("</div>");
       }
    }
 }

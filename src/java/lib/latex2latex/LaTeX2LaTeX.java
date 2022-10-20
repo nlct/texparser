@@ -747,6 +747,18 @@ public class LaTeX2LaTeX extends LaTeXParserListener
       }
    }
 
+   @Override
+   public void writeliteral(String string) throws IOException
+   {
+      write(string);
+   }
+
+   @Override
+   public void writeliteralln(String string) throws IOException
+   {
+      writeln(string);
+   }
+
    public void writeln(char c) throws IOException
    {
       if (writer != null)

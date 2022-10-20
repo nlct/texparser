@@ -131,6 +131,20 @@ public class PreambleParser extends LaTeXParserListener
    }
 
    @Override
+   public void writeliteral(String text)
+     throws IOException
+   {
+      write(text);
+   }
+
+   @Override
+   public void writeliteralln(String text)
+     throws IOException
+   {
+      writeln(text);
+   }
+
+   @Override
    public void write(String text)
      throws IOException
    {

@@ -81,13 +81,13 @@ public class L2HNormalFont extends Declaration
    {
       super.process(parser);
 
-      parser.getListener().getWriteable().write("<span style=\"font: normal;\">");
+      parser.getListener().getWriteable().writeliteral("<span style=\"font: normal;\">");
    }
 
    @Override
    public void end(TeXParser parser, TeXObjectList stack) throws IOException
    {
-      parser.getListener().getWriteable().write("</span>");
+      parser.getListener().getWriteable().writeliteral("</span>");
    }
 
    @Override

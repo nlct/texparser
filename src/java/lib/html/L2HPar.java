@@ -41,7 +41,7 @@ public class L2HPar extends Par
 
       if (listener.isInDocEnv())
       {
-         listener.writeln("<p>");
+         listener.writeliteralln("<p>");
       }
    }
 

@@ -69,7 +69,7 @@ public class L2HNoBreakSpace extends Command
    {
       if (((L2HConverter)parser.getListener()).isInDocEnv())
       {
-         parser.getListener().getWriteable().write("&nbsp;");
+         parser.getListener().getWriteable().writeliteral("&nbsp;");
       }
    }
 

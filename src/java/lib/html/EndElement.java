@@ -65,7 +65,7 @@ public class EndElement extends HtmlTag
 
       if (appendCR)
       {
-         parser.getListener().getWriteable().writeln("");
+         parser.getListener().getWriteable().writeliteralln("");
       }
    }
 

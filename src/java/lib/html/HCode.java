@@ -79,13 +79,13 @@ public class HCode extends Command
       throws IOException
    {
       TeXObject arg = stack.popArg(parser);
-      parser.getListener().getWriteable().write(arg.toString(parser));
+      parser.getListener().getWriteable().writeliteral(arg.toString(parser));
    }
 
    public void process(TeXParser parser)
       throws IOException
    {
       TeXObject arg = parser.popNextArg();
-      parser.getListener().getWriteable().write(arg.toString(parser));
+      parser.getListener().getWriteable().writeliteral(arg.toString(parser));
    }
 }

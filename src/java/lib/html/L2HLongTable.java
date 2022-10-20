@@ -70,11 +70,11 @@ public class L2HLongTable extends Tabular
 
       if (id == null)
       {
-         writeable.writeln(String.format("<table class=\"%s\">", cls));
+         writeable.writeliteralln(String.format("<table class=\"%s\">", cls));
       }
       else
       {
-         writeable.writeln(String.format("<table id=\"%s\" class=\"%s\">", id, cls));
+         writeable.writeliteralln(String.format("<table id=\"%s\" class=\"%s\">", id, cls));
       }
    }
 
@@ -369,7 +369,7 @@ public class L2HLongTable extends Tabular
    {
       Writeable writeable = parser.getListener().getWriteable();
 
-      writeable.writeln("</table>");
+      writeable.writeliteralln("</table>");
 
       super.end(parser, stack);
 

@@ -176,16 +176,16 @@ public class L2HToImage extends ControlSequence
 
          if (name == null)
          {
-            listener.getWriteable().write("<!-- Image Creation Failed -->");
+            listener.getWriteable().writeliteral("<!-- Image Creation Failed -->");
             alt.process(parser, stack);
-            listener.getWriteable().write("<!-- End of Image Alt Block -->");
+            listener.getWriteable().writeliteral("<!-- End of Image Alt Block -->");
          }
          else
          {
-            listener.getWriteable().write(
+            listener.getWriteable().writeliteral(
               String.format("<!-- Image %s Creation Failed -->", name));
             alt.process(parser, stack);
-            listener.getWriteable().write(
+            listener.getWriteable().writeliteral(
                String.format("<!-- End of Image %s Alt Block -->", name));
          }
       }

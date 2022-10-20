@@ -88,18 +88,18 @@ public class L2HFontSizeDeclaration extends FontSizeDeclaration
 
       if (!style.isEmpty())
       {
-         parser.getListener().getWriteable().write("<span style=\""+style+"\">");
+         parser.getListener().getWriteable().writeliteral("<span style=\""+style+"\">");
       }
       else
       {
-         parser.getListener().getWriteable().write("<span>");
+         parser.getListener().getWriteable().writeliteral("<span>");
       }
    }
 
    @Override
    public void end(TeXParser parser, TeXObjectList stack) throws IOException
    {
-      parser.getListener().getWriteable().write("</span>");
+      parser.getListener().getWriteable().writeliteral("</span>");
       super.end(parser, stack);
    }
 }

@@ -168,11 +168,11 @@ public class L2HMathDeclaration extends MathDeclaration
       {
          if (label == null)
          {
-            listener.write("<div class=\"displaymath\">");
+            listener.writeliteral("<div class=\"displaymath\">");
          }
          else
          {
-            listener.write(String.format("<div class=\"displaymath\" id=\"%s\">",
+            listener.writeliteral(String.format("<div class=\"displaymath\" id=\"%s\">",
                label));
          }
       }
@@ -290,11 +290,11 @@ public class L2HMathDeclaration extends MathDeclaration
       {
          if (label == null)
          {
-            listener.write("<div class=\"displaymath\">");
+            listener.writeliteral("<div class=\"displaymath\">");
          }
          else
          {
-            listener.write(String.format("<div class=\"displaymath\" id=\"%s\">",
+            listener.writeliteral(String.format("<div class=\"displaymath\" id=\"%s\">",
                label));
          }
       }
@@ -311,17 +311,17 @@ public class L2HMathDeclaration extends MathDeclaration
       {
          if (getMode() == TeXSettings.MODE_DISPLAY_MATH)
          {
-            listener.write(listener.mathJaxEndDisplay());
+            listener.writeliteral(listener.mathJaxEndDisplay());
          }
          else
          {
-            listener.write(listener.mathJaxEndInline());
+            listener.writeliteral(listener.mathJaxEndInline());
          }
       }
 
       if (getMode() == TeXSettings.MODE_DISPLAY_MATH)
       {
-         listener.write("</div>");
+         listener.writeliteral("</div>");
       }
    }
 }

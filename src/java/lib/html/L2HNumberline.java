@@ -47,11 +47,11 @@ public class L2HNumberline extends ControlSequence
 
       TeXObject arg = parser.popNextArg();
 
-      listener.write("<span class=\"numberline\">");
+      listener.writeliteral("<span class=\"numberline\">");
 
       arg.process(parser);
 
-      listener.write("</span>");
+      listener.writeliteral("</span>");
    }
 
    public void process(TeXParser parser, TeXObjectList stack)
@@ -61,10 +61,10 @@ public class L2HNumberline extends ControlSequence
 
       TeXObject arg = stack.popArg(parser);
 
-      listener.write("<span class=\"numberline\">");
+      listener.writeliteral("<span class=\"numberline\">");
 
       arg.process(parser);
 
-      listener.write("</span>");
+      listener.writeliteral("</span>");
    }
 }

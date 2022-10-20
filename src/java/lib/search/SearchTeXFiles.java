@@ -275,6 +275,13 @@ public class SearchTeXFiles extends LaTeXParserListener
    {
    }
 
+   public void writeliteralln(String text)
+   {
+   }
+
+   public void writeliteral(String text)
+   {
+   }
    public void writeln(String text)
    {
    }

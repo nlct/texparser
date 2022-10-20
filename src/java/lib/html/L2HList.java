@@ -49,7 +49,7 @@ public class L2HList extends ListDec
    {
       super.setup(parser, stack, labelCs, listsettings);
 
-      parser.getListener().getWriteable().write(
+      parser.getListener().getWriteable().writeliteral(
         String.format("<ul class=\"%s\">",
            isInLine() ? "inlinelist" : "displaylist"));
    }
@@ -58,7 +58,7 @@ public class L2HList extends ListDec
    public void end(TeXParser parser, TeXObjectList stack)
     throws IOException
    {
-      parser.getListener().getWriteable().write("</ul>");
+      parser.getListener().getWriteable().writeliteral("</ul>");
 
       super.end(parser, stack);
    }

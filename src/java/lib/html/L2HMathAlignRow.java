@@ -70,7 +70,7 @@ public class L2HMathAlignRow extends L2HAlignRow
    {// don't push to stack
       super.startRow(parser, stack);
 
-      parser.getListener().getWriteable().write("<td style=\"width: 50%; \"></td>");
+      parser.getListener().getWriteable().writeliteral("<td style=\"width: 50%; \"></td>");
    }
 
    @Override
@@ -84,7 +84,8 @@ public class L2HMathAlignRow extends L2HAlignRow
       {
          listener.stepcounter("equation");
 
-         writeable.write("<td style=\"width: 50%; align: right;\"><span class=\"eqno\">(");
+         writeable.writeliteral("<td style=\"width: 50%; align: right;\"><span class=\"eqno\">");
+         writeable.write('(');
 
          ControlSequence cs = parser.getListener().getControlSequence("theequation");
 
@@ -92,11 +93,12 @@ public class L2HMathAlignRow extends L2HAlignRow
 
          writeable.write(eqnum);
 
-         writeable.write(")</span></td>");
+         writeable.write(')');
+         writeable.writeliteral("</span></td>");
       }
       else
       {
-         writeable.write("<td style=\"width: 50%; \"></td>");
+         writeable.writeliteral("<td style=\"width: 50%; \"></td>");
       }
 
       super.endRow(parser, stack);
@@ -130,7 +132,7 @@ public class L2HMathAlignRow extends L2HAlignRow
 
       if (listener.useMathJax())
       {
-         listener.write(listener.mathJaxStartInline()+"\\displaystyle ");
+         listener.writeliteral(listener.mathJaxStartInline()+"\\displaystyle ");
       }
    }
 
@@ -141,7 +143,7 @@ public class L2HMathAlignRow extends L2HAlignRow
 
       if (listener.useMathJax())
       {
-         listener.write(listener.mathJaxEndInline());
+         listener.writeliteral(listener.mathJaxEndInline());
       }
 
       while (tags.size() > 0)

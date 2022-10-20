@@ -43,7 +43,7 @@ public class L2HAbstract extends AbstractDec
 
    public void process(TeXParser parser) throws IOException
    {
-      parser.getListener().getWriteable().write(
+      parser.getListener().getWriteable().writeliteral(
         String.format("%n<div class=\"%s\">", getName()));
 
       super.process(parser);
@@ -51,7 +51,7 @@ public class L2HAbstract extends AbstractDec
 
    public void process(TeXParser parser, TeXObjectList stack) throws IOException
    {
-      parser.getListener().getWriteable().write(
+      parser.getListener().getWriteable().writeliteral(
        String.format("%n<div class=\"%s\">", getName()));
 
       super.process(parser, stack);
@@ -61,7 +61,7 @@ public class L2HAbstract extends AbstractDec
    public void end(TeXParser parser, TeXObjectList stack)
     throws IOException
    {
-      parser.getListener().getWriteable().write(
+      parser.getListener().getWriteable().writeliteral(
        String.format("</div><!-- end of %s -->%n", getName()));
    }
 }

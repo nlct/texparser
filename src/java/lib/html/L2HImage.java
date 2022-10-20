@@ -290,29 +290,29 @@ public class L2HImage extends AbstractTeXObject implements Expandable
 
       Writeable writer = parser.getListener().getWriteable();
 
-      writer.write(String.format("<object data=\"%s\"", getData()));
+      writer.writeliteral(String.format("<object data=\"%s\"", getData()));
 
       if (width != 0)
       {
-         writer.write(String.format(" width=\"%d\"", width));
+         writer.writeliteral(String.format(" width=\"%d\"", width));
       }
 
       if (height != 0)
       {
-         writer.write(String.format(" height=\"%d\"", height));
+         writer.writeliteral(String.format(" height=\"%d\"", height));
       }
 
       if (mimetype != null)
       {
-         writer.write(String.format(" type=\"%s\"", mimetype));
+         writer.writeliteral(String.format(" type=\"%s\"", mimetype));
       }
 
       if (name != null)
       {
-         writer.write(String.format(" id=\"%s\"", name));
+         writer.writeliteral(String.format(" id=\"%s\"", name));
       }
 
-      writer.write(">");
+      writer.writeliteral(">");
 
       if (alt != null)
       {
@@ -326,7 +326,7 @@ public class L2HImage extends AbstractTeXObject implements Expandable
          }
       }
 
-      writer.write("</object>");
+      writer.writeliteral("</object>");
    }
 
    private Path path;

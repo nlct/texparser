@@ -70,10 +70,10 @@ public class ExampleEnv extends Declaration
       {
          listener.stepcounter("example");
 
-         ((L2HConverter)listener).write(
+         ((L2HConverter)listener).writeliteral(
            String.format("<div class=\"example\" id=\"%s\">", label));
 
-         ((L2HConverter)listener).write("<div class=\"title\">");
+         ((L2HConverter)listener).writeliteral("<div class=\"title\">");
 
          content.add(listener.getControlSequence("nlctexampletag"));
 
@@ -86,7 +86,7 @@ public class ExampleEnv extends Declaration
 
          TeXParserUtils.process(content, parser, stack);
 
-         ((L2HConverter)listener).write("</div>");
+         ((L2HConverter)listener).writeliteral("</div>");
       }
       else
       {
@@ -114,7 +114,7 @@ public class ExampleEnv extends Declaration
 
       if (listener instanceof L2HConverter)
       {
-         ((L2HConverter)listener).write("</div>");
+         ((L2HConverter)listener).writeliteral("</div>");
       }
       else
       {

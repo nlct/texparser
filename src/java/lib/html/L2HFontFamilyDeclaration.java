@@ -68,11 +68,11 @@ public class L2HFontFamilyDeclaration extends FontFamilyDeclaration
 
       if (spec.isEmpty())
       {
-         parser.getListener().getWriteable().write(String.format("<%s>", tag));
+         parser.getListener().getWriteable().writeliteral(String.format("<%s>", tag));
       }
       else
       {
-         parser.getListener().getWriteable().write(
+         parser.getListener().getWriteable().writeliteral(
            String.format("<%s style=\"%s\">", tag, spec));
       }
    }
@@ -82,11 +82,11 @@ public class L2HFontFamilyDeclaration extends FontFamilyDeclaration
    {
       if (getFamily() == TeXFontFamily.VERB)
       {
-         parser.getListener().getWriteable().write("</code>");
+         parser.getListener().getWriteable().writeliteral("</code>");
       }
       else
       {
-         parser.getListener().getWriteable().write("</span>");
+         parser.getListener().getWriteable().writeliteral("</span>");
       }
 
       super.end(parser, stack);

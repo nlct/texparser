@@ -47,7 +47,7 @@ public class L2HEqnarray extends L2HMathDeclaration
 
       listener.putControlSequence(new L2HMathAlignNewline(isNumbered()));
 
-      listener.writeln("<table>");
+      listener.writeliteralln("<table>");
 
       TeXSettings settings = parser.getSettings();
 
@@ -67,7 +67,7 @@ public class L2HEqnarray extends L2HMathDeclaration
 
       doModeSwitch(parser);
 
-      listener.write("<div class=\"displaymath\">");
+      listener.writeliteral("<div class=\"displaymath\">");
 
       startTabular(parser);
 
@@ -88,7 +88,7 @@ public class L2HEqnarray extends L2HMathDeclaration
 
       doModeSwitch(parser);
 
-      listener.write("<div class=\"displaymath\">");
+      listener.writeliteral("<div class=\"displaymath\">");
 
       startTabular(parser);
 
@@ -102,9 +102,9 @@ public class L2HEqnarray extends L2HMathDeclaration
    {
       L2HConverter listener = (L2HConverter)parser.getListener();
 
-      listener.writeln("</table>");
+      listener.writeliteralln("</table>");
 
-      listener.writeln("</div>");
+      listener.writeliteralln("</div>");
 
       revertModeSwitch(parser);
 

@@ -50,17 +50,17 @@ public class L2HItem extends ListItem
 
       if (trivList.isInLine())
       {
-         listener.write("<span class=\"inlineitem\">");
+         listener.writeliteral("<span class=\"inlineitem\">");
       }
       else
       {
          if (listener.isIfTrue(listener.getControlSequence("if@nmbrlist")))
          {
-            listener.write("<li><span class=\"numitem\">");
+            listener.writeliteral("<li><span class=\"numitem\">");
          }
          else
          {
-            listener.write("<li><span class=\"bulletitem\">");
+            listener.writeliteral("<li><span class=\"bulletitem\">");
          }
       }
 
@@ -73,7 +73,7 @@ public class L2HItem extends ListItem
          label.process(parser, stack);
       }
 
-      listener.write("</span>");
+      listener.writeliteral("</span>");
    }
 
 }

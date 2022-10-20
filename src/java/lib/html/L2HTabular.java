@@ -87,7 +87,7 @@ public class L2HTabular extends Tabular
          case 't': cls += "t"; break;
       }
 
-      writeable.writeln(String.format("<table class=\"%s\">", cls));
+      writeable.writeliteralln(String.format("<table class=\"%s\">", cls));
 
       if (caption != null)
       {
@@ -107,7 +107,7 @@ public class L2HTabular extends Tabular
    {
       Writeable writeable = parser.getListener().getWriteable();
 
-      writeable.writeln("</table>");
+      writeable.writeliteralln("</table>");
 
       super.end(parser, stack);
    }

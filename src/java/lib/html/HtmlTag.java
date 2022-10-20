@@ -73,7 +73,7 @@ public class HtmlTag extends AbstractTeXObject
    public void process(TeXParser parser)
       throws IOException
    {
-      parser.getListener().getWriteable().write(tag);
+      parser.getListener().getWriteable().writeliteral(tag);
    }
 
    @Override

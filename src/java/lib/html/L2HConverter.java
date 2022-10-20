@@ -409,7 +409,7 @@ public class L2HConverter extends LaTeXParserListener
       }
       else
       {
-         writeln("<br>\n");
+         writeliteral(String.format("<br>%n"));
       }
    }
 
@@ -543,6 +543,31 @@ public class L2HConverter extends LaTeXParserListener
    }
 
    @Override
+   public void writeliteralln(String string) throws IOException
+   {
+      writeliteral(String.format("%s%n", string));
+   }
+
+   @Override
+   public void writeliteral(String string) throws IOException
+   {
+      if (currentWriter == null)
+      {
+         currentWriter = writer;
+      }
+
+      if (currentWriter == null)
+      {
+         parser.debugMessage(TeXParser.DEBUG_IO, 
+           "No writer available. writeliteral: "+string);
+      }
+      else
+      {
+         currentWriter.write(string);
+      }
+   }
+
+   @Override
    public void writeCodePoint(int codePoint)
      throws IOException
    {
@@ -580,6 +605,10 @@ public class L2HConverter extends LaTeXParserListener
       else if (codePoint == '&')
       {
          currentWriter.write("&amp;");
+      }
+      else if (codePoint >= 128 && useHtmlEntities)
+      {
+         currentWriter.write(String.format("&#x%x;", codePoint));
       }
       else if (codePoint <= 0xFFFF)
       {
@@ -623,7 +652,39 @@ public class L2HConverter extends LaTeXParserListener
            LaTeXSyntaxException.ERROR_MISSING_BEGIN_DOC, str);
       }
 
-      currentWriter.write(str);
+      if (useHtmlEntities)
+      {
+         for (int i = 0; i < str.length(); )
+         {
+            int cp = str.codePointAt(i);
+            i += Character.charCount(cp);
+
+            if (cp == '&')
+            {
+               currentWriter.write("&amp;");
+            }
+            else if (cp == '<')
+            {
+               currentWriter.write("&lt;");
+            }
+            else if (cp == '>')
+            {
+               currentWriter.write("&gt;");
+            }
+            else if (cp >= 128)
+            {
+               currentWriter.write(String.format("&#x%x;", cp));
+            }
+            else
+            {
+               currentWriter.write((char)cp);
+            }
+         }
+      }
+      else
+      {
+         currentWriter.write(str);
+      }
    }
 
    @Override
@@ -652,7 +713,33 @@ public class L2HConverter extends LaTeXParserListener
            LaTeXSyntaxException.ERROR_MISSING_BEGIN_DOC, c);
       }
 
-      write(String.format("%c", c));
+      if (useHtmlEntities)
+      {
+         if (c == '&')
+         {
+            currentWriter.write("&amp;");
+         }
+         else if (c == '<')
+         {
+            currentWriter.write("&lt;");
+         }
+         else if (c == '>')
+         {
+            currentWriter.write("&gt;");
+         }
+         else if (c >= 128)
+         {
+            currentWriter.write(String.format("&#x%x;", c));
+         }
+         else
+         {
+            currentWriter.write(c);
+         }
+      }
+      else
+      {
+         currentWriter.write(c);
+      }
    }
 
    @Override
@@ -699,7 +786,11 @@ public class L2HConverter extends LaTeXParserListener
          }
       }
 
-      currentWriter.write("<a href=\""+url+"\"");
+      currentWriter.write("<a href=\"");
+
+      write(url);// escape HTML entities
+
+      currentWriter.write("\"");
 
       if (text instanceof AccSuppObject)
       {
@@ -986,24 +1077,24 @@ public class L2HConverter extends LaTeXParserListener
    {
       setUseMathJax(true);
 
-      writeable.writeln("<!-- MathJax -->");
-      writeable.writeln("<script type=\"text/x-mathjax-config\">");
-      writeable.writeln("MathJax.Hub.Config({tex2jax:");
-      writeable.writeln("{");
-      writeable.writeln(String.format("  inlineMath: [['%s','%s']],",
+      writeliteralln("<!-- MathJax -->");
+      writeliteralln("<script type=\"text/x-mathjax-config\">");
+      writeliteralln("MathJax.Hub.Config({tex2jax:");
+      writeliteralln("{");
+      writeliteralln(String.format("  inlineMath: [['%s','%s']],",
         mathJaxStartInline().replace("\\", "\\\\"),
         mathJaxEndInline().replace("\\", "\\\\")));
-      writeable.writeln(String.format("  displayMath: [ ['%s','%s'] ]",
+      writeliteralln(String.format("  displayMath: [ ['%s','%s'] ]",
         mathJaxStartDisplay().replace("\\", "\\\\"),
         mathJaxEndDisplay().replace("\\", "\\\\")));
-      writeable.writeln("}});");
+      writeliteralln("}});");
 
-      writeable.writeln("</script>");
+      writeliteralln("</script>");
 
-      writeable.write("<script type=\"text/javascript\" src=");
-      writeable.writeln(
+      writeliteral("<script type=\"text/javascript\" src=");
+      writeliteralln(
        "\"http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML\">");
-      writeable.writeln("</script>");
+      writeliteralln("</script>");
    }
 
    protected void writeTabularCss(String halign, String valign)
@@ -1021,22 +1112,22 @@ public class L2HConverter extends LaTeXParserListener
          suffix = suffix + valign.charAt(0);
       }
 
-      writeln("table.tabular-"+suffix);
-      writeln("{");
-      writeln("  display: inline-table;");
-      writeln("  border-collapse: collapse;");
+      writeliteralln("table.tabular-"+suffix);
+      writeliteralln("{");
+      writeliteralln("  display: inline-table;");
+      writeliteralln("  border-collapse: collapse;");
 
       if (halign != null)
       {
-         writeln("  align: "+halign+";");
+         writeliteralln("  align: "+halign+";");
       }
 
       if (valign != null)
       {
-         writeln("  vertical-align: "+valign+";");
+         writeliteralln("  vertical-align: "+valign+";");
       }
 
-      writeln("}");
+      writeliteralln("}");
    }
 
    public void writeCssStyles()
@@ -1044,16 +1135,16 @@ public class L2HConverter extends LaTeXParserListener
    {
       addDefaultTabularStyles();
 
-      writeln("#main {margin-left: 5%; margin-right: 15%}");
-      writeln("div.tomain {position: absolute; left: 0pt; width: 5%; text-align: right; font-size: x-small;}");
-      writeln("div.tomain a {text-decoration: none;}");
-      writeln("div.labellink {display: inline; font-size: x-small; margin-left: 1em; margin-right: 1em;}");
-      writeln("div.marginleft {position: absolute; left: 0pt; width: 5%;}");
-      writeln("div.marginright {position: absolute; right: 0pt; width: 15%;}");
+      writeliteralln("#main {margin-left: 5%; margin-right: 15%}");
+      writeliteralln("div.tomain {position: absolute; left: 0pt; width: 5%; text-align: right; font-size: x-small;}");
+      writeliteralln("div.tomain a {text-decoration: none;}");
+      writeliteralln("div.labellink {display: inline; font-size: x-small; margin-left: 1em; margin-right: 1em;}");
+      writeliteralln("div.marginleft {position: absolute; left: 0pt; width: 5%;}");
+      writeliteralln("div.marginright {position: absolute; right: 0pt; width: 15%;}");
 
-      writeln("div.displaymath { display: block; text-align: center; }");
-      writeln("span.eqno { float: right; }");
-      writeln("div.table { display: block; text-align: center; }");
+      writeliteralln("div.displaymath { display: block; text-align: center; }");
+      writeliteralln("span.eqno { float: right; }");
+      writeliteralln("div.table { display: block; text-align: center; }");
 
       writeTabularCss("center", "middle");
       writeTabularCss("center", "bottom");
@@ -1075,69 +1166,69 @@ public class L2HConverter extends LaTeXParserListener
       writeTabularCss("center", null);
       writeTabularCss("right", null);
 
-      writeln("pre { white-space: pre-wrap; }");
-      writeln("div.figure { display: block; text-align: center; }");
-      writeln("div.caption { display: block; text-align: center; }");
-      writeln("div.marginpar { float: right; }");
-      writeln("div.abstract { display: block; margin-right: 4em; margin-left: 4em;}");
-      writeln("div.title { display: block; text-align: center; font-size: x-large;}");
-      writeln("div.author { display: block; text-align: center; font-size: large;}");
-      writeln("div.date { display: block; text-align: center; font-size: medium;}");
-      writeln("div.bibliography { display: block; margin-left: 4em; }");
-      writeln("div.bibitem { display: inline; float: left; text-indent: -3em; }");
-      writeln("span.numberline { display: inline-block; width: 3em; }");
-      writeln(".toc-subsection span.numberline { display: inline-block; width: 3em; }");
-      writeln(".toc-subsubsection span.numberline { display: inline-block; width: 4em; }");
-      writeln(".toc-paragraph span.numberline { display: inline-block; width: 5em; }");
-      writeln(".toc-subparagraph span.numberline { display: inline-block; width: 6em; }");
-      writeln("nav ul { list-style-type: none; }");
-      writeln(".toc-part { padding-left: 0em; padding-bottom: 1ex; padding-top: 1ex; font-weight: bold; font-size: large;}");
-      writeln(".toc-chapter { padding-left: 0em; padding-bottom: .25ex; padding-top: .25ex; font-weight: bold; }");
-      writeln(".toc-section { padding-left: .5em; }");
-      writeln(".toc-subsection { padding-left: 1.5em; }");
-      writeln(".toc-subsubsection { padding-left: 2em; }");
-      writeln(".toc-paragraph { padding-left: 2.5em; }");
-      writeln(".toc-subparagraph { padding-left: 3em; }");
+      writeliteralln("pre { white-space: pre-wrap; }");
+      writeliteralln("div.figure { display: block; text-align: center; }");
+      writeliteralln("div.caption { display: block; text-align: center; }");
+      writeliteralln("div.marginpar { float: right; }");
+      writeliteralln("div.abstract { display: block; margin-right: 4em; margin-left: 4em;}");
+      writeliteralln("div.title { display: block; text-align: center; font-size: x-large;}");
+      writeliteralln("div.author { display: block; text-align: center; font-size: large;}");
+      writeliteralln("div.date { display: block; text-align: center; font-size: medium;}");
+      writeliteralln("div.bibliography { display: block; margin-left: 4em; }");
+      writeliteralln("div.bibitem { display: inline; float: left; text-indent: -3em; }");
+      writeliteralln("span.numberline { display: inline-block; width: 3em; }");
+      writeliteralln(".toc-subsection span.numberline { display: inline-block; width: 3em; }");
+      writeliteralln(".toc-subsubsection span.numberline { display: inline-block; width: 4em; }");
+      writeliteralln(".toc-paragraph span.numberline { display: inline-block; width: 5em; }");
+      writeliteralln(".toc-subparagraph span.numberline { display: inline-block; width: 6em; }");
+      writeliteralln("nav ul { list-style-type: none; }");
+      writeliteralln(".toc-part { padding-left: 0em; padding-bottom: 1ex; padding-top: 1ex; font-weight: bold; font-size: large;}");
+      writeliteralln(".toc-chapter { padding-left: 0em; padding-bottom: .25ex; padding-top: .25ex; font-weight: bold; }");
+      writeliteralln(".toc-section { padding-left: .5em; }");
+      writeliteralln(".toc-subsection { padding-left: 1.5em; }");
+      writeliteralln(".toc-subsubsection { padding-left: 2em; }");
+      writeliteralln(".toc-paragraph { padding-left: 2.5em; }");
+      writeliteralln(".toc-subparagraph { padding-left: 3em; }");
 
-      writeln(".part { font-size: x-large; font-weight: bold; }");
+      writeliteralln(".part { font-size: x-large; font-weight: bold; }");
 
-      writeln("div.bigskip { padding-left: 0pt; padding-right: 0pt; padding-top: 0pt; padding-bottom: 2ex;}");
-      writeln("div.medskip { padding-left: 0pt; padding-right: 0pt; padding-top: 0pt; padding-bottom: 1ex;}");
-      writeln("div.smallskip { padding-left: 0pt; padding-right: 0pt; padding-top: 0pt; padding-bottom: .5ex;}");
+      writeliteralln("div.bigskip { padding-left: 0pt; padding-right: 0pt; padding-top: 0pt; padding-bottom: 2ex;}");
+      writeliteralln("div.medskip { padding-left: 0pt; padding-right: 0pt; padding-top: 0pt; padding-bottom: 1ex;}");
+      writeliteralln("div.smallskip { padding-left: 0pt; padding-right: 0pt; padding-top: 0pt; padding-bottom: .5ex;}");
 
-      writeln("span.quad { padding-left: 0pt; padding-right: 1em; padding-top: 0pt; padding-bottom: 0pt;}");
-      writeln("span.qquad { padding-left: 0pt; padding-right: 2em; padding-top: 0pt; padding-bottom: 0pt;}");
+      writeliteralln("span.quad { padding-left: 0pt; padding-right: 1em; padding-top: 0pt; padding-bottom: 0pt;}");
+      writeliteralln("span.qquad { padding-left: 0pt; padding-right: 2em; padding-top: 0pt; padding-bottom: 0pt;}");
 
-      writeln(".displaylist { display: block; list-style-type: none; }");
-      writeln(".inlinelist { display: inline; }");
+      writeliteralln(".displaylist { display: block; list-style-type: none; }");
+      writeliteralln(".inlinelist { display: inline; }");
 
-      writeln("dl.inlinetitle dt { display: inline-block; margin-left: 0; margin-right: 1em;}");
-      writeln("dl.inlinetitle dd { display: inline; margin: 0; }");
-      writeln("dl.inlinetitle dd::after { display: block; content: ''; }");
+      writeliteralln("dl.inlinetitle dt { display: inline-block; margin-left: 0; margin-right: 1em;}");
+      writeliteralln("dl.inlinetitle dd { display: inline; margin: 0; }");
+      writeliteralln("dl.inlinetitle dd::after { display: block; content: ''; }");
 
       // TODO The inlineblock needs adjusting
-      writeln("dl.inlineblock dt { display: inline-block; margin-left: 0; margin-right: 1em;}");
-      writeln("dl.inlineblock dd { display: inline; margin: 0; }");
-      writeln("dl.inlineblock dd::after { display: block; content: ''; }");
+      writeliteralln("dl.inlineblock dt { display: inline-block; margin-left: 0; margin-right: 1em;}");
+      writeliteralln("dl.inlineblock dd { display: inline; margin: 0; }");
+      writeliteralln("dl.inlineblock dd::after { display: block; content: ''; }");
 
-      writeln(".clearfix::after { content: \"\"; clear: both; display: table; }");
-      writeln("span.inlineitem { margin-right: .5em; margin-left: .5em; }");
-      writeln("span.numitem { float: left; margin-left: -3em; text-align: right; min-width: 2.5em; }");
-      writeln("span.bulletitem { float: left; margin-left: -1em; }");
-      writeln("span.descitem { font: normal; font-weight: bold; }");
+      writeliteralln(".clearfix::after { content: \"\"; clear: both; display: table; }");
+      writeliteralln("span.inlineitem { margin-right: .5em; margin-left: .5em; }");
+      writeliteralln("span.numitem { float: left; margin-left: -3em; text-align: right; min-width: 2.5em; }");
+      writeliteralln("span.bulletitem { float: left; margin-left: -1em; }");
+      writeliteralln("span.descitem { font: normal; font-weight: bold; }");
 
-      writeln("div.indexspace { min-height: 2ex; }");
+      writeliteralln("div.indexspace { min-height: 2ex; }");
 
       for (Iterator<String> it = defaultStyles.keySet().iterator();
            it.hasNext();)
       {
          String style = it.next();
-         writeln(String.format(".%s {%s}", defaultStyles.get(style), style));
+         writeliteralln(String.format(".%s {%s}", defaultStyles.get(style), style));
       }
 
       for (String style : extraCssStyles)
       {
-         writeln(style);
+         writeliteralln(style);
       }
    }
 
@@ -1162,7 +1253,7 @@ public class L2HConverter extends LaTeXParserListener
    protected void writeDocType()
      throws IOException
    {
-      writeable.writeln("<!DOCTYPE html>");
+      writeliteralln("<!DOCTYPE html>");
    }
 
    @Override
@@ -1178,10 +1269,10 @@ public class L2HConverter extends LaTeXParserListener
       }
 
       writeDocType();
-      writeable.writeln("<html>");
-      writeable.writeln("<head>");
+      writeliteralln("<html>");
+      writeliteralln("<head>");
 
-      writeable.writeln(String.format(
+      writeliteralln(String.format(
        "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=%s\">", 
        htmlCharSet == null ? 
          Charset.defaultCharset().name() : 
@@ -1197,7 +1288,7 @@ public class L2HConverter extends LaTeXParserListener
 
       if (!generator.isEmpty())
       {
-         writeable.writeln(String.format("<meta name=\"generator\" content=\"%s\">",
+         writeliteralln(String.format("<meta name=\"generator\" content=\"%s\">",
            generator));
       }
 
@@ -1210,7 +1301,7 @@ public class L2HConverter extends LaTeXParserListener
       {
          for (String content : extraHead)
          {
-            writeable.writeln(content);
+            writeliteralln(content);
          }
       }
 
@@ -1229,41 +1320,41 @@ public class L2HConverter extends LaTeXParserListener
       {
          TeXObject title = TeXParserUtils.expandFully(cs, parser, stack);
 
-         writeable.write("<title>");
-         writeable.write(title.purified());
-         writeable.writeln("</title>");
+         writeliteral("<title>");
+         write(title.purified());
+         writeliteralln("</title>");
       }
       else
       {
-         writeable.writeln("<!-- no title found -->");
+         writeliteralln("<!-- no title found -->");
       }
 
-      writeable.writeln("<style type=\"text/css\">");
+      writeliteralln("<style type=\"text/css\">");
       writeCssStyles();
-      writeable.writeln("</style>");
+      writeliteralln("</style>");
 
-      writeable.writeln("</head>");
-      writeable.write("<body");
+      writeliteralln("</head>");
+      writeliteral("<body");
 
       Color fgCol = getParser().getSettings().getFgColor();
       Color bgCol = getParser().getSettings().getBgColor();
 
       if (fgCol != null && fgCol != Color.BLACK)
       {
-         writeable.write(String.format(" text=\"%s\"", getHtmlColor(fgCol)));
+         writeliteral(String.format(" text=\"%s\"", getHtmlColor(fgCol)));
       }
 
       if (bgCol != null && bgCol != Color.WHITE)
       {
-         writeable.write(String.format(" background=\"%s\"", 
+         writeliteral(String.format(" background=\"%s\"", 
            getHtmlColor(bgCol)));
       }
 
-      writeable.writeln(">");
+      writeliteralln(">");
 
       super.beginDocument(stack);
 
-      writeable.writeln("<div id=\"main\">");
+      writeliteralln("<div id=\"main\">");
 
       getParser().getSettings().setCharMapMode(TeXSettings.CHAR_MAP_ON);
    }
@@ -1280,14 +1371,14 @@ public class L2HConverter extends LaTeXParserListener
 
       if (currentSection != null)
       {
-         write(String.format("%n</section><!-- end of section %s -->%n", currentSection));
+         writeliteral(String.format("%n</section><!-- end of section %s -->%n", currentSection));
 
          currentSection = null;
       }
 
       processFootnotes(stack);
 
-      writeable.writeln("</div><!-- end of main -->");// ends <div id="main">
+      writeliteralln("</div><!-- end of main -->");// ends <div id="main">
 
       ControlSequence cs = parser.getControlSequence(
         "@enddocumenthook");
@@ -1304,8 +1395,8 @@ public class L2HConverter extends LaTeXParserListener
          }
       }
 
-      writeable.writeln("</body>");
-      writeable.writeln("</html>");
+      writeliteralln("</body>");
+      writeliteralln("</html>");
 
       documentEnded = true;
       writer.close();
@@ -1358,19 +1449,19 @@ public class L2HConverter extends LaTeXParserListener
       {
          if (firstDelim != null || secondDelim != null)
          {
-            write("\\left");
+            writeliteral("\\left");
             write(firstDelim==null?".":firstDelim.toString(getParser()));
          }
 
-         write("\\frac{");
+         writeliteral("\\frac{");
          before.process(getParser());
-         write("}{");
+         writeliteral("}{");
          after.process(getParser());
-         write("}");
+         writeliteral("}");
 
          if (firstDelim != null || secondDelim != null)
          {
-            write("\\right");
+            writeliteral("\\right");
             write(secondDelim==null?".":secondDelim.toString(getParser()));
          }
 
@@ -1382,12 +1473,12 @@ public class L2HConverter extends LaTeXParserListener
         firstDelim.process(parser);
       }
 
-      write("<table style=\"display: inline;\"><tr style=\"border-bottom-style: solid;\"><td>");
+      writeliteral("<table style=\"display: inline;\"><tr style=\"border-bottom-style: solid;\"><td>");
       before.process(parser);
-      write("</td></tr>");
-      write("<tr><td>");
+      writeliteral("</td></tr>");
+      writeliteral("<tr><td>");
       after.process(parser);
-      write("</td></tr><table>");
+      writeliteral("</td></tr><table>");
 
       if (secondDelim != null)
       {
@@ -1404,7 +1495,7 @@ public class L2HConverter extends LaTeXParserListener
       if (useMathJax())
       {
          write(before.toString(getParser()));
-         write("\\abovewithdelims ");
+         writeliteral("\\abovewithdelims ");
          write(firstDelim==null?".":firstDelim.toString(getParser()));
          write(secondDelim==null?".":secondDelim.toString(getParser()));
          write(thickness.toString(getParser()));
@@ -1419,12 +1510,12 @@ public class L2HConverter extends LaTeXParserListener
          firstDelim.process(parser);
       }
 
-      write("<table><tr><td>");
+      writeliteral("<table><tr><td>");
       before.process(parser);
-      write("</td></tr>");
-      write("<tr><td>");
+      writeliteral("</td></tr>");
+      writeliteral("<tr><td>");
       after.process(parser);
-      write("</td></tr><table>");
+      writeliteral("</td></tr><table>");
 
       if (secondDelim != null)
       {
@@ -1438,15 +1529,15 @@ public class L2HConverter extends LaTeXParserListener
    {
       if (useMathJax())
       {
-         write("_{");
+         writeliteral("_{");
          arg.process(parser);
-         write("}");
+         writeliteral("}");
       }
       else
       {
-         write("<sub>");
+         writeliteral("<sub>");
          arg.process(parser);
-         write("</sub>");
+         writeliteral("</sub>");
       }
    }
 
@@ -1456,15 +1547,15 @@ public class L2HConverter extends LaTeXParserListener
    {
       if (useMathJax())
       {
-         write("^{");
+         writeliteral("^{");
          arg.process(parser);
-         write("}");
+         writeliteral("}");
       }
       else
       {
-         write("<sup>");
+         writeliteral("<sup>");
          arg.process(parser);
-         write("</sup>");
+         writeliteral("</sup>");
       }
    }
 
@@ -1472,21 +1563,21 @@ public class L2HConverter extends LaTeXParserListener
      String text)
     throws IOException
    {
-      write("<code style=\"white-space: pre;\">");
+      writeliteral("<code style=\"white-space: pre;\">");
 
       super.verb(name, isStar, delim, text);
 
-      write("</code>");
+      writeliteral("</code>");
    }
 
    public void beginVerbatim() throws IOException
    {
-      write("<pre>");
+      writeliteral("<pre>");
    }
 
    public void endVerbatim() throws IOException
    {
-      write("</pre>");
+      writeliteral("</pre>");
    }
 
    public String getImagePreamble() throws IOException
@@ -1708,20 +1799,20 @@ public class L2HConverter extends LaTeXParserListener
             uri += String.format("?#zoom=%d", zoom);
          }
 
-         write(String.format("<object data=\"%s\"", uri));
+         writeliteral(String.format("<object data=\"%s\"", uri));
 
          if (type != null)
          {
-            write(String.format(" type=\"%s\"", type));
+            writeliteral(String.format(" type=\"%s\"", type));
          }
 
          if (dim != null)
          {
-            write(String.format(" width=\"%d\" height=\"%d\"",
+            writeliteral(String.format(" width=\"%d\" height=\"%d\"",
               (int)Math.round(scale*dim.width), (int)Math.round(scale*dim.height)));
          }
 
-         write(">");
+         writeliteral(">");
 
          try
          {
@@ -1732,7 +1823,7 @@ public class L2HConverter extends LaTeXParserListener
          }
          finally
          {
-            write("</object>");
+            writeliteral("</object>");
          }
 
          try
@@ -1755,18 +1846,18 @@ public class L2HConverter extends LaTeXParserListener
    protected void writeTransform(String tag, String property, String originProp)
    throws IOException
    {
-      write(String.format(
+      writeliteral(String.format(
         "<%s style=\"display: inline-block; transform: %s; -ms-transform: %s; -webkit-transform: %s;",
         tag, property, property, property));
 
       if (originProp != null)
       {
-         write(String.format(
+         writeliteral(String.format(
           " transform-origin: %s; -ms-transform-origin: %s; -webkit-transform-origin: %s;",
           originProp, originProp, originProp));
       }
 
-      write("\">");
+      writeliteral("\">");
    }
 
    public void transform(String function, TeXParser parser, 
@@ -1784,7 +1875,7 @@ public class L2HConverter extends LaTeXParserListener
          object.process(parser, stack);
       }
 
-      write("</div>");
+      writeliteral("</div>");
    }
 
    public void rotate(double angle, TeXParser parser, 
@@ -1871,19 +1962,19 @@ public class L2HConverter extends LaTeXParserListener
    throws IOException
    {// not implemented
 
-      write("<div style=\"display: inline-block;");
+      writeliteral("<div style=\"display: inline-block;");
 
       if (width != null)
       {
-         write(String.format(" width: %s;", getHtmlDimension(width)));
+         writeliteral(String.format(" width: %s;", getHtmlDimension(width)));
       }
 
       if (height != null)
       {
-         write(String.format(" height: %s;", getHtmlDimension(height)));
+         writeliteral(String.format(" height: %s;", getHtmlDimension(height)));
       }
 
-      write("\">");
+      writeliteral("\">");
 
       if (stack == parser || stack == null)
       {
@@ -1894,7 +1985,7 @@ public class L2HConverter extends LaTeXParserListener
          object.process(parser, stack);
       }
 
-      write("</div>");
+      writeliteral("</div>");
    }
 
    @Override
@@ -1983,30 +2074,30 @@ public class L2HConverter extends LaTeXParserListener
    public void marginpar(TeXObject leftText, TeXObject rightText)
      throws IOException
    {
-      write("<div class=\"margin");
+      writeliteral("<div class=\"margin");
 
       try
       {
          if (isMarginRight())
          {
-            write("right\">");
+            writeliteral("right\">");
             rightText.process(parser);
          }
          else
          {
-            write("left\">");
+            writeliteral("left\">");
             leftText.process(parser);
          }
       }
       finally
       {
-         write("</div>");
+         writeliteral("</div>");
       }
    }
 
    public void doFootnoteRule() throws IOException
    {
-      writeln("<p><hr><p>");
+      writeliteralln("<p><hr><p>");
    }
 
    public IndexLocation createIndexLocation(String indexLabel)
@@ -2016,7 +2107,7 @@ public class L2HConverter extends LaTeXParserListener
       String anchor = String.format("idx-%s-%d", 
         HtmlTag.getUriFragment(indexLabel), indexLoc);
 
-      write(String.format("<a id=\"%s\"></a>", anchor));
+      writeliteral(String.format("<a id=\"%s\"></a>", anchor));
 
       return new IndexLocation(new HtmlTag(
         String.format("<a ref=\"#%s\">%d</a>", anchor, indexLoc)));
@@ -2043,28 +2134,28 @@ public class L2HConverter extends LaTeXParserListener
          switch (((DescriptionDec)trivlist).getStyle())
          {
             case INLINE_TITLE:
-               write(String.format("%n<dl class=\"inlinetitle\">%n"));
+               writeliteral(String.format("%n<dl class=\"inlinetitle\">%n"));
             break;
             case INLINE_BLOCK_TITLE:
-               write(String.format("%n<dl class=\"inlineblock\">%n"));
+               writeliteral(String.format("%n<dl class=\"inlineblock\">%n"));
             break;
             default:
-               write(String.format("%n<dl>%n"));
+               writeliteral(String.format("%n<dl>%n"));
          }
       }
       else if (trivlist.isInLine())
       {
-         write("<div class=\"inlinelist\">");
+         writeliteral("<div class=\"inlinelist\">");
       }
       else
       {
          if (isIfTrue(getControlSequence("if@nmbrlist")))
          {
-            write(String.format("%n<ol class=\"displaylist\">%n"));
+            writeliteral(String.format("%n<ol class=\"displaylist\">%n"));
          }
          else
          {
-            write(String.format("%n<ul class=\"displaylist\">%n"));
+            writeliteral(String.format("%n<ul class=\"displaylist\">%n"));
          }
       }
    }
@@ -2073,21 +2164,21 @@ public class L2HConverter extends LaTeXParserListener
    {
       if (trivlist instanceof DescriptionDec)
       {
-         write(String.format("%n</dl>%n"));
+         writeliteral(String.format("%n</dl>%n"));
       }
       else if (trivlist.isInLine())
       {
-         write("</div>");
+         writeliteral("</div>");
       }
       else
       {
          if (isIfTrue(getControlSequence("if@nmbrlist")))
          {
-            write(String.format("%n</ol>%n"));
+            writeliteral(String.format("%n</ol>%n"));
          }
          else
          {
-            write(String.format("%n</ul>%n"));
+            writeliteral(String.format("%n</ul>%n"));
          }
       }
 
@@ -2226,18 +2317,18 @@ public class L2HConverter extends LaTeXParserListener
    {
       if (isInDocEnv())
       {
-         write("<span style=\"");
+         writeliteral("<span style=\"");
 
          if (isForeground)
          {
-            write("color: ");
+            writeliteral("color: ");
          }
          else
          {
-            write("background-color: ");
+            writeliteral("background-color: ");
          }
 
-         write(String.format(" %s\">", getHtmlColor(color)));
+         writeliteral(String.format(" %s\">", getHtmlColor(color)));
       }
    }
 
@@ -2246,7 +2337,7 @@ public class L2HConverter extends LaTeXParserListener
    {
       if (isInDocEnv())
       {
-         write("</span>");
+         writeliteral("</span>");
       }
    }
 
@@ -2302,7 +2393,7 @@ public class L2HConverter extends LaTeXParserListener
 
             if (isInDocEnv())
             {
-               write(String.format("<style>%s</style>", css));
+               writeliteral(String.format("<style>%s</style>", css));
             }
             else
             {
@@ -2528,7 +2619,7 @@ public class L2HConverter extends LaTeXParserListener
    {
       String tag = getElementTag(fbox);
 
-      write(String.format("<%s ", tag));
+      writeliteral(String.format("<%s ", tag));
 
       if (getDeclaredFrameBox(fbox.getId()) == null)
       {
@@ -2538,23 +2629,23 @@ public class L2HConverter extends LaTeXParserListener
 
          if (style == null)
          {
-            write(String.format("style=\"%s\"", specs));
+            writeliteral(String.format("style=\"%s\"", specs));
          }
          else if (!fbox.isInLine() && fbox.isMultiLine())
          {
-            write(String.format("class=\"%s clearfix\"", style));
+            writeliteral(String.format("class=\"%s clearfix\"", style));
          }
          else
          {
-            write(String.format("class=\"%s\"", style));
+            writeliteral(String.format("class=\"%s\"", style));
          }
       }
       else
       {
-         write(String.format("class=\"%s\"", fbox.getId()));
+         writeliteral(String.format("class=\"%s\"", fbox.getId()));
       }
 
-      write(">");
+      writeliteral(">");
    }
 
    public void endFrameBox(FrameBox fbox)
@@ -2562,30 +2653,30 @@ public class L2HConverter extends LaTeXParserListener
    {
       String tag = getElementTag(fbox);
 
-      write(String.format("</%s>", tag));
+      writeliteral(String.format("</%s>", tag));
 
       if (fbox.getFloatStyle() != FloatBoxStyle.NONE)
       {
-         write("<span class=\"clearfix\"></span>");
+         writeliteral("<span class=\"clearfix\"></span>");
       }
 
       if (tag.equals("div") && !fbox.isInLine() 
            && !getParser().getSettings().inVerb())
       {
-         writeln(String.format("<!-- end of %s -->", fbox.getId()));
+         writeliteralln(String.format("<!-- end of %s -->", fbox.getId()));
       }
    }
 
    public void startTheorem(String name) throws IOException
    {
-      write("<div class=\"");
-      write(name);
-      write("\">");
+      writeliteral("<div class=\"");
+      writeliteral(name);
+      writeliteral("\">");
    }
 
    public void endTheorem(String name) throws IOException
    {
-      write(String.format("</div><!-- end of %s -->", name));
+      writeliteral(String.format("</div><!-- end of %s -->", name));
    }
 
    public HtmlTag createLinkBox(String label)
@@ -2616,20 +2707,20 @@ public class L2HConverter extends LaTeXParserListener
    {
       if (currentSection != null)
       {
-         write(String.format("%n</section><!-- end of section %s -->%n", currentSection));
+         writeliteral(String.format("%n</section><!-- end of section %s -->%n", currentSection));
       }
 
       if (id == null)
       {
          currentSection = tag+"-"+name;
 
-         write(String.format("%n<section><!-- start of section %s -->", currentSection));
+         writeliteral(String.format("%n<section><!-- start of section %s -->", currentSection));
       }
       else
       {
          currentSection = id;
 
-         write(String.format("%n<section id=\"%s\"><!-- start of section %s -->",
+         writeliteral(String.format("%n<section id=\"%s\"><!-- start of section %s -->",
            id, currentSection));
       }
 
@@ -2641,7 +2732,7 @@ public class L2HConverter extends LaTeXParserListener
          text = parser.expandToString(cs, stack);
       }
 
-      write(String.format(
+      writeliteral(String.format(
        "<div class=\"tomain\"><a href=\"#main\">%s</a></div>",
        text));
    }
@@ -2801,7 +2892,7 @@ public class L2HConverter extends LaTeXParserListener
 
       if (isInDocEnv())
       {
-         write(String.format("<style>%s: {%s}</style>", name, specs));
+         writeliteral(String.format("<style>%s: {%s}</style>", name, specs));
       }
    }
 
@@ -2869,6 +2960,8 @@ public class L2HConverter extends LaTeXParserListener
    private boolean useMathJax=true;
 
    private boolean unicodeScriptSupport=true;
+
+   private boolean useHtmlEntities = false;
 
    private String suffix = "html";
 

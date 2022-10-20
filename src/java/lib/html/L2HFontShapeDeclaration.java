@@ -105,13 +105,13 @@ public class L2HFontShapeDeclaration extends FontShapeDeclaration
          break;
       }
 
-      parser.getListener().getWriteable().write("<span style=\""+style+"\">");
+      parser.getListener().getWriteable().writeliteral("<span style=\""+style+"\">");
    }
 
    @Override
    public void end(TeXParser parser, TeXObjectList stack) throws IOException
    {
-      parser.getListener().getWriteable().write("</span>");
+      parser.getListener().getWriteable().writeliteral("</span>");
       super.end(parser, stack);
    }
 

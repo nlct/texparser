@@ -65,7 +65,7 @@ public class L2HQuote extends Declaration
    public void process(TeXParser parser, TeXObjectList stack)
     throws IOException
    {
-      parser.getListener().getWriteable().write("<blockquote>");
+      parser.getListener().getWriteable().writeliteral("<blockquote>");
    }
 
    @Override
@@ -79,6 +79,6 @@ public class L2HQuote extends Declaration
    public void end(TeXParser parser, TeXObjectList stack)
     throws IOException
    {
-      parser.getListener().getWriteable().write("</blockquote>");
+      parser.getListener().getWriteable().writeliteral("</blockquote>");
    }
 }

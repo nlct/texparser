@@ -140,6 +140,7 @@ public class AuxParser extends DefaultTeXParserListener
               || cs instanceof Primitive);
    }
 
+   @Override
    public ControlSequence getControlSequence(String name)
    {
       ControlSequence cs = getParser().getControlSequence(name);
@@ -147,42 +148,62 @@ public class AuxParser extends DefaultTeXParserListener
       return isAllowedAuxCommand(cs) ? cs : new AuxIgnoreable(name);
    }
 
+   @Override
    public ControlSequence createUndefinedCs(String name)
    {
       return new AuxIgnoreable(name);
    }
 
+   @Override
    public Writeable getWriteable()
    {
       return this;
    }
 
+   @Override
+   public void writeliteral(String text)
+     throws IOException
+   {
+   }
+
+   @Override
+   public void writeliteralln(String text)
+     throws IOException
+   {
+   }
+
+   @Override
    public void write(String text)
      throws IOException
    {
    }
 
+   @Override
    public void writeln(String text)
      throws IOException
    {
    }
 
+   @Override
    public void write(char c)
      throws IOException
    {
    }
 
+   @Override
    public void writeCodePoint(int codePoint)
      throws IOException
    {
    }
 
+   @Override
    public void overwithdelims(TeXObject firstDelim,
      TeXObject secondDelim, TeXObject before, TeXObject after)
     throws IOException
    {
    }
 
+   @Override
    public void abovewithdelims(TeXObject firstDelim,
      TeXObject secondDelim, TeXDimension thickness, TeXObject before, 
      TeXObject after)
@@ -190,31 +211,37 @@ public class AuxParser extends DefaultTeXParserListener
    {
    }
 
+   @Override
    public void skipping(Ignoreable ignoreable)
       throws IOException
    {
    }
 
+   @Override
    public void href(String url, TeXObject text)
       throws IOException
    {
    }
 
+   @Override
    public void subscript(TeXObject arg)
      throws IOException
    {
    }
 
+   @Override
    public void superscript(TeXObject arg)
      throws IOException
    {
    }
 
+   @Override
    public void endParse(File file)
       throws IOException
    {
    }
 
+   @Override
    public void beginParse(File file, Charset encoding)
       throws IOException
    {
@@ -251,12 +278,14 @@ public class AuxParser extends DefaultTeXParserListener
       return auxData;
    }
 
+   @Override
    public Charset getCharSet()
    {
       return charset;
    }
 
    // shouldn't be needed in auxFile
+   @Override
    public float emToPt(float emValue)
    {
       getParser().warning(

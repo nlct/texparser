@@ -85,7 +85,7 @@ public class L2HMathGroup extends MathGroup
       {
          parser.getSettings().setMode(TeXSettings.MODE_DISPLAY_MATH);
 
-         listener.write("<div class=\"displaymath\">");
+         listener.writeliteral("<div class=\"displaymath\">");
       }
       else
       {
@@ -96,11 +96,11 @@ public class L2HMathGroup extends MathGroup
       {
          if (isInLine())
          {
-            listener.write(listener.mathJaxStartInline());
+            listener.writeliteral(listener.mathJaxStartInline());
          }
          else
          {
-            listener.write(listener.mathJaxStartDisplay());
+            listener.writeliteral(listener.mathJaxStartDisplay());
          }
       }
    }
@@ -114,17 +114,17 @@ public class L2HMathGroup extends MathGroup
       {
          if (isInLine())
          {
-            listener.write(listener.mathJaxEndInline());
+            listener.writeliteral(listener.mathJaxEndInline());
          }
          else
          {
-            listener.write(listener.mathJaxEndDisplay());
+            listener.writeliteral(listener.mathJaxEndDisplay());
          }
       }
 
       if (!isInLine())
       {
-         listener.write("</div>");
+         listener.writeliteral("</div>");
       }
 
       parser.endGroup();

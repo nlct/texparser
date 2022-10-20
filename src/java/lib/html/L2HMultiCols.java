@@ -83,16 +83,16 @@ public class L2HMultiCols extends Declaration
 
       TeXObject spread = popOptArg(parser, parser);
 
-      parser.getListener().getWriteable().write(
+      parser.getListener().getWriteable().writeliteral(
         String.format("<div class=\"multicols%d\">", num));
 
       if (spread != null)
       {
          popOptArg(parser, parser);
 
-         parser.getListener().getWriteable().write("<div class=\"multicolspan\">");
+         parser.getListener().getWriteable().writeliteral("<div class=\"multicolspan\">");
          spread.process(parser);
-         parser.getListener().getWriteable().write("</div>");
+         parser.getListener().getWriteable().writeliteral("</div>");
       }
 
       super.process(parser);
@@ -105,16 +105,16 @@ public class L2HMultiCols extends Declaration
 
       TeXObject spread = popOptArg(parser, stack);
 
-      parser.getListener().getWriteable().write(
+      parser.getListener().getWriteable().writeliteral(
         String.format("<div class=\"multicols%d\">", num));
 
       if (spread != null)
       {
          popOptArg(parser, stack);
 
-         parser.getListener().getWriteable().write("<div class=\"multicolspan\">");
+         parser.getListener().getWriteable().writeliteral("<div class=\"multicolspan\">");
          spread.process(parser);
-         parser.getListener().getWriteable().write("</div>");
+         parser.getListener().getWriteable().writeliteral("</div>");
       }
 
       super.process(parser, stack);
@@ -124,7 +124,7 @@ public class L2HMultiCols extends Declaration
    public void end(TeXParser parser, TeXObjectList stack)
     throws IOException
    {
-      parser.getListener().getWriteable().write("</div>");
+      parser.getListener().getWriteable().writeliteral("</div>");
    }
 
    @Override

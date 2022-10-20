@@ -101,26 +101,26 @@ public class StartElement extends HtmlTag
 
       if (insertCR)
       {
-         writeable.writeln("");
+         writeable.writeliteralln("");
       }
 
       if (attributes == null || attributes.isEmpty())
       {
-         writeable.write(getTag());
+         writeable.writeliteral(getTag());
       }
       else
       {
-         writeable.write("<"+name);
+         writeable.writeliteral("<"+name);
 
          for (Iterator<String> it = attributes.keySet().iterator(); it.hasNext(); )
          {
             String key = it.next();
             String val = attributes.get(key);
 
-            writeable.write(String.format(" %s=\"%s\"", key, val));
+            writeable.writeliteral(String.format(" %s=\"%s\"", key, val));
          }
 
-         writeable.write(">");
+         writeable.writeliteral(">");
       }
    }
 

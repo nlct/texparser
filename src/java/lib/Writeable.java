@@ -31,5 +31,8 @@ public interface Writeable
 
    public void writeln(String string) throws IOException;
 
+   public void writeliteral(String string) throws IOException;
+
+   public void writeliteralln(String string) throws IOException;
 }
 
