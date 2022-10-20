@@ -1,15 +1,20 @@
 % arara: pdflatex
 % arara: bib2gls
 % arara: pdflatex
+% arara: pdflatex if found("log", "Rerun to")
 \documentclass{article}
 
 \usepackage[T1]{fontenc}
 \usepackage{lipsum}
 \usepackage[colorlinks]{hyperref}
-\usepackage[indexcounter,style=index,record]{glossaries-extra}
+\usepackage[indexcounter,nostyles,style=index,stylemods={tree,table},record]{glossaries-extra}
 
 \setabbreviationstyle[acronym]{long-short}
 \GlsXtrLoadResources[src={example-glossaries-symbols,example-glossaries-acronym,example-glossaries-parent}]
+
+\newglossary*{other}{Other}
+\GlsXtrLoadResources[src=example-glossaries-acronyms-lang,
+ type=other,save-locations=false,selection=all]
 
 \begin{document}
 \tableofcontents
@@ -57,5 +62,13 @@ Reference section~\ref{sec:nolinks} (\ref*{sec:nolinks}).
 \hyperlink{sampleanchor}{Sample hyperlink}.
 
 \lipsum
+
+\section{Table Glossary}
+\label{sec:table}
+
+Other glossary listed in table~\ref{tab:other}.
+
+\printunsrttable[label={tab:other},type=other,
+ block-style=name,par=ragged,other=useri]
 
 \end{document}
