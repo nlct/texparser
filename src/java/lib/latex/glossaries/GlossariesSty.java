@@ -1504,6 +1504,71 @@ public class GlossariesSty extends LaTeXSty
       registerControlSequence(new LaTeXGenericCommand(true,
         "glstableNameTarget", "m", def));
 
+      // \glstableNameFmt
+      def = listener.createStack();
+      def.add(new TeXCsRef("glsentryitem"));
+      def.add(TeXParserUtils.createGroup(listener, listener.getParam(1)));
+      def.add(new TeXCsRef("glossentryname"));
+      def.add(TeXParserUtils.createGroup(listener, listener.getParam(1)));
+
+      registerControlSequence(new LaTeXGenericCommand(true,
+        "glstableNameFmt", "m", def));
+
+      // \glstableSubNameTarget
+      def = listener.createStack();
+      def.add(new TeXCsRef("glstarget"));
+      def.add(TeXParserUtils.createGroup(listener, listener.getParam(1)));
+
+      grp = listener.createGroup();
+      def.add(grp);
+      grp.add(new TeXCsRef("glstableSubNameFmt"));
+      grp.add(TeXParserUtils.createGroup(listener, listener.getParam(1)));
+
+      registerControlSequence(new LaTeXGenericCommand(true,
+        "glstableSubNameTarget", "m", def));
+
+      // \glstableSubNameFmt
+      def = listener.createStack();
+      def.add(new TeXCsRef("glssubentryitem"));
+      def.add(TeXParserUtils.createGroup(listener, listener.getParam(1)));
+
+      registerControlSequence(new LaTeXGenericCommand(true,
+        "glstableSubNameFmt", "m", def));
+
+      // \glstableOther
+      def = listener.createStack();
+      def.add(new TeXCsRef("glsxtrusefield"));
+      def.add(TeXParserUtils.createGroup(listener, listener.getParam(1)));
+      def.add(new TeXCsRef("glstableotherfield"));
+
+      registerControlSequence(new LaTeXGenericCommand(true,
+        "glstableOther", "m", def));
+
+      // \glstableNameSingleSuppl
+      def = listener.createStack();
+      def.add(listener.getOther('('));
+      def.add(listener.getParam(1));
+      def.add(listener.getOther(')'));
+
+      registerControlSequence(new LaTeXGenericCommand(true,
+        "glstableNameSingleSuppl", "m", def));
+
+      // \glstableNameSinglePostName
+      registerControlSequence(new TextualContentCommand(
+        "glstableNameSinglePostName", " "));
+
+      // \glstableNameSingleSymSep
+      registerControlSequence(new TextualContentCommand(
+        "glstableNameSingleSymSep", " "));
+
+      // \glstableOtherSep
+      registerControlSequence(new TextualContentCommand(
+        "glstableOtherSep", ", "));
+
+      registerControlSequence(new GlsTableNameSingleFmt(this));
+
+
+
       return new GlossaryStyleSty(this, "table",
            GlossaryStyleSty.STATUS_IMPLEMENTED);
    }
@@ -2879,6 +2944,22 @@ public class GlossariesSty extends LaTeXSty
          title = options.getExpandedValue("title", parser, stack);
 
          styleObj = options.getExpandedValue("style", parser, stack);
+
+         TeXObject preamble = options.getValue("preamble");
+
+         if (preamble != null)
+         {
+            parser.putControlSequence(true, new GenericCommand(
+             "glossarypreamble", null, preamble));
+         }
+
+         TeXObject postamble = options.getValue("postamble");
+
+         if (postamble != null)
+         {
+            parser.putControlSequence(true, new GenericCommand(
+             "glossarypostamble", null, postamble));
+         }
 
          if (indexingOpt == IndexingOption.UNSRT)
          {
