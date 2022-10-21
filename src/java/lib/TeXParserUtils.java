@@ -20,6 +20,7 @@ package com.dickimawbooks.texparserlib;
 
 import java.io.IOException;
 
+import com.dickimawbooks.texparserlib.primitives.Relax;
 import com.dickimawbooks.texparserlib.latex.KeyValList;
 import com.dickimawbooks.texparserlib.latex.CsvList;
 
@@ -732,6 +733,30 @@ public class TeXParserUtils
       }
 
       return object;
+   }
+
+   /**
+    * Test if the given object is void. That is, the object doesn't
+    * perform any significant action so can be skipped.
+    */ 
+   public static boolean isVoid(TeXObject object, TeXParser parser)
+   {
+      if (object == null || object.isEmpty() || object instanceof Relax)
+      {
+         return true;
+      }
+
+      if (object instanceof Resolvable)
+      {
+         object = ((Resolvable)object).resolve(parser);
+
+         if (object.isEmpty() || object instanceof Relax)
+         {
+            return true;
+         }
+      }
+
+      return false;
    }
 }
 
