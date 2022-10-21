@@ -1738,6 +1738,7 @@ public class GlossariesSty extends LaTeXSty
       registerControlSequence(new GlsTableStyleNameDesc());
       registerControlSequence(new GlsTableStyleName());
       registerControlSequence(new GlsTableStyleNameSymbol());
+      registerControlSequence(new GlsTableStyleDescName());
 
       registerControlSequence(new GlsTableChildEntries(this));
       registerControlSequence(new GlsTableSubEntries());
