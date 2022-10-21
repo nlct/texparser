@@ -153,5 +153,11 @@ public class UserNumber extends AbstractTeXObject implements TeXNumber
 
    private int value;
 
+   public static final UserNumber MINUS_ONE = new UserNumber(-1);
+   public static final UserNumber ZERO = new UserNumber(0);
    public static final UserNumber ONE = new UserNumber(1);
+   public static final UserNumber TWO = new UserNumber(2);
+   public static final UserNumber THREE = new UserNumber(3);
+   public static final UserNumber FOUR = new UserNumber(4);
+   public static final UserNumber FIVE = new UserNumber(5);
 }

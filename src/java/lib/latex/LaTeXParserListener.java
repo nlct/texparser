@@ -2905,17 +2905,17 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
 
    protected HashMap<String,FrameBox> frameBoxes;
 
-   public static final UserNumber ZERO = new UserNumber(0);
-   public static final UserNumber ONE = new UserNumber(1);
-   public static final UserNumber MINUS_ONE = new UserNumber(-1);
+   public static final UserNumber ZERO = UserNumber.ZERO;
+   public static final UserNumber ONE = UserNumber.ONE;
+   public static final UserNumber MINUS_ONE = UserNumber.MINUS_ONE;
 
    public static final UserNumber PART_LEVEL = MINUS_ONE;
    public static final UserNumber CHAPTER_LEVEL = ZERO;
    public static final UserNumber SECTION_LEVEL = ONE;
-   public static final UserNumber SUBSECTION_LEVEL = new UserNumber(2);
-   public static final UserNumber SUBSUBSECTION_LEVEL = new UserNumber(3);
-   public static final UserNumber PARAGRAPH_LEVEL = new UserNumber(4);
-   public static final UserNumber SUBPARAGRAPH_LEVEL = new UserNumber(5);
+   public static final UserNumber SUBSECTION_LEVEL = UserNumber.TWO;
+   public static final UserNumber SUBSUBSECTION_LEVEL = UserNumber.THREE;
+   public static final UserNumber PARAGRAPH_LEVEL = UserNumber.FOUR;
+   public static final UserNumber SUBPARAGRAPH_LEVEL = UserNumber.FIVE;
 
    public static final Pattern PTSIZE_PATTERN = Pattern.compile("(\\d+)pt");
 }
