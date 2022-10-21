@@ -35,6 +35,7 @@ import com.dickimawbooks.texparserlib.latex.*;
 import com.dickimawbooks.texparserlib.latex.hyperref.HyperTarget;
 import com.dickimawbooks.texparserlib.latex.hyperref.HyperLink;
 import com.dickimawbooks.texparserlib.latex.mfirstuc.MfirstucSty;
+import com.dickimawbooks.texparserlib.html.L2HConverter;
 
 /**
  * Limited support for the glossaries and glossaries-extra packages. They are
@@ -120,6 +121,16 @@ public class GlossariesSty extends LaTeXSty
    @Override
    public void addDefinitions()
    {
+      if (listener instanceof L2HConverter)
+      {
+         ((L2HConverter)listener).addCssStyle("table.glossary-ruled { border-top: solid 2px; border-bottom: solid 2px; border-collapse: collapse; }");
+         ((L2HConverter)listener).addCssStyle("tr.glossary-ruled { border-bottom: solid 1px; }");
+         ((L2HConverter)listener).addCssStyle(".cell-left-border { border-left: solid 1px; }");
+         ((L2HConverter)listener).addCssStyle("table.glossary-ruled td { vertical-align: text-top; }");
+         ((L2HConverter)listener).addCssStyle("table.glossary td { vertical-align: text-top; }");
+         ((L2HConverter)listener).addCssStyle("div.glossary-children{ padding-left: 1em; }");
+      }
+
       registerControlSequence(new ParCs("glspar"));
 
       registerControlSequence(new AtNumberOfNumber("glstexorpdfstring", 1, 2));
@@ -137,6 +148,19 @@ public class GlossariesSty extends LaTeXSty
       registerControlSequence(new TextualContentCommand("glossaryname", "Glossary"));
       registerControlSequence(new TextualContentCommand("acronymname", "Acronyms"));
 
+      registerControlSequence(new TextualContentCommand("entryname", "Notation"));
+      registerControlSequence(new TextualContentCommand("descriptionname",
+         "Description"));
+      registerControlSequence(new TextualContentCommand("symbolname",
+         "Symbol"));
+      registerControlSequence(new TextualContentCommand("pagelistname",
+         "Page List"));
+
+      registerControlSequence(new NewGlossary(this));
+      registerControlSequence(new NewGlossary("newignoredglossary",
+        Overwrite.FORBID, true, this));
+      registerControlSequence(new NewGlossary("provideignoredglossary",
+        Overwrite.ALLOW, true, this));
 
       registerControlSequence(new NewGlossaryStyle());
       registerControlSequence(new SetGlossaryStyle());
@@ -151,6 +175,8 @@ public class GlossariesSty extends LaTeXSty
          "name", CaseChange.SENTENCE, this));
       registerControlSequence(new GlossEntryField("Glossentrydesc",
          "description", CaseChange.SENTENCE, this));
+
+      registerControlSequence(new GenericCommand(true, "@@glossaryseclabel"));
 
       registerControlSequence(new PrintGlossary(this));
       registerControlSequence(new PrintGlossaries(this));
@@ -1419,6 +1445,9 @@ public class GlossariesSty extends LaTeXSty
        TeXParserUtils.createGroup(listener, listener.getParam(1))
       )));
 
+      registerControlSequence(new AtNumberOfNumber("glstableiffilter",
+        3, 3));
+
       // \glstableleftalign
       TeXObjectList def = listener.createStack();
       def.add(new TeXCsRef("glstable@parcase"));
@@ -1544,6 +1573,14 @@ public class GlossariesSty extends LaTeXSty
       registerControlSequence(new LaTeXGenericCommand(true,
         "glstableOther", "m", def));
 
+      // \glstableSubOther
+      def = listener.createStack();
+      def.add(new TeXCsRef("glstableOther"));
+      def.add(TeXParserUtils.createGroup(listener, listener.getParam(1)));
+
+      registerControlSequence(new LaTeXGenericCommand(true,
+        "glstableSubOther", "m", def));
+
       // \glstableNameSingleSuppl
       def = listener.createStack();
       def.add(listener.getOther('('));
@@ -1567,10 +1604,160 @@ public class GlossariesSty extends LaTeXSty
 
       registerControlSequence(new GlsTableNameSingleFmt(this));
 
+      registerControlSequence(new GlsTableSubNameSingleFmt(this));
 
+      registerControlSequence(new AtFirstOfOne("glstableNameSingleSubSuppl"));
+
+      // \glstableNameSinglePostSubName
+      registerControlSequence(new TextualContentCommand(
+        "glstableNameSinglePostSubName", " "));
+
+      registerControlSequence(new GlsTableIfHasOtherField(this));
+      registerControlSequence(new GlsTableNameNoDesc(this));
+      registerControlSequence(new GlsTableSubNameNoDesc(this));
+
+      // \glstableSymbolFmt
+      def = listener.createStack();
+      def.add(new TeXCsRef("glossentrysymbol"));
+      def.add(TeXParserUtils.createGroup(listener, listener.getParam(1)));
+
+      registerControlSequence(new LaTeXGenericCommand(true,
+        "glstableSymbolFmt", "m", def));
+
+      // \glstableSubSymbolFmt
+      def = listener.createStack();
+      def.add(new TeXCsRef("glstableSymbolFmt"));
+      def.add(TeXParserUtils.createGroup(listener, listener.getParam(1)));
+
+      registerControlSequence(new LaTeXGenericCommand(true,
+        "glstableSubSymbolFmt", "m", def));
+
+      // \glstableSymbolNameTarget
+      def = listener.createStack();
+      def.add(new TeXCsRef("glstarget"));
+      def.add(TeXParserUtils.createGroup(listener, listener.getParam(1)));
+
+      grp = listener.createGroup();
+      def.add(grp);
+      grp.add(new TeXCsRef("glstableSymbolNameFmt"));
+      grp.add(TeXParserUtils.createGroup(listener, listener.getParam(1)));
+
+      registerControlSequence(new LaTeXGenericCommand(true,
+        "glstableSymbolNameTarget", "m", def));
+
+      // \glstableSymbolNameFmt
+      def = listener.createStack();
+      def.add(new TeXCsRef("glsentryitem"));
+      def.add(TeXParserUtils.createGroup(listener, listener.getParam(1)));
+      def.add(new TeXCsRef("glossentrysymbol"));
+      def.add(TeXParserUtils.createGroup(listener, listener.getParam(1)));
+
+      registerControlSequence(new LaTeXGenericCommand(true,
+        "glstableSymbolNameFmt", "m", def));
+
+      // \glstableSubSymbolNameTarget
+      def = listener.createStack();
+      def.add(new TeXCsRef("glstarget"));
+      def.add(TeXParserUtils.createGroup(listener, listener.getParam(1)));
+
+      grp = listener.createGroup();
+      def.add(grp);
+      grp.add(new TeXCsRef("glstableSubSymbolNameFmt"));
+      grp.add(TeXParserUtils.createGroup(listener, listener.getParam(1)));
+
+      registerControlSequence(new LaTeXGenericCommand(true,
+        "glstableSubSymbolNameTarget", "m", def));
+
+      // \glstableSubSymbolNameFmt
+      def = listener.createStack();
+      def.add(new TeXCsRef("glssubentryitem"));
+      def.add(TeXParserUtils.createGroup(listener, listener.getParam(1)));
+
+      registerControlSequence(new LaTeXGenericCommand(true,
+        "glstableSubSymbolNameFmt", "m", def));
+
+      registerControlSequence(new GlsTableDesc(this));
+
+      // \glstableDescFmt
+      def = listener.createStack();
+      def.add(new TeXCsRef("glossentrydesc"));
+      def.add(TeXParserUtils.createGroup(listener, listener.getParam(1)));
+      def.add(new TeXCsRef("glspostdescription"));
+
+      registerControlSequence(new LaTeXGenericCommand(true,
+        "glstableDescFmt", "m", def));
+
+      // \glstableSubDesc
+      def = listener.createStack();
+      def.add(new TeXCsRef("glstableDesc"));
+      def.add(TeXParserUtils.createGroup(listener, listener.getParam(1)));
+
+      registerControlSequence(new LaTeXGenericCommand(true,
+        "glstableSubDesc", "m", def));
+
+      // \glstableSubDescFmt
+      def = listener.createStack();
+      def.add(new TeXCsRef("glstableDescFmt"));
+      def.add(TeXParserUtils.createGroup(listener, listener.getParam(1)));
+
+      registerControlSequence(new LaTeXGenericCommand(true,
+        "glstableSubDescFmt", "m", def));
+
+      registerControlSequence(new GlsTableOtherNoDesc(this));
+
+      // \glstableSubOtherNoDesc
+      def = listener.createStack();
+      def.add(new TeXCsRef("glstableOtherNoDesc"));
+      def.add(TeXParserUtils.createGroup(listener, listener.getParam(1)));
+
+      registerControlSequence(new LaTeXGenericCommand(true,
+        "glstableSubOtherNoDesc", "m", def));
+
+      // \glstableHeaderFmt
+      def = listener.createStack();
+      def.add(new TeXCsRef("textbf"));
+      def.add(TeXParserUtils.createGroup(listener, listener.getParam(1)));
+
+      registerControlSequence(new LaTeXGenericCommand(true,
+        "glstableHeaderFmt", "m", def));
+
+      registerControlSequence(new GenericCommand(true, "glstableblockheader"));
+      registerControlSequence(new GenericCommand(true, "glstableblockalign"));
+      registerControlSequence(new AtFirstOfOne("glstableblockentry"));
+      registerControlSequence(new AtFirstOfOne("glstableblocksubentry"));
+      registerControlSequence(new GenericCommand(true,"glstableinitlengthupdates"));
+      registerControlSequence(new AtFirstOfOne("glstablelengthupdate"));
+      registerControlSequence(new GenericCommand(true, "glstablefinishlengthupdates"));
+
+      registerControlSequence(new GlsTableSetStyle());
+      registerControlSequence(new GlsTableNewStyle());
+
+      registerControlSequence(new GlsTableStyleNameDesc());
+      registerControlSequence(new GlsTableStyleName());
+
+      registerControlSequence(new GlsTableChildEntries(this));
+      registerControlSequence(new GlsTableSubEntries());
+
+      registerControlSequence(new PrintUnsrtTable(this));
 
       return new GlossaryStyleSty(this, "table",
            GlossaryStyleSty.STATUS_IMPLEMENTED);
+   }
+
+   public String glsTableGetOtherFieldLabel(TeXObjectList stack)
+   throws IOException
+   {
+      return getParser().expandToString(
+           listener.getControlSequence("glstableotherfield"), stack);
+   }
+
+   public boolean glsTableHasOtherField(GlossaryEntry entry, TeXObjectList stack)
+   throws IOException
+   {
+      String otherLabel = glsTableGetOtherFieldLabel(stack);
+
+      return (!otherLabel.isEmpty() 
+                 && entry.hasField(getFieldName(otherLabel)));
    }
 
    @Override
@@ -1671,8 +1858,24 @@ public class GlossariesSty extends LaTeXSty
          createAcronyms = false;
       }
 
+      if (isAutoLabel)
+      {
+         TeXObjectList def = getListener().createStack();
+
+         def.add(listener.getControlSequence("label"));
+
+         Group grp = getParser().getListener().createGroup();
+         grp.add(getParser().getListener().getControlSequence("glsautoprefix"));
+         grp.add(getParser().getListener().getControlSequence("@glo@type"));
+
+         def.add(grp);
+
+         registerControlSequence(new GenericCommand(true, "@@glossaryseclabel",
+           null, def));
+      }
+
       getListener().putControlSequence(true, 
-        new GlossarySection(section, isNumberedSection, isAutoLabel));
+        new GlossarySection(section, isNumberedSection));
 
       if (loadList && listener.isStyLoaded("glossary-list"))
       {
@@ -2961,6 +3164,24 @@ public class GlossariesSty extends LaTeXSty
              "glossarypostamble", null, postamble));
          }
 
+         TeXObject prefixVal = options.getValue("prefix");
+
+         if (prefixVal != null)
+         {
+            parser.putControlSequence(true, new GenericCommand(true,
+             "glolinkprefix", null, prefixVal));
+         }
+
+         TeXObject labelVal = options.getValue("label");
+
+         if (labelVal != null)
+         {
+            parser.putControlSequence(true, new GenericCommand(true,
+             "@@glossaryseclabel", null, TeXParserUtils.createStack(parser,
+             new TeXCsRef("label"), TeXParserUtils.createGroup(parser,
+              labelVal))));
+         }
+
          if (indexingOpt == IndexingOption.UNSRT)
          {
             TeXObject val = options.get("flatten");
@@ -2978,6 +3199,23 @@ public class GlossariesSty extends LaTeXSty
                {
                   parser.putControlSequence(true,
                     new IfFalse("ifglsxtrprintglossflatten"));
+               }
+            }
+
+            Boolean targetVal = options.getBoolean("target", parser, stack);
+
+            if (targetVal != null)
+            {
+               if (targetVal.booleanValue())
+               {
+                  parser.putControlSequence(true, new LaTeXGenericCommand(true,
+                   "@glstarget", "m", TeXParserUtils.createStack(parser,
+                    getListener().getControlSequence("glsdohypertarget"), 
+                    TeXParserUtils.createGroup(parser, getListener().getParam(1)))));
+               }
+               else
+               {
+                  parser.putControlSequence(true, new AtSecondOfTwo("@glstarget"));
                }
             }
 
@@ -3397,4 +3635,6 @@ public class GlossariesSty extends LaTeXSty
     = "glossaries.abbreviation.style.file.not.found";
    public static final String UNRECOGNISED 
     = "glossaries.unrecognised";
+   public static final String TABLE_BLOCK_STYLE_NOT_DEFINED 
+    = "glossaries.table.block.style.not.defined";
 }

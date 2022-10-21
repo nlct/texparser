@@ -23,59 +23,38 @@ import java.io.IOException;
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.*;
 
-public class GlossarySection extends ControlSequence
+public class GlsTableSetStyle extends ControlSequence
 {
-   public GlossarySection(String section, 
-       boolean isNumbered)
+   public GlsTableSetStyle()
    {
-      this("glossarysection", section, isNumbered);
+      this("glstablesetstyle");
    }
 
-   public GlossarySection(String name, String section, 
-       boolean isNumbered)
+   public GlsTableSetStyle(String name)
    {
       super(name);
-      this.section = section;
-      this.isNumbered = isNumbered;
    }
 
+   @Override
    public Object clone()
    {
-      return new GlossarySection(getName(), section, isNumbered);
+      return new GlsTableSetStyle(getName());
    }
 
    public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      TeXObject tocTitle = popOptArg(parser, stack);
-      TeXObject title = popArg(parser, stack);
+      String styleName = popLabelString(parser, stack);
 
-      TeXParserListener listener = parser.getListener();
+      ControlSequence cs = parser.getControlSequence("@glstable@style@"+styleName);
 
-      TeXObjectList substack = listener.createStack();
-
-      substack.add(listener.getControlSequence(section));
-
-      if (!isNumbered)
+      if (cs == null)
       {
-         substack.add(listener.getOther('*'));
-      }
-      else if (tocTitle != null)
-      {
-         substack.add(listener.getOther('['));
-         substack.add(tocTitle);
-         substack.add(listener.getOther(']'));
+         throw new LaTeXSyntaxException(parser, 
+            GlossariesSty.TABLE_BLOCK_STYLE_NOT_DEFINED, styleName);
       }
 
-      Group grp = listener.createGroup();
-      grp.add(title);
-      substack.add(grp);
-
-      ControlSequence labelCs = listener.getControlSequence("@@glossaryseclabel");
-
-      substack.add(TeXParserUtils.expandOnce(labelCs, parser, stack), true);
-
-      TeXParserUtils.process(substack, parser, stack);
+      TeXParserUtils.process(cs, parser, stack);
    }
 
    public void process(TeXParser parser)
@@ -83,7 +62,4 @@ public class GlossarySection extends ControlSequence
    {
       process(parser, parser);
    }
-
-   private String section;
-   private boolean isNumbered;
 }

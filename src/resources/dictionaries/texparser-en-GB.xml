@@ -209,6 +209,7 @@ There is NO WARRANTY, to the extent permitted by law.</entry>
 <entry key="glossaries.abbreviation.style.not.defined">Abbreviation style ''{0}'' not defined</entry>
 <entry key="glossaries.abbreviation.style.file.not.found">Abbreviation style file ''{0}'' not found (provided with glossaries-extra.sty v1.49+). Abbreviation styles won''t be defined.</entry>
 <entry key="glossaries.unrecognised">''{0}'' not recognised by {1}</entry>
+<entry key="glossaries.table.block.style.not.defined">Table block style ''{0}'' not defined</entry>
 
 <!--  fontawesome messages -->
 

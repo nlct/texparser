@@ -23,21 +23,21 @@ import java.io.IOException;
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.*;
 
-public class GlsTableNameSingleFmt extends AbstractGlsCommand
+public class GlsTableSubNameSingleFmt extends AbstractGlsCommand
 {
-   public GlsTableNameSingleFmt(GlossariesSty sty)
+   public GlsTableSubNameSingleFmt(GlossariesSty sty)
    {
-      this("glstableNameSingleFmt", sty);
+      this("glstableSubNameSingleFmt", sty);
    }
 
-   public GlsTableNameSingleFmt(String name, GlossariesSty sty)
+   public GlsTableSubNameSingleFmt(String name, GlossariesSty sty)
    {
       super(name, sty);
    }
 
    public Object clone()
    {
-      return new GlsTableNameSingleFmt(getName(), getSty());
+      return new GlsTableSubNameSingleFmt(getName(), getSty());
    }
 
    @Override
@@ -71,66 +71,65 @@ public class GlsTableNameSingleFmt extends AbstractGlsCommand
 
          TeXObjectList content = listener.createStack();
 
-         content.add(listener.getControlSequence("glstableNameTarget"));
+         content.add(listener.getControlSequence("glstableSubNameTarget"));
          content.add(glslabel);
 
          boolean hasOther = getSty().glsTableHasOtherField(entry, stack);
 
          if (entry.hasField("description"))
          {
-            content.add(listener.getControlSequence("glstableNameSinglePostName"));
-            content.add(listener.getControlSequence("glstableNameSingleSuppl"));
+            content.add(listener.getControlSequence("glstableNameSinglePostSubName"));
+            content.add(listener.getControlSequence("glstableNameSingleSubSuppl"));
             Group grp = listener.createGroup();
             content.add(grp);
 
             if (entry.hasField("symbol"))
             {
-               grp.add(listener.getControlSequence("glstableSymbolFmt"));
+               grp.add(listener.getControlSequence("glstableSubSymbolFmt"));
                grp.add(glslabel);
+
                grp.add(listener.getControlSequence("glstableNameSingleSymSep"));
             }
 
             if (hasOther)
             {
-               grp.add(listener.getControlSequence("glstableOther"));
+               grp.add(listener.getControlSequence("glstableSubOther"));
                grp.add(glslabel);
                grp.add(listener.getControlSequence("glstableOtherSep"));
             }
 
-            grp.add(listener.getControlSequence("glstableDescFmt"));
+            grp.add(listener.getControlSequence("glstableSubDescFmt"));
             grp.add(glslabel);
          }
          else
          {
             if (entry.hasField("symbol"))
             {
-               content.add(listener.getControlSequence("glstableNameSinglePostName"));
-               content.add(listener.getControlSequence("glstableNameSingleSuppl"));
+               content.add(listener.getControlSequence("glstableNameSinglePostSubName"));
+               content.add(listener.getControlSequence("glstableNameSingleSubSuppl"));
                Group grp = listener.createGroup();
                content.add(grp);
 
-               grp.add(listener.getControlSequence("glstableSymbolFmt"));
+               grp.add(listener.getControlSequence("glstableSubSymbolFmt"));
                grp.add(glslabel);
 
                if (hasOther)
                {
                   grp.add(listener.getControlSequence("glstableNameSingleSymSep"));
-                  grp.add(listener.getControlSequence("glstableOther"));
+                  grp.add(listener.getControlSequence("glstableSubOther"));
                   grp.add(glslabel);
                }
             }
-            else
+            else if (hasOther)
             {
-               if (hasOther)
-               {
-                  content.add(listener.getControlSequence("glstableNameSinglePostName"));
-                  content.add(listener.getControlSequence("glstableNameSingleSuppl"));
-                  Group grp = listener.createGroup();
-                  content.add(grp);
+               content.add(listener.getControlSequence("glstableNameSingleSubPostName"));
+               content.add(listener.getControlSequence("glstableNameSinglePostSubName"));
+               content.add(listener.getControlSequence("glstableNameSingleSubSuppl"));
+               Group grp = listener.createGroup();
+               content.add(grp);
 
-                  grp.add(listener.getControlSequence("glstableOther"));
-                  grp.add(glslabel);
-               }
+               grp.add(listener.getControlSequence("glstableSubOther"));
+               grp.add(glslabel);
             }
          }
 

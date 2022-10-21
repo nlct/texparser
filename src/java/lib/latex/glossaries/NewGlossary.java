@@ -51,16 +51,7 @@ public class NewGlossary extends ControlSequence
    public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      boolean isStar = false;
-
-      TeXObject object = stack.peekStack();
-
-      if (object instanceof CharObject
-            && ((CharObject)object).getCharCode() == (int)'*')
-      {
-         isStar = true;
-         stack.popStack(parser);
-      }
+      boolean isStar = (popModifier(parser, stack, '*') == '*');
 
       String glg = null;
       String gls = null;
@@ -70,7 +61,7 @@ public class NewGlossary extends ControlSequence
 
       if (!isStar && !ignored)
       {
-         gls = popOptLabelString(parser, stack);
+         glg = popOptLabelString(parser, stack);
       }
 
       String label = popLabelString(parser, stack);

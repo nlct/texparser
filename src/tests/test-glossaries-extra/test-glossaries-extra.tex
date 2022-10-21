@@ -13,13 +13,14 @@
 \GlsXtrLoadResources[src={example-glossaries-symbols,example-glossaries-acronym,example-glossaries-parent}]
 
 \newglossary*{other}{Other}
-\GlsXtrLoadResources[src=example-glossaries-acronyms-lang,
+\GlsXtrLoadResources[%src=example-glossaries-acronyms-lang,
+ src=example-glossaries-childnoname,save-child-count,
  type=other,save-locations=false,selection=all]
 
 \begin{document}
 \tableofcontents
 
-\printunsrtglossaries
+\printunsrtglossary
 
 \section{No Links}
 \label{sec:nolinks}
