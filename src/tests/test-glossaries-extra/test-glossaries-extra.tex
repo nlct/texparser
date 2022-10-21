@@ -13,8 +13,10 @@
 \GlsXtrLoadResources[src={example-glossaries-symbols,example-glossaries-acronym,example-glossaries-parent}]
 
 \newglossary*{other}{Other}
-\GlsXtrLoadResources[%src=example-glossaries-acronyms-lang,
- src=example-glossaries-childnoname,save-child-count,
+\GlsXtrLoadResources[
+ src={example-glossaries-acronyms-lang,
+     example-glossaries-childnoname},
+ save-child-count,
  type=other,save-locations=false,selection=all]
 
 \begin{document}
@@ -70,6 +72,6 @@ Reference section~\ref{sec:nolinks} (\ref*{sec:nolinks}).
 Other glossary listed in table~\ref{tab:other}.
 
 \printunsrttable[label={tab:other},type=other,
- block-style=name,par=ragged,other=useri]
+ block-style=name-desc,par=ragged,other=useri]
 
 \end{document}

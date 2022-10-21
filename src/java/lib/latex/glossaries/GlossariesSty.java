@@ -1713,6 +1713,9 @@ public class GlossariesSty extends LaTeXSty
       registerControlSequence(new LaTeXGenericCommand(true,
         "glstableSubOtherNoDesc", "m", def));
 
+      // \glstableSubNameSep
+      registerControlSequence(new GenericCommand(true, "glstableSubNameSep"));
+
       // \glstableHeaderFmt
       def = listener.createStack();
       def.add(new TeXCsRef("textbf"));
@@ -1734,6 +1737,7 @@ public class GlossariesSty extends LaTeXSty
 
       registerControlSequence(new GlsTableStyleNameDesc());
       registerControlSequence(new GlsTableStyleName());
+      registerControlSequence(new GlsTableStyleNameSymbol());
 
       registerControlSequence(new GlsTableChildEntries(this));
       registerControlSequence(new GlsTableSubEntries());
