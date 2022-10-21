@@ -200,6 +200,42 @@ public class KeyValList extends HashMap<String,TeXObject>
    }
 
    // Returns null if option not in list
+   public Numerical getNumerical(String key, TeXParser parser,
+     TeXObjectList stack) throws IOException
+   {
+      TeXObject obj = getValue(key);
+
+      if (obj == null)
+      {
+         return null;
+      }
+
+      if (obj instanceof Numerical)
+      {
+         return (Numerical)obj;
+      }
+
+      obj = TeXParserUtils.expandFully(obj, parser, stack);
+
+      if (obj instanceof Numerical)
+      {
+         return (Numerical)obj;
+      }
+
+      String strVal = obj.toString(parser);
+
+      try
+      {
+         return new UserNumber(Integer.parseInt(strVal));
+      }
+      catch (NumberFormatException e)
+      {
+         throw new TeXSyntaxException(parser,
+                  TeXSyntaxException.ERROR_NUMBER_EXPECTED, strVal);
+      }
+   }
+
+   // Returns null if option not in list
    public Boolean getBoolean(String key, TeXParser parser,
      TeXObjectList stack) throws IOException
    {
