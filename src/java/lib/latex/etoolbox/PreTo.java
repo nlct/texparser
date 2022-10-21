@@ -22,6 +22,7 @@ import java.io.IOException;
 
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.*;
+import com.dickimawbooks.texparserlib.primitives.Undefined;
 
 public class PreTo extends AbstractEtoolBoxCommand
 {
@@ -79,6 +80,26 @@ public class PreTo extends AbstractEtoolBoxCommand
          code = TeXParserUtils.expandFully(code, parser, stack);
       }
 
+      TeXObject hook = TeXParserUtils.resolve(cs, parser);
+
+      if (cs instanceof Undefined)
+      {
+         if (isInternalList && !code.isEmpty())
+         {
+            EtoolboxList list = new EtoolboxList();
+            list.add(code);
+            cs = new GenericCommand(isShort, csname, null, list);
+         }
+         else
+         {
+            cs = new GenericCommand(isShort, csname, null, code);
+         }
+
+         parser.putControlSequence(!isGlobal, cs);
+
+         return;
+      }
+
       if (code.isEmpty())
       {
          return;
@@ -101,8 +122,6 @@ public class PreTo extends AbstractEtoolBoxCommand
       {
          defn.add(code, true);
       }
-
-      TeXObject hook = TeXParserUtils.resolve(cs, parser);
 
       TeXObject origDef = hook;
 
