@@ -279,6 +279,21 @@ public class UserGuideSty extends LaTeXSty
       registerControlSequence(new LaTeXGenericCommand(true, "oargm",
         "m", def));
 
+      // \\glscsname
+      def = listener.createStack();
+      def.add(new TeXCsRef("glslink"));
+      def.add(listener.getOther('['));
+      def.add(listener.getParam(1));
+      def.add(listener.getOther(']'));
+      def.add(TeXParserUtils.createGroup(listener, listener.getParam(1)));
+      grp = listener.createGroup();
+      def.add(grp);
+      grp.add(new TeXCsRef("csfmtfont"));
+      grp.add(TeXParserUtils.createGroup(listener, listener.getParam(1)));
+
+      registerControlSequence(new LaTeXGenericCommand(true, "glscsname",
+        "om", def, listener.createStack()));
+
       addTaggedColourBox("important", BG_IMPORTANT, FRAME_COL_IMPORTANT);
       addTaggedColourBox("warning", BG_WARNING, FRAME_COL_WARNING);
       addTaggedColourBox("information", BG_INFO, FRAME_COL_INFO);
@@ -1067,6 +1082,7 @@ public class UserGuideSty extends LaTeXSty
       registerControlSequence(new DocRef("altdocref", false, true));
 
       registerControlSequence(new Plabel());
+      registerControlSequence(new Pref());
 
       registerControlSequence(new Symbol("sectionrefprefix", 0x00A7));
       registerControlSequence(new TextualContentCommand(
@@ -1601,18 +1617,7 @@ public class UserGuideSty extends LaTeXSty
        "mm", def));
 
       // \fnsym
-      def = listener.createStack();
-      def.add(new TeXCsRef("tablefnmark"));
-      grp = listener.createGroup();
-      def.add(grp);
-
-      grp.add(new TeXCsRef("fnsymmark"));
-      grp.add(TeXParserUtils.createGroup(listener, 
-         new TeXCsRef("fnsymmarker"), 
-         TeXParserUtils.createGroup(listener, listener.getParam(1))));
-
-      registerControlSequence(new LaTeXGenericCommand(true, "fnsym",
-       "m", def));
+      registerControlSequence(new FnSym());
 
       // \fnsymmark
       registerControlSequence(new AtFirstOfOne("fnsymmark"));
