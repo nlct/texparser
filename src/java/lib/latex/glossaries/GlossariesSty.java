@@ -1520,6 +1520,12 @@ public class GlossariesSty extends LaTeXSty
        TeXParserUtils.createStack(listener,
        new TeXCsRef("glstablecenteralign"), new TeXCsRef("glstablesymbolwidth"))));
 
+      // glstableothercolalign
+      registerControlSequence(new GenericCommand(
+       "glstableothercolalign", null, 
+       TeXParserUtils.createStack(listener,
+       new TeXCsRef("glstableleftalign"), new TeXCsRef("glstableotherwidth"))));
+
       // \glstableNameTarget
       def = listener.createStack();
       def.add(new TeXCsRef("glstarget"));
@@ -1632,6 +1638,70 @@ public class GlossariesSty extends LaTeXSty
       registerControlSequence(new LaTeXGenericCommand(true,
         "glstableSubSymbolFmt", "m", def));
 
+      // \glstableSubSymbolPreSep
+      def = listener.createStack();
+      def.add(new TeXCsRef("ifglshassymbol"));
+      def.add(TeXParserUtils.createGroup(listener, listener.getParam(1)));
+
+      grp = listener.createGroup();
+      def.add(grp);
+      grp.add(new TeXCsRef("glstableSubSep"));
+      grp.add(new TeXCsRef("glstableSubSymbolFmt"));
+      grp.add(TeXParserUtils.createGroup(listener, listener.getParam(1)));
+
+      def.add(listener.createGroup());
+
+      registerControlSequence(new LaTeXGenericCommand(true,
+        "glstableSubSymbolPreSep", "m", def));
+
+      // \glstableSubSymbolPostSep
+      def = listener.createStack();
+      def.add(new TeXCsRef("ifglshassymbol"));
+      def.add(TeXParserUtils.createGroup(listener, listener.getParam(1)));
+
+      grp = listener.createGroup();
+      def.add(grp);
+      grp.add(new TeXCsRef("glstableSubSymbolFmt"));
+      grp.add(TeXParserUtils.createGroup(listener, listener.getParam(1)));
+      grp.add(new TeXCsRef("glstableSubSep"));
+
+      def.add(listener.createGroup());
+
+      registerControlSequence(new LaTeXGenericCommand(true,
+        "glstableSubSymbolPostSep", "m", def));
+
+      // \glstableSubOtherPreSep
+      def = listener.createStack();
+      def.add(new TeXCsRef("glstableifhasotherfield"));
+      def.add(TeXParserUtils.createGroup(listener, listener.getParam(1)));
+
+      grp = listener.createGroup();
+      def.add(grp);
+      grp.add(new TeXCsRef("glstableSubSep"));
+      grp.add(new TeXCsRef("glstableOther"));
+      grp.add(TeXParserUtils.createGroup(listener, listener.getParam(1)));
+
+      def.add(listener.createGroup());
+
+      registerControlSequence(new LaTeXGenericCommand(true,
+        "glstableSubOtherPreSep", "m", def));
+
+      // \glstableSubOtherPostSep
+      def = listener.createStack();
+      def.add(new TeXCsRef("glstableifhasotherfield"));
+      def.add(TeXParserUtils.createGroup(listener, listener.getParam(1)));
+
+      grp = listener.createGroup();
+      def.add(grp);
+      grp.add(new TeXCsRef("glstableOther"));
+      grp.add(TeXParserUtils.createGroup(listener, listener.getParam(1)));
+      grp.add(new TeXCsRef("glstableSubSep"));
+
+      def.add(listener.createGroup());
+
+      registerControlSequence(new LaTeXGenericCommand(true,
+        "glstableSubOtherPostSep", "m", def));
+
       // \glstableSymbolNameTarget
       def = listener.createStack();
       def.add(new TeXCsRef("glstarget"));
@@ -1676,7 +1746,7 @@ public class GlossariesSty extends LaTeXSty
       registerControlSequence(new LaTeXGenericCommand(true,
         "glstableSubSymbolNameFmt", "m", def));
 
-      registerControlSequence(new GlsTableDesc(this));
+      registerControlSequence(new GlsTableDescWithOther(this));
 
       // \glstableDescFmt
       def = listener.createStack();
@@ -1687,13 +1757,13 @@ public class GlossariesSty extends LaTeXSty
       registerControlSequence(new LaTeXGenericCommand(true,
         "glstableDescFmt", "m", def));
 
-      // \glstableSubDesc
+      // \glstableSubDescWithOther
       def = listener.createStack();
-      def.add(new TeXCsRef("glstableDesc"));
+      def.add(new TeXCsRef("glstableDescWithOther"));
       def.add(TeXParserUtils.createGroup(listener, listener.getParam(1)));
 
       registerControlSequence(new LaTeXGenericCommand(true,
-        "glstableSubDesc", "m", def));
+        "glstableSubDescWithOther", "m", def));
 
       // \glstableSubDescFmt
       def = listener.createStack();
@@ -1703,7 +1773,15 @@ public class GlossariesSty extends LaTeXSty
       registerControlSequence(new LaTeXGenericCommand(true,
         "glstableSubDescFmt", "m", def));
 
-      registerControlSequence(new GlsTableOtherNoDesc(this));
+      registerControlSequence(new GlsTableOtherIfSet(this));
+
+      // \glstableOtherNoDesc
+      def = listener.createStack();
+      def.add(new TeXCsRef("glstableOtherIfSet"));
+      def.add(TeXParserUtils.createGroup(listener, listener.getParam(1)));
+
+      registerControlSequence(new LaTeXGenericCommand(true,
+        "glstableOtherNoDesc", "m", def));
 
       // \glstableSubOtherNoDesc
       def = listener.createStack();
@@ -1713,8 +1791,20 @@ public class GlossariesSty extends LaTeXSty
       registerControlSequence(new LaTeXGenericCommand(true,
         "glstableSubOtherNoDesc", "m", def));
 
+      // \glstableSubOtherIfSet
+      def = listener.createStack();
+      def.add(new TeXCsRef("glstableOtherIfSet"));
+      def.add(TeXParserUtils.createGroup(listener, listener.getParam(1)));
+
+      registerControlSequence(new LaTeXGenericCommand(true,
+        "glstableSubOtherNoDesc", "m", def));
+
       // \glstableSubNameSep
       registerControlSequence(new GenericCommand(true, "glstableSubNameSep"));
+
+      // \glstableSubSep
+      registerControlSequence(new TextualContentCommand( 
+       "glstableSubSep", " "));
 
       // \glstableHeaderFmt
       def = listener.createStack();
@@ -1735,12 +1825,40 @@ public class GlossariesSty extends LaTeXSty
       registerControlSequence(new GlsTableSetStyle());
       registerControlSequence(new GlsTableNewStyle());
 
+      // name-desc
       registerControlSequence(new GlsTableStyleNameDesc());
+      // name
       registerControlSequence(new GlsTableStyleName());
+      // name-symbol
       registerControlSequence(new GlsTableStyleNameSymbol());
+      // desc-name
       registerControlSequence(new GlsTableStyleDescName());
+      // symbol-name
       registerControlSequence(new GlsTableStyleSymbolName());
+      // name-symbol-desc
       registerControlSequence(new GlsTableStyleNameSymbolDesc());
+      // name-other-desc
+      registerControlSequence(new GlsTableStyleNameOtherDesc());
+      // desc-other-name
+      registerControlSequence(new GlsTableStyleDescOtherName());
+      // name-symbol-other-desc
+      registerControlSequence(new GlsTableStyleNameSymbolOtherDesc());
+      // name-desc-symbol
+      registerControlSequence(new GlsTableStyleNameDescSymbol());
+      // desc-symbol-other-name
+      registerControlSequence(new GlsTableStyleDescSymbolOtherName());
+      // desc-other-symbol-name
+      registerControlSequence(new GlsTableStyleDescOtherSymbolName());
+      // name-other-symbol-desc
+      registerControlSequence(new GlsTableStyleNameOtherSymbolDesc());
+      // name-other
+      registerControlSequence(new GlsTableStyleNameOther());
+      // other-name
+      registerControlSequence(new GlsTableStyleOtherName());
+      // symbol-other
+      registerControlSequence(new GlsTableStyleSymbolOther());
+      // other-symbol
+      registerControlSequence(new GlsTableStyleOtherSymbol());
 
       registerControlSequence(new GlsTableChildEntries(this));
       registerControlSequence(new GlsTableSubEntries());
@@ -3183,10 +3301,18 @@ public class GlossariesSty extends LaTeXSty
 
          if (labelVal != null)
          {
-            parser.putControlSequence(true, new GenericCommand(true,
-             "@@glossaryseclabel", null, TeXParserUtils.createStack(parser,
-             new TeXCsRef("label"), TeXParserUtils.createGroup(parser,
-              labelVal))));
+            if (labelVal.isEmpty())
+            {
+               parser.putControlSequence(true, new GenericCommand(true,
+                "@@glossaryseclabel"));
+            }
+            else
+            {
+               parser.putControlSequence(true, new GenericCommand(true,
+                "@@glossaryseclabel", null, TeXParserUtils.createStack(parser,
+                new TeXCsRef("label"), TeXParserUtils.createGroup(parser,
+                 labelVal))));
+            }
          }
 
          if (indexingOpt == IndexingOption.UNSRT)

@@ -23,21 +23,21 @@ import java.io.IOException;
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.*;
 
-public class GlsTableDesc extends AbstractGlsCommand
+public class GlsTableOtherIfSet extends AbstractGlsCommand
 {
-   public GlsTableDesc(GlossariesSty sty)
+   public GlsTableOtherIfSet(GlossariesSty sty)
    {
-      this("glstableDesc", sty);
+      this("glstableOtherIfSet", sty);
    }
 
-   public GlsTableDesc(String name, GlossariesSty sty)
+   public GlsTableOtherIfSet(String name, GlossariesSty sty)
    {
       super(name, sty);
    }
 
    public Object clone()
    {
-      return new GlsTableDesc(getName(), getSty());
+      return new GlsTableOtherIfSet(getName(), getSty());
    }
 
    @Override
@@ -69,29 +69,15 @@ public class GlsTableDesc extends AbstractGlsCommand
       {
          TeXParserListener listener = parser.getListener();
 
-         TeXObjectList content = listener.createStack();
-
-         boolean hasOther = getSty().glsTableHasOtherField(entry, stack);
-
-         if (entry.hasField("description"))
+         if (getSty().glsTableHasOtherField(entry, stack))
          {
-            if (hasOther)
-            {
-               content.add(listener.getControlSequence("glstableOther"));
-               content.add(glslabel);
-               content.add(listener.getControlSequence("glstableOtherSep"));
-            }
+            TeXObjectList content = listener.createStack();
 
-            content.add(listener.getControlSequence("glstableDescFmt"));
-            content.add(glslabel);
-         }
-         else if (hasOther)
-         {
             content.add(listener.getControlSequence("glstableOther"));
             content.add(glslabel);
-         }
 
-         TeXParserUtils.process(content, parser, stack);
+            TeXParserUtils.process(content, parser, stack);
+         }
       }
    }
 

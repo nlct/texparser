@@ -152,7 +152,9 @@ public class GlsTableStyleNameSymbolDesc extends ControlSequence
 
       def.add(listener.getTab());
 
-      def.add(new TeXCsRef("glstableDesc"));
+      def.add(new TeXCsRef("glstableDescWithOther"));
+      def.add(TeXParserUtils.createGroup(listener, listener.getParam(1)));
+      def.add(new TeXCsRef("glstableChildEntries"));
       def.add(TeXParserUtils.createGroup(listener, listener.getParam(1)));
 
       parser.putControlSequence(true,
@@ -165,10 +167,10 @@ public class GlsTableStyleNameSymbolDesc extends ControlSequence
 
       def.add(new TeXCsRef("glstableSubNameSep"));
 
-      def.add(new TeXCsRef("glstableSubSymbolFmt"));
+      def.add(new TeXCsRef("glstableSubSymbolPostSep"));
       def.add(TeXParserUtils.createGroup(listener, listener.getParam(1)));
 
-      def.add(new TeXCsRef("glstableSubDesc"));
+      def.add(new TeXCsRef("glstableSubDescWithOther"));
       def.add(TeXParserUtils.createGroup(listener, listener.getParam(1)));
 
       parser.putControlSequence(true,

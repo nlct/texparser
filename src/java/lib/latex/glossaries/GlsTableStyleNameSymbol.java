@@ -120,6 +120,8 @@ public class GlsTableStyleNameSymbol extends ControlSequence
       def = listener.createStack();
       def.add(new TeXCsRef("glstableNameNoDesc"));
       def.add(TeXParserUtils.createGroup(listener, listener.getParam(1)));
+      def.add(new TeXCsRef("glstableChildEntries"));
+      def.add(TeXParserUtils.createGroup(listener, listener.getParam(1)));
 
       def.add(listener.getTab());
 

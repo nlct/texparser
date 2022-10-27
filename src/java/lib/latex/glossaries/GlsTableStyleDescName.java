@@ -119,7 +119,9 @@ public class GlsTableStyleDescName extends ControlSequence
       // \glstableblockentry
       def = listener.createStack();
 
-      def.add(new TeXCsRef("glstableDesc"));
+      def.add(new TeXCsRef("glstableDescWithOther"));
+      def.add(TeXParserUtils.createGroup(listener, listener.getParam(1)));
+      def.add(new TeXCsRef("glstableChildEntries"));
       def.add(TeXParserUtils.createGroup(listener, listener.getParam(1)));
 
       def.add(listener.getTab());
@@ -132,7 +134,7 @@ public class GlsTableStyleDescName extends ControlSequence
 
       // \glstableblocksubentry
       def = listener.createStack();
-      def.add(new TeXCsRef("glstableSubDesc"));
+      def.add(new TeXCsRef("glstableSubDescWithOther"));
       def.add(TeXParserUtils.createGroup(listener, listener.getParam(1)));
 
       def.add(new TeXCsRef("glstableSubNameSep"));

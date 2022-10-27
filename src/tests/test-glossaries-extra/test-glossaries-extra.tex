@@ -2,20 +2,31 @@
 % arara: bib2gls
 % arara: pdflatex
 % arara: pdflatex if found("log", "Rerun to")
-\documentclass{article}
+\documentclass[draft]{article}
 
 \usepackage[T1]{fontenc}
 \usepackage{lipsum}
 \usepackage[colorlinks]{hyperref}
-\usepackage[indexcounter,nostyles,style=index,stylemods={tree,table},record]{glossaries-extra}
+\usepackage[indexcounter,subentrycounter,
+ symbols,nostyles,style=index,stylemods={tree,table},record]{glossaries-extra}
+
+\newglossary*{homographs}{Homographs}
+\newglossary*{other}{Other}
 
 \setabbreviationstyle[acronym]{long-short}
-\GlsXtrLoadResources[src={example-glossaries-symbols,example-glossaries-acronym,example-glossaries-parent}]
+\GlsXtrLoadResources[src={example-glossaries-acronym,example-glossaries-parent}]
 
-\newglossary*{other}{Other}
+\GlsXtrLoadResources[src={example-glossaries-symbols},
+ save-child-count,type=symbols,selection=all,save-locations=false
+]
+
 \GlsXtrLoadResources[
- src={example-glossaries-acronyms-lang,
-     example-glossaries-childnoname},
+ src={example-glossaries-childnoname},
+ save-child-count,
+ type=homographs,save-locations=false,selection=all]
+
+\GlsXtrLoadResources[
+ src={example-glossaries-acronyms-lang},
  save-child-count,
  type=other,save-locations=false,selection=all]
 
@@ -66,12 +77,20 @@ Reference section~\ref{sec:nolinks} (\ref*{sec:nolinks}).
 
 \lipsum
 
-\section{Table Glossary}
+\section{Table Glossaries}
 \label{sec:table}
 
-Other glossary listed in table~\ref{tab:other}.
+Other glossary listed in table~\ref{tab:other},
+symbols listed in table~\ref{tab:symbols},
+and homographs listed in table~\ref{tab:homographs}.
 
 \printunsrttable[label={tab:other},type=other,
- block-style=name-desc,par=ragged,other=useri]
+ block-style=name,par=ragged,other=useri]
+
+\printunsrttable[label={tab:symbols},type=symbols,
+ block-style=name-symbol-desc,par=ragged]
+
+\printunsrttable[label={tab:homographs},type=homographs,
+ block-style=name-desc,par=ragged]
 
 \end{document}

@@ -70,6 +70,8 @@ public class GlsTableStyleName extends ControlSequence
       def = listener.createStack();
       def.add(new TeXCsRef("glstableNameSingleFmt"));
       def.add(TeXParserUtils.createGroup(listener, listener.getParam(1)));
+      def.add(new TeXCsRef("glstableChildEntries"));
+      def.add(TeXParserUtils.createGroup(listener, listener.getParam(1)));
 
       parser.putControlSequence(true,
         new LaTeXGenericCommand(true, "glstableblockentry", "m", def));

@@ -418,7 +418,6 @@ public class PrintUnsrtTable extends ControlSequence
       EndElement endRowElem = null;
 
       ControlSequence entryCs = listener.getControlSequence("glstableblockentry");
-      ControlSequence childCs = listener.getControlSequence("glstableChildEntries");
 
       TeXObjectList blockList = listener.createStack();
 
@@ -427,9 +426,6 @@ public class PrintUnsrtTable extends ControlSequence
       list.add(new TeXCsRef("glscurrententrylabel"));
 
       blockList.add(TeXParserUtils.expandOnce(entryCs, parser, list), true);
-
-      blockList.add(childCs);
-      blockList.add(new TeXCsRef("glscurrententrylabel"));
 
       for (GlsLabel glslabel : labelList)
       {

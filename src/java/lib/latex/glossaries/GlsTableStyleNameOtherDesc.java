@@ -23,14 +23,14 @@ import java.io.IOException;
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.*;
 
-public class GlsTableStyleNameDesc extends ControlSequence
+public class GlsTableStyleNameOtherDesc extends ControlSequence
 {
-   public GlsTableStyleNameDesc()
+   public GlsTableStyleNameOtherDesc()
    {
-      this("@glstable@style@name-desc");
+      this("@glstable@style@name-other-desc");
    }
 
-   public GlsTableStyleNameDesc(String name)
+   public GlsTableStyleNameOtherDesc(String name)
    {
       super(name);
    }
@@ -38,7 +38,7 @@ public class GlsTableStyleNameDesc extends ControlSequence
    @Override
    public Object clone()
    {
-      return new GlsTableStyleNameDesc(getName());
+      return new GlsTableStyleNameOtherDesc(getName());
    }
 
    public void process(TeXParser parser, TeXObjectList stack)
@@ -46,7 +46,7 @@ public class GlsTableStyleNameDesc extends ControlSequence
    {
       TeXParserListener listener = parser.getListener();
 
-      parser.getSettings().localSetRegister("glstablecolsperblock", UserNumber.TWO);
+      parser.getSettings().localSetRegister("glstablecolsperblock", UserNumber.THREE);
 
       // \glstableinitlengthupdates
       TeXObjectList def = listener.createStack();
@@ -57,10 +57,19 @@ public class GlsTableStyleNameDesc extends ControlSequence
       def.add(TeXParserUtils.createGroup(listener,
          new TeXCsRef("glstableHeaderFmt"), new TeXCsRef("glstablenameheader")));
 
+      def.add(new TeXCsRef("settowidth"));
+      def.add(new TeXCsRef("glstableotherwidth"));
+      def.add(TeXParserUtils.createGroup(listener,
+         new TeXCsRef("glstableHeaderFmt"), new TeXCsRef("glstableotherheader")));
+
       def.add(new TeXCsRef("else"));
 
       def.add(new TeXCsRef("setlength"));
       def.add(new TeXCsRef("glstablenamewidth"));
+      def.add(new UserDimension());
+
+      def.add(new TeXCsRef("setlength"));
+      def.add(new TeXCsRef("glstableotherwidth"));
       def.add(new UserDimension());
 
       def.add(new TeXCsRef("fi"));
@@ -80,6 +89,12 @@ public class GlsTableStyleNameDesc extends ControlSequence
        new TeXCsRef("glstableNameFmt"), TeXParserUtils.createGroup(
         listener, listener.getParam(1))));
 
+      def.add(new TeXCsRef("glstablemeasureandupdate"));
+      def.add(new TeXCsRef("glstableotherwidth"));
+      def.add(TeXParserUtils.createGroup(listener,
+       new TeXCsRef("glstableOtherFmt"), TeXParserUtils.createGroup(
+        listener, listener.getParam(1))));
+
       parser.putControlSequence(true,
        new LaTeXGenericCommand(true, "glstablelengthupdate", "m", def));
 
@@ -89,7 +104,9 @@ public class GlsTableStyleNameDesc extends ControlSequence
       def.add(new TeXCsRef("glstabledescwidth"));
       def.add(TeXParserUtils.createGroup(listener,
         new TeXCsRef("dimexpr"), new TeXCsRef("glstableblockwidth"),
-        listener.getOther('-'), new TeXCsRef("glstablenamewidth")));
+        listener.getOther('-'), new TeXCsRef("glstablenamewidth"),
+        listener.getOther('-'), new TeXCsRef("glstableotherwidth")
+      ));
 
       def.add(new TeXCsRef("ifdim"));
       def.add(new TeXCsRef("glstabledescwidth"));
@@ -107,6 +124,13 @@ public class GlsTableStyleNameDesc extends ControlSequence
       grp.add(listener.getOther('5'));
       grp.add(new TeXCsRef("glstableblockwidth"));
 
+      grp.add(listener.getOther('-'));
+      grp.add(listener.getOther('0'));
+      grp.add(listener.getOther('.'));
+      grp.add(listener.getOther('5'));
+      grp.add(new TeXCsRef("glstableotherwidth"));
+
+
       def.add(new TeXCsRef("setlength"));
       def.add(new TeXCsRef("glstabledescwidth"));
       def.add(new TeXCsRef("glstablenamewidth"));
@@ -123,7 +147,12 @@ public class GlsTableStyleNameDesc extends ControlSequence
 
       def.add(listener.getTab());
 
-      def.add(new TeXCsRef("glstableDescWithOther"));
+      def.add(new TeXCsRef("glstableOtherFmt"));
+      def.add(TeXParserUtils.createGroup(listener, listener.getParam(1)));
+
+      def.add(listener.getTab());
+
+      def.add(new TeXCsRef("glstableDescFmt"));
       def.add(TeXParserUtils.createGroup(listener, listener.getParam(1)));
       def.add(new TeXCsRef("glstableChildEntries"));
       def.add(TeXParserUtils.createGroup(listener, listener.getParam(1)));
@@ -138,7 +167,10 @@ public class GlsTableStyleNameDesc extends ControlSequence
 
       def.add(new TeXCsRef("glstableSubNameSep"));
 
-      def.add(new TeXCsRef("glstableSubDescWithOther"));
+      def.add(new TeXCsRef("glstableSubOtherPostSep"));
+      def.add(TeXParserUtils.createGroup(listener, listener.getParam(1)));
+
+      def.add(new TeXCsRef("glstableSubDescFmt"));
       def.add(TeXParserUtils.createGroup(listener, listener.getParam(1)));
 
       parser.putControlSequence(true,
@@ -150,6 +182,9 @@ public class GlsTableStyleNameDesc extends ControlSequence
       def.add(new TeXCsRef("glstablenameheader"));
       def.add(listener.getTab());
       def.add(new TeXCsRef("glstableHeaderFmt"));
+      def.add(new TeXCsRef("glstableotherheader"));
+      def.add(listener.getTab());
+      def.add(new TeXCsRef("glstableHeaderFmt"));
       def.add(new TeXCsRef("glstabledescheader"));
 
       parser.putControlSequence(true,
@@ -158,6 +193,7 @@ public class GlsTableStyleNameDesc extends ControlSequence
       // \glstableblockalign
       def = listener.createStack();
       def.add(new TeXCsRef("glstablenamecolalign"));
+      def.add(new TeXCsRef("glstableothercolalign"));
       def.add(new TeXCsRef("glstabledesccolalign"));
 
       parser.putControlSequence(true,
