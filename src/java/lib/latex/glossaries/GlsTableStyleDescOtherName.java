@@ -86,13 +86,13 @@ public class GlsTableStyleDescOtherName extends ControlSequence
       def.add(new TeXCsRef("glstablemeasureandupdate"));
       def.add(new TeXCsRef("glstablenamewidth"));
       def.add(TeXParserUtils.createGroup(listener,
-       new TeXCsRef("glstableNameFmt"), TeXParserUtils.createGroup(
+       new TeXCsRef("glstableName"), TeXParserUtils.createGroup(
         listener, listener.getParam(1))));
 
       def.add(new TeXCsRef("glstablemeasureandupdate"));
       def.add(new TeXCsRef("glstableotherwidth"));
       def.add(TeXParserUtils.createGroup(listener,
-       new TeXCsRef("glstableOtherFmt"), TeXParserUtils.createGroup(
+       new TeXCsRef("glstableOther"), TeXParserUtils.createGroup(
         listener, listener.getParam(1))));
 
       parser.putControlSequence(true,
@@ -144,14 +144,14 @@ public class GlsTableStyleDescOtherName extends ControlSequence
 
       def = listener.createStack();
 
-      def.add(new TeXCsRef("glstableDescFmt"));
+      def.add(new TeXCsRef("glstableDesc"));
       def.add(TeXParserUtils.createGroup(listener, listener.getParam(1)));
       def.add(new TeXCsRef("glstableChildEntries"));
       def.add(TeXParserUtils.createGroup(listener, listener.getParam(1)));
 
       def.add(listener.getTab());
 
-      def.add(new TeXCsRef("glstableOtherFmt"));
+      def.add(new TeXCsRef("glstableOther"));
       def.add(TeXParserUtils.createGroup(listener, listener.getParam(1)));
 
       def.add(listener.getTab());
@@ -165,7 +165,7 @@ public class GlsTableStyleDescOtherName extends ControlSequence
       // \glstableblocksubentry
       def = listener.createStack();
 
-      def.add(new TeXCsRef("glstableSubDescFmt"));
+      def.add(new TeXCsRef("glstableSubDesc"));
       def.add(TeXParserUtils.createGroup(listener, listener.getParam(1)));
 
       def.add(new TeXCsRef("glstableSubOtherPreSep"));

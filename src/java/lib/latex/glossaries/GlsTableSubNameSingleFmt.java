@@ -85,7 +85,7 @@ public class GlsTableSubNameSingleFmt extends AbstractGlsCommand
 
             if (entry.hasField("symbol"))
             {
-               grp.add(listener.getControlSequence("glstableSubSymbolFmt"));
+               grp.add(listener.getControlSequence("glstableSubSymbol"));
                grp.add(glslabel);
 
                grp.add(listener.getControlSequence("glstableNameSingleSymSep"));
@@ -98,7 +98,7 @@ public class GlsTableSubNameSingleFmt extends AbstractGlsCommand
                grp.add(listener.getControlSequence("glstableOtherSep"));
             }
 
-            grp.add(listener.getControlSequence("glstableSubDescFmt"));
+            grp.add(listener.getControlSequence("glstableSubDesc"));
             grp.add(glslabel);
          }
          else
@@ -110,7 +110,7 @@ public class GlsTableSubNameSingleFmt extends AbstractGlsCommand
                Group grp = listener.createGroup();
                content.add(grp);
 
-               grp.add(listener.getControlSequence("glstableSubSymbolFmt"));
+               grp.add(listener.getControlSequence("glstableSubSymbol"));
                grp.add(glslabel);
 
                if (hasOther)

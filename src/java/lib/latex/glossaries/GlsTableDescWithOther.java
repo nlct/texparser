@@ -82,7 +82,7 @@ public class GlsTableDescWithOther extends AbstractGlsCommand
                content.add(listener.getControlSequence("glstableOtherSep"));
             }
 
-            content.add(listener.getControlSequence("glstableDescFmt"));
+            content.add(listener.getControlSequence("glstableDesc"));
             content.add(glslabel);
          }
          else if (hasOther)

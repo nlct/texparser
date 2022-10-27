@@ -1533,21 +1533,26 @@ public class GlossariesSty extends LaTeXSty
 
       grp = listener.createGroup();
       def.add(grp);
-      grp.add(new TeXCsRef("glstableNameFmt"));
+      grp.add(new TeXCsRef("glstableName"));
       grp.add(TeXParserUtils.createGroup(listener, listener.getParam(1)));
 
       registerControlSequence(new LaTeXGenericCommand(true,
         "glstableNameTarget", "m", def));
 
-      // \glstableNameFmt
+      registerControlSequence(new AtFirstOfOne("glstableNameFmt"));
+
+      // \glstableName
       def = listener.createStack();
       def.add(new TeXCsRef("glsentryitem"));
       def.add(TeXParserUtils.createGroup(listener, listener.getParam(1)));
-      def.add(new TeXCsRef("glossentryname"));
-      def.add(TeXParserUtils.createGroup(listener, listener.getParam(1)));
+      def.add(new TeXCsRef("glstableNameFmt"));
+      grp = listener.createGroup();
+      def.add(grp);
+      grp.add(new TeXCsRef("glossentryname"));
+      grp.add(TeXParserUtils.createGroup(listener, listener.getParam(1)));
 
       registerControlSequence(new LaTeXGenericCommand(true,
-        "glstableNameFmt", "m", def));
+        "glstableName", "m", def));
 
       // \glstableSubNameTarget
       def = listener.createStack();
@@ -1556,25 +1561,37 @@ public class GlossariesSty extends LaTeXSty
 
       grp = listener.createGroup();
       def.add(grp);
-      grp.add(new TeXCsRef("glstableSubNameFmt"));
+      grp.add(new TeXCsRef("glstableSubName"));
       grp.add(TeXParserUtils.createGroup(listener, listener.getParam(1)));
 
       registerControlSequence(new LaTeXGenericCommand(true,
         "glstableSubNameTarget", "m", def));
 
-      // \glstableSubNameFmt
+      registerControlSequence(new AtGobble("glstableSubNameFmt"));
+
+      // \glstableSubName
       def = listener.createStack();
       def.add(new TeXCsRef("glssubentryitem"));
       def.add(TeXParserUtils.createGroup(listener, listener.getParam(1)));
+      def.add(new TeXCsRef("glstableSubNameFmt"));
+      grp = listener.createGroup();
+      def.add(grp);
+      grp.add(new TeXCsRef("glossentryname"));
+      grp.add(TeXParserUtils.createGroup(listener, listener.getParam(1)));
 
       registerControlSequence(new LaTeXGenericCommand(true,
-        "glstableSubNameFmt", "m", def));
+        "glstableSubName", "m", def));
+
+      registerControlSequence(new AtFirstOfOne("glstableOtherFmt"))
 
       // \glstableOther
       def = listener.createStack();
-      def.add(new TeXCsRef("glsxtrusefield"));
-      def.add(TeXParserUtils.createGroup(listener, listener.getParam(1)));
-      def.add(new TeXCsRef("glstableotherfield"));
+      def.add(new TeXCsRef("glstableOtherFmt"));
+      grp = listener.createGroup();
+      def.add(grp);
+      grp.add(new TeXCsRef("glsxtrusefield"));
+      grp.add(TeXParserUtils.createGroup(listener, listener.getParam(1)));
+      grp.add(new TeXCsRef("glstableotherfield"));
 
       registerControlSequence(new LaTeXGenericCommand(true,
         "glstableOther", "m", def));
@@ -1622,13 +1639,18 @@ public class GlossariesSty extends LaTeXSty
       registerControlSequence(new GlsTableNameNoDesc(this));
       registerControlSequence(new GlsTableSubNameNoDesc(this));
 
-      // \glstableSymbolFmt
+      registerControlSequence(new AtFirstOfOne("glstableSymbol"));
+
+      // \glstableSymbol
       def = listener.createStack();
-      def.add(new TeXCsRef("glossentrysymbol"));
-      def.add(TeXParserUtils.createGroup(listener, listener.getParam(1)));
+      def.add(new TeXCsRef("glstableSymbolFmt"));
+      grp = listener.createGroup();
+      def.add(grp);
+      grp.add(new TeXCsRef("glossentrysymbol"));
+      grp.add(TeXParserUtils.createGroup(listener, listener.getParam(1)));
 
       registerControlSequence(new LaTeXGenericCommand(true,
-        "glstableSymbolFmt", "m", def));
+        "glstableSymbol", "m", def));
 
       // \glstableSubSymbolFmt
       def = listener.createStack();
@@ -1638,6 +1660,17 @@ public class GlossariesSty extends LaTeXSty
       registerControlSequence(new LaTeXGenericCommand(true,
         "glstableSubSymbolFmt", "m", def));
 
+      // \glstableSubSymbol
+      def = listener.createStack();
+      def.add(new TeXCsRef("glstableSubSymbolFmt"));
+      grp = listener.createGroup();
+      def.add(grp);
+      grp.add(new TeXCsRef("glossentrysymbol"));
+      grp.add(TeXParserUtils.createGroup(listener, listener.getParam(1)));
+
+      registerControlSequence(new LaTeXGenericCommand(true,
+        "glstableSubSymbol", "m", def));
+
       // \glstableSubSymbolPreSep
       def = listener.createStack();
       def.add(new TeXCsRef("ifglshassymbol"));
@@ -1646,7 +1679,7 @@ public class GlossariesSty extends LaTeXSty
       grp = listener.createGroup();
       def.add(grp);
       grp.add(new TeXCsRef("glstableSubSep"));
-      grp.add(new TeXCsRef("glstableSubSymbolFmt"));
+      grp.add(new TeXCsRef("glstableSubSymbol"));
       grp.add(TeXParserUtils.createGroup(listener, listener.getParam(1)));
 
       def.add(listener.createGroup());
@@ -1661,7 +1694,7 @@ public class GlossariesSty extends LaTeXSty
 
       grp = listener.createGroup();
       def.add(grp);
-      grp.add(new TeXCsRef("glstableSubSymbolFmt"));
+      grp.add(new TeXCsRef("glstableSubSymbol"));
       grp.add(TeXParserUtils.createGroup(listener, listener.getParam(1)));
       grp.add(new TeXCsRef("glstableSubSep"));
 
@@ -1709,7 +1742,7 @@ public class GlossariesSty extends LaTeXSty
 
       grp = listener.createGroup();
       def.add(grp);
-      grp.add(new TeXCsRef("glstableSymbolNameFmt"));
+      grp.add(new TeXCsRef("glstableSymbolName"));
       grp.add(TeXParserUtils.createGroup(listener, listener.getParam(1)));
 
       registerControlSequence(new LaTeXGenericCommand(true,
@@ -1717,10 +1750,21 @@ public class GlossariesSty extends LaTeXSty
 
       // \glstableSymbolNameFmt
       def = listener.createStack();
+      def.add(new TeXCsRef("glstableSymbolFmt"));
+      def.add(TeXParserUtils.createGroup(listener, listener.getParam(1)));
+
+      registerControlSequence(new LaTeXGenericCommand(true,
+        "glstableSymbolNameFmt", "m", def));
+
+      // \glstableSymbolName
+      def = listener.createStack();
       def.add(new TeXCsRef("glsentryitem"));
       def.add(TeXParserUtils.createGroup(listener, listener.getParam(1)));
-      def.add(new TeXCsRef("glossentrysymbol"));
-      def.add(TeXParserUtils.createGroup(listener, listener.getParam(1)));
+      def.add(new TeXCsRef("glstableSymbolNameFmt"));
+      grp = listener.createGroup();
+      def.add(grp);
+      grp.add(new TeXCsRef("glossentrysymbol"));
+      grp.add(TeXParserUtils.createGroup(listener, listener.getParam(1)));
 
       registerControlSequence(new LaTeXGenericCommand(true,
         "glstableSymbolNameFmt", "m", def));
@@ -1732,30 +1776,43 @@ public class GlossariesSty extends LaTeXSty
 
       grp = listener.createGroup();
       def.add(grp);
-      grp.add(new TeXCsRef("glstableSubSymbolNameFmt"));
+      grp.add(new TeXCsRef("glstableSubSymbolName"));
       grp.add(TeXParserUtils.createGroup(listener, listener.getParam(1)));
 
       registerControlSequence(new LaTeXGenericCommand(true,
         "glstableSubSymbolNameTarget", "m", def));
 
-      // \glstableSubSymbolNameFmt
+      registerControlSequence(new AtGobble("glstableSubSymbolNameFmt"));
+
+      // \glstableSubSymbolName
       def = listener.createStack();
       def.add(new TeXCsRef("glssubentryitem"));
       def.add(TeXParserUtils.createGroup(listener, listener.getParam(1)));
+      def.add(new TeXCsRef("glstableSubSymbolNameFmt"));
+      grp = listener.createGroup();
+      def.add(grp);
+      grp.add(new TeXCsRef("glossentrysymbol"));
+      grp.add(TeXParserUtils.createGroup(listener, listener.getParam(1)));
 
       registerControlSequence(new LaTeXGenericCommand(true,
-        "glstableSubSymbolNameFmt", "m", def));
+        "glstableSubSymbolName", "m", def));
 
       registerControlSequence(new GlsTableDescWithOther(this));
 
-      // \glstableDescFmt
+      registerControlSequence(new AtFirstOfOne("glstableDescFmt"));
+
+      // \glstableDesc
       def = listener.createStack();
-      def.add(new TeXCsRef("glossentrydesc"));
-      def.add(TeXParserUtils.createGroup(listener, listener.getParam(1)));
-      def.add(new TeXCsRef("glspostdescription"));
+
+      def.add(new TeXCsRef("glstableDescFmt"));
+      grp = listener.createGroup();
+      def.add(grp);
+      grp.add(new TeXCsRef("glossentrydesc"));
+      grp.add(TeXParserUtils.createGroup(listener, listener.getParam(1)));
+      grp.add(new TeXCsRef("glspostdescription"));
 
       registerControlSequence(new LaTeXGenericCommand(true,
-        "glstableDescFmt", "m", def));
+        "glstableDesc", "m", def));
 
       // \glstableSubDescWithOther
       def = listener.createStack();

@@ -77,7 +77,7 @@ public class GlsTableStyleOtherSymbol extends ControlSequence
       def.add(new TeXCsRef("glstablemeasureandupdate"));
       def.add(new TeXCsRef("glstableotherwidth"));
       def.add(TeXParserUtils.createGroup(listener,
-       new TeXCsRef("glstableOtherFmt"), TeXParserUtils.createGroup(
+       new TeXCsRef("glstableOther"), TeXParserUtils.createGroup(
         listener, listener.getParam(1))));
 
       parser.putControlSequence(true,

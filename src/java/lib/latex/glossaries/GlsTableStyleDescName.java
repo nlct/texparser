@@ -77,7 +77,7 @@ public class GlsTableStyleDescName extends ControlSequence
       def.add(new TeXCsRef("glstablemeasureandupdate"));
       def.add(new TeXCsRef("glstablenamewidth"));
       def.add(TeXParserUtils.createGroup(listener,
-       new TeXCsRef("glstableNameFmt"), TeXParserUtils.createGroup(
+       new TeXCsRef("glstableName"), TeXParserUtils.createGroup(
         listener, listener.getParam(1))));
 
       parser.putControlSequence(true,
