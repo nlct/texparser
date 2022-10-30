@@ -285,14 +285,14 @@ public class UserGuideSty extends LaTeXSty
       def.add(listener.getOther('['));
       def.add(listener.getParam(1));
       def.add(listener.getOther(']'));
-      def.add(TeXParserUtils.createGroup(listener, listener.getParam(1)));
+      def.add(TeXParserUtils.createGroup(listener, listener.getParam(2)));
       grp = listener.createGroup();
       def.add(grp);
       grp.add(new TeXCsRef("csfmtfont"));
-      grp.add(TeXParserUtils.createGroup(listener, listener.getParam(1)));
+      grp.add(TeXParserUtils.createGroup(listener, listener.getParam(2)));
 
       registerControlSequence(new LaTeXGenericCommand(true, "glscsname",
-        "om", def, listener.createStack()));
+        "om", def, TeXParserUtils.createStack(listener, listener.createStack())));
 
       addTaggedColourBox("important", BG_IMPORTANT, FRAME_COL_IMPORTANT);
       addTaggedColourBox("warning", BG_WARNING, FRAME_COL_WARNING);
@@ -478,6 +478,7 @@ public class UserGuideSty extends LaTeXSty
         CaseChange.SENTENCE, glossariesSty));
 
       registerControlSequence(new InlineGlsDef("inlineswitchdef", "switch.", glossariesSty));
+      registerControlSequence(new InlineGlsDef("inlineoptdef", "opt.", glossariesSty));
       registerControlSequence(new CmdDefSyntax(glossariesSty));
       registerControlSequence(new OptDefSyntax(glossariesSty));
 
@@ -500,8 +501,10 @@ public class UserGuideSty extends LaTeXSty
       registerControlSequence(new Dgls("Idxpl", CaseChange.SENTENCE, true, glossariesSty));
       registerControlSequence(new Dglslink("idxc", false, glossariesSty));
 
-      registerControlSequence(new Idxn(glossariesSty));
-      registerControlSequence(new Idxn("idxf", "first", glossariesSty));
+      registerControlSequence(new Dglsfield("idxn", glossariesSty, 
+         CaseChange.NO_CHANGE, "name"));
+      registerControlSequence(new Dglsfield("idxf", glossariesSty, 
+         CaseChange.NO_CHANGE, "first"));
 
       registerControlSequence(new MirrorSampleFile());
 
@@ -1084,6 +1087,17 @@ public class UserGuideSty extends LaTeXSty
       registerControlSequence(new Plabel());
       registerControlSequence(new Pref());
 
+      // \phyperref
+      def = listener.createStack();
+      def.add(new TeXCsRef("hyperref"));
+      def.add(listener.getOther('['));
+      def.add(listener.getParam(2));
+      def.add(listener.getOther(']'));
+      def.add(TeXParserUtils.createGroup(listener, listener.getParam(1)));
+
+      registerControlSequence(new LaTeXGenericCommand(true, "phyperref",
+       "mm", def));
+
       registerControlSequence(new Symbol("sectionrefprefix", 0x00A7));
       registerControlSequence(new TextualContentCommand(
         "sectionsrefprefix", "\u00A7\u00A7"));
@@ -1536,6 +1550,7 @@ public class UserGuideSty extends LaTeXSty
       registerControlSequence(new GenericCommand("nlctuserguidepreletterrules"));
       registerControlSequence(new GenericCommand("nlctuserguideletterrules"));
       registerControlSequence(new GenericCommand("nlctuserguideextrarules"));
+      registerControlSequence(new GenericCommand("nlctuserguidebibextrapreamble"));
 
       registerControlSequence(new TextualContentCommand("codepar", 
        String.format("%n")));

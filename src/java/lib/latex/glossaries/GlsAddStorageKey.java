@@ -38,6 +38,7 @@ public class GlsAddStorageKey extends AbstractGlsCommand
    public GlsAddStorageKey(String name, Overwrite overwrite, GlossariesSty sty)
    {
       super(name, sty);
+      this.overwrite = overwrite;
    }
 
    @Override
@@ -72,18 +73,16 @@ public class GlsAddStorageKey extends AbstractGlsCommand
       String field = popLabelString(parser, stack);
       TeXObject defValue = popArg(parser, stack);
       TeXObject csArg = popArg(parser, stack);
+      ControlSequence cs = null;
 
-      if (!csArg.isEmpty())
+      if (parser.isStack(csArg) && !csArg.isEmpty())
       {
-         if (!(csArg instanceof ControlSequence))
-         {
-            throw new TeXSyntaxException(
-               parser,
-               TeXSyntaxException.ERROR_CS_EXPECTED,
-               csArg.format(), csArg.getClass().getSimpleName());
-         }
+         cs = popControlSequence(parser, (TeXObjectList)csArg);
+      }
 
-         String csname = ((ControlSequence)csArg).getName();
+      if (cs != null)
+      {
+         String csname = cs.getName();
 
          switch (overwrite)
          {

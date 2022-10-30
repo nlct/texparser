@@ -616,6 +616,11 @@ public class TeXParserApp implements TeXApp
    public String kpsewhich(String name)
      throws IOException,InterruptedException
    {
+      if (name.indexOf("\\") != -1)
+      {
+         throw new IOException(getMessage("error.bksl_in_kpsewhich", name));
+      }
+
       return kpsewhich(name, "kpsewhich");
    }
 

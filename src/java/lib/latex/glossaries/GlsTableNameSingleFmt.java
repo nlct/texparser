@@ -76,14 +76,14 @@ public class GlsTableNameSingleFmt extends AbstractGlsCommand
 
          boolean hasOther = getSty().glsTableHasOtherField(entry, stack);
 
-         if (entry.hasField("description"))
+         if (!entry.isFieldEmpty("description"))
          {
             content.add(listener.getControlSequence("glstableNameSinglePostName"));
             content.add(listener.getControlSequence("glstableNameSingleSuppl"));
             Group grp = listener.createGroup();
             content.add(grp);
 
-            if (entry.hasField("symbol"))
+            if (!entry.isFieldEmpty("symbol"))
             {
                grp.add(listener.getControlSequence("glstableSymbol"));
                grp.add(glslabel);
@@ -102,7 +102,7 @@ public class GlsTableNameSingleFmt extends AbstractGlsCommand
          }
          else
          {
-            if (entry.hasField("symbol"))
+            if (!entry.isFieldEmpty("symbol"))
             {
                content.add(listener.getControlSequence("glstableNameSinglePostName"));
                content.add(listener.getControlSequence("glstableNameSingleSuppl"));

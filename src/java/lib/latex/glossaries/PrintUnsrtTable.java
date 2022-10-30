@@ -113,7 +113,7 @@ public class PrintUnsrtTable extends ControlSequence
 
    protected void html(boolean showHeader, boolean showRules,
      boolean showGroups, int blocksperrow, int colsperblock,
-     Glossary glossary,
+     boolean showCaption, Glossary glossary,
      TeXObjectList content, TeXParser parser, TeXObjectList stack)
      throws IOException
    {
@@ -202,45 +202,48 @@ public class PrintUnsrtTable extends ControlSequence
 
       content.add(startElem);
 
-      listener.stepcounter("table");
-
-      StartElement captionElem = new StartElement("caption", true);
-
-      TeXObject labelObj = TeXParserUtils.expandOnce(
-        listener.getControlSequence("@@glossaryseclabel"), parser, stack);
-
-      if (!labelObj.isEmpty() && parser.isStack(labelObj))
+      if (showCaption)
       {
-         TeXObjectList list = (TeXObjectList)labelObj;
+         listener.stepcounter("table");
 
-         TeXObject obj = list.peekStack();
+         StartElement captionElem = new StartElement("caption", true);
 
-         if (obj instanceof ControlSequence 
-             && ((ControlSequence)obj).getName().equals("label"))
+         TeXObject labelObj = TeXParserUtils.expandOnce(
+           listener.getControlSequence("@@glossaryseclabel"), parser, stack);
+
+         if (!labelObj.isEmpty() && parser.isStack(labelObj))
          {
-            obj = list.popStack(parser);
-            String label = TeXParserUtils.popLabelString(parser, list);
+            TeXObjectList list = (TeXObjectList)labelObj;
 
-            if (!label.isEmpty())
+            TeXObject obj = list.peekStack();
+
+            if (obj instanceof ControlSequence 
+                && ((ControlSequence)obj).getName().equals("label"))
             {
-               captionElem.putAttribute("id", label);
+               obj = list.popStack(parser);
+               String label = TeXParserUtils.popLabelString(parser, list);
+
+               if (!label.isEmpty())
+               {
+                  captionElem.putAttribute("id", label);
+               }
             }
          }
+
+         content.add(captionElem);
+
+         content.add(listener.getControlSequence("@makecaption"));
+         Group grp = listener.createGroup();
+         content.add(grp);
+
+         grp.add(listener.getControlSequence("tablename"));
+         grp.add(listener.getControlSequence("nobreakspace"));
+         grp.add(listener.getControlSequence("thetable"));
+
+         content.add(listener.getControlSequence("glossarytitle"));
+
+         content.add(new EndElement("caption", true));
       }
-
-      content.add(captionElem);
-
-      content.add(listener.getControlSequence("@makecaption"));
-      Group grp = listener.createGroup();
-      content.add(grp);
-
-      grp.add(listener.getControlSequence("tablename"));
-      grp.add(listener.getControlSequence("nobreakspace"));
-      grp.add(listener.getControlSequence("thetable"));
-
-      content.add(listener.getControlSequence("glossarytitle"));
-
-      content.add(new EndElement("caption", true));
 
       TeXObject preamble = TeXParserUtils.expandOnce(
        listener.getControlSequence("glossarypreamble"), parser, stack);
@@ -539,7 +542,7 @@ public class PrintUnsrtTable extends ControlSequence
 
    protected void latex(boolean showHeader, boolean showRules,
      boolean showGroups,int blocksperrow, int colsperblock,
-     Glossary glossary, 
+     boolean showCaption, Glossary glossary, 
      TeXObjectList content, TeXParser parser, TeXObjectList stack)
      throws IOException
    {
@@ -644,6 +647,9 @@ public class PrintUnsrtTable extends ControlSequence
       Boolean showGroupsBool = null;
       boolean showGroups = true;
 
+      Boolean showCaptionBool = null;
+      boolean showCaption = true;
+
       NumericRegister reg = settings.getNumericRegister("glstableblockperrowcount");
       int blocksperrow = reg.number(parser);
 
@@ -662,6 +668,7 @@ public class PrintUnsrtTable extends ControlSequence
          showHeaderBool = options.getBoolean("header", parser, stack);
          showRulesBool = options.getBoolean("rules", parser, stack);
          showGroupsBool = options.getBoolean("groups", parser, stack);
+         showCaptionBool = options.getBoolean("caption", parser, stack);
 
          TeXObject val = options.getValue("blocksep");
 
@@ -714,7 +721,36 @@ public class PrintUnsrtTable extends ControlSequence
 
          if (val != null)
          {
-            initCode = val;
+            TeXObjectList def;
+
+            if (parser.isStack(val))
+            {
+               def = (TeXObjectList)val;
+            }
+            else
+            {
+               def = TeXParserUtils.createStack(listener, val);
+            }
+
+            initCode = new GenericCommand(true, "glstable@init", null, def);
+         }
+      }
+
+      if (showCaptionBool == null)
+      {
+         showCaption = TeXParserUtils.isTrue("ifKV@printglosstable@caption", parser);
+      }
+      else
+      {
+         showCaption = showCaptionBool.booleanValue();
+      }
+
+      if (TeXParserUtils.isTrue("if@glsxtr@floats", parser))
+      {
+         if (showCaption)
+         {
+            parser.putControlSequence(true, 
+             new TextualContentCommand("glscounter", "table"));
          }
       }
 
@@ -800,12 +836,12 @@ public class PrintUnsrtTable extends ControlSequence
       if (listener instanceof L2HConverter)
       {
          html(showHeader, showRules, showGroups, blocksperrow, colsperblock,
-           glossary, content, parser, stack);
+           showCaption, glossary, content, parser, stack);
       }
       else
       {
          latex(showHeader, showRules, showGroups, 
-           blocksperrow, colsperblock, glossary, content, parser, stack);
+           blocksperrow, colsperblock, showCaption, glossary, content, parser, stack);
       }
 
       TeXParserUtils.process(content, parser, stack);
