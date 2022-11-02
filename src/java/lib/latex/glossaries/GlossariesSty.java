@@ -578,6 +578,8 @@ public class GlossariesSty extends LaTeXSty
          null, new TeXCsRef("space")));
 
       registerControlSequence(new GlsAddEach());
+      registerControlSequence(new GlsAddEach("glsstartrange"));
+      registerControlSequence(new GlsAddEach("glsendrange"));
       registerControlSequence(new TextualContentCommand("glsxtrnopostpunc", ""));
       registerControlSequence(new Symbol("glsxtrshowtargetsymbolright", 0x25B7));
       registerControlSequence(new Symbol("glsxtrshowtargetsymbolleft", 0x25C1));
