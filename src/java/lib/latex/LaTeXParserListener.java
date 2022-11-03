@@ -800,6 +800,31 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       // changes to allow command names to be read properly
       parser.putControlSequence(new ExplSyntaxOn());
       parser.putControlSequence(new CharSetCatCodeNN());
+
+      parser.putControlSequence(new GenericCommand(true,
+        "BooleanTrue", null, ONE));
+      parser.putControlSequence(new GenericCommand(true,
+        "BooleanFalse", null, ZERO));
+
+      parser.putControlSequence(new IfBoolean());
+      parser.putControlSequence(new IfBoolean("IfBooleanT", true, false));
+      parser.putControlSequence(new IfBoolean("IfBooleanF", false, true));
+
+      parser.putControlSequence(new IfValue());
+      parser.putControlSequence(new IfValue("IfValueT", true, false));
+      parser.putControlSequence(new IfValue("IfValueF", false, true));
+
+      parser.putControlSequence(new IfNoValue());
+      parser.putControlSequence(new IfNoValue("IfNoValueT", true, false));
+      parser.putControlSequence(new IfNoValue("IfNoValueF", false, true));
+
+      parser.putControlSequence(new NewDocumentCommand());
+      parser.putControlSequence(new NewDocumentCommand(
+      "RenewDocumentCommand", Overwrite.FORCE));
+      parser.putControlSequence(new NewDocumentCommand(
+      "ProvideDocumentCommand", Overwrite.SKIP));
+      parser.putControlSequence(new NewDocumentCommand(
+      "DeclareDocumentCommand", Overwrite.ALLOW));
    }
 
    protected TeXParserSection createTeXParserSection(String sectionCsname)

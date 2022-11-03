@@ -206,7 +206,9 @@ public abstract class Macro extends AbstractTeXObject
    protected TeXObject popArg(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      return TeXParserUtils.popArg(parser, stack);
+      byte popStyle = TeXObjectList.getArgPopStyle(isShort());
+
+      return TeXParserUtils.popArg(parser, stack, popStyle);
    }
 
    // pops an optional argument
@@ -214,7 +216,9 @@ public abstract class Macro extends AbstractTeXObject
    protected TeXObject popOptArg(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      return TeXParserUtils.popOptArg(parser, stack);
+      byte popStyle = TeXObjectList.getArgPopStyle(isShort());
+
+      return TeXParserUtils.popOptArg(popStyle, parser, stack);
    }
 
    // pops an optional argument

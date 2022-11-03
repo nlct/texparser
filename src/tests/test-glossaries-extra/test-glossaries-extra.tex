@@ -10,8 +10,11 @@
 \usepackage[indexcounter,subentrycounter,
  symbols,nostyles,style=index,stylemods={tree,table},record]{glossaries-extra}
 
+\NewDocumentCommand{\test}{ o m }{\IfValueT{#1}{#1 }#2}
+
 \newglossary*{homographs}{Homographs}
 \newglossary*{other}{Other}
+\newglossary*{test}{Test}
 
 \setabbreviationstyle[acronym]{long-short}
 \GlsXtrLoadResources[src={example-glossaries-acronym,example-glossaries-parent}]
@@ -29,6 +32,8 @@
  src={example-glossaries-acronyms-lang},
  save-child-count,
  type=other,save-locations=false,selection=all]
+
+\GlsXtrLoadResources[type=test,src=\jobname,selection=all]
 
 \begin{document}
 \tableofcontents
@@ -76,6 +81,12 @@ Reference section~\ref{sec:nolinks} (\ref*{sec:nolinks}).
 \hyperlink{sampleanchor}{Sample hyperlink}.
 
 \lipsum
+
+\section{Test}
+
+\gls{theduck} and \gls{dog}.
+
+\printunsrtglossary[type=test,title={Test}]
 
 \section{Table Glossaries}
 \label{sec:table}

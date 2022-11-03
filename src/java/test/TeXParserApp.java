@@ -220,6 +220,8 @@ public class TeXParserApp implements TeXApp
          }
       };
 
+      listener.setUseEntities(useHtmlEntities);
+
       if (extraHead != null)
       {
          listener.addToHead(extraHead);
@@ -1142,6 +1144,8 @@ public class TeXParserApp implements TeXApp
       System.out.println(getMessage("syntax.html.options"));
       System.out.println();
       System.out.println(getMessage("syntax.head", "--head"));
+      System.out.println(getMessage("syntax.mathjax", "--mathjax"));
+      System.out.println(getMessage("syntax.entities", "--entities"));
       System.out.println();
       System.out.println(getMessage("syntax.bugreport", 
         "https://github.com/nlct/texparser"));
@@ -1459,6 +1463,14 @@ public class TeXParserApp implements TeXApp
          {
             mathJax = true;
          }
+         else if (args[i].equals("--noentities"))
+         {
+            useHtmlEntities = false;
+         }
+         else if (args[i].equals("--entities"))
+         {
+            useHtmlEntities = true;
+         }
          else if (args[i].equals("--head"))
          {
             i++;
@@ -1719,9 +1731,9 @@ public class TeXParserApp implements TeXApp
 
    // TeXParser class now has its own version and date.
    // As from 0.9.2.2b these now refer to the test application only.
-   public static final String APP_VERSION = "0.9.2.4b";
+   public static final String APP_VERSION = "0.9.2.5b";
    public static final String APP_NAME = "texparsertest";
-   public static final String APP_DATE = "2022-10-14";
+   public static final String APP_DATE = "2022-11-02";
 
    public static long MAX_PROCESS_TIME=0L;
 
@@ -1756,6 +1768,7 @@ public class TeXParserApp implements TeXApp
    private boolean deleteTempDirOnExit = true;
    private boolean convertImages = true;
    private boolean mathJax = true;
+   private boolean useHtmlEntities = false;
 
    public static final Pattern PNG_INFO =
     Pattern.compile(".*: PNG image data, (\\d+) x (\\d+),.*");

@@ -71,4 +71,6 @@ public class LaTeXSyntaxException extends TeXSyntaxException
    "latex.error.counter.too.large";
    public static final String ERROR_COUNTER_OUT_OF_RANGE = 
    "latex.error.counter.out.of.range";
+   public static final String ERROR_UNSUPPORTED_XPARSE_TYPE =
+   "latex.unsupported.xparse_type";
 }

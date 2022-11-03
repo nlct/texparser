@@ -2790,6 +2790,109 @@ public class TeXParser extends TeXObjectList
       return list;
    }
 
+   // For commands that haven't been identified as verbatim.
+   // For example, commands that have an optional argument.
+   public TeXObjectList popVerb()
+     throws IOException
+   {
+      int delim = -1;
+
+      TeXObjectList charList = new TeXObjectList();
+
+      // This will be problematic if there's anything already on the
+      // parser's stack, but if there is, let's hope it's just
+      // ignoreables, white space or something that can be
+      // detokenized.
+
+      while (size() > 0)
+      {
+         TeXObject obj = firstElement();
+
+         if (obj instanceof Ignoreable || obj instanceof WhiteSpace)
+         {
+            remove(0);
+         }
+         else
+         {
+            break;
+         }
+      }
+
+      if (isEmpty())
+      {
+         delim = read();
+
+         readVerb(delim, charList);
+      }
+      else
+      {
+         String str = "";
+
+         while (str.isEmpty() && size() > 0)
+         {
+            TeXObject obj = remove(0);
+
+            str = obj.toString(this);
+         }
+
+         if (str.isEmpty())
+         {
+            delim = read();
+
+            readVerb(delim, charList);
+         }
+         else
+         {
+            delim = str.codePointAt(0);
+            int i = Character.charCount(delim);
+
+            boolean found = false;
+
+            while (!found)
+            {
+               for ( ; i < str.length() ; )
+               {
+                  int cp = str.codePointAt(i);
+                  i += Character.charCount(cp);
+
+                  if (cp == delim)
+                  {
+                     if (i < str.length())
+                     {
+                        addAll(0, listener.createString(str.substring(i)));
+                     }
+
+                     found = true;
+                  }
+                  else
+                  {
+                     charList.add(listener.getOther(cp)); 
+                  }
+               }
+
+               if (!found)
+               {
+                  if (size() > 0)
+                  {
+                     TeXObject obj = remove(0);
+                     str = obj.toString(this);
+                  }
+                  else
+                  {
+                     readVerb(delim, charList);
+                     found = true;
+                  }
+               }
+
+               i = 0;
+            }
+
+         }
+      }
+
+      return charList;
+   }
+
    public TeXNumber popNumber()
      throws IOException
    {
@@ -3591,5 +3694,5 @@ public class TeXParser extends TeXObjectList
    public static final int DEBUG_EXPANSION_ONCE_LIST = 8192;
 
    public static final String VERSION = "0.9.2.8b";
-   public static final String VERSION_DATE = "2022-10-30";
+   public static final String VERSION_DATE = "2022-11-03";
 }

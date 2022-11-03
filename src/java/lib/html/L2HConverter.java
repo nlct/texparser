@@ -567,6 +567,11 @@ public class L2HConverter extends LaTeXParserListener
       }
    }
 
+   public void setUseEntities(boolean useEntities)
+   {
+      this.useHtmlEntities = useEntities;
+   }
+
    @Override
    public void writeCodePoint(int codePoint)
      throws IOException
