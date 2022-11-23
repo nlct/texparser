@@ -654,7 +654,7 @@ public class TeXObjectList extends Vector<TeXObject>
              || Character.isDigit(codePoint)
              || codePoint == '-' || codePoint == '+')
          {
-            return popNumber(parser);
+            return popNumber(parser, object);
          }
       }
 
@@ -824,6 +824,12 @@ public class TeXObjectList extends Vector<TeXObject>
    {
       TeXObject object = peekStack(POP_IGNORE_LEADING_SPACE);
 
+      return popNumber(parser, object);
+   }
+
+   private TeXNumber popNumber(TeXParser parser, TeXObject object)
+    throws IOException
+   {
       int base = 10;
 
       if (object instanceof CharObject)
@@ -846,24 +852,47 @@ public class TeXObjectList extends Vector<TeXObject>
 
             TeXObject nextObj = peekStack();
 
-            if (nextObj instanceof ControlSequence)
+            if (nextObj instanceof Macro)
             {
                popStack(parser);
 
-               String name = ((ControlSequence)nextObj).getName();
+               String name = nextObj.toString(parser);
 
                codePoint = name.codePointAt(0);
+               int charCount = Character.charCount(codePoint);
 
-               if (Character.charCount(codePoint) != name.length())
+               if (codePoint == parser.getEscChar())
                {
-                  throw new TeXSyntaxException(parser,
-                    TeXSyntaxException.ERROR_IMPROPER_ALPHABETIC_CONSTANT,
-                    nextObj.toString(parser));
+                  name = name.substring(charCount);
+
+                  codePoint = name.codePointAt(0);
+                  charCount = Character.charCount(codePoint);
                }
 
-               // skip trailing spaces
+               int n = name.length();
 
-               popLeadingWhiteSpace();
+               if (charCount < n)
+               {
+                  // push trailing content back as letters
+
+                  TeXObjectList substack = new TeXObjectList(n-1);
+
+                  for (int i = charCount; i < n; )
+                  {
+                     int cp = name.codePointAt(i);
+                     i += Character.charCount(cp);
+
+                     substack.add(parser.getListener().getLetter(cp));
+                  }
+
+                  addAll(0, substack);
+               }
+               else
+               {
+                  // skip trailing spaces
+
+                  popLeadingWhiteSpace();
+               }
 
                return new UserNumber(codePoint);
             }
