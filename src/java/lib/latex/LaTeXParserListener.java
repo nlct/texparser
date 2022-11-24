@@ -795,10 +795,14 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
 
       parser.putControlSequence(new ExternalDocument());
 
+      // limited support for switching off babel shorthand
+      parser.putControlSequence(new ShortHandOff());
+
       // LaTeX3
       // currently just implementing enough to pick up cat code
       // changes to allow command names to be read properly
       parser.putControlSequence(new ExplSyntaxOn());
+      parser.putControlSequence(new ExplSyntaxOff());
       parser.putControlSequence(new CharSetCatCodeNN());
 
       parser.putControlSequence(new GenericCommand(true,

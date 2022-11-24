@@ -132,6 +132,11 @@ public class AuxParser extends DefaultTeXParserListener
     */ 
    public boolean isAllowedAuxCommand(ControlSequence cs)
    {
+      if (cs instanceof CatCodeChanger)
+      {
+         return allowCatChangers;
+      }
+
       return (cs instanceof Input
               || cs instanceof AuxCommand 
               || cs instanceof AuxIgnoreable 
@@ -145,7 +150,30 @@ public class AuxParser extends DefaultTeXParserListener
    {
       ControlSequence cs = getParser().getControlSequence(name);
 
+      if (cs instanceof CatCodeChanger && !allowCatChangers)
+      {
+         return ((CatCodeChanger)cs).getNoOpCommand();
+      }
+
       return isAllowedAuxCommand(cs) ? cs : new AuxIgnoreable(name);
+   }
+
+   /**
+    * Sets whether or not to allow catcode changing commands.
+    */ 
+   public void setAllowCatCodeChangers(boolean allow)
+   {
+      allowCatChangers = allow;
+   }
+
+   /**
+    * Determines whether or not allow catcode setting is on.
+    * @return true if known catcode changing commands will be
+    * implemented
+    */ 
+   public boolean isAllowCatCodeChangersOn()
+   {
+      return allowCatChangers;
    }
 
    @Override
@@ -308,4 +336,5 @@ public class AuxParser extends DefaultTeXParserListener
 
    private Charset charset=null;
    private String labelPrefix = null;
+   private boolean allowCatChangers = true;
 }

@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.EOFException;
 
 import com.dickimawbooks.texparserlib.*;
+import com.dickimawbooks.texparserlib.generic.GobbleNumber;
 
 public class CatCodeCs extends Primitive 
    implements CatCodeChanger,NumericExpansion,InternalQuantity
@@ -63,6 +64,7 @@ public class CatCodeCs extends Primitive
       return new UserNumber(parser.getCatCode(arg.number(parser)));
    }
 
+   @Override
    public void applyCatCodeChange(TeXParser parser) throws IOException
    {
       Numerical arg1 = parser.popNumerical();
@@ -102,6 +104,7 @@ public class CatCodeCs extends Primitive
 
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
@@ -124,6 +127,7 @@ public class CatCodeCs extends Primitive
       parser.setCatCode(true, num1, num2);
    }
 
+   @Override
    public void process(TeXParser parser)
       throws IOException
    {
@@ -146,4 +150,8 @@ public class CatCodeCs extends Primitive
       parser.setCatCode(true, num1, num2);
    }
 
+   public ControlSequence getNoOpCommand()
+   {
+      return new GobbleNumber(getName(), true);
+   }
 }

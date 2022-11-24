@@ -23,15 +23,18 @@ import java.io.IOException;
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.primitives.Relax;
 
-public class ObeySpaces extends ControlSequence
+/* This will normally be defined by ExplSyntaxOn but this is
+ provided just in case ExplSyntaxOn isn't detected and also to provide no-op.
+*/
+public class ExplSyntaxOff extends ControlSequence
   implements CatCodeChanger
 {
-   public ObeySpaces()
+   public ExplSyntaxOff()
    {
-      this("obeyspaces");
+      this("ExplSyntaxOff");
    }
 
-   public ObeySpaces(String name)
+   public ExplSyntaxOff(String name)
    {
       super(name);
    }
@@ -39,31 +42,35 @@ public class ObeySpaces extends ControlSequence
    @Override
    public Object clone()
    {
-      return new ObeySpaces(getName());
+      return new ExplSyntaxOff(getName());
    }
 
    @Override
-   public void applyCatCodeChange(TeXParser parser)
-      throws IOException
+   public void applyCatCodeChange(TeXParser parser) throws IOException
    {
-      parser.setCatCode(true, ' ', TeXParser.TYPE_ACTIVE);
-
-      parser.putActiveChar(true, new AssignedActiveChar(' ', 
-        parser.getListener().getControlSequence("obeyedspace")));
+      parser.setCatCode(true, 9, TeXParser.TYPE_SPACE);
+      parser.setCatCode(true, 32, TeXParser.TYPE_SPACE);
+      parser.setCatCode(true, 34, TeXParser.TYPE_OTHER);
+      parser.setCatCode(true, 38, TeXParser.TYPE_TAB);
+      parser.setCatCode(true, 58, TeXParser.TYPE_OTHER);
+      parser.setCatCode(true, 94, TeXParser.TYPE_SP);
+      parser.setCatCode(true, 95, TeXParser.TYPE_SB);
+      parser.setCatCode(true, 124, TeXParser.TYPE_OTHER);
+      parser.setCatCode(true, 126, TeXParser.TYPE_ACTIVE);
    }
 
    @Override
    public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      process(parser);
+      applyCatCodeChange(parser);
    }
 
    @Override
    public void process(TeXParser parser)
      throws IOException
    {
-      applyCatCodeChange(parser);
+      process(parser, parser);
    }
 
    @Override

@@ -24,5 +24,8 @@ public interface CatCodeChanger
 {
    // anything popped off parser must be pushed back on
    public void applyCatCodeChange(TeXParser parser) throws IOException;
+
+   // returns a command with the same syntax that does nothing
+   public ControlSequence getNoOpCommand();
 }
 

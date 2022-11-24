@@ -21,6 +21,7 @@ package com.dickimawbooks.texparserlib.latex;
 import java.io.IOException;
 
 import com.dickimawbooks.texparserlib.*;
+import com.dickimawbooks.texparserlib.primitives.Relax;
 
 public class MakeAtOther extends ControlSequence
   implements CatCodeChanger
@@ -35,27 +36,36 @@ public class MakeAtOther extends ControlSequence
       super(name);
    }
 
+   @Override
    public Object clone()
    {
       return new MakeAtOther(getName());
    }
 
+   @Override
    public void applyCatCodeChange(TeXParser parser)
       throws IOException
    {
       parser.setCatCode(true, '@', TeXParser.TYPE_OTHER);
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList list)
      throws IOException
    {
       process(parser);
    }
 
+   @Override
    public void process(TeXParser parser)
      throws IOException
    {
       applyCatCodeChange(parser);
    }
 
+   @Override
+   public ControlSequence getNoOpCommand()
+   {
+      return new Relax(getName());
+   }
 }

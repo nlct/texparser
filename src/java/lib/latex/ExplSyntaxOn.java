@@ -21,6 +21,7 @@ package com.dickimawbooks.texparserlib.latex;
 import java.io.IOException;
 
 import com.dickimawbooks.texparserlib.*;
+import com.dickimawbooks.texparserlib.primitives.Relax;
 
 public class ExplSyntaxOn extends ControlSequence
   implements CatCodeChanger
@@ -121,4 +122,9 @@ public class ExplSyntaxOn extends ControlSequence
       process(parser, parser);
    }
 
+   @Override
+   public ControlSequence getNoOpCommand()
+   {
+      return new Relax(getName());
+   }
 }
