@@ -1,0 +1,2 @@
+Main-Class: com/dickimawbooks/texparsertestsearch/TestSearch
+Class-Path: . texparserlib.jar

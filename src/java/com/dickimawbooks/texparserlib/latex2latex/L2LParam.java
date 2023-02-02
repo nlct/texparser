@@ -16,20 +16,27 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
-package com.dickimawbooks.texparserlib;
+package com.dickimawbooks.texparserlib.latex2latex;
 
 import java.io.IOException;
 
-public class L2LDoubleParam extends DoubleParam
+import com.dickimawbooks.texparserlib.Ignoreable;
+import com.dickimawbooks.texparserlib.Param;
+import com.dickimawbooks.texparserlib.TeXObject;
+import com.dickimawbooks.texparserlib.TeXObjectList;
+import com.dickimawbooks.texparserlib.TeXParser;
+import com.dickimawbooks.texparserlib.Writeable;
+
+public class L2LParam extends Param
 {
-   public L2LDoubleParam(ParameterToken param)
+   public L2LParam(int digit)
    {
-      super(param);
+      super(digit);
    }
 
    public Object clone()
    {
-      return new L2LDoubleParam((ParameterToken)next().clone());
+      return new L2LParam(getDigit());
    }
 
    public void process(TeXParser parser, TeXObjectList stack)
@@ -38,6 +45,7 @@ public class L2LDoubleParam extends DoubleParam
       Writeable writeable = parser.getListener().getWriteable();
 
       writeable.write(toString(parser));
+
       while (stack.size() > 0)
       {
          TeXObject nextObj = stack.pop();

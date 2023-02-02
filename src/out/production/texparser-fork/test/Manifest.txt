@@ -1,0 +1,2 @@
+Main-Class: com/dickimawbooks/texparsertest/TeXParserApp
+Class-Path: . texparserlib.jar

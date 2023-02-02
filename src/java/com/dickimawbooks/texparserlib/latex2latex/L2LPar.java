@@ -16,34 +16,38 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
-package com.dickimawbooks.texparserlib;
+package com.dickimawbooks.texparserlib.latex2latex;
 
 import java.io.IOException;
 
-public class L2LTab extends Tab
+import com.dickimawbooks.texparserlib.Par;
+import com.dickimawbooks.texparserlib.TeXObjectList;
+import com.dickimawbooks.texparserlib.TeXParser;
+
+public class L2LPar extends Par
 {
-   public L2LTab()
+   public L2LPar()
    {
       super();
    }
 
    public Object clone()
    {
-      return new L2LTab();
+      return new L2LPar();
    }
 
-   public void process(TeXParser parser, TeXObjectList stack)
-     throws IOException
+   public void process(TeXParser parser, TeXObjectList list)
+      throws IOException
    {
       process(parser);
    }
 
    public void process(TeXParser parser)
-     throws IOException
+      throws IOException
    {
-      super.process(parser);
-      parser.getListener().getWriteable().write(toString(parser));
+      parser.getListener().getWriteable().write(String.format("%n%n"));
    }
+
 
 }
 

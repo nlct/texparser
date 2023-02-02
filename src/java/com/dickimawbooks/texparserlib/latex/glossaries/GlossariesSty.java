@@ -1175,7 +1175,7 @@ public class GlossariesSty extends LaTeXSty
 
       registerControlSequence(new GlsXtrNewGls(this));
       registerControlSequence(new GlsXtrNewGlsLike(this));
-      registerControlSequence(new GlsXtrNewGLSLike(this));
+//      registerControlSequence(new GlsXtrNewGLSLike(this));	// wilbur
 
       registerControlSequence(new GlsXtrNewGlsLink(this));
       registerControlSequence(new GlsXtrNewGlsLink("glsxtrnewglsdisp", true, this));
