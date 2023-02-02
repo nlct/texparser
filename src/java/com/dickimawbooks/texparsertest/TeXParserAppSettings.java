@@ -554,7 +554,7 @@ public class TeXParserAppSettings extends Properties
    public static final int STARTUP_CUSTOM = 3;
 
    public static final String HELPSET_DIR = "/resources/helpsets/";
-   public static final String DICT_DIR = "/resources/dictionaries/";
+   public static final String DICT_DIR = "resources/dictionaries/"; // "/resources/dictionaries/";	// wilbur: removed leading /
 
    public static final Pattern PATTERN_HELPSET 
      = Pattern.compile(RESOURCE+"-([a-z]{2})(-[A-Z]{2})?");
