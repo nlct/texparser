@@ -1,0 +1,55 @@
+\documentclass[wcp]{jmlr}
+
+\jmlrworkshop{Workshop on Something}
+\jmlryear{2013}
+\jmlrvolume{10}
+
+\newcommand*{\boldstuff}[1]{\textbf{#1}}
+
+\author{\Name{Ann Other}\Email{sample@nowhere.com}\\\addr{University of Nowhere}}
+
+\title{A Sample Article}
+
+\editor{Ann Editor}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+This is an example paper. The abstract has a formula
+$\boldsymbol{\xi} = \surd2 \sum_{i=1}^n \mathbf{x}$
+and a citation \citep{smith2005}. It also has a custom
+\boldstuff{command} defined by the author.
+\end{abstract}
+\begin{keywords}
+test;sample
+\end{keywords}
+
+\section{Introduction}
+
+Here's some dummy text with a reference to section~\ref{sec:sample}.
+\[
+ y = mx + c
+\]
+
+\section{Sample Section}
+\label{sec:sample}
+
+Some \textbf{bold text}, some \textit{italic text} and some
+\emph{emphasized text}.
+
+\begin{table}[htbp]
+\caption{A Sample Table}\label{tab:sample}
+\centering
+\begin{tabular}{@{+}l||cr}
+\hline\hline
+Lorum & Ipsum & Dolor sit amet\\
+\multicolumn{3}{c}{consectetuer adipiscing elit}\\
+Ut & purus & elit\\
+vestibulum ut & placerat ac & adipiscing vitae, felis\\\hline
+\end{tabular}
+\end{table}
+
+\bibliography{sample}
+\end{document}

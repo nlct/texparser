@@ -1,0 +1,114 @@
+% arara: pdflatex
+% arara: bibtex
+% arara: pdflatex
+% arara: pdflatex
+\documentclass{article}
+
+\usepackage{lipsum}
+\usepackage{amsmath}
+\usepackage{pifont}
+\usepackage{textcase}
+\usepackage[colorlinks]{hyperref}
+
+\title{Sample Article}
+\author{Nicola Talbot\thanks{Some attribution}}
+
+\newcommand*{\pfrac}[2]{\frac{\partial#1}{\partial#2}}
+\newcommand*{\dpfrac}[3]{\frac{\partial^2#1}{\partial#2\partial#3}}
+
+\renewcommand*{\vec}[1]{\boldsymbol{#1}}
+
+\begin{document}
+\maketitle
+
+\tableofcontents
+
+\begin{abstract}
+\lipsum[1]
+\end{abstract}
+
+\section*{An Unnumbered Section}
+\addcontentsline{toc}{section}{An Unnumbered Section}
+
+\lipsum[4-5]
+
+\section{Introduction}
+\label{sec:intro}
+
+This is an example section. An unnumbered equation:
+\[
+  f(\vec{a}; x) = \sum_{i=1}^n a_i x^i
+\]
+
+A numbered equation:
+\begin{equation}
+y = m x + c
+\label{eq:mx+c}
+\end{equation}
+
+Another numbered equation:
+\begin{equation}\label{eq:dp}
+ \dpfrac{L}{\eta_j}{w_k}
+ = \dpfrac{L}{w_k}{\eta_j}
+ = \sum_{i=1}^n \pfrac{g(z_i)}{z_i}
+   \phi_k(\vec{x}_i)\pfrac{z_i}{\eta_j}
+ + (\hat{y}_i - y_i)\pfrac{\phi_k(\vec{x}_i)}{\eta_j}
+\end{equation}
+
+Oh, no! It's an \texttt{eqnarray}:
+\begin{eqnarray}
+f(x) &=& ax^2 +b\label{eq:f}\\
+f'(x) &=& 2ax\label{eq:df}
+\end{eqnarray}
+and an \texttt{eqnarray*}:
+\begin{eqnarray*}
+\mathcal{I} & = & \int_0^\infty f(x)\,dx\\
+g(x) & = & \prod_i h_i(x)
+\end{eqnarray*}
+
+Some \textbf{bold text}, \textit{italic text}, 
+\textsf{sans-serif text}, \textsc{small caps}.
+Here's a footnote.\footnote{Here's the footnote text.}
+
+\section{Case-Changing}
+\label{sec:casechange}
+
+\TeX\ case-change: \uppercase{upper \lowercase{LOWER} MiXeD $\alpha \neq a$.}
+\LaTeX\ case-change: \MakeUppercase{abc\ae\ \protect\( a = b
+\protect\) and $\alpha \neq a$}.
+\texttt{textcase.sty} case-change: \MakeTextUppercase{abc\ae\ \( a = b \) and 
+$\alpha \neq a$ \NoCaseChange{No Case-Change}}.
+
+\newcommand{\foo}{fooa}
+\newcommand{\FOO}{foob}
+Upper: \uppercase{\foo}. Lower: \lowercase{\FOO}.
+TC: Upper: \MakeTextUppercase{\foo}. Lower:
+\MakeTextLowercase{\FOO}.
+
+
+\section{Another Section}
+
+Some cross-references: section~\ref{sec:intro},
+equation~\ref{eq:mx+c} and some
+citations~\cite{article-full,incollection-full}
+and~\cite[some text]{inproceedings-full}.
+
+Some more references: equations~\ref{eq:f} and~\ref{eq:df}.
+
+\lipsum[2-3]
+
+\subsection{A Subsection}
+
+\lipsum[6-7]
+
+\section*{Another Unnumbered Section}
+\addcontentsline{toc}{section}{Another Unnumbered Section}
+
+Some symbols: \ding{67}, \ding{118}, \ding{161}
+
+\lipsum[8-9]
+
+\bibliographystyle{plain}
+\bibliography{xampl}
+
+\end{document}
