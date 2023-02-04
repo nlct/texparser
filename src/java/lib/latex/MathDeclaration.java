@@ -26,24 +26,58 @@ public class MathDeclaration extends Declaration
 {
    public MathDeclaration()
    {
-      this("(", TeXSettings.MODE_INLINE_MATH, false);
+      this("(", TeXMode.INLINE_MATH, false);
    }
 
    public MathDeclaration(String name)
    {
-      this(name, TeXSettings.MODE_INLINE_MATH, false);
+      this(name, TeXMode.INLINE_MATH, false);
    }
 
+   @Deprecated
    public MathDeclaration(String name, int mode)
    {
       this(name, mode, false);
    }
 
-   public MathDeclaration(String name, int mode, boolean numbered)
+   @Deprecated
+   public MathDeclaration(String name, int modeId, boolean numbered)
    {
       super(name);
-      this.mode = mode;
       this.numbered = numbered;
+
+      if (modeId == TeXSettings.MODE_INLINE_MATH)
+      {
+         mode = TeXMode.INLINE_MATH;
+      }
+      else if (modeId == TeXSettings.MODE_DISPLAY_MATH)
+      {
+         mode = TeXMode.DISPLAY_MATH;
+      }
+      else
+      {
+         throw new IllegalArgumentException("Illegal modeId argument "+modeId);
+      }
+   }
+
+   public MathDeclaration(String name, TeXMode mode)
+   {
+      this(name, mode, false);
+   }
+
+   public MathDeclaration(String name, TeXMode mode, boolean numbered)
+   {
+      super(name);
+      this.numbered = numbered;
+
+      if (TeXMode.isMath(mode))
+      {
+         this.mode = mode;
+      }
+      else
+      {
+         throw new IllegalArgumentException("Illegal mode argument "+mode);
+      }
    }
 
    @Override
@@ -129,7 +163,7 @@ public class MathDeclaration extends Declaration
       revertModeSwitch(parser);
    }
 
-   public int getMode()
+   public TeXMode getMode()
    {
       return mode;
    }
@@ -145,9 +179,9 @@ public class MathDeclaration extends Declaration
       return true;
    }
 
-   private int orgMode;
+   private TeXMode orgMode;
 
-   private int mode = TeXSettings.MODE_INLINE_MATH;
+   private TeXMode mode = TeXMode.INLINE_MATH;
 
    private boolean numbered;
 }

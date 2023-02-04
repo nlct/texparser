@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2023 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -16,41 +16,29 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
-package com.dickimawbooks.texparserlib.primitives;
+package com.dickimawbooks.texparserlib;
 
 import java.io.IOException;
-import java.io.EOFException;
 
-import com.dickimawbooks.texparserlib.*;
-
-public class DisplayStyle extends Primitive
+public enum TeXMode
 {
-   public DisplayStyle()
+   INHERIT(-1), TEXT(0), INLINE_MATH(1), DISPLAY_MATH(2);
+
+   TeXMode(int id)
    {
-      this("displaystyle");
+      this.id = id;
    }
 
-   public DisplayStyle(String name)
+   public int getValue()
    {
-      super(name);
+      return id;
    }
 
-   public Object clone()
+   public static boolean isMath(TeXMode mode)
    {
-      return new DisplayStyle(getName());
+      return (mode == INLINE_MATH || mode == DISPLAY_MATH);
    }
 
-   public void process(TeXParser parser, TeXObjectList stack)
-      throws IOException
-   {
-      process(parser);
-   }
-
-   public void process(TeXParser parser)
-      throws IOException
-   {
-      TeXSettings settings = parser.getSettings();
-
-      settings.setMode(TeXMode.DISPLAY_MATH);
-   }
+   private final int id;
 }
+

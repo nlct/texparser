@@ -35,12 +35,24 @@ public class L2HMathDeclaration extends MathDeclaration
       super(name);
    }
 
+   @Deprecated
    public L2HMathDeclaration(String name, int mode)
    {
       super(name, mode);
    }
 
+   @Deprecated
    public L2HMathDeclaration(String name, int mode, boolean numbered)
+   {
+      super(name, mode, numbered);
+   }
+
+   public L2HMathDeclaration(String name, TeXMode mode)
+   {
+      super(name, mode);
+   }
+
+   public L2HMathDeclaration(String name, TeXMode mode, boolean numbered)
    {
       super(name, mode, numbered);
    }
@@ -140,7 +152,7 @@ public class L2HMathDeclaration extends MathDeclaration
 
       if (listener.useMathJax())
       {
-         if (getMode() == TeXSettings.MODE_DISPLAY_MATH)
+         if (getMode() == TeXMode.DISPLAY_MATH)
          {
             stack.push(new HtmlTag(listener.mathJaxStartDisplay()));
          }
@@ -164,7 +176,7 @@ public class L2HMathDeclaration extends MathDeclaration
          stack.push(elem);
       }
 
-      if (getMode() == TeXSettings.MODE_DISPLAY_MATH)
+      if (getMode() == TeXMode.DISPLAY_MATH)
       {
          if (label == null)
          {
@@ -267,7 +279,7 @@ public class L2HMathDeclaration extends MathDeclaration
 
       if (listener.useMathJax())
       {
-         if (getMode() == TeXSettings.MODE_DISPLAY_MATH)
+         if (getMode() == TeXMode.DISPLAY_MATH)
          {
             parser.push(new HtmlTag(listener.mathJaxStartDisplay()));
          }
@@ -286,7 +298,7 @@ public class L2HMathDeclaration extends MathDeclaration
          parser.push(new HtmlTag("<span class=\"eqno\">"));
       }
 
-      if (getMode() == TeXSettings.MODE_DISPLAY_MATH)
+      if (getMode() == TeXMode.DISPLAY_MATH)
       {
          if (label == null)
          {
@@ -309,7 +321,7 @@ public class L2HMathDeclaration extends MathDeclaration
 
       if (listener.useMathJax())
       {
-         if (getMode() == TeXSettings.MODE_DISPLAY_MATH)
+         if (getMode() == TeXMode.DISPLAY_MATH)
          {
             listener.writeliteral(listener.mathJaxEndDisplay());
          }
@@ -319,7 +331,7 @@ public class L2HMathDeclaration extends MathDeclaration
          }
       }
 
-      if (getMode() == TeXSettings.MODE_DISPLAY_MATH)
+      if (getMode() == TeXMode.DISPLAY_MATH)
       {
          listener.writeliteral("</div>");
       }

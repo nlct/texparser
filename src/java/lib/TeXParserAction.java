@@ -22,6 +22,6 @@ import java.io.IOException;
 
 public enum TeXParserAction
 {
-   INPUT_FILE;
+   INPUT_FILE, MODE_CHANGE;
 }
 

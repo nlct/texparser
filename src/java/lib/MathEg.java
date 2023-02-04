@@ -53,7 +53,7 @@ public class MathEg extends EgChar implements Expandable
    {
       TeXObjectList list = new TeXObjectList(1);
       list.add(this);
-      parser.getSettings().setMode(TeXSettings.INHERIT);
+      parser.getSettings().setMode(TeXMode.INHERIT);
       parser.endGroup();
 
       return list;

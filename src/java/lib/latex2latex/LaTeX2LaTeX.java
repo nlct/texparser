@@ -95,22 +95,22 @@ public class LaTeX2LaTeX extends LaTeXParserListener
       putControlSequence(new EndDeclaration(")", begMathDecl));
 
       L2LMathDeclaration begDispDecl =
-         new L2LMathDeclaration("[", TeXSettings.MODE_DISPLAY_MATH);
+         new L2LMathDeclaration("[", TeXMode.DISPLAY_MATH);
 
       putControlSequence(begDispDecl);
       putControlSequence(new EndDeclaration("]", begDispDecl));
 
       putControlSequence(
-         new L2LMathDeclaration("displaymath", TeXSettings.MODE_DISPLAY_MATH));
+         new L2LMathDeclaration("displaymath", TeXMode.DISPLAY_MATH));
       putControlSequence(
-         new L2LMathDeclaration("equation", TeXSettings.MODE_DISPLAY_MATH, true));
+         new L2LMathDeclaration("equation", TeXMode.DISPLAY_MATH, true));
       putControlSequence(
-         new L2LMathDeclaration("equation*", TeXSettings.MODE_DISPLAY_MATH));
+         new L2LMathDeclaration("equation*", TeXMode.DISPLAY_MATH));
 
       putControlSequence(
-         new L2LMathDeclaration("align", TeXSettings.MODE_DISPLAY_MATH, true));
+         new L2LMathDeclaration("align", TeXMode.DISPLAY_MATH, true));
       putControlSequence(
-         new L2LMathDeclaration("align*", TeXSettings.MODE_DISPLAY_MATH));
+         new L2LMathDeclaration("align*", TeXMode.DISPLAY_MATH));
 
       putControlSequence(new L2LBibliography());
       putControlSequence(new L2LVerbatim());

@@ -27,12 +27,12 @@ public class L2HEqnarray extends L2HMathDeclaration
 {
    public L2HEqnarray()
    {
-      super("eqnarray", TeXSettings.MODE_DISPLAY_MATH, true);
+      super("eqnarray", TeXMode.DISPLAY_MATH, true);
    }
 
    public L2HEqnarray(String name, boolean numbered)
    {
-      super(name, TeXSettings.MODE_DISPLAY_MATH, numbered);
+      super(name, TeXMode.DISPLAY_MATH, numbered);
    }
 
    public Object clone()

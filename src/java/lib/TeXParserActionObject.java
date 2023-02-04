@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2022 Nicola L.C. Talbot
+    Copyright (C) 2022-2023 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -78,6 +78,11 @@ public class TeXParserActionObject extends AbstractTeXObject
       }
 
       return new TeXParserActionObject(TeXParserAction.INPUT_FILE, stack, file);
+   }
+
+   public static TeXParserActionObject createModeChangeAction(TeXMode mode)
+   {
+      return new TeXParserActionObject(TeXParserAction.MODE_CHANGE, null, mode);
    }
 
    @Override

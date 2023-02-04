@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013-2022 Nicola L.C. Talbot
+    Copyright (C) 2013-2023 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -38,5 +38,6 @@ public class AmsmathSty extends LaTeXSty
    {
       registerControlSequence(new Align());
       registerControlSequence(new Align("align*", false));
+      registerControlSequence(new Text());
    }
 }

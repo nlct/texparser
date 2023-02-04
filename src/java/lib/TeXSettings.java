@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013-2020 Nicola L.C. Talbot
+    Copyright (C) 2013-2023 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -71,18 +71,18 @@ public class TeXSettings
       return afterGroup;
    }
 
-   public int getCurrentMode()
+   public TeXMode getCurrentMode()
    {
       return currentMode;
    }
 
-   public int getMode()
+   public TeXMode getMode()
    {
-      if (currentMode == INHERIT)
+      if (currentMode == TeXMode.INHERIT)
       {
          if (parent == null)
          {
-            return MODE_TEXT;
+            return TeXMode.TEXT;
          }
 
          return parent.getMode();
@@ -91,19 +91,35 @@ public class TeXSettings
       return currentMode;
    }
 
+   @Deprecated
    public void setMode(int setting)
    {
-      if (setting == INHERIT
-       || setting == MODE_TEXT
-       || setting == MODE_INLINE_MATH
-       || setting == MODE_DISPLAY_MATH)
+      if (setting == INHERIT)
       {
-         currentMode = setting;
-         return;
+         currentMode = TeXMode.INHERIT;
       }
+      else if (setting == MODE_TEXT)
+      {
+         currentMode = TeXMode.TEXT;
+      }
+      else if (setting == MODE_INLINE_MATH)
+      {
+         currentMode = TeXMode.INLINE_MATH;
+      }
+      else if (setting == MODE_DISPLAY_MATH)
+      {
+         currentMode = TeXMode.DISPLAY_MATH;
+      }
+      else
+      {
+         throw new IllegalArgumentException(String.format(
+             "Invalid argument '%d' for setMode(int)", setting));
+      }
+   }
 
-      throw new IllegalArgumentException(String.format(
-          "Invalid argument '%d' for setMode(int)", setting));
+   public void setMode(TeXMode setting)
+   {
+      currentMode = setting;
    }
 
    public int getCurrentCharMapMode()
@@ -1800,7 +1816,7 @@ public class TeXSettings
 
       switch (getMode())
       {
-         case MODE_TEXT :
+         case TEXT :
 
            if (charCode == (int)'\'')
            {
@@ -1809,8 +1825,8 @@ public class TeXSettings
 
            return FontEncoding.CHAR_MAP_NONE;
 
-         case MODE_INLINE_MATH:
-         case MODE_DISPLAY_MATH:
+         case INLINE_MATH:
+         case DISPLAY_MATH:
 
             if (charCode == (int)'-')
             {
@@ -3089,7 +3105,7 @@ public class TeXSettings
    private TeXDimension currentParSkip = null;
    private TeXDimension currentHangIndent = null;
 
-   private int currentMode = INHERIT;
+   private TeXMode currentMode = TeXMode.INHERIT;
 
    private int currentCharMapMode = INHERIT;
 

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2023 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -16,41 +16,55 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
-package com.dickimawbooks.texparserlib.primitives;
+package com.dickimawbooks.texparserlib.latex.amsmath;
 
 import java.io.IOException;
-import java.io.EOFException;
 
 import com.dickimawbooks.texparserlib.*;
 
-public class DisplayStyle extends Primitive
+public class Text extends ControlSequence
 {
-   public DisplayStyle()
+   public Text()
    {
-      this("displaystyle");
+      this("text");
    }
 
-   public DisplayStyle(String name)
+   public Text(String name)
    {
       super(name);
    }
 
+   @Override
    public Object clone()
    {
-      return new DisplayStyle(getName());
+      return new Text(getName());
    }
 
-   public void process(TeXParser parser, TeXObjectList stack)
-      throws IOException
+   @Override
+   public void process(TeXParser parser) throws IOException
    {
-      process(parser);
+      process(parser, parser);
    }
 
-   public void process(TeXParser parser)
-      throws IOException
+   @Override
+   public void process(TeXParser parser, TeXObjectList stack) throws IOException
    {
-      TeXSettings settings = parser.getSettings();
+      TeXObject arg = popArg(parser, stack);
 
-      settings.setMode(TeXMode.DISPLAY_MATH);
+      Group grp = parser.getListener().createGroup();
+
+      grp.add(TeXParserActionObject.createModeChangeAction(TeXMode.TEXT));
+
+      if (parser.isStack(arg))
+      {
+         grp.addAll((TeXObjectList)arg);
+      }
+      else
+      {
+         grp.add(arg);
+      }
+
+      TeXParserUtils.process(grp, parser, stack);
    }
+
 }

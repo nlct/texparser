@@ -55,7 +55,7 @@ public class MathBg extends BgChar implements Expandable
       list.add(this);
       parser.startGroup();
       parser.getSettings().setMode(
-        isInLine() ? TeXSettings.MODE_INLINE_MATH : TeXSettings.MODE_DISPLAY_MATH);
+        isInLine() ? TeXMode.INLINE_MATH : TeXMode.DISPLAY_MATH);
 
       return list;
    }

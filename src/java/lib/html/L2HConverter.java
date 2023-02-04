@@ -206,14 +206,14 @@ public class L2HConverter extends LaTeXParserListener
       parser.putControlSequence(begMathDecl);
       parser.putControlSequence(new EndDeclaration(")", begMathDecl));
       parser.putControlSequence(
-         new L2HMathDeclaration("displaymath", TeXSettings.MODE_DISPLAY_MATH));
+         new L2HMathDeclaration("displaymath", TeXMode.DISPLAY_MATH));
 
-      MathDeclaration begDispDecl = new L2HMathDeclaration("[", TeXSettings.MODE_DISPLAY_MATH);
+      MathDeclaration begDispDecl = new L2HMathDeclaration("[", TeXMode.DISPLAY_MATH);
 
       parser.putControlSequence(begDispDecl);
       parser.putControlSequence(new EndDeclaration("]", begDispDecl));
       parser.putControlSequence(
-         new L2HMathDeclaration("equation", TeXSettings.MODE_DISPLAY_MATH, true));
+         new L2HMathDeclaration("equation", TeXMode.DISPLAY_MATH, true));
 
       parser.putControlSequence(new L2HTabular());
       parser.putControlSequence(new L2HTabular("array"));

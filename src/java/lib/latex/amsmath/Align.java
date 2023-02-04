@@ -32,10 +32,16 @@ public class Align extends MathDeclaration
 
    public Align(String name, boolean numbered)
    {
-      this(name, TeXSettings.MODE_DISPLAY_MATH, numbered);
+      this(name, TeXMode.DISPLAY_MATH, numbered);
    }
 
+   @Deprecated
    public Align(String name, int mode, boolean numbered)
+   {
+      super(name, mode, numbered);
+   }
+
+   public Align(String name, TeXMode mode, boolean numbered)
    {
       super(name, mode, numbered);
    }

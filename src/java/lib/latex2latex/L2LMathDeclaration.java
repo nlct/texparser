@@ -35,12 +35,24 @@ public class L2LMathDeclaration extends MathDeclaration
       super(name);
    }
 
+   @Deprecated
    public L2LMathDeclaration(String name, int mode)
    {
       super(name, mode);
    }
 
+   @Deprecated
    public L2LMathDeclaration(String name, int mode, boolean numbered)
+   {
+      super(name, mode, numbered);
+   }
+
+   public L2LMathDeclaration(String name, TeXMode mode)
+   {
+      super(name, mode);
+   }
+
+   public L2LMathDeclaration(String name, TeXMode mode, boolean numbered)
    {
       super(name, mode, numbered);
    }

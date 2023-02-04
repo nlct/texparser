@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013-2021 Nicola L.C. Talbot
+    Copyright (C) 2013-2023 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -1952,10 +1952,33 @@ public class TeXParser extends TeXObjectList
    public void parse(TeXReader reader)
      throws IOException
    {
-      parse(reader, TeXSettings.INHERIT);
+      parse(reader, TeXMode.INHERIT);
    }
 
+   @Deprecated
    public void parse(TeXReader reader, int mode)
+     throws IOException
+   {
+      switch (mode)
+      {
+         case TeXSettings.INHERIT:
+            parse(reader, TeXMode.INHERIT);
+         break;
+         case TeXSettings.MODE_TEXT:
+            parse(reader, TeXMode.TEXT);
+         break;
+         case TeXSettings.MODE_INLINE_MATH:
+            parse(reader, TeXMode.INLINE_MATH);
+         break;
+         case TeXSettings.MODE_DISPLAY_MATH:
+            parse(reader, TeXMode.DISPLAY_MATH);
+         break;
+         default:
+            throw new IllegalArgumentException("Invalid mode "+mode);
+      }
+   }
+
+   public void parse(TeXReader reader, TeXMode mode)
      throws IOException
    {
       if (reader != this.reader)
@@ -2201,6 +2224,9 @@ public class TeXParser extends TeXObjectList
       {
          case INPUT_FILE:
            parse(obj.getFile(), currentInputCharset, obj.getPending());
+         break;
+         case MODE_CHANGE:
+           settings.setMode((TeXMode)obj.getData());
          break;
       }
    }
@@ -3038,7 +3064,7 @@ public class TeXParser extends TeXObjectList
 
    public boolean isMathMode()
    {
-      return settings.getMode() != TeXSettings.MODE_TEXT;
+      return TeXMode.isMath(settings.getMode());
    }
 
    public void putControlSequence(ControlSequence cs)
@@ -3693,6 +3719,6 @@ public class TeXParser extends TeXObjectList
    public static final int DEBUG_EXPANSION_ONCE = 4096;
    public static final int DEBUG_EXPANSION_ONCE_LIST = 8192;
 
-   public static final String VERSION = "0.9.2.9b";
-   public static final String VERSION_DATE = "2022-11-24";
+   public static final String VERSION = "0.9.3b";
+   public static final String VERSION_DATE = "2023-02-04";
 }

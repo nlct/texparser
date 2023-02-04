@@ -735,14 +735,14 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       parser.putControlSequence(begMathDecl);
       parser.putControlSequence(new EndDeclaration(")", begMathDecl));
       parser.putControlSequence(
-         new MathDeclaration("displaymath", TeXSettings.MODE_DISPLAY_MATH));
+         new MathDeclaration("displaymath", TeXMode.DISPLAY_MATH));
 
-      MathDeclaration begDispDecl = new MathDeclaration("[", TeXSettings.MODE_DISPLAY_MATH);
+      MathDeclaration begDispDecl = new MathDeclaration("[", TeXMode.DISPLAY_MATH);
 
       parser.putControlSequence(begDispDecl);
       parser.putControlSequence(new EndDeclaration("]", begDispDecl));
       parser.putControlSequence(
-         new MathDeclaration("equation", TeXSettings.MODE_DISPLAY_MATH, true));
+         new MathDeclaration("equation", TeXMode.DISPLAY_MATH, true));
 
       // Math font commands
 

@@ -83,13 +83,13 @@ public class L2HMathGroup extends MathGroup
 
       if (!isInLine())
       {
-         parser.getSettings().setMode(TeXSettings.MODE_DISPLAY_MATH);
+         parser.getSettings().setMode(TeXMode.DISPLAY_MATH);
 
          listener.writeliteral("<div class=\"displaymath\">");
       }
       else
       {
-         parser.getSettings().setMode(TeXSettings.MODE_INLINE_MATH);
+         parser.getSettings().setMode(TeXMode.INLINE_MATH);
       }
 
       if (listener.useMathJax())

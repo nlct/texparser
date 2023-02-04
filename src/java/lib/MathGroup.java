@@ -105,8 +105,8 @@ public class MathGroup extends Group
 
       TeXSettings settings = parser.getSettings();
 
-      settings.setMode(isinline ? TeXSettings.MODE_INLINE_MATH :
-         TeXSettings.MODE_DISPLAY_MATH);
+      settings.setMode(isinline ? TeXMode.INLINE_MATH :
+         TeXMode.DISPLAY_MATH);
    }
 
    @Override

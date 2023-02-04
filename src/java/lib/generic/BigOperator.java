@@ -54,10 +54,10 @@ public class BigOperator extends MathSymbol
 
       switch (settings.getMode())
       {
-         case TeXSettings.MODE_INLINE_MATH:
+         case INLINE_MATH:
             cp = getCharCode();
          break;
-         case TeXSettings.MODE_DISPLAY_MATH:
+         case DISPLAY_MATH:
             cp = dispCodePoint;
          break;
          default:

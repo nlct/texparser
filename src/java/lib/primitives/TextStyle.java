@@ -51,6 +51,6 @@ public class TextStyle extends Primitive
    {
       TeXSettings settings = parser.getSettings();
 
-      settings.setMode(TeXSettings.MODE_INLINE_MATH);
+      settings.setMode(TeXMode.INLINE_MATH);
    }
 }
