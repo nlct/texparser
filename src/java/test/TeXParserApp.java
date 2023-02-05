@@ -1128,6 +1128,7 @@ public class TeXParserApp implements TeXApp
       System.out.println(getMessage("syntax.timeout", "--timeout"));
       System.out.println(getMessage("syntax.debug", "--debug"));
       System.out.println(getMessage("syntax.nodebug", "--nodebug"));
+      System.out.println(getMessage("syntax.debug-mode", "--debug-mode"));
       System.out.println(getMessage("syntax.log", "--log"));
       System.out.println(getMessage("syntax.nolog", "--nolog"));
       System.out.println();
@@ -1144,7 +1145,7 @@ public class TeXParserApp implements TeXApp
       System.out.println(getMessage("syntax.html.options"));
       System.out.println();
       System.out.println(getMessage("syntax.head", "--head"));
-      System.out.println(getMessage("syntax.mathjax", "--mathjax"));
+      System.out.println(getMessage("syntax.mathjax", "--[no]mathjax"));
       System.out.println(getMessage("syntax.entities", "--entities"));
       System.out.println();
       System.out.println(getMessage("syntax.bugreport", 
@@ -1731,9 +1732,9 @@ public class TeXParserApp implements TeXApp
 
    // TeXParser class now has its own version and date.
    // As from 0.9.2.2b these now refer to the test application only.
-   public static final String APP_VERSION = "0.9.2.5b";
+   public static final String APP_VERSION = "0.9.2.6b";
    public static final String APP_NAME = "texparsertest";
-   public static final String APP_DATE = "2022-11-02";
+   public static final String APP_DATE = "2023-02-05";
 
    public static long MAX_PROCESS_TIME=0L;
 
