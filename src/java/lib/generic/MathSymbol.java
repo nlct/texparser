@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2023 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -30,6 +30,7 @@ public class MathSymbol extends Symbol
       super(name, codePoint);
    }
 
+   @Override
    public Object clone()
    {
       return new MathSymbol(getName(), getCharCode());
@@ -41,12 +42,14 @@ public class MathSymbol extends Symbol
       return false;
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser)
      throws IOException
    {
       return null;
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser,
       TeXObjectList stack)
      throws IOException
@@ -54,11 +57,13 @@ public class MathSymbol extends Symbol
       return null;
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser) throws IOException
    {
       return null;
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser, TeXObjectList stack) 
       throws IOException
    {

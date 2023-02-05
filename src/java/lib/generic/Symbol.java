@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013-2020 Nicola L.C. Talbot
+    Copyright (C) 2013-2023 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -31,11 +31,13 @@ public class Symbol extends ControlSequence implements Expandable,CaseChangeable
       this.codePoint = codePoint;
    }
 
+   @Override
    public Object clone()
    {
       return new Symbol(getName(), codePoint);
    }
 
+   @Override
    public boolean equals(Object other)
    {
       if (this == other) return true;
@@ -45,6 +47,7 @@ public class Symbol extends ControlSequence implements Expandable,CaseChangeable
       return codePoint == ((Symbol)other).codePoint;
    }
 
+   @Override
    public TeXObject toLowerCase(TeXParser parser)
    {
       if (!(Character.isUpperCase(codePoint)
@@ -56,6 +59,7 @@ public class Symbol extends ControlSequence implements Expandable,CaseChangeable
       return parser.getListener().getOther(Character.toLowerCase(codePoint));
    }
 
+   @Override
    public TeXObject toUpperCase(TeXParser parser)
    {
       if (!Character.isLowerCase(codePoint))
@@ -72,6 +76,7 @@ public class Symbol extends ControlSequence implements Expandable,CaseChangeable
       return true;
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser)
      throws IOException
    {
@@ -83,6 +88,7 @@ public class Symbol extends ControlSequence implements Expandable,CaseChangeable
       return list;
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser,
       TeXObjectList stack)
      throws IOException
@@ -90,12 +96,14 @@ public class Symbol extends ControlSequence implements Expandable,CaseChangeable
       return expandonce(parser);
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser)
      throws IOException
    {
       return expandonce(parser);
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser,
       TeXObjectList stack)
      throws IOException
@@ -114,11 +122,13 @@ public class Symbol extends ControlSequence implements Expandable,CaseChangeable
       listener.getWriteable().writeCodePoint(c == -1 ? codePoint : c);
    }
 
+   @Override
    public void process(TeXParser parser) throws IOException
    {
       write(parser);
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack) throws IOException
    {
       process(parser);
