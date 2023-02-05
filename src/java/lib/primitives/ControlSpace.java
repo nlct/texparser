@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2023 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -35,17 +35,20 @@ public class ControlSpace extends Primitive
       super(name);
    }
 
+   @Override
    public Object clone()
    {
       return new ControlSpace(getName());
    }
 
+   @Override
    public void process(TeXParser parser)
       throws IOException
    {
       parser.getListener().getWriteable().write(' ');
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack)
       throws IOException
    {

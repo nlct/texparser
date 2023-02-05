@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2023 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -35,11 +35,13 @@ public class AboveWithDelims extends MidControlSequence
       super(name);
    }
 
+   @Override
    public Object clone()
    {
       return new AboveWithDelims(getName());
    }
 
+   @Override
    public void process(TeXParser parser, 
       TeXObjectList before, TeXObjectList following)
       throws IOException
