@@ -82,6 +82,8 @@ public class End extends ControlSequence
          throw new LaTeXSyntaxException(parser, 
              LaTeXSyntaxException.ERROR_EXTRA_END, name);
       }
+
+      endHook(name, parser, stack);
    }
 
    @Override
@@ -117,4 +119,13 @@ public class End extends ControlSequence
          }
       }
    }
+
+   /**
+    * Hook performed after scope ends.
+    */ 
+   protected void endHook(String name, TeXParser parser, TeXObjectList stack)
+     throws IOException
+   {
+   }
+
 }
