@@ -27,7 +27,7 @@ public class Align extends MathDeclaration
 {
    public Align()
    {
-      this("align", TeXSettings.MODE_DISPLAY_MATH, true);
+      this("align", TeXMode.DISPLAY_MATH, true);
    }
 
    public Align(String name, boolean numbered)
@@ -36,9 +36,9 @@ public class Align extends MathDeclaration
    }
 
    @Deprecated
-   public Align(String name, int mode, boolean numbered)
+   public Align(String name, int modeId, boolean numbered)
    {
-      super(name, mode, numbered);
+      super(name, modeId, numbered);
    }
 
    public Align(String name, TeXMode mode, boolean numbered)
