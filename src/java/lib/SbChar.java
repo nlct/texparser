@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2023 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -26,21 +26,25 @@ public class SbChar extends Macro
    {
    }
 
+   @Override
    public Object clone()
    {
       return new SbChar();
    }
 
+   @Override
    public String toString(TeXParser parser)
    {
       return new String(Character.toChars(parser.getSbChar()));
    }
 
+   @Override
    public String format()
    {
       return "_";
    }
 
+   @Override
    public TeXObjectList string(TeXParser parser)
      throws IOException
    {
@@ -50,6 +54,7 @@ public class SbChar extends Macro
       return list;
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
@@ -69,6 +74,7 @@ public class SbChar extends Macro
       parser.getListener().subscript(object);
    }
 
+   @Override
    public void process(TeXParser parser)
      throws IOException
    {
@@ -87,7 +93,6 @@ public class SbChar extends Macro
 
       parser.getListener().subscript(object);
    }
-
 
    public String show(TeXParser parser)
     throws IOException
