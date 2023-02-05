@@ -40,6 +40,21 @@ There is NO WARRANTY, to the extent permitted by law.</entry>
 <entry key="syntax.help">{0} (or {1})			Print this help message and exit.</entry>
 <entry key="syntax.debug">{0} [&lt;level&gt;]			Switch on debug mode.</entry>
 <entry key="syntax.nodebug">{0}			Switch off debug mode. (Default.)</entry>
+<entry key="syntax.debug-mode">{0} &lt;value&gt;			Debug verbosity. The value may be an integer or a comma-separated list of keywords:
+	all	Extremely verbose!
+	io	I/O operations
+	popped	Object popped from a stack
+	decl	Declarations
+	sty-data	Package data
+	expansion	Whenever an object is expanded
+	expansion-list	Whenever a list is expanded
+	expansion-once	Whenever an object is expanded once
+	expansion-once-list Whenever a list is expanded once
+	process		Whenever an object is processed
+	process-stack	Whenever a stack is processed
+	cs		Control sequence
+	process-generic-cs	Whenever a GenericCommand is processed
+</entry>
 <entry key="syntax.log">{0} &lt;file&gt;				Set log file.</entry>
 <entry key="syntax.nolog">{0}				Don''t log (default).</entry>
 <entry key="syntax.timeout">{0} &lt;n&gt;			Timeout processes after &lt;n&gt; milliseconds.</entry>
