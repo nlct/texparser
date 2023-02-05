@@ -65,6 +65,10 @@ public class Begin extends ControlSequence
       return new Begin(getName());
    }
 
+   /**
+    * Hook performed after environment name is read but before scope
+    * starts.
+    */ 
    protected void beginHook(String name, TeXParser parser, TeXObjectList stack)
      throws IOException
    {
@@ -162,10 +166,10 @@ public class Begin extends ControlSequence
       }
    }
 
+   @Override
    public void process(TeXParser parser)
      throws IOException
    {
       process(parser, parser);
    }
-
 }
