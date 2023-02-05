@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013-2023 Nicola L.C. Talbot
+    Copyright (C) 2023 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -25,22 +25,17 @@ import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.generic.*;
 import com.dickimawbooks.texparserlib.latex.*;
 
-public class L2HBigOperator extends BigOperator
+public class L2HBinarySymbol extends BinarySymbol
 {
-   public L2HBigOperator(String name, int codePoint)
+   public L2HBinarySymbol(String name, int codePoint)
    {
       super(name, codePoint);
-   }
-
-   public L2HBigOperator(String name, int codePoint, int dispCharCode)
-   {
-      super(name, codePoint, dispCharCode);
    }
 
    @Override
    public Object clone()
    {
-      return new L2HBigOperator(getName(), getCharCode(), getDispCharCode());
+      return new L2HBinarySymbol(getName(), getCharCode());
    }
 
    @Override
@@ -69,7 +64,7 @@ public class L2HBigOperator extends BigOperator
 
       if (listener.useMathJax())
       {
-         // assume all BigOperator objects are supported by MathJax
+         // assume all BinarySymbol objects are supported by MathJax
          listener.write(format());
       }
       else
@@ -86,7 +81,7 @@ public class L2HBigOperator extends BigOperator
 
       if (listener.useMathJax())
       {
-         // assume all BigOperator objects are supported by MathJax
+         // assume all BinarySymbol objects are supported by MathJax
          listener.write(format());
       }
       else

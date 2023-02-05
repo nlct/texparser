@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013-2023 Nicola L.C. Talbot
+    Copyright (C) 2023 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -19,45 +19,53 @@
 package com.dickimawbooks.texparserlib.html;
 
 import java.io.IOException;
-import java.io.Writer;
 
 import com.dickimawbooks.texparserlib.*;
-import com.dickimawbooks.texparserlib.primitives.*;
 
-public class L2HUndefined extends Undefined
+public class L2HMathJaxCommand extends ControlSequence
 {
-   public L2HUndefined()
+   public L2HMathJaxCommand(ControlSequence cs)
    {
-      this("undefined");
+      this(cs, cs.getName());
    }
 
-   public L2HUndefined(String name)
+   public L2HMathJaxCommand(TeXObject object, String name)
    {
-      this(name, UndefAction.ERROR);
+      this(object, name, name);
    }
 
-   public L2HUndefined(String name, UndefAction action)
+   public L2HMathJaxCommand(TeXObject object, String csname, String mathJaxName)
    {
-      super(name, action);
+      super(csname);
+      this.underlying = object;
+      this.mathJaxName = mathJaxName;
    }
 
-   @Deprecated
-   public L2HUndefined(String name, byte actionId)
+   public TeXObject getUnderlying()
    {
-      super(name, actionId);
+      return underlying;
    }
 
    @Override
    public Object clone()
    {
-      return new L2HUndefined(getName(), getAction());
+      return new L2HMathJaxCommand(getUnderlying(), getName(), mathJaxName);
    }
 
    @Override
    public void process(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
-      process(parser);
+      L2HConverter listener = (L2HConverter)parser.getListener();
+
+      if (parser.isMathMode() && listener.useMathJax())
+      {
+         listener.write(String.format("\\%s ", mathJaxName));
+      }
+      else
+      {
+         underlying.process(parser, stack);
+      }
    }
 
    @Override
@@ -68,32 +76,14 @@ public class L2HUndefined extends Undefined
 
       if (parser.isMathMode() && listener.useMathJax())
       {
-         // assume unknown commands occuring in math mode are supported by MathJax
-         listener.write(format());
+         listener.write(String.format("\\%s ", mathJaxName));
       }
       else
       {
-         try
-         {
-            throw new TeXSyntaxException(parser, 
-               TeXSyntaxException.ERROR_UNDEFINED, getName());
-
-         }
-         catch (TeXSyntaxException e)
-         {
-            switch (getAction())
-            {
-               case ERROR:
-                  parser.error(e);
-               break;
-               case WARN:
-                  parser.warning(e);
-               break;
-               case MESSAGE:
-                  parser.message(e);
-               break;
-            }
-         }
+         underlying.process(parser);
       }
    }
+
+   protected TeXObject underlying;
+   protected String mathJaxName;
 }

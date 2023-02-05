@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013-2022 Nicola L.C. Talbot
+    Copyright (C) 2013-2023 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -343,6 +343,18 @@ public class L2HConverter extends LaTeXParserListener
    }
 
    @Override
+   public BinarySymbol createBinarySymbol(String name, int code)
+   {
+      return new L2HBinarySymbol(name, code);
+   }
+
+   @Override
+   public GreekSymbol createGreekSymbol(String name, int code)
+   {
+      return new L2HGreekSymbol(name, code);
+   }
+
+   @Override
    public Letter getLetter(int charCode)
    {
       return new L2HLetter(charCode);
@@ -376,6 +388,18 @@ public class L2HConverter extends LaTeXParserListener
    public TeXObject getDivider(String name)
    {
       return new HtmlTag(String.format("<div class=\"%s\"><hr></div>", name));
+   }
+
+   @Override
+   public Group createGroup()
+   {
+      return new L2HGroup();
+   }
+
+   @Override
+   public Group createGroup(String text)
+   {
+      return new L2HGroup(this, text); 
    }
 
    @Override
@@ -1313,6 +1337,64 @@ public class L2HConverter extends LaTeXParserListener
       inPreamble = true;
    }
 
+   /**
+    * Add support for known MathJax commands. This needs to be done
+    * after packages have been loaded to ensure that the original
+    * command is defined. Called by beginDocument(TeXObjectList) if
+    * the useMathJax flag is set. Commands like \abovewithdelims are 
+    * dealt with by the corresponding TeXParserListener method.
+    * Known symbol commands defined as the wrapper classes, such as
+    * L2HMathSymbol, are dealt with by the sub-class.
+    * Unknown commands will be dealt with by L2HUndefined.
+    */
+   protected void addMathJaxCommands()
+   {
+      // \begin and \end currently not implemented
+      //putControlSequence(new L2HBegin());
+      //putControlSequence(new L2HEnd());
+
+      putControlSequence(new L2HMathJaxCommand(getControlSequence("textstyle")));
+      putControlSequence(new L2HMathJaxCommand(getControlSequence("displaystyle")));
+
+      putControlSequence(new L2HMathJaxCommand(getControlSequence("text")));
+      putControlSequence(new L2HMathJaxCommand(getControlSequence("mbox")));
+      putControlSequence(new L2HMathJaxCommand(getControlSequence("textrm")));
+      putControlSequence(new L2HMathJaxCommand(getControlSequence("textsf")));
+      putControlSequence(new L2HMathJaxCommand(getControlSequence("texttt")));
+      putControlSequence(new L2HMathJaxCommand(getControlSequence("textbf")));
+      putControlSequence(new L2HMathJaxCommand(getControlSequence("textmd")));
+      putControlSequence(new L2HMathJaxCommand(getControlSequence("textit")));
+      putControlSequence(new L2HMathJaxCommand(getControlSequence("textsl")));
+      putControlSequence(new L2HMathJaxCommand(getControlSequence("textup")));
+      putControlSequence(new L2HMathJaxCommand(getControlSequence("textsc")));
+
+      putControlSequence(new L2HMathJaxCommand(getControlSequence("mathrm")));
+      putControlSequence(new L2HMathJaxCommand(getControlSequence("mathsf")));
+      putControlSequence(new L2HMathJaxCommand(getControlSequence("mathtt")));
+      putControlSequence(new L2HMathJaxCommand(getControlSequence("mathit")));
+      putControlSequence(new L2HMathJaxCommand(getControlSequence("mathbf")));
+      putControlSequence(new L2HMathJaxCommand(getControlSequence("mathcal")));
+      putControlSequence(new L2HMathJaxCommand(getControlSequence("mathbb")));
+      putControlSequence(new L2HMathJaxCommand(getControlSequence("mathfrak")));
+      putControlSequence(new L2HMathJaxCommand(getControlSequence("boldsymbol")));
+      putControlSequence(new L2HMathJaxCommand(getControlSequence("pmb")));
+
+      putControlSequence(new L2HMathJaxCommand(getControlSequence(" ")));
+      putControlSequence(new L2HMathJaxCommand(getControlSequence("_")));
+      putControlSequence(new L2HMathJaxCommand(getControlSequence(",")));
+      putControlSequence(new L2HMathJaxCommand(getControlSequence(";")));
+      putControlSequence(new L2HMathJaxCommand(getControlSequence(":")));
+      putControlSequence(new L2HMathJaxCommand(getControlSequence("!")));
+      putControlSequence(new L2HMathJaxCommand(getControlSequence("{")));
+      putControlSequence(new L2HMathJaxCommand(getControlSequence("}")));
+      putControlSequence(new L2HMathJaxCommand(getControlSequence("&")));
+      putControlSequence(new L2HMathJaxCommand(getControlSequence("#")));
+      putControlSequence(new L2HMathJaxCommand(getControlSequence("%")));
+      putControlSequence(new L2HMathJaxCommand(getControlSequence(">")));
+      putControlSequence(new L2HMathJaxCommand(getControlSequence("|")));
+      putControlSequence(new L2HMathJaxCommand(getControlSequence("$")));
+   }
+
    @Override
    public void beginDocument(TeXObjectList stack)
      throws IOException
@@ -1358,6 +1440,11 @@ public class L2HConverter extends LaTeXParserListener
       writeliteralln(">");
 
       super.beginDocument(stack);
+
+      if (useMathJax())
+      {
+         addMathJaxCommands();
+      }
 
       writeliteralln("<div id=\"main\">");
 

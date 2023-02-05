@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2023 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -32,31 +32,13 @@ public class L2HMathSymbol extends MathSymbol
       super(name, codePoint);
    }
 
+   @Override
    public Object clone()
    {
       return new L2HMathSymbol(getName(), getCharCode());
    }
 
-   public void process(TeXParser parser, TeXObjectList stack)
-   throws IOException
-   {
-      L2HConverter listener = (L2HConverter)parser.getListener();
-
-      if (listener.useMathJax() && !listener.isStyControlSequence(this))
-      {
-         listener.write(toString(parser));
-
-         if (isControlWord(parser))
-         {
-            listener.write(' ');
-         }
-      }
-      else
-      {
-         write(parser);
-      }
-   }
-
+   @Override
    public TeXObjectList expandonce(TeXParser parser)
      throws IOException
    {
@@ -65,23 +47,46 @@ public class L2HMathSymbol extends MathSymbol
       return listener.useMathJax() ? null : super.expandonce(parser);
    }
 
+   @Override
+   public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
+     throws IOException
+   {
+      L2HConverter listener = (L2HConverter)parser.getListener();
+
+      return listener.useMathJax() ? null : super.expandonce(parser, stack);
+   }
+
+   @Override
+   public void process(TeXParser parser, TeXObjectList stack)
+   throws IOException
+   {
+      L2HConverter listener = (L2HConverter)parser.getListener();
+
+      if (listener.useMathJax())
+      {
+         // assume all MathSymbol objects are supported by MathJax
+         listener.write(format());
+      }
+      else
+      {
+         super.process(parser, stack);
+      }
+   }
+
+   @Override
    public void process(TeXParser parser)
    throws IOException
    {
       L2HConverter listener = (L2HConverter)parser.getListener();
 
-      if (listener.useMathJax() && !listener.isStyControlSequence(this))
+      if (listener.useMathJax())
       {
-         listener.write(toString(parser));
-
-         if (isControlWord(parser))
-         {
-            listener.write(' ');
-         }
+         // assume all MathSymbol objects are supported by MathJax
+         listener.write(format());
       }
       else
       {
-         write(parser);
+         super.process(parser);
       }
    }
 

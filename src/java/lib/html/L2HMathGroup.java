@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2023 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -62,15 +62,7 @@ public class L2HMathGroup extends MathGroup
             break;
          }
 
-         if (listener.useMathJax() && object instanceof ControlSequence
-         && !listener.isStyControlSequence((ControlSequence)object))
-         {
-            listener.write(object.format());
-         }
-         else
-         {
-            object.process(parser, this);
-         }
+         object.process(parser, this);
       }
    }
 
