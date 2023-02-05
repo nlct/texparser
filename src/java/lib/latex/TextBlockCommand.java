@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2023 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -27,18 +27,31 @@ public class TextBlockCommand extends ControlSequence
 {
    public TextBlockCommand(String name, Declaration declaration)
    {
+      this(name, declaration, TeXMode.INHERIT);
+   }
+
+   public TextBlockCommand(String name, Declaration declaration, TeXMode mode)
+   {
       super(name);
       this.declaration = declaration;
+      this.mode = mode;
    }
 
+   @Override
    public Object clone()
    {
-      return new TextBlockCommand(getName(), (Declaration)declaration.clone());
+      return new TextBlockCommand(getName(), (Declaration)declaration.clone(), mode);
    }
 
+   @Override
    public void process(TeXParser parser) throws IOException
    {
       Group grp = parser.getListener().createGroup();
+
+      if (mode != TeXMode.INHERIT)
+      {
+         grp.add(TeXParserActionObject.createModeChangeAction(mode));
+      }
 
       grp.add(declaration);
       String argTypes = declaration.getArgTypes();
@@ -79,6 +92,7 @@ public class TextBlockCommand extends ControlSequence
       grp.process(parser);
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack) throws IOException
    {
       Group grp = parser.getListener().createGroup();
@@ -124,4 +138,5 @@ public class TextBlockCommand extends ControlSequence
    }
 
    private Declaration declaration;
+   private TeXMode mode;
 }

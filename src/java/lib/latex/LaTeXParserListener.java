@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013-2022 Nicola L.C. Talbot
+    Copyright (C) 2013-2023 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -1160,12 +1160,18 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
         new LaTeXGenericEnvironment(name, cs, endDefinition));
    }
 
+   protected TextBlockCommand createTextBlockCommand(String textblockName,
+    Declaration decl)
+   {
+      return new TextBlockCommand(textblockName, decl, TeXMode.TEXT);
+   }
+
    private void addFontWeightDeclaration(
        String declName, String textblockName, TeXFontWeight weight)
    {
       Declaration decl = getFontWeightDeclaration(declName, weight);
       parser.putControlSequence(decl);
-      parser.putControlSequence(new TextBlockCommand(textblockName, decl));
+      parser.putControlSequence(createTextBlockCommand(textblockName, decl));
    }
 
    private void addFontShapeDeclaration(
@@ -1173,7 +1179,7 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
    {
       Declaration decl = getFontShapeDeclaration(declName, shape);
       parser.putControlSequence(decl);
-      parser.putControlSequence(new TextBlockCommand(textblockName, decl));
+      parser.putControlSequence(createTextBlockCommand(textblockName, decl));
    }
 
    private void addFontSizeDeclaration(String name, TeXFontSize size)
@@ -1186,7 +1192,7 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
    {
       Declaration decl =  getFontFamilyDeclaration(declName, family);
       parser.putControlSequence(decl);
-      parser.putControlSequence(new TextBlockCommand(textblockName, decl));
+      parser.putControlSequence(createTextBlockCommand(textblockName, decl));
    }
 
    @Override
@@ -1222,7 +1228,7 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       if (name.equals("em"))
       {
          Declaration decl = getFontShapeDeclaration("em", TeXFontShape.EM);
-         putControlSequence(new TextBlockCommand("emph", decl));
+         putControlSequence(createTextBlockCommand("emph", decl));
          return decl;
       }
 
