@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013-2023 Nicola L.C. Talbot
+    Copyright (C) 2023 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -18,36 +18,18 @@
 */
 package com.dickimawbooks.texparserlib;
 
-public class Letter extends CharObject implements CaseChangeable
+import java.io.IOException;
+
+/**
+ * For classes such as Param, DoubleParam, MathBg and MathEg to 
+ * allow multiple tokens to be separated.
+ */
+
+public interface MultiToken extends TeXObject
 {
-   public Letter(int charCode)
-   {
-      super(charCode);
-   }
+   public TeXObjectList splitTokens(TeXParser parser);
 
-   @Override
-   public TeXObject toLowerCase(TeXParser parser)
-   {
-      return parser.getListener().getLetter(Character.toLowerCase(charCode));
-   }
-
-   @Override
-   public TeXObject toUpperCase(TeXParser parser)
-   {
-      return parser.getListener().getLetter(Character.toUpperCase(charCode));
-   }
-
-   @Override
-   public Object clone()
-   {
-      return new Letter(getCharCode());
-   }
-
-   @Override
-   public int getCatCode()
-   {
-      return TeXParser.TYPE_LETTER;
-   }
-
+   public TeXObject reconstitute(TeXParser parser, TeXObjectList stack)
+   throws IOException;
 }
 

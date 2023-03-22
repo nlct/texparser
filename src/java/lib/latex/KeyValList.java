@@ -35,6 +35,12 @@ public class KeyValList extends HashMap<String,TeXObject>
       keyList = new Vector<String>();
    }
 
+   @Override
+   public boolean isSingleToken()
+   {
+      return false;
+   }
+
    public TeXObject put(String key, TeXObject value)
    {
       TeXObject oldValue = super.put(key, value);

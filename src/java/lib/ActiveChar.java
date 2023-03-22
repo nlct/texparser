@@ -26,6 +26,11 @@ public abstract class ActiveChar extends Macro implements Expandable,SingleToken
 
    public abstract int getCharCode();
 
+   public int getCatCode()
+   {
+      return TeXParser.TYPE_ACTIVE;
+   }
+
    @Override
    public String toString()
    {

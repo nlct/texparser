@@ -133,6 +133,29 @@ public class Group extends TeXObjectList
       parser.endGroup();
    }
 
+   public TeXObjectList splitTokens(TeXParser parser)
+   {
+      TeXObjectList list = new TeXObjectList();
+
+      TeXObject obj = getBegin(parser);
+
+      if (obj instanceof MultiToken)
+      {
+         list.addAll(((MultiToken)obj).splitTokens(parser));
+      }
+
+      list.addAll(this);
+
+      obj = getEnd(parser);
+
+      if (obj instanceof MultiToken)
+      {
+         list.addAll(((MultiToken)obj).splitTokens(parser));
+      }
+
+      return list;
+   }
+
    @Override
    public TeXObjectList expandonce(TeXParser parser) throws IOException
    {

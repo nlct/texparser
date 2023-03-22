@@ -50,6 +50,12 @@ public class Tab extends AbstractTeXObject implements SingleToken
    }
 
    @Override
+   public int getCatCode()
+   {
+      return TeXParser.TYPE_TAB;
+   }
+
+   @Override
    public String toString(TeXParser parser)
    {
       return format();

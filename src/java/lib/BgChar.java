@@ -99,6 +99,12 @@ public class BgChar extends Macro implements SingleToken
       return charCode;
    }
 
+   @Override
+   public int getCatCode()
+   {
+      return TeXParser.TYPE_BG;
+   }
+
    public Group createGroup(TeXParser parser)
    {
       return parser.getListener().createGroup();

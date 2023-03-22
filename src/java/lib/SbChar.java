@@ -56,6 +56,12 @@ public class SbChar extends Macro implements SingleToken
    }
 
    @Override
+   public int getCatCode()
+   {
+      return TeXParser.TYPE_SB;
+   }
+
+   @Override
    public String format()
    {
       return new String(Character.toChars(charCode));

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013-2022 Nicola L.C. Talbot
+    Copyright (C) 2013-2023 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -31,7 +31,122 @@ public class DoubleParam extends AbstractTeXObject
    @Override
    public Object clone()
    {
-      return new DoubleParam((ParameterToken)param.clone());
+      DoubleParam dblParam = new DoubleParam((ParameterToken)param.clone());
+
+      dblParam.setCharCode(getCharCode());
+
+      return dblParam;
+   }
+
+   @Override
+   public boolean isSingleToken()
+   {
+      return false;
+   }
+
+   public void setCharCode(int charCode)
+   {
+      this.charCode = charCode;
+   }
+
+   @Override
+   public int getCharCode()
+   {
+      return charCode;
+   }
+
+   public int getCatCode()
+   {
+      return TeXParser.TYPE_PARAM;
+   }
+
+   @Override
+   public TeXObjectList splitTokens(TeXParser parser)
+   {
+      TeXObjectList list = new TeXObjectList();
+
+      list.add(new SpecialToken(this, charCode, TeXParser.TYPE_PARAM));
+
+      list.addAll(param.splitTokens(parser));
+
+      return list;
+   }
+
+   @Override
+   public TeXObject reconstitute(TeXParser parser, TeXObjectList stack)
+   throws IOException
+   {
+      byte popStyle = TeXObjectList.POP_SHORT;
+      boolean pop = false;
+
+      TeXObject nextToken = TeXParserUtils.peek(parser, stack, popStyle);
+
+      ParameterToken paramToken;
+
+      if (nextToken instanceof ParameterToken)
+      {
+         DoubleParam dblParam = parser.getListener().getDoubleParam(
+           (ParameterToken)nextToken);
+
+         dblParam.setCharCode(getCharCode());
+
+         paramToken = dblParam;
+
+         pop = true;
+      }
+      else if (nextToken.isSingleToken())
+      {
+         int cp = ((SingleToken)nextToken).getCharCode();
+         int cat = ((SingleToken)nextToken).getCatCode();
+         
+         if (cp >= '1' && cp <= '9')
+         {
+            Param param = parser.getListener().getParam(cp-'0');
+            param.setCharCode(getCharCode());
+            paramToken = param;
+            pop = true;
+         }
+         else if (cat == TeXParser.TYPE_BG)
+         {
+            Param param = parser.getListener().getParam(-1);
+            param.setCharCode(getCharCode());
+            paramToken = param;
+         }
+         else if (cat == TeXParser.TYPE_PARAM && nextToken instanceof SpecialToken)
+         {
+            SpecialToken st = (SpecialToken)nextToken;
+
+            TeXParserUtils.pop(parser, stack, popStyle);
+
+            ParameterToken nextParam = (ParameterToken)
+               st.getObject().reconstitute(parser, stack);
+
+            DoubleParam dblParam = parser.getListener().getDoubleParam(nextParam);
+
+            dblParam.setCharCode(getCharCode());
+
+            paramToken = dblParam;
+         }
+         else
+         {
+            Param param = parser.getListener().getParam(0);
+            param.setCharCode(getCharCode());
+            paramToken = param;
+         }
+      }
+      else
+      {
+         Param param = parser.getListener().getParam(0);
+         param.setCharCode(getCharCode());
+         paramToken = param;
+      }
+
+      if (pop)
+      {
+         TeXParserUtils.pop(parser, stack, popStyle);
+      }
+
+      return paramToken;
    }
 
    @Override
@@ -100,14 +215,16 @@ public class DoubleParam extends AbstractTeXObject
    public String toString(TeXParser parser)
    {
       return String.format("%s%s", 
-         new String(Character.toChars(parser.getParamChar())),
+         new String(Character.toChars(charCode)),
          next().toString(parser));
    }
 
    @Override
    public String format()
    {
-      return "#"+next().format();
+      return String.format("%s%s", 
+         new String(Character.toChars(charCode)),
+         next().format());
    }
 
    @Override
@@ -121,7 +238,7 @@ public class DoubleParam extends AbstractTeXObject
      throws IOException
    {
       TeXObjectList list = new TeXObjectList();
-      list.add(parser.getListener().getOther(parser.getParamChar()));
+      list.add(parser.getListener().getOther(charCode));
       list.add(next());
 
       return list;
@@ -142,5 +259,6 @@ public class DoubleParam extends AbstractTeXObject
    }
 
    private ParameterToken param;
+   protected int charCode = '#';
 }
 

@@ -44,6 +44,12 @@ public class SpChar extends Macro implements SingleToken
    }
 
    @Override
+   public int getCatCode()
+   {
+      return TeXParser.TYPE_SP;
+   }
+
+   @Override
    public Object clone()
    {
       return new SpChar(charCode);

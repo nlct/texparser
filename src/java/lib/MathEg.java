@@ -20,7 +20,7 @@ package com.dickimawbooks.texparserlib;
 
 import java.io.IOException;
 
-public class MathEg extends EgChar implements Expandable
+public class MathEg extends EgChar implements Expandable,MultiToken
 {
    public MathEg(boolean isinline)
    {
@@ -44,11 +44,56 @@ public class MathEg extends EgChar implements Expandable
    }
 
    @Override
+   public boolean isSingleToken()
+   {
+      return isInLine();
+   }
+
+   @Override
+   public int getCatCode()
+   {
+      return TeXParser.TYPE_MATH;
+   }
+
+   @Override
+   public TeXObjectList splitTokens(TeXParser parser)
+   {
+      TeXObjectList list = new TeXObjectList();
+
+      list.add(new SpecialToken(this, getCharCode(), TeXParser.TYPE_MATH));
+
+      if (!isInLine())
+      {
+         list.add(new SpecialToken(this, getCharCode(), TeXParser.TYPE_MATH));
+      }
+
+      return list;
+   }
+
+   @Override
+   public TeXObject reconstitute(TeXParser parser, TeXObjectList stack)
+   throws IOException
+   {
+      TeXObject obj = TeXParserUtils.peek(parser, stack, TeXObjectList.POP_SHORT);
+
+      if (obj.isSingleToken()
+            && ((SingleToken)obj).getCatCode() == TeXParser.TYPE_MATH)
+      {
+         isinline = true;
+
+         TeXParserUtils.pop(parser, stack, TeXObjectList.POP_SHORT);
+      }
+
+      return this;
+   }
+
+   @Override
    public boolean canExpand()
    {
       return true;
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser) throws IOException
    {
       TeXObjectList list = new TeXObjectList(1);
@@ -59,24 +104,28 @@ public class MathEg extends EgChar implements Expandable
       return list;
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
       return expandonce(parser);
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser)
       throws IOException
    {
       return expandonce(parser);
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
       return expandonce(parser);
    }
 
+   @Override
    public String format()
    {
       String charStr = new String(Character.toChars(getCharCode()));
@@ -84,17 +133,20 @@ public class MathEg extends EgChar implements Expandable
       return isInLine() ? charStr : String.format("%s%s", charStr, charStr);
    }
 
+   @Override
    public String toString()
    {
       return String.format("%s[delim=%s]",
        getClass().getName(), format());
    }
 
+   @Override
    public String toString(TeXParser parser)
    {
       return parser.getMathDelim(isInLine());
    }
 
+   @Override
    public TeXObjectList string(TeXParser parser)
      throws IOException
    {

@@ -54,6 +54,12 @@ public class DataToolRows extends Vector<DataToolEntryRow>
    }
 
    @Override
+   public boolean isSingleToken()
+   {
+      return false;
+   }
+
+   @Override
    public synchronized void addElement(DataToolEntryRow row)
    {
       row.setRowIndex(size()+1);

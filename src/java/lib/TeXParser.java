@@ -1208,7 +1208,10 @@ public class TeXParser extends TeXObjectList
 
       if (isCatCode(TYPE_PARAM, c))
       {
-         readParam(list, listener.getDoubleParam(paramToken));
+         DoubleParam dblParam = listener.getDoubleParam(paramToken);
+         dblParam.setCharCode(c);
+
+         readParam(list, dblParam);
       }
       else
       {
@@ -1234,34 +1237,42 @@ public class TeXParser extends TeXObjectList
       return true;
    }
 
-   private boolean readParam(TeXObjectList list)
+   private boolean readParam(TeXObjectList list, int charCode)
      throws IOException
    {
       mark(1);
       int c = read();
 
+      Param param = listener.getParam(0);
+      param.setCharCode(charCode);
+
       if (c == -1)
       {
-         list.add(listener.getParam(0));
+         list.add(param);
          return false;
       }
 
       if (isCatCode(TYPE_PARAM, c))
       {
-         return readParam(list, listener.getDoubleParam(listener.getParam(0)));
+         DoubleParam dblParam = listener.getDoubleParam(param);
+         dblParam.setCharCode(c);
+
+         return readParam(list, dblParam);
       }
       else if (c > '0' && c <= '9')
       {
-         list.add(listener.getParam(c-'0'));
+         param.setDigit(c-'0');
+         list.add(param);
       }
       else if (isCatCode(TYPE_BG, c))
       {
-         list.add(listener.getParam(-1));
+         param.setDigit(-1);
+         list.add(param);
          reset();
       }
       else
       {
-         list.add(listener.getParam(0));
+         list.add(new SpecialToken(param, charCode, TYPE_PARAM));
          reset();
       }
 
@@ -1878,7 +1889,7 @@ public class TeXParser extends TeXObjectList
       }
       else if (isCatCode(TYPE_PARAM, c))
       {
-         return readParam(list);
+         return readParam(list, c);
       }
       else if (isCatCode(TYPE_ACTIVE, c))
       {

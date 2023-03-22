@@ -82,6 +82,12 @@ public class DataObjectList extends TeXObjectList
       return true;
    }
 
+   @Override
+   public boolean isSingleToken()
+   {
+      return false;
+   }
+
    public TeXObjectList createList()
    {
       return new DataObjectList(capacity(), protect);

@@ -26,6 +26,32 @@ import com.dickimawbooks.texparserlib.latex.CsvList;
 
 public class TeXParserUtils
 {
+   public static TeXObject peek(TeXParser parser, TeXObjectList stack, byte popStyle)
+   throws IOException
+   {
+      if (parser == stack || stack == null)
+      {
+         return parser.peekStack(popStyle);
+      }
+      else
+      {
+         return stack.peekStack(popStyle);
+      }
+   }
+
+   public static TeXObject pop(TeXParser parser, TeXObjectList stack, byte popStyle)
+   throws IOException
+   {
+      if (parser == stack || stack == null)
+      {
+         return parser.popStack(popStyle);
+      }
+      else
+      {
+         return stack.popStack(parser, popStyle);
+      }
+   }
+
    /**
    * Pops a matching token if present.
    * This method will pop the next token but only if it's a CharObject

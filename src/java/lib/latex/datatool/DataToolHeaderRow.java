@@ -52,6 +52,12 @@ public class DataToolHeaderRow extends Vector<DataToolHeader>
       return row;
    }
 
+   @Override
+   public boolean isSingleToken()
+   {
+      return false;
+   }
+
    public static DataToolHeaderRow toHeaderRow(TeXParser parser,
      TeXObjectList stack, DataToolSty sty)
       throws IOException

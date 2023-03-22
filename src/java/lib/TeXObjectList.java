@@ -1776,6 +1776,12 @@ public class TeXObjectList extends Vector<TeXObject>
    }
 
    @Override
+   public boolean isSingleToken()
+   {
+      return false;
+   }
+
+   @Override
    public boolean isExpansionBlocker()
    {
       return false;

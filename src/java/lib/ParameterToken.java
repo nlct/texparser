@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2018 Nicola L.C. Talbot
+    Copyright (C) 2018-2023 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -20,9 +20,10 @@ package com.dickimawbooks.texparserlib;
 
 import java.io.IOException;
 
-public interface ParameterToken extends TeXObject
+public interface ParameterToken extends MultiToken
 {
    public ParameterToken next();
    public Param tail();
+   public int getCharCode();
 }
 

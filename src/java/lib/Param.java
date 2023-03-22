@@ -30,7 +30,11 @@ public class Param extends AbstractTeXObject implements ParameterToken
    @Override
    public Object clone()
    {
-      return new Param(digit);
+      Param param = new Param(digit);
+
+      param.setCharCode(getCharCode());
+
+      return param;
    }
 
    public int getDigit()
@@ -41,6 +45,107 @@ public class Param extends AbstractTeXObject implements ParameterToken
    public void setDigit(int digit)
    {
       this.digit = digit;
+   }
+
+   @Override
+   public boolean isSingleToken()
+   {
+      return false;
+   }
+
+   public void setCharCode(int charCode)
+   {
+      this.charCode = charCode;
+   }
+
+   @Override
+   public int getCharCode()
+   {
+      return charCode;
+   }
+
+   public int getCatCode()
+   {
+      return TeXParser.TYPE_PARAM;
+   }
+
+   @Override
+   public TeXObjectList splitTokens(TeXParser parser)
+   {
+      TeXObjectList list = new TeXObjectList();
+
+      list.add(new SpecialToken(this, charCode, TeXParser.TYPE_PARAM));
+
+      if (digit > 0)
+      {
+         list.add(parser.getListener().getOther('0'+digit));
+      }
+
+      return list;
+   }
+
+   @Override
+   public TeXObject reconstitute(TeXParser parser, TeXObjectList stack)
+   throws IOException
+   {
+      byte popStyle = TeXObjectList.POP_SHORT;
+      boolean pop = false;
+
+      TeXObject nextToken = TeXParserUtils.peek(parser, stack, popStyle);
+
+      Param param = parser.getListener().getParam(0);
+      param.setCharCode(getCharCode());
+
+      ParameterToken paramToken = param;
+
+      if (nextToken instanceof ParameterToken)
+      {
+         DoubleParam dblParam = parser.getListener().getDoubleParam(
+           (ParameterToken)nextToken);
+
+         dblParam.setCharCode(getCharCode());
+
+         paramToken = dblParam;
+
+         pop = true;
+      }
+      else if (nextToken.isSingleToken())
+      {
+         int cp = ((SingleToken)nextToken).getCharCode();
+         int cat = ((SingleToken)nextToken).getCatCode();
+
+         if (cp >= '1' && cp <= '9')
+         {
+            param.setDigit(cp - '0');
+            pop = true;
+         }
+         else if (cat == TeXParser.TYPE_BG)
+         {
+            param.setDigit(-1);
+         }
+         else if (cat == TeXParser.TYPE_PARAM && nextToken instanceof SpecialToken)
+         {
+            SpecialToken st = (SpecialToken)nextToken;
+
+            TeXParserUtils.pop(parser, stack, popStyle);
+
+            ParameterToken nextParam = (ParameterToken)
+               st.getObject().reconstitute(parser, stack);
+
+            DoubleParam dblParam = parser.getListener().getDoubleParam(nextParam);
+
+            dblParam.setCharCode(getCharCode());
+
+            paramToken = dblParam;
+         }
+      }
+
+      if (pop)
+      {
+         TeXParserUtils.pop(parser, stack, popStyle);
+      }
+
+      return paramToken;
    }
 
    @Override
@@ -74,24 +179,27 @@ public class Param extends AbstractTeXObject implements ParameterToken
    @Override
    public String toString(TeXParser parser)
    {
-      String charStr = new String(Character.toChars(parser.getParamChar()));
-
-      return digit <= 0 ? String.format("%s", charStr)
-                         : String.format("%s%d", charStr, digit);
+      return format();
    }
 
    @Override
    public String format()
    {
-      return (digit <= 0 ? "#" : "#"+digit);
+      if (digit <= 0)
+      {
+         return new String(Character.toChars(charCode));
+      }
+      else
+      {
+         return String.format("%s%d", new String(Character.toChars(charCode)), digit);
+      }
    }
 
    @Override
    public String toString()
    {
       return String.format("%s[%s]", 
-        getClass().getSimpleName(),
-        (digit <= 0 ? "#" : "#"+digit));
+        getClass().getSimpleName(), format());
    }
 
    @Override
@@ -99,7 +207,7 @@ public class Param extends AbstractTeXObject implements ParameterToken
      throws IOException
    {
       TeXObjectList list = new TeXObjectList();
-      list.add(parser.getListener().getOther(parser.getParamChar()));
+      list.add(parser.getListener().getOther(charCode));
 
       if (digit != -1)
       {
@@ -124,5 +232,7 @@ public class Param extends AbstractTeXObject implements ParameterToken
    // -1 indicates #{ 
    // 0 indicates # not followed by digit or {
    private int digit;
+
+   protected int charCode = '#';
 }
 

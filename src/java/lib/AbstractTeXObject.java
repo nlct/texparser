@@ -59,4 +59,10 @@ public abstract class AbstractTeXObject implements TeXObject
    {
       return "";
    }
+
+   @Override
+   public boolean isSingleToken()
+   {
+      return (this instanceof SingleToken);
+   }
 }

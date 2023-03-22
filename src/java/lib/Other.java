@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2023 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -28,11 +28,13 @@ public class Other extends CharObject implements CaseChangeable
       super(charCode);
    }
 
+   @Override
    public Object clone()
    {
       return new Other(getCharCode());
    }
 
+   @Override
    public TeXObject toLowerCase(TeXParser parser)
    {
       if (!(Character.isUpperCase(charCode)
@@ -44,6 +46,7 @@ public class Other extends CharObject implements CaseChangeable
       return parser.getListener().getOther(Character.toLowerCase(charCode));
    }
 
+   @Override
    public TeXObject toUpperCase(TeXParser parser)
    {
       if (!Character.isLowerCase(charCode))
@@ -54,5 +57,10 @@ public class Other extends CharObject implements CaseChangeable
       return parser.getListener().getOther(Character.toUpperCase(charCode));
    }
 
+   @Override
+   public int getCatCode()
+   {
+      return TeXParser.TYPE_OTHER;
+   }
 }
 

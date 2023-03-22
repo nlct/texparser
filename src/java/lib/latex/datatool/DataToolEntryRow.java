@@ -59,6 +59,12 @@ public class DataToolEntryRow extends Vector<DataToolEntry>
       return row;
    }
 
+   @Override
+   public boolean isSingleToken()
+   {
+      return false;
+   }
+
    public int getRowIndex()
    {
       return rowIndex;

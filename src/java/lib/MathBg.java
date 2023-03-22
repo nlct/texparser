@@ -20,7 +20,7 @@ package com.dickimawbooks.texparserlib;
 
 import java.io.IOException;
 
-public class MathBg extends BgChar implements Expandable
+public class MathBg extends BgChar implements Expandable,MultiToken
 {
    public MathBg(boolean isinline)
    {
@@ -38,9 +38,56 @@ public class MathBg extends BgChar implements Expandable
       this.isinline = isinline;
    }
 
+   @Override
    public Object clone()
    {
       return new MathBg(getCharCode(), isInLine());
+   }
+
+   @Override
+   public boolean isSingleToken()
+   {
+      return isInLine();
+   }
+
+   @Override
+   public int getCatCode()
+   {
+      return TeXParser.TYPE_MATH;
+   }
+
+   @Override
+   public TeXObjectList splitTokens(TeXParser parser)
+   {
+      TeXObjectList list = new TeXObjectList();
+
+      list.add(new SpecialToken(this, getCharCode(), TeXParser.TYPE_MATH));
+
+      if (!isInLine())
+      {
+         list.add(new SpecialToken(this, getCharCode(), TeXParser.TYPE_MATH));
+      }
+
+      return list;
+   }
+
+   @Override
+   public TeXObject reconstitute(TeXParser parser, TeXObjectList stack)
+   throws IOException
+   {
+      byte popStyle = TeXObjectList.POP_SHORT;
+
+      TeXObject obj = TeXParserUtils.peek(parser, stack, popStyle);
+
+      if (obj.isSingleToken()
+            && ((SingleToken)obj).getCatCode() == TeXParser.TYPE_MATH)
+      {
+         isinline = true;
+
+         TeXParserUtils.pop(parser, stack, popStyle);
+      }
+
+      return this;
    }
 
    @Override
@@ -49,6 +96,7 @@ public class MathBg extends BgChar implements Expandable
       return true;
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser) throws IOException
    {
       TeXObjectList list = new TeXObjectList(1);
@@ -60,24 +108,28 @@ public class MathBg extends BgChar implements Expandable
       return list;
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
       return expandonce(parser);
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser)
       throws IOException
    {
       return expandonce(parser);
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
       return expandonce(parser);
    }
 
+   @Override
    public String format()
    {
       String charStr = new String(Character.toChars(getCharCode()));
@@ -85,17 +137,20 @@ public class MathBg extends BgChar implements Expandable
       return isInLine() ?  charStr : String.format("%s%s", charStr, charStr);
    }
 
+   @Override
    public String toString()
    {
       return String.format("%s[delim=%s]",
        getClass().getName(), format());
    }
 
+   @Override
    public String toString(TeXParser parser)
    {
       return parser.getMathDelim(isInLine());
    }
 
+   @Override
    public TeXObjectList string(TeXParser parser)
      throws IOException
    {

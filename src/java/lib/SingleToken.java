@@ -21,12 +21,12 @@ package com.dickimawbooks.texparserlib;
 /**
  * Object represents a single token (Unicode character), which may 
  * be a letter, "other", special character, or active character.
- * TODO: add MultiToken for classes such as Param, Group, MathBg to 
- * allow multiple tokens to be separated.
  */
 
 public interface SingleToken extends TeXObject
 {
    public int getCharCode();
+
+   public int getCatCode();
 }
 
