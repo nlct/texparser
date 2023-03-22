@@ -143,6 +143,10 @@ public class Group extends TeXObjectList
       {
          list.addAll(((MultiToken)obj).splitTokens(parser));
       }
+      else
+      {
+         list.add(obj);
+      }
 
       list.addAll(this);
 
@@ -151,6 +155,10 @@ public class Group extends TeXObjectList
       if (obj instanceof MultiToken)
       {
          list.addAll(((MultiToken)obj).splitTokens(parser));
+      }
+      else
+      {
+         list.add(obj);
       }
 
       return list;
