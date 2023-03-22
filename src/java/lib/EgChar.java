@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2023 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -20,7 +20,7 @@ package com.dickimawbooks.texparserlib;
 
 import java.io.IOException;
 
-public class EgChar extends Macro
+public class EgChar extends Macro implements SingleToken
 {
    public EgChar()
    {
@@ -32,26 +32,36 @@ public class EgChar extends Macro
       charCode = code;
    }
 
+   public EgChar(TeXParser parser)
+   {
+      this(parser.getEgChar());
+   }
+
+   @Override
    public Object clone()
    {
       return new EgChar(charCode);
    }
 
+   @Override
    public int getCharCode()
    {
       return charCode;
    }
 
+   @Override
    public String format()
    {
       return new String(Character.toChars(charCode));
    }
 
+   @Override
    public String toString(TeXParser parser)
    {
-      return new String(Character.toChars(parser.getEgChar()));
+      return format();
    }
 
+   @Override
    public TeXObjectList string(TeXParser parser)
      throws IOException
    {
@@ -61,6 +71,7 @@ public class EgChar extends Macro
       return list;
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
@@ -68,6 +79,7 @@ public class EgChar extends Macro
          TeXSyntaxException.ERROR_UNEXPECTED_EG);
    }
 
+   @Override
    public void process(TeXParser parser)
      throws IOException
    {
@@ -75,12 +87,10 @@ public class EgChar extends Macro
          TeXSyntaxException.ERROR_UNEXPECTED_EG);
    }
 
-
    public String show(TeXParser parser)
     throws IOException
    {
-      return String.format("end-group character %s", 
-       new String(Character.toChars(charCode)));
+      return String.format("end-group character %s", format());
    }
 
    public boolean matches(BgChar bgChar)

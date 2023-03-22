@@ -20,7 +20,7 @@ package com.dickimawbooks.texparserlib;
 
 import java.io.IOException;
 
-public abstract class CharObject extends AbstractTeXObject
+public abstract class CharObject extends AbstractTeXObject implements SingleToken
 {
    public CharObject(int charCode)
    {
@@ -71,6 +71,7 @@ public abstract class CharObject extends AbstractTeXObject
       return list;
    }
 
+   @Override
    public int getCharCode()
    {
       return charCode;

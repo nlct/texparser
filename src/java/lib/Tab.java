@@ -20,22 +20,39 @@ package com.dickimawbooks.texparserlib;
 
 import java.io.IOException;
 
-public class Tab extends AbstractTeXObject
+public class Tab extends AbstractTeXObject implements SingleToken
 {
    public Tab()
    {
+      this('&');
+   }
+
+   public Tab(int charCode)
+   {
+      this.charCode = charCode;
+   }
+
+   public Tab(TeXParser parser)
+   {
+      this(parser.getTabChar());
    }
 
    @Override
    public Object clone()
    {
-      return new Tab();
+      return new Tab(charCode);
+   }
+
+   @Override
+   public int getCharCode()
+   {
+      return charCode;
    }
 
    @Override
    public String toString(TeXParser parser)
    {
-      return new String(Character.toChars(parser.getTabChar()));
+      return format();
    }
 
    @Override
@@ -47,7 +64,7 @@ public class Tab extends AbstractTeXObject
    @Override
    public String format()
    {
-      return "&";
+      return new String(Character.toChars(charCode));
    }
 
    @Override
@@ -55,7 +72,7 @@ public class Tab extends AbstractTeXObject
      throws IOException
    {
       TeXObjectList list = new TeXObjectList();
-      list.add(parser.getListener().getOther(parser.getTabChar()));
+      list.add(parser.getListener().getOther(charCode));
 
       return list;
    }
@@ -76,5 +93,6 @@ public class Tab extends AbstractTeXObject
       settings.startColumn();
    }
 
+   protected int charCode;
 }
 

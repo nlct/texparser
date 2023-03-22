@@ -1895,15 +1895,15 @@ public class TeXParser extends TeXObjectList
       }
       else if (isCatCode(TYPE_SP, c))
       {
-         list.add(listener.createSpChar());
+         list.add(listener.createSpChar(c));
       }
       else if (isCatCode(TYPE_SB, c))
       {
-         list.add(listener.createSbChar());
+         list.add(listener.createSbChar(c));
       }
       else if (isCatCode(TYPE_TAB, c))
       {
-         list.add(listener.getTab());
+         list.add(listener.getTab(c));
       }
       else if (isCatCode(TYPE_MATH, c))
       {
@@ -3309,7 +3309,7 @@ public class TeXParser extends TeXObjectList
 
    public int getTabChar()
    {
-      return getSpecialChar(TYPE_TAB, '\t');
+      return getSpecialChar(TYPE_TAB, '&');
    }
 
    public String getJobname()
@@ -3719,6 +3719,6 @@ public class TeXParser extends TeXObjectList
    public static final int DEBUG_EXPANSION_ONCE = 4096;
    public static final int DEBUG_EXPANSION_ONCE_LIST = 8192;
 
-   public static final String VERSION = "0.9.3b";
-   public static final String VERSION_DATE = "2023-02-04";
+   public static final String VERSION = "0.9.4b";
+   public static final String VERSION_DATE = "2023-03-22";
 }

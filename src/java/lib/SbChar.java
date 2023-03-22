@@ -20,28 +20,45 @@ package com.dickimawbooks.texparserlib;
 
 import java.io.IOException;
 
-public class SbChar extends Macro
+public class SbChar extends Macro implements SingleToken
 {
    public SbChar()
    {
+      this('_');
+   }
+
+   public SbChar(int c)
+   {
+      charCode = c;
+   }
+
+   public SbChar(TeXParser parser)
+   {
+      this(parser.getSbChar());
    }
 
    @Override
    public Object clone()
    {
-      return new SbChar();
+      return new SbChar(charCode);
    }
 
    @Override
    public String toString(TeXParser parser)
    {
-      return new String(Character.toChars(parser.getSbChar()));
+      return format();
+   }
+
+   @Override
+   public int getCharCode()
+   {
+      return charCode;
    }
 
    @Override
    public String format()
    {
-      return "_";
+      return new String(Character.toChars(charCode));
    }
 
    @Override
@@ -49,7 +66,7 @@ public class SbChar extends Macro
      throws IOException
    {
       TeXObjectList list = new TeXObjectList();
-      list.add(parser.getListener().getOther(parser.getSbChar()));
+      list.add(parser.getListener().getOther(charCode));
 
       return list;
    }
@@ -97,8 +114,9 @@ public class SbChar extends Macro
    public String show(TeXParser parser)
     throws IOException
    {
-      return String.format("subscript character %s", 
-       new String(Character.toChars(parser.getSbChar())));
+      return String.format("subscript character %s", format());
    }
+
+   protected int charCode;
 }
 

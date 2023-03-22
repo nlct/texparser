@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2023 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -20,7 +20,7 @@ package com.dickimawbooks.texparserlib;
 
 import java.io.IOException;
 
-public class BgChar extends Macro
+public class BgChar extends Macro implements SingleToken
 {
    public BgChar()
    {
@@ -32,21 +32,30 @@ public class BgChar extends Macro
       charCode = code;
    }
 
+   public BgChar(TeXParser parser)
+   {
+     this(parser.getBgChar());
+   }
+
+   @Override
    public Object clone()
    {
       return new BgChar(charCode);
    }
 
+   @Override
    public String format()
    {
       return new String(Character.toChars(charCode));
    }
 
+   @Override
    public String toString(TeXParser parser)
    {
-      return new String(Character.toChars(parser.getBgChar()));
+      return format();
    }
 
+   @Override
    public TeXObjectList string(TeXParser parser)
      throws IOException
    {
@@ -56,6 +65,7 @@ public class BgChar extends Macro
       return list;
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
@@ -66,6 +76,7 @@ public class BgChar extends Macro
       stack.push(group);
    }
 
+   @Override
    public void process(TeXParser parser)
      throws IOException
    {
@@ -76,14 +87,13 @@ public class BgChar extends Macro
       parser.push(group);
    }
 
-
    public String show(TeXParser parser)
     throws IOException
    {
-      return String.format("begin-group character %s", 
-        new String(Character.toChars(charCode)));
+      return String.format("begin-group character %s", format());
    }
 
+   @Override
    public int getCharCode()
    {
       return charCode;

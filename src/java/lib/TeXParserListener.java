@@ -75,7 +75,12 @@ public abstract class TeXParserListener
 
    public abstract DoubleParam getDoubleParam(ParameterToken param);
 
-   public abstract Tab getTab();
+   public abstract Tab getTab(int charCode);
+
+   public Tab getTab()
+   {
+      return getTab(parser.getTabChar());
+   }
 
    public abstract Letter getLetter(int charCode);
 
@@ -113,9 +118,19 @@ public abstract class TeXParserListener
 
    public abstract MathGroup createMathGroup();
 
-   public abstract SpChar createSpChar();
+   public abstract SpChar createSpChar(int charCode);
 
-   public abstract SbChar createSbChar();
+   public SpChar createSpChar()
+   {
+      return createSpChar(parser.getSpChar());
+   }
+
+   public abstract SbChar createSbChar(int charCode);
+
+   public SbChar createSbChar()
+   {
+      return createSbChar(parser.getSbChar());
+   }
 
    public abstract Comment createComment();
 

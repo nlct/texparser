@@ -20,28 +20,45 @@ package com.dickimawbooks.texparserlib;
 
 import java.io.IOException;
 
-public class SpChar extends Macro
+public class SpChar extends Macro implements SingleToken
 {
+   public SpChar(int charCode)
+   {
+      this.charCode = charCode;
+   }
+
    public SpChar()
    {
+      this('^');
+   }
+
+   public SpChar(TeXParser parser)
+   {
+      this(parser.getSpChar());
+   }
+
+   @Override
+   public int getCharCode()
+   {
+      return charCode;
    }
 
    @Override
    public Object clone()
    {
-      return new SpChar();
+      return new SpChar(charCode);
    }
 
    @Override
    public String format()
    {
-      return "^";
+      return new String(Character.toChars(charCode));
    }
 
    @Override
    public String toString(TeXParser parser)
    {
-      return new String(Character.toChars(parser.getSpChar()));
+      return format();
    }
 
    @Override
@@ -49,7 +66,7 @@ public class SpChar extends Macro
      throws IOException
    {
       TeXObjectList list = new TeXObjectList();
-      list.add(parser.getListener().getOther(parser.getSpChar()));
+      list.add(parser.getListener().getOther(charCode));
 
       return list;
    }
@@ -97,8 +114,9 @@ public class SpChar extends Macro
    public String show(TeXParser parser)
     throws IOException
    {
-      return String.format("superscript character %s", 
-        new String(Character.toChars(parser.getSpChar())));
+      return String.format("superscript character %s", format());
    }
+
+   protected int charCode;
 }
 

@@ -405,9 +405,9 @@ public abstract class DefaultTeXParserListener extends TeXParserListener
       return new DoubleParam(param);
    }
 
-   public Tab getTab()
+   public Tab getTab(int charCode)
    {
-      return new Tab();
+      return new Tab(charCode);
    }
 
    public Letter getLetter(int charCode)
@@ -522,14 +522,14 @@ public abstract class DefaultTeXParserListener extends TeXParserListener
       return new MathGroup();
    }
 
-   public SpChar createSpChar()
+   public SpChar createSpChar(int charCode)
    {
-      return new SpChar();
+      return new SpChar(charCode);
    }
 
-   public SbChar createSbChar()
+   public SbChar createSbChar(int charCode)
    {
-      return new SbChar();
+      return new SbChar(charCode);
    }
 
    public Comment createComment()
