@@ -28,13 +28,60 @@ public class Letter extends CharObject implements CaseChangeable
    @Override
    public TeXObject toLowerCase(TeXParser parser)
    {
-      return parser.getListener().getLetter(Character.toLowerCase(charCode));
+      // Not locale-sensitive
+      int cp = Character.toLowerCase(charCode);
+
+      if (cp == getCharCode())
+      {
+         String str = toString(parser).toLowerCase();
+         cp = str.codePointAt(0);
+
+         if (str.length() == Character.charCount(cp))
+         {
+            return parser.getListener().getLetter(cp);
+         }
+         else
+         {
+            return parser.getListener().createString(str);
+         }
+      }
+      else
+      {
+         return parser.getListener().getLetter(cp);
+      }
    }
 
    @Override
    public TeXObject toUpperCase(TeXParser parser)
    {
-      return parser.getListener().getLetter(Character.toUpperCase(charCode));
+      // Not locale-sensitive
+      int cp = Character.toUpperCase(charCode);
+
+      if (cp == getCharCode())
+      {
+         /*
+           Allow for the possibility that the uppercase 
+           version of the letter may consist of multiple characters.
+           (For example, eszett -> SS.) In this case,
+            Character.toUpperCase(int) will return the original code point.
+          */ 
+         String str = toString(parser).toUpperCase();
+
+         cp = str.codePointAt(0);
+
+         if (str.length() == Character.charCount(cp))
+         {
+            return parser.getListener().getLetter(cp);
+         }
+         else
+         {
+            return parser.getListener().createString(str);
+         }
+      }
+      else
+      {
+         return parser.getListener().getLetter(cp);
+      }
    }
 
    @Override
