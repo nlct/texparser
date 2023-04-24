@@ -282,6 +282,14 @@ public class Group extends TeXObjectList
       return "{"+super.format()+"}";
    }
 
+   @Override
+   public String toTruncatedString(TeXParser parser, int maxIdx, String etc)
+   {
+      return String.format("%s%s%s", getBegin(parser).toString(parser),
+         super.toTruncatedString(parser, maxIdx, etc),
+          getEnd(parser).toString(parser));
+   }
+
    public TeXObject getBegin(TeXParser parser)
    {
       return parser.getListener().getBgChar(parser.getBgChar());
