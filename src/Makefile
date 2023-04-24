@@ -1,8 +1,4 @@
-ifeq ($(origin JAVA8BOOTCLASSLIB),undefined)
-TARGET_VERSION :=
-else
-TARGET_VERSION := -target 1.8 -source 1.8 -bootclasspath $(JAVA8BOOTCLASSLIB)/rt.jar:$(JAVA8BOOTCLASSLIB)/charsets.jar:$(JAVA8BOOTCLASSLIB)/jfr.jar:$(JAVA8BOOTCLASSLIB)/jfxswt.jar:$(JAVA8BOOTCLASSLIB)/jce.jar:$(JAVA8BOOTCLASSLIB)/jsse.jar:$(JAVA8BOOTCLASSLIB)/deploy.jar:$(JAVA8BOOTCLASSLIB)/plugin.jar:$(JAVA8BOOTCLASSLIB)/javaws.jar:$(JAVA8BOOTCLASSLIB)/resources.jar:$(JAVA8BOOTCLASSLIB)/management-agent.jar:$(JAVA8BOOTCLASSLIB)/security/US_export_policy.jar:$(JAVA8BOOTCLASSLIB)/security/local_policy.jar:$(JAVA8BOOTCLASSLIB)/ext/cldrdata.jar:$(JAVA8BOOTCLASSLIB)/ext/dnsns.jar:$(JAVA8BOOTCLASSLIB)/ext/jfxrt.jar:$(JAVA8BOOTCLASSLIB)/ext/nashorn.jar:$(JAVA8BOOTCLASSLIB)/ext/sunpkcs11.jar:$(JAVA8BOOTCLASSLIB)/ext/localedata.jar:$(JAVA8BOOTCLASSLIB)/ext/sunec.jar:$(JAVA8BOOTCLASSLIB)/ext/jaccess.jar:$(JAVA8BOOTCLASSLIB)/ext/zipfs.jar:$(JAVA8BOOTCLASSLIB)/ext/sunjce_provider.jar
-endif
+TARGET_VERSION := --release 8
 
 test	: test-obs test-abs test-article test-nested test-doc \
 	  test-probsoln test-lists test-datatool test-mkimages \
