@@ -2301,6 +2301,29 @@ public class TeXObjectList extends Vector<TeXObject>
       return builder.toString();
    }
 
+   /**
+    * Gets the string version of this list up to the designated
+    * maximum index. Note that this list may contain sub-lists which
+    * may themselves be long and won't be truncated if their index
+    * in this list is less than or equal to the given maximum.
+    * If you want a maximum number of characters in the output
+    * instead, use toString(parser).substring(0,max)
+    * @param parser the parser
+    * @param maxIdx the maximum index
+    * @param etc prefix to append if the list is truncated
+    */ 
+   public String toTruncatedString(TeXParser parser, int maxIdx, String etc)
+   {
+      if (maxIdx < size())
+      {
+         return substring(parser, 0, maxIdx) + etc;
+      }
+      else
+      {
+         return toString(parser);
+      }
+   }
+
    public String substring(TeXParser parser, int startIdx, int endIdx)
    {
       StringBuilder builder = new StringBuilder();
