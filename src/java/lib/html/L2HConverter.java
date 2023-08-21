@@ -137,6 +137,7 @@ public class L2HConverter extends LaTeXParserListener
 
       parser.putControlSequence(new TextualContentCommand("TeX", "TeX"));
       parser.putControlSequence(new TextualContentCommand("LaTeX", "LaTeX"));
+      parser.putControlSequence(new TextualContentCommand("LaTeXe", "LaTeX2e"));
       parser.putControlSequence(new TextualContentCommand("eTeX", "eTeX"));
       parser.putControlSequence(new TextualContentCommand("XeTeX", "XeTeX"));
       parser.putControlSequence(new TextualContentCommand("XeLaTeX", "XeLaTeX"));
