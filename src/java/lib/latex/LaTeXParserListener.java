@@ -790,6 +790,8 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       parser.putControlSequence(new TextualContentCommand("obeyedspace", " "));
       parser.putControlSequence(new ObeySpaces());
 
+      parser.putControlSequence(new PadNumber("two@digits", 2));
+
       parser.putControlSequence(new GenericError());
       parser.putControlSequence(new DocumentStyle());
 
