@@ -85,5 +85,5 @@ public class PadNumber extends Command
       process(parser, parser);
    }
 
-   protected boolean numDigits;
+   protected int numDigits;
 }
