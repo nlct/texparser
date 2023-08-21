@@ -479,6 +479,7 @@ public class UserGuideSty extends LaTeXSty
 
       registerControlSequence(new InlineGlsDef("inlineswitchdef", "switch.", glossariesSty));
       registerControlSequence(new InlineGlsDef("inlineoptdef", "opt.", glossariesSty));
+      registerControlSequence(new InlineGlsDef("inlinepkgdef", "pkg.", glossariesSty));
       registerControlSequence(new CmdDefSyntax(glossariesSty));
       registerControlSequence(new OptDefSyntax(glossariesSty));
 
