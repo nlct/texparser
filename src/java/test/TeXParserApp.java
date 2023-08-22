@@ -1588,6 +1588,10 @@ public class TeXParserApp implements TeXApp
                   {
                      debugMode = debugMode | TeXParser.DEBUG_PROCESSING_GENERIC_CS;
                   }
+                  else if (mode.equals("catcode"))
+                  {
+                     debugMode = debugMode | TeXParser.DEBUG_CATCODE;
+                  }
                   else
                   {
                      throw new InvalidSyntaxException(
@@ -1732,9 +1736,9 @@ public class TeXParserApp implements TeXApp
 
    // TeXParser class now has its own version and date.
    // As from 0.9.2.2b these now refer to the test application only.
-   public static final String APP_VERSION = "0.9.2.6b";
+   public static final String APP_VERSION = "0.9.2.7b";
    public static final String APP_NAME = "texparsertest";
-   public static final String APP_DATE = "2023-02-05";
+   public static final String APP_DATE = "2023-08-22";
 
    public static long MAX_PROCESS_TIME=0L;
 

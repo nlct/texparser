@@ -445,6 +445,12 @@ public class TeXParser extends TeXObjectList
    {
       if (isLocal)
       {
+         if (isDebugMode(DEBUG_CATCODE))
+         {
+            logMessage(String.format("CatCode (local) %s -> %d", 
+             new String(Character.toChars(c)), catCode));
+         }
+
          settings.setCatCode(c, catCode);
       }
       else
@@ -455,6 +461,12 @@ public class TeXParser extends TeXObjectList
 
    public void setCatCode(int c, int catCode)
    {
+      if (isDebugMode(DEBUG_CATCODE))
+      {
+         logMessage(String.format("CatCode (global) %s -> %d", 
+          new String(Character.toChars(c)), catCode));
+      }
+
       Integer character = Integer.valueOf(c);
 
       // remove it from its current catcode list
@@ -3729,7 +3741,8 @@ public class TeXParser extends TeXObjectList
    public static final int DEBUG_PROCESSING_GENERIC_CS = 2048;
    public static final int DEBUG_EXPANSION_ONCE = 4096;
    public static final int DEBUG_EXPANSION_ONCE_LIST = 8192;
+   public static final int DEBUG_CATCODE = 16384;
 
-   public static final String VERSION = "0.9.5b.20230721";
-   public static final String VERSION_DATE = "2023-07-21";
+   public static final String VERSION = "0.9.5b.20230722";
+   public static final String VERSION_DATE = "2023-07-22";
 }
