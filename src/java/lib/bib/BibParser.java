@@ -85,12 +85,26 @@ public class BibParser extends DefaultTeXParserListener
    public TeXParser parseBibFile(File bibFile, Charset charset)
      throws IOException
    {
+      TeXParser parser = new TeXParser(this);
+
+      parseBibFile(parser, bibFile, charset);
+
+      return parser;
+   }
+
+   public void parseBibFile(TeXParser parser, File bibFile)
+     throws IOException
+   {
+      parseBibFile(parser, bibFile, null);
+   }
+
+   public void parseBibFile(TeXParser parser, File bibFile, Charset charset)
+     throws IOException
+   {
       if (charset != null)
       {
          this.charset=charset;
       }
-
-      TeXParser parser = new TeXParser(this);
 
       int atcode = parser.getCatCode('@');
       int hashcode = parser.getCatCode('#');
@@ -117,8 +131,6 @@ public class BibParser extends DefaultTeXParserListener
       {
          parser.setCatCode('~', tildecode);
       }
-
-      return parser;
    }
 
    @Override

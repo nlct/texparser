@@ -79,19 +79,31 @@ public class AuxParser extends DefaultTeXParserListener
    public TeXParser parseAuxFile(File auxFile, Charset charset)
      throws IOException
    {
+      TeXParser parser = new TeXParser(this);
+
+      parseAuxFile(parser, auxFile, charset);
+
+      return parser;
+   }
+
+   public void parseAuxFile(TeXParser parser, File auxFile)
+     throws IOException
+   {
+      parseAuxFile(parser, auxFile, null);
+   }
+
+   public void parseAuxFile(TeXParser parser, File auxFile, Charset charset)
+     throws IOException
+   {
       if (charset != null)
       {
          this.charset=charset;
       }
 
-      TeXParser parser = new TeXParser(this);
-
       int code = parser.getCatCode('@');
       parser.setCatCode('@', TeXParser.TYPE_LETTER);
       parser.parse(auxFile);
       parser.setCatCode('@', code);
-
-      return parser;
    }
 
    @Override
@@ -283,6 +295,11 @@ public class AuxParser extends DefaultTeXParserListener
 
    public void addAuxData(AuxData data)
    {
+      if (getParser().isDebugMode(TeXParser.DEBUG_STY_DATA))
+      {
+         getParser().logMessage("AuxData: "+data.toString(parser));
+      }
+
       auxData.add(data);
    }
 
