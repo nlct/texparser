@@ -326,7 +326,7 @@ public class AuxParser extends DefaultTeXParserListener
    @Override
    public Charset getCharSet()
    {
-      return charset;
+      return charset == null ? super.getCharSet() : charset;
    }
 
    // shouldn't be needed in auxFile

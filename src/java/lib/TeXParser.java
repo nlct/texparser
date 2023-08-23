@@ -539,7 +539,22 @@ public class TeXParser extends TeXObjectList
 
    private int read() throws IOException
    {
-      return reader.read();
+      int cp = reader.read();
+
+      if (isDebugMode(DEBUG_READ))
+      {
+         if (cp == -1)
+         {
+            logMessage("READ <EOF>");
+         }
+         else
+         {
+            logMessage(String.format("READ %s (0x%x)", 
+               new String(Character.toChars(cp)), cp));
+         }
+      }
+
+      return cp;
    }
 
    private void mark(int limit) throws IOException
@@ -549,6 +564,8 @@ public class TeXParser extends TeXObjectList
 
    private void reset() throws IOException
    {
+      debugMessage(DEBUG_READ, "READER RESET");
+
       reader.reset();
    }
 
@@ -2269,6 +2286,11 @@ public class TeXParser extends TeXObjectList
    public void parse(File file, Charset charset, TeXObjectList stack)
      throws IOException
    {
+      if (charset == null)
+      {
+         charset = getListener().getTeXApp().getDefaultCharset();
+      }
+
       currentInputCharset = charset;
 
       if (!getListener().getTeXApp().isReadAccessAllowed(file))
@@ -2341,6 +2363,11 @@ public class TeXParser extends TeXObjectList
    public void parse(TeXPath path, Charset charset, TeXObjectList stack)
      throws IOException
    {
+      if (charset == null)
+      {
+         charset = getListener().getTeXApp().getDefaultCharset();
+      }
+
       if (!getListener().getTeXApp().isReadAccessAllowed(path))
       {
          warningMessage(TeXApp.MESSAGE_NO_READ, path);
@@ -3742,7 +3769,8 @@ public class TeXParser extends TeXObjectList
    public static final int DEBUG_EXPANSION_ONCE = 4096;
    public static final int DEBUG_EXPANSION_ONCE_LIST = 8192;
    public static final int DEBUG_CATCODE = 16384;
+   public static final int DEBUG_READ = 32768;
 
-   public static final String VERSION = "0.9.5b.20230722";
-   public static final String VERSION_DATE = "2023-07-22";
+   public static final String VERSION = "0.9.5b.20230823";
+   public static final String VERSION_DATE = "2023-08-23";
 }

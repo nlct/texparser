@@ -70,6 +70,15 @@ public class LaTeX2LaTeX extends LaTeXParserListener
       this.texApp = texApp;
       setReplaceGraphicsPath(replaceGraphicsPath);
 
+      if (outCharset == null)
+      {
+         this.outCharset = texApp.getDefaultCharset();
+      }
+      else
+      {
+         this.outCharset = outCharset;
+      }
+
       setWriteable(this);
    }
 
@@ -413,8 +422,7 @@ public class LaTeX2LaTeX extends LaTeXParserListener
       {
          try
          {
-            String enc = InputEncSty.getOption(parser, outCharset == null ? 
-               Charset.defaultCharset() : outCharset);
+            String enc = InputEncSty.getOption(parser, outCharset);
 
             if (options == null || options.get(enc) == null)
             {
@@ -1003,16 +1011,10 @@ public class LaTeX2LaTeX extends LaTeXParserListener
 
          getParser().message(TeXApp.MESSAGE_WRITING, outFile);
 
-         if (outCharset == null)
-         {
-            writer = new PrintWriter(outFile);
-         }
-         else
-         {
-            getParser().message(TeXApp.MESSAGE_ENCODING, outCharset);
+         getParser().message(TeXApp.MESSAGE_ENCODING, outCharset);
 
-            writer = new PrintWriter(outFile, outCharset.name());
-         }
+         writer = new PrintWriter(Files.newBufferedWriter(outFile.toPath(),
+           outCharset));
       }
    }
 

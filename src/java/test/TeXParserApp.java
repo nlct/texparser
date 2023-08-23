@@ -828,6 +828,12 @@ public class TeXParserApp implements TeXApp
       return (new File(System.getProperty("user.dir"))).canWrite();
    }
 
+   @Override
+   public Charset getDefaultCharset()
+   {
+      return Charset.defaultCharset();
+   }
+
    public void copyFile(File src, File dest)
    throws IOException
    {
@@ -1592,6 +1598,10 @@ public class TeXParserApp implements TeXApp
                   {
                      debugMode = debugMode | TeXParser.DEBUG_CATCODE;
                   }
+                  else if (mode.equals("read"))
+                  {
+                     debugMode = debugMode | TeXParser.DEBUG_READ;
+                  }
                   else
                   {
                      throw new InvalidSyntaxException(
@@ -1738,7 +1748,7 @@ public class TeXParserApp implements TeXApp
    // As from 0.9.2.2b these now refer to the test application only.
    public static final String APP_VERSION = "0.9.2.7b";
    public static final String APP_NAME = "texparsertest";
-   public static final String APP_DATE = "2023-08-22";
+   public static final String APP_DATE = "2023-08-23";
 
    public static long MAX_PROCESS_TIME=0L;
 

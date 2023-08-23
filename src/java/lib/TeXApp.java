@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2023 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -18,6 +18,7 @@
 */
 package com.dickimawbooks.texparserlib;
 
+import java.nio.charset.Charset;
 import java.io.IOException;
 import java.io.File;
 
@@ -67,6 +68,8 @@ public interface TeXApp
 
    public boolean isWriteAccessAllowed(TeXPath path);
    public boolean isWriteAccessAllowed(File file);
+
+   public Charset getDefaultCharset();
 
    public static String MESSAGE_READING = "message.reading";
    public static String MESSAGE_WRITING = "message.writing";

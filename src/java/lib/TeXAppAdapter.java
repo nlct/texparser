@@ -18,6 +18,7 @@
 */
 package com.dickimawbooks.texparserlib;
 
+import java.nio.charset.Charset;
 import java.io.IOException;
 import java.io.File;
 
@@ -146,4 +147,8 @@ public class TeXAppAdapter implements TeXApp
       return (new File(System.getProperty("user.dir"))).canWrite();
    }
 
+   public Charset getDefaultCharset()
+   {
+      return Charset.defaultCharset();
+   }
 }

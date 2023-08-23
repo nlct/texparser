@@ -2155,7 +2155,7 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
          }
       }
 
-      return charset;
+      return charset == null ? super.getCharSet() : charset;
    }
 
    public void setGraphicsPath(TeXObjectList paths)

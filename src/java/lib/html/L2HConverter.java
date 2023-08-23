@@ -107,6 +107,11 @@ public class L2HConverter extends LaTeXParserListener
       this.outPath = (outDir == null ? null : outDir.toPath());
       this.htmlCharSet = outCharSet;
 
+      if (htmlCharSet == null)
+      {
+         htmlCharSet = texApp.getDefaultCharset();
+      }
+
       this.styCs = new Vector<String>();
       defaultStyles = new HashMap<String,String>();
       internalReferences = new HashMap<String,TeXObject>();
@@ -1304,9 +1309,7 @@ public class L2HConverter extends LaTeXParserListener
 
       writeliteralln(String.format(
        "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=%s\">", 
-       htmlCharSet == null ? 
-         Charset.defaultCharset().name() : 
-         htmlCharSet.name()));
+       htmlCharSet.name()));
 
       ControlSequence cs = parser.getControlSequence("TeXParserLibGeneratorName");
       String generator = "TeX Parser Library";
@@ -2130,16 +2133,10 @@ public class L2HConverter extends LaTeXParserListener
 
          getParser().message(TeXApp.MESSAGE_WRITING, outFile);
 
-         if (htmlCharSet == null)
-         {
-            writer = new PrintWriter(outFile);
-         }
-         else
-         {
-            getParser().message(TeXApp.MESSAGE_ENCODING, htmlCharSet);
+         getParser().message(TeXApp.MESSAGE_ENCODING, htmlCharSet);
 
-            writer = new PrintWriter(outFile, htmlCharSet.name());
-         }
+         writer = new PrintWriter(Files.newBufferedWriter(outFile.toPath(),
+            htmlCharSet));
       }
    }
 

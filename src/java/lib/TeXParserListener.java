@@ -220,7 +220,10 @@ public abstract class TeXParserListener
    public abstract boolean input(TeXPath path, TeXObjectList stack)
     throws IOException;
 
-   public abstract Charset getCharSet();
+   public Charset getCharSet()
+   {
+      return getTeXApp().getDefaultCharset();
+   }
 
    public abstract TeXObjectList special(String param)
      throws IOException;
