@@ -54,6 +54,8 @@ There is NO WARRANTY, to the extent permitted by law.</entry>
 	process-stack	Whenever a stack is processed
 	cs		Control sequence
 	process-generic-cs	Whenever a GenericCommand is processed
+	catcode	Whenever a category code changes
+	read	Whenever a codepoint is read from a file
 </entry>
 <entry key="syntax.log">{0} &lt;file&gt;				Set log file.</entry>
 <entry key="syntax.nolog">{0}				Don''t log (default).</entry>
