@@ -15,7 +15,7 @@ sourceSets {
             srcDir("src/java/lib/")
         }
         resources {
-            srcDir("src/resources")
+            srcDir("src/java/lib/")
         }
     }
 }
