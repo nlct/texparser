@@ -329,6 +329,11 @@ public class AuxParser extends DefaultTeXParserListener
       return charset == null ? super.getCharSet() : charset;
    }
 
+   public void setCharSet(Charset charset)
+   {
+      this.charset = charset;
+   }
+
    // shouldn't be needed in auxFile
    @Override
    public float emToPt(float emValue)
