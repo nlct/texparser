@@ -2274,7 +2274,7 @@ public class TeXParser extends TeXObjectList
    public void parse(File file)
      throws IOException
    {
-      parse(file, null);
+      parse(file, getListener().getCharSet());
    }
 
    public void parse(File file, Charset charset)
@@ -2351,7 +2351,7 @@ public class TeXParser extends TeXObjectList
    public void parse(TeXPath path)
      throws IOException
    {
-      parse(path, null);
+      parse(path, getListener().getCharSet());
    }
 
    public void parse(TeXPath path, Charset charset)
