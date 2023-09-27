@@ -70,6 +70,7 @@ public class NewEnvironment extends Command
       return null;
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
@@ -125,6 +126,7 @@ public class NewEnvironment extends Command
          overwrite, name, envName, numParams, defValue, beginCode, endCode);
    }
 
+   @Override
    public void process(TeXParser parser)
      throws IOException
    {
