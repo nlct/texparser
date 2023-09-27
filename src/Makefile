@@ -3,7 +3,7 @@ TARGET_VERSION := --release 8
 test	: test-obs test-abs test-article test-nested test-doc \
 	  test-probsoln test-lists test-datatool test-mkimages \
 	  test-jmlrutils test-glossaries test-glossaries-extra \
-	  test-fontawesome test-userguide test-input
+	  test-fontawesome test-userguide test-input test-datatool-v3
 
 tests/output	:
 	mkdir -p tests/output
@@ -86,6 +86,10 @@ test-lists : app tests/output
 test-datatool : app tests/output
 	rm -f -r tests/output/test-datatool
 	bin/texparsertest --debug --in tests/test-datatool/test-datatool.tex --output tests/output/test-datatool --html
+
+test-datatool-v3 : app tests/output
+	rm -f -r tests/output/test-datatool-v3
+	bin/texparsertest --debug --in tests/test-datatool-v3/test-datatool-v3.tex --output tests/output/test-datatool-v3 --html
 
 test-jmlr	: app tests/output
 	rm -f -r tests/output/test-jmlr

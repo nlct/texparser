@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2023 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -21,18 +21,16 @@ package com.dickimawbooks.texparserlib.latex.datatool;
 import java.io.IOException;
 
 import com.dickimawbooks.texparserlib.*;
-import com.dickimawbooks.texparserlib.primitives.Relax;
 import com.dickimawbooks.texparserlib.latex.*;
 
-public class DTLsettabseparator extends ControlSequence
-  implements CatCodeChanger
+public class DTLdbNewRow extends ControlSequence
 {
-   public DTLsettabseparator(DataToolSty sty)
+   public DTLdbNewRow(DataToolSty sty)
    {
-      this("DTLsettabseparator", sty);
+      this("DTLdbNewRow", sty);
    }
 
-   public DTLsettabseparator(String name, DataToolSty sty)
+   public DTLdbNewRow(String name, DataToolSty sty)
    {
       super(name);
       this.sty = sty;
@@ -41,35 +39,31 @@ public class DTLsettabseparator extends ControlSequence
    @Override
    public Object clone()
    {
-      return new DTLsettabseparator(getName(), sty);
-   }
-
-   @Override
-   public void applyCatCodeChange(TeXParser parser)
-      throws IOException
-   {
-      parser.setCatCode(true, '\t', TeXParser.TYPE_OTHER);
-   }
-
-   @Override
-   public ControlSequence getNoOpCommand()
-   {
-      return new Relax(getName());
+      return new DTLdbNewRow(getName(), sty);
    }
 
    @Override
    public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      process(parser);
+      String label = "untitled";
+
+      ControlSequence cs =
+         parser.getControlSequence("l__datatool_default_dbname_str");
+
+      if (cs != null)
+      {
+         label = parser.expandToString(cs, stack);
+      }
+
+      sty.addNewRow(label);
    }
 
    @Override
    public void process(TeXParser parser)
      throws IOException
    {
-      applyCatCodeChange(parser);
-      sty.setSeparator('\t');
+      process(parser, parser);
    }
 
    protected DataToolSty sty;

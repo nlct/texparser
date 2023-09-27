@@ -28,6 +28,9 @@ import com.dickimawbooks.texparserlib.latex.*;
 import com.dickimawbooks.texparserlib.latex.ifthen.IfThenSty;
 import com.dickimawbooks.texparserlib.primitives.*;
 
+/**
+ * Limited support for datatool.sty.
+ */
 public class DataToolSty extends LaTeXSty
 {
    public DataToolSty(KeyValList options, LaTeXParserListener listener, 
@@ -79,6 +82,36 @@ public class DataToolSty extends LaTeXSty
         new UserNumber(DataToolHeader.TYPE_REAL)));
       registerControlSequence(new GenericCommand("DTLcurrencytype", null,
         new UserNumber(DataToolHeader.TYPE_CURRENCY)));
+
+      registerControlSequence(
+        new TextualContentCommand("@dtl@delimiter", "\""));
+
+      registerControlSequence(
+        new TextualContentCommand("@dtl@separator", ","));
+
+      // datatool v3.0:
+
+      registerControlSequence(new DTLsetup(this));
+      registerControlSequence(new DTLdbProvideData(this));
+      registerControlSequence(new DTLdbNewRow(this));
+      registerControlSequence(new DTLdbNewEntry(this));
+      registerControlSequence(new DTLdbSetHeader(this));
+
+      registerControlSequence(
+        new LaTeX3Boolean("l__datatool_db_global_bool", true));
+      registerControlSequence(
+        new LaTeX3Boolean("l__datatool_new_element_trim_bool", true));
+      registerControlSequence(
+        new LaTeX3Boolean("l__datatool_db_store_datum_bool", false));
+      registerControlSequence(
+        new LaTeX3Boolean("l_datatool_include_header_bool", true));
+      registerControlSequence(
+        new LaTeX3Boolean("l__datatool_append_allowed_bool", true));
+      registerControlSequence(
+        new LaTeX3Boolean("l__datatool_csv_literal_content_bool", true));
+
+      registerControlSequence(
+        new TextualContentCommand("l__datatool_default_dbname_str", "untitled"));
    }
 
    @Override
@@ -318,6 +351,25 @@ public class DataToolSty extends LaTeXSty
 
       headers.add(header);
       update(dbName, headers);
+
+      return header;
+   }
+
+   public DataToolHeader setColumnHeader(String dbName, String key,
+     TeXObject headerValue)
+   throws IOException
+   {
+      DataToolHeaderRow headers = getHeaderContents(dbName);
+
+      DataToolHeader header = headers.getHeader(key);
+
+      if (header == null)
+      {
+         throw new LaTeXSyntaxException(getListener().getParser(),
+           ERROR_HEADER_DOESNT_EXIST, key);
+      }
+
+      header.setTitle(headerValue);
 
       return header;
    }
@@ -666,26 +718,150 @@ public class DataToolSty extends LaTeXSty
    }
 
    public int getSeparator()
+   throws IOException
    {
+      ControlSequence cs = getParser().getControlSequence("@dtl@separator");
+
+      int separator = -1;
+
+      if (cs instanceof TextualContentCommand)
+      {
+         separator = ((TextualContentCommand)cs).getText().codePointAt(0);
+      }
+      else
+      {
+         String str = getParser().expandToString(cs, getParser());
+         separator = str.codePointAt(0);
+      }
+
       return separator;
    }
 
    public int getDelimiter()
+   throws IOException
    {
+      ControlSequence cs = getParser().getControlSequence("@dtl@delimiter");
+
+      int delimiter = -1;
+
+      if (cs instanceof TextualContentCommand)
+      {
+         delimiter = ((TextualContentCommand)cs).getText().codePointAt(0);
+      }
+      else
+      {
+         String str = getParser().expandToString(cs, getParser());
+         delimiter = str.codePointAt(0);
+      }
+
       return delimiter;
    }
 
    public void setSeparator(int charCode)
    {
-      separator = charCode;
+      getParser().putControlSequence(true, 
+       new TextualContentCommand("@dtl@separator", 
+        new String(Character.toChars(charCode))));
    }
 
    public void setDelimiter(int charCode)
    {
-      delimiter = charCode;
+      getParser().putControlSequence(true, 
+       new TextualContentCommand("@dtl@delimiter", 
+        new String(Character.toChars(charCode))));
    }
 
-   private int separator=',', delimiter='"';
+   public void processIOKeys(TeXObject arg, TeXObjectList stack)
+   throws IOException
+   {
+      TeXParser parser = getParser();
+
+      KeyValList options = TeXParserUtils.toKeyValList(arg, parser);
+
+      for (Iterator<String> it = options.keySet().iterator();
+           it.hasNext(); )
+      {  
+         String key = it.next();
+         
+         TeXObject val = options.get(key);
+
+         if (key.equals("name"))
+         {
+            parser.putControlSequence(true, 
+              new TextualContentCommand("l__datatool_io_name_str",
+                 parser.expandToString(val, stack)));
+         }
+         else if (key.equals("keys"))
+         {// TODO
+         }
+         else if (key.equals("headers"))
+         {// TODO
+         }
+         else if (key.equals("expand"))
+         {// TODO
+         }
+         else if (key.equals("format"))
+         {// TODO
+         }
+         else if (key.equals("add-delimiter"))
+         {// TODO
+         }
+         else if (key.equals("csv-escape-chars"))
+         {// TODO
+         }
+         else if (key.equals("csv-content"))
+         {// TODO
+         }
+         else if (key.equals("csv-blank"))
+         {// TODO
+         }
+         else if (key.equals("csv-skip-lines") || key.equals("omitlines"))
+         {// TODO
+         }
+         else if (key.equals("no-header") || key.equals("noheader"))
+         {// TODO
+         }
+         else if (key.equals("auto-keys") || key.equals("autokeys"))
+         {// TODO
+         }
+         else if (key.equals("overwrite"))
+         {// TODO
+         }
+         else if (key.equals("load-action"))
+         {// TODO
+         }
+         else if (key.equals("delimiter"))
+         {
+            String str = parser.expandToString(val, stack);
+            setDelimiter(str.codePointAt(0));
+         }
+         else if (key.equals("separator"))
+         {
+            String str = parser.expandToString(val, stack);
+            setSeparator(str.codePointAt(0));
+         }
+      }
+   }
+
+   public void processActionKeys(TeXObject arg, TeXObjectList stack)
+   throws IOException
+   {
+      TeXParser parser = getParser();
+
+      KeyValList options = TeXParserUtils.toKeyValList(arg, parser);
+
+// TODO
+   }
+
+   public void processDisplayKeys(TeXObject arg, TeXObjectList stack)
+   throws IOException
+   {
+      TeXParser parser = getParser();
+
+      KeyValList options = TeXParserUtils.toKeyValList(arg, parser);
+
+// TODO
+   }
 
    private DataToolBaseSty dataToolBaseSty;
 
@@ -704,4 +880,7 @@ public class DataToolSty extends LaTeXSty
 
    public static final String MESSAGE_LOADDB
      ="datatool.loaddb.message";
+
+   public static final String ERROR_UNKNOWN_KEY
+     ="datatool.unknown_key";
 }

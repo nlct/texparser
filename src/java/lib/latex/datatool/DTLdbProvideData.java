@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2023 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -21,18 +21,16 @@ package com.dickimawbooks.texparserlib.latex.datatool;
 import java.io.IOException;
 
 import com.dickimawbooks.texparserlib.*;
-import com.dickimawbooks.texparserlib.primitives.Relax;
 import com.dickimawbooks.texparserlib.latex.*;
 
-public class DTLsettabseparator extends ControlSequence
-  implements CatCodeChanger
+public class DTLdbProvideData extends ControlSequence
 {
-   public DTLsettabseparator(DataToolSty sty)
+   public DTLdbProvideData(DataToolSty sty)
    {
-      this("DTLsettabseparator", sty);
+      this("DTLdbProvideData", sty);
    }
 
-   public DTLsettabseparator(String name, DataToolSty sty)
+   public DTLdbProvideData(String name, DataToolSty sty)
    {
       super(name);
       this.sty = sty;
@@ -41,35 +39,41 @@ public class DTLsettabseparator extends ControlSequence
    @Override
    public Object clone()
    {
-      return new DTLsettabseparator(getName(), sty);
-   }
-
-   @Override
-   public void applyCatCodeChange(TeXParser parser)
-      throws IOException
-   {
-      parser.setCatCode(true, '\t', TeXParser.TYPE_OTHER);
-   }
-
-   @Override
-   public ControlSequence getNoOpCommand()
-   {
-      return new Relax(getName());
+      return new DTLdbProvideData(getName(), sty);
    }
 
    @Override
    public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      process(parser);
+      String label = popLabelString(parser, stack);
+
+      parser.putControlSequence(true, 
+       new TextualContentCommand("l__datatool_default_dbname_str", label));
+
+      parser.putControlSequence(true, 
+       new TextualContentCommand("dtllastloadeddb", label));
+
+      boolean global = true;
+
+      ControlSequence cs = parser.getControlSequence("l__datatool_db_global_bool");
+
+      if (cs instanceof TeXBoolean)
+      {
+         global = ((TeXBoolean)cs).booleanValue();
+      }
+
+      if (!sty.dbExists(label))
+      {
+         sty.createDataBase(label, global);
+      }
    }
 
    @Override
    public void process(TeXParser parser)
      throws IOException
    {
-      applyCatCodeChange(parser);
-      sty.setSeparator('\t');
+      process(parser, parser);
    }
 
    protected DataToolSty sty;

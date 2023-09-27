@@ -801,11 +801,15 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       parser.putControlSequence(new ShortHandOff());
 
       // LaTeX3
-      // currently just implementing enough to pick up cat code
+      // minimal support, mainly to pick up cat code
       // changes to allow command names to be read properly
       parser.putControlSequence(new ExplSyntaxOn());
       parser.putControlSequence(new ExplSyntaxOff());
       parser.putControlSequence(new CharSetCatCodeNN());
+
+      // Booleans
+      parser.putControlSequence(new LaTeX3Boolean("c_false_bool", false));
+      parser.putControlSequence(new LaTeX3Boolean("c_true_bool", true));
 
       parser.putControlSequence(new GenericCommand(true,
         "BooleanTrue", null, ONE));
