@@ -7,11 +7,17 @@
 % in.
 \newcommand{\boldstuff}[1]{{\bf #1}}
 
+\newenvironment{itquote}{\begin{quotation}\itshape}{\end{quotation}}
+
 \title{Sample Document}
 \author{Me}
 
 \begin{document}
 \maketitle
+
+\begin{itquote}
+Test environment.
+\end{itquote}
 
 This is a test {\sf document} that uses {\bf  deprecated} code.
 Figure~\ref{fig:sample} shows a sample {\it image}.

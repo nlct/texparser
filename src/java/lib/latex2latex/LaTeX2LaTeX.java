@@ -1113,6 +1113,33 @@ public class LaTeX2LaTeX extends LaTeXParserListener
       write(String.format("%s%s%s", bg, definition.toString(parser), eg));
    }
 
+   @Override
+   public void newenvironment(Overwrite overwrite, String type, String envName,
+     int numParams, TeXObject defValue, TeXObject definition, TeXObject endDefinition)
+   throws IOException
+   {
+      String bg = new String(Character.toChars(parser.getBgChar()));
+      String eg = new String(Character.toChars(parser.getEgChar()));
+      String esc = new String(Character.toChars(parser.getEscChar()));
+      
+      write(esc);
+      write(type);
+      write(bg+envName+eg);
+
+      if (numParams > 0)
+      {
+         write("["+numParams+"]");
+
+         if (defValue != null)
+         {
+            write("["+defValue.toString(parser)+"]");
+         }
+      }
+
+      write(bg + definition.toString(parser) + eg);
+      write(bg + endDefinition.toString(parser) + eg);
+   }
+
    private Path outPath, basePath;
    private PrintWriter writer;
 
@@ -1136,7 +1163,7 @@ public class LaTeX2LaTeX extends LaTeXParserListener
       "equation", "endequation", "equation*", "endequation*",
       "align", "endalign", "align*", "endalign*",
       "input", "newcommand", "renewcommand", "providecommand",
-      "bibliography"
+      "newenvironment", "renewenvironment", "bibliography"
    };
 
    public static final String[] SKIP_CMDS = new String[]
