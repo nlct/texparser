@@ -45,14 +45,22 @@ public class L2LVerbatim extends Verbatim
    public void process(TeXParser parser, TeXObjectList stack)
     throws IOException
    {
+      LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
+
       process(parser);
+
+      listener.beginVerbatim();
+
+      Writeable writeable = listener.getWriteable();
 
       for (TeXObject obj : stack)
       {
-         parser.getListener().getWriteable().write(obj.toString(parser));
+         writeable.write(obj.toString(parser));
       }
 
       end(parser, stack);
+
+      listener.endVerbatim();
    }
 
    @Override

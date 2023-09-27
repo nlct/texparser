@@ -252,8 +252,15 @@ public class TeXReader implements Readable,Closeable
    @Override
    public String toString()
    {
-      return String.format("%s[source=%s,pending=%s,isOpen=%s,eofFound=%s,parent=%s]", 
-        getClass().getSimpleName(), source, pending, isOpen, eofFound,
+      int line = -1;
+
+      if (reader instanceof LineNumberReader)
+      {
+         line = ((LineNumberReader)reader).getLineNumber();
+      }
+
+      return String.format("%s[source=%s,line=%d,pending=%s,isOpen=%s,eofFound=%s,parent=%s]", 
+        getClass().getSimpleName(), source, line, pending, isOpen, eofFound,
          parent == null ? null : parent.source);
    }
 

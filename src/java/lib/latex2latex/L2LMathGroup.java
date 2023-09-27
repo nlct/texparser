@@ -44,17 +44,20 @@ public class L2LMathGroup extends MathGroup
       this.closeDelim = closeDelim;
    }
 
+   @Override
    public TeXObjectList createList()
    {
       return new L2LMathGroup(isInLine(), openDelim, closeDelim);
    }
 
+   @Override
    public void process(TeXParser parser)
       throws IOException
    {
       process(parser, parser);
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack)
       throws IOException
    {

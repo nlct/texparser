@@ -14,7 +14,8 @@ test-nested	: app tests/output
 
 test-obs	: app tests/output
 	rm -f -r tests/output/test-obsolete
-	bin/texparsertest --debug --in tests/test-obsolete/test-obs.tex --output tests/output/test-obsolete
+	bin/texparsertest --debug --log tests/output/test-obsolete.log --in tests/test-obsolete/test-obs.tex --output tests/output/test-obsolete
+	cd tests/output/test-obsolete; pdflatex test-obs.tex
 
 test-sw	: app tests/output
 	rm -f -r tests/output/test-sw

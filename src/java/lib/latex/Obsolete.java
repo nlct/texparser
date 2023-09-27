@@ -55,6 +55,11 @@ public class Obsolete extends ControlSequence
 
          if (cs != null)
          {
+            if (parser.isDebugMode(TeXParser.DEBUG_PROCESSING))
+            {
+               parser.logMessage(String.format("OBSOLETE %s -> %s", orgCommand, cs));
+            }
+
             TeXObjectList repl = new TeXObjectList();
 
             repl.add(cs);
@@ -65,30 +70,14 @@ public class Obsolete extends ControlSequence
             StringBuilder builder = new StringBuilder();
             builder.append(orgCommand.toString(parser));
 
-            TeXObject obj;
-
-            if (stack == parser)
-            {
-               obj = parser.popStack(popStyle);
-            }
-            else
-            {
-               obj = stack.popStack(parser, popStyle);
-            }
+            TeXObject obj = TeXParserUtils.pop(parser, stack, popStyle);
 
             while (obj instanceof Ignoreable)
             {
                repl.add(obj);
                builder.append(obj.toString(parser));
 
-               if (stack == parser)
-               {
-                  obj = parser.popStack(popStyle);
-               }
-               else
-               {
-                  obj = stack.popStack(parser, popStyle);
-               }
+               obj = TeXParserUtils.pop(parser, stack, popStyle);
             }
 
             while (obj != null)
@@ -108,14 +97,7 @@ public class Obsolete extends ControlSequence
                builder.append(obj.toString(parser));
                grp.add(obj);
 
-               if (stack == parser)
-               {
-                  obj = parser.popStack(popStyle);
-               }
-               else
-               {
-                  obj = stack.popStack(parser, popStyle);
-               }
+               obj = TeXParserUtils.pop(parser, stack, popStyle);
             }
 
             if (obj != null)
@@ -125,40 +107,20 @@ public class Obsolete extends ControlSequence
 
             listener.substituting(builder.toString(), repl.toString(parser));
 
-            if (parser == stack)
-            {
-               repl.process(parser);
-            }
-            else
-            {
-               repl.process(parser, stack);
-            }
+            TeXParserUtils.process(repl, parser, stack);
 
-            return;
-         }
-
-         if (parser == stack)
-         {
-            orgCommand.process(parser);
          }
          else
          {
-            orgCommand.process(parser, stack);
+            TeXParserUtils.process(orgCommand, parser, stack);
          }
-
-         return;
-      }
-
-      listener.substituting( 
-        orgCommand.toString(parser), replacementCommand.toString(parser));
-
-      if (parser == stack)
-      {
-         replacementCommand.process(parser);
       }
       else
       {
-         replacementCommand.process(parser, stack);
+         listener.substituting( 
+           orgCommand.toString(parser), replacementCommand.toString(parser));
+
+         TeXParserUtils.process(replacementCommand, parser, stack);
       }
    }
 

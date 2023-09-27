@@ -1897,6 +1897,8 @@ public class TeXParser extends TeXObjectList
    {
       if (reader == null)
       {
+         logMessage("NULL reader");
+
          return false;
       }
 
@@ -2770,7 +2772,7 @@ public class TeXParser extends TeXObjectList
             fetchNext(isShort(popStyle));
          }
 
-         if (fetchNext())
+         if (!fetchNext())
          {
             throw new EOFException();
          }
@@ -3371,10 +3373,14 @@ public class TeXParser extends TeXObjectList
    {
       StringBuilder builder = new StringBuilder();
 
+      builder.append(getClass().getSimpleName()+"[reader="+reader+",buffered: ");
+
       for (TeXObject object : this)
       {
          builder.append(object.toString());
       }
+
+      builder.append("]");
 
       return builder.toString();
    }
@@ -3771,6 +3777,6 @@ public class TeXParser extends TeXObjectList
    public static final int DEBUG_CATCODE = 16384;
    public static final int DEBUG_READ = 32768;
 
-   public static final String VERSION = "0.9.7b";
-   public static final String VERSION_DATE = "2023-09-04";
+   public static final String VERSION = "0.9.8b";
+   public static final String VERSION_DATE = "2023-09-27";
 }

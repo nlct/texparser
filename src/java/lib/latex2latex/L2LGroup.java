@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2023 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -42,6 +42,7 @@ public class L2LGroup extends Group
       super(listener, text);
    }
 
+   @Override
    public TeXObjectList createList()
    {
       return new L2LGroup(capacity());
@@ -99,6 +100,7 @@ public class L2LGroup extends Group
       push(object);
    }
 
+   @Override
    public void startGroup(TeXParser parser)
     throws IOException
    {
@@ -112,6 +114,7 @@ public class L2LGroup extends Group
       parser.startGroup();
    }
 
+   @Override
    public void endGroup(TeXParser parser)
     throws IOException
    {

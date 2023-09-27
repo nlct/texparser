@@ -76,8 +76,10 @@ public class Verbatim extends Declaration
    public void process(TeXParser parser)
     throws IOException
    {
-      // Do nothing (Begin checks for Verbatim and creates a
-      // substack) so this method shouldn't be called.
+      /* Do nothing (Begin checks for Verbatim and creates a
+         substack) so this method shouldn't be called.
+         Note that latex2latex/L2HVerbatim overrides this.
+       */
    }
 
    @Override
