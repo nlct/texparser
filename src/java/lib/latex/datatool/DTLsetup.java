@@ -144,7 +144,8 @@ public class DTLsetup extends ControlSequence
          }
          else
          {
-            throw new LaTeXSyntaxException(parser, DataToolSty.ERROR_UNKNOWN_KEY,
+            throw new LaTeXSyntaxException(parser,
+             LaTeXSyntaxException.ERROR_UNKNOWN_OPTION,
              key, "datatool");
          }
       }

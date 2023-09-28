@@ -29,7 +29,12 @@ import com.dickimawbooks.texparserlib.latex.ifthen.IfThenSty;
 import com.dickimawbooks.texparserlib.primitives.*;
 
 /**
- * Limited support for datatool.sty.
+ * Limited support for datatool.sty. This is mostly intended for use
+ * by datatooltk for reading and writing database files. Additional
+ * commands are supplied to make it easier to test. (It may
+ * eventually be possible to add support to LaTeX2LaTeX to allow
+ * expansion of the datatool commands, but support for datatooltk is
+ * the primary focus at the moment.)
  */
 public class DataToolSty extends LaTeXSty
 {
@@ -89,7 +94,43 @@ public class DataToolSty extends LaTeXSty
       registerControlSequence(
         new TextualContentCommand("@dtl@separator", ","));
 
+      registerControlSequence(
+        new TextualContentCommand("dtldisplayvalign", "c"));
+
+      registerControlSequence(
+         new GenericCommand("dtldisplaystarttab"));
+
+      registerControlSequence(
+         new TextualContentCommand("dtlstringalign", "l"));
+
+      registerControlSequence(
+         new TextualContentCommand("dtlintalign", "r"));
+
+      registerControlSequence(
+         new TextualContentCommand("dtlrealalign", "r"));
+
+      registerControlSequence(
+         new TextualContentCommand("dtlcurrencyalign", "r"));
+
+      registerControlSequence(
+         new GenericCommand("dtlbetweencols"));
+
+      registerControlSequence(
+         new GenericCommand("dtlbeforecols"));
+
+      registerControlSequence(
+         new GenericCommand("dtlaftercols"));
+
       // datatool v3.0:
+
+      registerControlSequence(
+        new TextualContentCommand("dtldisplaydbenv", "tabular"));
+
+      registerControlSequence(
+        new TextualContentCommand("dtldisplaylongdbenv", "longtable"));
+
+      registerControlSequence(new AtNumberOfNumber(
+       "__datatool_if_display_row:nNT", 3, 3));
 
       registerControlSequence(new DTLsetup(this));
       registerControlSequence(new DTLdbProvideData(this));
@@ -109,9 +150,34 @@ public class DataToolSty extends LaTeXSty
         new LaTeX3Boolean("l__datatool_append_allowed_bool", true));
       registerControlSequence(
         new LaTeX3Boolean("l__datatool_csv_literal_content_bool", true));
-
       registerControlSequence(
         new TextualContentCommand("l__datatool_default_dbname_str", "untitled"));
+
+      // display options
+
+      registerControlSequence(
+         new GenericCommand("l__datatool_omit_columns_seq"));
+
+      registerControlSequence(
+         new GenericCommand("l__datatool_omit_keys_seq"));
+
+      registerControlSequence(
+         new GenericCommand("l__datatool_only_columns_seq"));
+
+      registerControlSequence(
+         new GenericCommand("l__datatool_only_keys_seq"));
+
+      registerControlSequence(
+         new GenericCommand("l__datatool_pre_display_tl"));
+
+      registerControlSequence(
+         new GenericCommand("l__datatool_post_head_tl"));
+
+      registerControlSequence(
+         new GenericCommand("l__datatool_user_align_tl"));
+
+      registerControlSequence(
+         new GenericCommand("l__datatool_user_header_tl"));
    }
 
    @Override
@@ -860,7 +926,249 @@ public class DataToolSty extends LaTeXSty
 
       KeyValList options = TeXParserUtils.toKeyValList(arg, parser);
 
-// TODO
+      for (Iterator<String> it = options.keySet().iterator();
+           it.hasNext(); )
+      {  
+         String key = it.next();
+         
+         TeXObject val = options.get(key);
+
+         if (key.equals("omit-columns") || key.equals("omit"))
+         {
+            if (val == null || val.isEmpty())
+            {
+               parser.putControlSequence(true, 
+                new GenericCommand("l__datatool_omit_columns_seq"));
+            }
+            else
+            {
+               CsvList csvList = TeXParserUtils.toCsvList(val, parser);
+
+               parser.putControlSequence(true, 
+                new GenericCommand("l__datatool_omit_columns_seq", null, csvList));
+
+               parser.putControlSequence(true, 
+                new GenericCommand("l__datatool_only_columns_seq"));
+
+               parser.putControlSequence(true, 
+                new GenericCommand("l__datatool_only_keys_seq"));
+
+               parser.putControlSequence(true, 
+                new GenericCommand("l__datatool_omit_keys_seq"));
+            }
+         }
+         else if (key.equals("only-columns"))
+         {
+            if (val == null || val.isEmpty())
+            {
+               parser.putControlSequence(true, 
+                new GenericCommand("l__datatool_only_columns_seq"));
+            }
+            else
+            {
+               CsvList csvList = TeXParserUtils.toCsvList(val, parser);
+
+               parser.putControlSequence(true, 
+                new GenericCommand("l__datatool_only_columns_seq", null, csvList));
+
+               parser.putControlSequence(true, 
+                new GenericCommand("l__datatool_omit_columns_seq"));
+
+               parser.putControlSequence(true, 
+                new GenericCommand("l__datatool_only_keys_seq"));
+
+               parser.putControlSequence(true, 
+                new GenericCommand("l__datatool_omit_keys_seq"));
+            }
+         }
+         else if (key.equals("omit-keys"))
+         {
+            if (val == null || val.isEmpty())
+            {
+               parser.putControlSequence(true, 
+                new GenericCommand("l__datatool_omit_keys_seq"));
+            }
+            else
+            {
+               CsvList csvList = TeXParserUtils.toCsvList(val, parser);
+
+               parser.putControlSequence(true, 
+                new GenericCommand("l__datatool_omit_keys_seq", null, csvList));
+
+               parser.putControlSequence(true, 
+                new GenericCommand("l__datatool_omit_columns_seq"));
+
+               parser.putControlSequence(true, 
+                new GenericCommand("l__datatool_only_columns_seq"));
+
+               parser.putControlSequence(true, 
+                new GenericCommand("l__datatool_only_keys_seq"));
+            }
+         }
+         else if (key.equals("only-keys"))
+         {
+            if (val == null || val.isEmpty())
+            {
+               parser.putControlSequence(true, 
+                new GenericCommand("l__datatool_only_keys_seq"));
+            }
+            else
+            {
+               CsvList csvList = TeXParserUtils.toCsvList(val, parser);
+
+               parser.putControlSequence(true, 
+                new GenericCommand("l__datatool_only_keys_seq", null, csvList));
+
+               parser.putControlSequence(true, 
+                new GenericCommand("l__datatool_omit_keys_seq"));
+
+               parser.putControlSequence(true, 
+                new GenericCommand("l__datatool_only_columns_seq"));
+
+               parser.putControlSequence(true, 
+                new GenericCommand("l__datatool_omit_columns_seq"));
+            }
+         }
+         else if (key.equals("row-condition"))
+         {
+            parser.putControlSequence(true, 
+             new GenericCommand(parser.getListener(), true,
+               "__datatool_if_display_row:nNT", 3, 
+               TeXParserUtils.toList(val, parser)));
+         }
+         else if (key.equals("pre-content"))
+         {
+            parser.putControlSequence(true, 
+             new GenericCommand("l__datatool_pre_display_tl", null, val));
+         }
+         else if (key.equals("pre-head"))
+         {
+            parser.putControlSequence(true, 
+             new GenericCommand("dtldisplaystarttab", null, val));
+         }
+         else if (key.equals("post-head"))
+         {
+            parser.putControlSequence(true, 
+             new GenericCommand("l_datatool_post_head_tl", null, val));
+         }
+         else if (key.equals("align-specs"))
+         {
+            parser.putControlSequence(true, 
+             new GenericCommand("l__datatool_user_align_tl", null, val));
+         }
+         else if (key.equals("header-row"))
+         {
+            parser.putControlSequence(true, 
+             new GenericCommand("l__datatool_user_header_tl", null, val));
+         }
+         else if (key.equals("no-header"))
+         {
+            parser.putControlSequence(true, 
+             new LaTeX3Boolean("l_datatool_include_header_bool", 
+              !(val == null || val.isEmpty() 
+                || val.toString(parser).trim().equals("true"))));
+         }
+         else if (key.equals("string-align"))
+         {
+            parser.putControlSequence(true, 
+             new GenericCommand("dtlstringalign", null, val));
+         }
+         else if (key.equals("int-align") || key.equals("integer-align"))
+         {
+            parser.putControlSequence(true, 
+             new GenericCommand("dtlintalign", null, val));
+         }
+         else if (key.equals("real-align") || key.equals("decimal-align"))
+         {
+            parser.putControlSequence(true, 
+             new GenericCommand("dtlrealalign", null, val));
+         }
+         else if (key.equals("currency-align"))
+         {
+            parser.putControlSequence(true, 
+             new GenericCommand("dtlcurrencyalign", null, val));
+         }
+         else if (key.equals("inter-col"))
+         {
+            parser.putControlSequence(true, 
+             new GenericCommand("dtlbetweencols", null, val));
+         }
+         else if (key.equals("pre-col"))
+         {
+            parser.putControlSequence(true, 
+             new GenericCommand("dtlbeforecols", null, val));
+         }
+         else if (key.equals("post-col"))
+         {
+            parser.putControlSequence(true, 
+             new GenericCommand("dtlaftercols", null, val));
+         }
+         else if (key.equals("tabular-env"))
+         {
+            String valStr = (val == null || val.isEmpty() ? "tabular"
+              : parser.expandToString(val, stack).trim());
+
+            parser.putControlSequence(true,
+              new TextualContentCommand("dtldisplaydbenv", valStr));
+
+            if (valStr.equals("tabular") || valStr.equals("array"))
+            {
+               String currValign = parser.expandToString(
+                 parser.getControlSequence("dtldisplayvalign"), stack);
+
+               if (!(currValign.equals("t") || currValign.equals("b")
+                      || currValign.equals("c")))
+               {
+                  parser.putControlSequence(true,
+                     new TextualContentCommand("dtldisplayvalign", "c"));
+               }
+            }
+         }
+         else if (key.equals("longtable-env"))
+         {
+            String valStr = (val == null || val.isEmpty() ? "longtable"
+              : parser.expandToString(val, stack).trim());
+
+            parser.putControlSequence(true,
+              new TextualContentCommand("dtldisplaylongdbenv", valStr));
+         }
+         else if (key.equals("caption"))
+         {
+            parser.putControlSequence(true,
+              new GenericCommand("l_datatool_caption_tl", null, val));
+         }
+         else if (key.equals("short-caption") || key.equals("shortcaption"))
+         {
+            parser.putControlSequence(true,
+              new GenericCommand("l_datatool_short_caption_tl", null, val));
+         }
+         else if (key.equals("cont-caption") || key.equals("contcaption"))
+         {
+            parser.putControlSequence(true,
+              new GenericCommand("l_datatool_cont_caption_tl", null, val));
+         }
+         else if (key.equals("label"))
+         {
+            parser.putControlSequence(true,
+              new GenericCommand("l_datatool_label_tl", null, val));
+         }
+         else if (key.equals("foot"))
+         {
+            parser.putControlSequence(true,
+              new GenericCommand("l_datatool_foot_tl", null, val));
+         }
+         else if (key.equals("last-foot") || key.equals("lastfoot"))
+         {
+            parser.putControlSequence(true,
+              new GenericCommand("l_datatool_last_foot_tl", null, val));
+         }
+         else
+         {
+            throw new LaTeXSyntaxException(parser, 
+             LaTeXSyntaxException.ERROR_UNKNOWN_OPTION,
+             key, "datatool/display");
+         }
+      }
    }
 
    private DataToolBaseSty dataToolBaseSty;
@@ -881,6 +1189,4 @@ public class DataToolSty extends LaTeXSty
    public static final String MESSAGE_LOADDB
      ="datatool.loaddb.message";
 
-   public static final String ERROR_UNKNOWN_KEY
-     ="datatool.unknown_key";
 }

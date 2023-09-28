@@ -449,11 +449,19 @@ public class TeXParserUtils
          arg.format(), arg.getClass().getSimpleName());
    }
 
-   public static CsvList popCsvList(TeXParser parser, TeXObjectList stack)
+   public static TeXObjectList toList(TeXObject arg, TeXParser parser)
+   {
+      if (parser.isStack(arg))
+      {
+         return (TeXObjectList)arg;
+      }
+
+      return createStack(parser, arg);
+   }
+
+   public static CsvList toCsvList(TeXObject arg, TeXParser parser)
      throws IOException
    {
-      TeXObject arg = popArg(parser, stack);
-
       if (arg instanceof CsvList)
       {
          return (CsvList)arg;
@@ -472,6 +480,14 @@ public class TeXParserUtils
       return CsvList.getList(parser, arg);
    }
 
+   public static CsvList popCsvList(TeXParser parser, TeXObjectList stack)
+     throws IOException
+   {
+      TeXObject arg = popArg(parser, stack);
+
+      return toCsvList(arg, parser);
+   }
+
    public static CsvList popOptCsvList(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
@@ -482,22 +498,7 @@ public class TeXParserUtils
          return null;
       }
 
-      if (arg instanceof CsvList)
-      {
-         return (CsvList)arg;
-      }
-
-      if (parser.isStack(arg))
-      {
-         TeXObjectList list = (TeXObjectList)arg;
-
-         if (list.size() == 1 && list.firstElement() instanceof CsvList)
-         {
-            return (CsvList)list.firstElement();
-         }
-      }
-
-      return CsvList.getList(parser, arg);
+      return toCsvList(arg, parser);
    }
 
    public static KeyValList toKeyValList(TeXObject arg, TeXParser parser)

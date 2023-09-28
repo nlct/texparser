@@ -73,4 +73,6 @@ public class LaTeXSyntaxException extends TeXSyntaxException
    "latex.error.counter.out.of.range";
    public static final String ERROR_UNSUPPORTED_XPARSE_TYPE =
    "latex.unsupported.xparse_type";
+   public static final String ERROR_UNKNOWN_OPTION =
+   "latex.unknown.option";
 }
