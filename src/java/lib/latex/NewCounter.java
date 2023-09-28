@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2023 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -34,86 +34,35 @@ public class NewCounter extends ControlSequence
       super(name);
    }
 
+   @Override
    public Object clone()
    {
       return new NewCounter(getName());
    }
 
-   public void process(TeXParser parser, TeXObjectList list)
+   @Override
+   public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      TeXObject counter = list.popArg(parser);
-
-      if (counter instanceof Expandable)
-      {
-         TeXObjectList expanded = ((Expandable)counter).expandfully(parser, list);
-
-         if (expanded != null)
-         {
-            counter = expanded;
-         }
-      }
-
-      TeXObject master = list.popArg(parser, '[', ']');
-
-      if (master != null && master instanceof Expandable)
-      {
-         TeXObjectList expanded = ((Expandable)master).expandfully(parser, list);
-
-         if (expanded != null)
-         {
-            master = expanded;
-         }
-      }
+      String parent = popOptLabelString(parser, stack);
+      String counterName = popLabelString(parser, stack);
 
       LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
 
-      if (master == null)
+      if (parent == null)
       {
-         listener.newcounter(counter.toString(parser));
+         listener.newcounter(counterName);
       }
       else
       {
-         listener.newcounter(counter.toString(parser), master.toString(parser));
+         listener.newcounter(counterName, parent);
       }
    }
 
+   @Override
    public void process(TeXParser parser)
      throws IOException
    {
-      TeXObject counter = parser.popNextArg();
-
-      if (counter instanceof Expandable)
-      {
-         TeXObjectList expanded = ((Expandable)counter).expandfully(parser);
-
-         if (expanded != null)
-         {
-            counter = expanded;
-         }
-      }
-
-      TeXObject master = parser.popNextArg('[', ']');
-
-      if (master != null && master instanceof Expandable)
-      {
-         TeXObjectList expanded = ((Expandable)master).expandfully(parser);
-
-         if (expanded != null)
-         {
-            master = expanded;
-         }
-      }
-
-      LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
-
-      if (master == null)
-      {
-         listener.newcounter(counter.toString(parser));
-      }
-      else
-      {
-         listener.newcounter(counter.toString(parser), master.toString(parser));
-      }
+      process(parser, parser);
    }
 }
