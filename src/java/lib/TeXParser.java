@@ -2288,6 +2288,11 @@ public class TeXParser extends TeXObjectList
    public void parse(File file, Charset charset, TeXObjectList stack)
      throws IOException
    {
+      if (baseDir == null)
+      {
+         setBaseDir(file.getParentFile());
+      }
+
       if (charset == null)
       {
          charset = getListener().getTeXApp().getDefaultCharset();
@@ -2365,6 +2370,11 @@ public class TeXParser extends TeXObjectList
    public void parse(TeXPath path, Charset charset, TeXObjectList stack)
      throws IOException
    {
+      if (baseDir == null)
+      {
+         setBaseDir(path.getBaseDir());
+      }
+
       if (charset == null)
       {
          charset = getListener().getTeXApp().getDefaultCharset();
@@ -3092,6 +3102,21 @@ public class TeXParser extends TeXObjectList
       return null;
    }
 
+   public void setBaseDir(File dir)
+   {
+      baseDir = dir;
+   }
+
+   public void setBaseDir(Path path)
+   {
+      baseDir = (path == null ? null : path.toFile());
+   }
+
+   public File getBaseDir()
+   {
+      return baseDir;
+   }
+
    public void setReader(TeXReader reader)
    {
       this.reader = reader;
@@ -3740,6 +3765,8 @@ public class TeXParser extends TeXObjectList
 
    private TeXReader reader;
 
+   protected File baseDir = null;
+
    private TeXParserListener listener;
 
    public static final int TYPE_ESC = 0, TYPE_BG=1, TYPE_EG=2,
@@ -3777,6 +3804,6 @@ public class TeXParser extends TeXObjectList
    public static final int DEBUG_CATCODE = 16384;
    public static final int DEBUG_READ = 32768;
 
-   public static final String VERSION = "0.9.8b";
-   public static final String VERSION_DATE = "2023-09-27";
+   public static final String VERSION = "0.9.8.20230928b";
+   public static final String VERSION_DATE = "2023-09-28";
 }

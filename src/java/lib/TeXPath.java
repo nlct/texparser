@@ -67,7 +67,7 @@ public class TeXPath
    private void init(TeXParser parser, File file)
      throws IOException
    {
-      File parent = (parser == null ? null : parser.getCurrentParentFile());
+      File parent = (parser == null ? null : parser.getBaseDir());
 
       Path path = file.toPath();
 
@@ -94,7 +94,7 @@ public class TeXPath
      boolean useKpsewhich, String... defExt)
      throws IOException
    {
-      File parent = (parser == null ? null : parser.getCurrentParentFile());
+      File parent = (parser == null ? null : parser.getBaseDir());
 
       base = (parent == null ? null : parent.toPath());
 
