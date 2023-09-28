@@ -2291,6 +2291,11 @@ public class TeXParser extends TeXObjectList
       if (baseDir == null)
       {
          setBaseDir(file.getParentFile());
+
+         if (baseDir == null)
+         {
+            setBaseDir(new File("."));
+         }
       }
 
       if (charset == null)
@@ -2373,6 +2378,11 @@ public class TeXParser extends TeXObjectList
       if (baseDir == null)
       {
          setBaseDir(path.getBaseDir());
+
+         if (baseDir == null)
+         {
+            setBaseDir(new File("."));
+         }
       }
 
       if (charset == null)
