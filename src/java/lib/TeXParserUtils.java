@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2022 Nicola L.C. Talbot
+    Copyright (C) 2022-2023 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -279,6 +279,26 @@ public class TeXParserUtils
       }
 
       return expandFully(arg, parser, stack);
+   }
+
+   public static Numerical toNumerical(TeXObject obj, 
+    TeXParser parser, TeXObjectList stack)
+   throws IOException
+   {
+      if (obj instanceof Numerical)
+      {
+         return (Numerical)obj;
+      }
+
+      if (parser.isStack(obj) && ((TeXObjectList)obj).size() == 1
+           && ((TeXObjectList)obj).firstElement() instanceof Numerical)
+      {
+         return (Numerical)((TeXObjectList)obj).firstElement();
+      }
+
+      String str = parser.expandToString(obj, stack).trim();
+
+      return new UserNumber(parser, str);
    }
 
    /**

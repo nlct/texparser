@@ -62,6 +62,7 @@ public class DataToolSty extends LaTeXSty
       registerControlSequence(new DTLnewdbentry(this));
       registerControlSequence(new DTLmessage());
       registerControlSequence(new DTLforeach(this));
+      registerControlSequence(new DTLdisplaydb(this));
       registerControlSequence(new DTLsetdelimiter(this));
       registerControlSequence(new DTLsetseparator(this));
       registerControlSequence(new DTLsettabseparator(this));
@@ -121,6 +122,9 @@ public class DataToolSty extends LaTeXSty
       registerControlSequence(
          new GenericCommand("dtlaftercols"));
 
+      getParser().getSettings().newcount(true, "dtlcolumnnum");
+      getParser().getSettings().newcount(true, "dtlrownum");
+
       // datatool v3.0:
 
       registerControlSequence(
@@ -137,6 +141,9 @@ public class DataToolSty extends LaTeXSty
       registerControlSequence(new DTLdbNewRow(this));
       registerControlSequence(new DTLdbNewEntry(this));
       registerControlSequence(new DTLdbSetHeader(this));
+
+      getParser().getSettings().newcount(true, "l__datatool_max_cols_int");
+      getParser().getSettings().newcount(true, "l__datatool_item_type_int");
 
       registerControlSequence(
         new LaTeX3Boolean("l__datatool_db_global_bool", true));
@@ -156,16 +163,16 @@ public class DataToolSty extends LaTeXSty
       // display options
 
       registerControlSequence(
-         new GenericCommand("l__datatool_omit_columns_seq"));
+         new SequenceCommand("l__datatool_omit_columns_seq"));
 
       registerControlSequence(
-         new GenericCommand("l__datatool_omit_keys_seq"));
+         new SequenceCommand("l__datatool_omit_keys_seq"));
 
       registerControlSequence(
-         new GenericCommand("l__datatool_only_columns_seq"));
+         new SequenceCommand("l__datatool_only_columns_seq"));
 
       registerControlSequence(
-         new GenericCommand("l__datatool_only_keys_seq"));
+         new SequenceCommand("l__datatool_only_keys_seq"));
 
       registerControlSequence(
          new GenericCommand("l__datatool_pre_display_tl"));
@@ -938,23 +945,24 @@ public class DataToolSty extends LaTeXSty
             if (val == null || val.isEmpty())
             {
                parser.putControlSequence(true, 
-                new GenericCommand("l__datatool_omit_columns_seq"));
+                new SequenceCommand("l__datatool_omit_columns_seq"));
             }
             else
             {
                CsvList csvList = TeXParserUtils.toCsvList(val, parser);
 
                parser.putControlSequence(true, 
-                new GenericCommand("l__datatool_omit_columns_seq", null, csvList));
+                SequenceCommand.createFromClist(
+                  parser, "l__datatool_omit_columns_seq", csvList));
 
                parser.putControlSequence(true, 
-                new GenericCommand("l__datatool_only_columns_seq"));
+                new SequenceCommand("l__datatool_only_columns_seq"));
 
                parser.putControlSequence(true, 
-                new GenericCommand("l__datatool_only_keys_seq"));
+                new SequenceCommand("l__datatool_only_keys_seq"));
 
                parser.putControlSequence(true, 
-                new GenericCommand("l__datatool_omit_keys_seq"));
+                new SequenceCommand("l__datatool_omit_keys_seq"));
             }
          }
          else if (key.equals("only-columns"))
@@ -962,23 +970,24 @@ public class DataToolSty extends LaTeXSty
             if (val == null || val.isEmpty())
             {
                parser.putControlSequence(true, 
-                new GenericCommand("l__datatool_only_columns_seq"));
+                new SequenceCommand("l__datatool_only_columns_seq"));
             }
             else
             {
                CsvList csvList = TeXParserUtils.toCsvList(val, parser);
 
                parser.putControlSequence(true, 
-                new GenericCommand("l__datatool_only_columns_seq", null, csvList));
+                SequenceCommand.createFromClist(
+                  parser, "l__datatool_only_columns_seq", csvList));
 
                parser.putControlSequence(true, 
-                new GenericCommand("l__datatool_omit_columns_seq"));
+                new SequenceCommand("l__datatool_omit_columns_seq"));
 
                parser.putControlSequence(true, 
-                new GenericCommand("l__datatool_only_keys_seq"));
+                new SequenceCommand("l__datatool_only_keys_seq"));
 
                parser.putControlSequence(true, 
-                new GenericCommand("l__datatool_omit_keys_seq"));
+                new SequenceCommand("l__datatool_omit_keys_seq"));
             }
          }
          else if (key.equals("omit-keys"))
@@ -986,23 +995,24 @@ public class DataToolSty extends LaTeXSty
             if (val == null || val.isEmpty())
             {
                parser.putControlSequence(true, 
-                new GenericCommand("l__datatool_omit_keys_seq"));
+                new SequenceCommand("l__datatool_omit_keys_seq"));
             }
             else
             {
                CsvList csvList = TeXParserUtils.toCsvList(val, parser);
 
                parser.putControlSequence(true, 
-                new GenericCommand("l__datatool_omit_keys_seq", null, csvList));
+                SequenceCommand.createFromClist(
+                 parser, "l__datatool_omit_keys_seq", csvList));
 
                parser.putControlSequence(true, 
-                new GenericCommand("l__datatool_omit_columns_seq"));
+                new SequenceCommand("l__datatool_omit_columns_seq"));
 
                parser.putControlSequence(true, 
-                new GenericCommand("l__datatool_only_columns_seq"));
+                new SequenceCommand("l__datatool_only_columns_seq"));
 
                parser.putControlSequence(true, 
-                new GenericCommand("l__datatool_only_keys_seq"));
+                new SequenceCommand("l__datatool_only_keys_seq"));
             }
          }
          else if (key.equals("only-keys"))
@@ -1010,23 +1020,24 @@ public class DataToolSty extends LaTeXSty
             if (val == null || val.isEmpty())
             {
                parser.putControlSequence(true, 
-                new GenericCommand("l__datatool_only_keys_seq"));
+                new SequenceCommand("l__datatool_only_keys_seq"));
             }
             else
             {
                CsvList csvList = TeXParserUtils.toCsvList(val, parser);
 
                parser.putControlSequence(true, 
-                new GenericCommand("l__datatool_only_keys_seq", null, csvList));
+                SequenceCommand.createFromClist(
+                  parser, "l__datatool_only_keys_seq", csvList));
 
                parser.putControlSequence(true, 
-                new GenericCommand("l__datatool_omit_keys_seq"));
+                new SequenceCommand("l__datatool_omit_keys_seq"));
 
                parser.putControlSequence(true, 
-                new GenericCommand("l__datatool_only_columns_seq"));
+                new SequenceCommand("l__datatool_only_columns_seq"));
 
                parser.putControlSequence(true, 
-                new GenericCommand("l__datatool_omit_columns_seq"));
+                new SequenceCommand("l__datatool_omit_columns_seq"));
             }
          }
          else if (key.equals("row-condition"))
@@ -1185,6 +1196,8 @@ public class DataToolSty extends LaTeXSty
      ="datatool.invalid.contents";
    public static final String ERROR_ROW_NOT_FOUND
      ="datatool.row.not.found";
+   public static final String ERROR_NO_COLUMNS
+     ="datatool.no.columns";
 
    public static final String MESSAGE_LOADDB
      ="datatool.loaddb.message";

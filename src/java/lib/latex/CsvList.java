@@ -119,6 +119,11 @@ public class CsvList extends DataObjectList
 
    public TeXObject getValue(int index)
    {
+      return getValue(index, false);
+   }
+
+   public TeXObject getValue(int index, boolean trim)
+   {
       TeXObject value = get(index);
 
       if (!(value instanceof TeXObjectList))
@@ -154,7 +159,7 @@ public class CsvList extends DataObjectList
       {
          TeXObject obj = list.get(i);
 
-         if (!(obj instanceof Ignoreable))
+         if (!(obj instanceof Ignoreable || (trim && obj instanceof WhiteSpace)))
          {
             start = i;
             break;
@@ -165,7 +170,7 @@ public class CsvList extends DataObjectList
       {
          TeXObject obj = list.get(i);
 
-         if (!(obj instanceof Ignoreable))
+         if (!(obj instanceof Ignoreable || (trim && obj instanceof WhiteSpace)))
          {
             end = i;
             break;

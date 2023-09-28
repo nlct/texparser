@@ -164,6 +164,9 @@ There is NO WARRANTY, to the extent permitted by law.</entry>
 <entry key="latex.error.counter.out.of.range">Counter value {0} out of valid range ({1})</entry>
 <entry key="latex.unsupported.xparse_type">Unsupported xparse type {0} in command {1}</entry>
 <entry key="latex.unknown.option">Unknown option ''{0}'' in {1}</entry>
+<entry key="latex.not.sequence">Not a sequence command: {0}</entry>
+<entry key="latex.not.tokenlist">Not a token list command: {0}</entry>
+<entry key="latex.not.boolean">Not a boolean command: {0}</entry>
 
 <!--  bibtex errors -->
 <entry key="bibtex.error.missing_value">Missing value</entry>
@@ -202,6 +205,7 @@ There is NO WARRANTY, to the extent permitted by law.</entry>
 <entry key="datatool.row.not.found">Row index ''{0}'' doesn''t exist.</entry>
 <entry key="datatool.loaddb.message">Database ''{0}'' loaded from ''{1}'' (column count={2}, row count={3}).</entry>
 <entry key="datatool.index.outofrange">List index ''{0}'' out of range.</entry>
+<entry key="datatool.no.columns">No columns available for database ''{0}''</entry>
 
 <!--  ifthen messages -->
 

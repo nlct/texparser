@@ -976,6 +976,137 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       parser.putControlSequence(cs);
    }
 
+   public SequenceCommand getSequenceCommand(String name, TeXObjectList stack)
+   throws IOException
+   {
+      ControlSequence cs = getParser().getControlSequence(name);
+      SequenceCommand seq = null;
+
+      if (cs instanceof SequenceCommand)
+      {
+         seq = (SequenceCommand)cs;
+      }
+      else if (cs == null)
+      {
+         seq = new SequenceCommand(name);
+
+         getTeXApp().warning(getParser(), getTeXApp().getMessage(
+          TeXSyntaxException.ERROR_UNDEFINED, "\\"+name));
+
+         parser.putControlSequence(true, seq);
+      }
+      else if (cs.isEmpty())
+      {
+         seq = new SequenceCommand(name);
+         parser.putControlSequence(true, seq);
+      }
+      else
+      {
+         TeXObject obj = TeXParserUtils.expandOnce(cs, getParser(), stack);
+
+         if (parser.isStack(obj))
+         {
+            seq = SequenceCommand.createFromSeqContent(parser, name,
+               (TeXObjectList)obj);
+            parser.putControlSequence(true, seq);
+         }
+      }
+
+      if (seq == null)
+      {
+         throw new LaTeXSyntaxException(parser,
+           LaTeXSyntaxException.ERROR_NOT_SEQUENCE, cs.toString(getParser()));
+      }
+
+      return seq;
+   }
+
+   public TokenListCommand getTokenListCommand(String name, TeXObjectList stack)
+   throws IOException
+   {
+      ControlSequence cs = getParser().getControlSequence(name);
+      TokenListCommand tl = null;
+
+      if (cs instanceof TokenListCommand)
+      {
+         tl = (TokenListCommand)cs;
+      }
+      else if (cs == null)
+      {
+         tl = new TokenListCommand(name);
+
+         getTeXApp().warning(getParser(), getTeXApp().getMessage(
+          TeXSyntaxException.ERROR_UNDEFINED, "\\"+name));
+
+         parser.putControlSequence(true, tl);
+      }
+      else if (cs.isEmpty())
+      {
+         tl = new TokenListCommand(name);
+         parser.putControlSequence(true, tl);
+      }
+      else
+      {
+         TeXObject obj = TeXParserUtils.expandOnce(cs, getParser(), stack);
+
+         if (parser.isStack(obj))
+         {
+            tl = new TokenListCommand(name, (TeXObjectList)obj);
+            parser.putControlSequence(true, tl);
+         }
+      }
+
+      if (tl == null)
+      {
+         throw new LaTeXSyntaxException(parser,
+           LaTeXSyntaxException.ERROR_NOT_TOKEN_LIST, cs.toString(getParser()));
+      }
+
+      return tl;
+   }
+
+   public LaTeX3Boolean getLaTeX3Boolean(String name, TeXObjectList stack)
+   throws IOException
+   {
+      ControlSequence cs = getParser().getControlSequence(name);
+      LaTeX3Boolean bool = null;
+
+      if (cs instanceof LaTeX3Boolean)
+      {
+         bool = (LaTeX3Boolean)cs;
+      }
+      else if (cs == null)
+      {
+         bool = new LaTeX3Boolean(name, false);
+
+         getTeXApp().warning(getParser(), getTeXApp().getMessage(
+          TeXSyntaxException.ERROR_UNDEFINED, "\\"+name));
+
+         parser.putControlSequence(true, bool);
+      }
+      else
+      {
+         String str = getParser().expandToString(cs, stack);
+
+         if (str.equals("0"))
+         {
+            bool = new LaTeX3Boolean(name, false);
+         }
+         else if (str.equals("1"))
+         {
+            bool = new LaTeX3Boolean(name, true);
+         }
+      }
+
+      if (bool == null)
+      {
+         throw new LaTeXSyntaxException(parser,
+           LaTeXSyntaxException.ERROR_NOT_BOOLEAN, cs.toString(getParser()));
+      }
+
+      return bool;
+   }
+
    public void newcommand(Overwrite overwrite, 
      String type, String csName, boolean isShort,
      int numParams, TeXObject defValue, TeXObject definition)

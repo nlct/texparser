@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2023 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -75,4 +75,10 @@ public class LaTeXSyntaxException extends TeXSyntaxException
    "latex.unsupported.xparse_type";
    public static final String ERROR_UNKNOWN_OPTION =
    "latex.unknown.option";
+   public static final String ERROR_NOT_SEQUENCE =
+   "latex.not.sequence";
+   public static final String ERROR_NOT_TOKEN_LIST =
+   "latex.not.tokenlist";
+   public static final String ERROR_NOT_BOOLEAN =
+   "latex.not.boolean";
 }
