@@ -36,10 +36,19 @@ public class TokenListCommand extends Command
       content = new TeXObjectList(capacity);
    }
 
-   public TokenListCommand(String name, TeXObjectList content)
+   public TokenListCommand(String name, TeXObject newContent)
    {
       super(name);
-      this.content = content;
+
+      if (newContent instanceof TeXObjectList && !(newContent instanceof Group))
+      {
+         content = (TeXObjectList)newContent;
+      }
+      else
+      {
+         content = new TeXObjectList();
+         content.add(newContent);
+      }
    }
 
    public TokenListCommand(String name, TokenListCommand other)
@@ -91,12 +100,22 @@ public class TokenListCommand extends Command
       content.add(obj);
    }
 
+   public void rightConcat(TeXObjectList list)
+   {
+      content.addAll(list);
+   }
+
    /**
     * Prepends an element to the token list.
     */ 
    public void prepend(TeXObject obj)
    {
       content.add(0, obj);
+   }
+
+   public void leftConcat(TeXObjectList list)
+   {
+      content.addAll(0, list);
    }
 
    /**
