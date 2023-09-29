@@ -247,7 +247,7 @@ public class CreateExample extends ControlSequence
                catch (IOException | InterruptedException e)
                {
                   throw new LaTeXSyntaxException(e, parser, 
-                    LaTeXSyntaxException.CLASS_ERROR, e.getMessage());
+                    LaTeXSyntaxException.PACKAGE_ERROR, "nlctuserguide", e.getMessage());
                }
 
                if (imgPath != null)
