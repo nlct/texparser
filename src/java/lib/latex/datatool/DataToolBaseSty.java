@@ -44,6 +44,18 @@ public class DataToolBaseSty extends LaTeXSty
       sortCountReg = parser.getSettings().newcount(false, "dtl@sortresult");
       NewIf.createConditional(true, parser, "ifDTLlistskipempty", true);
 
+      CountRegister reg;
+
+      parser.getSettings().newcount(false, "c_datatool_string_int");
+      reg = parser.getSettings().newcount(false, "c_datatool_integer_int");
+      reg.setValue(1);
+      reg = parser.getSettings().newcount(false, "c_datatool_decimal_int");
+      reg.setValue(2);
+      reg = parser.getSettings().newcount(false, "c_datatool_currency_int");
+      reg.setValue(3);
+      reg = parser.getSettings().newcount(false, "c_datatool_unknown_int");
+      reg.setValue(-1);
+
       registerControlSequence(new DTLnewcurrencysymbol(this));
       registerControlSequence(new DTLsetdefaultcurrency(this));
       registerControlSequence(new DTLifintopenbetween());

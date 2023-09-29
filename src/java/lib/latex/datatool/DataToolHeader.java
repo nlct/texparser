@@ -77,6 +77,35 @@ public class DataToolHeader extends AbstractTeXObject implements TeXObject
       return type;
    }
 
+   public NumericRegister getNumericalType(TeXParser parser)
+   throws TeXSyntaxException
+   {
+      switch (type)
+      {
+         case TYPE_STRING:
+
+           return parser.getSettings().getNumericRegister(
+            "c_datatool_string_int");
+
+         case TYPE_INT:
+
+           return parser.getSettings().getNumericRegister(
+            "c_datatool_integer_int");
+
+         case TYPE_REAL:
+
+           return parser.getSettings().getNumericRegister(
+            "c_datatool_decimal_int");
+
+         case TYPE_CURRENCY:
+
+           return parser.getSettings().getNumericRegister(
+            "c_datatool_currency_int");
+      }
+
+      return parser.getSettings().getNumericRegister("c_datatool_unknown_int");
+   }
+
    public void setType(byte newType)
    {
       switch (newType)

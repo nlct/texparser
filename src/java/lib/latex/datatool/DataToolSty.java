@@ -63,6 +63,7 @@ public class DataToolSty extends LaTeXSty
       registerControlSequence(new DTLmessage());
       registerControlSequence(new DTLforeach(this));
       registerControlSequence(new DTLdisplaydb(this));
+      registerControlSequence(new DTLdisplaydb("DTLdisplaylongdb", true, this));
       registerControlSequence(new DTLsetdelimiter(this));
       registerControlSequence(new DTLsetseparator(this));
       registerControlSequence(new DTLsettabseparator(this));
@@ -76,8 +77,8 @@ public class DataToolSty extends LaTeXSty
       registerControlSequence(new DTLloaddbtex());
       registerControlSequence(new DTLloaddb(this));
 
-      registerControlSequence(new GenericCommand("dtldefaultkey",
-       null, getListener().createString("Column")));
+      registerControlSequence(new TextualContentCommand("dtldefaultkey",
+       "Column"));
 
       registerControlSequence(new GenericCommand("DTLunsettype"));
       registerControlSequence(new GenericCommand("DTLstringtype", null,
@@ -99,7 +100,7 @@ public class DataToolSty extends LaTeXSty
         new TextualContentCommand("dtldisplayvalign", "c"));
 
       registerControlSequence(
-         new GenericCommand("dtldisplaystarttab"));
+         new TokenListCommand("dtldisplaystarttab"));
 
       registerControlSequence(
          new TextualContentCommand("dtlstringalign", "l"));
@@ -114,13 +115,13 @@ public class DataToolSty extends LaTeXSty
          new TextualContentCommand("dtlcurrencyalign", "r"));
 
       registerControlSequence(
-         new GenericCommand("dtlbetweencols"));
+         new TokenListCommand("dtlbetweencols"));
 
       registerControlSequence(
-         new GenericCommand("dtlbeforecols"));
+         new TokenListCommand("dtlbeforecols"));
 
       registerControlSequence(
-         new GenericCommand("dtlaftercols"));
+         new TokenListCommand("dtlaftercols"));
 
       getParser().getSettings().newcount(true, "dtlcolumnnum");
       getParser().getSettings().newcount(true, "dtlrownum");
@@ -142,7 +143,11 @@ public class DataToolSty extends LaTeXSty
       registerControlSequence(new DTLdbNewEntry(this));
       registerControlSequence(new DTLdbSetHeader(this));
 
+      registerControlSequence(new DTLaddalign());
+      registerControlSequence(new DTLaddheaderalign());
+
       getParser().getSettings().newcount(true, "l__datatool_max_cols_int");
+      getParser().getSettings().newcount(true, "l__datatool_row_idx_int");
       getParser().getSettings().newcount(true, "l__datatool_item_type_int");
 
       registerControlSequence(
@@ -175,16 +180,16 @@ public class DataToolSty extends LaTeXSty
          new SequenceCommand("l__datatool_only_keys_seq"));
 
       registerControlSequence(
-         new GenericCommand("l__datatool_pre_display_tl"));
+         new TokenListCommand("l__datatool_pre_display_tl"));
 
       registerControlSequence(
-         new GenericCommand("l__datatool_post_head_tl"));
+         new TokenListCommand("l__datatool_post_head_tl"));
 
       registerControlSequence(
-         new GenericCommand("l__datatool_user_align_tl"));
+         new TokenListCommand("l__datatool_user_align_tl"));
 
       registerControlSequence(
-         new GenericCommand("l__datatool_user_header_tl"));
+         new TokenListCommand("l__datatool_user_header_tl"));
    }
 
    @Override
@@ -1050,27 +1055,27 @@ public class DataToolSty extends LaTeXSty
          else if (key.equals("pre-content"))
          {
             parser.putControlSequence(true, 
-             new GenericCommand("l__datatool_pre_display_tl", null, val));
+             new TokenListCommand("l__datatool_pre_display_tl", val));
          }
          else if (key.equals("pre-head"))
          {
             parser.putControlSequence(true, 
-             new GenericCommand("dtldisplaystarttab", null, val));
+             new TokenListCommand("dtldisplaystarttab", val));
          }
          else if (key.equals("post-head"))
          {
             parser.putControlSequence(true, 
-             new GenericCommand("l_datatool_post_head_tl", null, val));
+             new TokenListCommand("l_datatool_post_head_tl", val));
          }
          else if (key.equals("align-specs"))
          {
             parser.putControlSequence(true, 
-             new GenericCommand("l__datatool_user_align_tl", null, val));
+             new TokenListCommand("l__datatool_user_align_tl", val));
          }
          else if (key.equals("header-row"))
          {
             parser.putControlSequence(true, 
-             new GenericCommand("l__datatool_user_header_tl", null, val));
+             new TokenListCommand("l__datatool_user_header_tl", val));
          }
          else if (key.equals("no-header"))
          {
@@ -1082,37 +1087,37 @@ public class DataToolSty extends LaTeXSty
          else if (key.equals("string-align"))
          {
             parser.putControlSequence(true, 
-             new GenericCommand("dtlstringalign", null, val));
+             new TokenListCommand("dtlstringalign", val));
          }
          else if (key.equals("int-align") || key.equals("integer-align"))
          {
             parser.putControlSequence(true, 
-             new GenericCommand("dtlintalign", null, val));
+             new TokenListCommand("dtlintalign", val));
          }
          else if (key.equals("real-align") || key.equals("decimal-align"))
          {
             parser.putControlSequence(true, 
-             new GenericCommand("dtlrealalign", null, val));
+             new TokenListCommand("dtlrealalign", val));
          }
          else if (key.equals("currency-align"))
          {
             parser.putControlSequence(true, 
-             new GenericCommand("dtlcurrencyalign", null, val));
+             new TokenListCommand("dtlcurrencyalign", val));
          }
          else if (key.equals("inter-col"))
          {
             parser.putControlSequence(true, 
-             new GenericCommand("dtlbetweencols", null, val));
+             new TokenListCommand("dtlbetweencols", val));
          }
          else if (key.equals("pre-col"))
          {
             parser.putControlSequence(true, 
-             new GenericCommand("dtlbeforecols", null, val));
+             new TokenListCommand("dtlbeforecols", val));
          }
          else if (key.equals("post-col"))
          {
             parser.putControlSequence(true, 
-             new GenericCommand("dtlaftercols", null, val));
+             new TokenListCommand("dtlaftercols", val));
          }
          else if (key.equals("tabular-env"))
          {
@@ -1146,32 +1151,32 @@ public class DataToolSty extends LaTeXSty
          else if (key.equals("caption"))
          {
             parser.putControlSequence(true,
-              new GenericCommand("l_datatool_caption_tl", null, val));
+              new TokenListCommand("l_datatool_caption_tl", val));
          }
          else if (key.equals("short-caption") || key.equals("shortcaption"))
          {
             parser.putControlSequence(true,
-              new GenericCommand("l_datatool_short_caption_tl", null, val));
+              new TokenListCommand("l_datatool_short_caption_tl", val));
          }
          else if (key.equals("cont-caption") || key.equals("contcaption"))
          {
             parser.putControlSequence(true,
-              new GenericCommand("l_datatool_cont_caption_tl", null, val));
+              new TokenListCommand("l_datatool_cont_caption_tl", val));
          }
          else if (key.equals("label"))
          {
             parser.putControlSequence(true,
-              new GenericCommand("l_datatool_label_tl", null, val));
+              new TokenListCommand("l_datatool_label_tl", val));
          }
          else if (key.equals("foot"))
          {
             parser.putControlSequence(true,
-              new GenericCommand("l_datatool_foot_tl", null, val));
+              new TokenListCommand("l_datatool_foot_tl", val));
          }
          else if (key.equals("last-foot") || key.equals("lastfoot"))
          {
             parser.putControlSequence(true,
-              new GenericCommand("l_datatool_last_foot_tl", null, val));
+              new TokenListCommand("l_datatool_last_foot_tl", val));
          }
          else
          {

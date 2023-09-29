@@ -57,16 +57,18 @@ public class DTLdisplaydb extends Command
       parser.putControlSequence(true,
        new TextualContentCommand("dtldbname", dbLabel));
 
-      parser.putControlSequence(true,
-       new TokenListCommand("l__datatool_content_tl"));
+      TokenListCommand contentTl = new TokenListCommand("l__datatool_content_tl");
+      parser.putControlSequence(true, contentTl);
 
-      parser.putControlSequence(true,
-       new TokenListCommand("l__datatool_align_tl"));
+      TokenListCommand alignTl = new TokenListCommand("l__datatool_align_tl");
+      parser.putControlSequence(true, alignTl);
 
-      parser.putControlSequence(true,
-       new TokenListCommand("l__datatool_row_tl"));
+      TokenListCommand rowTl = new TokenListCommand("l__datatool_row_tl");
+      parser.putControlSequence(true, rowTl);
 
-      SequenceCommand cs;
+      TokenListCommand tmpTl = new TokenListCommand("l__datatool_tmpb_tl");
+
+      SequenceCommand seqCs;
       SequenceCommand colIndexes;
 
       colIndexes = listener.getSequenceCommand(
@@ -89,14 +91,14 @@ public class DTLdisplaydb extends Command
       }
       else
       {
-         cs = listener.getSequenceCommand(
+         seqCs = listener.getSequenceCommand(
            "l__datatool_only_keys_seq", stack);
 
-         if (cs != null && !cs.isEmpty())
+         if (seqCs != null && !seqCs.isEmpty())
          {
-            for (int i = 0; i < cs.size(); i++)
+            for (int i = 0; i < seqCs.size(); i++)
             {
-               String key = parser.expandToString(cs.get(i), stack);
+               String key = parser.expandToString(seqCs.get(i), stack);
                DataToolHeader header = db.getHeader(key);
                int colIdx = header.getColumnIndex();
 
@@ -107,16 +109,16 @@ public class DTLdisplaydb extends Command
          {
             Vector<Integer> excls = null;
 
-            cs = listener.getSequenceCommand(
+            seqCs = listener.getSequenceCommand(
               "l__datatool_omit_columns_seq", stack);
 
-            if (cs != null && !cs.isEmpty())
+            if (seqCs != null && !seqCs.isEmpty())
             {
-               excls = new Vector<Integer>(cs.size());
+               excls = new Vector<Integer>(seqCs.size());
 
-               for (int i = 0; i < cs.size(); i++)
+               for (int i = 0; i < seqCs.size(); i++)
                {
-                  TeXObject obj = cs.get(i);
+                  TeXObject obj = seqCs.get(i);
 
                   Numerical num = TeXParserUtils.toNumerical(obj, parser, stack);
                   excls.add(Integer.valueOf(num.number(parser)));
@@ -124,14 +126,14 @@ public class DTLdisplaydb extends Command
             }
             else
             {
-               cs = listener.getSequenceCommand(
+               seqCs = listener.getSequenceCommand(
                  "l__datatool_omit_keys_seq", stack);
 
-               if (cs != null && !cs.isEmpty())
+               if (seqCs != null && !seqCs.isEmpty())
                {
-                  for (int i = 0; i < cs.size(); i++)
+                  for (int i = 0; i < seqCs.size(); i++)
                   {
-                     String key = parser.expandToString(cs.get(i), stack);
+                     String key = parser.expandToString(seqCs.get(i), stack);
                      DataToolHeader header = db.getHeader(key);
                      int colIdx = header.getColumnIndex();
                      excls.add(Integer.valueOf(colIdx));
@@ -158,8 +160,22 @@ public class DTLdisplaydb extends Command
       parser.getSettings().localSetRegister("l__datatool_max_cols_int",
         new UserNumber(colIndexes.size()));
 
+      NumericRegister maxColsReg = parser.getSettings().getNumericRegister(
+        "l__datatool_max_cols_int");
+
       parser.getSettings().localSetRegister("dtlcolumnnum", UserNumber.ZERO);
       parser.getSettings().localSetRegister("dtlrownum", UserNumber.ZERO);
+
+      NumericRegister colNumReg =
+        parser.getSettings().getNumericRegister("dtlcolumnnum");
+      NumericRegister rowNumReg =
+        parser.getSettings().getNumericRegister("dtlrownum");
+
+      parser.getSettings().localSetRegister("l__datatool_row_idx_int",
+        UserNumber.ZERO);
+
+      NumericRegister tabRowNumReg =
+        parser.getSettings().getNumericRegister("l__datatool_row_idx_int");
 
       TokenListCommand userAlign = listener.getTokenListCommand(
         "l__datatool_user_align_tl", stack);
@@ -190,12 +206,111 @@ public class DTLdisplaydb extends Command
           new TokenListCommand("l__datatool_row_tl", userHeader));
       }
 
+      if (userAlign.isEmpty() || userHeader.isEmpty())
+      {
+         for (int i = 0; i < colIndexes.size(); i++)
+         {
+            Numerical num = TeXParserUtils.toNumerical(colIndexes.get(i),
+              parser, stack);
+            int colIdx = num.number(parser);
+            colNumReg.advance(parser, UserNumber.ONE);
+
+            DataToolHeader header = db.getHeader(colIdx);
+            NumericRegister type = header.getNumericalType(parser);
+
+            TeXObjectList substack = listener.createStack();
+
+            if (userAlign.isEmpty())
+            {
+               substack.add(listener.getControlSequence("dtladdalign"));
+               substack.add(alignTl);
+               substack.add(type);
+               substack.add(colNumReg);
+               substack.add(maxColsReg);
+
+               TeXParserUtils.process(substack, parser, stack);
+            }
+
+            if (userHeader.isEmpty())
+            {
+               if (!rowTl.isEmpty())
+               {
+                  rowTl.append(listener.getTab());
+               }
+
+               tmpTl.clear();
+               substack.add(listener.getControlSequence("dtladdheaderalign"));
+               substack.add(tmpTl);
+               substack.add(type);
+               substack.add(colNumReg);
+               substack.add(maxColsReg);
+
+               TeXParserUtils.process(substack, parser, stack);
+
+               rowTl.append(listener.getControlSequence("dtlcolumnheader"));
+               Group grp = listener.createGroup();
+               grp.addAll(tmpTl.getContent());
+               rowTl.append(grp);
+
+               grp = listener.createGroup();
+               TeXObject title = (TeXObject)header.getTitle().clone();
+
+               if (parser.isStack(title))
+               {
+                  grp.addAll((TeXObjectList)title);
+               }
+               else
+               {
+                  grp.add(title);
+               }
+
+               rowTl.append(grp);
+            }
+         }
+      }
+
+      TeXObjectList substack = listener.createStack();
+
+      if (isLong)
+      {
+      }
+      else
+      {
+         substack.add(listener.getControlSequence("DTLdisplaydbAddBegin"));
+         substack.add(contentTl);
+         substack.add(alignTl);
+         substack.add(rowTl);
+      }
+
+      for (int i = 0; i < numRows; i++)
+      {
+      }
+
+      if (isLong)
+      {
+      }
+      else
+      {
+         substack.add(listener.getControlSequence("DTLdisplaydbAddEnd"));
+         substack.add(contentTl);
+      }
 
       // The tabular/longtable code should now be in the definition
       // of \l__datatool_content_tl
 
-      return listener.getTokenListCommand("l__datatool_content_tl", stack)
-               .getContent();
+      ControlSequence preCs =
+        listener.getControlSequence("l__datatool_pre_display_tl");
+
+      if (preCs.isEmpty())
+      {
+         return contentTl.getContent();
+      }
+      else
+      {
+         substack.add(preCs);
+         substack.addAll(contentTl.getContent());
+         return substack;
+      }
    }
 
    @Override
@@ -265,6 +380,13 @@ public class DTLdisplaydb extends Command
          throw new LaTeXSyntaxException(parser,
            DataToolSty.ERROR_DB_DOESNT_EXIST, dbLabel);
       }
+   }
+
+   @Override
+   public TeXObjectList expandfully(TeXParser parser, TeXObjectList stack)
+     throws IOException
+   {
+      return expandonce(parser, stack);
    }
 
    protected boolean isLong;
