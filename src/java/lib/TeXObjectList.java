@@ -971,7 +971,7 @@ public class TeXObjectList extends Vector<TeXObject>
       {
          throw new TeXSyntaxException(parser,
           TeXSyntaxException.ERROR_NUMBER_EXPECTED, 
-          object.toString(parser));
+          object == null ? "" : object.toString(parser));
       }
 
       return new UserNumber(parser, builder.toString(), base);
@@ -1320,6 +1320,8 @@ public class TeXObjectList extends Vector<TeXObject>
          return null;
       }
 
+      int lineNum = parser.getLineNumber();
+
       TeXObjectList list = new TeXObjectList();
       boolean isShort = isShort(popStyle);
 
@@ -1354,9 +1356,20 @@ public class TeXObjectList extends Vector<TeXObject>
          list.add(object);
       }
 
-      throw new TeXSyntaxException(parser,
-               TeXSyntaxException.ERROR_MISSING_CLOSING,
-               ""+closeDelim);
+      if (lineNum > 0)
+      {
+         throw new TeXSyntaxException(parser,
+                  TeXSyntaxException.ERROR_MISSING_CLOSING_FROM_OPEN,
+                  new String(Character.toChars(closeDelim)),
+                  new String(Character.toChars(openDelim)),
+                  lineNum);
+      }
+      else
+      {
+         throw new TeXSyntaxException(parser,
+                  TeXSyntaxException.ERROR_MISSING_CLOSING,
+                  new String(Character.toChars(closeDelim)));
+      }
    }
 
    public Numerical popNumericalArg(TeXParser parser)
