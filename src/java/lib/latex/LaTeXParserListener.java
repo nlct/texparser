@@ -1021,6 +1021,19 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       return seq;
    }
 
+   public TokenListCommand popTokenListCommand(TeXParser parser, TeXObjectList stack)
+   throws IOException
+   {
+      ControlSequence cs = TeXParserUtils.popControlSequence(parser, stack);
+
+      if (cs instanceof TokenListCommand)
+      {
+         return (TokenListCommand)cs;
+      }
+
+      return getTokenListCommand(cs.getName(), stack);
+   }
+
    public TokenListCommand getTokenListCommand(String name, TeXObjectList stack)
    throws IOException
    {
@@ -1030,6 +1043,11 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       if (cs instanceof TokenListCommand)
       {
          tl = (TokenListCommand)cs;
+      }
+      else if (cs instanceof TextualContentCommand)
+      {
+         tl = new TokenListCommand(name,
+          createString(((TextualContentCommand)cs).getText()));
       }
       else if (cs == null)
       {
