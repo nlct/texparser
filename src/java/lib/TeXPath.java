@@ -64,10 +64,27 @@ public class TeXPath
       init(parser, file);
    }
 
+   protected File getDefaultBaseDir(TeXParser parser)
+   {
+      if (parser == null)
+      {
+         return null;
+      }
+
+      File file = parser.getBaseDir();
+
+      if (file != null && file.getName().equals("."))
+      {
+         return null;
+      }
+
+      return file;
+   }
+
    private void init(TeXParser parser, File file)
      throws IOException
    {
-      File parent = (parser == null ? null : parser.getBaseDir());
+      File parent = getDefaultBaseDir(parser);
 
       Path path = file.toPath();
 
@@ -94,7 +111,7 @@ public class TeXPath
      boolean useKpsewhich, String... defExt)
      throws IOException
    {
-      File parent = (parser == null ? null : parser.getBaseDir());
+      File parent = getDefaultBaseDir(parser);
 
       base = (parent == null ? null : parent.toPath());
 
