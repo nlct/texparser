@@ -157,6 +157,9 @@ public class DTLdisplaydb extends Command
             DataToolSty.ERROR_NO_COLUMNS, dbLabel);
       }
 
+      parser.putControlSequence(true, new SequenceCommand(
+       "l__datatool_column_indexes_seq", colIndexes));
+
       parser.getSettings().localSetRegister("l__datatool_max_cols_int",
         new UserNumber(colIndexes.size()));
 
@@ -272,28 +275,52 @@ public class DTLdisplaydb extends Command
       TeXObjectList substack = listener.createStack();
 
       if (isLong)
-      {
+      {//TODO
       }
       else
       {
          substack.add(listener.getControlSequence("DTLdisplaydbAddBegin"));
          substack.add(contentTl);
          substack.add(alignTl);
-         substack.add(rowTl);
+
+         Group grp = listener.createGroup();
+
+         if (!rowTl.isEmpty())
+         {
+            grp.addAll(rowTl.getContent());
+         }
+
+         substack.add(grp);
       }
 
-      for (int i = 0; i < numRows; i++)
+      TeXParserUtils.process(substack, parser, stack);
+
+      for (int i = 1; i <= numRows; i++)
       {
+         tabRowNumReg.setValue(parser, new UserNumber(i));
+
+         substack.add(
+           listener.getControlSequence("__datatool_if_display_row:nNT"));
+         substack.add(tabRowNumReg);
+         substack.add(contentTl);
+         substack.add(TeXParserUtils.createGroup(parser,
+          listener.getControlSequence("__datatool_display_db_row:Nn"),
+          contentTl, tabRowNumReg
+         ));
+
+         TeXParserUtils.process(substack, parser, stack);
       }
 
       if (isLong)
-      {
+      {//TODO
       }
       else
       {
          substack.add(listener.getControlSequence("DTLdisplaydbAddEnd"));
          substack.add(contentTl);
       }
+
+      TeXParserUtils.process(substack, parser, stack);
 
       // The tabular/longtable code should now be in the definition
       // of \l__datatool_content_tl

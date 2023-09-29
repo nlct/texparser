@@ -36,6 +36,12 @@ public class SequenceCommand extends Command
       content = new TeXObjectList(capacity);
    }
 
+   public SequenceCommand(String name, SequenceCommand other)
+   {
+      super(name);
+      content = (TeXObjectList)other.content.clone();
+   }
+
    public static SequenceCommand createFromSeqContent(TeXParser parser, String name,
      TeXObjectList otherContent)
    throws IOException

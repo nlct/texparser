@@ -80,6 +80,9 @@ public class DataToolSty extends LaTeXSty
       registerControlSequence(new TextualContentCommand("dtldefaultkey",
        "Column"));
 
+      registerControlSequence(new GenericCommand("dtldisplaycr", null,
+       TeXParserUtils.createStack(getParser(), new TeXCsRef("tabularnewline"))));
+
       registerControlSequence(new GenericCommand("DTLunsettype"));
       registerControlSequence(new GenericCommand("DTLstringtype", null,
         new UserNumber(DataToolHeader.TYPE_STRING)));
@@ -101,6 +104,15 @@ public class DataToolSty extends LaTeXSty
 
       registerControlSequence(
          new TokenListCommand("dtldisplaystarttab"));
+
+      registerControlSequence(
+         new TokenListCommand("dtldisplayafterhead"));
+
+      registerControlSequence(
+         new TokenListCommand("dtldisplayendtab"));
+
+      registerControlSequence(
+         new TokenListCommand("dtldisplaystartrow"));
 
       registerControlSequence(
          new TextualContentCommand("dtlstringalign", "l"));
@@ -134,6 +146,25 @@ public class DataToolSty extends LaTeXSty
       registerControlSequence(
         new TextualContentCommand("dtldisplaylongdbenv", "longtable"));
 
+      registerControlSequence(new DTLdisplaydbAddBegin());
+      registerControlSequence(new DTLdisplaydbAddEnd());
+
+      registerControlSequence(new GenericCommand(listener, true, "dtlcolumnheader",
+        2, TeXParserUtils.createStack(getParser(),
+            new TeXCsRef("multicolumn"),
+            UserNumber.ONE,
+            TeXParserUtils.createGroup(getParser(), listener.getParam(1)),
+            TeXParserUtils.createGroup(getParser(), 
+              new TeXCsRef("dtlheaderformat"),
+               TeXParserUtils.createGroup(getParser(), listener.getParam(2))
+            )
+        )));
+
+      registerControlSequence(new GenericCommand(listener, true, "dtlheaderformat",
+       1, TeXParserUtils.createStack(getParser(), 
+            new TeXCsRef("textbf"), 
+              TeXParserUtils.createGroup(getParser(), listener.getParam(1)))));
+
       registerControlSequence(new AtNumberOfNumber(
        "__datatool_if_display_row:nNT", 3, 3));
 
@@ -146,8 +177,12 @@ public class DataToolSty extends LaTeXSty
       registerControlSequence(new DTLaddalign());
       registerControlSequence(new DTLaddheaderalign());
 
+      registerControlSequence(new DTLdisplayDbRow(this));
+
       getParser().getSettings().newcount(true, "l__datatool_max_cols_int");
       getParser().getSettings().newcount(true, "l__datatool_row_idx_int");
+      getParser().getSettings().newcount(true, "l__datatool_col_idx_int");
+
       getParser().getSettings().newcount(true, "l__datatool_item_type_int");
 
       registerControlSequence(
@@ -183,7 +218,7 @@ public class DataToolSty extends LaTeXSty
          new TokenListCommand("l__datatool_pre_display_tl"));
 
       registerControlSequence(
-         new TokenListCommand("l__datatool_post_head_tl"));
+         new TokenListCommand("l_datatool_post_head_tl"));
 
       registerControlSequence(
          new TokenListCommand("l__datatool_user_align_tl"));

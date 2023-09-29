@@ -105,6 +105,37 @@ public class TokenListCommand extends Command
       content.addAll(list);
    }
 
+   public void appendValue(TeXObject obj, TeXParser parser, TeXObjectList stack)
+    throws IOException
+   {
+      if (obj instanceof TokenListCommand)
+      {
+         appendValue((TokenListCommand)obj);
+      }
+      else if (!obj.isEmpty())
+      {
+         TeXObject expanded = TeXParserUtils.expandOnce(
+           (TeXObject)obj.clone(), parser, stack);
+
+         if (parser.isStack(expanded))
+         {
+            rightConcat((TeXObjectList)expanded);
+         }
+         else
+         {
+            append(expanded);
+         }
+      }
+   }
+
+   public void appendValue(TokenListCommand tl)
+   {
+      if (!tl.isEmpty())
+      {
+         rightConcat((TeXObjectList)tl.getContent().clone());
+      }
+   }
+
    /**
     * Prepends an element to the token list.
     */ 
@@ -116,6 +147,37 @@ public class TokenListCommand extends Command
    public void leftConcat(TeXObjectList list)
    {
       content.addAll(0, list);
+   }
+
+   public void prependValue(TeXObject obj, TeXParser parser, TeXObjectList stack)
+    throws IOException
+   {
+      if (obj instanceof TokenListCommand)
+      {
+         prependValue((TokenListCommand)obj);
+      }
+      else if (!obj.isEmpty())
+      {
+         TeXObject expanded = TeXParserUtils.expandOnce(
+           (TeXObject)obj.clone(), parser, stack);
+
+         if (parser.isStack(expanded))
+         {
+            leftConcat((TeXObjectList)expanded);
+         }
+         else
+         {
+            prepend(expanded);
+         }
+      }
+   }
+
+   public void prependValue(TokenListCommand tl)
+   {
+      if (!tl.isEmpty())
+      {
+         leftConcat((TeXObjectList)tl.getContent().clone());
+      }
    }
 
    /**
@@ -198,6 +260,12 @@ public class TokenListCommand extends Command
       }
 
       return list;
+   }
+
+   public String toString()
+   {
+      return String.format("%s[name=%s,content=%s]", getClass().getSimpleName(),
+       getName(), content);
    }
 
    protected TeXObjectList content;
