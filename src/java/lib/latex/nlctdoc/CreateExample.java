@@ -261,8 +261,10 @@ public class CreateExample extends ControlSequence
                   }
 
                   imgOptions.put("alt", altList);
+                  imgOptions.put("class", listener.createString("pageimage"));
 
                   listener.includegraphics(stack, imgOptions, imgPath);
+                  listener.getWriteable().writeln("");
                }
             }
          }

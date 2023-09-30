@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2022 Nicola L.C. Talbot
+    Copyright (C) 2022-2023 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -61,6 +61,7 @@ public class CodeResult extends GatherEnvContents
    {
       TeXParserListener listener = parser.getListener();
 
+      popOptArg(parser, stack);// ignore optional arguments
       TeXObject object = stack.pop();
 
       TeXObjectList codeBox = parser.getListener().createStack();
