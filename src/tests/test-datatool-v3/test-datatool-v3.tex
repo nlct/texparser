@@ -3,23 +3,14 @@
 \usepackage{datatool}[=v3.0]
 
 \begin{document}
-\DTLdbProvideData{mydata}
-\DTLdbNewRow
-\DTLdbNewEntry{name}{Joe}
-\DTLdbNewEntry{score}{23.4}
-\DTLdbNewRow
-\DTLdbNewEntry{name}{Jane}
-\DTLdbNewEntry{score}{32.5}
-\DTLdbNewRow
-\DTLdbNewEntry{name}{Evelyn}
-\DTLdbNewEntry{score}{45.0}
+\DTLread[format=dtltex]{test-data-3}
 
-\DTLdbSetHeader{name}{Name}
-\DTLdbSetHeader{score}{Score (\%)}
-
-Row count: \DTLrowcount{mydata}.
-Column count: \DTLcolumncount{mydata}.
+%Row count: \DTLrowcount{mydata}.
+%Column count: \DTLcolumncount{mydata}.
 
 \DTLdisplaydb{mydata}
 
+%\DTLread[format=dbtex]{test-data-3}
+%
+%\DTLdisplaydb{data3}
 \end{document}

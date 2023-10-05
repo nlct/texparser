@@ -39,22 +39,39 @@ public class CountRegister extends NumericRegister implements TeXNumber
       this.value = value;
    }
 
+   @Override
    public void setValue(TeXParser parser, Numerical numerical)
     throws TeXSyntaxException
    {
       setValue(numerical.number(parser));
    }
 
+   @Override
+   public void setContents(TeXParser parser, int value)
+    throws TeXSyntaxException
+   {
+      setValue(value);
+   }
+
+   @Override
    public int getValue()
    {
       return value;
    }
 
+   @Override
+   public double doubleValue()
+   {
+      return (double)value;
+   }
+
+   @Override
    public int number(TeXParser parser) throws TeXSyntaxException
    {
       return value;
    }
 
+   @Override
    public TeXObject getContents(TeXParser parser)
    {
       return parser.string(""+value);
@@ -65,22 +82,26 @@ public class CountRegister extends NumericRegister implements TeXNumber
       value++;
    }
 
+   @Override
    public void advance(TeXParser parser, Numerical increment)
     throws TeXSyntaxException
    {
       value += increment.number(parser);
    }
 
+   @Override
    public void divide(int divisor)
    {
       value /= divisor;
    }
 
+   @Override
    public void multiply(int factor)
    {
       value *= factor;
    }
 
+   @Override
    public Object clone()
    {
       CountRegister reg = new CountRegister(getName(), value);
@@ -90,12 +111,14 @@ public class CountRegister extends NumericRegister implements TeXNumber
       return reg;
    }
 
+   @Override
    public String toString()
    {
       return String.format("%s[name=%s,value=%d]",
        getClass().getSimpleName(), getName(), value);
    }
 
+   @Override
    public String format()
    {
       return ""+value;

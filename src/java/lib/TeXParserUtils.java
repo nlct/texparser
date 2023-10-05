@@ -435,6 +435,24 @@ public class TeXParserUtils
            TeXSyntaxException.ERROR_DIMEN_EXPECTED);
    }
 
+   public static boolean isControlSequence(TeXObject obj, String... csnames)
+   {
+      if (obj instanceof ControlSequence)
+      {
+         ControlSequence cs = (ControlSequence)obj;
+
+         for (String name : csnames)
+         {
+            if (cs.getName().equals(name))
+            {
+               return true;
+            }
+         }
+      }
+
+      return false;
+   }
+
    public static ControlSequence popControlSequence(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
@@ -643,7 +661,7 @@ public class TeXParserUtils
    {
       if (object instanceof TeXNumber)
       {
-         return (float)((TeXNumber)object).getValue();
+         return (float)((TeXNumber)object).doubleValue();
       }
 
       if (object instanceof AssignedControlSequence)
@@ -674,7 +692,7 @@ public class TeXParserUtils
    {
       if (object instanceof TeXNumber)
       {
-         return (double)((TeXNumber)object).getValue();
+         return ((TeXNumber)object).doubleValue();
       }
 
       if (object instanceof AssignedControlSequence)

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2023 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -16,10 +16,21 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
-package com.dickimawbooks.texparserlib;
+package com.dickimawbooks.texparserlib.latex.datatool;
 
-public interface TeXNumber extends Numerical,TeXObject
+public enum DatumType
 {
-   public int getValue();
-   public double doubleValue();
+   UNKNOWN(-1), STRING(0), INTEGER(1), DECIMAL(2), CURRENCY(3);
+
+   DatumType(int id)
+   {
+      this.id = id;
+   }
+
+   public int getValue()
+   {
+      return id;
+   }
+
+   private final int id;
 }

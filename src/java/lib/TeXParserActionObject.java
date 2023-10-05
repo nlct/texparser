@@ -20,6 +20,7 @@ package com.dickimawbooks.texparserlib;
 
 import java.io.IOException;
 import java.io.File;
+import java.nio.charset.Charset;
 
 public class TeXParserActionObject extends AbstractTeXObject
 {
@@ -36,10 +37,22 @@ public class TeXParserActionObject extends AbstractTeXObject
       return createInputAction(new TeXPath(parser, filename));
    }
 
+   public static TeXParserActionObject createInputAction(TeXParser parser, String filename, Charset charset)
+    throws IOException
+   {
+      return createInputAction(new TeXPath(parser, filename, charset));
+   }
+
    public static TeXParserActionObject createInputAction(TeXParser parser, String filename, TeXObjectList stack)
     throws IOException
    {
       return createInputAction(new TeXPath(parser, filename), stack);
+   }
+
+   public static TeXParserActionObject createInputAction(TeXParser parser, String filename, Charset charset, TeXObjectList stack)
+    throws IOException
+   {
+      return createInputAction(new TeXPath(parser, filename, charset), stack);
    }
 
    public static TeXParserActionObject createInputAction(TeXPath texPath)

@@ -58,6 +58,12 @@ public abstract class Register extends ControlSequence implements InternalQuanti
    public abstract void setContents(TeXParser parser, TeXObject contents)
      throws TeXSyntaxException;
    
+   public void setContents(TeXParser parser, int value)
+    throws TeXSyntaxException
+   {
+      setContents(parser, new UserNumber(value));
+   }
+
    protected abstract TeXObject popValue(TeXParser parser, TeXObjectList stack)
       throws IOException;
 

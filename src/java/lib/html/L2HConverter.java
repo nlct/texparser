@@ -1805,6 +1805,8 @@ public class L2HConverter extends LaTeXParserListener
       }
 
       TeXObject alt = null;
+      String cssClass = null;
+      String cssStyle = null;
 
       String type=getMimeType(file.getName());
       L2HImage image=null;
@@ -1825,6 +1827,14 @@ public class L2HConverter extends LaTeXParserListener
             if (key.equals("alt"))
             {
                alt = value;
+            }
+            else if (key.equals("class"))
+            {
+               cssClass = parser.expandToString(value, stack);
+            }
+            else if (key.equals("style"))
+            {
+               cssStyle = parser.expandToString(value, stack);
             }
             else if (key.equals("scale"))
             {
@@ -1900,6 +1910,16 @@ public class L2HConverter extends LaTeXParserListener
          if (type != null)
          {
             writeliteral(String.format(" type=\"%s\"", type));
+         }
+
+         if (cssClass != null)
+         {
+            writeliteral(String.format(" class=\"%s\"", cssClass));
+         }
+
+         if (cssStyle != null)
+         {
+            writeliteral(String.format(" style=\"%s\"", cssStyle));
          }
 
          if (dim != null)
@@ -2668,6 +2688,11 @@ public class L2HConverter extends LaTeXParserListener
          }
 
          builder.append(String.format("width: %s; ", getHtmlDimension(width)));
+
+         if (fbox.isMultiLine())
+         {
+            builder.append("overflow: auto; ");
+         }
       }
 
       TeXDimension height = fbox.getHeight(getParser());

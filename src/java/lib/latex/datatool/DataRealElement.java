@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013-2022 Nicola L.C. Talbot
+    Copyright (C) 2013-2023 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -27,26 +27,25 @@ import com.dickimawbooks.texparserlib.latex.*;
 public class DataRealElement extends AbstractTeXObject
   implements DataNumericElement,Expandable
 {
-   public DataRealElement(DataToolSty sty)
+   public DataRealElement()
    {
-      this(sty, 0.0);
+      this(0.0);
    }
 
-   public DataRealElement(DataToolSty sty, TeXNumber num)
+   public DataRealElement(TeXNumber num)
    {
-      this(sty, num.getValue());
+      this(num.getValue());
    }
 
-   public DataRealElement(DataToolSty sty, double value)
+   public DataRealElement(double value)
    {
-      this.sty = sty;
       this.value = value;
    }
 
    @Override
    public Object clone()
    {
-      return new DataRealElement(sty, value);
+      return new DataRealElement(value);
    }
 
    @Override
@@ -92,9 +91,16 @@ public class DataRealElement extends AbstractTeXObject
       return intValue();
    }
 
+   @Override
    public byte getDataType()
    {
       return DataToolHeader.TYPE_REAL;
+   }
+
+   @Override
+   public DatumType getDatumType()
+   {
+      return DatumType.DECIMAL;
    }
 
    @Override
@@ -169,6 +175,10 @@ public class DataRealElement extends AbstractTeXObject
       process(parser);
    }
 
+   public String toString()
+   {
+      return String.format("%f", value);
+   }
+
    private double value;
-   protected DataToolSty sty;
 }

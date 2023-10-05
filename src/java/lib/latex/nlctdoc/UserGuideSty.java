@@ -48,7 +48,7 @@ public class UserGuideSty extends LaTeXSty
 
       if (listener instanceof L2HConverter)
       {
-         ((L2HConverter)listener).addCssStyle("dfn { font-style: normal; font-weight: bold; } a { text-decoration: none; } a:hover { text-decoration: underline; } div.tablefns { border-top: solid; } div.example { border-bottom: solid silver; padding: 20px; } div.example div.title { font-weight: bold; font-size: large; } .pageimage { padding-left: .5em; padding-right: .5em; vertical-align: top; }");
+         ((L2HConverter)listener).addCssStyle("dfn { font-style: normal; font-weight: bold; } a { text-decoration: none; } a:hover { text-decoration: underline; } div.tablefns { border-top: solid; } div.example { border-bottom: solid silver; padding: 20px; } div.example div.title { font-weight: bold; font-size: large; } .pageimage { padding: 10px; vertical-align: top; }");
       }
 
       glossariesSty.setModifier(listener.getOther('+'), "format",

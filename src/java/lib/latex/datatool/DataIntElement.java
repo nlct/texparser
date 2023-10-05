@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013-2022 Nicola L.C. Talbot
+    Copyright (C) 2013-2023 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -26,32 +26,37 @@ import com.dickimawbooks.texparserlib.latex.*;
 
 public class DataIntElement extends UserNumber implements DataNumericElement
 {
-   public DataIntElement(DataToolSty sty)
+   public DataIntElement()
    {
-      this(sty, 0);
+      this(0);
    }
 
-   public DataIntElement(DataToolSty sty, int value)
+   public DataIntElement(int value)
    {
       super(value);
-      this.sty = sty;
    }
 
-   public DataIntElement(DataToolSty sty, TeXNumber num)
+   public DataIntElement(TeXNumber num)
    {
       super(num.getValue());
-      this.sty = sty;
    }
 
    @Override
    public Object clone()
    {
-      return new DataIntElement(sty, getValue());
+      return new DataIntElement(getValue());
    }
 
+   @Override
    public byte getDataType()
    {
       return DataToolHeader.TYPE_INT;
+   }
+
+   @Override
+   public DatumType getDatumType()
+   {
+      return DatumType.INTEGER;
    }
 
    @Override
@@ -78,5 +83,4 @@ public class DataIntElement extends UserNumber implements DataNumericElement
       return String.format("%d", getValue());
    }
 
-   protected DataToolSty sty;
 }

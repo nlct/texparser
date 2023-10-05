@@ -81,4 +81,6 @@ public class LaTeXSyntaxException extends TeXSyntaxException
    "latex.not.tokenlist";
    public static final String ERROR_NOT_BOOLEAN =
    "latex.not.boolean";
+   public static final String ERROR_TRAILING_CONTENT =
+   "latex.trailing_content";
 }

@@ -32,27 +32,37 @@ public class IntegerContentCommand extends TextualContentCommand implements TeXN
 {
    public IntegerContentCommand(String name, int num)
    {
-      this(name, ""+num, new UserNumber(num));
+     this(name, num, false);
+   }
+
+   public IntegerContentCommand(String name, int num, boolean isConstant)
+   {
+      this(name, ""+num, new UserNumber(num), isConstant);
    }
 
    protected IntegerContentCommand(String name, String text, UserNumber num)
    {
+      this(name, text, num, false);
+   }
+
+   protected IntegerContentCommand(String name, String text, UserNumber num, boolean isConstant)
+   {
       super(name, text, num);
+      this.isConstant = isConstant;
    }
 
    @Override
    public Object clone()
    {
-      return new IntegerContentCommand(getName(), getText(), getNumber());
+      return isConstant ? this :
+        new IntegerContentCommand(getName(), getText(), getNumber());
    }
 
    @Override
    public TextualContentCommand duplicate(String newcsname)
    {
-      TextualContentCommand copy = (TextualContentCommand)clone();
-      copy.name = newcsname;
-      copy.data = new UserNumber(getValue());
-      return copy;
+      return new IntegerContentCommand(newcsname, getText(),
+         new UserNumber(getValue()), false);
    }
 
    @Override
@@ -61,10 +71,19 @@ public class IntegerContentCommand extends TextualContentCommand implements TeXN
       return getNumber().getValue();
    }
 
+   @Override
+   public double doubleValue()
+   {
+      return (double)getValue();
+   }
+
    public void setValue(int val)
    {
-      text = ""+val;
-      getNumber().setValue(val);
+      if (!isConstant)
+      {
+         text = ""+val;
+         getNumber().setValue(val);
+      }
    }
 
    public UserNumber getNumber()
@@ -81,23 +100,38 @@ public class IntegerContentCommand extends TextualContentCommand implements TeXN
    @Override
    public void multiply(int factor)
    {
-      getNumber().multiply(factor);
-      text = ""+getValue();
+      if (!isConstant)
+      {
+         getNumber().multiply(factor);
+         text = ""+getValue();
+      }
    }
 
    @Override
    public void divide(int divisor)
    {
-      getNumber().divide(divisor);
-      text = ""+getValue();
+      if (!isConstant)
+      {
+         getNumber().divide(divisor);
+         text = ""+getValue();
+      }
    }
 
    @Override
    public void advance(TeXParser parser, Numerical increment)
     throws TeXSyntaxException
    {
-      getNumber().advance(parser, increment);
-      text = ""+getValue();
+      if (isConstant)
+      {
+         throw new TeXSyntaxException(parser,
+          TeXSyntaxException.ERROR_CANT_CHANGE_CONSTANT, toString(parser));
+      }
+      else
+      {
+         getNumber().advance(parser, increment);
+         text = ""+getValue();
+      }
    }
 
+   protected boolean isConstant = false;
 }

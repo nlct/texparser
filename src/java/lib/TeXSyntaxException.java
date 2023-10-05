@@ -153,6 +153,7 @@ public class TeXSyntaxException extends IOException
    public static final String ERROR_DIMEN_EXPECTED = "tex.error.dimen_expected";
    public static final String ERROR_MISSING_UNIT = "tex.error.missing_unit";
    public static final String ERROR_EXPECTED = "tex.error.expected";
+   public static final String ERROR_EXPECTED_BUT_FOUND = "tex.error.expected_but_found";
    public static final String ERROR_UNDEFINED = "tex.error.undefined";
    public static final String ERROR_UNDEFINED_CHAR = "tex.error.undefined_char";
    public static final String ERROR_CS_EXPECTED = "tex.error.cs_expected";
@@ -193,4 +194,6 @@ public class TeXSyntaxException extends IOException
       "tex.error.generic";
    public static final String ERROR_UNEXPANDABLE =
       "tex.error.unexpandable";
+   public static final String ERROR_CANT_CHANGE_CONSTANT =
+      "tex.error.cant_change_const";
 }

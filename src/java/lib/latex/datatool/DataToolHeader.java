@@ -77,33 +77,39 @@ public class DataToolHeader extends AbstractTeXObject implements TeXObject
       return type;
    }
 
-   public NumericRegister getNumericalType(TeXParser parser)
+   public TeXNumber getNumericalType(TeXParser parser)
    throws TeXSyntaxException
    {
+      ControlSequence cs;
+
       switch (type)
       {
          case TYPE_STRING:
-
-           return parser.getSettings().getNumericRegister(
-            "c_datatool_string_int");
+           cs = parser.getControlSequence("c_datatool_string_int");
+         break;
 
          case TYPE_INT:
-
-           return parser.getSettings().getNumericRegister(
-            "c_datatool_integer_int");
+           cs = parser.getControlSequence("c_datatool_integer_int");
+         break;
 
          case TYPE_REAL:
-
-           return parser.getSettings().getNumericRegister(
-            "c_datatool_decimal_int");
+           cs = parser.getControlSequence("c_datatool_decimal_int");
+         break;
 
          case TYPE_CURRENCY:
+           cs = parser.getControlSequence("c_datatool_currency_int");
+         break;
 
-           return parser.getSettings().getNumericRegister(
-            "c_datatool_currency_int");
+         default:
+           cs = parser.getControlSequence("c_datatool_unknown_int");
       }
 
-      return parser.getSettings().getNumericRegister("c_datatool_unknown_int");
+      if (cs instanceof TeXNumber)
+      {
+         return (TeXNumber)cs;
+      }
+
+      return new UserNumber(type);
    }
 
    public void setType(byte newType)
@@ -376,6 +382,12 @@ public class DataToolHeader extends AbstractTeXObject implements TeXObject
       }
 
       return title == header.title;
+   }
+
+   public String toString()
+   {
+      return String.format("%s[column=%d,key=%s,type=%d,title=%s]",
+         getClass().getSimpleName(), column, key, type, title);
    }
 
    private DataToolSty sty;

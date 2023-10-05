@@ -64,6 +64,12 @@ public class LaTeX3Boolean extends Command
    }
 
    @Override
+   public double doubleValue()
+   {
+      return (double)getValue();
+   }
+
+   @Override
    public int number(TeXParser parser) throws TeXSyntaxException
    {
       return getValue();

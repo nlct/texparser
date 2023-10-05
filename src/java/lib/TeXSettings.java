@@ -1099,14 +1099,32 @@ public class TeXSettings
 
    public CountRegister newcount(boolean isLocal, String name)
    {
+      return newcount(isLocal, name, 0);
+   }
+
+   public CountRegister newcount(boolean isLocal, String name, int value)
+   {
+      CountRegister reg;
+
       if (isLocal || parent == null)
       {
-         return newcount(name);
+         reg = newcount(name, value);
       }
       else
       {
-         return parent.newcount(isLocal, name);
+         TeXSettings root = parent.getRoot();
+         reg = root.newcount(name, value);
+         localRegisters.put(name, (Register)reg.clone());
       }
+
+      return reg;
+   }
+
+   public CountRegister newcount(String name, int value)
+   {
+      CountRegister reg = newcount(name);
+      reg.setValue(value);
+      return reg;
    }
 
    public CountRegister newcount(String name)
@@ -1168,14 +1186,20 @@ public class TeXSettings
 
    public TokenRegister newtoks(boolean isLocal, String name)
    {
+      TokenRegister reg;
+
       if (isLocal || parent == null)
       {
-         return newtoks(name);
+         reg = newtoks(name);
       }
       else
       {
-         return parent.newtoks(isLocal, name);
+         TeXSettings root = parent.getRoot();
+         reg = root.newtoks(name);
+         localRegisters.put(name, (Register)reg.clone());
       }
+
+      return reg;
    }
 
    protected Register putRegister(Register register)
@@ -1229,6 +1253,34 @@ public class TeXSettings
       reg.setContents(parser, value);
    }
 
+   public void localSetRegister(String name, int value)
+     throws TeXSyntaxException
+   {
+      Register reg = localRegisters.get(name);
+
+      if (reg == null)
+      {
+         if (parent != null)
+         {
+            reg = parent.getRegister(name);
+         }
+
+         if (reg == null)
+         {
+            throw new TeXSyntaxException(parser,
+               TeXSyntaxException.ERROR_REGISTER_UNDEF, name);
+         }
+
+         if (parent != null)
+         {
+            reg = (Register)reg.clone();
+            localRegisters.put(name, reg);
+         }
+      }
+
+      reg.setContents(parser, value);
+   }
+
    public void globalSetRegister(String name, TeXObject value)
      throws TeXSyntaxException
    {
@@ -1255,6 +1307,36 @@ public class TeXSettings
          else if (reg != rootReg)
          {
             rootReg.setContents(parser, reg.getContents(parser));
+         }
+      }
+   }
+
+   public void globalSetRegister(String name, int value)
+     throws TeXSyntaxException
+   {
+      Register reg = getRegister(name);
+
+      if (reg == null)
+      {
+         throw new TeXSyntaxException(parser,
+            TeXSyntaxException.ERROR_REGISTER_UNDEF, name);
+      }
+
+      reg.setContents(parser, value);
+
+      if (parent != null)
+      {
+         TeXSettings root = parent.getRoot();
+
+         Register rootReg = root.getRegister(name);
+
+         if (rootReg == null)
+         {
+            root.putRegister((Register)reg.clone());
+         }
+         else if (reg != rootReg)
+         {
+            rootReg.setContents(parser, value);
          }
       }
    }

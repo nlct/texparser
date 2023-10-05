@@ -119,7 +119,8 @@ There is NO WARRANTY, to the extent permitted by law.</entry>
 <entry key="tex.error.dimen_expected">Dimension expected</entry>
 <entry key="tex.error.missing_unit">Missing unit</entry>
 <entry key="tex.error.expected">Expected {0}</entry>
-<entry key="tex.error.undefined">Undefined command {0}</entry>
+<entry key="tex.error.expected_but_found">Expected {0} but found ''{1}''</entry>
+<entry key="tex.error.undefined">Undefined command ''{0}''</entry>
 <entry key="tex.error.undefined_char">Undefined active character ''{0}''</entry>
 <entry key="tex.error.cs_expected">Control sequence expected (found ''{0}'', class ''{1}'')</entry>
 <entry key="tex.error.number_expected">Number expected (found ''{0}'')</entry>
@@ -142,6 +143,7 @@ There is NO WARRANTY, to the extent permitted by law.</entry>
 <entry key="tex.error.generic">{0}</entry>
 <entry key="tex.error.file.not.found">File ''{0}'' not found.</entry>
 <entry key="tex.error.unexpandable">Can''t expand ''{0}''</entry>
+<entry key="tex.error.cant_change_const">Can''t change constant {0}</entry>
 
 <!--  LaTeX Error Messages -->
 
@@ -168,6 +170,7 @@ There is NO WARRANTY, to the extent permitted by law.</entry>
 <entry key="latex.not.sequence">Not a sequence command: {0}</entry>
 <entry key="latex.not.tokenlist">Not a token list command: {0}</entry>
 <entry key="latex.not.boolean">Not a boolean command: {0}</entry>
+<entry key="latex.trailing_content">Trailing content found while processing ''{0}'': {1}</entry>
 
 <!--  bibtex errors -->
 <entry key="bibtex.error.missing_value">Missing value</entry>
@@ -207,6 +210,8 @@ There is NO WARRANTY, to the extent permitted by law.</entry>
 <entry key="datatool.loaddb.message">Database ''{0}'' loaded from ''{1}'' (column count={2}, row count={3}).</entry>
 <entry key="datatool.index.outofrange">List index ''{0}'' out of range.</entry>
 <entry key="datatool.no.columns">No columns available for database ''{0}''</entry>
+<entry key="datatool.file_info">Identified file format {0} version {1} (encoding {2})</entry>
+<entry key="datatool.file_info_failed">Failed to parse file identifier on first line of file {0} (assuming {1})</entry>
 
 <!--  ifthen messages -->
 

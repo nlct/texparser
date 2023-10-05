@@ -27,13 +27,25 @@ public abstract class NumericRegister extends Register implements Numerical
       super(name);
    }
 
+   /**
+    * Increments value by given amount. 
+    */ 
    public abstract void advance(TeXParser parser, Numerical increment)
     throws TeXSyntaxException;
 
+   /**
+    * Divides this value by given amount. 
+    */ 
    public abstract void divide(int divisor);
 
+   /**
+    * Multiplies this value by given amount. 
+    */ 
    public abstract void multiply(int factor);
 
+   /**
+    * Sets this value to the given amount. 
+    */ 
    public abstract void setValue(TeXParser parser, Numerical value)
     throws TeXSyntaxException;
 
@@ -54,6 +66,10 @@ public abstract class NumericRegister extends Register implements Numerical
       return object;
    }
 
+   /**
+    * Sets the content of this register. The object must expand to a
+    * numeric value. 
+    */ 
    public void setContents(TeXParser parser, TeXObject object)
     throws TeXSyntaxException
    {

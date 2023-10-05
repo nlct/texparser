@@ -91,7 +91,7 @@ public class Tabular extends Declaration
 
       LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
 
-      listener.putControlSequence(new TabularNewline());
+      parser.putControlSequence(true, new TabularNewline());
 
       settings.setAlignmentList(listener.createTeXCellAlignList(columnSpecs));
       settings.startAlignment();

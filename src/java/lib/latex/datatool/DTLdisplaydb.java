@@ -219,7 +219,7 @@ public class DTLdisplaydb extends Command
             colNumReg.advance(parser, UserNumber.ONE);
 
             DataToolHeader header = db.getHeader(colIdx);
-            NumericRegister type = header.getNumericalType(parser);
+            TeXNumber type = header.getNumericalType(parser);
 
             TeXObjectList substack = listener.createStack();
 
@@ -250,24 +250,29 @@ public class DTLdisplaydb extends Command
 
                TeXParserUtils.process(substack, parser, stack);
 
-               rowTl.append(listener.getControlSequence("dtlcolumnheader"));
+               TeXObjectList headerCell = listener.createStack();
+               headerCell.add(listener.getControlSequence("dtlcolumnheader"));
+
                Group grp = listener.createGroup();
+               headerCell.add(grp);
                grp.addAll(tmpTl.getContent());
-               rowTl.append(grp);
 
-               grp = listener.createGroup();
-               TeXObject title = (TeXObject)header.getTitle().clone();
 
-               if (parser.isStack(title))
+               TeXObject title = header.getTitle();
+
+               if (title == null)
                {
-                  grp.addAll((TeXObjectList)title);
+                  headerCell.add(listener.createGroup(header.getColumnLabel()));
                }
                else
                {
-                  grp.add(title);
+                  grp = listener.createGroup();
+                  headerCell.add(grp);
+                  grp.add((TeXObject)title.clone(), true);
                }
 
-               rowTl.append(grp);
+               rowTl.rightConcat(headerCell.expandonce(parser, stack));
+
             }
          }
       }

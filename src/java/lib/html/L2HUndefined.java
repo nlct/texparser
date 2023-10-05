@@ -68,7 +68,7 @@ public class L2HUndefined extends Undefined
 
       if (parser.isMathMode() && listener.useMathJax())
       {
-         // assume unknown commands occuring in math mode are supported by MathJax
+         // assume unknown commands occurring in math mode are supported by MathJax
          listener.write(format());
       }
       else
@@ -76,7 +76,7 @@ public class L2HUndefined extends Undefined
          try
          {
             throw new TeXSyntaxException(parser, 
-               TeXSyntaxException.ERROR_UNDEFINED, getName());
+               TeXSyntaxException.ERROR_UNDEFINED, toString(parser));
 
          }
          catch (TeXSyntaxException e)

@@ -48,24 +48,28 @@ public class DTLdbProvideData extends ControlSequence
    {
       String label = popLabelString(parser, stack);
 
+      ControlSequence nameCs = parser.getControlSequence(
+         "l__datatool_io_name_str");
+
+      if (nameCs != null)
+      {
+         String name = parser.expandToString(nameCs, stack).trim();
+
+         if (!name.isEmpty())
+         {
+            label = name;
+         }
+      }
+
       parser.putControlSequence(true, 
        new TextualContentCommand("l__datatool_default_dbname_str", label));
 
       parser.putControlSequence(true, 
        new TextualContentCommand("dtllastloadeddb", label));
 
-      boolean global = true;
-
-      ControlSequence cs = parser.getControlSequence("l__datatool_db_global_bool");
-
-      if (cs instanceof TeXBoolean)
-      {
-         global = ((TeXBoolean)cs).booleanValue();
-      }
-
       if (!sty.dbExists(label))
       {
-         sty.createDataBase(label, global);
+         sty.createDataBase(label, sty.isDbGlobalOn());
       }
    }
 

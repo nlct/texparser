@@ -2265,7 +2265,17 @@ public class TeXParser extends TeXObjectList
       switch (obj.getAction())
       {
          case INPUT_FILE:
-           parse(obj.getFile(), currentInputCharset, obj.getPending());
+
+           TeXPath texPath = (TeXPath)obj.getData();
+           File file = texPath.getFile();
+           Charset charset = texPath.getEncoding();
+
+           if (charset == null)
+           {
+              charset = currentInputCharset;
+           }
+
+           parse(file, charset, obj.getPending());
          break;
          case MODE_CHANGE:
            settings.setMode((TeXMode)obj.getData());
@@ -3157,7 +3167,7 @@ public class TeXParser extends TeXObjectList
    public void putControlSequence(ControlSequence cs)
    {
       settings.undefControlSequence(cs.getName());
-      settings.putControlSequence(cs);
+      settings.getRoot().putControlSequence(cs);
 
       if (cs instanceof Declaration)
       {
@@ -3814,6 +3824,6 @@ public class TeXParser extends TeXObjectList
    public static final int DEBUG_CATCODE = 16384;
    public static final int DEBUG_READ = 32768;
 
-   public static final String VERSION = "0.9.8b";
-   public static final String VERSION_DATE = "2023-09-29";
+   public static final String VERSION = "0.9.8b.20231005";
+   public static final String VERSION_DATE = "2023-10-05";
 }

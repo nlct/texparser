@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013-2022 Nicola L.C. Talbot
+    Copyright (C) 2013-2023 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -42,6 +42,7 @@ public class DataStringElement extends DataObjectList implements DataElement
       addAll(list);
    }
 
+   @Override
    public Object clone()
    {
       DataStringElement element = new DataStringElement(capacity());
@@ -54,9 +55,16 @@ public class DataStringElement extends DataObjectList implements DataElement
       return element;
    }
 
+   @Override
    public byte getDataType()
    {
       return DataToolHeader.TYPE_STRING;
+   }
+
+   @Override
+   public DatumType getDatumType()
+   {
+      return DatumType.STRING;
    }
 
 }

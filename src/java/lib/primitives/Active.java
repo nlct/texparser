@@ -49,6 +49,12 @@ public class Active extends Primitive implements Expandable,TeXNumber
    }
 
    @Override
+   public double doubleValue()
+   {
+      return value.doubleValue();
+   }
+
+   @Override
    public void advance(TeXParser parser, Numerical increment)
     throws TeXSyntaxException
    {

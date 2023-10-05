@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2023 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -26,31 +26,39 @@ import com.dickimawbooks.texparserlib.latex.*;
 
 public class DataCurrencyElement extends DataRealElement
 {
-   public DataCurrencyElement(DataToolSty sty, TeXObject symbol)
+   public DataCurrencyElement(TeXObject symbol)
    {
-      this(sty, symbol, 0.0);
+      this(symbol, 0.0);
    }
 
-   public DataCurrencyElement(DataToolSty sty, TeXObject symbol, TeXNumber num)
+   public DataCurrencyElement(TeXObject symbol, TeXNumber num)
    {
-      this(sty, symbol, num.getValue());
+      this(symbol, num.getValue());
    }
 
-   public DataCurrencyElement(DataToolSty sty, TeXObject symbol, double value)
+   public DataCurrencyElement(TeXObject symbol, double value)
    {
-      super(sty, value);
+      super(value);
       this.symbol = symbol;
    }
 
+   @Override
    public Object clone()
    {
-      return new DataCurrencyElement(sty, (TeXObject)symbol.clone(), 
+      return new DataCurrencyElement((TeXObject)symbol.clone(), 
          doubleValue());
    }
 
+   @Override
    public byte getDataType()
    {
       return DataToolHeader.TYPE_CURRENCY;
+   }
+
+   @Override
+   public DatumType getDatumType()
+   {
+      return DatumType.CURRENCY;
    }
 
    public TeXObject getSymbol()
@@ -58,11 +66,13 @@ public class DataCurrencyElement extends DataRealElement
       return symbol;
    }
 
+   @Override
    public String toString(TeXParser parser)
    {
       return String.format("%s%s", symbol.toString(parser), format());
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser) throws IOException
    {
       TeXObjectList list = super.expandonce(parser);
@@ -88,10 +98,16 @@ public class DataCurrencyElement extends DataRealElement
       return list;
    }
 
+   @Override
    public void process(TeXParser parser) throws IOException
    {
       symbol.process(parser);
       parser.getListener().getWriteable().write(super.toString(parser));
+   }
+
+   public String toString()
+   {
+      return String.format("%s%f", symbol.toString(), doubleValue());
    }
 
    private TeXObject symbol;

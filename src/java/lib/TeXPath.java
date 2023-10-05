@@ -21,6 +21,7 @@ package com.dickimawbooks.texparserlib;
 import java.io.IOException;
 import java.io.File;
 import java.nio.file.Path;
+import java.nio.charset.Charset;
 
 import java.util.Iterator;
 
@@ -29,7 +30,14 @@ public class TeXPath
    public TeXPath(TeXParser parser, String texPath)
      throws IOException
    {
+      this(parser, texPath, (Charset)null);
+   }
+
+   public TeXPath(TeXParser parser, String texPath, Charset charset)
+     throws IOException
+   {
       this(parser, texPath, true, "tex");
+      setEncoding(charset);
    }
 
    public TeXPath(TeXParser parser, String texPath, boolean useKpsewhich)
@@ -448,7 +456,26 @@ public class TeXPath
       return foundByKpsewhich;
    }
 
+   /**
+    * Gets the file encoding or null if not known. Assume default,
+    * if null.
+    */ 
+   public Charset getEncoding()
+   {
+      return charset;
+   }
+
+   /**
+    * Sets the file encoding.
+    */ 
+   public void setEncoding(Charset charset)
+   {
+      this.charset = charset;
+   }
+
    private Path base, relative;
 
    private boolean foundByKpsewhich = false;
+
+   private Charset charset; // encoding if known
 }

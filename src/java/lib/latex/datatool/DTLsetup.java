@@ -26,12 +26,12 @@ import com.dickimawbooks.texparserlib.latex.*;
 
 public class DTLsetup extends ControlSequence
 {
-   public DTLsetup(DataToolSty sty)
+   public DTLsetup(DataToolBaseSty sty)
    {
       this("DTLsetup", sty);
    }
 
-   public DTLsetup(String name, DataToolSty sty)
+   public DTLsetup(String name, DataToolBaseSty sty)
    {
       super(name);
       this.sty = sty;
@@ -54,100 +54,9 @@ public class DTLsetup extends ControlSequence
       {
          String key = it.next();
 
-         TeXObject val = options.get(key);
+         TeXObject value = options.get(key);
 
-         if (key.equals("default-name"))
-         {
-            parser.putControlSequence(true, 
-              new TextualContentCommand("l__datatool_default_dbname_str",
-                 parser.expandToString(val, stack)));
-         }
-         else if (key.equals("global"))
-         {
-            boolean boolVal = true;
-
-            if (val != null)
-            {
-               boolVal = Boolean.parseBoolean(parser.expandToString(val, stack));
-            }
-
-            parser.putControlSequence(true, 
-              new LaTeX3Boolean("l__datatool_db_global_bool", boolVal));
-         }
-         else if (key.equals("store-datum"))
-         {
-            boolean boolVal = true;
-
-            if (val != null)
-            {
-               boolVal = Boolean.parseBoolean(parser.expandToString(val, stack));
-            }
-
-            parser.putControlSequence(true, 
-              new LaTeX3Boolean("l__datatool_db_store_datum_bool", boolVal));
-         }
-         else if (key.equals("new-value-trim"))
-         {
-            boolean boolVal = true;
-
-            if (val != null)
-            {
-               boolVal = Boolean.parseBoolean(parser.expandToString(val, stack));
-            }
-
-            parser.putControlSequence(true, 
-              new LaTeX3Boolean("l__datatool_new_element_trim_bool", boolVal));
-         }
-         else if (key.equals("new-value-expand"))
-         {
-            boolean boolVal = true;
-
-            if (val != null)
-            {
-               boolVal = Boolean.parseBoolean(parser.expandToString(val, stack));
-            }
-
-            ControlSequence cs;
-
-            if (boolVal)
-            {
-               cs = parser.getListener().getControlSequence("dtlexpandnewvalue");
-            }
-            else
-            {
-               cs = parser.getListener().getControlSequence("dtlnoexpandnewvalue");
-            }
-
-            TeXParserUtils.process(cs, parser, stack);
-         }
-         else if (key.equals("delimiter"))
-         {
-            String str = parser.expandToString(val, stack);
-            sty.setDelimiter(str.codePointAt(0));
-         }
-         else if (key.equals("separator"))
-         {
-            String str = parser.expandToString(val, stack);
-            sty.setSeparator(str.codePointAt(0));
-         }
-         else if (key.equals("io"))
-         {
-            sty.processIOKeys(val, stack);
-         }
-         else if (key.equals("action"))
-         {
-            sty.processActionKeys(val, stack);
-         }
-         else if (key.equals("display"))
-         {
-            sty.processDisplayKeys(val, stack);
-         }
-         else
-         {
-            throw new LaTeXSyntaxException(parser,
-             LaTeXSyntaxException.ERROR_UNKNOWN_OPTION,
-             key, "datatool");
-         }
+         sty.processSetupOption(key, value, stack);
       }
    }
 
@@ -158,5 +67,5 @@ public class DTLsetup extends ControlSequence
       process(parser, parser);
    }
 
-   protected DataToolSty sty;
+   protected DataToolBaseSty sty;
 }
