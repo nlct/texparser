@@ -18,12 +18,37 @@
 */
 package com.dickimawbooks.texparserlib.latex.datatool;
 
+import java.io.PrintWriter;
+import java.io.IOException;
+
+import com.dickimawbooks.texparserlib.TeXParser;
 import com.dickimawbooks.texparserlib.TeXObject;
 import com.dickimawbooks.texparserlib.ControlSequence;
 
 public interface DataElement extends TeXObject
 {
+   /**
+    * Gets the data type as a byte. The return value should be one
+    * of: DataToolHeader.TYPE_UNDEF, DataToolHeader.TYPE_STRING,
+    * DataToolHeader.TYPE_INT, DataToolHeader.TYPE_REAL,
+    * DataToolHeader.TYPE_CURRENCY.
+    */ 
    public byte getDataType();
+
+   /**
+    * Gets the data type.
+    */ 
    public DatumType getDatumType();
+
+   /**
+    * Creates a control sequence that is defined to this value.
+    */ 
    public ControlSequence createControlSequence(String name);
+
+   /**
+    * Writes this value according to the file format type.
+    */ 
+   public void write(TeXParser parser, PrintWriter writer, 
+    String format, String version)
+   throws IOException;
 }

@@ -18,6 +18,7 @@
 */
 package com.dickimawbooks.texparserlib.latex.datatool;
 
+import java.io.PrintWriter;
 import java.io.IOException;
 import java.util.Vector;
 
@@ -120,6 +121,14 @@ public class DataCurrencyElement extends DataRealElement
    public String toString()
    {
       return String.format("%s%f", symbol.toString(), doubleValue());
+   }
+
+   @Override
+   public void write(TeXParser parser, PrintWriter writer, 
+    String format, String version)
+   throws IOException
+   {
+      writer.print(toString());
    }
 
    private TeXObject symbol;

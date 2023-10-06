@@ -18,6 +18,7 @@
 */
 package com.dickimawbooks.texparserlib.latex.datatool;
 
+import java.io.PrintWriter;
 import java.io.IOException;
 import java.util.Vector;
 
@@ -50,7 +51,11 @@ public class DatumElement extends AbstractTeXObject
    public Object clone()
    {
       DatumElement element = new DatumElement((TeXObject)content.clone());
-      element.number = (TeXNumber)number.clone();
+
+      if (number != null)
+      {
+         element.number = (TeXNumber)number.clone();
+      }
 
       if (currencySymbol != null)
       {
@@ -235,9 +240,31 @@ public class DatumElement extends AbstractTeXObject
    }
 
    @Override
+   public void write(TeXParser parser, PrintWriter writer, String format, String version)
+    throws IOException
+   {
+      if (format.equals("dbtex") && version.equals("3.0"))
+      {
+         writer.format("\\dtl@db@datum@reconstruct{%s}{%s}{%s}{%d}%%%n",
+            content.format(),
+            number == null ? "" : number.format(),
+            currencySymbol == null ? "" : currencySymbol.format(),
+            datumType.getValue());
+      }
+      else
+      {
+         writer.print(content.format());
+      }
+   }
+
+   @Override
    public String format()
    {
-      return content.format();
+      return String.format("\\__datatool_datum:nnnn {%s}{%s}{%s}{%d}",
+         content.format(),
+         number == null ? "" : number.format(),
+         currencySymbol == null ? "" : currencySymbol.format(),
+         datumType.getValue());
    }
 
    @Override

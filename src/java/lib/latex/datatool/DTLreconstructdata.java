@@ -230,7 +230,7 @@ public class DTLreconstructdata extends ControlSequence
               = TeXParserUtils.toList(popArg(parser, rowContent), parser);
 
             obj = cellContent.peekStack();
-            TeXObjectList value = cellContent;
+            TeXObject value = cellContent;
 
             if (obj instanceof ControlSequence)
             {
@@ -239,19 +239,13 @@ public class DTLreconstructdata extends ControlSequence
                if (csname.equals("dtl@db@value@reconstruct"))
                {
                   cellContent.popStack(parser);
-                  value = TeXParserUtils.toList(
-                     TeXParserUtils.popArg(parser, cellContent), parser);
+                  value = TeXParserUtils.popArg(parser, cellContent);
                }
                else if (csname.equals("dtl@db@datum@reconstruct"))
                {
                   cellContent.popStack(parser);
-                  value = listener.createStack();
-                  value.add(listener.getControlSequence(
-                    "__datatool_datum:nnnn"));
 
                   obj = TeXParserUtils.popArg(parser, cellContent);
-                  value.add(TeXParserUtils.createGroup(parser, obj));
-
                   TeXObject numArg = TeXParserUtils.popArg(parser, cellContent);
                   TeXObject symArg = TeXParserUtils.popArg(parser, cellContent);
                   int type = TeXParserUtils.popInt(parser, cellContent);
@@ -259,38 +253,28 @@ public class DTLreconstructdata extends ControlSequence
                   switch (type)
                   {
                      case DataToolHeader.TYPE_INT:
-                       value.add(new UserNumber(
-                          TeXParserUtils.toInt(numArg, parser, cellContent)));
-                       value.add(listener.createGroup());
-                       value.add(listener.getControlSequence(
-                         "c_datatool_integer_int"));
+                       value = new DatumElement(obj, 
+                         new UserNumber(
+                           TeXParserUtils.toInt(numArg, parser, cellContent)),
+                         null, DatumType.INTEGER
+                       );
                      break;
                      case DataToolHeader.TYPE_REAL:
-                       value.add(new TeXFloatingPoint(
-                         TeXParserUtils.toDouble(numArg, parser, cellContent)));
-                       value.add(listener.createGroup());
-                       value.add(listener.getControlSequence(
-                         "c_datatool_decimal_int"));
+                       value = new DatumElement(obj, 
+                         new TeXFloatingPoint(
+                           TeXParserUtils.toDouble(numArg, parser, cellContent)),
+                         null, DatumType.DECIMAL
+                       );
                      break;
                      case DataToolHeader.TYPE_CURRENCY:
-                       value.add(new TeXFloatingPoint(
-                         TeXParserUtils.toDouble(numArg, parser, cellContent)));
-                       value.add(TeXParserUtils.createGroup(parser, symArg));
-                       value.add(listener.getControlSequence(
-                         "c_datatool_currency_int"));
+                       value = new DatumElement(obj, 
+                         new TeXFloatingPoint(
+                           TeXParserUtils.toDouble(numArg, parser, cellContent)),
+                         symArg, DatumType.CURRENCY
+                       );
                      break;
-                     case DataToolHeader.TYPE_STRING:
-                       value.add(listener.createGroup());
-                       value.add(listener.createGroup());
-                       value.add(listener.getControlSequence(
-                         "c_datatool_string_int"));
-                     break;
-                     case DataToolHeader.TYPE_UNDEF:
-                       value.add(listener.createGroup());
-                       value.add(listener.createGroup());
-                       value.add(listener.getControlSequence(
-                         "c_datatool_unknown_int"));
-                     break;
+                     default:
+                       value = new DatumElement(obj);
                   }
                }
             }
@@ -304,7 +288,7 @@ public class DTLreconstructdata extends ControlSequence
             contentTokenList.add(new TeXCsRef("db@col@id@end@"));
 
             contentTokenList.add(new TeXCsRef("db@col@elt@w"));
-            contentTokenList.addAll(value);
+            contentTokenList.add(value, true);
             contentTokenList.add(new TeXCsRef("db@col@elt@end@"));
 
             contentTokenList.add(new TeXCsRef("db@col@id@w"));

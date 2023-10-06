@@ -18,6 +18,7 @@
 */
 package com.dickimawbooks.texparserlib.latex.datatool;
 
+import java.io.PrintWriter;
 import java.io.IOException;
 import java.util.Vector;
 
@@ -72,4 +73,13 @@ public class DataStringElement extends DataObjectList implements DataElement
    {
       return new GenericCommand(name, null, toList());
    }
+
+   @Override
+   public void write(TeXParser parser, PrintWriter writer, 
+    String format, String version)
+   throws IOException
+   {
+      writer.print(toString(parser));
+   }
+
 }
