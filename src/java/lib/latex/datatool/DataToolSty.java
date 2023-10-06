@@ -593,6 +593,57 @@ public class DataToolSty extends LaTeXSty
       }
    }
 
+   public void updateInternals(boolean global, String name)
+   throws TeXSyntaxException
+   {
+      DataBase db = null;
+
+      if (databases != null)
+      {
+         db = databases.get(name);
+      }
+
+      if (db == null)
+      {
+         throw new LaTeXSyntaxException(getParser(),
+           ERROR_DB_DOESNT_EXIST, name);
+      }
+
+      String headerRegName = getHeaderRegisterName(name);
+      String contentRegName = getContentsRegisterName(name);
+      String rowCountRegName = getRowCountRegisterName(name);
+      String colCountRegName = getColumnCountRegisterName(name);
+
+      TeXSettings settings = getParser().getSettings();
+
+      DataToolHeaderRow headers = db.getHeaders();
+
+      if (global)
+      {
+         settings.globalSetRegister(headerRegName, headers);
+         settings.globalSetRegister(contentRegName, db.getData());
+         settings.globalSetRegister(rowCountRegName, db.getRowCount());
+         settings.globalSetRegister(colCountRegName, db.getColumnCount());
+      }
+      else
+      {
+         settings.localSetRegister(headerRegName, headers);
+         settings.localSetRegister(contentRegName, db.getData());
+         settings.localSetRegister(rowCountRegName, db.getRowCount());
+         settings.localSetRegister(colCountRegName, db.getColumnCount());
+      }
+
+      for (DataToolHeader header : headers)
+      {
+         String key = header.getColumnLabel();
+         int idx = header.getColumnIndex();
+
+         getParser().putControlSequence(!global, 
+           new IntegerContentCommand(getColumnHeaderName(name, key), idx));
+      }
+
+   }
+
    public DataToolHeaderRow getHeaderContents(String name)
     throws IOException
    {
@@ -750,16 +801,7 @@ public class DataToolSty extends LaTeXSty
 
    public boolean isDbGlobalOn()
    {
-      boolean global = true;
-
-      ControlSequence cs = getParser().getControlSequence("l__datatool_db_global_bool");
-
-      if (cs instanceof TeXBoolean)
-      {
-         global = ((TeXBoolean)cs).booleanValue();
-      }
-
-      return global;
+      return TeXParserUtils.isTrue("l__datatool_db_global_bool", getParser());
    }
 
    public DataToolBaseSty getDataToolBaseSty()
@@ -1306,7 +1348,7 @@ public class DataToolSty extends LaTeXSty
     * Writes information about the named database to STDOUT. For debugging.
     */ 
    public void showDbInfo(String name)
-   throws IOException
+   throws TeXSyntaxException
    {
       DataBase db = (databases == null ? null : databases.get(name));
       TeXParser parser = getParser();
@@ -1396,7 +1438,19 @@ public class DataToolSty extends LaTeXSty
          if (headerCs instanceof TokenRegister)
          {
             TeXObject contents = ((TokenRegister)headerCs).getContents(parser);
-            showHeaderContent(TeXParserUtils.toList(contents, parser));
+
+            if (contents.isEmpty())
+            {
+               System.out.println("Empty");
+            }
+            else if (contents instanceof DataToolHeaderRow)
+            {
+               ((DataToolHeaderRow)contents).info();
+            }
+            else
+            {
+               showHeaderContent(TeXParserUtils.toList(contents, parser));
+            }
          }
          else
          {
@@ -1418,7 +1472,19 @@ public class DataToolSty extends LaTeXSty
          if (contentsCs instanceof TokenRegister)
          {
             TeXObject contents = ((TokenRegister)contentsCs).getContents(parser);
-            showDataContent(TeXParserUtils.toList(contents, parser));
+
+            if (contents.isEmpty())
+            {
+               System.out.println("Empty");
+            }
+            else if (contents instanceof DataToolRows)
+            {
+               ((DataToolRows)contents).info();
+            }
+            else
+            {
+               showDataContent(TeXParserUtils.toList(contents, parser));
+            }
          }
          else
          {
@@ -1468,7 +1534,6 @@ public class DataToolSty extends LaTeXSty
    }
 
    public void showHeaderContent(TeXObjectList contents)
-    throws IOException
    {
       TeXParser parser = getParser();
       TeXParserListener listener = getListener();
@@ -1983,7 +2048,6 @@ public class DataToolSty extends LaTeXSty
    }
 
    public void showDataContent(TeXObjectList contents)
-    throws IOException
    {
       TeXParser parser = getParser();
       TeXParserListener listener = getListener();

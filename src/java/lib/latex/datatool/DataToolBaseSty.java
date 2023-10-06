@@ -20,6 +20,8 @@ package com.dickimawbooks.texparserlib.latex.datatool;
 
 import java.util.Vector;
 import java.io.IOException;
+import java.text.DecimalFormat;
+import java.text.ParseException;
 
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.*;
@@ -70,6 +72,19 @@ public class DataToolBaseSty extends LaTeXSty
       registerControlSequence(new DTLinsertinto("edtlinsertinto", true, this));
       registerControlSequence(new DTLcompare());
       registerControlSequence(new DTLcompare("dtlicompare", false));
+
+      registerControlSequence(new DTLsetnumberchars());
+      registerControlSequence(new TextualContentCommand("@dtl@numbergroupchar", ","));
+      registerControlSequence(new TextualContentCommand("@dtl@decimal", "."));
+
+      registerControlSequence(
+        new NumericFormatter("__texparser_fmt_integer_value:n", new DecimalFormat("#,##0"), "."));
+
+      registerControlSequence(
+        new NumericFormatter("__texparser_fmt_decimal_value:n", new DecimalFormat("#,##0.0#####")));
+
+      registerControlSequence(
+        new NumericFormatter("__texparser_fmt_currency_value:n", new DecimalFormat("#,##0.00")));
 
       addCurrencySymbol("$");
       addCurrencySymbol("pounds");
@@ -202,10 +217,86 @@ public class DataToolBaseSty extends LaTeXSty
       return sortCountReg;
    }
 
+   public static int parseInt(String str, TeXParser parser)
+    throws TeXSyntaxException
+   {
+      ControlSequence cs 
+        = parser.getControlSequence("__texparser_fmt_integer_value:n");
+
+      try
+      {
+         if (cs instanceof NumericFormatter)
+         {
+            return ((NumericFormatter)cs).parse(str).intValue();
+         }
+
+         return Integer.parseInt(str);
+      }
+      catch (NumberFormatException | ParseException e)
+      {
+         throw new TeXSyntaxException(e, parser,
+           TeXSyntaxException.ERROR_NUMBER_EXPECTED, str);
+      }
+   }
+
+   public static double parseDecimal(String str, TeXParser parser)
+    throws TeXSyntaxException
+   {
+      ControlSequence cs
+        = parser.getControlSequence("__texparser_fmt_decimal_value:n");
+
+      try
+      {
+         if (cs instanceof NumericFormatter)
+         {
+            return ((NumericFormatter)cs).parse(str).doubleValue();
+         }
+
+         return Double.parseDouble(str);
+      }
+      catch (NumberFormatException | ParseException e)
+      {
+         throw new TeXSyntaxException(e, parser, 
+           TeXSyntaxException.ERROR_NUMBER_EXPECTED, str);
+      }
+   }
+
+   public static double parseCurrencyDecimal(String str, TeXParser parser)
+    throws TeXSyntaxException
+   {
+      ControlSequence cs 
+        = parser.getControlSequence("__texparser_fmt_currency_value:n");
+            
+      try
+      {
+         if (cs instanceof NumericFormatter)
+         {
+            return ((NumericFormatter)cs).parse(str).doubleValue();
+         }  
+
+         return Double.parseDouble(str);
+      }     
+      catch (NumberFormatException | ParseException e)
+      {
+         throw new TeXSyntaxException(e, parser,
+           TeXSyntaxException.ERROR_NUMBER_EXPECTED, str);
+      }
+   }
+
    public DataElement getElement(TeXObject entry)
      throws IOException
    {
       TeXParser parser = getListener().getParser();
+
+      boolean useDatum
+        = TeXParserUtils.isTrue("l__datatool_db_store_datum_bool", parser);
+
+      TeXObject original = null;
+
+      if (useDatum)
+      {
+         original = (TeXObject)entry.clone();
+      }
 
       if (entry instanceof TeXObjectList)
       {
@@ -221,7 +312,7 @@ public class DataToolBaseSty extends LaTeXSty
 
          if (DatumMarker.isDatumMarker(first))
          {
-            DataElement elem = DatumMarker.popDataElement(parser, list);
+            DataElement elem = DatumMarker.popDataElement(useDatum, parser, list);
 
             list.trim();
 
@@ -245,10 +336,32 @@ public class DataToolBaseSty extends LaTeXSty
 
             try
             {
-               return new DataCurrencyElement(first, 
-                Double.parseDouble(list.toString(parser).trim()));
+               ControlSequence cs = parser.getControlSequence(
+                 "__texparser_fmt_currency_value:n");
+
+               String str = list.toString(parser).trim();
+               double value;
+
+               if (cs instanceof NumericFormatter)
+               {
+                  value = ((NumericFormatter)cs).parse(str).doubleValue();
+               }
+               else
+               {
+                  value = Double.parseDouble(str);
+               }
+
+               if (useDatum)
+               {
+                  return new DatumElement(original,
+                     new TeXFloatingPoint(value), first, DatumType.CURRENCY);
+               }
+               else
+               {
+                  return new DataCurrencyElement(first, value);
+               }
             }
-            catch (NumberFormatException e)
+            catch (NumberFormatException | ParseException e)
             {// not numeric
 
                list.add(0, first);
@@ -263,9 +376,31 @@ public class DataToolBaseSty extends LaTeXSty
 
       try
       {
-         return new DataIntElement(Integer.parseInt(str));
+         ControlSequence cs = parser.getControlSequence(
+            "__texparser_fmt_integer_value:n");
+
+         int value;
+
+         if (cs instanceof NumericFormatter)
+         {
+            value = ((NumericFormatter)cs).parse(str).intValue();
+         }
+         else
+         {
+            value = Integer.parseInt(str);
+         }
+
+         if (useDatum)
+         {
+            return new DatumElement(original, new UserNumber(value),
+             null, DatumType.INTEGER);
+         }
+         else
+         {
+            return new DataIntElement(value);
+         }
       }
-      catch (NumberFormatException e)
+      catch (NumberFormatException | ParseException e)
       {
       }
 
@@ -273,20 +408,56 @@ public class DataToolBaseSty extends LaTeXSty
 
       try
       {
-         return new DataRealElement(Double.parseDouble(str));
+         ControlSequence cs = parser.getControlSequence(
+            "__texparser_fmt_decimal_value:n");
+
+         double value;
+
+         if (cs instanceof NumericFormatter)
+         {
+            value = ((NumericFormatter)cs).parse(str).doubleValue();
+         }
+         else
+         {
+            value = Double.parseDouble(str);
+         }
+
+         if (useDatum)
+         {
+            return new DatumElement(original, new TeXFloatingPoint(value),
+              null, DatumType.DECIMAL);
+         }
+         else
+         {
+            return new DataRealElement(value);
+         }
       }
-      catch (NumberFormatException e)
+      catch (NumberFormatException | ParseException e)
       {
       }
 
-      if (entry instanceof TeXObjectList)
+      if (useDatum)
       {
-         return new DataStringElement((TeXObjectList)entry);
+         if (entry.isEmpty())
+         {
+            return new DatumElement();
+         }
+         else
+         {
+            return new DatumElement(entry);
+         }
       }
+      else
+      {
+         if (entry instanceof TeXObjectList)
+         {
+            return new DataStringElement((TeXObjectList)entry);
+         }
 
-      DataStringElement elem = new DataStringElement();
-      elem.add(entry);
-      return elem;
+         DataStringElement elem = new DataStringElement();
+         elem.add(entry);
+         return elem;
+      }
    }
 
    private IfThenSty ifThenSty;

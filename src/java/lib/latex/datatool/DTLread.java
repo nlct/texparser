@@ -73,14 +73,24 @@ public class DTLread extends ControlSequence
       String format = parser.expandToString(
        listener.getControlSequence("l__datatool_format_str"), stack);
 
+      int idx = format.indexOf('-');
+      String formatVersion = null;
+
+      if (idx != -1)
+      {
+         formatVersion = format.substring(idx+1)+".0";
+         format = format.substring(0, idx);
+      }
+
       String ext = parser.expandToString(
        listener.getControlSequence("l__datatool_default_ext_str"), stack);
 
       TeXPath texPath = new TeXPath(parser, filename, ext, false);
 
-      if (format.startsWith("dtltex") || format.startsWith("dbtex"))
+      if (format.equals("dtltex") || format.equals("dbtex"))
       {
          stack.push(listener.getControlSequence("endgroup"));
+         stack.push(new PostReadHook(sty));
 
          if (texPath.exists())
          {
@@ -109,6 +119,14 @@ public class DTLread extends ControlSequence
                      listener.getTeXApp().message(
                       listener.getTeXApp().getMessage(FILE_INFO, 
                         fileType, version, charsetName));
+
+                     parser.putControlSequence(true,
+                      new TextualContentCommand("__datatool_current_file_type",
+                        fileType.toLowerCase()));
+
+                     parser.putControlSequence(true,
+                      new TextualContentCommand("__datatool_current_file_version",
+                        version));
                   }
                }
             }

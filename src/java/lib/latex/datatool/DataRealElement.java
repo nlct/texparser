@@ -32,9 +32,14 @@ public class DataRealElement extends AbstractTeXObject
       this(0.0);
    }
 
+   public DataRealElement(Number num)
+   {
+      this(num.doubleValue());
+   }
+
    public DataRealElement(TeXNumber num)
    {
-      this(num.getValue());
+      this(num.doubleValue());
    }
 
    public DataRealElement(double value)
@@ -113,42 +118,40 @@ public class DataRealElement extends AbstractTeXObject
    public TeXObjectList expandonce(TeXParser parser)
     throws IOException
    {
-      return string(parser);
+      return expandonce(parser, parser);
    }
 
    @Override
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
     throws IOException
    {
-      return expandonce(parser);
+      TeXParserListener listener = parser.getListener();
+
+      TeXObjectList expanded = listener.createStack();
+
+      expanded.add(new TeXFloatingPoint(doubleValue()));
+
+      return expanded;
    }
 
    @Override
    public TeXObjectList expandfully(TeXParser parser)
     throws IOException
    {
-      TeXObjectList list = expandonce(parser);
-
-      if (list == null) return null;
-
-      return list.expandfully(parser);
+      return expandfully(parser, parser);
    }
 
    @Override
    public TeXObjectList expandfully(TeXParser parser, TeXObjectList stack)
     throws IOException
    {
-      TeXObjectList list = expandonce(parser, stack);
-
-      if (list == null) return null;
-
-      return list.expandfully(parser, stack);
+      return parser.getListener().createString(format());
    }
 
    @Override
    public String format()
    {
-      return String.format("%f", value);
+      return "" + value;
    }
 
    @Override
@@ -166,18 +169,31 @@ public class DataRealElement extends AbstractTeXObject
    @Override
    public void process(TeXParser parser) throws IOException
    {
-      parser.getListener().getWriteable().write(toString(parser));
+      process(parser, parser);
    }
 
    @Override
    public void process(TeXParser parser, TeXObjectList stack) throws IOException
    {
-      process(parser);
+      TeXParserListener listener = parser.getListener();
+
+      TeXObjectList expanded = listener.createStack();
+
+      expanded.add(listener.getControlSequence("__texparser_fmt_decimal_value:n"));
+      expanded.add(new TeXFloatingPoint(doubleValue()));
+
+      TeXParserUtils.process(expanded, parser, stack);
    }
 
    public String toString()
    {
       return String.format("%f", value);
+   }
+
+   @Override
+   public ControlSequence createControlSequence(String name)
+   {
+      return new FloatingPointContentCommand(name, value);
    }
 
    private double value;

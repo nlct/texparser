@@ -217,5 +217,16 @@ public class DataToolHeaderRow extends Vector<DataToolHeader>
       return false;
    }
 
+   public void info()
+   {
+      for (DataToolHeader header: this)
+      {
+         System.out.println("Column "+header.getColumnIndex()+":");
+         System.out.println("  Label: "+header.getColumnLabel());
+         System.out.println("  Type: "+header.getType());
+         System.out.println("  Title: "+header.getTitle());
+      }
+   }
+
    private DataToolSty sty;
 }

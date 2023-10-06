@@ -67,4 +67,9 @@ public class DataStringElement extends DataObjectList implements DataElement
       return DatumType.STRING;
    }
 
+   @Override
+   public ControlSequence createControlSequence(String name)
+   {
+      return new GenericCommand(name, null, toList());
+   }
 }

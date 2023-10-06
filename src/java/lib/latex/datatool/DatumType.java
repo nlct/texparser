@@ -32,5 +32,19 @@ public enum DatumType
       return id;
    }
 
+   public static DatumType toDatumType(int type)
+   {
+      switch (type)
+      {
+         case -1 : return UNKNOWN;
+         case 0 : return STRING;
+         case 1 : return INTEGER;
+         case 2 : return DECIMAL;
+         case 3 : return CURRENCY;
+      }
+
+      throw new IllegalArgumentException("Invalid DatumType id "+type);
+   }
+
    private final int id;
 }

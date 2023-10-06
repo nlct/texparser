@@ -194,8 +194,7 @@ public class DTLdisplaydb extends Command
 
       if (userHeader.isEmpty())
       {
-         if (!listener.getLaTeX3Boolean(
-              "l_datatool_include_header_bool", stack).booleanValue())
+         if (!TeXParserUtils.isTrue("l_datatool_include_header_bool", parser))
          {
             userHeader = new TokenListCommand("l__datatool_user_header_tl", 
               TeXParserUtils.createStack(parser, TokenListCommand.EMPTY));

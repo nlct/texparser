@@ -93,6 +93,15 @@ public class DataObjectList extends TeXObjectList
       return new DataObjectList(capacity(), protect);
    }
 
+   public TeXObjectList toList()
+   {
+      TeXObjectList list = new TeXObjectList(size());
+
+      list.addAll(this);
+
+      return list;
+   }
+
    @Override
    public boolean add(TeXObject object, boolean flatten)
    {

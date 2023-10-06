@@ -19,9 +19,11 @@
 package com.dickimawbooks.texparserlib.latex.datatool;
 
 import com.dickimawbooks.texparserlib.TeXObject;
+import com.dickimawbooks.texparserlib.ControlSequence;
 
 public interface DataElement extends TeXObject
 {
    public byte getDataType();
    public DatumType getDatumType();
+   public ControlSequence createControlSequence(String name);
 }

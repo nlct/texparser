@@ -33,7 +33,12 @@ public class DataCurrencyElement extends DataRealElement
 
    public DataCurrencyElement(TeXObject symbol, TeXNumber num)
    {
-      this(symbol, num.getValue());
+      this(symbol, num.doubleValue());
+   }
+
+   public DataCurrencyElement(TeXObject symbol, Number num)
+   {
+      this(symbol, num.doubleValue());
    }
 
    public DataCurrencyElement(TeXObject symbol, double value)
@@ -61,6 +66,12 @@ public class DataCurrencyElement extends DataRealElement
       return DatumType.CURRENCY;
    }
 
+   @Override
+   public ControlSequence createControlSequence(String name)
+   {
+      return new CurrencyContentCommand(name, (TeXObject)symbol.clone(), doubleValue());
+   }
+
    public TeXObject getSymbol()
    {
       return symbol;
@@ -69,40 +80,41 @@ public class DataCurrencyElement extends DataRealElement
    @Override
    public String toString(TeXParser parser)
    {
-      return String.format("%s%s", symbol.toString(parser), format());
+      return String.format("%s%0.2f", symbol.toString(parser), doubleValue());
    }
 
    @Override
    public TeXObjectList expandonce(TeXParser parser) throws IOException
    {
-      TeXObjectList list = super.expandonce(parser);
+      TeXParserListener listener = parser.getListener();
 
-      if (symbol instanceof Expandable)
-      {
-         TeXObjectList expanded = ((Expandable)symbol).expandonce(parser);
+      TeXObjectList expanded = listener.createStack();
 
-         if (expanded == null)
-         {
-            list.add(0, symbol);
-         }
-         else
-         {
-            list.addAll(0, expanded);
-         }
-      }
-      else
-      {
-         list.add(0, symbol);
-      }
+      expanded.add(listener.getControlSequence("DTLfmtcurrency"));
 
-      return list;
+      Group grp = listener.createGroup();
+      grp.add(symbol, true);
+      expanded.add(grp);
+
+      grp = listener.createGroup();
+      expanded.add(grp);
+
+      grp.add(listener.getControlSequence("__texparser_fmt_currency_value:n"));
+      grp.add(new TeXFloatingPoint(doubleValue()));
+
+      return expanded;
    }
 
    @Override
    public void process(TeXParser parser) throws IOException
    {
-      symbol.process(parser);
-      parser.getListener().getWriteable().write(super.toString(parser));
+      expandonce(parser).process(parser);
+   }
+
+   @Override
+   public void process(TeXParser parser, TeXObjectList stack) throws IOException
+   {
+      expandonce(parser, stack).process(parser, stack);
    }
 
    public String toString()

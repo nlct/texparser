@@ -31,6 +31,11 @@ public class DataIntElement extends UserNumber implements DataNumericElement
       this(0);
    }
 
+   public DataIntElement(Number value)
+   {
+      super(value.intValue());
+   }
+
    public DataIntElement(int value)
    {
       super(value);
@@ -78,9 +83,33 @@ public class DataIntElement extends UserNumber implements DataNumericElement
    }
 
    @Override
-   public String format()
+   public void process(TeXParser parser) throws IOException
    {
-      return String.format("%d", getValue());
+      process(parser, parser);
    }
 
+   @Override
+   public void process(TeXParser parser, TeXObjectList stack) throws IOException
+   {
+      TeXParserListener listener = parser.getListener();
+
+      TeXObjectList expanded = listener.createStack();
+   
+      expanded.add(listener.getControlSequence("__texparser_fmt_integer_value:n")); 
+      expanded.add(new UserNumber(getValue()));
+      
+      TeXParserUtils.process(expanded, parser, stack);
+   }
+
+   @Override
+   public String format()
+   {
+      return "" + getValue();
+   }
+
+   @Override
+   public ControlSequence createControlSequence(String name)
+   {
+      return new IntegerContentCommand(name, intValue());
+   }
 }

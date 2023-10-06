@@ -19,64 +19,53 @@
 package com.dickimawbooks.texparserlib.latex.datatool;
 
 import java.io.IOException;
+import java.text.DecimalFormat;
 
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.*;
 
-public class DTLdbProvideData extends ControlSequence
+public class DTLsetnumberchars extends ControlSequence
 {
-   public DTLdbProvideData(DataToolSty sty)
+   public DTLsetnumberchars()
    {
-      this("DTLdbProvideData", sty);
+      this("DTLsetnumberchars");
    }
 
-   public DTLdbProvideData(String name, DataToolSty sty)
+   public DTLsetnumberchars(String name)
    {
       super(name);
-      this.sty = sty;
    }
 
    @Override
    public Object clone()
    {
-      return new DTLdbProvideData(getName(), sty);
+      return new DTLsetnumberchars(getName());
    }
 
    @Override
    public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      String label = popLabelString(parser, stack);
-
-      ControlSequence nameCs = parser.getControlSequence(
-         "l__datatool_io_name_str");
-
-      if (nameCs != null)
-      {
-         String name = parser.expandToString(nameCs, stack).trim();
-
-         if (!name.isEmpty())
-         {
-            label = name;
-         }
-      }
+      String numGrpChar = popLabelString(parser, stack);
+      String decimalChar = popLabelString(parser, stack);
 
       parser.putControlSequence(true, 
-       new TextualContentCommand("l__datatool_default_dbname_str", label));
+        new TextualContentCommand("@dtl@numbergroupchar", numGrpChar));
 
       parser.putControlSequence(true, 
-       new TextualContentCommand("dtllastloadeddb", label));
+        new TextualContentCommand("@dtl@decimal", decimalChar));
 
-      parser.putControlSequence(true,
-        new TextualContentCommand("__datatool_current_file_type", "dtltex"));
+      parser.putControlSequence(true, 
+        new NumericFormatter("__texparser_fmt_integer_value:n",
+          new DecimalFormat("#"+numGrpChar+"##0"), decimalChar));
 
-      parser.putControlSequence(true,
-        new TextualContentCommand("__datatool_current_file_version", "3.0"));
+      parser.putControlSequence(true, 
+        new NumericFormatter("__texparser_fmt_decimal_value:n",
+          new DecimalFormat("#"+numGrpChar+"##0"+decimalChar+"0######")));
 
-      if (!sty.dbExists(label))
-      {
-         sty.createDataBase(label, sty.isDbGlobalOn());
-      }
+      parser.putControlSequence(true, 
+        new NumericFormatter("__texparser_fmt_currency_value:n",
+          new DecimalFormat("#"+numGrpChar+"##0"+decimalChar+"00")));
    }
 
    @Override
@@ -86,5 +75,4 @@ public class DTLdbProvideData extends ControlSequence
       process(parser, parser);
    }
 
-   protected DataToolSty sty;
 }

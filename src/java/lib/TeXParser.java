@@ -3166,7 +3166,7 @@ public class TeXParser extends TeXObjectList
 
    public void putControlSequence(ControlSequence cs)
    {
-      settings.undefControlSequence(cs.getName());
+      settings.removeGlobalControlSequence(cs.getName());
       settings.getRoot().putControlSequence(cs);
 
       if (cs instanceof Declaration)
@@ -3824,6 +3824,6 @@ public class TeXParser extends TeXObjectList
    public static final int DEBUG_CATCODE = 16384;
    public static final int DEBUG_READ = 32768;
 
-   public static final String VERSION = "0.9.8b.20231005";
-   public static final String VERSION_DATE = "2023-10-05";
+   public static final String VERSION = "0.9.8b.20231006";
+   public static final String VERSION_DATE = "2023-10-06";
 }

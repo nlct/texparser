@@ -314,5 +314,19 @@ public class DataToolRows extends Vector<DataToolEntryRow>
       return false;
    }
 
+   public void info()
+   {
+      for (DataToolEntryRow row : this)
+      {
+         System.out.println("Row "+row.getRowIndex()+":");
+
+         for (DataToolEntry entry : row)
+         {
+            System.out.println("  Column "+entry.getColumnIndex() +": ");
+            System.out.println("  "+entry.getContents());
+         }
+      }
+   }
+
    private DataToolSty sty;
 }

@@ -1023,10 +1023,11 @@ public class TeXSettings
    public ControlSequence removeGlobalControlSequence(String name)
    {
       ControlSequence cs = csTable.remove(name);
+      ControlSequence reg = localRegisters.remove(name);
 
       if (cs == null)
       {
-         cs = localRegisters.remove(name);
+         cs = reg;
       }
 
       ControlSequence parentCs = parser.removeControlSequence(false, name);

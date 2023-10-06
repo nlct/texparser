@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2023 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -45,38 +45,21 @@ public class DTLnewdb extends ControlSequence
    public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      TeXObject dbArg = stack.popArg(parser);
+      parser.putControlSequence(true,
+        new TextualContentCommand("__datatool_current_file_type", "dtltex"));
 
-      if (dbArg instanceof Expandable)
-      {
-         TeXObjectList expanded = ((Expandable)dbArg).expandfully(parser, 
-            stack);
+      parser.putControlSequence(true,
+        new TextualContentCommand("__datatool_current_file_version", "2.0"));
 
-         if (expanded != null)
-         {
-            dbArg = expanded;
-         }
-      }
+      String dbLabel = popLabelString(parser, stack);
 
-      sty.createDataBase(dbArg.toString(parser), global);
+      sty.createDataBase(dbLabel, global);
    }
 
    public void process(TeXParser parser)
      throws IOException
    {
-      TeXObject dbArg = parser.popNextArg();
-
-      if (dbArg instanceof Expandable)
-      {
-         TeXObjectList expanded = ((Expandable)dbArg).expandfully(parser);
-
-         if (expanded != null)
-         {
-            dbArg = expanded;
-         }
-      }
-
-      sty.createDataBase(dbArg.toString(parser), global);
+      process(parser, parser);
    }
 
    protected DataToolSty sty;

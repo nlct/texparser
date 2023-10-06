@@ -90,7 +90,8 @@ public class DatumMarker extends Command
       return false;
    }
 
-   public static DataElement popDataElement(TeXParser parser, TeXObjectList stack)
+   public static DataElement popDataElement(boolean useDatum,
+      TeXParser parser, TeXObjectList stack)
    throws IOException
    {
       TeXObject arg = TeXParserUtils.popArg(parser, stack);
@@ -109,20 +110,64 @@ public class DatumMarker extends Command
       TeXObject symArg = TeXParserUtils.popArg(parser, stack);
       int type = TeXParserUtils.popInt(parser, stack);
 
+      if (useDatum)
+      {
+         if (numArg == null)
+         {
+            if (content.isEmpty() && type == DataToolHeader.TYPE_UNDEF)
+            {
+               return new DatumElement();
+            }
+            else
+            {
+               return new DatumElement(content);
+            }
+         }
+
+         TeXNumber num;
+
+         if (numArg instanceof TeXNumber)
+         {
+            num = (TeXNumber)numArg;
+         }
+         else
+         {
+            String str = parser.expandToString(numArg, stack);
+
+            if (type == DataToolHeader.TYPE_INT)
+            {
+               num = new UserNumber(DataToolBaseSty.parseInt(str, parser));
+            }
+            else if (type == DataToolHeader.TYPE_CURRENCY)
+            {
+               num = new TeXFloatingPoint(
+                  DataToolBaseSty.parseCurrencyDecimal(str, parser));
+            }
+            else
+            {
+               num = new TeXFloatingPoint(DataToolBaseSty.parseDecimal(str, parser));
+            }
+         }
+
+         return new DatumElement(content, num, symArg, DatumType.toDatumType(type));
+      }
+
+      String str = numArg == null ? null : parser.expandToString(numArg, stack);
+
       switch (type)
       {
          case DataToolHeader.TYPE_INT:
 
-           return new DataIntElement(TeXParserUtils.toInt(numArg, parser, stack));
+           return new DataIntElement(DataToolBaseSty.parseInt(str, parser));
 
          case DataToolHeader.TYPE_REAL:
 
-           return new DataRealElement(TeXParserUtils.toDouble(numArg, parser, stack));
+           return new DataRealElement(DataToolBaseSty.parseDecimal(str, parser));
 
          case DataToolHeader.TYPE_CURRENCY:
 
-           return new DataCurrencyElement(
-              symArg, TeXParserUtils.toDouble(numArg, parser, stack));
+           return new DataCurrencyElement(symArg, 
+             DataToolBaseSty.parseDecimal(str, parser));
 
          default:
 

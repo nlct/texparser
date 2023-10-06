@@ -39,7 +39,7 @@
   }% End of Column 1 Content
   \dtl@db@col@reconstruct{2}% Column 2
   {% Column 2 Content
-   \dtl@db@value@reconstruct{5.43}%
+   \dtl@db@value@reconstruct{5.0}%
   }% End of Column 2 Content
 }%
 }% End of Content

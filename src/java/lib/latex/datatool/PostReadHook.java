@@ -23,14 +23,14 @@ import java.io.IOException;
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.*;
 
-public class DTLdbProvideData extends ControlSequence
+public class PostReadHook extends ControlSequence
 {
-   public DTLdbProvideData(DataToolSty sty)
+   public PostReadHook(DataToolSty sty)
    {
-      this("DTLdbProvideData", sty);
+      this("__texparser_post_read_hook", sty);
    }
 
-   public DTLdbProvideData(String name, DataToolSty sty)
+   public PostReadHook(String name, DataToolSty sty)
    {
       super(name);
       this.sty = sty;
@@ -39,43 +39,26 @@ public class DTLdbProvideData extends ControlSequence
    @Override
    public Object clone()
    {
-      return new DTLdbProvideData(getName(), sty);
+      return new PostReadHook(getName(), sty);
    }
 
    @Override
    public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      String label = popLabelString(parser, stack);
+      ControlSequence fileTypeCs = parser.getControlSequence("__datatool_current_file_type");
 
-      ControlSequence nameCs = parser.getControlSequence(
-         "l__datatool_io_name_str");
-
-      if (nameCs != null)
+      if (fileTypeCs != null)
       {
-         String name = parser.expandToString(nameCs, stack).trim();
+         String fileType = parser.expandToString(fileTypeCs, stack);
 
-         if (!name.isEmpty())
+         if (!fileType.equals("dbtex"))
          {
-            label = name;
+            String dbLabel = parser.expandToString(
+              parser.getControlSequence("dtllastloadeddb"), stack);
+
+            sty.updateInternals(true, dbLabel);
          }
-      }
-
-      parser.putControlSequence(true, 
-       new TextualContentCommand("l__datatool_default_dbname_str", label));
-
-      parser.putControlSequence(true, 
-       new TextualContentCommand("dtllastloadeddb", label));
-
-      parser.putControlSequence(true,
-        new TextualContentCommand("__datatool_current_file_type", "dtltex"));
-
-      parser.putControlSequence(true,
-        new TextualContentCommand("__datatool_current_file_version", "3.0"));
-
-      if (!sty.dbExists(label))
-      {
-         sty.createDataBase(label, sty.isDbGlobalOn());
       }
    }
 

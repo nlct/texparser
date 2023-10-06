@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2022 Nicola L.C. Talbot
+    Copyright (C) 2023 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -23,26 +23,27 @@ import java.io.IOException;
 import com.dickimawbooks.texparserlib.*;
 
 /*
- * A command that simply expands to an integer.
+ * A command that simply expands to a floating point number.
  */
-public class IntegerContentCommand extends TextualContentCommand implements TeXNumber
+public class FloatingPointContentCommand extends TextualContentCommand
+ implements TeXNumber
 {
-   public IntegerContentCommand(String name, int num)
+   public FloatingPointContentCommand(String name, double num)
    {
-     this(name, num, false);
+      this(name, num, false);
    }
 
-   public IntegerContentCommand(String name, int num, boolean isConstant)
+   public FloatingPointContentCommand(String name, double num, boolean isConstant)
    {
-      this(name, ""+num, new UserNumber(num), isConstant);
+      this(name, ""+num, new TeXFloatingPoint(num), isConstant);
    }
 
-   protected IntegerContentCommand(String name, String text, UserNumber num)
+   protected FloatingPointContentCommand(String name, String text, TeXFloatingPoint num)
    {
       this(name, text, num, false);
    }
 
-   protected IntegerContentCommand(String name, String text, UserNumber num, boolean isConstant)
+   protected FloatingPointContentCommand(String name, String text, TeXFloatingPoint num, boolean isConstant)
    {
       super(name, text, num);
       this.isConstant = isConstant;
@@ -52,15 +53,15 @@ public class IntegerContentCommand extends TextualContentCommand implements TeXN
    public Object clone()
    {
       return isConstant ? this :
-        new IntegerContentCommand(getName(), getText(),
-          (UserNumber)getNumber().clone());
+        new FloatingPointContentCommand(getName(), getText(),
+          (TeXFloatingPoint)getNumber().clone());
    }
 
    @Override
    public TextualContentCommand duplicate(String newcsname)
    {
-      return new IntegerContentCommand(newcsname, getText(),
-         new UserNumber(getValue()), false);
+      return new FloatingPointContentCommand(newcsname, getText(),
+         new TeXFloatingPoint(getValue()), false);
    }
 
    @Override
@@ -72,10 +73,15 @@ public class IntegerContentCommand extends TextualContentCommand implements TeXN
    @Override
    public double doubleValue()
    {
-      return (double)getValue();
+      return getNumber().doubleValue();
    }
 
    public void setValue(int val)
+   {
+      setValue((double)val);
+   }
+
+   public void setValue(double val)
    {
       if (!isConstant)
       {
@@ -84,9 +90,9 @@ public class IntegerContentCommand extends TextualContentCommand implements TeXN
       }
    }
 
-   public UserNumber getNumber()
+   public TeXFloatingPoint getNumber()
    {
-      return (UserNumber)data;
+      return (TeXFloatingPoint)data;
    }
 
    @Override
