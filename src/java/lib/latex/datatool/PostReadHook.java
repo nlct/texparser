@@ -25,41 +25,55 @@ import com.dickimawbooks.texparserlib.latex.*;
 
 public class PostReadHook extends ControlSequence
 {
-   public PostReadHook(DataToolSty sty)
+   public PostReadHook(DataToolSty sty, TeXPath texPath)
    {
-      this("__texparser_post_read_hook", sty);
+      this("__texparser_post_read_hook", sty, texPath);
    }
 
-   public PostReadHook(String name, DataToolSty sty)
+   public PostReadHook(String name, DataToolSty sty, TeXPath texPath)
    {
       super(name);
       this.sty = sty;
+      this.texPath = texPath;
    }
 
    @Override
    public Object clone()
    {
-      return new PostReadHook(getName(), sty);
+      return this;
    }
 
    @Override
    public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
+      String fileType = "tex";
+      String fileVersion = "";
+
       ControlSequence fileTypeCs = parser.getControlSequence("__datatool_current_file_type");
+      ControlSequence fileVersionCs = parser.getControlSequence("__datatool_current_file_version");
+
+      String dbLabel = parser.expandToString(
+        parser.getControlSequence("dtllastloadeddb"), stack);
 
       if (fileTypeCs != null)
       {
-         String fileType = parser.expandToString(fileTypeCs, stack);
-
-         if (!fileType.equals("dbtex"))
-         {
-            String dbLabel = parser.expandToString(
-              parser.getControlSequence("dtllastloadeddb"), stack);
-
-            sty.updateInternals(true, dbLabel);
-         }
+         fileType = parser.expandToString(fileTypeCs, stack);
       }
+
+      if (fileVersionCs != null)
+      {
+         fileVersion = parser.expandToString(fileVersionCs, stack);
+      }
+
+      if (!fileType.equals("dbtex"))
+      {
+         sty.updateInternals(true, dbLabel);
+      }
+
+      parser.endGroup();
+
+      sty.registerFileLoaded(dbLabel, fileType, fileVersion, texPath);
    }
 
    @Override
@@ -70,4 +84,5 @@ public class PostReadHook extends ControlSequence
    }
 
    protected DataToolSty sty;
+   protected TeXPath texPath;
 }

@@ -74,7 +74,7 @@ public class DTLread extends ControlSequence
        listener.getControlSequence("l__datatool_format_str"), stack);
 
       int idx = format.indexOf('-');
-      String formatVersion = null;
+      String formatVersion = "";
 
       if (idx != -1)
       {
@@ -89,11 +89,10 @@ public class DTLread extends ControlSequence
 
       if (format.equals("dtltex") || format.equals("dbtex"))
       {
-         stack.push(listener.getControlSequence("endgroup"));
-         stack.push(new PostReadHook(sty));
-
          if (texPath.exists())
          {
+            stack.push(new PostReadHook(sty, texPath));
+
             listener.addFileReference(texPath);
 
             String charsetName = null;
@@ -111,22 +110,14 @@ public class DTLread extends ControlSequence
 
                   if (m.matches())
                   {
-                     String fileType = m.group(1);
-                     String version = m.group(2);
+                     format = m.group(1).toLowerCase();
+                     formatVersion = m.group(2);
                      charsetName = InputEncSty.getCharSetName(m.group(3));
                      texPath.setEncoding(Charset.forName(charsetName));
 
                      listener.getTeXApp().message(
                       listener.getTeXApp().getMessage(FILE_INFO, 
-                        fileType, version, charsetName));
-
-                     parser.putControlSequence(true,
-                      new TextualContentCommand("__datatool_current_file_type",
-                        fileType.toLowerCase()));
-
-                     parser.putControlSequence(true,
-                      new TextualContentCommand("__datatool_current_file_version",
-                        version));
+                        format, formatVersion, charsetName));
                   }
                }
             }
@@ -150,7 +141,19 @@ public class DTLread extends ControlSequence
                in.close();
             }
 
+            parser.putControlSequence(true,
+              new TextualContentCommand("__datatool_current_file_type",
+                format));
+
+            parser.putControlSequence(true,
+             new TextualContentCommand("__datatool_current_file_version",
+               formatVersion));
+
             listener.input(texPath, stack);
+         }
+         else
+         {
+            parser.endGroup();
          }
       }
       else

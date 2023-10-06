@@ -1344,6 +1344,28 @@ public class DataToolSty extends LaTeXSty
       }
    }
 
+   public void addFileLoadedListener(FileLoadedListener listener)
+   {
+      if (fileLoadedListeners == null)
+      {
+         fileLoadedListeners = new Vector<FileLoadedListener>();
+      }
+
+      fileLoadedListeners.add(listener);
+   }
+
+   public void registerFileLoaded(String dbLabel, String fileType,
+    String formatVersion, TeXPath texPath)
+   {
+      if (fileLoadedListeners != null)
+      {
+         for (FileLoadedListener listener : fileLoadedListeners)
+         {
+            listener.fileLoaded(dbLabel, fileType, formatVersion, texPath);
+         }
+      }
+   }
+
    /**
     * Writes information about the named database to STDOUT. For debugging.
     */ 
@@ -2725,6 +2747,8 @@ public class DataToolSty extends LaTeXSty
    private DataToolBaseSty dataToolBaseSty;
 
    private ConcurrentHashMap<String,DataBase> databases;
+
+   private Vector<FileLoadedListener> fileLoadedListeners;
 
    public static final String ERROR_DB_EXISTS="datatool.db_exists";
    public static final String ERROR_DB_DOESNT_EXIST="datatool.db_doesnt_exist";
