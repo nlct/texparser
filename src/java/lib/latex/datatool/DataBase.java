@@ -27,6 +27,7 @@ import java.nio.file.Files;
 import java.nio.charset.Charset;
 import java.nio.charset.MalformedInputException;
 import java.nio.charset.UnsupportedCharsetException;
+import java.nio.charset.IllegalCharsetNameException;
 
 import java.util.Vector;
 import java.util.Hashtable;
@@ -107,6 +108,17 @@ public class DataBase
    {
       TeXParserListener listener = parser.getListener();
       TeXApp texApp = listener.getTeXApp();
+      Charset charset = texPath.getEncoding();
+
+      if (charset == null)
+      {
+         charset = listener.getCharSet();
+      }
+
+      if (charset != null)
+      {
+         texPath.setEncoding(charset);
+      }
 
       FileFormatType format = settings.getFormat();
       String version = settings.getFileVersion();
@@ -125,7 +137,7 @@ public class DataBase
 
             try
             {
-               in = Files.newBufferedReader(texPath.getPath(), listener.getCharSet());
+               in = Files.newBufferedReader(texPath.getPath(), charset);
                String line = in.readLine();
 
                if (line != null)
@@ -160,11 +172,23 @@ public class DataBase
                             formatStr, formatVersion));
                      }
 
-                     charsetName = InputEncSty.getCharSetName(m.group(3));
-                     texPath.setEncoding(Charset.forName(charsetName));
+                     charsetName = m.group(3);
+
+                     try
+                     {
+                        charset = Charset.forName(charsetName);
+                     }
+                     catch (IllegalCharsetNameException
+                          | UnsupportedCharsetException e)
+                     {
+                        charsetName = InputEncSty.getCharSetName(m.group(3));
+                        charset = Charset.forName(charsetName);
+                     }
+
+                     texPath.setEncoding(charset);
 
                      texApp.message(texApp.getMessage(FILE_INFO, 
-                        formatStr, formatVersion, charsetName));
+                        formatStr, formatVersion, charset.name()));
                   }
                }
             }

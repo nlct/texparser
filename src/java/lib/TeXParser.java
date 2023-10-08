@@ -557,6 +557,11 @@ public class TeXParser extends TeXObjectList
       return cp;
    }
 
+   private void mark() throws IOException
+   {
+      mark(2);
+   }
+
    private void mark(int limit) throws IOException
    {
       reader.mark(limit);
@@ -767,7 +772,7 @@ public class TeXParser extends TeXObjectList
          // Is this just LF or is it LF+CR?
          // Or is it \n\n (paragraph break?)
 
-         mark(1);
+         mark();
 
          c = read();
 
@@ -786,7 +791,7 @@ public class TeXParser extends TeXObjectList
 
             // Is this followed by another eol character?
 
-            mark(1);
+            mark();
 
             c = read();
 
@@ -840,7 +845,7 @@ public class TeXParser extends TeXObjectList
          // Is this just CR or is it CR+LF?
          // Or is it \r\r (paragraph break?)
 
-         mark(1);
+         mark();
 
          c = read();
 
@@ -859,7 +864,7 @@ public class TeXParser extends TeXObjectList
 
             // Is this followed by another eol character?
 
-            mark(1);
+            mark();
 
             c = read();
 
@@ -905,7 +910,7 @@ public class TeXParser extends TeXObjectList
          // User has assigned another character the EOL
          // category code
 
-         mark(1);
+         mark();
 
          c = read();
 
@@ -946,7 +951,7 @@ public class TeXParser extends TeXObjectList
    {
       int c = -1;
 
-      mark(1);
+      mark();
 
       SkippedEols skipped = null;
 
@@ -967,7 +972,7 @@ public class TeXParser extends TeXObjectList
          eol.setEol(new String(Character.toChars(c)));
          skipped.add(eol);
 
-         mark(1);
+         mark();
       }
 
       if (skipped != null)
@@ -983,7 +988,7 @@ public class TeXParser extends TeXObjectList
    {
       int c = -1;
 
-      mark(1);
+      mark();
 
       SkippedSpaces skipped = null;
 
@@ -1015,7 +1020,7 @@ public class TeXParser extends TeXObjectList
             skipped.add(space);
          }
 
-         mark(1);
+         mark();
       }
 
       if (c == -1)
@@ -1071,13 +1076,13 @@ public class TeXParser extends TeXObjectList
          {
             if (c == '\n')
             {
-               mark(1);
+               mark();
                c = read();
 
                if (c == '\r')
                {
                   // LF+CR
-                  mark(1);
+                  mark();
                   c = read();
 
                   if (isCatCode(TYPE_EOL, c))
@@ -1126,13 +1131,13 @@ public class TeXParser extends TeXObjectList
             }
             else if (c == '\r')
             {
-               mark(1);
+               mark();
                c = read();
 
                if (c == '\n')
                {
                   // CR+LF
-                  mark(1);
+                  mark();
                   c = read();
 
                   if (isCatCode(TYPE_EOL, c))
@@ -1183,7 +1188,7 @@ public class TeXParser extends TeXObjectList
             {
                // EOL
 
-               mark(1);
+               mark();
                c = read();
 
                if (isCatCode(TYPE_EOL, c))
@@ -1226,7 +1231,7 @@ public class TeXParser extends TeXObjectList
    private boolean readParam(TeXObjectList list, DoubleParam paramToken)
      throws IOException
    {
-      mark(1);
+      mark();
       int c = read();
 
       if (c == -1)
@@ -1269,7 +1274,7 @@ public class TeXParser extends TeXObjectList
    private boolean readParam(TeXObjectList list, int charCode)
      throws IOException
    {
-      mark(1);
+      mark();
       int c = read();
 
       Param param = listener.getParam(0);
@@ -1428,7 +1433,7 @@ public class TeXParser extends TeXObjectList
    {
       int c;
 
-      mark(1);
+      mark();
 
       startGroup();
 
@@ -1482,7 +1487,7 @@ public class TeXParser extends TeXObjectList
                   TeXSyntaxException.ERROR_PAR_BEFORE_EG);
             }
 
-            mark(1);
+            mark();
          }
 
          if (c == -1)
@@ -1502,7 +1507,7 @@ public class TeXParser extends TeXObjectList
    private void readMath(MathGroup math)
      throws IOException
    {
-      mark(1);
+      mark();
       int c = read();
 
       if (c == -1)
@@ -1526,7 +1531,7 @@ public class TeXParser extends TeXObjectList
    private void readInLineMath(MathGroup math)
      throws IOException
    {
-      mark(1);
+      mark();
       int c;
 
       startGroup();
@@ -1553,7 +1558,7 @@ public class TeXParser extends TeXObjectList
                catCodeChanger.applyCatCodeChange(this);
             }
 
-            mark(1);
+            mark();
          }
       }
       finally
@@ -1567,7 +1572,7 @@ public class TeXParser extends TeXObjectList
    private void readDisplayMath(MathGroup math)
      throws IOException
    {
-      mark(1);
+      mark();
       int c;
 
       startGroup();
@@ -1578,7 +1583,7 @@ public class TeXParser extends TeXObjectList
          {
             if (isCatCode(TYPE_MATH, c))
             {
-               mark(1);
+               mark();
                c = read();
 
                if (c == -1)
@@ -1610,7 +1615,7 @@ public class TeXParser extends TeXObjectList
                catCodeChanger.applyCatCodeChange(this);
             }
 
-            mark(1);
+            mark();
          }
       }
       finally
@@ -1734,7 +1739,7 @@ public class TeXParser extends TeXObjectList
       StringBuilder macro = new StringBuilder();
 
       int c = -1;
-      mark(1);
+      mark();
 
       while ((c = read()) != -1)
       {
@@ -1835,12 +1840,12 @@ public class TeXParser extends TeXObjectList
             }
             else if (cs.getName().equals("string"))
             {
-               mark(1);
+               mark();
                c = read();
 
                while (isCatCode(TYPE_SPACE, c))
                {
-                  mark(1);
+                  mark();
                   c = read();
                }
 
@@ -1861,7 +1866,7 @@ public class TeXParser extends TeXObjectList
             return true;
          }
 
-         mark(1);
+         mark();
          macro.appendCodePoint(c);    
       }
 
@@ -1979,7 +1984,7 @@ public class TeXParser extends TeXObjectList
 
       try
       {
-         mark(1);
+         mark();
       }
       catch (IOException e)
       {
@@ -2447,6 +2452,472 @@ public class TeXParser extends TeXObjectList
             reader = reader.getParent();
          }
       }
+   }
+
+   /**
+    * Iterates over each line in the given file and applies the
+    * handler function. If the TeXPath object has the file encoding
+    * set, that will be used, otherwise the current encoding will be
+    * used. The FileMapType indicates how to parse the file.
+    * @param texPath the file to be parsed
+    * @param mapType how the file should be parsed
+    * @param handler the function to handle each line
+    */ 
+   public void fileMap(TeXPath texPath, FileMapType mapType, FileMapHandler handler)
+   throws IOException
+   {
+      TeXApp texApp = getListener().getTeXApp();
+
+      if (!texApp.isReadAccessAllowed(texPath))
+      {
+         throw new TeXSyntaxException(this, TeXApp.MESSAGE_NO_READ, texPath);
+      }
+
+      Charset charset = texPath.getEncoding();
+
+      if (charset == null)
+      {
+         if (reader == null)
+         {
+            charset = texApp.getDefaultCharset();
+         }
+         else
+         {
+            charset = reader.getEncoding();
+         }
+      }
+
+      TeXReader parentReader = reader;
+
+      int lineNum = 1;
+
+      try
+      {
+         reader = new TeXReader(texPath.getFile(), charset);
+
+         if (!isEmpty())
+         {
+            TeXObjectList pending = new TeXObjectList();
+            pending.addAll(this);
+            reader.setPending(pending);
+            clear();
+         }
+
+         texApp.message(texApp.getMessage(TeXApp.MESSAGE_READING, texPath));
+
+         TeXObjectList line;
+
+         while ((line = fileMapReadLine(mapType)) != null)
+         {
+            handler.processLine(this, line, lineNum);
+            lineNum++;
+         } 
+      }
+      catch (TeXSyntaxException e)
+      {
+         throw new TeXSyntaxException(e, this, lineNum, texPath.getFile(),
+          TeXSyntaxException.ERROR_FILE_MAPPER, texPath.getRelativePath(),
+           texApp.getMessage(e.getErrorTag(), e.getParams()));
+      }
+      catch (IOException e)
+      {
+         throw new TeXSyntaxException(e, this, lineNum, texPath.getFile(),
+          TeXSyntaxException.ERROR_FILE_MAPPER, e.getMessage());
+      }
+      finally
+      {
+         if (reader.hasPending())
+         {
+            add(0, reader.getPending());
+            reader.setPending(null);
+         }
+
+         if (reader != null)
+         {
+            reader.close();
+         }
+
+         reader = parentReader;
+      }
+   }
+
+   protected TeXObjectList fileMapReadLine(FileMapType mapType)
+    throws IOException
+   {
+      int c = read();
+      int c2;
+
+      if (c == -1) return null;
+
+      TeXObjectList line = getListener().createStack();
+
+      while (c != -1)
+      {
+         if (isCatCode(TYPE_EOL, c))
+         {
+            if (c == '\r')
+            {
+               mark();
+
+               if (read() != '\n')
+               {
+                  reset();
+               }
+            }
+            else if (c == '\n')
+            {
+               mark();
+
+               if (read() != '\r')
+               {
+                  reset();
+               }
+            }
+
+            return line;
+         }
+
+         boolean eol = false;
+
+         switch (mapType)
+         {
+            case VERBATIM:
+
+               if (Character.isLetter(c))
+               {
+                  line.add(listener.getLetter(c));
+               }
+               else
+               {
+                  line.add(listener.getOther(c));
+               }
+
+            break;
+            case VERBATIM_EXCEPT_ESC_SYM:
+
+               if (isCatCode(TYPE_ESC, c))
+               {
+                  c = read();
+
+                  if (c == -1)
+                  {
+                     line.add(new TeXCsRef("\n"));
+                     eol = true;
+                  }
+                  else if (isCatCode(TYPE_EOL, c))
+                  {
+                     eol = true;
+
+                     if (c == '\r')
+                     {
+                        mark();
+
+                        if (read() == '\n')
+                        {
+                           line.add(new TeXCsRef("\r\n"));
+                        }
+                        else
+                        {
+                           reset();
+                           line.add(new TeXCsRef("\r"));
+                        }
+                     }
+                     else if (c == '\n')
+                     {
+                        mark();
+
+                        if (read() == '\r')
+                        {
+                           line.add(new TeXCsRef("\n\r"));
+                        }
+                        else
+                        {
+                           reset();
+                           line.add(new TeXCsRef("\n"));
+                        }
+                     }
+                     else
+                     {
+                        line.add(new TeXCsRef(new String(Character.toChars(c))));
+                     }
+                  }
+                  else
+                  {
+                     line.add(new TeXCsRef(new String(Character.toChars(c))));
+                  }
+               }
+               else if (Character.isLetter(c))
+               {
+                  line.add(listener.getLetter(c));
+               }
+               else
+               {
+                  line.add(listener.getOther(c));
+               }
+            break;
+            case VERBATIM_EXCEPT_ESC_SEQ:
+
+               if (isCatCode(TYPE_ESC, c))
+               {
+                  c = read();
+
+                  if (c == -1)
+                  {
+                     eol = true;
+                     line.add(new TeXCsRef("\n"));
+                  }
+                  else if (isCatCode(TYPE_EOL, c))
+                  {
+                     eol = true;
+
+                     if (c == '\r')
+                     {
+                        mark();
+
+                        if (read() == '\n')
+                        {
+                           line.add(new TeXCsRef("\r\n"));
+                        }
+                        else
+                        {
+                           reset();
+                           line.add(new TeXCsRef("\r"));
+                        }
+                     }
+                     else if (c == '\n')
+                     {
+                        mark();
+
+                        if (read() == '\r')
+                        {
+                           line.add(new TeXCsRef("\n\r"));
+                        }
+                        else
+                        {
+                           reset();
+                           line.add(new TeXCsRef("\n"));
+                        }
+                     }
+                     else
+                     {
+                        line.add(new TeXCsRef(new String(Character.toChars(c))));
+                     }
+                  }
+                  else
+                  {
+                     StringBuilder csname = new StringBuilder();
+
+                     csname.appendCodePoint(c);
+
+                     boolean reset = false;
+
+                     while (!(eol || isCatCode(TYPE_EOL, c))
+                              && Character.isLetter(c))
+                     {
+                        csname.appendCodePoint(c);
+
+                        mark();
+                        reset = true;
+                        c = read();
+
+                        if (c == -1)
+                        {
+                           eol = true;
+                           reset = false;
+                        }
+                     }
+
+                     line.add(new TeXCsRef(csname.toString()));
+
+                     if (isCatCode(TYPE_EOL, c))
+                     {
+                        eol = true;
+
+                        if (c == '\r')
+                        {
+                           mark();
+
+                           if (read() != '\n')
+                           {
+                              reset();
+                           }
+                        }
+                        else if (c == '\n')
+                        {
+                           mark();
+            
+                           if (read() != '\r')
+                           {
+                              reset();
+                           }
+                        }
+                     }
+                     else if (reset)
+                     {
+                        reader.reset();
+                     }
+                  }
+               }
+               else if (Character.isLetter(c))
+               {
+                  line.add(listener.getLetter(c));
+               }
+               else
+               {
+                  line.add(listener.getOther(c));
+               }
+
+            break;
+            case TEX:
+
+               if (isCatCode(TYPE_ESC, c))
+               {
+                  /*
+                     The actual line ending will be skipped
+                     so the following line will be treated as a
+                     continuation of this line (unless EOF).
+                   */
+
+                  eol = !readControlSequence(line);
+               }
+               else if (isCatCode(TYPE_COMMENT, c))
+               {
+                  /*
+                     The actual line ending will be skipped
+                     so the following line will be treated as a
+                     continuation of this line (unless EOF).
+                   */
+
+                  eol = !readComment(line);
+               }
+               else if (isCatCode(TYPE_PARAM, c))
+               {
+                  eol = !readParam(line, c);
+               }
+               else if (isCatCode(TYPE_ACTIVE, c))
+               {
+                  TeXObject obj = listener.getActiveChar(c);
+
+                  if (obj == null)
+                  {
+                     throw new TeXSyntaxException(this, 
+                       TeXSyntaxException.ERROR_UNDEFINED_CHAR, 
+                       new String(Character.toChars(c)));
+                  }
+
+                  line.add(obj);
+               }
+               else if (isCatCode(TYPE_SP, c))
+               {
+                  line.add(listener.createSpChar(c));
+               }
+               else if (isCatCode(TYPE_SB, c))
+               {
+                  line.add(listener.createSbChar(c));
+               }
+               else if (isCatCode(TYPE_TAB, c))
+               {
+                  line.add(listener.getTab(c));
+               }
+               else if (isCatCode(TYPE_MATH, c))
+               {
+                  MathGroup math = listener.createMathGroup();
+                  line.add(math);
+                  readMath(math);
+               }
+               else if (isCatCode(TYPE_BG, c))
+               {
+                  /*
+                    EOL within a group is considered part of the same line.
+                   */
+ 
+                  Group grp = listener.createGroup();
+                  line.add(grp);
+
+                  eol = !readGroup(grp, false);
+               }
+               else if (isCatCode(TYPE_EG, c))
+               {
+                  line.add(listener.getEgChar(c));
+               }
+               else if (isCatCode(TYPE_SPACE, c))
+               {
+                  Space space = listener.getSpace();
+                  space.setSpace(c);
+                  line.add(space);
+
+                  // skip following spaces unless EOL
+
+                  boolean isSpace = true;
+                  SkippedSpaces skipped = null;
+
+                  while (isSpace)
+                  {
+                     mark();
+                     c = read();
+
+                     if (isCatCode(TYPE_EOL, c))
+                     {
+                        eol = true;
+                        isSpace = false;
+
+                        if (c == '\r')
+                        {
+                           mark();
+
+                           if (read() != '\n')
+                           {
+                              reset();
+                           }
+                        }
+                        else if (c == '\n')
+                        {
+                           mark();
+
+                           if (read() != '\r')
+                           {
+                              reset();
+                           }
+                        }
+                     }
+                     else if (isCatCode(TYPE_SPACE, c))
+                     {
+                        space = listener.getSpace();
+                        space.setSpace(c);
+
+                        if (skipped == null)
+                        {
+                           skipped = new SkippedSpaces();
+                           line.add(skipped);
+                        }
+
+                        skipped.add(space);
+                     }
+                     else
+                     {
+                        isSpace = false;
+                        reset();
+                     }
+                  }
+               }
+               else if (isLetter(c))
+               {
+                  line.add(listener.getLetter(c));
+               }
+               else
+               {
+                  line.add(listener.getOther(c));
+               }
+
+            break;
+         }
+
+         if (eol) break;
+
+         c = read();
+      }
+
+      return line;
    }
 
    public TeXObject pop()
@@ -3824,6 +4295,6 @@ public class TeXParser extends TeXObjectList
    public static final int DEBUG_CATCODE = 16384;
    public static final int DEBUG_READ = 32768;
 
-   public static final String VERSION = "0.9.8b.20231006";
-   public static final String VERSION_DATE = "2023-10-06";
+   public static final String VERSION = "0.9.8b.20231008";
+   public static final String VERSION_DATE = "2023-10-08";
 }

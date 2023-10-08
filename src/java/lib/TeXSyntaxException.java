@@ -64,6 +64,18 @@ public class TeXSyntaxException extends IOException
       this.parser = parser;
    }
 
+   public TeXSyntaxException(Throwable cause, TeXParser parser, int lineNumber, File file, String errorTag, Object... params)
+   {
+      super("TeX syntax error code "+errorTag, cause);
+
+      this.file = file;
+      this.lineNum = lineNumber;
+
+      this.errorTag = errorTag;
+      this.params = params;
+      this.parser = parser;
+   }
+
    public TeXParser getParser()
    {
       return parser;
@@ -198,4 +210,6 @@ public class TeXSyntaxException extends IOException
       "tex.error.cant_change_const";
    public static final String ERROR_FILE_OVERWRITE_FORBIDDEN =
       "tex.error.file.overwrite_forbidden";
+   public static final String ERROR_FILE_MAPPER =
+      "tex.error.file.mapper";
 }

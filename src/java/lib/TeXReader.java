@@ -48,14 +48,21 @@ public class TeXReader implements Readable,Closeable
 
       if (charset == null)
       {
-         reader = new LineNumberReader(new FileReader(file));
+         if (parent != null)
+         {
+            charset = parent.charset;
+         }
+         else
+         {
+            charset = Charset.defaultCharset();
+         }
       }
-      else
-      {
-         reader = new LineNumberReader(
-           new LineNumberReader(Files.newBufferedReader(file.toPath(),
-            charset)));
-      }
+
+      reader = new LineNumberReader(
+        new LineNumberReader(Files.newBufferedReader(file.toPath(),
+         charset)));
+
+      this.charset = charset;
 
       isOpen = true;
    }
@@ -100,13 +107,39 @@ public class TeXReader implements Readable,Closeable
 
    public int read() throws IOException
    {
-      if (isClosed()) return -1;
+      int c;
 
-      int c = reader.read();
+      if (pendingChar != -1)
+      {
+         c = pendingChar;
+         pendingChar = -1;
+      }
+      else if (isClosed())
+      {
+         return -1;
+      }
+      else
+      {
+         c = reader.read();
+      }
 
       if (c == -1)
       {
          eofFound = true;
+      }
+
+      if (Character.isSurrogate((char)c))
+      {
+         int c2 = reader.read();
+
+         if (c2 != -1 && Character.isSurrogatePair((char)c, (char)c2))
+         {
+            c = Character.toCodePoint((char)c, (char)c2);
+         }
+         else
+         {
+            pendingChar = c2;
+         }
       }
 
       return c;
@@ -279,9 +312,16 @@ public class TeXReader implements Readable,Closeable
       return pending != null;
    }
 
+   public Charset getEncoding()
+   {
+      return charset;
+   }
+
    private Reader reader;
    private TeXReader parent;
    private Object source;
    private TeXObjectList pending;
+   private int pendingChar = -1;
+   private Charset charset;
    private boolean isOpen = false, eofFound=false;
 }
