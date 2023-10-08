@@ -239,32 +239,72 @@ public class DatumElement extends AbstractTeXObject
       content.process(parser);
    }
 
-   @Override
-   public void write(TeXParser parser, PrintWriter writer, String format, String version)
+   public void write(TeXParser parser, PrintWriter writer, FileFormatType format, String version)
     throws IOException
    {
-      if (format.equals("dbtex") && version.equals("3.0"))
+      if (format == FileFormatType.DBTEX && version.equals("3.0"))
       {
-         writer.format("\\dtl@db@datum@reconstruct{%s}{%s}{%s}{%d}%%%n",
-            content.format(),
-            number == null ? "" : number.format(),
-            currencySymbol == null ? "" : currencySymbol.format(),
-            datumType.getValue());
+         writer.print("\\dtl@db@datum@reconstruct{");
+         writer.print(content.toString(parser));
+         writer.print("}{");
+
+         if (number != null)
+         {
+            writer.print(number);
+         }
+
+         writer.print("}{");
+
+         if (currencySymbol != null)
+         {
+            writer.print(currencySymbol.toString(parser));
+         }
+
+         writer.print("}{");
+         writer.print(datumType.getValue());
+         writer.print("}");
       }
       else
       {
-         writer.print(content.format());
+         writer.print(content.toString(parser));
       }
+   }
+
+   public TeXObject getContent(TeXParser parser)
+   {
+      TeXParserListener listener = parser.getListener();
+      TeXObjectList stack = listener.createStack();
+
+      stack.add(listener.getControlSequence("__datatool_datum:nnnn"));
+      Group grp = listener.createGroup();
+      stack.add(grp);
+      grp.add(content, true);
+
+      grp = listener.createGroup();
+      stack.add(grp);
+
+      if (number != null)
+      {
+         grp.add(number);
+      }
+
+      grp = listener.createGroup();
+      stack.add(grp);
+
+      if (currencySymbol != null)
+      {
+         grp.add(currencySymbol);
+      }
+
+      stack.add(new UserNumber(datumType.getValue()));
+
+      return stack;
    }
 
    @Override
    public String format()
    {
-      return String.format("\\__datatool_datum:nnnn {%s}{%s}{%s}{%d}",
-         content.format(),
-         number == null ? "" : number.format(),
-         currencySymbol == null ? "" : currencySymbol.format(),
-         datumType.getValue());
+      return content.format();
    }
 
    @Override

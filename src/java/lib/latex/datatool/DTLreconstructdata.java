@@ -48,7 +48,7 @@ public class DTLreconstructdata extends ControlSequence
      throws IOException
    {
       parser.putControlSequence(true,
-        new TextualContentCommand("__datatool_current_file_type", "dbtex"));
+        new TextualContentCommand("__texparser_current_file_type_tl", "dbtex"));
 
       TeXParserListener listener = parser.getListener();
 

@@ -45,6 +45,8 @@ public class LaTeXSyntaxException extends TeXSyntaxException
       "latex.error.multi_cls";
    public static final String ERROR_MISSING_KEY = 
       "latex.error.missing_key";
+   public static final String ERROR_MISSING_KEY_VALUE = 
+      "latex.error.missing_key_value";
    public static final String ERROR_EXTRA_END = 
       "latex.error.extra_end";
    public static final String ERROR_UNACCESSIBLE = 

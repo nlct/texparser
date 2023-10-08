@@ -68,10 +68,10 @@ public class DTLdbProvideData extends ControlSequence
        new TextualContentCommand("dtllastloadeddb", label));
 
       parser.putControlSequence(true,
-        new TextualContentCommand("__datatool_current_file_type", "dtltex"));
+        new TextualContentCommand("__texparser_current_file_type_tl", "dtltex"));
 
       parser.putControlSequence(true,
-        new TextualContentCommand("__datatool_current_file_version", "3.0"));
+        new TextualContentCommand("__texparser_current_file_version_tl", "3.0"));
 
       if (!sty.dbExists(label))
       {

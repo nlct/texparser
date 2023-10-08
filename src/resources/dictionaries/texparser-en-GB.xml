@@ -30,6 +30,7 @@ There is NO WARRANTY, to the extent permitted by law.</entry>
 <entry key="warning.removing">Removing {0}</entry>
 <entry key="warning.unsupported.image.type">Unsupported image type {0}</entry>
 <entry key="warning.unsupported.generic">Not supported: {0}</entry>
+<entry key="warning.overwriting">Overwriting file {0}</entry>
 
 <!--  Syntax -->
 <entry key="syntax.title">Syntax:</entry>
@@ -144,6 +145,7 @@ There is NO WARRANTY, to the extent permitted by law.</entry>
 <entry key="tex.error.file.not.found">File ''{0}'' not found.</entry>
 <entry key="tex.error.unexpandable">Can''t expand ''{0}''</entry>
 <entry key="tex.error.cant_change_const">Can''t change constant {0}</entry>
+<entry key="tex.error.file.overwrite_forbidden">File ''{0}'' already exists (overwrite forbidden).</entry>
 
 <!--  LaTeX Error Messages -->
 
@@ -154,6 +156,7 @@ There is NO WARRANTY, to the extent permitted by law.</entry>
 <entry key="latex.error.missing_begin_doc">Missing \begin'{'document'}' (unexpected content ''{0}'')</entry>
 <entry key="latex.error.multi_cls">Only one \documentclass permitted</entry>
 <entry key="latex.error.missing_key">Missing ''{0}'' key</entry>
+<entry key="latex.error.missing_key_value">Missing value for ''{0}'' key</entry>
 <entry key="latex.error.extra_end">Extra \end'{'{0}'}' found</entry>
 <entry key="latex.error.unaccessible">Unaccessible ''{0}''</entry>
 <entry key="latex.error.defined">''{0}'' already defined</entry>
@@ -212,6 +215,8 @@ There is NO WARRANTY, to the extent permitted by law.</entry>
 <entry key="datatool.no.columns">No columns available for database ''{0}''</entry>
 <entry key="datatool.file_info">Identified file format {0} version {1} (encoding {2})</entry>
 <entry key="datatool.file_info_failed">Failed to parse file identifier on first line of file {0} (assuming {1})</entry>
+<entry key="datatool.unknown_file_format_version">Unknown version ''{0}'' of file format ''{1}''</entry>
+<entry key="datatool.write.comment">Created by {0} version {1} on {2, date, yyyy-MM-dd HH:mm:ss Z}</entry>
 
 <!--  ifthen messages -->
 

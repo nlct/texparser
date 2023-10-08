@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013-2023 Nicola L.C. Talbot
+    Copyright (C) 2023 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -23,39 +23,49 @@ import java.io.IOException;
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.*;
 
-public class DTLnewdb extends ControlSequence
+public class DTLwrite extends ControlSequence
 {
-   public DTLnewdb(DataToolSty sty)
+   public DTLwrite(DataToolSty sty)
    {
-      this("DTLnewdb", false, sty);
+      this("DTLwrite", sty);
    }
 
-   public DTLnewdb(String name, boolean global, DataToolSty sty)
+   public DTLwrite(String name, DataToolSty sty)
    {
       super(name);
       this.sty = sty;
-      this.global = global;
    }
 
+   @Override
    public Object clone()
    {
-      return new DTLnewdb(getName(), global, sty);
+      return new DTLwrite(getName(), sty);
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      parser.putControlSequence(true,
-        new TextualContentCommand("__texparser_current_file_type_tl", "dtltex"));
+      KeyValList options = TeXParserUtils.popOptKeyValList(parser, stack);
 
-      parser.putControlSequence(true,
-        new TextualContentCommand("__texparser_current_file_version_tl", "2.0"));
+      String filename = popLabelString(parser, stack);
 
-      String dbLabel = popLabelString(parser, stack);
+      TeXParserListener listener = parser.getListener();
+      TeXApp texApp = listener.getTeXApp();
 
-      sty.createDataBase(dbLabel, global);
+      parser.startGroup();
+
+      if (options != null)
+      {
+         sty.processIOKeys(options, stack);
+      }
+
+      stack.push(listener.getControlSequence("endgroup"));
+
+      DataBase.write(sty, filename, parser, stack);
    }
 
+   @Override
    public void process(TeXParser parser)
      throws IOException
    {
@@ -63,5 +73,4 @@ public class DTLnewdb extends ControlSequence
    }
 
    protected DataToolSty sty;
-   protected boolean global;
 }

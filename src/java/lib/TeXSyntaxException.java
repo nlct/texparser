@@ -196,4 +196,6 @@ public class TeXSyntaxException extends IOException
       "tex.error.unexpandable";
    public static final String ERROR_CANT_CHANGE_CONSTANT =
       "tex.error.cant_change_const";
+   public static final String ERROR_FILE_OVERWRITE_FORBIDDEN =
+      "tex.error.file.overwrite_forbidden";
 }

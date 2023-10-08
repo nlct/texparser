@@ -18,7 +18,6 @@
 */
 package com.dickimawbooks.texparserlib.latex.datatool;
 
-import java.io.PrintWriter;
 import java.io.IOException;
 import java.util.Vector;
 
@@ -114,11 +113,4 @@ public class DataIntElement extends UserNumber implements DataNumericElement
       return new IntegerContentCommand(name, intValue());
    }
 
-   @Override
-   public void write(TeXParser parser, PrintWriter writer, 
-    String format, String version)
-   throws IOException
-   {
-      writer.print(getValue());
-   }
 }

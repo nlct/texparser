@@ -19,20 +19,9 @@
 package com.dickimawbooks.texparserlib.latex.datatool;
 
 import java.io.IOException;
-import java.io.BufferedReader;
-
-import java.nio.file.Files;
-
-import java.nio.charset.Charset;
-import java.nio.charset.MalformedInputException;
-import java.nio.charset.UnsupportedCharsetException;
-
-import java.util.regex.Pattern;
-import java.util.regex.Matcher;
 
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.*;
-import com.dickimawbooks.texparserlib.latex.inputenc.InputEncSty;
 
 public class DTLread extends ControlSequence
 {
@@ -62,6 +51,7 @@ public class DTLread extends ControlSequence
       String filename = popLabelString(parser, stack);
 
       TeXParserListener listener = parser.getListener();
+      TeXApp texApp = listener.getTeXApp();
 
       parser.startGroup();
 
@@ -70,115 +60,15 @@ public class DTLread extends ControlSequence
          sty.processIOKeys(options, stack);
       }
 
-      String format = parser.expandToString(
-       listener.getControlSequence("l__datatool_format_str"), stack);
+      IOSettings settings = IOSettings.fetchReadSettings(sty, parser, stack);
 
-      int idx = format.indexOf('-');
-      String formatVersion = "";
+      String defExt = settings.getDefaultExtension();
 
-      if (idx != -1)
-      {
-         formatVersion = format.substring(idx+1)+".0";
-         format = format.substring(0, idx);
-      }
+      TeXPath texPath = new TeXPath(parser, filename, defExt, false);
 
-      String ext = parser.expandToString(
-       listener.getControlSequence("l__datatool_default_ext_str"), stack);
+      stack.push(listener.getControlSequence("endgroup"));
 
-      TeXPath texPath = new TeXPath(parser, filename, ext, false);
-
-      if (format.equals("dtltex") || format.equals("dbtex"))
-      {
-         if (texPath.exists())
-         {
-            stack.push(new PostReadHook(sty, texPath));
-
-            listener.addFileReference(texPath);
-
-            String charsetName = null;
-
-            BufferedReader in = null;
-
-            try
-            {
-               in = Files.newBufferedReader(texPath.getPath(), listener.getCharSet());
-               String line = in.readLine();
-
-               if (line != null)
-               {
-                  Matcher m = FILE_IDENTIFIER.matcher(line);
-
-                  if (m.matches())
-                  {
-                     format = m.group(1).toLowerCase();
-                     formatVersion = m.group(2);
-                     charsetName = InputEncSty.getCharSetName(m.group(3));
-                     texPath.setEncoding(Charset.forName(charsetName));
-
-                     listener.getTeXApp().message(
-                      listener.getTeXApp().getMessage(FILE_INFO, 
-                        format, formatVersion, charsetName));
-                  }
-               }
-            }
-            catch (MalformedInputException e)
-            {
-               parser.logMessage(e);
-               listener.getTeXApp().warning(parser, 
-                 listener.getTeXApp().getMessage(ERROR_FILE_INFO_FAILED,
-                   texPath, listener.getTeXApp().getDefaultCharset()));
-            }
-            catch (UnsupportedCharsetException e)
-            {
-               listener.getTeXApp().warning(parser, 
-                 listener.getTeXApp().getMessage(
-                   InputEncSty.ERROR_UNKNOWN_ENCODING, charsetName));
-               parser.logMessage(e);
-            }
-
-            if (in != null)
-            {
-               in.close();
-            }
-
-            parser.putControlSequence(true,
-              new TextualContentCommand("__datatool_current_file_type",
-                format));
-
-            parser.putControlSequence(true,
-             new TextualContentCommand("__datatool_current_file_version",
-               formatVersion));
-
-            listener.input(texPath, stack);
-         }
-         else
-         {
-            parser.endGroup();
-         }
-      }
-      else
-      {
-         int separator = sty.getSeparator();
-         int delimiter = sty.getDelimiter();
-
-         int catcode = parser.getCatCode(separator);
-
-         if (catcode != TeXParser.TYPE_OTHER)
-         {
-            parser.setCatCode(true, separator, TeXParser.TYPE_OTHER);
-         }
-
-         catcode = parser.getCatCode(delimiter);
-
-         if (catcode != TeXParser.TYPE_OTHER)
-         {
-            parser.setCatCode(true, delimiter, TeXParser.TYPE_OTHER);
-         }
-
-// TODO
-
-         parser.endGroup();
-      }
+      DataBase.read(sty, texPath, settings, parser, stack);
    }
 
    @Override
@@ -189,9 +79,4 @@ public class DTLread extends ControlSequence
    }
 
    protected DataToolSty sty;
-
-   public static Pattern FILE_IDENTIFIER = Pattern.compile("% (DBTEX|DTLTEX) ([0-9\\.]+) ([a-zA-Z0-9\\-]+)");
-
-   public static String FILE_INFO = "datatool.file_info";
-   public static String ERROR_FILE_INFO_FAILED = "datatool.file_info_failed";
 }

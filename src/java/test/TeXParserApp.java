@@ -1720,6 +1720,18 @@ public class TeXParserApp implements TeXApp
       }
    }
 
+   @Override
+   public String getApplicationName()
+   {
+      return APP_NAME;
+   }
+
+   @Override
+   public String getApplicationVersion()
+   {
+      return APP_VERSION;
+   }
+
    public static void main(String[] args)
    {
       final TeXParserApp app = new TeXParserApp();

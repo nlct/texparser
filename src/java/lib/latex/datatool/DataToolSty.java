@@ -93,6 +93,9 @@ public class DataToolSty extends LaTeXSty
       registerControlSequence(new GenericCommand("DTLcurrencytype", null,
         new UserNumber(DataToolHeader.TYPE_CURRENCY)));
 
+      NewIf.createConditional(true, getParser(), "ifdtlnoheader", false);
+      NewIf.createConditional(true, getParser(), "ifdtlautokeys", false);
+
       registerControlSequence(
         new TextualContentCommand("@dtl@delimiter", "\""));
 
@@ -137,10 +140,12 @@ public class DataToolSty extends LaTeXSty
 
       getParser().getSettings().newcount(true, "dtlcolumnnum");
       getParser().getSettings().newcount(true, "dtlrownum");
+      getParser().getSettings().newcount(true, "dtl@omitlines");
 
       // datatool v3.0:
 
       registerControlSequence(new DTLread(this));
+      registerControlSequence(new DTLwrite(this));
 
       registerControlSequence(
         new TextualContentCommand("dtldisplaydbenv", "tabular"));
@@ -308,7 +313,7 @@ public class DataToolSty extends LaTeXSty
 
    public boolean dbExists(String name)
    {
-      ControlSequence cs = getListener().getParser().getControlSequence(
+      ControlSequence cs = getParser().getControlSequence(
          getContentsRegisterName(name));
 
       return cs != null;
@@ -997,10 +1002,42 @@ public class DataToolSty extends LaTeXSty
          {// TODO
          }
          else if (key.equals("expand"))
-         {// TODO
+         {
+            String str = (val == null ? "protected" : parser.expandToString(val, stack));
+
+            ControlSequence cs;
+
+            if (str.equals("none"))
+            {
+               parser.putControlSequence(true, 
+                 new TextualContentCommand("__texparser_io_expand_tl", str));
+
+               cs = getParser().getListener().getControlSequence("dtlnoexpandnewvalue");
+            }
+            else if (str.equals("protected") || str.equals("full"))
+            {
+               parser.putControlSequence(true, 
+                 new TextualContentCommand("__texparser_io_expand_tl", str));
+
+               cs = getParser().getListener().getControlSequence("dtlexpandnewvalue");
+            }
+            else
+            {
+               throw new LaTeXSyntaxException(parser, 
+                LaTeXSyntaxException.ERROR_UNKNOWN_OPTION,
+                key+"="+str, "datatool/io");
+            }
+
+            TeXParserUtils.process(cs, getParser(), stack);
          }
          else if (key.equals("format"))
          {
+            if (val == null)
+            {
+               throw new TeXSyntaxException(parser,
+                 LaTeXSyntaxException.ERROR_MISSING_KEY_VALUE, key);
+            }
+
             String format = parser.expandToString(val, stack);
 
             parser.putControlSequence(true, 
@@ -1039,39 +1076,228 @@ public class DataToolSty extends LaTeXSty
             }
          }
          else if (key.equals("add-delimiter"))
-         {// TODO
+         {
+            if (val == null)
+            {
+               throw new TeXSyntaxException(parser,
+                 LaTeXSyntaxException.ERROR_MISSING_KEY_VALUE, key);
+            }
+
+            String str = parser.expandToString(val, stack);
+
+            if (str.equals("always") || str.equals("detect") || str.equals("never"))
+            {
+               parser.putControlSequence(true,
+                 new TextualContentCommand("__texparser_io_add_delimiter_tl", str));
+            }
+            else
+            {
+               throw new LaTeXSyntaxException(parser,
+                LaTeXSyntaxException.ERROR_UNKNOWN_OPTION,
+                  key+"="+str, "datatool/io");
+            }
          }
          else if (key.equals("csv-escape-chars"))
-         {// TODO
+         {
+            if (val == null)
+            {
+               throw new TeXSyntaxException(parser,
+                 LaTeXSyntaxException.ERROR_MISSING_KEY_VALUE, key);
+            }
+
+            String str = parser.expandToString(val, stack);
+
+            if (str.equals("none") || str.equals("delim") || str.equals("delim+bksl"))
+            {
+               parser.putControlSequence(true,
+                 new TextualContentCommand("__texparser_io_csv_escape_chars_tl", str));
+            }
+            else
+            {
+               throw new LaTeXSyntaxException(parser,
+                LaTeXSyntaxException.ERROR_UNKNOWN_OPTION,
+                  key+"="+str, "datatool/io");
+            }
          }
          else if (key.equals("csv-content"))
-         {// TODO
+         {
+            if (val == null)
+            {
+               throw new TeXSyntaxException(parser,
+                 LaTeXSyntaxException.ERROR_MISSING_KEY_VALUE, key);
+            }
+
+            boolean boolVal = true;
+
+            String str = parser.expandToString(val, stack).trim();
+
+            if (str.equals("tex"))
+            {
+               boolVal = false;
+            }
+            else if (str.equals("literal"))
+            {
+               boolVal = true;
+            }
+            else
+            {
+               throw new LaTeXSyntaxException(parser,
+                LaTeXSyntaxException.ERROR_UNKNOWN_OPTION,
+                  key+"="+str, "datatool/io");
+            }
+
+            getParser().putControlSequence(true,
+              new LaTeX3Boolean("l__datatool_csv_literal_content_bool", boolVal));
          }
          else if (key.equals("csv-blank"))
-         {// TODO
+         {
+            if (val == null)
+            {
+               throw new TeXSyntaxException(parser,
+                 LaTeXSyntaxException.ERROR_MISSING_KEY_VALUE, key);
+            }
+
+            String str = parser.expandToString(val, stack);
+
+            if (str.equals("ignore") || str.equals("empty-row") || str.equals("end"))
+            {
+               parser.putControlSequence(true,
+                 new TextualContentCommand("__texparser_io_csv_blank_tl", str));
+            }
+            else
+            {
+               throw new LaTeXSyntaxException(parser,
+                LaTeXSyntaxException.ERROR_UNKNOWN_OPTION,
+                  key+"="+str, "datatool/io");
+            }
          }
          else if (key.equals("csv-skip-lines") || key.equals("omitlines"))
-         {// TODO
+         {
+            if (val == null)
+            {
+               throw new TeXSyntaxException(parser,
+                 LaTeXSyntaxException.ERROR_MISSING_KEY_VALUE, key);
+            }
+
+            String str = val.toString(parser).trim();
+            int num;
+
+            if (str.equals("false"))
+            {
+               num = 0;
+            }
+            else
+            {
+               try
+               {
+                  num = Integer.parseInt(str);
+               }
+               catch (NumberFormatException e)
+               {
+                  num = TeXParserUtils.toInt(val, parser, stack);
+               }
+            }
+
+            parser.getSettings().localSetRegister("dtl@omitlines", num);
          }
          else if (key.equals("no-header") || key.equals("noheader"))
-         {// TODO
+         {
+            String strVal = (val == null ? "" : val.toString(parser).trim());
+
+            if (val.equals("") || val.equals("true"))
+            {
+               parser.putControlSequence(true, new IfTrue("ifdtlnoheader"));
+            }
+            else
+            {
+               parser.putControlSequence(true, new IfFalse("ifdtlnoheader"));
+            }
          }
          else if (key.equals("auto-keys") || key.equals("autokeys"))
-         {// TODO
+         {
+            String strVal = (val == null ? "" : val.toString(parser).trim());
+
+            if (val.equals("") || val.equals("true"))
+            {
+               parser.putControlSequence(true, new IfTrue("ifdtlautokeys"));
+            }
+            else
+            {
+               parser.putControlSequence(true, new IfFalse("ifdtlautokeys"));
+            }
          }
          else if (key.equals("overwrite"))
-         {// TODO
+         {
+            if (val == null)
+            {
+               throw new TeXSyntaxException(parser,
+                 LaTeXSyntaxException.ERROR_MISSING_KEY_VALUE, key);
+            }
+
+            String str = parser.expandToString(val, stack);
+
+            if (str.equals("error") || str.equals("warn") || str.equals("allow"))
+            {
+               parser.putControlSequence(true,
+                 new TextualContentCommand("__texparser_io_overwrite_tl", str));
+            }
+            else
+            {
+               throw new LaTeXSyntaxException(parser,
+                LaTeXSyntaxException.ERROR_UNKNOWN_OPTION,
+                  key+"="+str, "datatool/io");
+            }
          }
          else if (key.equals("load-action"))
-         {// TODO
+         {
+            if (val == null)
+            {
+               throw new TeXSyntaxException(parser,
+                 LaTeXSyntaxException.ERROR_MISSING_KEY_VALUE, key);
+            }
+
+            boolean boolVal = true;
+
+            String str = parser.expandToString(val, stack).trim();
+
+            // simplified to just a boolean allow/disallow appending
+            if (str.equals("detect") || str.equals("append"))
+            {
+               boolVal = true;
+            }
+            else if (str.equals("create") || str.equals("old-style"))
+            {
+               boolVal = false;
+            }
+            else
+            {
+               throw new LaTeXSyntaxException(parser,
+                LaTeXSyntaxException.ERROR_UNKNOWN_OPTION,
+                  key+"="+str, "datatool/io");
+            }
+
+            getParser().putControlSequence(true,
+              new LaTeX3Boolean("l__datatool_append_allowed_bool", boolVal));
          }
          else if (key.equals("delimiter"))
          {
+            if (val == null)
+            {
+               throw new TeXSyntaxException(parser,
+                 LaTeXSyntaxException.ERROR_MISSING_KEY_VALUE, key);
+            }
+
             String str = parser.expandToString(val, stack);
             setDelimiter(str.codePointAt(0));
          }
          else if (key.equals("separator"))
          {
+            if (val == null)
+            {
+               throw new TeXSyntaxException(parser,
+                 LaTeXSyntaxException.ERROR_MISSING_KEY_VALUE, key);
+            }
+
             String str = parser.expandToString(val, stack);
             setSeparator(str.codePointAt(0));
          }

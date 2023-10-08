@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013-2023 Nicola L.C. Talbot
+    Copyright (C) 2023 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -18,30 +18,7 @@
 */
 package com.dickimawbooks.texparserlib.latex.datatool;
 
-import java.io.IOException;
-
-import com.dickimawbooks.texparserlib.TeXParser;
-import com.dickimawbooks.texparserlib.TeXObject;
-import com.dickimawbooks.texparserlib.ControlSequence;
-
-public interface DataElement extends TeXObject
+public enum IOExpandOption
 {
-   /**
-    * Gets the data type as a byte. The return value should be one
-    * of: DataToolHeader.TYPE_UNDEF, DataToolHeader.TYPE_STRING,
-    * DataToolHeader.TYPE_INT, DataToolHeader.TYPE_REAL,
-    * DataToolHeader.TYPE_CURRENCY.
-    */ 
-   public byte getDataType();
-
-   /**
-    * Gets the data type.
-    */ 
-   public DatumType getDatumType();
-
-   /**
-    * Creates a control sequence that is defined to this value.
-    */ 
-   public ControlSequence createControlSequence(String name);
-
+   NONE, PROTECTED, FULL;
 }

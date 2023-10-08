@@ -71,9 +71,14 @@ public interface TeXApp
 
    public Charset getDefaultCharset();
 
+   public String getApplicationName();
+
+   public String getApplicationVersion();
+
    public static String MESSAGE_READING = "message.reading";
    public static String MESSAGE_WRITING = "message.writing";
    public static String MESSAGE_NO_READ = "message.no.read";
    public static String MESSAGE_NO_WRITE = "message.no.write";
    public static String MESSAGE_ENCODING = "message.charset";
+   public static String WARNING_OVERWRITING = "warning.overwriting";
 }

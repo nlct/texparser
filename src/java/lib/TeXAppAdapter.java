@@ -151,4 +151,17 @@ public class TeXAppAdapter implements TeXApp
    {
       return Charset.defaultCharset();
    }
+
+   @Override
+   public String getApplicationName()
+   {
+      return "TeX Parser Library";
+   }
+
+   @Override
+   public String getApplicationVersion()
+   {
+      return TeXParser.VERSION;
+   }
+
 }

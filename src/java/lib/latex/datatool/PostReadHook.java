@@ -50,8 +50,8 @@ public class PostReadHook extends ControlSequence
       String fileType = "tex";
       String fileVersion = "";
 
-      ControlSequence fileTypeCs = parser.getControlSequence("__datatool_current_file_type");
-      ControlSequence fileVersionCs = parser.getControlSequence("__datatool_current_file_version");
+      ControlSequence fileTypeCs = parser.getControlSequence("__texparser_current_file_type_tl");
+      ControlSequence fileVersionCs = parser.getControlSequence("__texparser_current_file_version_tl");
 
       String dbLabel = parser.expandToString(
         parser.getControlSequence("dtllastloadeddb"), stack);
@@ -70,8 +70,6 @@ public class PostReadHook extends ControlSequence
       {
          sty.updateInternals(true, dbLabel);
       }
-
-      parser.endGroup();
 
       sty.registerFileLoaded(dbLabel, fileType, fileVersion, texPath);
    }
