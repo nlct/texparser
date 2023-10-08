@@ -226,6 +226,25 @@ public class DataBase
          }
          else
          {
+            String name = settings.getDefaultName();
+
+            DataBase db = null;
+
+            if (sty.dbExists(name))
+            {
+               db = sty.getDataBase(name);
+            }
+
+            if (db == null)
+            {
+               db = sty.createDataBase(name, true);
+            }
+            else if (!settings.isAppendAllowed())
+            {
+               throw new LaTeXSyntaxException(parser,
+                 DataToolSty.ERROR_DB_EXISTS, name);
+            }
+
             int separator = settings.getSeparator();
             int delimiter = settings.getDelimiter();
 
@@ -243,14 +262,19 @@ public class DataBase
                parser.setCatCode(true, delimiter, TeXParser.TYPE_OTHER);
             }
 
-// TODO
+            FileMapType mapType;
 
-            parser.endGroup();
+            if (settings.isCsvLiteral())
+            {
+               mapType = FileMapType.VERBATIM_EXCEPT_ESC_SYM;
+            }
+            else
+            {
+               mapType = FileMapType.TEX;
+            }
+
+            parser.fileMap(texPath, mapType, new CsvReadHandler(db, settings));
          }
-      }
-      else
-      {
-         parser.endGroup();
       }
    }
 

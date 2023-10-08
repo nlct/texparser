@@ -22,7 +22,26 @@ import java.io.IOException;
 
 public interface FileMapHandler
 {
+   /**
+     Handler function used by TeXParser.fileMap(TeXParser,FileMapType,FileMapHandler) to process each line of the file.
+     The line number corresponds to the number of "lines" read so far, 
+     but one or more of the lines may include EOL with FileMapType.TEX,
+     in which case the line number won't correspond to the actual 
+     file line number. Use TeXParser.getLineNumber() for the actual file line number.
+     Parsing can be prematurely stopped by throwing EOFException.
+     @param parser the calling parser
+     @param line the line read in from the file
+     @param lineNumber the number of lines (that is, data rows) read so far
+    */ 
    public void processLine(TeXParser parser, TeXObjectList line, int lineNumber)
       throws IOException;
+
+   /**
+     Called by TeXParser.fileMap(TeXParser,FileMapType,FileMapHandler)
+     when parsing is finished. Not called if parsing prematurely
+     stopped.
+    */ 
+   public void processCompleted(TeXParser parser)
+     throws IOException;
 }
 

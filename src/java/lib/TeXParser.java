@@ -2487,6 +2487,9 @@ public class TeXParser extends TeXObjectList
          }
       }
 
+      int parentLineNum = getLineNumber();
+      File parentFile = getCurrentFile();
+
       TeXReader parentReader = reader;
 
       int lineNum = 1;
@@ -2512,12 +2515,21 @@ public class TeXParser extends TeXObjectList
             handler.processLine(this, line, lineNum);
             lineNum++;
          } 
+
+         handler.processCompleted(this);
+      }
+      catch (EOFException e)
+      {
+         /* 
+            The handler function may throw this exception to
+            prematurely end parsing.
+          */
       }
       catch (TeXSyntaxException e)
       {
-         throw new TeXSyntaxException(e, this, lineNum, texPath.getFile(),
+         throw new TeXSyntaxException(e, this, parentLineNum, parentFile,
           TeXSyntaxException.ERROR_FILE_MAPPER, texPath.getRelativePath(),
-           texApp.getMessage(e.getErrorTag(), e.getParams()));
+           e.getMessage(texApp));
       }
       catch (IOException e)
       {

@@ -146,7 +146,8 @@ There is NO WARRANTY, to the extent permitted by law.</entry>
 <entry key="tex.error.unexpandable">Can''t expand ''{0}''</entry>
 <entry key="tex.error.cant_change_const">Can''t change constant {0}</entry>
 <entry key="tex.error.file.overwrite_forbidden">File ''{0}'' already exists (overwrite forbidden).</entry>
-<entry key="tex.error.file.mapper">An error occurred while parsing file ''{0}'': {1}</entry>
+<entry key="tex.error.file.mapper">An error occurred while parsing {0}:
+   {1}</entry>
 
 <!--  LaTeX Error Messages -->
 
