@@ -2506,6 +2506,19 @@ public class TeXObjectList extends Vector<TeXObject>
       return false;
    }
 
+   public boolean isBlank()
+   {
+      for (TeXObject obj : this)
+      {
+         if ( ! (obj instanceof Ignoreable || obj instanceof WhiteSpace) )
+         {
+            return false;
+         }
+      }
+
+      return true;
+   }
+
    public TeXObjectList trim()
    {
       // strip redundant white space and grouping
@@ -2530,6 +2543,23 @@ public class TeXObjectList extends Vector<TeXObject>
       }
 
       return this;
+   }
+
+   public void trimTrailing()
+   {
+      for (int i = size() - 1; i >= 0; i--)
+      {
+         TeXObject obj = get(i);
+
+         if (obj instanceof WhiteSpace || obj instanceof Ignoreable)
+         {
+            remove(i);
+         }
+         else
+         {
+            break;
+         }
+      }
    }
 
    @Override
