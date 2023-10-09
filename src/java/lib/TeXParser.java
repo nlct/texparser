@@ -2267,13 +2267,25 @@ public class TeXParser extends TeXObjectList
    public void processAction(TeXParserActionObject obj)
      throws IOException
    {
+      Object data = obj.getData();
+
       switch (obj.getAction())
       {
          case INPUT_FILE:
 
-           TeXPath texPath = (TeXPath)obj.getData();
-           File file = texPath.getFile();
-           Charset charset = texPath.getEncoding();
+           File file = null;
+           Charset charset = null;
+
+           if (data instanceof File)
+           {
+              file = (File)data;
+           }
+           else
+           {
+              TeXPath texPath = (TeXPath)data;
+              file = texPath.getFile();
+              charset = texPath.getEncoding();
+           }
 
            if (charset == null)
            {
@@ -2283,7 +2295,7 @@ public class TeXParser extends TeXObjectList
            parse(file, charset, obj.getPending());
          break;
          case MODE_CHANGE:
-           settings.setMode((TeXMode)obj.getData());
+           settings.setMode((TeXMode)data);
          break;
       }
    }
@@ -4307,6 +4319,6 @@ public class TeXParser extends TeXObjectList
    public static final int DEBUG_CATCODE = 16384;
    public static final int DEBUG_READ = 32768;
 
-   public static final String VERSION = "0.9.8b.20231008";
-   public static final String VERSION_DATE = "2023-10-08";
+   public static final String VERSION = "0.9.8b.20231009";
+   public static final String VERSION_DATE = "2023-10-09";
 }
