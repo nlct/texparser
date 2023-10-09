@@ -768,6 +768,21 @@ public class TeXParserUtils
       return grp;
    }
 
+   public static TeXObjectList removeGroup(TeXObjectList list)
+   {
+      if (list.size() == 1)
+      {
+         TeXObject elem = list.firstElement();
+
+         if (elem instanceof Group && !(elem instanceof MathGroup))
+         {
+            list = ((Group)list).toList();
+         }
+      }
+
+      return list;
+   }
+
    public static void process(TeXObject obj, TeXParser parser, TeXObjectList stack)
     throws IOException
    {
