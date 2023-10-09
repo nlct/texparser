@@ -172,6 +172,9 @@ public class IOSettings
 
          appendAllowed = !TeXParserUtils.isFalse(
            "l__datatool_append_allowed_bool", parser);
+
+         trimElement = !TeXParserUtils.isFalse(
+           "l__datatool_new_element_trim_bool", parser);
       }
       else
       {
@@ -451,6 +454,16 @@ public class IOSettings
       skipLines = value;
    }
 
+   public boolean isTrimElementOn()
+   {
+      return trimElement;
+   }
+
+   public void setTrimElement(boolean on)
+   {
+      trimElement = on;
+   }
+
    public DataToolSty getSty()
    {
       return sty;
@@ -473,4 +486,5 @@ public class IOSettings
    boolean appendAllowed = false;
    boolean autoKeys = false;
    int skipLines = 0;
+   boolean trimElement = true;
 }
