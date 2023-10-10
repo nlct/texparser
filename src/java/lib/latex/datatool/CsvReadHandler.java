@@ -61,12 +61,12 @@ System.out.println("PROCESSING LINE "+lineNumber+" "+line.toString(parser));
 
                if (settings.isHeaderIncluded())
                {
-                  parseHeader(parser, row);
+                  parseHeader(row, parser, line);
                   rowIdx = 1;
                }
                else
                {
-                  parseRow(parser, row);
+                  parseRow(row, parser, line);
                   rowIdx++;
                }
             }
@@ -88,29 +88,136 @@ System.out.println("PROCESSING LINE "+lineNumber+" "+line.toString(parser));
                }
             }
 
-            parseRow(parser, row);
+            parseRow(row, parser, line);
             rowIdx++;
          }
       }
    }
 
-   protected void parseHeader(TeXParser parser, TeXObjectList row)
+   protected void parseHeader(TeXObjectList row, TeXParser parser, TeXObjectList stack)
    throws IOException
    {
 // TODO
       for (int i = 0; i < row.size(); i++)
       {
-System.out.println("Header Row element "+i+": "+row.get(i).toString(parser));
+         TeXObject cell = processCell(row.get(i), parser, stack);
+System.out.println("Header Row element "+i+": "+cell.toString(parser));
       }
    }
 
-   protected void parseRow(TeXParser parser, TeXObjectList row)
+   protected void parseRow(TeXObjectList row, TeXParser parser, TeXObjectList stack)
    throws IOException
    {
 // TODO
       for (int i = 0; i < row.size(); i++)
       {
-System.out.println("Row element "+i+": "+row.get(i).toString(parser));
+         TeXObject cell = processCell(row.get(i), parser, stack);
+System.out.println("Row element "+i+": "+cell.toString(parser));
+      }
+   }
+
+   protected TeXObject processCell(TeXObject obj, 
+     TeXParser parser, TeXObjectList stack)
+   throws IOException
+   {
+
+      if (settings.isCsvLiteral())
+      {
+         StringBuilder builder = new StringBuilder();
+
+         TeXObjectList list;
+
+         if (parser.isStack(obj))
+         {
+            list = (TeXObjectList)obj;
+
+            for (int i = 0; i < list.size(); i++)
+            {
+               processLiteralToken(parser, list.get(i), builder);
+            }
+         }
+         else
+         {
+            processLiteralToken(parser, obj, builder);
+         }
+
+         list = parser.getListener().createStack();
+
+         parser.scan(builder.toString(), list);
+
+// TODO apply user mappings
+
+         obj = list;
+      }
+
+      switch (settings.getExpandOption())
+      {
+         case PROTECTED:
+           obj = TeXParserUtils.expandOnce(obj, parser, stack);
+         break;
+         case FULL:
+           obj = TeXParserUtils.expandFully(obj, parser, stack);
+         break;
+      }
+
+      if (settings.isTrimElementOn() && parser.isStack(obj))
+      {
+         ((TeXObjectList)obj).trim();
+      }
+
+      return obj;
+   }
+
+   protected void processLiteralToken(TeXParser parser,
+       TeXObject obj, StringBuilder builder)
+   {
+      if (obj instanceof ControlSequence)
+      {
+         String csname = ((ControlSequence)obj).getName();
+
+         if (csname.equals("f") || csname.equals("n") || csname.equals("r"))
+         {
+            builder.append(' ');
+         }
+         else if (csname.equals("t"))
+         {
+            builder.append('\t');
+         }
+         else
+         {
+            builder.append(obj.toString(parser));
+         }
+      }
+      else if (obj instanceof CharObject)
+      {
+         int cp = ((CharObject)obj).getCharCode();
+
+         if (cp == '#' || cp == '$' || cp == '%' || cp == '&'
+             || cp == '_' || cp == '{' || cp == '}')
+         {
+            builder.append('\\');
+            builder.appendCodePoint(cp);
+         }
+         else if (cp == '\\')
+         {
+            builder.append("\\textbackslash ");
+         }
+         else if (cp == '^')
+         {
+            builder.append("\\textasciicircum ");
+         }
+         else if (cp == '~')
+         {
+            builder.append("\\textasciitilde ");
+         }
+         else
+         {
+            builder.appendCodePoint(cp);
+         }
+      }
+      else
+      {
+         builder.append(obj.toString(parser));
       }
    }
 
@@ -203,7 +310,10 @@ System.out.println("Row element "+i+": "+row.get(i).toString(parser));
 
                if (pendingCell != null)
                {
-                  pendingCell = TeXParserUtils.removeGroup(pendingCell);
+                  if (!settings.isCsvLiteral())
+                  {
+                     pendingCell = TeXParserUtils.removeGroup(pendingCell);
+                  }
 
                   if (settings.isTrimElementOn())
                   {
@@ -289,7 +399,10 @@ System.out.println("Row element "+i+": "+row.get(i).toString(parser));
       {
          if (pendingCell != null)
          {
-            pendingCell = TeXParserUtils.removeGroup(pendingCell);
+            if (!settings.isCsvLiteral())
+            {
+               pendingCell = TeXParserUtils.removeGroup(pendingCell);
+            }
 
             if (settings.isTrimElementOn())
             {
