@@ -228,6 +228,7 @@ public class DataBase
          {
             String name = settings.getDefaultName();
 
+            boolean appending = false;
             DataBase db = null;
 
             if (sty.dbExists(name))
@@ -239,7 +240,11 @@ public class DataBase
             {
                db = sty.createDataBase(name, true);
             }
-            else if (!settings.isAppendAllowed())
+            else if (settings.isAppendAllowed())
+            {
+               appending = true;
+            }
+            else
             {
                throw new LaTeXSyntaxException(parser,
                  DataToolSty.ERROR_DB_EXISTS, name);
@@ -273,7 +278,8 @@ public class DataBase
                mapType = FileMapType.TEX;
             }
 
-            parser.fileMap(texPath, mapType, new CsvReadHandler(db, settings));
+            parser.fileMap(texPath, mapType, 
+              new CsvReadHandler(db, appending, settings));
          }
       }
    }

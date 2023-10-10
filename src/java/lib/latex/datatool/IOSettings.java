@@ -138,7 +138,7 @@ public class IOSettings
       {
          if (format == FileFormatType.CSV || format == FileFormatType.TSV)
          {
-            autoKeys = !TeXParserUtils.isTrue("ifdtlautokeys", parser);
+            autoKeys = TeXParserUtils.isTrue("ifdtlautokeys", parser);
 
             skipLines = TeXParserUtils.toInt(
               parser.getListener().getControlSequence("dtl@omitlines"),

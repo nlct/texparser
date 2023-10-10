@@ -21,7 +21,11 @@ package com.dickimawbooks.texparserlib.latex.datatool;
 import java.io.IOException;
 import java.io.EOFException;
 
+import java.util.Vector;
+import java.util.Hashtable;
+
 import com.dickimawbooks.texparserlib.*;
+import com.dickimawbooks.texparserlib.latex.latex3.PropertyCommand;
 
 /**
  * FileMapHandler used to read CSV files by DataBase.read().
@@ -30,22 +34,51 @@ import com.dickimawbooks.texparserlib.*;
  */
 public class CsvReadHandler implements FileMapHandler
 {
-   public CsvReadHandler(DataBase database, IOSettings settings)
+   public CsvReadHandler(DataBase database, boolean appending, IOSettings settings)
    {
       this.database = database;
+      this.appending = appending;
       this.settings = settings;
+
+      headers = new Vector<DataToolHeader>();
+
+      parser = settings.getSty().getParser();
+
+      ControlSequence cs = parser.getControlSequence("l__datatool_csv_headers_prop");
+
+      if (cs instanceof PropertyCommand)
+      {
+         @SuppressWarnings("unchecked")
+         PropertyCommand<Integer> prop = (PropertyCommand<Integer>)cs;
+
+         colHeadersProp = prop;
+      }
+
+      cs = parser.getControlSequence("l__datatool_csv_keys_prop");
+
+      if (cs instanceof PropertyCommand)
+      {
+         @SuppressWarnings("unchecked")
+         PropertyCommand<Integer> prop = (PropertyCommand<Integer>)cs;
+
+         colKeysProp = prop;
+      }
+
+      headers = new Vector<DataToolHeader>();
    }
 
    @Override
    public void processLine(TeXParser parser, TeXObjectList line, int lineNumber)
    throws IOException
    {
-System.out.println("PROCESSING LINE "+lineNumber+" "+line.toString(parser));
+      this.parser = parser;
+      currentStack = line;
+
       if (rowIdx == 0)
       {
          if (settings.getSkipLines() < lineNumber)
          {
-            TeXObjectList row = splitRow(parser, line);
+            TeXObjectList row = splitRow(line);
 
             if (row != null)
             {
@@ -61,12 +94,12 @@ System.out.println("PROCESSING LINE "+lineNumber+" "+line.toString(parser));
 
                if (settings.isHeaderIncluded())
                {
-                  parseHeader(row, parser, line);
+                  parseHeader(row);
                   rowIdx = 1;
                }
                else
                {
-                  parseRow(row, parser, line);
+                  parseRow(row);
                   rowIdx++;
                }
             }
@@ -74,7 +107,7 @@ System.out.println("PROCESSING LINE "+lineNumber+" "+line.toString(parser));
       }
       else
       {
-         TeXObjectList row = splitRow(parser, line);
+         TeXObjectList row = splitRow(line);
 
          if (row != null)
          {
@@ -88,39 +121,174 @@ System.out.println("PROCESSING LINE "+lineNumber+" "+line.toString(parser));
                }
             }
 
-            parseRow(row, parser, line);
+            parseRow(row);
             rowIdx++;
          }
       }
    }
 
-   protected void parseHeader(TeXObjectList row, TeXParser parser, TeXObjectList stack)
+   protected void parseHeader(TeXObjectList row)
    throws IOException
    {
-// TODO
+      boolean autokeys = settings.isAutoKeysOn();
+
+      DataToolHeaderRow headerRow = database.getHeaders();
+
+      if (headerRow == null)
+      {
+         headerRow = new DataToolHeaderRow(settings.getSty());
+         database.update(headerRow, database.getData());
+      }
+
       for (int i = 0; i < row.size(); i++)
       {
-         TeXObject cell = processCell(row.get(i), parser, stack);
-System.out.println("Header Row element "+i+": "+cell.toString(parser));
+         Integer colIdx = Integer.valueOf(i+1);
+         String colKey;
+         TeXObject cell;
+
+         if (autokeys)
+         {
+            colKey = parser.expandToString(
+               parser.getListener().getControlSequence("dtldefaultkey"),
+                 currentStack) + colIdx;
+            cell = parser.getListener().createString(colKey);
+         }
+         else
+         {
+            TeXObject key = (colKeysProp == null ? null : colKeysProp.get(colIdx));
+
+            if (key == null)
+            {
+               cell = processCell(row.get(i));
+            }
+            else
+            {
+               cell = key;
+            }
+
+            colKey = cell.toString(parser);
+
+            if (colKey.isEmpty())
+            {
+               colKey = parser.expandToString(
+                 parser.getListener().getControlSequence("dtldefaultkey"),
+                 currentStack) + colIdx;
+            }
+         }
+
+         TeXObject title = (colHeadersProp == null ? null : colHeadersProp.get(colIdx));
+
+         if (title == null)
+         {
+            title = cell;
+         }
+
+         DataToolHeader header;
+
+         if (appending)
+         {
+            header = database.getHeader(colKey);
+
+            if (header == null)
+            {
+               header = new DataToolHeader(settings.getSty(),
+                 headerRow.size()+1, colKey);
+               header.setTitle(title);
+               headerRow.add(header);
+            }
+         }
+         else
+         {
+            header = new DataToolHeader(settings.getSty(), colIdx, colKey);
+            header.setTitle(title);
+            headerRow.add(header);
+         }
+
+         headers.add(header);
       }
    }
 
-   protected void parseRow(TeXObjectList row, TeXParser parser, TeXObjectList stack)
+   protected void parseRow(TeXObjectList row)
    throws IOException
    {
-// TODO
+      DataToolHeaderRow headerRow = database.getHeaders();
+
+      if (headerRow == null)
+      {
+         headerRow = new DataToolHeaderRow(settings.getSty());
+      }
+
+      DataToolRows data = database.getData();
+
+      if (data == null)
+      {
+         data = new DataToolRows(settings.getSty());
+      }
+
+      DataToolEntryRow entryRow = new DataToolEntryRow(
+        data.size()+1, settings.getSty());
+
+      data.add(entryRow);
+
+      database.update(headerRow, data);
+
       for (int i = 0; i < row.size(); i++)
       {
-         TeXObject cell = processCell(row.get(i), parser, stack);
-System.out.println("Row element "+i+": "+cell.toString(parser));
+         TeXObject cell = processCell(row.get(i));
+
+         DataElement element = settings.getSty().getElement(cell);
+         boolean update = true;
+
+         if (element == null)
+         {
+            update = false;
+            element = new DataStringElement();
+         }
+
+         DataToolHeader header = null;
+
+         if (headers.size() > i)
+         {
+            header = headers.get(i);
+         }
+         else
+         {
+            Integer colIdx = Integer.valueOf(i+1);
+
+            TeXObject key = (colKeysProp == null ? null : colKeysProp.get(colIdx));
+
+            String colKey;
+
+            if (key == null)
+            {
+               colKey = parser.expandToString(
+                 parser.getListener().getControlSequence("dtldefaultkey"),
+                    currentStack) + colIdx;
+            }
+            else
+            {
+               colKey = parser.expandToString(key, currentStack);
+            }
+
+            header = new DataToolHeader(settings.getSty(), headerRow.size()+1, colKey);
+            headerRow.add(header);
+            headers.add(header);
+         }
+
+         if (update)
+         {
+            header.updateType(element);
+         }
+
+         DataToolEntry entry = new DataToolEntry(settings.getSty(),
+          header.getColumnIndex(), element);
+         entryRow.add(entry);
       }
    }
 
-   protected TeXObject processCell(TeXObject obj, 
-     TeXParser parser, TeXObjectList stack)
+   protected TeXObject processCell(TeXObject obj)
    throws IOException
    {
-
       if (settings.isCsvLiteral())
       {
          StringBuilder builder = new StringBuilder();
@@ -133,12 +301,12 @@ System.out.println("Row element "+i+": "+cell.toString(parser));
 
             for (int i = 0; i < list.size(); i++)
             {
-               processLiteralToken(parser, list.get(i), builder);
+               processLiteralToken(list.get(i), builder);
             }
          }
          else
          {
-            processLiteralToken(parser, obj, builder);
+            processLiteralToken(obj, builder);
          }
 
          list = parser.getListener().createStack();
@@ -153,10 +321,10 @@ System.out.println("Row element "+i+": "+cell.toString(parser));
       switch (settings.getExpandOption())
       {
          case PROTECTED:
-           obj = TeXParserUtils.expandOnce(obj, parser, stack);
+           obj = TeXParserUtils.expandOnce(obj, parser, currentStack);
          break;
          case FULL:
-           obj = TeXParserUtils.expandFully(obj, parser, stack);
+           obj = TeXParserUtils.expandFully(obj, parser, currentStack);
          break;
       }
 
@@ -168,8 +336,7 @@ System.out.println("Row element "+i+": "+cell.toString(parser));
       return obj;
    }
 
-   protected void processLiteralToken(TeXParser parser,
-       TeXObject obj, StringBuilder builder)
+   protected void processLiteralToken(TeXObject obj, StringBuilder builder)
    {
       if (obj instanceof ControlSequence)
       {
@@ -221,7 +388,7 @@ System.out.println("Row element "+i+": "+cell.toString(parser));
       }
    }
 
-   protected TeXObjectList splitRow(TeXParser parser, TeXObjectList line)
+   protected TeXObjectList splitRow(TeXObjectList line)
    throws IOException
    {
       int delimiter = settings.getDelimiter();
@@ -378,7 +545,7 @@ System.out.println("Row element "+i+": "+cell.toString(parser));
                pendingCell = new TeXObjectList();
             }
 
-            pendingCell.add(fromControlSequence(parser, (ControlSequence)obj));
+            pendingCell.add(fromControlSequence((ControlSequence)obj));
          }
          else
          {
@@ -432,7 +599,7 @@ System.out.println("Row element "+i+": "+cell.toString(parser));
       }
    }
 
-   protected TeXObject fromControlSequence(TeXParser parser, ControlSequence cs)
+   protected TeXObject fromControlSequence(ControlSequence cs)
    {
       EscapeCharsOption opt = settings.getEscapeCharsOption();
 
@@ -478,12 +645,17 @@ System.out.println("Row element "+i+": "+cell.toString(parser));
    public void processCompleted(TeXParser parser)
      throws IOException
    {
-// TODO
    }
 
    DataBase database;
    IOSettings settings;
+   boolean appending = false;
    int rowIdx = 0;
    TeXObjectList pendingRow = null;
    TeXObjectList pendingCell = null;
+   TeXObjectList currentStack = null;
+   PropertyCommand<Integer> colKeysProp;
+   PropertyCommand<Integer> colHeadersProp;
+   Vector<DataToolHeader> headers;
+   TeXParser parser;
 }

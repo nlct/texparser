@@ -208,6 +208,11 @@ public class DataToolSty extends LaTeXSty
       registerControlSequence(
         new TextualContentCommand("l__datatool_default_dbname_str", "untitled"));
 
+      registerControlSequence(
+        new PropertyCommand<Integer>("l__datatool_csv_headers_prop"));
+      registerControlSequence(
+        new PropertyCommand<Integer>("l__datatool_csv_keys_prop"));
+
       // display options
 
       registerControlSequence(
@@ -997,10 +1002,42 @@ public class DataToolSty extends LaTeXSty
                  parser.expandToString(val, stack)));
          }
          else if (key.equals("keys"))
-         {// TODO
+         {
+            PropertyCommand<Integer> prop 
+              = new PropertyCommand<Integer>("l__datatool_csv_keys_prop");
+
+            if (val != null)
+            {
+               CsvList csvList = TeXParserUtils.toCsvList(val, parser);
+
+               for (int i = 0; i < csvList.size(); i++)
+               {
+                  TeXObject obj = csvList.getValue(i);
+
+                  prop.put(Integer.valueOf(i+1), obj);
+               }
+            }
+
+            parser.putControlSequence(true, prop);
          }
          else if (key.equals("headers"))
-         {// TODO
+         {
+            PropertyCommand<Integer> prop 
+              = new PropertyCommand<Integer>("l__datatool_csv_headers_prop");
+
+            if (val != null)
+            {
+               CsvList csvList = TeXParserUtils.toCsvList(val, parser);
+
+               for (int i = 0; i < csvList.size(); i++)
+               {
+                  TeXObject obj = csvList.getValue(i);
+
+                  prop.put(Integer.valueOf(i+1), obj);
+               }
+            }
+
+            parser.putControlSequence(true, prop);
          }
          else if (key.equals("expand"))
          {
