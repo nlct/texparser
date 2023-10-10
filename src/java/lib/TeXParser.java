@@ -584,6 +584,7 @@ public class TeXParser extends TeXObjectList
    public void scan(String text, TeXObjectList list)
      throws IOException
    {
+      TeXReader orgReader = reader;
       TeXReader strReader = new TeXReader(reader, text);
       reader = strReader;
 
@@ -594,6 +595,8 @@ public class TeXParser extends TeXObjectList
             break;
          }
       }
+
+      reader = orgReader;
    }
 
    public TeXObjectList readLine(TeXReader otherReader, boolean retainEol)
@@ -4319,6 +4322,6 @@ public class TeXParser extends TeXObjectList
    public static final int DEBUG_CATCODE = 16384;
    public static final int DEBUG_READ = 32768;
 
-   public static final String VERSION = "0.9.8b.20231009";
-   public static final String VERSION_DATE = "2023-10-09";
+   public static final String VERSION = "0.9.8b.20231010";
+   public static final String VERSION_DATE = "2023-10-10";
 }
