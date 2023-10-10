@@ -23,6 +23,7 @@ import java.io.IOException;
 
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.*;
+import com.dickimawbooks.texparserlib.latex.latex3.*;
 
 public class DTLdisplaydb extends Command
 {

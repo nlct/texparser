@@ -25,6 +25,7 @@ import java.io.IOException;
 
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.*;
+import com.dickimawbooks.texparserlib.latex.latex3.*;
 import com.dickimawbooks.texparserlib.latex.ifthen.IfThenSty;
 import com.dickimawbooks.texparserlib.primitives.*;
 

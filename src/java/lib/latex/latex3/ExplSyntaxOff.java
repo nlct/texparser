@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2022 Nicola L.C. Talbot
+    Copyright (C) 2022-2023 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -16,22 +16,25 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
-package com.dickimawbooks.texparserlib.latex;
+package com.dickimawbooks.texparserlib.latex.latex3;
 
 import java.io.IOException;
 
 import com.dickimawbooks.texparserlib.*;
-import com.dickimawbooks.texparserlib.generic.GobbleNumber;
+import com.dickimawbooks.texparserlib.primitives.Relax;
 
-public class CharSetCatCodeNN extends ControlSequence
+/* This will normally be defined by ExplSyntaxOn but this is
+ provided just in case ExplSyntaxOn isn't detected and also to provide no-op.
+*/
+public class ExplSyntaxOff extends ControlSequence
   implements CatCodeChanger
 {
-   public CharSetCatCodeNN()
+   public ExplSyntaxOff()
    {
-      this("CharSetCatCodeNN");
+      this("ExplSyntaxOff");
    }
 
-   public CharSetCatCodeNN(String name)
+   public ExplSyntaxOff(String name)
    {
       super(name);
    }
@@ -39,29 +42,28 @@ public class CharSetCatCodeNN extends ControlSequence
    @Override
    public Object clone()
    {
-      return new CharSetCatCodeNN(getName());
+      return new ExplSyntaxOff(getName());
    }
 
    @Override
    public void applyCatCodeChange(TeXParser parser) throws IOException
    {
-      Numerical cp = TeXParserUtils.popNumericalArg(parser, parser);
-      Numerical cat = TeXParserUtils.popNumericalArg(parser, parser);
-
-      parser.setCatCode(true, cp.number(parser), cat.number(parser));
-
-      parser.push(TeXParserUtils.createGroup(parser, cat));
-      parser.push(TeXParserUtils.createGroup(parser, cp));
+      parser.setCatCode(true, 9, TeXParser.TYPE_SPACE);
+      parser.setCatCode(true, 32, TeXParser.TYPE_SPACE);
+      parser.setCatCode(true, 34, TeXParser.TYPE_OTHER);
+      parser.setCatCode(true, 38, TeXParser.TYPE_TAB);
+      parser.setCatCode(true, 58, TeXParser.TYPE_OTHER);
+      parser.setCatCode(true, 94, TeXParser.TYPE_SP);
+      parser.setCatCode(true, 95, TeXParser.TYPE_SB);
+      parser.setCatCode(true, 124, TeXParser.TYPE_OTHER);
+      parser.setCatCode(true, 126, TeXParser.TYPE_ACTIVE);
    }
 
    @Override
    public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      int cp = TeXParserUtils.popInt(parser, stack);
-      int cat = TeXParserUtils.popInt(parser, stack);
-
-      parser.setCatCode(true, cp, cat);
+      applyCatCodeChange(parser);
    }
 
    @Override
@@ -74,6 +76,6 @@ public class CharSetCatCodeNN extends ControlSequence
    @Override
    public ControlSequence getNoOpCommand()
    {
-      return new GobbleNumber(getName(), true);
+      return new Relax(getName());
    }
 }

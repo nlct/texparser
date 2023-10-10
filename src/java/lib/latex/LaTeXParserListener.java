@@ -55,6 +55,7 @@ import com.dickimawbooks.texparserlib.latex.inputenc.*;
 import com.dickimawbooks.texparserlib.latex.jmlr.*;
 import com.dickimawbooks.texparserlib.latex.keyval.*;
 import com.dickimawbooks.texparserlib.latex.lipsum.*;
+import com.dickimawbooks.texparserlib.latex.latex3.*;
 import com.dickimawbooks.texparserlib.latex.mfirstuc.*;
 import com.dickimawbooks.texparserlib.latex.mhchem.*;
 import com.dickimawbooks.texparserlib.latex.mnsymbol.*;
