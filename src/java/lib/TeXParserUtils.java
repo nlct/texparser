@@ -770,13 +770,17 @@ public class TeXParserUtils
 
    public static TeXObjectList removeGroup(TeXObjectList list)
    {
-      if (list.size() == 1)
+      if (list instanceof Group && !(list instanceof MathGroup))
+      {
+         list = ((Group)list).toList();
+      }
+      else if (list.size() == 1)
       {
          TeXObject elem = list.firstElement();
 
          if (elem instanceof Group && !(elem instanceof MathGroup))
          {
-            list = ((Group)list).toList();
+            list = ((Group)elem).toList();
          }
       }
 
