@@ -925,14 +925,18 @@ public class DataBase
          }
          else if (cp == delimiter)
          {
-            if (escCharsOpt != EscapeCharsOption.NONE)
+            if (escCharsOpt == EscapeCharsOption.DOUBLE_DELIM)
+            {
+               builder.appendCodePoint(delimiter);
+            }
+            else if (escCharsOpt != EscapeCharsOption.NONE)
             {
                builder.appendCodePoint('\\');
             }
          }
          else if (cp == '\\')
          {
-            if (escCharsOpt == EscapeCharsOption.DELIM_BKSL)
+            if (escCharsOpt == EscapeCharsOption.ESC_DELIM_BKSL)
             {
                builder.appendCodePoint('\\');
             }

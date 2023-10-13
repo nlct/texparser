@@ -1145,7 +1145,8 @@ public class DataToolSty extends LaTeXSty
 
             String str = parser.expandToString(val, stack);
 
-            if (str.equals("none") || str.equals("delim") || str.equals("delim+bksl"))
+            if (str.equals("none") || str.equals("double-delim")
+             || str.equals("delim") || str.equals("delim+bksl"))
             {
                parser.putControlSequence(true,
                  new TextualContentCommand("__texparser_io_csv_escape_chars_tl", str));

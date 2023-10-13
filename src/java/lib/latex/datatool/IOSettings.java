@@ -111,19 +111,23 @@ public class IOSettings
          delimiter = sty.getDelimiter();
 
          val = getControlSequenceValue("__texparser_io_csv_escape_chars_tl",
-          "none", parser, stack);
+          "double-delim", parser, stack);
 
          if (val.equals("none"))
          {
             escCharsOpt = EscapeCharsOption.NONE;
          }
+         else if (val.equals("double-delim"))
+         {
+            escCharsOpt = EscapeCharsOption.DOUBLE_DELIM;
+         }
          else if (val.equals("delim"))
          {
-            escCharsOpt = EscapeCharsOption.DELIM;
+            escCharsOpt = EscapeCharsOption.ESC_DELIM;
          }
          else if (val.equals("delim+bksl"))
          {
-            escCharsOpt = EscapeCharsOption.DELIM_BKSL;
+            escCharsOpt = EscapeCharsOption.ESC_DELIM_BKSL;
          }
          else
          {
@@ -479,7 +483,7 @@ public class IOSettings
    int delimiter = '"';
    FileOverwriteOption fileOverwriteOpt = FileOverwriteOption.ERROR;
    AddDelimiterOption addDelimOpt = AddDelimiterOption.DETECT;
-   EscapeCharsOption escCharsOpt = EscapeCharsOption.NONE;
+   EscapeCharsOption escCharsOpt = EscapeCharsOption.DOUBLE_DELIM;
    CsvBlankOption csvBlankOpt = CsvBlankOption.IGNORE;
    boolean csvLiteral = true;
    IOExpandOption expandOpt = IOExpandOption.NONE;

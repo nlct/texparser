@@ -20,5 +20,5 @@ package com.dickimawbooks.texparserlib.latex.datatool;
 
 public enum EscapeCharsOption
 {
-   NONE, DELIM, DELIM_BKSL;
+   NONE, DOUBLE_DELIM, ESC_DELIM, ESC_DELIM_BKSL;
 }

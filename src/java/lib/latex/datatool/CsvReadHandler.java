@@ -435,10 +435,10 @@ public class CsvReadHandler implements FileMapHandler
                      return row;
                   }
                   else if ((nextObj instanceof CharObject)
-                           && ((CharObject)nextObj).getCharCode() == separator
-                          )
+                            && (((CharObject)nextObj).getCharCode()) == separator)
                   {
-                     // end of cell
+                     // Closing delimiter followed by separator.
+                     // End of cell
                      pendingRow.add(pendingCell);
                      pendingCell = null;
                      needsClosingDelim = false;
@@ -446,7 +446,29 @@ public class CsvReadHandler implements FileMapHandler
                   }
                   else
                   {
-                     pendingCell.add(obj);
+                     nextObj = line.peekStack();
+
+                     if (nextObj instanceof CharObject
+                          && ((CharObject)nextObj).getCharCode() == delimiter
+                          && (settings.getEscapeCharsOption()
+                                  == EscapeCharsOption.DOUBLE_DELIM))
+                     {
+                        // double delimiter
+
+                        pendingCell.add(obj);
+                        line.popStack(parser);
+                     }
+                     else
+                     {
+                        /*
+                         Delimiter not followed by separator or
+                         eol or (with csv-escape-chars=double-delim)
+                         another delimiter.
+                         Assume literal?
+                        */ 
+
+                        pendingCell.add(obj);
+                     }
                   }
                }
                else
@@ -545,7 +567,30 @@ public class CsvReadHandler implements FileMapHandler
                pendingCell = new TeXObjectList();
             }
 
-            pendingCell.add(fromControlSequence((ControlSequence)obj));
+            if (settings.getEscapeCharsOption() == EscapeCharsOption.DOUBLE_DELIM)
+            {
+               String csname = ((ControlSequence)obj).getName();
+               int cp = csname.codePointAt(0);
+
+               pendingCell.add(obj);
+
+               if (cp == delimiter
+                   && csname.length() == Character.charCount(cp))
+               {
+                  TeXObject nextObj = line.peekStack();
+
+                  if ((nextObj instanceof CharObject)
+                   && ((CharObject)nextObj).getCharCode() == delimiter
+                     )
+                  {
+                     line.popStack(parser);
+                  }
+               }
+            }
+            else
+            {
+               pendingCell.add(fromControlSequence((ControlSequence)obj));
+            }
          }
          else
          {
@@ -603,7 +648,8 @@ public class CsvReadHandler implements FileMapHandler
    {
       EscapeCharsOption opt = settings.getEscapeCharsOption();
 
-      if (opt == EscapeCharsOption.NONE)
+      if (opt == EscapeCharsOption.NONE
+       || opt == EscapeCharsOption.DOUBLE_DELIM)
       {
          return cs;
       }
@@ -615,7 +661,7 @@ public class CsvReadHandler implements FileMapHandler
 
          switch (opt)
          {
-            case DELIM:
+            case ESC_DELIM:
 
                if (cp == delimiter && csname.length() 
                     == Character.charCount(cp))
@@ -625,7 +671,7 @@ public class CsvReadHandler implements FileMapHandler
 
             break;
 
-            case DELIM_BKSL:
+            case ESC_DELIM_BKSL:
 
                if ((cp == delimiter || parser.isCatCode(TeXParser.TYPE_ESC, cp))
                    && csname.length() == Character.charCount(cp)
