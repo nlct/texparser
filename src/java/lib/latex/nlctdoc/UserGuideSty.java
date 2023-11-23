@@ -109,6 +109,8 @@ public class UserGuideSty extends LaTeXSty
       addSemanticCommand("deprecatedorbannedfmt", FG_DEPRECATED_OR_BANNED);
       addSemanticCommand("summarylocfmt", TeXFontShape.IT);
 
+      registerControlSequence(new GenericCommand("optiondefhook"));
+
       registerControlSequence(AccSuppObject.createSymbol(
         listener, "menusep", 0x279C, "menu separator", true));
       addSemanticCommand("menufmt", TeXFontFamily.TT);
@@ -225,11 +227,13 @@ public class UserGuideSty extends LaTeXSty
 
       addNestedSemanticCommand("meta", new TeXFontText(TeXFontShape.EM),
         new TeXFontText(TeXFontFamily.RM),
-        Color.BLACK, listener.getOther(0x2329), listener.getOther(0x232A));
+        null, listener.getOther(0x2329), listener.getOther(0x232A));
 
       registerControlSequence(new LaTeXGenericCommand(true,
         "texmeta", "m", TeXParserUtils.createStack(listener, 
          new TeXCsRef("meta"), listener.getParam(1))));
+
+      addSemanticCommand("faded", FADED);
 
       addNestedSemanticCommand("initvalnotefmt", new TeXFontText(TeXFontShape.EM),
         new TeXFontText(TeXFontFamily.RM),
@@ -2239,4 +2243,6 @@ public class UserGuideSty extends LaTeXSty
 
    public static final Color FRAME_COL_INFO = new Color(0f,0.5f,0.5f);
    public static final Color BG_INFO = new Color(0.94f,1.0f,1.0f);
+
+   public static final Color FADED = Color.GRAY;
 }

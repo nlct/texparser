@@ -65,9 +65,23 @@ public class OptionDef extends StandaloneDef
    }
 
    @Override
-   protected void postArgHook(GlsLabel glslabel, TeXParser parser, TeXObjectList stack)
+   protected void preArgHook(TeXParser parser, TeXObjectList stack)
    throws IOException
    {
+      // ignore bookmark level option
+      popModifier(parser, stack, '+');
+      popOptArg(parser, stack);
+   }
+
+   @Override
+   protected void postArgHook(GlsLabel glslabel,
+    TeXParser parser, TeXObjectList stack)
+   throws IOException
+   {
+      TeXParserUtils.process(
+        parser.getListener().getControlSequence("optiondefhook"),
+        parser, stack);
+
       TeXObject syntax = glslabel.getField("syntax");
 
       TeXObjectList title = parser.getListener().createStack();
