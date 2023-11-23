@@ -219,6 +219,7 @@ There is NO WARRANTY, to the extent permitted by law.</entry>
 <entry key="datatool.file_info_failed">Failed to parse file identifier on first line of file {0} (assuming {1})</entry>
 <entry key="datatool.unknown_file_format_version">Unknown version ''{0}'' of file format ''{1}''</entry>
 <entry key="datatool.write.comment">Created by {0} version {1} on {2, date, yyyy-MM-dd HH:mm:ss Z}</entry>
+<entry key="datatool.warn.dbtex3exp">Detected DBTEX v3.0 experimental format. Resave database file as DBTEX v3.0</entry>
 
 <!--  ifthen messages -->
 

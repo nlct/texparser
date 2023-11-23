@@ -239,12 +239,13 @@ public class DatumElement extends AbstractTeXObject
       content.process(parser);
    }
 
-   public void write(TeXParser parser, PrintWriter writer, FileFormatType format, String version)
+   public void write(TeXParser parser, PrintWriter writer,
+      FileFormatType format, String version)
     throws IOException
    {
       if (format == FileFormatType.DBTEX && version.equals("3.0"))
       {
-         writer.print("\\dtl@db@datum@reconstruct{");
+         writer.print("\\dtldbdatumreconstruct{");
          writer.print(content.toString(parser));
          writer.print("}{");
 

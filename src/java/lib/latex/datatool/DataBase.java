@@ -373,12 +373,12 @@ public class DataBase
                   writer.print(name);
                   writer.println("}%");
 
-                  writer.println("\\DTLreconstructdata");
+                  writer.println("\\DTLreconstructdbdata");
                   writer.println("{% Header");
 
                   for (DataToolHeader header : headerRow)
                   {
-                     writer.print("\\dtl@db@header@reconstruct{");
+                     writer.print("\\dtldbheaderreconstruct{");
                      writer.print(header.getColumnIndex());
                      writer.print("}{");
                      writer.print(header.getColumnLabel());
@@ -408,7 +408,7 @@ public class DataBase
                   {
                      writer.print("% Row ");
                      writer.println(row.getRowIndex());
-                     writer.print("\\dtl@db@row@reconstruct{");
+                     writer.print("\\dtldbrowreconstruct{");
                      writer.print(row.getRowIndex());
                      writer.println("}%");
 
@@ -418,7 +418,7 @@ public class DataBase
 
                      for (DataToolEntry entry : row)
                      {
-                        writer.print("  \\dtl@db@col@reconstruct{");
+                        writer.print("  \\dtldbcolreconstruct{");
                         writer.print(entry.getColumnIndex());
                         writer.print("}% Column ");
                         writer.println(entry.getColumnIndex());
@@ -446,7 +446,7 @@ public class DataBase
                         }
                         else
                         {
-                           writer.print("\\dtl@db@value@reconstruct{");
+                           writer.print("\\dtldbvaluereconstruct{");
                            writer.print(contents.toString(parser));
                            writer.print("}");
                         }
@@ -474,7 +474,7 @@ public class DataBase
 
                   for (DataToolHeader header : headerRow)
                   {
-                     writer.print("\\dtl@db@reconstruct@keyindex{");
+                     writer.print("\\dtldbreconstructkeyindex{");
                      writer.print(header.getColumnLabel());
                      writer.print("}{");
                      writer.print(header.getColumnIndex());

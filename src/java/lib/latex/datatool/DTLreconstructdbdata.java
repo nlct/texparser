@@ -24,14 +24,14 @@ import java.io.EOFException;
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.*;
 
-public class DTLreconstructdata extends ControlSequence
+public class DTLreconstructdbdata extends ControlSequence
 {
-   public DTLreconstructdata(DataToolSty sty)
+   public DTLreconstructdbdata(DataToolSty sty)
    {
-      this("DTLreconstructdata", sty);
+      this("DTLreconstructdbdata", sty);
    }
 
-   public DTLreconstructdata(String name, DataToolSty sty)
+   public DTLreconstructdbdata(String name, DataToolSty sty)
    {
       super(name);
       this.sty = sty;
@@ -40,7 +40,7 @@ public class DTLreconstructdata extends ControlSequence
    @Override
    public Object clone()
    {
-      return new DTLreconstructdata(getName(), sty);
+      return new DTLreconstructdbdata(getName(), sty);
    }
 
    @Override
@@ -49,13 +49,8 @@ public class DTLreconstructdata extends ControlSequence
    {
       TeXParserListener listener = parser.getListener();
 
-      listener.getTeXApp().warning(parser,
-       listener.getTeXApp().getMessage("datatool.warn.dbtex3exp"));
-
       parser.putControlSequence(true,
         new TextualContentCommand("__texparser_current_file_type_tl", "dbtex"));
-
-      parser.setCatCode(true, '@', TeXParser.TYPE_LETTER);
 
       String name = parser.expandToString(
         listener.getControlSequence("dtllastloadeddb"), stack);
@@ -131,11 +126,11 @@ public class DTLreconstructdata extends ControlSequence
          {
             markerCs = TeXParserUtils.popControlSequence(parser, headerArg);
 
-            if (!markerCs.getName().equals("dtl@db@header@reconstruct"))
+            if (!markerCs.getName().equals("dtldbheaderreconstruct"))
             {
                throw new TeXSyntaxException(parser,
                 TeXSyntaxException.ERROR_EXPECTED_BUT_FOUND, 
-                 "\\dtl@db@header@reconstruct", markerCs);
+                 "\\dtldbheaderreconstruct", markerCs);
             }
          }
          catch (EOFException e)
@@ -190,11 +185,11 @@ public class DTLreconstructdata extends ControlSequence
             break;
          }
 
-         if (!TeXParserUtils.isControlSequence(obj, "dtl@db@row@reconstruct"))
+         if (!TeXParserUtils.isControlSequence(obj, "dtldbrowreconstruct"))
          {
             throw new TeXSyntaxException(parser,
              TeXSyntaxException.ERROR_EXPECTED_BUT_FOUND, 
-              "\\dtl@db@row@reconstruct", obj);
+              "\\dtldbrowreconstruct", obj);
          }
 
          int rowIdx = popInt(parser, contentArg);
@@ -220,11 +215,11 @@ public class DTLreconstructdata extends ControlSequence
                break;
             }
 
-            if (!TeXParserUtils.isControlSequence(obj, "dtl@db@col@reconstruct"))
+            if (!TeXParserUtils.isControlSequence(obj, "dtldbcolreconstruct"))
             {
                throw new TeXSyntaxException(parser,
                 TeXSyntaxException.ERROR_EXPECTED_BUT_FOUND, 
-                 "\\dtl@db@col@reconstruct", obj);
+                 "\\dtldbcolreconstruct", obj);
             }
 
             int colIdx = popInt(parser, rowContent);
@@ -239,12 +234,12 @@ public class DTLreconstructdata extends ControlSequence
             {
                String csname = ((ControlSequence)obj).getName();
 
-               if (csname.equals("dtl@db@value@reconstruct"))
+               if (csname.equals("dtldbvaluereconstruct"))
                {
                   cellContent.popStack(parser);
                   value = TeXParserUtils.popArg(parser, cellContent);
                }
-               else if (csname.equals("dtl@db@datum@reconstruct"))
+               else if (csname.equals("dtldbdatumreconstruct"))
                {
                   cellContent.popStack(parser);
 
@@ -320,11 +315,11 @@ public class DTLreconstructdata extends ControlSequence
          {
             markerCs = TeXParserUtils.popControlSequence(parser, mapArg);
 
-            if (!markerCs.getName().equals("dtl@db@reconstruct@keyindex"))
+            if (!markerCs.getName().equals("dtldbreconstructkeyindex"))
             {
                throw new TeXSyntaxException(parser,
                 TeXSyntaxException.ERROR_EXPECTED_BUT_FOUND, 
-                 "\\dtl@db@reconstruct@keyindex", markerCs);
+                 "\\dtldbreconstructkeyindex", markerCs);
             }
          }
          catch (EOFException e)
