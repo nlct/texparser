@@ -150,7 +150,7 @@ public class TeXFloatingPoint extends AbstractTeXObject implements TeXNumber
    @Override
    public String toString()
    {
-      return String.format("%s[value=%d]",
+      return String.format("%s[value=%f]",
          getClass().getSimpleName(), value);
    }
 

@@ -80,7 +80,7 @@ public class DataCurrencyElement extends DataRealElement
    @Override
    public String toString(TeXParser parser)
    {
-      return String.format("%s%0.2f", symbol.toString(parser), doubleValue());
+      return String.format("%s%.2f", symbol.toString(parser), doubleValue());
    }
 
    @Override
