@@ -116,6 +116,12 @@ public class UserGuideSty extends LaTeXSty
       addSemanticCommand("menufmt", TeXFontFamily.TT);
       registerControlSequence(new WidgetMenu("menu", "menusep"));
 
+      registerControlSequence(AccSuppObject.createSymbol(
+        listener, "tabsym", 0x21B9, "TAB", true));
+
+      registerControlSequence(AccSuppObject.createSymbol(
+        listener, "upsym", 0x2B71, "Up", true));
+
       addSemanticCommand("cbeg", TeXFontFamily.VERB, null, 
         listener.createString("\\begin{"), listener.getOther('}'));
       addSemanticCommand("cend", TeXFontFamily.VERB, null, 
@@ -1675,6 +1681,7 @@ public class UserGuideSty extends LaTeXSty
        null, def));
 
       registerControlSequence(new AtGobble("settabcolsep"));
+      registerControlSequence(new AtGobble("tcbset"));
 
       registerControlSequence(new AtFirstOfOne("textsmaller"));
       registerControlSequence(new AtFirstOfOne("textlarger"));
