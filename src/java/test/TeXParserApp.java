@@ -1602,6 +1602,10 @@ public class TeXParserApp implements TeXApp
                   {
                      debugMode = debugMode | TeXParser.DEBUG_READ;
                   }
+                  else if (mode.equals("settings"))
+                  {
+                     debugMode = debugMode | TeXParser.DEBUG_SETTINGS;
+                  }
                   else
                   {
                      throw new InvalidSyntaxException(

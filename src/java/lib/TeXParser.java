@@ -3818,11 +3818,21 @@ public class TeXParser extends TeXObjectList
    public void startGroup()
    {
       settings = new TeXSettings(settings, this);
+
+      if (isDebugMode(DEBUG_SETTINGS))
+      {
+        logMessage("START GROUP ID "+settings.getID());
+      }
    }
 
    public void endGroup()
     throws TeXSyntaxException
    {
+      if (isDebugMode(DEBUG_SETTINGS))
+      {
+        logMessage("ENDING GROUP ID "+settings.getID());
+      }
+
       if (settings.getParent() == null)
       {
          throw new TeXSyntaxException(this,
@@ -3832,8 +3842,18 @@ public class TeXParser extends TeXObjectList
       TeXObjectList afterGroup = settings.getAfterGroup();
       settings = settings.getParent();
 
+      if (isDebugMode(DEBUG_SETTINGS))
+      {
+        logMessage("RETURNING TO GROUP ID "+settings.getID());
+      }
+
       if (afterGroup != null)
       {
+         if (isDebugMode(DEBUG_SETTINGS))
+         {
+           logMessage("PUSHING AFTER GROUP CONTENT: "+afterGroup);
+         }
+
          addAll(0, afterGroup);
       }
    }
@@ -4321,6 +4341,7 @@ public class TeXParser extends TeXObjectList
    public static final int DEBUG_EXPANSION_ONCE_LIST = 8192;
    public static final int DEBUG_CATCODE = 16384;
    public static final int DEBUG_READ = 32768;
+   public static final int DEBUG_SETTINGS = 65536;
 
    public static final String VERSION = "0.9.8b.20231123";
    public static final String VERSION_DATE = "2023-11-23";

@@ -25,6 +25,7 @@ public class TeXSettings
 {
    private TeXSettings()
    {
+      settingsID = ++currentSettingID;
       activeTable = new Hashtable<Integer,ActiveChar>();
       csTable = new Hashtable<String,ControlSequence>();
    }
@@ -44,6 +45,11 @@ public class TeXSettings
    public TeXParser getParser()
    {
       return parser;
+   }
+
+   public long getID()
+   {
+      return settingsID;
    }
 
    public TeXSettings getRoot()
@@ -3217,5 +3223,8 @@ public class TeXSettings
    protected TeXObjectList afterGroup;
 
    protected CatCodeList[] catcodes=null;
+
+   private long settingsID = -1;
+   private static long currentSettingID=0;
 }
 
