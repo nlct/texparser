@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2023 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -77,7 +77,16 @@ public class Advance extends Primitive
 
       Numerical num = stack.popNumerical(parser);
 
-      ((NumericRegister)reg).advance(parser, num);
+      TeXSettings settings = parser.getSettings();
+
+      if (getPrefix() == PREFIX_GLOBAL)
+      {
+         settings.globalSetRegister(reg.getName(), num);
+      }
+      else
+      {
+         settings.localSetRegister(reg.getName(), num);
+      }
    }
 
    public void process(TeXParser parser)
