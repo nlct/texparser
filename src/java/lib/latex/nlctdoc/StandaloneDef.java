@@ -147,6 +147,28 @@ public class StandaloneDef extends AbstractGlsCommand
          }
       }
 
+      val = glslabel.getEntry().get("variants");
+
+      if (val != null)
+      {
+         if (list == null)
+         {
+            list = parser.getListener().createStack();
+         }
+         else
+         {
+            list.add(parser.getListener().getOther(';'));
+            list.add(parser.getListener().getSpace());
+         }
+
+         list.add(parser.getListener().getControlSequence("summarytagfmt"));
+         list.add(parser.getListener().createGroup("variants"));
+
+         list.add(parser.getListener().getControlSequence("code"));
+         list.add(parser.getListener().createGroup(
+           parser.expandToString(val, parser).replace(",", " ")));
+      }
+
       return list;
    }
 
@@ -176,6 +198,12 @@ public class StandaloneDef extends AbstractGlsCommand
       list.add(TeXParserUtils.createGroup(parser, note));
 
       return list;
+   }
+
+   protected void preNote(TeXObjectList content, GlsLabel glslabel,
+     TeXParser parser)
+    throws IOException
+   {
    }
 
    protected String getDefinitionCsName()
@@ -260,6 +288,11 @@ public class StandaloneDef extends AbstractGlsCommand
    {
    }
 
+   protected void initHook(GlsLabel glslabel, TeXParser parser, TeXObjectList stack)
+   throws IOException
+   {
+   }
+
    protected String getMainTag()
    {
       return "";
@@ -280,6 +313,8 @@ public class StandaloneDef extends AbstractGlsCommand
       TeXParserListener listener = parser.getListener();
 
       parser.startGroup();
+
+      initHook(glslabel, parser, stack);
 
       TeXObjectList content = listener.createStack();
       content.add(taggedBox);
@@ -351,6 +386,8 @@ public class StandaloneDef extends AbstractGlsCommand
                addRow(content, lb, parser, null);
             }
          }
+
+         preNote(content, glslabel, parser);
 
          TeXObject note = getNote(glslabel, parser);
 

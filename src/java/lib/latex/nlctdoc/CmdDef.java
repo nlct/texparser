@@ -86,6 +86,55 @@ public class CmdDef extends StandaloneDef
    }
 
    @Override
+   protected void initHook(GlsLabel glslabel, TeXParser parser, TeXObjectList stack)
+   throws IOException
+   {
+      parser.putControlSequence(true, new GenericCommand(true, 
+       "explTFsuffix", null, 
+        TeXParserUtils.createStack(parser, 
+          new TeXCsRef("@explboolsyntaxfmt"),
+          parser.getListener().createGroup("TF"))));
+   }
+
+   @Override
+   protected void preNote(TeXObjectList content, GlsLabel glslabel,
+     TeXParser parser)
+    throws IOException
+   {
+      GlossaryEntry entry = glslabel.getEntry();
+
+      if (entry != null)
+      {
+         TeXObject value = entry.get("explsuffix");
+
+         if (value != null && !value.isEmpty())
+         {
+            Group grp = parser.getListener().createGroup();
+            content.add(grp);
+
+            grp.add(parser.getListener().getControlSequence("def"));
+            grp.add(new TeXCsRef("explsuffix"));
+            grp.add(parser.getListener().createGroup(
+              parser.expandToString(value, parser)));
+
+            grp.add(parser.getListener().getControlSequence("def"));
+            grp.add(new TeXCsRef("explTFsuffix"));
+            grp.add(parser.getListener().createGroup());
+
+            grp.add(parser.getListener().getControlSequence("def"));
+            grp.add(new TeXCsRef("TFsuffix"));
+            grp.add(parser.getListener().createGroup());
+
+            grp.add(parser.getListener().getControlSequence("newline"));
+            grp.add(parser.getListener().getControlSequence("code"));
+
+            grp.add(TeXParserUtils.createGroup(parser,
+             entry.get("name"), entry.get("syntax")));
+         }
+      }
+   }
+
+   @Override
    protected ControlSequence getNoteFmt(TeXParser parser)
    {
       return parser.getControlSequence("cmdnotefmt");

@@ -147,6 +147,28 @@ public class SummaryBox extends AbstractGlsCommand
          list.add(TeXParserUtils.createGroup(parser, alias));
       }
 
+      val = glslabel.getEntry().get("variants");
+
+      if (val != null)
+      {
+         if (list == null)
+         {
+            list = parser.getListener().createStack();
+         }
+         else
+         {
+            list.add(parser.getListener().getOther(';'));
+            list.add(parser.getListener().getSpace());
+         }
+
+         list.add(parser.getListener().getControlSequence("summarytagfmt"));
+         list.add(parser.getListener().createGroup("variants"));
+
+         list.add(parser.getListener().getControlSequence("code"));
+         list.add(parser.getListener().createGroup(
+           parser.expandToString(val, parser).replace(",", " ")));
+      }
+
       int n = (list == null ? 0 : list.size());
 
       list = addStatus(list, glslabel, parser);
@@ -187,6 +209,12 @@ public class SummaryBox extends AbstractGlsCommand
    protected TeXObject getNote(GlsLabel glslabel, TeXParser parser)
    {
       return glslabel.getField("note");
+   }
+
+   protected void preNote(TeXObjectList content, GlsLabel glslabel,
+     TeXParser parser)
+    throws IOException
+   {
    }
 
    protected void addRow(TeXObjectList list, GlsLabel glslabel, 
@@ -275,6 +303,11 @@ public class SummaryBox extends AbstractGlsCommand
    {
    }
 
+   protected void initHook(GlsLabel glslabel, TeXParser parser, TeXObjectList stack)
+   throws IOException
+   {
+   }
+
    @Override
    public void process(TeXParser parser, TeXObjectList stack)
    throws IOException
@@ -286,6 +319,10 @@ public class SummaryBox extends AbstractGlsCommand
       GlsLabel glslabel = popEntryLabel("glscurrententrylabel", parser, stack);
 
       postArgHook(glslabel, parser, stack);
+
+      parser.startGroup();
+
+      initHook(glslabel, parser, stack);
 
       TeXParserListener listener = parser.getListener();
 
@@ -337,6 +374,8 @@ public class SummaryBox extends AbstractGlsCommand
 
          addRow(content, glslabel, parser, stack, modList);
 
+         preNote(content, glslabel, parser);
+
          TeXObject note = getNote(glslabel, parser);
 
          if (note != null)
@@ -352,6 +391,8 @@ public class SummaryBox extends AbstractGlsCommand
       }
 
       TeXParserUtils.process(substack, parser, stack);
+
+      parser.endGroup();
    }
 
    @Override

@@ -77,6 +77,29 @@
     \desc{another minor command}
   }
   \gcmd{@internal@foo}{\desc{an internal command}}
+  \gcmd{foo\-bar\-tl}
+  {%
+    \initvalcs{cs.space}
+    \desc{sample command that is initialised to expand to backslash
+space}
+  }
+  \gfn{foo\dsb test}{nn}{VV,vv}
+  {
+    \syntax{\ \margm{tl1} \margm{tl2}}
+    \desc{a \LaTeX3 command that takes two arguments with variants}
+  }
+  \gexplpred{foo\dsb if\dsb exist}{n}
+   {
+    \syntax{\ \margm{tl} \TFsyntax}
+    \desc{conditional and predicate}
+   }
+  \gexplcond{foo\dsb if\dsb eq}{nn}
+   {
+    \syntax{\ \margm{tl1} \margm{tl2} \TFsyntax}
+    \desc{conditional but no predicate}
+   }
+% index only command
+  \gcmd{cs.space}{\name{\csfmt{\textvisiblespace}}}% "\ "
 % package
   \gpkg{foobarsty}
   {%
@@ -331,6 +354,24 @@ Another command.
 
 \cmddef{fooname}
 A language-sensitive command.
+
+\cmddef{foobartl}
+Some token list type of command that expands to \gls{cs.space}
+(backslash space).
+
+\cmddef{footest}
+A \LaTeX3 function that has variants \expfunc{footest}{VV} and
+\expfunc{footest}{vv}.
+
+\cmddef{fooifexist:n}
+A conditional \gls{fooifexist:n}, which may also be
+\condcsT{fooifexist:n} or \condcsF{fooifexist:n}, and predicate
+\predcs{fooifexist:n}.
+
+\cmddef{fooifeq:nn}
+A conditional \gls{fooifeq:nn}, which may also be
+\condcsT{fooifeq:nn} or \condcsF{fooifeq:nn}, but there's no
+predicate.
 
 A deprecated command:
 

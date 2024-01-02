@@ -48,7 +48,7 @@ public class UserGuideSty extends LaTeXSty
 
       if (listener instanceof L2HConverter)
       {
-         ((L2HConverter)listener).addCssStyle("dfn { font-style: normal; font-weight: bold; } a { text-decoration: none; } a:hover { text-decoration: underline; } div.tablefns { border-top: solid; } div.example { border-bottom: solid silver; padding: 20px; } div.example div.title { font-weight: bold; font-size: large; } .pageimage { padding: 10px; vertical-align: top; }");
+         ((L2HConverter)listener).addCssStyle("dfn { font-style: normal; font-weight: bold; } a { text-decoration: none; } a:hover { text-decoration: underline; } div.tablefns { border-top: solid; } div.example { border-bottom: solid silver; padding: 20px; } div.example div.title { font-weight: bold; font-size: large; } .pageimage { padding: 10px; vertical-align: top; } .boolsuffix { text-decoration: underline; }");
       }
 
       glossariesSty.setModifier(listener.getOther('+'), "format",
@@ -218,6 +218,27 @@ public class UserGuideSty extends LaTeXSty
       registerControlSequence(new TextualContentCommand("cmddefbookmarkleveloffset", "1"));
 
       registerControlSequence(new MainGlsAdd(glossariesSty));
+
+      registerControlSequence(new ExpFunc(glossariesSty));
+      registerControlSequence(new PredCs(glossariesSty));
+
+      registerControlSequence(new TextualContentCommand("explsuffix", ""));
+      registerControlSequence(new TextualContentCommand("explTFsuffix", "TF"));
+
+      registerControlSequence(new CondCs("condcsT", "T", glossariesSty));
+      registerControlSequence(new CondCs("condcsF", "F", glossariesSty));
+
+      registerControlSequence(new GenericCommand(true,
+        "TFsyntax", null, TeXParserUtils.createStack(listener, 
+         new TeXCsRef("margm"), listener.createGroup("true"),
+         listener.getSpace(),
+         new TeXCsRef("margm"), listener.createGroup("false")
+       )));
+
+      addSemanticCommand("@explboolsyntaxfmt",
+       "boolsuffix", new TeXFontText(TeXFontShape.EM),
+        null, null, null, null, null, true, false);
+
 
       addSemanticCommand("longargfmt", TeXFontFamily.TT,
         null, new TeXCsRef("longswitch"), null);
@@ -1452,6 +1473,7 @@ public class UserGuideSty extends LaTeXSty
           new TeXCsRef("label"), listener.createGroup("sec:listofexamples"))));
 
       registerControlSequence(new ListOfExamples());
+      registerControlSequence(new ListOfExamplesHeader());
 
       registerControlSequence(new GenericCommand(true,
         "nlctexampletag", null, TeXParserUtils.createStack(listener,

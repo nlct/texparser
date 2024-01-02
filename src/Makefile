@@ -89,7 +89,7 @@ test-datatool : app tests/output
 
 test-datatool-v3 : app tests/output
 	rm -f -r tests/output/test-datatool-v3
-	bin/texparsertest --debug --in tests/test-datatool-v3/test-datatool-v3.tex --output tests/output/test-datatool-v3 --html
+	bin/texparsertest --debug-mode process-generic-cs,expansion,process,process-stack,io --log tests/output/test-datatool-v3.log --in tests/test-datatool-v3/test-datatool-v3.tex --output tests/output/test-datatool-v3 --html
 
 test-jmlr	: app tests/output
 	rm -f -r tests/output/test-jmlr

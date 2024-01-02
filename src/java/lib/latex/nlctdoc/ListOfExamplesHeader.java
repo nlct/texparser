@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2022 Nicola L.C. Talbot
+    Copyright (C) 2024 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -19,21 +19,18 @@
 package com.dickimawbooks.texparserlib.latex.nlctdoc;
 
 import java.io.IOException;
-import java.awt.Color;
-import java.util.Vector;
 
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.*;
-import com.dickimawbooks.texparserlib.latex.glossaries.*;
 
-public class ListOfExamples extends ControlSequence
+public class ListOfExamplesHeader extends ControlSequence
 {
-   public ListOfExamples()
+   public ListOfExamplesHeader()
    {
-      this("listofexamples");
+      this("listofexamplesheader");
    }
 
-   public ListOfExamples(String name)
+   public ListOfExamplesHeader(String name)
    {
       super(name);
    }
@@ -41,7 +38,7 @@ public class ListOfExamples extends ControlSequence
    @Override
    public Object clone()
    {
-      return new ListOfExamples(getName());
+      return new ListOfExamplesHeader(getName());
    }
 
    @Override
@@ -50,36 +47,32 @@ public class ListOfExamples extends ControlSequence
    {
       TeXParserListener listener = parser.getListener();
 
-      boolean isStar = popModifier(parser, stack, '*') == '*';
-
       TeXObjectList substack = listener.createStack();
+      substack.add(listener.getPar());
 
-      ControlSequence cs = parser.getControlSequence("chapter");
+      substack.add(listener.createString("If an example shows the icon "));
+      substack.add(listener.getControlSequence("exampledownloadtexicon"));
+      substack.add(listener.createString(" then you can click on that icon to try downloading the example source code from a location relative to this document. You can also try using: "));
 
-      if (cs == null)
-      {
-         cs = listener.getControlSequence("section");
-      }
+      substack.add(listener.getControlSequence("texdocref"));
 
-      substack.add(cs);
+      Group grp = listener.createGroup();
+      substack.add(grp);
 
-      if (isStar)
-      {
-         substack.add(listener.getOther('*'));
-      }
+      grp.add(listener.createString("-l "));
+      grp.add(listener.getControlSequence("jobname"));
+      grp.add(listener.createString("-example"));
+      grp.add(listener.getControlSequence("meta"));
+      grp.add(listener.createGroup("nnn"));
 
-      substack.add(listener.getControlSequence("listofexamplesname"));
+      substack.add(listener.createString(
+       "where "));
+      substack.add(listener.getControlSequence("meta"));
+      substack.add(listener.createGroup("nnn"));
+      substack.add(listener.createString(
+       " is the example number zero-padded to three digits to find out if the example files are installed on your device. "));
 
-      if (!isStar)
-      {
-         substack.add(TeXParserUtils.expandOnce(
-           listener.getControlSequence("listofexampleslabel"), parser, stack), true);
-      }
-
-      substack.add(listener.getControlSequence("listofexamplesheader"));
-
-      substack.add(listener.getControlSequence("@starttoc"));
-      substack.add(listener.createGroup("loe"));
+      substack.add(listener.getPar());
 
       TeXParserUtils.process(substack, parser, stack);
    }
