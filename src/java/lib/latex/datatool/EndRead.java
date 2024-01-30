@@ -23,52 +23,36 @@ import java.io.IOException;
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.*;
 
-public class DTLread extends ControlSequence
+public class EndRead extends ControlSequence
 {
-   public DTLread(DataToolSty sty)
+   public EndRead()
    {
-      this("DTLread", sty);
+      this("__texparser_end_read");
    }
 
-   public DTLread(String name, DataToolSty sty)
+   public EndRead(String name)
    {
       super(name);
-      this.sty = sty;
    }
 
    @Override
    public Object clone()
    {
-      return new DTLread(getName(), sty);
+      return this;
    }
 
    @Override
    public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      KeyValList options = TeXParserUtils.popOptKeyValList(parser, stack);
-
-      String filename = popLabelString(parser, stack);
-
-      TeXParserListener listener = parser.getListener();
-      TeXApp texApp = listener.getTeXApp();
+      ControlSequence cs = parser.getControlSequence("dtllastloadeddb");
 
       parser.startGroup();
 
-      if (options != null)
+      if (cs != null)
       {
-         sty.processIOKeys(options, stack);
+         parser.putControlSequence(true, cs);
       }
-
-      IOSettings settings = IOSettings.fetchReadSettings(sty, parser, stack);
-
-      String defExt = settings.getDefaultExtension();
-
-      TeXPath texPath = new TeXPath(parser, filename, defExt, false);
-
-      stack.push(new EndRead());
-
-      DataBase.read(sty, texPath, settings, parser, stack);
    }
 
    @Override
@@ -78,5 +62,4 @@ public class DTLread extends ControlSequence
       process(parser, parser);
    }
 
-   protected DataToolSty sty;
 }

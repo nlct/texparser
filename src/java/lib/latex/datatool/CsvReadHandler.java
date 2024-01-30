@@ -28,7 +28,7 @@ import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.latex3.PropertyCommand;
 
 /**
- * FileMapHandler used to read CSV files by DataBase.read().
+ * The FileMapHandler used to read CSV files by DataBase.read().
  * This is designed to approximate the way that <code>\DTLread</code>
  * parses a CSV file, although there may be some differences.
  */

@@ -250,6 +250,9 @@ public class DataBase
                  DataToolSty.ERROR_DB_EXISTS, name);
             }
 
+            parser.putControlSequence(true, 
+              new TextualContentCommand("dtllastloadeddb", name));
+
             int separator = settings.getSeparator();
             int delimiter = settings.getDelimiter();
 
