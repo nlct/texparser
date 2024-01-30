@@ -81,11 +81,11 @@ public class Advance extends Primitive
 
       if (getPrefix() == PREFIX_GLOBAL)
       {
-         settings.globalSetRegister(reg.getName(), num);
+         settings.globalAdvanceRegister(reg.getName(), num);
       }
       else
       {
-         settings.localSetRegister(reg.getName(), num);
+         settings.localAdvanceRegister(reg.getName(), num);
       }
    }
 
