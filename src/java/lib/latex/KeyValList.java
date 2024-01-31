@@ -61,11 +61,21 @@ public class KeyValList extends HashMap<String,TeXObject>
          throw new NullPointerException();
       }
 
+      if (object instanceof CsvList)
+      {
+         return ((CsvList)object).toKeyValList(parser);
+      }
+
       KeyValList keyValList = new KeyValList();
 
       if (object instanceof TeXObjectList)
       {
          TeXObjectList list = (TeXObjectList)object;
+
+         if (list.size() == 1 && (list.firstElement() instanceof CsvList))
+         {
+            return ((CsvList)list.firstElement()).toKeyValList(parser);
+         }
 
          list.stripIgnoreables();
 
@@ -240,6 +250,21 @@ public class KeyValList extends HashMap<String,TeXObject>
                   TeXSyntaxException.ERROR_NUMBER_EXPECTED, strVal);
       }
    }
+
+   // Returns null if option not in list
+   public String getString(String key, TeXParser parser,
+     TeXObjectList stack) throws IOException
+   {
+      TeXObject obj = getValue(key);
+
+      if (obj == null)
+      {
+         return null;
+      }
+
+      return parser.expandToString(obj, stack);
+   }
+
 
    // Returns null if option not in list
    public Boolean getBoolean(String key, TeXParser parser,

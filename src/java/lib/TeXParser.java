@@ -521,6 +521,12 @@ public class TeXParser extends TeXObjectList
         && ((TeXObjectList)obj).isStack());
    }
 
+   public boolean isGroup(Object obj)
+   {
+      return (obj != null && obj instanceof Group
+               && !((Group)obj).isMathGroup());
+   }
+
    public boolean isUndefined(Object obj)
    {
       return (obj == null || obj instanceof Undefined);
@@ -4343,6 +4349,6 @@ public class TeXParser extends TeXObjectList
    public static final int DEBUG_READ = 32768;
    public static final int DEBUG_SETTINGS = 65536;
 
-   public static final String VERSION = "0.9.9b-20240130";
-   public static final String VERSION_DATE = "2024-01-30";
+   public static final String VERSION = "0.9.9b-20240131";
+   public static final String VERSION_DATE = "2024-01-31";
 }

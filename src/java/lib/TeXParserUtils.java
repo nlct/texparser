@@ -547,13 +547,27 @@ public class TeXParserUtils
          return (KeyValList)arg;
       }
 
+      if (arg instanceof CsvList)
+      {
+         return ((CsvList)arg).toKeyValList(parser);
+      }
+
       if (parser.isStack(arg))
       {
          TeXObjectList list = (TeXObjectList)arg;
 
-         if (list.size() == 1 && list.firstElement() instanceof KeyValList)
+         if (list.size() == 1)
          {
-            return (KeyValList)list.firstElement();
+            TeXObject firstElem = list.firstElement();
+
+            if (firstElem instanceof KeyValList)
+            {
+               return (KeyValList)list.firstElement();
+            }
+            else if (firstElem instanceof CsvList)
+            {
+               return ((CsvList)firstElem).toKeyValList(parser);
+            }
          }
       }
 

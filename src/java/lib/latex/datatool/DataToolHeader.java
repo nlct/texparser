@@ -31,13 +31,19 @@ public class DataToolHeader extends AbstractTeXObject implements TeXObject
    }
 
    public DataToolHeader(DataToolSty sty,
-     int column, String key, byte type, TeXObject title)
+     int column, String key, DatumType type, TeXObject title)
    {
       this.sty = sty;
       setColumnIndex(column);
       setColumnLabel(key);
       setType(type);
       setTitle(title);
+   }
+
+   public DataToolHeader(DataToolSty sty,
+     int column, String key, byte btype, TeXObject title)
+   {
+      this(sty, column, key, DatumType.toDatumType(btype), title);
    }
 
    @Override
@@ -74,6 +80,11 @@ public class DataToolHeader extends AbstractTeXObject implements TeXObject
 
    public byte getType()
    {
+      return (byte)type.getValue();
+   }
+
+   public DatumType getDataType()
+   {
       return type;
    }
 
@@ -84,19 +95,19 @@ public class DataToolHeader extends AbstractTeXObject implements TeXObject
 
       switch (type)
       {
-         case TYPE_STRING:
+         case STRING:
            cs = parser.getControlSequence("c_datatool_string_int");
          break;
 
-         case TYPE_INT:
+         case INTEGER:
            cs = parser.getControlSequence("c_datatool_integer_int");
          break;
 
-         case TYPE_REAL:
+         case DECIMAL:
            cs = parser.getControlSequence("c_datatool_decimal_int");
          break;
 
-         case TYPE_CURRENCY:
+         case CURRENCY:
            cs = parser.getControlSequence("c_datatool_currency_int");
          break;
 
@@ -109,23 +120,17 @@ public class DataToolHeader extends AbstractTeXObject implements TeXObject
          return (TeXNumber)cs;
       }
 
-      return new UserNumber(type);
+      return new UserNumber(type.getValue());
+   }
+
+   public void setType(DatumType newType)
+   {
+      type = newType;
    }
 
    public void setType(byte newType)
    {
-      switch (newType)
-      {
-         case TYPE_UNDEF:
-         case TYPE_STRING:
-         case TYPE_INT:
-         case TYPE_REAL:
-         case TYPE_CURRENCY:
-            this.type = newType;
-         break;
-         default:
-            throw new IllegalArgumentException("Invalid data type "+newType);
-      }
+      setType(DatumType.toDatumType(newType));
    }
 
    public void updateType(DataElement element)
@@ -134,20 +139,20 @@ public class DataToolHeader extends AbstractTeXObject implements TeXObject
 
       switch (type)
       {
-         case TYPE_UNDEF:
-         case TYPE_INT:
-           type = newType;
+         case UNKNOWN:
+         case INTEGER:
+           setType(newType);
          break;
-         case TYPE_REAL:
+         case DECIMAL:
            if (newType != TYPE_INT)
            {
-              type = newType;
+              setType(newType);
            }
          break;
-         case TYPE_CURRENCY:
+         case CURRENCY:
            if (newType == TYPE_STRING)
            {
-              type = newType;
+              setType(newType);
            }
          break;
       }
@@ -275,10 +280,7 @@ public class DataToolHeader extends AbstractTeXObject implements TeXObject
 
       list.add(new TeXCsRef("db@type@id@w"));
 
-      if (type != TYPE_UNDEF)
-      {
-         list.add(new UserNumber(type));
-      }
+      list.add(new UserNumber(type.getValue()));
 
       list.add(new TeXCsRef("db@type@id@end@"));
 
@@ -386,7 +388,7 @@ public class DataToolHeader extends AbstractTeXObject implements TeXObject
 
    public String toString()
    {
-      return String.format("%s[column=%d,key=%s,type=%d,title=%s]",
+      return String.format("%s[column=%d,key=%s,type=%s,title=%s]",
          getClass().getSimpleName(), column, key, type, title);
    }
 
@@ -394,7 +396,7 @@ public class DataToolHeader extends AbstractTeXObject implements TeXObject
 
    private int column;
    private String key;
-   private byte type;
+   private DatumType type;
    private TeXObject title;
 
    public static final byte TYPE_UNDEF=-1;

@@ -159,6 +159,7 @@ There is NO WARRANTY, to the extent permitted by law.</entry>
 <entry key="latex.error.multi_cls">Only one \documentclass permitted</entry>
 <entry key="latex.error.missing_key">Missing ''{0}'' key</entry>
 <entry key="latex.error.missing_key_value">Missing value for ''{0}'' key</entry>
+<entry key="latex.error.missing_or">Missing ''{0}'' or ''{1}''</entry>
 <entry key="latex.error.extra_end">Extra \end'{'{0}'}' found</entry>
 <entry key="latex.error.unaccessible">Unaccessible ''{0}''</entry>
 <entry key="latex.error.defined">''{0}'' already defined</entry>
@@ -172,6 +173,7 @@ There is NO WARRANTY, to the extent permitted by law.</entry>
 <entry key="latex.error.counter.out.of.range">Counter value {0} out of valid range ({1})</entry>
 <entry key="latex.unsupported.xparse_type">Unsupported xparse type {0} in command {1}</entry>
 <entry key="latex.unknown.option">Unknown option ''{0}'' in {1}</entry>
+<entry key="latex.invalid.option.value">Invalid value ''{1}'' in {0}={1}</entry>
 <entry key="latex.not.sequence">Not a sequence command: {0}</entry>
 <entry key="latex.not.tokenlist">Not a token list command: {0}</entry>
 <entry key="latex.not.boolean">Not a boolean command: {0}</entry>
@@ -213,13 +215,14 @@ There is NO WARRANTY, to the extent permitted by law.</entry>
 <entry key="datatool.header.doesnt_exist">Header ''{0}'' doesn''t exist.</entry>
 <entry key="datatool.row.not.found">Row index ''{0}'' doesn''t exist.</entry>
 <entry key="datatool.loaddb.message">Database ''{0}'' loaded from ''{1}'' (column count={2}, row count={3}).</entry>
-<entry key="datatool.index.outofrange">List index ''{0}'' out of range.</entry>
+<entry key="datatool.index.outofrange">Index ''{0}'' out of range.</entry>
 <entry key="datatool.no.columns">No columns available for database ''{0}''</entry>
 <entry key="datatool.file_info">Identified file format {0} version {1} (encoding {2})</entry>
 <entry key="datatool.file_info_failed">Failed to parse file identifier on first line of file {0} (assuming {1})</entry>
 <entry key="datatool.unknown_file_format_version">Unknown version ''{0}'' of file format ''{1}''</entry>
 <entry key="datatool.write.comment">Created by {0} version {1} on {2, date, yyyy-MM-dd HH:mm:ss Z}</entry>
 <entry key="datatool.warn.dbtex3exp">Detected DBTEX v3.0 experimental format. Resave database file as DBTEX v3.0</entry>
+<entry key="datatool.unsupported.action">Unsupported action: ''{0}''</entry>
 
 <!--  ifthen messages -->
 

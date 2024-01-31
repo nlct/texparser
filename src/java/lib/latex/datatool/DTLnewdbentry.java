@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2024 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -44,67 +44,18 @@ public class DTLnewdbentry extends ControlSequence
    public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      TeXObject dbArg = stack.popArg(parser);
-
-      if (dbArg instanceof Expandable)
-      {
-         TeXObjectList expanded = ((Expandable)dbArg).expandfully(parser, stack);
-
-         if (expanded != null)
-         {
-            dbArg = expanded;
-         }
-      }
-
-      TeXObject keyArg = stack.popArg(parser);
-
-      if (keyArg instanceof Expandable)
-      {
-         TeXObjectList expanded = ((Expandable)keyArg).expandfully(parser, stack);
-
-         if (expanded != null)
-         {
-            keyArg = expanded;
-         }
-      }
+      String dbName = popLabelString(parser, stack);
+      String key = popLabelString(parser, stack);
 
       TeXObject valueArg = stack.popArg(parser);
 
-      sty.addNewEntry(dbArg.toString(parser), 
-         keyArg.toString(parser), valueArg);
+      sty.addNewEntry(dbName, key, valueArg);
    }
 
    public void process(TeXParser parser)
      throws IOException
    {
-      TeXObject dbArg = parser.popNextArg();
-
-      if (dbArg instanceof Expandable)
-      {
-         TeXObjectList expanded = ((Expandable)dbArg).expandfully(parser);
-
-         if (expanded != null)
-         {
-            dbArg = expanded;
-         }
-      }
-
-      TeXObject keyArg = parser.popNextArg();
-
-      if (keyArg instanceof Expandable)
-      {
-         TeXObjectList expanded = ((Expandable)keyArg).expandfully(parser);
-
-         if (expanded != null)
-         {
-            keyArg = expanded;
-         }
-      }
-
-      TeXObject valueArg = parser.popNextArg();
-
-      sty.addNewEntry(dbArg.toString(parser), 
-         keyArg.toString(parser), valueArg);
+      process(parser, parser);
    }
 
    protected DataToolSty sty;

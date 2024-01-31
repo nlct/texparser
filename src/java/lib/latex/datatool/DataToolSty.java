@@ -69,6 +69,8 @@ public class DataToolSty extends LaTeXSty
       registerControlSequence(new DTLsetseparator(this));
       registerControlSequence(new DTLsettabseparator(this));
 
+      registerControlSequence(new DTLaction(this));
+
       registerControlSequence(
          new DTLsetExpansion("dtlexpandnewvalue", true, this));
       registerControlSequence(
@@ -355,8 +357,31 @@ public class DataToolSty extends LaTeXSty
          databases = new ConcurrentHashMap<String,DataBase>();
       }
 
+      latestDatabase = db;
+
       databases.put(name, db);
       return db;
+   }
+
+   public DataBase getLatestDataBase()
+   {
+      return latestDatabase;
+   }
+
+   public void clearLatestDataBase()
+   {
+      latestDatabase = null;
+   }
+
+   public void setLatestDataBase(DataBase db)
+   {
+      latestDatabase = db;
+   }
+
+   public void setLatestDataBase(String name)
+      throws IOException
+   {
+      latestDatabase = getDataBase(name);
    }
 
    public DataBase getDataBase(String name)
@@ -966,10 +991,6 @@ public class DataToolSty extends LaTeXSty
       {
          processIOKeys(value, stack);
       }
-      else if (key.equals("action"))
-      {
-         processActionKeys(value, stack);
-      }
       else if (key.equals("display"))
       {
          processDisplayKeys(value, stack);
@@ -1342,16 +1363,6 @@ public class DataToolSty extends LaTeXSty
             setSeparator(str.codePointAt(0));
          }
       }
-   }
-
-   public void processActionKeys(TeXObject arg, TeXObjectList stack)
-   throws IOException
-   {
-      TeXParser parser = getParser();
-
-      KeyValList options = TeXParserUtils.toKeyValList(arg, parser);
-
-// TODO
    }
 
    public void processDisplayKeys(TeXObject arg, TeXObjectList stack)
@@ -3013,6 +3024,8 @@ public class DataToolSty extends LaTeXSty
    private DataToolBaseSty dataToolBaseSty;
 
    private ConcurrentHashMap<String,DataBase> databases;
+
+   private DataBase latestDatabase = null;
 
    private Vector<FileLoadedListener> fileLoadedListeners;
 

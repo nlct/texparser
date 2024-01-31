@@ -47,6 +47,8 @@ public class LaTeXSyntaxException extends TeXSyntaxException
       "latex.error.missing_key";
    public static final String ERROR_MISSING_KEY_VALUE = 
       "latex.error.missing_key_value";
+   public static final String ERROR_MISSING_OR = 
+      "latex.error.missing_or";
    public static final String ERROR_EXTRA_END = 
       "latex.error.extra_end";
    public static final String ERROR_UNACCESSIBLE = 
@@ -85,4 +87,6 @@ public class LaTeXSyntaxException extends TeXSyntaxException
    "latex.not.boolean";
    public static final String ERROR_TRAILING_CONTENT =
    "latex.trailing_content";
+   public static final String ERROR_INVALID_OPTION_VALUE =
+   "latex.invalid.option.value";
 }

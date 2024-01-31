@@ -86,6 +86,92 @@ public class CsvList extends DataObjectList
       }
    }
 
+   public KeyValList toKeyValList(TeXParser parser) throws IOException
+   {
+      KeyValList keyValList = new KeyValList();
+
+      for (int i = 0; i < size(); i++)
+      {
+         TeXObject elem = get(i);
+
+         if (elem.isEmpty())
+         {
+            continue;
+         }
+
+         TeXObjectList elemList = TeXParserUtils.toList(elem, parser);
+
+         TeXObjectList keyList = parser.getListener().createStack();
+         TeXObjectList valList = null;
+
+         for (int j = 0; j < elemList.size(); j++)
+         {
+            elem = elemList.get(i);
+
+            if (elem instanceof WhiteSpace && keyList.isEmpty())
+            {
+               continue;
+            }
+
+            if (elem instanceof CharObject)
+            {
+               int cp = ((CharObject)elem).getCharCode();
+
+               if (cp == '=')
+               {
+                  valList = parser.getListener().createStack();
+                  continue;
+               }
+            }
+
+            if (valList == null)
+            {
+               keyList.add(elem);
+            }
+            else if (!(elem instanceof WhiteSpace && valList.isEmpty()))
+            {
+               valList.add(elem);
+            }
+         }
+
+         String key = parser.expandToString(keyList, valList).trim();
+
+         if (!key.isEmpty())
+         {
+            // Don't add empty keys
+
+            if (valList == null)
+            {
+               keyValList.put(key, new MissingValue());
+            }
+            else
+            {
+               valList.trimTrailing();
+
+               if (valList.size() == 1)
+               {
+                  elem = valList.firstElement();
+
+                  if (parser.isGroup(elem))
+                  {
+                     keyValList.put(key, ((Group)elem).toList());
+                  }
+                  else
+                  {
+                     keyValList.put(key, elem);
+                  }
+               }
+               else
+               {
+                  keyValList.put(key, valList);
+               }
+            }
+         }
+      }
+
+      return keyValList;
+   }
+
    public TeXObject getSeparator(TeXParser parser)
    {
       return parser.getListener().getOther(',');

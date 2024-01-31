@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2024 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -44,42 +44,15 @@ public class DTLaddcolumn extends ControlSequence
    public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      TeXObject dbArg = stack.popArg(parser);
+      boolean isStar = (popModifier(parser, stack, '*') != -1);
 
-      boolean isStar = false;
+      String dbName = popLabelString(parser, stack);
 
-      if (dbArg instanceof CharObject
-        && ((CharObject)dbArg).getCharCode() == (int)'*')
-      {
-         isStar = true;
-         dbArg = stack.popArg(parser);
-      }
-
-      if (dbArg instanceof Expandable)
-      {
-         TeXObjectList expanded = ((Expandable)dbArg).expandfully(parser, stack);
-
-         if (expanded != null)
-         {
-            dbArg = expanded;
-         }
-      }
-
-      TeXObject keyArg = stack.popArg(parser);
-
-      if (keyArg instanceof Expandable)
-      {
-         TeXObjectList expanded = ((Expandable)keyArg).expandfully(parser, stack);
-
-         if (expanded != null)
-         {
-            keyArg = expanded;
-         }
-      }
+      String key = popLabelString(parser, stack);
 
       try
       {
-         sty.addNewColumn(dbArg.toString(parser), keyArg.toString(parser));
+         sty.addNewColumn(dbName, key);
       }
       catch (LaTeXSyntaxException e)
       {
@@ -93,50 +66,7 @@ public class DTLaddcolumn extends ControlSequence
    public void process(TeXParser parser)
      throws IOException
    {
-      TeXObject dbArg = parser.popNextArg();
-
-      boolean isStar = false;
-
-      if (dbArg instanceof CharObject
-        && ((CharObject)dbArg).getCharCode() == (int)'*')
-      {
-         isStar = true;
-         dbArg = parser.popNextArg();
-      }
-
-      if (dbArg instanceof Expandable)
-      {
-         TeXObjectList expanded = ((Expandable)dbArg).expandfully(parser);
-
-         if (expanded != null)
-         {
-            dbArg = expanded;
-         }
-      }
-
-      TeXObject keyArg = parser.popNextArg();
-
-      if (keyArg instanceof Expandable)
-      {
-         TeXObjectList expanded = ((Expandable)keyArg).expandfully(parser);
-
-         if (expanded != null)
-         {
-            keyArg = expanded;
-         }
-      }
-
-      try
-      {
-         sty.addNewColumn(dbArg.toString(parser), keyArg.toString(parser));
-      }
-      catch (LaTeXSyntaxException e)
-      {
-         if (!isStar)
-         {
-            throw (e);
-         }
-      }
+      process(parser, parser);
    }
 
    protected DataToolSty sty;

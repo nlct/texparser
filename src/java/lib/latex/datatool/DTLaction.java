@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2023 Nicola L.C. Talbot
+    Copyright (C) 2024 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -23,62 +23,34 @@ import java.io.IOException;
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.*;
 
-public class PostReadHook extends ControlSequence
+public class DTLaction extends ControlSequence
 {
-   public PostReadHook(DataToolSty sty, TeXPath texPath)
+   public DTLaction(DataToolSty sty)
    {
-      this("__texparser_post_read_hook", sty, texPath);
+      this("DTLaction", sty);
    }
 
-   public PostReadHook(String name, DataToolSty sty, TeXPath texPath)
+   public DTLaction(String name, DataToolSty sty)
    {
       super(name);
       this.sty = sty;
-      this.texPath = texPath;
    }
 
-   @Override
    public Object clone()
    {
-      return this;
+      return new DTLaction(getName(), sty);
    }
 
-   @Override
    public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      String fileType = "tex";
-      String fileVersion = "";
+      KeyValList options = TeXParserUtils.popOptKeyValList(parser, stack);
 
-      ControlSequence fileTypeCs = parser.getControlSequence("__texparser_current_file_type_tl");
-      ControlSequence fileVersionCs = parser.getControlSequence("__texparser_current_file_version_tl");
+      String action = popLabelString(parser, stack).trim();
 
-      String dbLabel = parser.expandToString(
-        parser.getControlSequence("dtllastloadeddb"), stack);
-
-      if (fileTypeCs != null)
-      {
-         fileType = parser.expandToString(fileTypeCs, stack);
-      }
-
-      if (fileVersionCs != null)
-      {
-         fileVersion = parser.expandToString(fileVersionCs, stack);
-      }
-
-      if (fileType.equals("dbtex"))
-      {
-         sty.setLatestDataBase(dbLabel);
-      }
-      else
-      {
-         sty.updateInternals(true, dbLabel);
-      }
-
-      sty.registerFileLoaded(dbLabel, fileType, fileVersion, texPath);
+      Action.getAction(action, sty, options, parser, stack).doAction();
    }
 
-   @Override
    public void process(TeXParser parser)
      throws IOException
    {
@@ -86,5 +58,4 @@ public class PostReadHook extends ControlSequence
    }
 
    protected DataToolSty sty;
-   protected TeXPath texPath;
 }
