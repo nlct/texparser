@@ -91,29 +91,7 @@ public class DataToolHeader extends AbstractTeXObject implements TeXObject
    public TeXNumber getNumericalType(TeXParser parser)
    throws TeXSyntaxException
    {
-      ControlSequence cs;
-
-      switch (type)
-      {
-         case STRING:
-           cs = parser.getControlSequence("c_datatool_string_int");
-         break;
-
-         case INTEGER:
-           cs = parser.getControlSequence("c_datatool_integer_int");
-         break;
-
-         case DECIMAL:
-           cs = parser.getControlSequence("c_datatool_decimal_int");
-         break;
-
-         case CURRENCY:
-           cs = parser.getControlSequence("c_datatool_currency_int");
-         break;
-
-         default:
-           cs = parser.getControlSequence("c_datatool_unknown_int");
-      }
+      ControlSequence cs = type.getCs(parser.getListener());
 
       if (cs instanceof TeXNumber)
       {
@@ -398,6 +376,8 @@ public class DataToolHeader extends AbstractTeXObject implements TeXObject
    private String key;
    private DatumType type;
    private TeXObject title;
+
+   // byte identifier is being phased out in favour of DatumType
 
    public static final byte TYPE_UNDEF=-1;
    public static final byte TYPE_STRING=0;

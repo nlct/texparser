@@ -18,18 +18,36 @@
 */
 package com.dickimawbooks.texparserlib.latex.datatool;
 
+import com.dickimawbooks.texparserlib.TeXParserListener;
+import com.dickimawbooks.texparserlib.ControlSequence;
+
 public enum DatumType
 {
-   UNKNOWN(-1), STRING(0), INTEGER(1), DECIMAL(2), CURRENCY(3);
+   UNKNOWN(-1, "c_datatool_unknown_int"),
+   STRING(0, "c_datatool_string_int"),
+   INTEGER(1, "c_datatool_integer_int"),
+   DECIMAL(2, "c_datatool_decimal_int"),
+   CURRENCY(3, "c_datatool_currency_int");
 
-   DatumType(int id)
+   DatumType(int id, String csname)
    {
       this.id = id;
+      this.csname = csname;
    }
 
    public int getValue()
    {
       return id;
+   }
+
+   public String getCsName()
+   {
+      return csname;
+   }
+
+   public ControlSequence getCs(TeXParserListener listener)
+   {
+      return listener.getControlSequence(csname);
    }
 
    public static DatumType toDatumType(int type)
@@ -47,4 +65,5 @@ public enum DatumType
    }
 
    private final int id;
+   private final String csname;
 }

@@ -97,26 +97,26 @@ public class UserNumber extends AbstractTeXObject implements TeXNumber
 
    public void setValue(float newValue)
    {
-      value = (int)newValue;
+      setValue((int)newValue);
    }
 
    @Override
    public void multiply(int factor)
    {
-      value *= factor;
+      setValue(value * factor);
    }
 
    @Override
    public void divide(int divisor)
    {
-      value /= divisor;
+      setValue(value / divisor);
    }
 
    @Override
    public void advance(TeXParser parser, Numerical increment)
     throws TeXSyntaxException
    {
-      value += increment.number(parser);
+      setValue(value + increment.number(parser));
    }
 
    @Override

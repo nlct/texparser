@@ -47,10 +47,17 @@ public class DataRealElement extends AbstractTeXObject
       this.value = value;
    }
 
+   public DataRealElement(double value, TeXObject original)
+   {
+      this.value = value;
+      this.original = original;
+   }
+
    @Override
    public Object clone()
    {
-      return new DataRealElement(value);
+      return new DataRealElement(value,
+        original == null ? null : (TeXObject)original.clone());
    }
 
    @Override
@@ -76,18 +83,21 @@ public class DataRealElement extends AbstractTeXObject
     throws TeXSyntaxException
    {
       value += increment.number(parser);
+      original = null;
    }
 
    @Override
    public void divide(int divisor)
    {
       value /= divisor;
+      original = null;
    }
 
    @Override
    public void multiply(int factor)
    {
       value *= factor;
+      original = null;
    }
 
    @Override
@@ -125,11 +135,23 @@ public class DataRealElement extends AbstractTeXObject
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
     throws IOException
    {
+      if (parser.isStack(original))
+      {
+         return (TeXObjectList)original.clone();
+      }
+
       TeXParserListener listener = parser.getListener();
 
       TeXObjectList expanded = listener.createStack();
 
-      expanded.add(new TeXFloatingPoint(doubleValue()));
+      if (original == null)
+      {
+         expanded.add(new TeXFloatingPoint(doubleValue()));
+      }
+      else
+      {
+         expanded.add((TeXObject)original.clone());
+      }
 
       return expanded;
    }
@@ -151,13 +173,27 @@ public class DataRealElement extends AbstractTeXObject
    @Override
    public String format()
    {
-      return "" + value;
+      if (original == null)
+      {
+         return "" + value;
+      }
+      else
+      {
+         return original.format();
+      }
    }
 
    @Override
    public String toString(TeXParser parser)
    {
-      return format();
+      if (original == null)
+      {
+         return "" + value;
+      }
+      else
+      {
+         return original.toString(parser);
+      }
    }
 
    @Override
@@ -177,17 +213,25 @@ public class DataRealElement extends AbstractTeXObject
    {
       TeXParserListener listener = parser.getListener();
 
-      TeXObjectList expanded = listener.createStack();
+      if (original == null)
+      {
+         TeXObjectList expanded = listener.createStack();
 
-      expanded.add(listener.getControlSequence("__texparser_fmt_decimal_value:n"));
-      expanded.add(new TeXFloatingPoint(doubleValue()));
+         expanded.add(listener.getControlSequence("__texparser_fmt_decimal_value:n"));
+         expanded.add(new TeXFloatingPoint(doubleValue()));
 
-      TeXParserUtils.process(expanded, parser, stack);
+         TeXParserUtils.process(expanded, parser, stack);
+      }
+      else
+      {
+         TeXParserUtils.process(original, parser, stack);
+      }
    }
 
    public String toString()
    {
-      return String.format("%f", value);
+      return String.format("%s[value=%f,original=%s]",
+        getClass().getSimpleName(), value, original);
    }
 
    @Override
@@ -196,5 +240,6 @@ public class DataRealElement extends AbstractTeXObject
       return new FloatingPointContentCommand(name, value);
    }
 
-   private double value;
+   protected double value;
+   protected TeXObject original;
 }

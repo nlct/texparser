@@ -103,9 +103,68 @@ public class DTLdisplayDbRow extends ControlSequence
             colIdxReg.advance(parser, UserNumber.ONE);
 
             DataToolEntry entry = row.getEntry(colIdx);
+            DatumType type = DatumType.UNKNOWN;
 
-//TODO check data type and add formatting command
-            contentTl.append((TeXObject)entry.getContents().clone());
+            if (entry instanceof DataElement)
+            {
+               type = ((DataElement)entry).getDatumType();
+            }
+            else
+            {
+               DataToolHeader header = db.getHeader(colIdx);
+
+               type = header.getDataType();
+            }
+
+            TeXObject elem;
+
+            if (entry == null)
+            {
+               if (type == DatumType.STRING || type == DatumType.UNKNOWN)
+               {
+                  elem = listener.getControlSequence("DTLstringnull");
+               }
+               else
+               {
+                  elem = listener.getControlSequence("DTLnumbernull");
+               }
+            }
+            else
+            {
+               elem = TeXParserUtils.createGroup(listener,
+                 (TeXObject)entry.getContents().clone());
+            }
+
+            ControlSequence fmtCs;
+
+            switch (type)
+            {
+               case INTEGER:
+                 fmtCs = listener.getControlSequence("dtlintformat");
+               break;
+               case DECIMAL:
+                 fmtCs = listener.getControlSequence("dtlrealformat");
+               break;
+               case CURRENCY:
+                 fmtCs = listener.getControlSequence("dtlcurrencyformat");
+               break;
+               default:
+                 fmtCs = listener.getControlSequence("dtlstringformat");
+            }
+
+            TeXObjectList substack = listener.createStack();
+
+            substack.add(listener.getControlSequence("DTLdisplaydbAddItem"));
+            substack.add(contentTl);
+            substack.add(elem);
+            substack.add(fmtCs);
+            substack.add(type.getCs(listener));
+            substack.add(rowNumReg);
+            substack.add(new UserNumber(rowIdx));
+            substack.add(colIdxReg);
+            substack.add(new UserNumber(colIdx));
+
+            TeXParserUtils.process(substack, parser, stack);
          }
       }
    }

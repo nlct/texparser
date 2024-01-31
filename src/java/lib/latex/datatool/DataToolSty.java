@@ -158,6 +158,12 @@ public class DataToolSty extends LaTeXSty
 
       registerControlSequence(new DTLdisplaydbAddBegin());
       registerControlSequence(new DTLdisplaydbAddEnd());
+      registerControlSequence(new DTLdisplaydbAddItem());
+
+      registerControlSequence(new AtFirstOfOne("dtlstringformat"));
+      registerControlSequence(new AtFirstOfOne("dtlintformat"));
+      registerControlSequence(new AtFirstOfOne("dtlrealformat"));
+      registerControlSequence(new AtFirstOfOne("dtlcurrencyformat"));
 
       registerControlSequence(new GenericCommand(listener, true, "dtlcolumnheader",
         2, TeXParserUtils.createStack(getParser(),
@@ -913,11 +919,24 @@ public class DataToolSty extends LaTeXSty
    public void processSetupOption(String key, TeXObject value, TeXObjectList stack)
    throws IOException
    {
+      if (value instanceof MissingValue)
+      {
+         value = null;
+      }
+
       if (key.equals("default-name"))
       {
-         getParser().putControlSequence(true,
-           new TextualContentCommand("l__datatool_default_dbname_str",
-              getParser().expandToString(value, stack)));
+         if (value == null)
+         {
+            throw new LaTeXSyntaxException(getParser(),
+              LaTeXSyntaxException.ERROR_MISSING_KEY_VALUE, key);
+         }
+         else
+         {
+            getParser().putControlSequence(true,
+              new TextualContentCommand("l__datatool_default_dbname_str",
+                 getParser().expandToString(value, stack)));
+         }
       }
       else if (key.equals("global"))
       {
@@ -979,21 +998,43 @@ public class DataToolSty extends LaTeXSty
       }
       else if (key.equals("delimiter"))
       {
-         String str = getParser().expandToString(value, stack);
-         setDelimiter(str.codePointAt(0));
+         if (value == null)
+         {
+            throw new LaTeXSyntaxException(getParser(),
+              LaTeXSyntaxException.ERROR_MISSING_KEY_VALUE, key);
+         }
+         else
+         {
+            String str = getParser().expandToString(value, stack);
+            setDelimiter(str.codePointAt(0));
+         }
       }
       else if (key.equals("separator"))
       {
-         String str = getParser().expandToString(value, stack);
-         setSeparator(str.codePointAt(0));
+         if (value == null)
+         {
+            throw new LaTeXSyntaxException(getParser(),
+              LaTeXSyntaxException.ERROR_MISSING_KEY_VALUE, key);
+         }
+         else
+         {
+            String str = getParser().expandToString(value, stack);
+            setSeparator(str.codePointAt(0));
+         }
       }
       else if (key.equals("io"))
       {
-         processIOKeys(value, stack);
+         if (value != null)
+         {
+            processIOKeys(value, stack);
+         }
       }
       else if (key.equals("display"))
       {
-         processDisplayKeys(value, stack);
+         if (value != null)
+         {
+            processDisplayKeys(value, stack);
+         }
       }
       else
       {

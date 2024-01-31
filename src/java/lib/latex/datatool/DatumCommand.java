@@ -201,27 +201,7 @@ public class DatumCommand extends Command
          }
       }
 
-      String csName;
-
-      switch (type)
-      {
-         case STRING:
-           csName = "c_datatool_string_int";
-         break;
-         case INTEGER:
-           csName = "c_datatool_integer_int";
-         break;
-         case DECIMAL:
-           csName = "c_datatool_decimal_int";
-         break;
-         case CURRENCY:
-           csName = "c_datatool_currency_int";
-         break;
-         default:
-           csName = "c_datatool_unknown_int";
-      }
-
-      expanded.add(listener.getControlSequence(csName));
+      expanded.add(type.getCs(listener));
 
       return expanded;
    }

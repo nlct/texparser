@@ -46,10 +46,17 @@ public class DataIntElement extends UserNumber implements DataNumericElement
       super(num.getValue());
    }
 
+   public DataIntElement(int value, TeXObject original)
+   {
+      super(value);
+      this.original = original;
+   }
+
    @Override
    public Object clone()
    {
-      return new DataIntElement(getValue());
+      return new DataIntElement(getValue(),
+        original == null ? null : (TeXObject)original.clone());
    }
 
    @Override
@@ -83,6 +90,13 @@ public class DataIntElement extends UserNumber implements DataNumericElement
    }
 
    @Override
+   public void setValue(int newValue)
+   {
+      super.setValue(newValue);
+      original = null;
+   }
+
+   @Override
    public void process(TeXParser parser) throws IOException
    {
       process(parser, parser);
@@ -93,18 +107,51 @@ public class DataIntElement extends UserNumber implements DataNumericElement
    {
       TeXParserListener listener = parser.getListener();
 
-      TeXObjectList expanded = listener.createStack();
+      if (original == null)
+      {
+         TeXObjectList expanded = listener.createStack();
    
-      expanded.add(listener.getControlSequence("__texparser_fmt_integer_value:n")); 
-      expanded.add(new UserNumber(getValue()));
+         expanded.add(listener.getControlSequence("__texparser_fmt_integer_value:n")); 
+         expanded.add(new UserNumber(getValue()));
       
-      TeXParserUtils.process(expanded, parser, stack);
+         TeXParserUtils.process(expanded, parser, stack);
+      }
+      else
+      {
+         TeXParserUtils.process(original, parser, stack);
+      }
    }
 
    @Override
    public String format()
    {
-      return "" + getValue();
+      if (original == null)
+      {
+         return "" + getValue();
+      }
+      else
+      {
+         return original.format();
+      }
+   }
+
+   @Override
+   public String toString(TeXParser parser)
+   {
+      if (original == null)
+      {
+         return super.toString(parser);
+      }
+      else
+      {
+         return original.toString(parser);
+      }
+   }
+
+   public String toString()
+   {
+      return String.format("%s[value=%d,original=%s]",
+        getClass().getSimpleName(), intValue(), original);
    }
 
    @Override
@@ -113,4 +160,5 @@ public class DataIntElement extends UserNumber implements DataNumericElement
       return new IntegerContentCommand(name, intValue());
    }
 
+   protected TeXObject original;
 }

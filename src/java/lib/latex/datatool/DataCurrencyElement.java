@@ -47,11 +47,17 @@ public class DataCurrencyElement extends DataRealElement
       this.symbol = symbol;
    }
 
+   public DataCurrencyElement(TeXObject symbol, double value, TeXObject original)
+   {
+      super(value, original);
+      this.symbol = symbol;
+   }
+
    @Override
    public Object clone()
    {
       return new DataCurrencyElement((TeXObject)symbol.clone(), 
-         doubleValue());
+         doubleValue(), original == null ? null : (TeXObject)original.clone());
    }
 
    @Override
@@ -80,12 +86,24 @@ public class DataCurrencyElement extends DataRealElement
    @Override
    public String toString(TeXParser parser)
    {
-      return String.format("%s%.2f", symbol.toString(parser), doubleValue());
+      if (original == null)
+      {
+         return String.format("%s%.2f", symbol.toString(parser), doubleValue());
+      }
+      else
+      {
+         return original.toString(parser);
+      }
    }
 
    @Override
    public TeXObjectList expandonce(TeXParser parser) throws IOException
    {
+      if (parser.isStack(original))
+      {
+         return (TeXObjectList)original.clone();
+      }
+
       TeXParserListener listener = parser.getListener();
 
       TeXObjectList expanded = listener.createStack();
@@ -117,11 +135,12 @@ public class DataCurrencyElement extends DataRealElement
       expandonce(parser, stack).process(parser, stack);
    }
 
+   @Override
    public String toString()
    {
-      return String.format("%s%f", symbol.toString(), doubleValue());
+      return String.format("%s[symbol=%s,value=%f,original=%s]",
+        getClass().getSimpleName(), symbol, value, original);
    }
-
 
    private TeXObject symbol;
 }
