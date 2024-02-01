@@ -2233,7 +2233,20 @@ public class GlossariesSty extends LaTeXSty
 
       if (initialStyle != null)
       {
-         substack.add(new TeXCsRef("@glsstyle@"+initialStyle));
+         ControlSequence cs = getParser().getControlSequence("@glsstyle@"+initialStyle);
+
+         if (cs == null)
+         {
+            TeXApp texApp = getListener().getTeXApp();
+            texApp.warning(getParser(), 
+              texApp.getMessage(GLOSSARY_STYLE_NOT_DEFINED, initialStyle));
+
+            initialStyle = null;
+         }
+         else
+         {
+            substack.add(cs);
+         }
       }
 
       if (!substack.isEmpty())

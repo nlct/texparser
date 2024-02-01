@@ -50,11 +50,14 @@ public class SetGlossaryStyle extends ControlSequence
 
       if (cs == null)
       {
-         throw new LaTeXSyntaxException(parser, 
-            GlossariesSty.GLOSSARY_STYLE_NOT_DEFINED, styleName);
+         TeXApp texApp = parser.getListener().getTeXApp();
+         texApp.warning(parser,
+            texApp.getMessage(GlossariesSty.GLOSSARY_STYLE_NOT_DEFINED, styleName));
       }
-
-      TeXParserUtils.process(cs, parser, stack);
+      else
+      {
+         TeXParserUtils.process(cs, parser, stack);
+      }
    }
 
    public void process(TeXParser parser)
