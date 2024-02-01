@@ -20,6 +20,7 @@ package com.dickimawbooks.texparserlib.latex.datatool;
 
 import java.util.Vector;
 import java.util.Iterator;
+import java.util.Enumeration;
 import java.util.concurrent.ConcurrentHashMap;
 import java.io.IOException;
 
@@ -388,6 +389,16 @@ public class DataToolSty extends LaTeXSty
       throws IOException
    {
       latestDatabase = getDataBase(name);
+   }
+
+   public int getDataBaseCount()
+   {
+      return databases == null ? 0 : databases.size();
+   }
+
+   public Enumeration<String> getDataBaseNames()
+   {
+      return databases == null ? null : databases.keys();
    }
 
    public DataBase getDataBase(String name)
