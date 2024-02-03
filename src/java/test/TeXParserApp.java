@@ -152,6 +152,7 @@ public class TeXParserApp implements TeXApp
       if (logFile != null)
       {
          logWriter = new PrintWriter(logFile);
+
          parser.setDebugMode(debugMode, logWriter);
       }
 
@@ -1532,85 +1533,13 @@ public class TeXParserApp implements TeXApp
             }
             catch (NumberFormatException e)
             {
-               debugMode = 0;
-
-               String[] split = args[i].split(",");
-
-               for (String mode : split)
+               try
                {
-                  if (mode.equals("all"))
-                  {
-                     debugMode = Integer.MAX_VALUE;
-                  }
-                  else if (mode.equals("io"))
-                  {
-                     debugMode = debugMode | TeXParser.DEBUG_IO;
-                  }
-                  else if (mode.equals("popped"))
-                  {
-                     debugMode = debugMode | TeXParser.DEBUG_POPPED;
-                  }
-                  else if (mode.equals("decl"))
-                  {
-                     debugMode = debugMode | TeXParser.DEBUG_DECL;
-                  }
-                  else if (mode.equals("sty-data"))
-                  {
-                     debugMode = debugMode | TeXParser.DEBUG_STY_DATA;
-                  }
-                  else if (mode.equals("expansion"))
-                  {
-                     debugMode = debugMode | TeXParser.DEBUG_EXPANSION;
-                  }
-                  else if (mode.equals("expansion-list"))
-                  {
-                     debugMode = debugMode | TeXParser.DEBUG_EXPANSION_LIST;
-                  }
-                  else if (mode.equals("expansion-once"))
-                  {
-                     debugMode = debugMode | TeXParser.DEBUG_EXPANSION_ONCE;
-                  }
-                  else if (mode.equals("expansion-once-list"))
-                  {
-                     debugMode = debugMode | TeXParser.DEBUG_EXPANSION_ONCE_LIST;
-                  }
-                  else if (mode.equals("process"))
-                  {
-                     debugMode = debugMode | TeXParser.DEBUG_PROCESSING;
-                  }
-                  else if (mode.equals("process-stack"))
-                  {
-                     debugMode = debugMode | TeXParser.DEBUG_PROCESSING_STACK;
-                  }
-                  else if (mode.equals("process-stack-list"))
-                  {
-                     debugMode = debugMode | TeXParser.DEBUG_PROCESSING_STACK_LIST;
-                  }
-                  else if (mode.equals("cs"))
-                  {
-                     debugMode = debugMode | TeXParser.DEBUG_CS;
-                  }
-                  else if (mode.equals("process-generic-cs"))
-                  {
-                     debugMode = debugMode | TeXParser.DEBUG_PROCESSING_GENERIC_CS;
-                  }
-                  else if (mode.equals("catcode"))
-                  {
-                     debugMode = debugMode | TeXParser.DEBUG_CATCODE;
-                  }
-                  else if (mode.equals("read"))
-                  {
-                     debugMode = debugMode | TeXParser.DEBUG_READ;
-                  }
-                  else if (mode.equals("settings"))
-                  {
-                     debugMode = debugMode | TeXParser.DEBUG_SETTINGS;
-                  }
-                  else
-                  {
-                     throw new InvalidSyntaxException(
-                       getMessage("error.syntax.unknown_debug_mode", mode));
-                  }
+                  debugMode = TeXParser.getDebugLevelFromModeList(args[i].split(","));
+               }
+               catch (TeXSyntaxException e2)
+               {
+                  throw new InvalidSyntaxException(e2.getMessage(this), e2);
                }
             }
          }

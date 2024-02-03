@@ -148,6 +148,7 @@ There is NO WARRANTY, to the extent permitted by law.</entry>
 <entry key="tex.error.file.overwrite_forbidden">File ''{0}'' already exists (overwrite forbidden).</entry>
 <entry key="tex.error.file.mapper">An error occurred while parsing {0}:
    {1}</entry>
+<entry key="tex.error.invalid.debug_mode">Invalid debug mode ''{0}''. Recognised mode names: {1}</entry>
 
 <!--  LaTeX Error Messages -->
 

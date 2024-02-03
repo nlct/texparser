@@ -264,6 +264,97 @@ public class TeXParser extends TeXObjectList
       logging = doLogging;
    }
 
+   /**
+    * Calculates the level from the list of mode names.
+    */
+   public static int getDebugLevelFromModeList(String... modes)
+    throws TeXSyntaxException
+   {
+      int level = 0;
+
+      for (String mode : modes)
+      {
+         mode = mode.trim();
+
+         if (mode.equals("all"))
+         {
+            level = Integer.MAX_VALUE;
+         }
+         else if (mode.equals("io"))
+         {
+            level = level | TeXParser.DEBUG_IO;
+         }
+         else if (mode.equals("popped"))
+         {
+            level = level | TeXParser.DEBUG_POPPED;
+         }
+         else if (mode.equals("decl"))
+         {
+            level = level | TeXParser.DEBUG_DECL;
+         }
+         else if (mode.equals("sty-data"))
+         {
+            level = level | TeXParser.DEBUG_STY_DATA;
+         }
+         else if (mode.equals("expansion"))
+         {
+            level = level | TeXParser.DEBUG_EXPANSION;
+         }
+         else if (mode.equals("expansion-list"))
+         {
+            level = level | TeXParser.DEBUG_EXPANSION_LIST;
+         }
+         else if (mode.equals("process"))
+         {
+            level = level | TeXParser.DEBUG_PROCESSING;
+         }
+         else if (mode.equals("process-stack"))
+         {
+            level = level | TeXParser.DEBUG_PROCESSING_STACK;
+         }
+         else if (mode.equals("process-stack-list"))
+         {
+            level = level | TeXParser.DEBUG_PROCESSING_STACK_LIST;
+         }
+         else if (mode.equals("cs"))
+         {
+            level = level | TeXParser.DEBUG_CS;
+         }
+         else if (mode.equals("process-generic-cs"))
+         {
+            level = level | TeXParser.DEBUG_PROCESSING_GENERIC_CS;
+         }
+         else if (mode.equals("expansion-once"))
+         {
+            level = level | TeXParser.DEBUG_EXPANSION_ONCE;
+         }
+         else if (mode.equals("expansion-once-list"))
+         {
+            level = level | TeXParser.DEBUG_EXPANSION_ONCE_LIST;
+         }
+         else if (mode.equals("catcode"))
+         {
+            level = level | TeXParser.DEBUG_CATCODE;
+         }
+         else if (mode.equals("read"))
+         {
+            level = level | TeXParser.DEBUG_READ;
+         }
+         else if (mode.equals("settings"))
+         {
+            level = level | TeXParser.DEBUG_SETTINGS;
+         }
+         else
+         {
+            throw new TeXSyntaxException(null,
+              TeXSyntaxException.ERROR_INVALID_DEBUG_MODE, mode,
+              "all, io, read, popped, cs, decl, sty-data, expansion, expansion-list, expansion-once, expansion-once-list, process, process-generic-cs, process-stack, process-stack-list, catcode, settings");
+         }
+      }
+
+      return level;
+   }
+
    @Deprecated
    public int getDebugLevel()
    {
@@ -4349,6 +4440,6 @@ public class TeXParser extends TeXObjectList
    public static final int DEBUG_READ = 32768;
    public static final int DEBUG_SETTINGS = 65536;
 
-   public static final String VERSION = "0.9.9b-20240201";
-   public static final String VERSION_DATE = "2024-02-01";
+   public static final String VERSION = "0.9.9b-20240203";
+   public static final String VERSION_DATE = "2024-02-03";
 }

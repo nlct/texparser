@@ -212,4 +212,6 @@ public class TeXSyntaxException extends IOException
       "tex.error.file.overwrite_forbidden";
    public static final String ERROR_FILE_MAPPER =
       "tex.error.file.mapper";
+   public static final String ERROR_INVALID_DEBUG_MODE =
+      "tex.error.invalid.debug_mode";
 }
