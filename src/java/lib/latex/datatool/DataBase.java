@@ -285,6 +285,11 @@ public class DataBase
               new CsvReadHandler(db, appending, settings));
          }
       }
+      else
+      {
+         throw new TeXSyntaxException(parser,
+           TeXSyntaxException.ERROR_FILE_NOT_FOUND, texPath);
+      }
    }
 
    public static void write(DataToolSty sty, String filename,
