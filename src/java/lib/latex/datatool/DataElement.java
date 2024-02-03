@@ -44,4 +44,8 @@ public interface DataElement extends TeXObject
     */ 
    public ControlSequence createControlSequence(String name);
 
+   /**
+    * Gets the currency symbol or null if not currency.
+    */
+   public TeXObject getCurrencySymbol();
 }

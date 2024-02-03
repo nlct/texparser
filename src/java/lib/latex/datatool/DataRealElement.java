@@ -79,6 +79,12 @@ public class DataRealElement extends AbstractTeXObject
    }
 
    @Override
+   public TeXObject getCurrencySymbol()
+   {
+      return null;
+   }
+
+   @Override
    public void advance(TeXParser parser, Numerical increment)
     throws TeXSyntaxException
    {

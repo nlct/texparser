@@ -78,6 +78,12 @@ public class DataCurrencyElement extends DataRealElement
       return new CurrencyContentCommand(name, (TeXObject)symbol.clone(), doubleValue());
    }
 
+   @Override
+   public TeXObject getCurrencySymbol()
+   {
+      return getSymbol();
+   }
+
    public TeXObject getSymbol()
    {
       return symbol;

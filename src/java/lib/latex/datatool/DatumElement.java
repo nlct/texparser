@@ -118,6 +118,7 @@ public class DatumElement extends AbstractTeXObject
       return Double.valueOf(number.doubleValue());
    }
 
+   @Override
    public TeXObject getCurrencySymbol()
    {
       return currencySymbol;

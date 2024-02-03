@@ -97,6 +97,12 @@ public class DataIntElement extends UserNumber implements DataNumericElement
    }
 
    @Override
+   public TeXObject getCurrencySymbol()
+   {
+      return null;
+   }
+
+   @Override
    public void process(TeXParser parser) throws IOException
    {
       process(parser, parser);

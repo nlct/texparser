@@ -73,4 +73,9 @@ public class DataStringElement extends DataObjectList implements DataElement
       return new GenericCommand(name, null, toList());
    }
 
+   @Override
+   public TeXObject getCurrencySymbol()
+   {
+      return null;
+   }
 }
