@@ -286,10 +286,45 @@ public class DataToolBaseSty extends LaTeXSty
    public DataElement getElement(TeXObject entry)
      throws IOException
    {
+      if (entry instanceof DatumElement)
+      {
+         return (DatumElement)entry;
+      }
+
       TeXParser parser = getListener().getParser();
 
       boolean useDatum
         = TeXParserUtils.isTrue("l__datatool_db_store_datum_bool", parser);
+
+      if (entry instanceof DataElement)
+      {
+         if (useDatum)
+         {
+            DatumType type = ((DataElement)entry).getDatumType();
+
+            switch (type)
+            {
+               case INTEGER:
+                 return new DatumElement(entry,
+                    new UserNumber(((DataNumericElement)entry).intValue()),
+                    null, type);
+               case DECIMAL:
+                 return new DatumElement(entry,
+                    new TeXFloatingPoint(((DataNumericElement)entry).doubleValue()),
+                    null, type);
+               case CURRENCY:
+                 return new DatumElement(entry,
+                    new TeXFloatingPoint(((DataNumericElement)entry).doubleValue()),
+                    ((DataElement)entry).getCurrencySymbol(), type);
+               default:
+                 return new DatumElement(entry);
+            }
+         }
+         else
+         {
+            return (DataElement)entry;
+         }
+      }
 
       TeXObject original = null;
 
