@@ -50,6 +50,11 @@ public enum DatumType
       return listener.getControlSequence(csname);
    }
 
+   public boolean isNumeric()
+   {
+      return id > 0;
+   }
+
    public static DatumType toDatumType(int type)
    {
       switch (type)
