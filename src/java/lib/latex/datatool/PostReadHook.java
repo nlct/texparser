@@ -27,7 +27,7 @@ public class PostReadHook extends ControlSequence
 {
    public PostReadHook(DataToolSty sty, TeXPath texPath)
    {
-      this("__texparser_post_read_hook", sty, texPath);
+      this(DataToolSty.POST_READ_HOOK, sty, texPath);
    }
 
    public PostReadHook(String name, DataToolSty sty, TeXPath texPath)
@@ -50,8 +50,10 @@ public class PostReadHook extends ControlSequence
       String fileType = "tex";
       String fileVersion = "";
 
-      ControlSequence fileTypeCs = parser.getControlSequence("__texparser_current_file_type_tl");
-      ControlSequence fileVersionCs = parser.getControlSequence("__texparser_current_file_version_tl");
+      ControlSequence fileTypeCs = parser.getControlSequence(
+        DataToolSty.CURRENT_FILE_TYPE);
+      ControlSequence fileVersionCs = parser.getControlSequence(
+        DataToolSty.CURRENT_FILE_VERSION);
 
       String dbLabel = parser.expandToString(
         parser.getControlSequence("dtllastloadeddb"), stack);

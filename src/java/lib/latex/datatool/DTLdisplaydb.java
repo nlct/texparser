@@ -58,26 +58,26 @@ public class DTLdisplaydb extends Command
       parser.putControlSequence(true,
        new TextualContentCommand("dtldbname", dbLabel));
 
-      TokenListCommand contentTl = new TokenListCommand("l__datatool_content_tl");
+      TokenListCommand contentTl = new TokenListCommand(DataToolSty.CONTENT_VAR);
       parser.putControlSequence(true, contentTl);
 
-      TokenListCommand alignTl = new TokenListCommand("l__datatool_align_tl");
+      TokenListCommand alignTl = new TokenListCommand(DataToolSty.ALIGN_VAR);
       parser.putControlSequence(true, alignTl);
 
-      TokenListCommand rowTl = new TokenListCommand("l__datatool_row_tl");
+      TokenListCommand rowTl = new TokenListCommand(DataToolSty.ROW_VAR);
       parser.putControlSequence(true, rowTl);
 
-      TokenListCommand tmpTl = new TokenListCommand("l__datatool_tmpb_tl");
+      TokenListCommand tmpTl = new TokenListCommand(DataToolBaseSty.TMPB_VAR);
 
       SequenceCommand seqCs;
       SequenceCommand colIndexes;
 
       colIndexes = listener.getSequenceCommand(
-        "l__datatool_only_columns_seq", stack);
+        DataToolSty.ONLY_COLUMNS_SEQ, stack);
 
       if (colIndexes == null)
       {
-         colIndexes = new SequenceCommand("l__datatool_only_columns_seq");
+         colIndexes = new SequenceCommand(DataToolSty.ONLY_COLUMNS_SEQ);
       }
 
       if (!colIndexes.isEmpty())
@@ -92,8 +92,7 @@ public class DTLdisplaydb extends Command
       }
       else
       {
-         seqCs = listener.getSequenceCommand(
-           "l__datatool_only_keys_seq", stack);
+         seqCs = listener.getSequenceCommand(DataToolSty.ONLY_KEYS_SEQ, stack);
 
          if (seqCs != null && !seqCs.isEmpty())
          {
@@ -111,7 +110,7 @@ public class DTLdisplaydb extends Command
             Vector<Integer> excls = null;
 
             seqCs = listener.getSequenceCommand(
-              "l__datatool_omit_columns_seq", stack);
+              DataToolSty.OMIT_COLUMNS_SEQ, stack);
 
             if (seqCs != null && !seqCs.isEmpty())
             {
@@ -128,7 +127,7 @@ public class DTLdisplaydb extends Command
             else
             {
                seqCs = listener.getSequenceCommand(
-                 "l__datatool_omit_keys_seq", stack);
+                 DataToolSty.OMIT_KEYS_SEQ, stack);
 
                if (seqCs != null && !seqCs.isEmpty())
                {
@@ -159,13 +158,14 @@ public class DTLdisplaydb extends Command
       }
 
       parser.putControlSequence(true, new SequenceCommand(
-       "l__datatool_column_indexes_seq", colIndexes));
+       DataToolSty.COLUMN_INDEXES_SEQ, colIndexes));
 
-      parser.getSettings().localSetRegister("l__datatool_max_cols_int",
+      parser.getSettings().localSetRegister(
+        DataToolSty.MAX_COLS_INT,
         new UserNumber(colIndexes.size()));
 
       NumericRegister maxColsReg = parser.getSettings().getNumericRegister(
-        "l__datatool_max_cols_int");
+        DataToolSty.MAX_COLS_INT);
 
       parser.getSettings().localSetRegister("dtlcolumnnum", UserNumber.ZERO);
       parser.getSettings().localSetRegister("dtlrownum", UserNumber.ZERO);
@@ -175,29 +175,30 @@ public class DTLdisplaydb extends Command
       NumericRegister rowNumReg =
         parser.getSettings().getNumericRegister("dtlrownum");
 
-      parser.getSettings().localSetRegister("l__datatool_row_idx_int",
+      parser.getSettings().localSetRegister(DataToolSty.ROW_IDX_INT,
         UserNumber.ZERO);
 
       NumericRegister tabRowNumReg =
-        parser.getSettings().getNumericRegister("l__datatool_row_idx_int");
+        parser.getSettings().getNumericRegister(DataToolSty.ROW_IDX_INT);
 
       TokenListCommand userAlign = listener.getTokenListCommand(
-        "l__datatool_user_align_tl", stack);
+        DataToolSty.USER_ALIGN, stack);
 
       if (!userAlign.isEmpty())
       {
          parser.putControlSequence(true,
-          new TokenListCommand("l__datatool_align_tl", userAlign));
+          new TokenListCommand(DataToolSty.ALIGN_VAR, userAlign));
       }
 
       TokenListCommand userHeader = listener.getTokenListCommand(
-        "l__datatool_user_header_tl", stack);
+        DataToolSty.USER_HEADER, stack);
 
       if (userHeader.isEmpty())
       {
-         if (!TeXParserUtils.isTrue("l_datatool_include_header_bool", parser))
+         if (!TeXParserUtils.isTrue(DataToolSty.INCLUDE_HEADER_BOOL, parser))
          {
-            userHeader = new TokenListCommand("l__datatool_user_header_tl", 
+            userHeader = new TokenListCommand(
+              DataToolSty.USER_HEADER, 
               TeXParserUtils.createStack(parser, TokenListCommand.EMPTY));
 
             parser.putControlSequence(true, userHeader);
@@ -206,7 +207,7 @@ public class DTLdisplaydb extends Command
       else
       {
          parser.putControlSequence(true,
-          new TokenListCommand("l__datatool_row_tl", userHeader));
+          new TokenListCommand(DataToolSty.ROW_VAR, userHeader));
       }
 
       if (userAlign.isEmpty() || userHeader.isEmpty())
@@ -305,11 +306,11 @@ public class DTLdisplaydb extends Command
          tabRowNumReg.setValue(parser, new UserNumber(i));
 
          substack.add(
-           listener.getControlSequence("__datatool_if_display_row:nNT"));
+           listener.getControlSequence(DataToolSty.IF_DISPLAY_ROW));
          substack.add(tabRowNumReg);
          substack.add(contentTl);
          substack.add(TeXParserUtils.createGroup(parser,
-          listener.getControlSequence("__datatool_display_db_row:Nn"),
+          listener.getControlSequence(DataToolSty.DISPLAY_DB_ROW),
           contentTl, tabRowNumReg
          ));
 
@@ -331,7 +332,7 @@ public class DTLdisplaydb extends Command
       // of \l__datatool_content_tl
 
       ControlSequence preCs =
-        listener.getControlSequence("l__datatool_pre_display_tl");
+        listener.getControlSequence(DataToolSty.PRE_DISPLAY);
 
       if (preCs.isEmpty())
       {
@@ -380,7 +381,7 @@ public class DTLdisplaydb extends Command
             if (optArg == null || optArg.isEmpty())
             {
                parser.putControlSequence(true,
-                new SequenceCommand("l__datatool_omit_columns_seq"));
+                new SequenceCommand(DataToolSty.OMIT_COLUMNS_SEQ));
             }
             else
             {
@@ -388,17 +389,17 @@ public class DTLdisplaydb extends Command
 
                parser.putControlSequence(true,
                 SequenceCommand.createFromClist(
-                 parser, "l__datatool_omit_columns_seq", csvList));
+                 parser, DataToolSty.OMIT_COLUMNS_SEQ, csvList));
             }
 
             parser.putControlSequence(true,
-             new SequenceCommand("l__datatool_only_columns_seq"));
+             new SequenceCommand(DataToolSty.ONLY_COLUMNS_SEQ));
 
             parser.putControlSequence(true,
-             new SequenceCommand("l__datatool_only_keys_seq"));
+             new SequenceCommand(DataToolSty.ONLY_KEYS_SEQ));
 
             parser.putControlSequence(true,
-             new SequenceCommand("l__datatool_omit_keys_seq"));
+             new SequenceCommand(DataToolSty.OMIT_KEYS_SEQ));
          }
 
          TeXObjectList list = construct(dbLabel, parser, stack);

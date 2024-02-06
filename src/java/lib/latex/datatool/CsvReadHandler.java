@@ -44,7 +44,8 @@ public class CsvReadHandler implements FileMapHandler
 
       parser = settings.getSty().getParser();
 
-      ControlSequence cs = parser.getControlSequence("l__datatool_csv_headers_prop");
+      ControlSequence cs = parser.getControlSequence(
+        DataToolSty.CSV_HEADERS_PROP);
 
       if (cs instanceof PropertyCommand)
       {
@@ -54,7 +55,7 @@ public class CsvReadHandler implements FileMapHandler
          colHeadersProp = prop;
       }
 
-      cs = parser.getControlSequence("l__datatool_csv_keys_prop");
+      cs = parser.getControlSequence(DataToolSty.CSV_KEYS_PROP);
 
       if (cs instanceof PropertyCommand)
       {

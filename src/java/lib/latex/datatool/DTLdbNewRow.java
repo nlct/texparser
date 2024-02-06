@@ -46,15 +46,8 @@ public class DTLdbNewRow extends ControlSequence
    public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      String label = "untitled";
-
-      ControlSequence cs =
-         parser.getControlSequence("l__datatool_default_dbname_str");
-
-      if (cs != null)
-      {
-         label = parser.expandToString(cs, stack);
-      }
+      String label = TeXParserUtils.getControlSequenceValue(
+        DataToolSty.DEFAULT_NAME, "untitled", parser, stack);
 
       sty.addNewRow(label);
    }

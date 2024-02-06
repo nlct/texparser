@@ -215,18 +215,24 @@ public class DataBase
             }
 
             parser.putControlSequence(true,
-              new TextualContentCommand("__texparser_current_file_type_tl",
-                format.toString()));
+              new TextualContentCommand(
+                DataToolSty.CURRENT_FILE_TYPE, format.toString()));
 
             parser.putControlSequence(true,
-             new TextualContentCommand("__texparser_current_file_version_tl",
-               version));
+             new TextualContentCommand(
+               DataToolSty.CURRENT_FILE_VERSION, version));
 
             listener.input(texPath, stack);
          }
          else
          {
             String name = settings.getDefaultName();
+
+            if (name == null)
+            {
+               name = TeXParserUtils.getControlSequenceValue(
+                 DataToolSty.DEFAULT_NAME, "untitled", parser, stack);
+            }
 
             boolean appending = false;
             DataBase db = null;

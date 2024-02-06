@@ -51,7 +51,7 @@ public class DTLdisplaydbAddEnd extends ControlSequence
 
       TokenListCommand contentTl = listener.popTokenListCommand(parser, stack);
 
-      ControlSequence cs = parser.getControlSequence("l_datatool_foot_tl");
+      ControlSequence cs = parser.getControlSequence(DataToolSty.FOOT);
 
       if (cs != null)
       {

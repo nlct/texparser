@@ -87,7 +87,7 @@ public class DTLdisplaydbAddBegin extends ControlSequence
       }
 
       contentTl.appendValue(
-        listener.getControlSequence("l_datatool_post_head_tl"), parser, stack);
+        listener.getControlSequence(DataToolSty.POST_HEAD), parser, stack);
 
       contentTl.appendValue(listener.getControlSequence("dtldisplaycr"), 
         parser, stack);

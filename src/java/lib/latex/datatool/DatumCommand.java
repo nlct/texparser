@@ -156,7 +156,7 @@ public class DatumCommand extends Command
       TeXParserListener listener = parser.getListener();
 
       TeXObjectList expanded = listener.createStack();
-      expanded.add(listener.getControlSequence("__datatool_datum:nnnn"));
+      expanded.add(listener.getControlSequence(DataToolBaseSty.DATUM_NNNN));
 
       Group grp = listener.createGroup();
       expanded.add(grp);

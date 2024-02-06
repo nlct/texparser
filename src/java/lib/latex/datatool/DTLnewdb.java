@@ -46,10 +46,12 @@ public class DTLnewdb extends ControlSequence
      throws IOException
    {
       parser.putControlSequence(true,
-        new TextualContentCommand("__texparser_current_file_type_tl", "dtltex"));
+        new TextualContentCommand(
+         DataToolSty.CURRENT_FILE_TYPE, "dtltex"));
 
       parser.putControlSequence(true,
-        new TextualContentCommand("__texparser_current_file_version_tl", "2.0"));
+        new TextualContentCommand(
+         DataToolSty.CURRENT_FILE_VERSION, "2.0"));
 
       String dbLabel = popLabelString(parser, stack);
 

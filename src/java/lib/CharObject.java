@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013-2022 Nicola L.C. Talbot
+    Copyright (C) 2013-2024 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -32,6 +32,7 @@ public abstract class CharObject extends AbstractTeXObject implements SingleToke
       if (this == obj) return true;
 
       if (!(obj instanceof CharObject) || obj == null) return false;
+
       return ((CharObject)obj).getCharCode() == getCharCode();
    }
 

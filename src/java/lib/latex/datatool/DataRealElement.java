@@ -152,6 +152,8 @@ public class DataRealElement extends AbstractTeXObject
 
       if (original == null)
       {
+         expanded.add(listener.getControlSequence(
+           DataToolBaseSty.FMT_DECIMAL_VALUE));
          expanded.add(new TeXFloatingPoint(doubleValue()));
       }
       else
@@ -223,7 +225,8 @@ public class DataRealElement extends AbstractTeXObject
       {
          TeXObjectList expanded = listener.createStack();
 
-         expanded.add(listener.getControlSequence("__texparser_fmt_decimal_value:n"));
+         expanded.add(listener.getControlSequence(
+           DataToolBaseSty.FMT_DECIMAL_VALUE));
          expanded.add(new TeXFloatingPoint(doubleValue()));
 
          TeXParserUtils.process(expanded, parser, stack);

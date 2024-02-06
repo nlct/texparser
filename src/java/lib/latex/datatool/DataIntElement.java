@@ -117,7 +117,8 @@ public class DataIntElement extends UserNumber implements DataNumericElement
       {
          TeXObjectList expanded = listener.createStack();
    
-         expanded.add(listener.getControlSequence("__texparser_fmt_integer_value:n")); 
+         expanded.add(listener.getControlSequence(
+           DataToolBaseSty.FMT_INTEGER_VALUE)); 
          expanded.add(new UserNumber(getValue()));
       
          TeXParserUtils.process(expanded, parser, stack);

@@ -27,7 +27,7 @@ public class EndRead extends ControlSequence
 {
    public EndRead()
    {
-      this("__texparser_end_read");
+      this(DataToolSty.END_READ);
    }
 
    public EndRead(String name)
@@ -47,7 +47,7 @@ public class EndRead extends ControlSequence
    {
       ControlSequence cs = parser.getControlSequence("dtllastloadeddb");
 
-      parser.startGroup();
+      parser.endGroup();
 
       if (cs != null)
       {

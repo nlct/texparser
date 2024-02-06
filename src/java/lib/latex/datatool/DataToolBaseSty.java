@@ -73,18 +73,22 @@ public class DataToolBaseSty extends LaTeXSty
       registerControlSequence(new DTLcompare());
       registerControlSequence(new DTLcompare("dtlicompare", false));
 
+      // Numeric
+
       registerControlSequence(new DTLsetnumberchars());
       registerControlSequence(new TextualContentCommand("@dtl@numbergroupchar", ","));
       registerControlSequence(new TextualContentCommand("@dtl@decimal", "."));
 
       registerControlSequence(
-        new NumericFormatter("__texparser_fmt_integer_value:n", new DecimalFormat("#,##0"), "."));
+        new NumericFormatter(FMT_INTEGER_VALUE, new DecimalFormat("#,##0"), "."));
 
       registerControlSequence(
-        new NumericFormatter("__texparser_fmt_decimal_value:n", new DecimalFormat("#,##0.0#####")));
+        new NumericFormatter(FMT_DECIMAL_VALUE, new DecimalFormat("#,##0.0#####")));
 
       registerControlSequence(
-        new NumericFormatter("__texparser_fmt_currency_value:n", new DecimalFormat("#,##0.00")));
+        new NumericFormatter(FMT_CURRENCY_VALUE, new DecimalFormat("#,##0.00")));
+
+      // Currency
 
       addCurrencySymbol("$");
       addCurrencySymbol("pounds");
@@ -97,20 +101,133 @@ public class DataToolBaseSty extends LaTeXSty
       addCurrencySymbol("euro");
       addCurrencySymbol("yen");
 
-      // datatool-base v3.0:
+      defineCurrency(null, "XXX", new TeXCsRef("textcurrency"),
+        listener.getOther(0x00A4));
+
+      defineCurrency(null, "XBT", new TeXCsRef("faBtc"),
+        listener.getOther(0x20BF));
+
+      defineCurrency(null, "EUR", new TeXCsRef("euro"),
+        listener.getOther(0x20AC));
+
+      registerControlSequence(new GenericCommand(true,
+        DTL_CURRENCY_CSNAME, null, new TeXCsRef("$")));
+
+      registerControlSequence(new LaTeXGenericCommand(true,
+        "DTLcurrency", false, "m",
+        TeXParserUtils.createStack(parser, 
+         new TeXCsRef("DTLfmtcurrency"), new TeXCsRef(DTL_CURRENCY_CSNAME),
+         TeXParserUtils.createGroup(parser, listener.getParam(1)))));
+
+      registerControlSequence(new LaTeXGenericCommand(true, "DTLfmtcurrency", 
+       "mm", TeXParserUtils.createStack(listener, 
+          new TeXCsRef("dtlcurrdefaultfmt"),
+          TeXParserUtils.createGroup(listener, listener.getParam(1)),
+          TeXParserUtils.createGroup(listener, listener.getParam(2))
+          )
+      ));
+
+      registerControlSequence(new LaTeXGenericCommand(true, "dtlcurrdefaultfmt", 
+       "mm", TeXParserUtils.createStack(listener, 
+         new TeXCsRef("dtlcurrprefixfmt"),
+          TeXParserUtils.createGroup(listener, listener.getParam(1)),
+          TeXParserUtils.createGroup(listener, listener.getParam(2))
+          )
+      ));
+
+      registerControlSequence(new LaTeXGenericCommand(true,
+        "dtlcurrprefixfmt", false, "mm",
+        TeXParserUtils.createStack(parser, 
+          listener.getParam(1),
+          new TeXCsRef("dtlcurrfmtsep"),
+          listener.getParam(2))
+      ));
+
+      registerControlSequence(new LaTeXGenericCommand(true,
+        "dtlcurrsuffixfmt", false, "mm",
+        TeXParserUtils.createStack(parser, 
+          listener.getParam(2),
+          new TeXCsRef("dtlcurrfmtsep"),
+          listener.getParam(1))
+      ));
+
+      registerControlSequence(new GenericCommand(true,
+        "dtlcurrfmtsep", null, TeXParserUtils.createStack(listener,
+        new TeXCsRef("DTLcurrCodeOrSymOrStr"),
+         TeXParserUtils.createGroup(listener, listener.getActiveChar('~')),
+         listener.createGroup(), listener.createGroup())
+      ));
+
+      registerControlSequence(new TextualContentCommand("DTLCurrencyCode", "XXX"));
+      registerControlSequence(new AtNumberOfNumber("DTLcurrCodeOrSymOrStr", 2, 3));
+
+      registerControlSequence(new GenericCommand(true,
+        "DTLdefaultEURcurrencyfmt", null, new TeXCsRef("dtlcurrdefaultfmt")));
+
+      // Null
+
+      nullMarker = TeXParserUtils.createStack(listener,
+       listener.getOther(' '),
+       listener.getLetter('U'),
+       listener.getLetter('n'),
+       listener.getLetter('d'),
+       listener.getLetter('e'),
+       listener.getLetter('f'),
+       listener.getLetter('i'),
+       listener.getLetter('n'),
+       listener.getLetter('e'),
+       listener.getLetter('d'),
+       listener.getOther(' '),
+       listener.getLetter('V'),
+       listener.getLetter('a'),
+       listener.getLetter('l'),
+       listener.getLetter('u'),
+       listener.getLetter('e'),
+       listener.getLetter(' ')
+      );
+
+      registerControlSequence(
+        new GenericCommand(true, NULL_VALUE_CSNAME, 
+         null, nullMarker));
+
+      noValueCs = new GenericCommand(true, "dtlnovalue",
+          null, new TeXCsRef(NULL_VALUE_CSNAME));
+
+      registerControlSequence(noValueCs);
+
+      registerControlSequence(
+        new IntegerContentCommand(NUMBER_NULL_CSNAME, 0, true));
+
+      numberNullCs = new GenericCommand(true, "DTLnumbernull",
+          null, new TeXCsRef(NUMBER_NULL_CSNAME));
+
+      registerControlSequence(numberNullCs);
+
+      registerControlSequence(
+        new TextualContentCommand(STRING_NULL_CSNAME, "NULL", true));
+
+      stringNullCs = new GenericCommand(true, "DTLstringnull",
+          null, new TeXCsRef(STRING_NULL_CSNAME));
+
+      registerControlSequence(stringNullCs);
 
       registerControlSequence(new DTLsetup(this));
       registerControlSequence(new DatumMarker());
 
-      registerControlSequence(new IntegerContentCommand("c_datatool_string_int",
+      registerControlSequence(new IntegerContentCommand(
+        DatumType.STRING.getCsName(),
         DatumType.STRING.getValue(), true));
-      registerControlSequence(new IntegerContentCommand("c_datatool_integer_int",
+      registerControlSequence(new IntegerContentCommand(
+        DatumType.INTEGER.getCsName(),
         DatumType.INTEGER.getValue(), true));
-      registerControlSequence(new IntegerContentCommand("c_datatool_decimal_int",
+      registerControlSequence(new IntegerContentCommand(
+        DatumType.DECIMAL.getCsName(),
         DatumType.DECIMAL.getValue(), true));
-      registerControlSequence(new IntegerContentCommand("c_datatool_currency_int",
+      registerControlSequence(new IntegerContentCommand(
+        DatumType.CURRENCY.getCsName(),
         DatumType.CURRENCY.getValue(), true));
-      registerControlSequence(new IntegerContentCommand("c_datatool_unknown_int",
+      registerControlSequence(new IntegerContentCommand(
+        DatumType.UNKNOWN.getCsName(),
         DatumType.UNKNOWN.getValue(), true));
    }
 
@@ -163,7 +280,6 @@ public class DataToolBaseSty extends LaTeXSty
       if (currencySymbolList == null)
       {
          currencySymbolList = new Vector<TeXObject>();
-         defaultCurrency = symbol;
       }
 
       if (symbol == null)
@@ -204,7 +320,67 @@ public class DataToolBaseSty extends LaTeXSty
 
    public void setDefaultCurrency(TeXObject symbol)
    {
-      defaultCurrency = symbol;
+      String symLabel = symbol.toString(getParser());
+
+      ControlSequence cs = getParser().getControlSequence(
+        "dtl@curr@" + symLabel + "@fmt");
+
+      if (cs == null)
+      {
+         getParser().putControlSequence(
+            new TextualContentCommand("DTLCurrencyCode", "XXX"));
+         getParser().putControlSequence(true,
+           new GenericCommand(true, DTL_CURRENCY_CSNAME, null, symbol));
+      }
+      else
+      {
+         getParser().putControlSequence(
+            new TextualContentCommand("DTLCurrencyCode", symLabel));
+
+         getParser().putControlSequence(true,
+           new GenericCommand(true, DTL_CURRENCY_CSNAME, null,
+           new TeXCsRef("DTLcurr"+symLabel)));
+
+         getParser().putControlSequence(true,
+          new GenericCommand(true, "DTLfmtcurrency", null, cs));
+      }
+   }
+
+   public void defineCurrency(TeXObject fmt, String label, TeXObject sym,
+     TeXObject str)
+   {
+      if (fmt == null)
+      {
+         fmt = new TeXCsRef("dtlcurrdefaultfmt");
+      }
+
+      getParser().putControlSequence(true,
+        new GenericCommand(true, "dtl@curr@"+label+"@str", null, str));
+
+      getParser().putControlSequence(true,
+        new GenericCommand(true, "dtl@curr@"+label+"@sym", null, sym));
+
+      getParser().putControlSequence(true,
+        new GenericCommand(true, "DTLcurr"+label, null, 
+         TeXParserUtils.createStack(listener,
+            new TeXCsRef("dtltexorsort"),
+            TeXParserUtils.createGroup(listener,
+              new TeXCsRef("DTLcurrCodeOrSymOrStr"),
+               TeXParserUtils.createGroup(listener, listener.getParam(1)),
+               new TeXCsRef("dtl@curr@"+label+"@sym"),
+               new TeXCsRef("dtl@curr@"+label+"@str")
+            ),
+            TeXParserUtils.createGroup(listener,
+             new TeXCsRef("dtl@curr@"+label+"@str"))
+         )
+      ));
+
+      addCurrencySymbol("DTLcurr"+label);
+      addCurrencySymbol(sym);
+      addCurrencySymbol(str);
+
+      getParser().putControlSequence(true,
+         new GenericCommand(true, "dtl@curr@"+label+"@fmt", null, fmt));
    }
 
    public IfThenSty getIfThenSty()
@@ -220,8 +396,7 @@ public class DataToolBaseSty extends LaTeXSty
    public static int parseInt(String str, TeXParser parser)
     throws TeXSyntaxException
    {
-      ControlSequence cs 
-        = parser.getControlSequence("__texparser_fmt_integer_value:n");
+      ControlSequence cs = parser.getControlSequence(FMT_INTEGER_VALUE);
 
       try
       {
@@ -243,7 +418,7 @@ public class DataToolBaseSty extends LaTeXSty
     throws TeXSyntaxException
    {
       ControlSequence cs
-        = parser.getControlSequence("__texparser_fmt_decimal_value:n");
+        = parser.getControlSequence(FMT_DECIMAL_VALUE);
 
       try
       {
@@ -265,7 +440,7 @@ public class DataToolBaseSty extends LaTeXSty
     throws TeXSyntaxException
    {
       ControlSequence cs 
-        = parser.getControlSequence("__texparser_fmt_currency_value:n");
+        = parser.getControlSequence(FMT_CURRENCY_VALUE);
             
       try
       {
@@ -294,7 +469,7 @@ public class DataToolBaseSty extends LaTeXSty
       TeXParser parser = getListener().getParser();
 
       boolean useDatum
-        = TeXParserUtils.isTrue("l__datatool_db_store_datum_bool", parser);
+        = TeXParserUtils.isTrue(DataToolSty.DB_STORE_DATUM_BOOL, parser);
 
       if (entry instanceof DataElement)
       {
@@ -372,7 +547,7 @@ public class DataToolBaseSty extends LaTeXSty
             try
             {
                ControlSequence cs = parser.getControlSequence(
-                 "__texparser_fmt_currency_value:n");
+                 FMT_CURRENCY_VALUE);
 
                String str = list.toString(parser).trim();
                double value;
@@ -411,8 +586,7 @@ public class DataToolBaseSty extends LaTeXSty
 
       try
       {
-         ControlSequence cs = parser.getControlSequence(
-            "__texparser_fmt_integer_value:n");
+         ControlSequence cs = parser.getControlSequence(FMT_INTEGER_VALUE);
 
          int value;
 
@@ -443,8 +617,7 @@ public class DataToolBaseSty extends LaTeXSty
 
       try
       {
-         ControlSequence cs = parser.getControlSequence(
-            "__texparser_fmt_decimal_value:n");
+         ControlSequence cs = parser.getControlSequence(FMT_DECIMAL_VALUE);
 
          double value;
 
@@ -495,14 +668,89 @@ public class DataToolBaseSty extends LaTeXSty
       }
    }
 
+   public boolean isNull(TeXObject object)
+   {
+      if (object instanceof AssignedMacro)
+      {
+         object = ((AssignedMacro)object).getBaseUnderlying();
+      }
+
+      if (object.equals(noValueCs)
+         || object.equals(numberNullCs)
+         || object.equals(stringNullCs))
+      {
+         return true;
+      }
+      else if (object instanceof ControlSequence)
+      {
+         String name = ((ControlSequence)object).getName();
+
+         if (name.equals(NULL_VALUE_CSNAME)
+         || name.equals(NUMBER_NULL_CSNAME)
+         || name.equals(STRING_NULL_CSNAME)
+            )
+         {
+            return true;
+         }
+      }
+      else if (getParser().isStack(object))
+      {
+         if (((TeXObjectList)object).size() == 1)
+         {
+            object = ((TeXObjectList)object).firstElement();
+
+            if (object instanceof ControlSequence)
+            {
+                String name = ((ControlSequence)object).getName();
+
+                if (name.equals(NULL_VALUE_CSNAME)
+                || name.equals(NUMBER_NULL_CSNAME)
+                || name.equals(STRING_NULL_CSNAME)
+                )
+                {
+                   return true;
+                }
+            }
+         }
+         else if (((TeXObjectList)object).equalsMatchCatCode(nullMarker))
+         {
+            return true;
+         }
+      }
+
+      return false;
+   }
+
    private IfThenSty ifThenSty;
 
    private Vector<TeXObject> currencySymbolList;
-   private TeXObject defaultCurrency;
 
    private CountRegister sortCountReg;
+
+   private TeXObjectList nullMarker;
+   private GenericCommand noValueCs, numberNullCs, stringNullCs;
 
    private DataToolSty datatoolSty;
 
    public static final String INDEX_OUT_OF_RANGE="datatool.index.outofrange";
+
+   public static final String FMT_INTEGER_VALUE
+      = "__texparser_fmt_integer_value:n";
+
+   public static final String FMT_DECIMAL_VALUE
+      = "__texparser_fmt_decimal_value:n";
+
+   public static final String FMT_CURRENCY_VALUE
+      = "__texparser_fmt_currency_value:n";
+
+   public static final String DATUM_NNNN = "__datatool_datum:nnnn";
+
+   public static final String NULL_VALUE_CSNAME = "c_datatool_nullvalue_tl";
+   public static final String NUMBER_NULL_CSNAME = "@dtlnumbernull";
+   public static final String STRING_NULL_CSNAME = "@dtlstringnull";
+
+   public static final String DTL_CURRENCY_CSNAME = "@dtl@currency";
+
+   public static final String TMPA_VAR = "l__datatool_tmpa_tl";
+   public static final String TMPB_VAR = "l__datatool_tmpb_tl";
 }

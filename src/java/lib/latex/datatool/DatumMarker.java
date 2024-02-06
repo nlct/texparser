@@ -26,7 +26,7 @@ public class DatumMarker extends Command
 {
    public DatumMarker()
    {
-      this("__datatool_datum:nnnn");
+      this(DataToolBaseSty.DATUM_NNNN);
    }
 
    public DatumMarker(String name)
@@ -82,7 +82,7 @@ public class DatumMarker extends Command
    {
       if (object instanceof DatumMarker
          || (object instanceof ControlSequence 
-              && ((ControlSequence)object).getName().equals("__datatool_datum:nnnn")))
+              && ((ControlSequence)object).getName().equals(DataToolBaseSty.DATUM_NNNN)))
       {
          return true;
       }

@@ -51,15 +51,15 @@ public class IOSettings
    public void fetchSettings(boolean isRead, TeXParser parser, TeXObjectList stack)
     throws IOException
    {
-      defaultName = getControlSequenceValue("l__datatool_io_name_str",
+      defaultName = TeXParserUtils.getControlSequenceValue(DataToolSty.IO_NAME,
         null, parser, stack);
 
-      defaultExtension = getControlSequenceValue("l__datatool_default_ext_str",
-        null, parser, stack);
+      defaultExtension = TeXParserUtils.getControlSequenceValue(
+        DataToolSty.DEFAULT_EXT, null, parser, stack);
 
       incHeader = !TeXParserUtils.isTrue("ifdtlnoheader", parser);
 
-      String val = getControlSequenceValue("l__datatool_format_str",
+      String val = TeXParserUtils.getControlSequenceValue(DataToolSty.FORMAT,
         "csv", parser, stack);
 
       String formatStr = val;
@@ -110,8 +110,8 @@ public class IOSettings
          separator = sty.getSeparator();
          delimiter = sty.getDelimiter();
 
-         val = getControlSequenceValue("__texparser_io_csv_escape_chars_tl",
-          "double-delim", parser, stack);
+         val = TeXParserUtils.getControlSequenceValue(
+          DataToolSty.CSV_ESCAPE_CHARS, "double-delim", parser, stack);
 
          if (val.equals("none"))
          {
@@ -145,10 +145,10 @@ public class IOSettings
             autoKeys = TeXParserUtils.isTrue("ifdtlautokeys", parser);
 
             skipLines = TeXParserUtils.toInt(
-              parser.getListener().getControlSequence("dtl@omitlines"),
+              parser.getListener().getControlSequence(DataToolSty.OMIT_LINES),
               parser, stack);
 
-            val = getControlSequenceValue("__texparser_io_csv_blank_tl",
+            val = TeXParserUtils.getControlSequenceValue(DataToolSty.CSV_BLANK,
              "ignore", parser, stack);
 
             if (val.equals("ignore"))
@@ -171,24 +171,24 @@ public class IOSettings
             }
 
             csvLiteral = !TeXParserUtils.isFalse(
-              "l__datatool_csv_literal_content_bool", parser);
+              DataToolSty.CSV_LITERAL_CONTENT_BOOL, parser);
          }
 
          appendAllowed = !TeXParserUtils.isFalse(
-           "l__datatool_append_allowed_bool", parser);
+           DataToolSty.APPEND_ALLOWED_BOOL, parser);
 
          trimElement = !TeXParserUtils.isFalse(
-           "l__datatool_new_element_trim_bool", parser);
+           DataToolSty.NEW_ELEMENT_TRIM_BOOL, parser);
       }
       else
       {
          if (defaultName == null)
          {
-            defaultName = getControlSequenceValue("l__datatool_default_dbname_str",
-              "untitled", parser, stack);
+            defaultName = TeXParserUtils.getControlSequenceValue(
+              DataToolSty.DEFAULT_NAME, "untitled", parser, stack);
          }
 
-         val = getControlSequenceValue("__texparser_io_overwrite_tl",
+         val = TeXParserUtils.getControlSequenceValue(DataToolSty.IO_OVERWRITE,
           "error", parser, stack);
 
          if (val.equals("allow"))
@@ -212,7 +212,7 @@ public class IOSettings
 
          if (format != FileFormatType.DBTEX)
          {
-            val = getControlSequenceValue("__texparser_io_expand_tl",
+            val = TeXParserUtils.getControlSequenceValue(DataToolSty.IO_EXPAND,
              "none", parser, stack);
 
             if (val.equals("none"))
@@ -237,8 +237,8 @@ public class IOSettings
 
          if (format == FileFormatType.CSV || format == FileFormatType.TSV)
          {
-            val = getControlSequenceValue("__texparser_io_add_delimiter_tl",
-             "detect", parser, stack);
+            val = TeXParserUtils.getControlSequenceValue(
+             DataToolSty.IO_ADD_DELIMITER, "detect", parser, stack);
 
             if (val.equals("always"))
             {
@@ -261,22 +261,6 @@ public class IOSettings
 
          }
       }
-   }
-
-   protected String getControlSequenceValue(String csname, String defValue,
-     TeXParser parser, TeXObjectList stack)
-   throws IOException
-   {
-      ControlSequence cs = parser.getControlSequence(csname);
-
-      if (cs == null) return defValue;
-
-      if (cs instanceof TextualContentCommand)
-      {
-         return ((TextualContentCommand)cs).getText();
-      }
-
-      return parser.expandToString(cs, stack);
    }
 
    public FileFormatType getFormat()

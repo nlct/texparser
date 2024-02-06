@@ -56,15 +56,18 @@ public class DTLsetnumberchars extends ControlSequence
         new TextualContentCommand("@dtl@decimal", decimalChar));
 
       parser.putControlSequence(true, 
-        new NumericFormatter("__texparser_fmt_integer_value:n",
+        new NumericFormatter(
+          DataToolBaseSty.FMT_INTEGER_VALUE,
           new DecimalFormat("#"+numGrpChar+"##0"), decimalChar));
 
       parser.putControlSequence(true, 
-        new NumericFormatter("__texparser_fmt_decimal_value:n",
+        new NumericFormatter(
+          DataToolBaseSty.FMT_DECIMAL_VALUE,
           new DecimalFormat("#"+numGrpChar+"##0"+decimalChar+"0######")));
 
       parser.putControlSequence(true, 
-        new NumericFormatter("__texparser_fmt_currency_value:n",
+        new NumericFormatter(
+          DataToolBaseSty.FMT_CURRENCY_VALUE,
           new DecimalFormat("#"+numGrpChar+"##0"+decimalChar+"00")));
    }
 

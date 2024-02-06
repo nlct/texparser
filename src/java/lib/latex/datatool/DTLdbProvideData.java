@@ -48,8 +48,7 @@ public class DTLdbProvideData extends ControlSequence
    {
       String label = popLabelString(parser, stack);
 
-      ControlSequence nameCs = parser.getControlSequence(
-         "l__datatool_io_name_str");
+      ControlSequence nameCs = parser.getControlSequence(DataToolSty.IO_NAME);
 
       if (nameCs != null)
       {
@@ -62,16 +61,16 @@ public class DTLdbProvideData extends ControlSequence
       }
 
       parser.putControlSequence(true, 
-       new TextualContentCommand("l__datatool_default_dbname_str", label));
+       new TextualContentCommand(DataToolSty.DEFAULT_NAME, label));
 
       parser.putControlSequence(true, 
        new TextualContentCommand("dtllastloadeddb", label));
 
       parser.putControlSequence(true,
-        new TextualContentCommand("__texparser_current_file_type_tl", "dtltex"));
+        new TextualContentCommand(DataToolSty.CURRENT_FILE_TYPE, "dtltex"));
 
       parser.putControlSequence(true,
-        new TextualContentCommand("__texparser_current_file_version_tl", "3.0"));
+        new TextualContentCommand(DataToolSty.CURRENT_FILE_VERSION, "3.0"));
 
       if (!sty.dbExists(label))
       {

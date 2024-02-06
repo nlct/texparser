@@ -53,7 +53,8 @@ public class DTLreconstructdata extends ControlSequence
        listener.getTeXApp().getMessage("datatool.warn.dbtex3exp"));
 
       parser.putControlSequence(true,
-        new TextualContentCommand("__texparser_current_file_type_tl", "dbtex"));
+        new TextualContentCommand(
+        DataToolSty.CURRENT_FILE_TYPE, "dbtex"));
 
       parser.setCatCode(true, '@', TeXParser.TYPE_LETTER);
 

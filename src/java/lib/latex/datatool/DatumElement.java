@@ -277,7 +277,7 @@ public class DatumElement extends AbstractTeXObject
       TeXParserListener listener = parser.getListener();
       TeXObjectList stack = listener.createStack();
 
-      stack.add(listener.getControlSequence("__datatool_datum:nnnn"));
+      stack.add(listener.getControlSequence(DataToolBaseSty.DATUM_NNNN));
       Group grp = listener.createGroup();
       stack.add(grp);
       grp.add(content, true);

@@ -103,11 +103,12 @@ public class DataCurrencyElement extends DataRealElement
    }
 
    @Override
-   public TeXObjectList expandonce(TeXParser parser) throws IOException
+   public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
+     throws IOException
    {
-      if (parser.isStack(original))
+      if (original != null)
       {
-         return (TeXObjectList)original.clone();
+         return super.expandonce(parser, stack);
       }
 
       TeXParserListener listener = parser.getListener();
@@ -123,7 +124,8 @@ public class DataCurrencyElement extends DataRealElement
       grp = listener.createGroup();
       expanded.add(grp);
 
-      grp.add(listener.getControlSequence("__texparser_fmt_currency_value:n"));
+      grp.add(listener.getControlSequence(
+        DataToolBaseSty.FMT_CURRENCY_VALUE));
       grp.add(new TeXFloatingPoint(doubleValue()));
 
       return expanded;

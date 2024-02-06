@@ -183,15 +183,8 @@ public abstract class Action
    {
       if (dbName == null)
       {
-         dbName = "untitled";
-
-         ControlSequence cs
-           = parser.getControlSequence("l__datatool_default_dbname_tl");
-
-         if (cs != null)
-         {
-            dbName = parser.expandToString(cs, stack);
-         }
+         dbName = TeXParserUtils.getControlSequenceValue(
+            DataToolSty.DEFAULT_NAME, "untitled", parser, stack);
       }
 
       return dbName;

@@ -29,7 +29,7 @@ public class DTLdisplayDbRow extends ControlSequence
 {
    public DTLdisplayDbRow(DataToolSty sty)
    {
-      this("__datatool_display_db_row:Nn", sty);
+      this(DataToolSty.DISPLAY_DB_ROW, sty);
    }
 
    public DTLdisplayDbRow(String name, DataToolSty sty)
@@ -82,14 +82,14 @@ public class DTLdisplayDbRow extends ControlSequence
               parser, stack);
          }
 
-         parser.getSettings().localSetRegister("l__datatool_col_idx_int",
+         parser.getSettings().localSetRegister(DataToolSty.COL_IDX_INT,
             UserNumber.ZERO);
 
          NumericRegister colIdxReg =
-           parser.getSettings().getNumericRegister("l__datatool_col_idx_int");
+           parser.getSettings().getNumericRegister(DataToolSty.COL_IDX_INT);
 
          SequenceCommand colIndexes = listener.getSequenceCommand(
-           "l__datatool_column_indexes_seq", stack);
+           DataToolSty.COLUMN_INDEXES_SEQ, stack);
 
          for (int i = 0; i < colIndexes.size(); i++)
          {
