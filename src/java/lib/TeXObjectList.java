@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013-2022 Nicola L.C. Talbot
+    Copyright (C) 2013-2024 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -1078,6 +1078,49 @@ public class TeXObjectList extends Vector<TeXObject>
       }
 
       return false;
+   }
+
+   public boolean equalsMatchCatCode(TeXObject other)
+   {
+      if (other == null || !other.getClass().equals(getClass()))
+      {
+         return false;
+      }
+
+      TeXObjectList otherList = (TeXObjectList)other;
+
+      if (otherList.size() != size())
+      {
+         return false;
+      }
+
+      for (int i = 0; i < size(); i++)
+      {
+         TeXObject obj1 = get(i);
+         TeXObject obj2 = otherList.get(i);
+
+         if (obj1 instanceof TeXObjectList && obj2 instanceof TeXObjectList)
+         {
+            if (!((TeXObjectList)obj1).equalsMatchCatCode((TeXObjectList)obj2))
+            {
+               return false;
+            }
+         }
+         else if (
+            ! (
+               obj1.isSingleToken()
+            && obj2.isSingleToken()
+            && ((SingleToken)obj1).getCatCode()
+                   == ((SingleToken)obj2).getCatCode()
+            && obj1.equals(obj2)
+              )
+            )
+         {
+            return false;
+         }
+      }
+
+      return true;
    }
 
    public void push(TeXObject object)
