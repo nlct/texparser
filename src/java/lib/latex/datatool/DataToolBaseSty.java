@@ -164,6 +164,8 @@ public class DataToolBaseSty extends LaTeXSty
       registerControlSequence(new GenericCommand(true,
         "DTLdefaultEURcurrencyfmt", null, new TeXCsRef("dtlcurrdefaultfmt")));
 
+      registerControlSequence(new DTLdefcurrency(this));
+
       // Null
 
       nullMarker = TeXParserUtils.createStack(listener,
