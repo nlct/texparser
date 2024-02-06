@@ -281,6 +281,22 @@ public class TeXParserUtils
       return expandFully(arg, parser, stack);
    }
 
+   public static String getControlSequenceValue(String csname, String defValue,
+     TeXParser parser, TeXObjectList stack)
+   throws IOException
+   {
+      ControlSequence cs = parser.getControlSequence(csname);
+               
+      if (cs == null) return defValue;
+            
+      if (cs instanceof TextualContentCommand)
+      {
+         return ((TextualContentCommand)cs).getText();
+      }
+
+      return parser.expandToString(cs, stack);
+   }
+
    public static Numerical toNumerical(TeXObject obj, 
     TeXParser parser, TeXObjectList stack)
    throws IOException
