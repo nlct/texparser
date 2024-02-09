@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2022-2023 Nicola L.C. Talbot
+    Copyright (C) 2022-2024 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -862,6 +862,75 @@ public class TeXParserUtils
       }
 
       return false;
+   }
+
+   /**
+    * Tests if the given object consists solely of "letter" or
+    * "other" or "space".
+    */ 
+   public static boolean isString(TeXObject object, TeXParser parser)
+   {
+      if (object == null)
+      {
+         return false;
+      }
+
+      if (parser.isStack(object))
+      {
+         TeXObjectList list = (TeXObjectList)object;
+
+         for (TeXObject obj : list)
+         {
+            if (!isString(obj, parser)) return false;
+         }
+
+         return true;
+      }
+      else if (object instanceof WhiteSpace
+            || object instanceof Letter
+            || object instanceof Other)
+      {
+         return true;
+      }
+      else if (object.isSingleToken())
+      {
+         int catcode = ((SingleToken)object).getCatCode();
+
+         return (catcode == TeXParser.TYPE_LETTER
+               || catcode == TeXParser.TYPE_OTHER
+               || catcode == TeXParser.TYPE_SPACE);
+      }
+      else
+      {
+         return false;
+      }
+   }
+
+   public static TeXObject purify(TeXObject object, TeXParser parser,
+     TeXObjectList stack)
+   throws IOException
+   {
+      object = expandFully(object, parser, stack);
+
+      if (isString(object, parser))
+      {
+         return object;
+      }
+
+      TeXObjectList list = parser.getListener().createStack();
+
+      if (object instanceof TeXObjectList)
+      {
+         for (TeXObject o : (TeXObjectList)object)
+         {
+            if (isString(o, parser))
+            {
+               list.add(o, true);
+            }
+         }
+      }
+
+      return list;
    }
 }
 
