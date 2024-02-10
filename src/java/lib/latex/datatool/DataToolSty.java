@@ -69,6 +69,8 @@ public class DataToolSty extends LaTeXSty
       registerControlSequence(new DTLsetdelimiter(this));
       registerControlSequence(new DTLsetseparator(this));
       registerControlSequence(new DTLsettabseparator(this));
+      registerControlSequence(new DTLaddcolumn(this));
+      registerControlSequence(new DTLsetheader(this));
 
       registerControlSequence(new DTLaction(this));
 
