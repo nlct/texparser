@@ -88,6 +88,12 @@ public class DataToolBaseSty extends LaTeXSty
       registerControlSequence(
         new NumericFormatter(FMT_CURRENCY_VALUE, new DecimalFormat("#,##0.00")));
 
+      registerControlSequence(new DTLpadleadingzeros());
+      registerControlSequence(new TextualContentCommand(
+        "dtlpadleadingzerosminus", "-"));
+      registerControlSequence(new TextualContentCommand(
+        "dtlpadleadingzerosplus", ""));
+
       // Currency
 
       addCurrencySymbol("$");
