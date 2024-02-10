@@ -509,12 +509,7 @@ public class DataToolBaseSty extends LaTeXSty
          }
       }
 
-      TeXObject original = null;
-
-      if (useDatum)
-      {
-         original = (TeXObject)entry.clone();
-      }
+      TeXObject original = original = (TeXObject)entry.clone();
 
       if (entry instanceof TeXObjectList)
       {
@@ -576,7 +571,7 @@ public class DataToolBaseSty extends LaTeXSty
                }
                else
                {
-                  return new DataCurrencyElement(first, value);
+                  return new DataCurrencyElement(first, value, original);
                }
             }
             catch (NumberFormatException | ParseException e)
@@ -614,7 +609,7 @@ public class DataToolBaseSty extends LaTeXSty
          }
          else
          {
-            return new DataIntElement(value);
+            return new DataIntElement(value, original);
          }
       }
       catch (NumberFormatException | ParseException e)
@@ -645,7 +640,7 @@ public class DataToolBaseSty extends LaTeXSty
          }
          else
          {
-            return new DataRealElement(value);
+            return new DataRealElement(value, original);
          }
       }
       catch (NumberFormatException | ParseException e)
