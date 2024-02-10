@@ -44,9 +44,9 @@ public class DTLpadleadingzeros extends Command
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
    throws IOException
    {
-      String valStr = popLabelString(parser, stack).trim();
-
       int numDigits = TeXParserUtils.popInt(parser, stack);
+
+      String valStr = popLabelString(parser, stack).trim();
 
       TeXParserListener listener = parser.getListener();
 
