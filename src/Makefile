@@ -1,4 +1,8 @@
-TARGET_VERSION := --release 8
+ifeq ($(shell javac -version 2>&1 | grep 1.8),)
+  target_version := --release 8
+else
+  target_version = 
+endif
 
 test	: test-obs test-abs test-article test-nested test-doc \
 	  test-probsoln test-lists test-datatool test-mkimages \
@@ -69,7 +73,7 @@ tests/test-userguide/test-userguide.pdf	: tests/test-userguide/test-userguide.te
 
 test-jmlrutils : app tests/output
 	rm -f -r tests/output/test-jmlrutils
-	bin/texparsertest --debug --in tests/test-jmlrutils/test-jmlrutils.tex --output tests/output/test-jmlrutils --html
+	bin/texparsertest --no-rm-tmp-dir --debug --in tests/test-jmlrutils/test-jmlrutils.tex --output tests/output/test-jmlrutils --html
 
 test-doc : app tests/output
 	rm -f -r tests/output/test-doc
@@ -129,7 +133,7 @@ classes/com/dickimawbooks/texparsertest/TeXParserApp.class   : classes/com/dicki
 classes/com/dickimawbooks/texparserlib/TeXParser.class   : classes/com/dickimawbooks/texparserlib \
 	java/lib/*.java java/lib/*/*.java java/lib/*/*/*.java
 	cd java/lib; \
-	javac $(TARGET_VERSION) -d ../../classes -Xlint:unchecked -Xlint:deprecation *.java */*.java */*/*.java
+	javac $(target_version) -d ../../classes -Xlint:unchecked -Xlint:deprecation *.java */*.java */*/*.java
 
 classes/com/dickimawbooks/texparsertest    :
 	mkdir -p classes/com/dickimawbooks/texparsertest
