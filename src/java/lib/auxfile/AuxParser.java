@@ -106,6 +106,11 @@ public class AuxParser extends DefaultTeXParserListener
       parser.setCatCode('@', code);
    }
 
+   public String getLabelPrefix()
+   {
+      return labelPrefix;
+   }
+
    @Override
    protected void addPredefined()
    {
@@ -121,8 +126,7 @@ public class AuxParser extends DefaultTeXParserListener
 
       putControlSequence(new AuxProvideCommand());
 
-      putControlSequence(new AuxIgnoreable("@writefile", false, 
-        new boolean[]{true, true}));
+      addAuxCommand("@writefile", 2);
 
       putControlSequence(new AuxIgnoreable("selectlanguage", true, new boolean[]{true}));
    }
@@ -186,6 +190,35 @@ public class AuxParser extends DefaultTeXParserListener
    public boolean isAllowCatCodeChangersOn()
    {
       return allowCatChangers;
+   }
+
+   /**
+    * Sets whether or not document divisions should be saved.
+    * These correspond to the toc content line written to the aux file.
+    * (That is, lines starting <code>\@writefile{toc}{\contentsline...}</code>.)
+    */
+   public void enableSaveDivisions(boolean enabled)
+   {
+      saveDivisions = enabled;
+   }
+
+   public boolean isSaveDivisionsEnabled()
+   {
+      return saveDivisions;
+   }
+
+   protected DivisionData createDivisionData(String unit, TeXObject prefix, TeXObject title, 
+     String target, TeXObject location)
+   {
+      return new DivisionData(unit, prefix, title, target, location);
+   }
+
+   protected void initDivisionData()
+   {
+      divisionData = new Vector<DivisionData>();
+
+      // add document root
+      divisionData.add(createDivisionData("document", null, null, "Doc-Start", null));
    }
 
    @Override
@@ -300,7 +333,164 @@ public class AuxParser extends DefaultTeXParserListener
          getParser().logMessage("AuxData: "+data.toString(parser));
       }
 
-      auxData.add(data);
+      if (data.getName().equals("@writefile"))
+      {
+         if (saveDivisions)
+         {
+            String ext = data.getArg(0).toString(getParser());
+
+            if (ext.equals("toc"))
+            {
+               DivisionData divData = getDivisionData(data.getArg(1));
+
+               if (divData != null)
+               {
+                  if (divisionData == null)
+                  {
+                     initDivisionData();
+                  }
+
+                  divisionData.add(divData);
+               }
+            }
+         }
+      }
+      else
+      {
+         if (saveDivisions && data.getName().equals("newlabel"))
+         {
+            if (divisionData == null)
+            {
+               initDivisionData();
+            }
+
+            if (!divisionData.isEmpty())
+            {
+               DivisionData divData = divisionData.lastElement();
+               divData.addLabel(data.getArg(0).toString(getParser()));
+            }
+         }
+
+         auxData.add(data);
+      }
+   }
+
+   protected DivisionData getDivisionData(TeXObject content)
+   {
+      if (!getParser().isStack(content))
+      {
+         return null;
+      }
+
+      TeXObjectList stack = (TeXObjectList)content;
+
+      if (stack.isEmpty()) return null;
+
+      try
+      {
+         TeXObject obj = stack.popStack(getParser());
+
+         if (!(obj instanceof ControlSequence)
+               || !((ControlSequence)obj).getName().equals("contentsline"))
+         {
+            return null;
+         }
+
+         String unit = TeXParserUtils.popLabelString(getParser(), stack);
+
+         TeXObject title = stack.popArg(getParser());
+         TeXObject prefix = null;
+
+         if (getParser().isStack(title))
+         {
+            obj = ((TeXObjectList)title).peek();
+
+            if (obj instanceof ControlSequence)
+            {
+               ControlSequence cs = (ControlSequence)obj;
+
+               if (cs.getName().equals("numberline"))
+               {
+                  ((TeXObjectList)title).pop();
+
+                  prefix = ((TeXObjectList)title).popArg(getParser());
+               }
+               else if (cs.getName().equals("nonumberline"))
+               {
+                  ((TeXObjectList)title).pop();
+               }
+            }
+         }
+
+         TeXObject location = stack.popArg(getParser());
+         String target = null;
+
+         if (!stack.isEmpty())
+         {
+            target = TeXParserUtils.popLabelString(getParser(), stack);
+         }
+
+         return createDivisionData(unit, prefix, title, target, location);
+      }
+      catch (IOException e)
+      {
+         if (getParser().isDebugModeOn())
+         {
+            getTeXApp().error(e);
+         }
+
+         return null;
+      }
+   }
+
+   public Vector<DivisionData> getDivisionData()
+   {
+      return divisionData;
+   }
+
+   public DivisionData getDivisionByTarget(String target)
+   {
+      if (divisionData == null) return null;
+
+      for (DivisionData divData : divisionData)
+      {
+         if (target.equals(divData.getTarget()))
+         {
+            return divData;
+         }
+      }
+
+      return null;
+   }
+
+   public DivisionData getDivisionByLabel(String label)
+   {
+      if (divisionData == null) return null;
+
+      for (DivisionData divData : divisionData)
+      {
+         if (label.equals(divData.getLabel()))
+         {
+            return divData;
+         }
+      }
+
+      return null;
+   }
+
+   public DivisionData getDivisionContainingLabel(String label)
+   {
+      if (divisionData == null) return null;
+
+      for (DivisionData divData : divisionData)
+      {
+         if (divData.containsLabel(label))
+         {
+            return divData;
+         }
+      }
+
+      return null;
    }
 
    public Vector<AuxData> getAuxData(String name)
@@ -354,9 +544,11 @@ public class AuxParser extends DefaultTeXParserListener
    }
 
    private Vector<AuxData> auxData;
+   protected Vector<DivisionData> divisionData;
    private TeXApp texApp;
 
    private Charset charset=null;
    private String labelPrefix = null;
    private boolean allowCatChangers = true;
+   private boolean saveDivisions = false;
 }
