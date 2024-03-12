@@ -242,6 +242,11 @@ public class TeXParser extends TeXObjectList
 
    }
 
+   public boolean isDebugModeOn()
+   {
+      return debugMode > 0;
+   }
+
    public boolean isDebugMode(int mode)
    {
       return (debugMode & mode) == mode;
@@ -4440,6 +4445,6 @@ public class TeXParser extends TeXObjectList
    public static final int DEBUG_READ = 32768;
    public static final int DEBUG_SETTINGS = 65536;
 
-   public static final String VERSION = "0.9.9b-20240210";
-   public static final String VERSION_DATE = "2024-02-10";
+   public static final String VERSION = "0.9.9b-20240312";
+   public static final String VERSION_DATE = "2024-03-12";
 }
