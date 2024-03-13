@@ -28,6 +28,7 @@ import java.util.Vector;
 import java.util.Stack;
 import java.util.Iterator;
 import java.util.HashMap;
+import java.util.TreeMap;
 import java.awt.Color;
 import java.awt.Dimension;
 
@@ -1453,6 +1454,11 @@ public class L2HConverter extends LaTeXParserListener
       writeliteralln("<div id=\"main\">");
 
       getParser().getSettings().setCharMapMode(TeXSettings.CHAR_MAP_ON);
+
+      if (divisionData != null)
+      {
+         createDivisionTree();
+      }
    }
 
    @Override
@@ -1533,6 +1539,67 @@ public class L2HConverter extends LaTeXParserListener
          doFootnoteRule();
 
          writer.write(footnoteWriter.toString());
+      }
+   }
+
+// TODO
+   protected void createDivisionTree()
+   {
+      if (divisionData == null || divisionData.isEmpty()) return;
+
+      divisionMap = new TreeMap<String,DivisionNode>();
+
+      DivisionNode prevNode = null;
+
+      for (int i = 0; i < divisionData.size(); i++)
+      {
+         DivisionData data = divisionData.get(i);
+
+         DivisionNode parent = null;
+
+         if (prevNode != null)
+         {
+            if (prevNode.getUnit().equals(data.getUnit()))
+            {
+               parent = prevNode.getParent();
+            }
+            else
+            {
+               parent = prevNode.getAncestorAtUnit(data.getUnit());
+
+               if (parent == null)
+               {
+                  DivisionNode childNode = prevNode.getFirstChild();
+
+                  if (childNode == null || childNode.getUnit().equals(data.getUnit()))
+                  {
+                     parent = prevNode;
+                  }
+               }
+               else
+               {
+                  parent = parent.getParent();
+               }
+            }
+         }
+
+         DivisionNode node = new DivisionNode(i, data, parent);
+
+         String label = data.getLabel();
+
+         if (label == null)
+         {
+            label = data.getTarget();
+         }
+
+         if (label != null)
+         {
+            node.setRef("#"+HtmlTag.getUriFragment(label));
+
+            divisionMap.put(label, node);
+         }
+
+         prevNode = node;
       }
    }
 
@@ -3093,6 +3160,8 @@ public class L2HConverter extends LaTeXParserListener
    private String currentSection = null;
 
    private Stack<TrivListDec> trivListStack = new Stack<TrivListDec>();
+
+   private TreeMap<String,DivisionNode> divisionMap;
 
    public static final String MIME_TYPE_PDF = "application/pdf";
    public static final String MIME_TYPE_PNG = "image/png";

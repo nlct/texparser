@@ -31,6 +31,11 @@ public class DivisionData
    public DivisionData(String unit, TeXObject prefix, TeXObject title,
      String target, TeXObject location)
    {
+      if (unit == null)
+      {
+         throw new NullPointerException();
+      }
+
       this.unit = unit;
       this.prefix = prefix;
       this.title = title;
@@ -70,6 +75,11 @@ public class DivisionData
 
    public void setUnit(String unit)
    {
+      if (unit == null)
+      {
+         throw new NullPointerException();
+      }
+
       this.unit = unit;
    }
 
@@ -108,17 +118,59 @@ public class DivisionData
       return location;
    }
 
-   public void setRef(String ref)
+   @Override
+   public boolean equals(Object other)
    {
-      this.ref = ref;
+      if (this == other) return true;
+
+      if (!(other instanceof DivisionData)) return false;
+
+      DivisionData data = (DivisionData)other;
+
+      if (!unit.equals(data.unit)) return false;
+
+      if ((target != null && data.target == null)
+       || (target == null && data.target != null))
+      {
+         return false;
+      }
+
+      if (target != null && !target.equals(data.target)) return false;
+
+      if ((prefix != null && data.prefix == null)
+       || (prefix == null && data.prefix != null))
+      {
+         return false;
+      }
+
+      if (prefix != null && !prefix.equals(data.prefix)) return false;
+
+      if ((title != null && data.title == null)
+       || (title == null && data.title != null))
+      {
+         return false;
+      }
+
+      if (title != null && !title.equals(data.title)) return false;
+
+      if ((location != null && data.location == null)
+       || (location == null && data.location != null))
+      {
+         return false;
+      }
+
+      if (location != null && !location.equals(data.location)) return false;
+
+      if ((labels != null && data.labels == null)
+       || (labels == null && data.labels != null))
+      {
+         return false;
+      }
+
+      return (labels == null || labels.equals(data.labels));
    }
 
-   public String getRef()
-   {
-      return ref;
-   }
-
-   protected String target, unit, ref;
+   protected String target, unit;
    protected TeXObject prefix, title, location;
 
    protected Vector<String> labels;

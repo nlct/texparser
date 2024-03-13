@@ -124,6 +124,17 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       this.parseAux = parseAux;
    }
 
+   public boolean isSaveDivisionsEnabled()
+   {
+      return saveDivisions;
+   }
+
+   // only relevant if parseAux = true
+   public void setSaveDivisionsEnabled(boolean enable)
+   {
+      saveDivisions = enable;
+   }
+
    public TeXObject getAnchor(String anchorName)
    {
       return null;
@@ -1489,6 +1500,8 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
             parser.debugMessage(TeXParser.DEBUG_IO, "Parsing AUX file: "+auxFile);
 
             AuxParser auxListener = new AuxParser(getTeXApp(), getCharSet(), prefix);
+
+            auxListener.enableSaveDivisions(saveDivisions);
             auxListener.parseAuxFile(auxFile);
 
             Vector<AuxData> data = auxListener.getAuxData();
@@ -1501,6 +1514,8 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
             {
                auxData.addAll(data);
             }
+
+            divisionData = auxListener.getDivisionData();
          }
          else
          {
@@ -2485,6 +2500,25 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       return new AlignRow(getParser(), stack);
    }
 
+   public void setAuxData(AuxParser auxParser)
+   {
+      this.auxData = auxParser.getAuxData();
+
+      saveDivisions = auxParser.isSaveDivisionsEnabled();
+
+      divisionData = auxParser.getDivisionData();
+   }
+
+   public void setDivisionData(Vector<DivisionData> divisionData)
+   {
+      this.divisionData = divisionData;
+   }
+
+   public Vector<DivisionData> getDivisionData()
+   {
+      return divisionData;
+   }
+
    public void setAuxData(Vector<AuxData> auxData)
    {
       this.auxData = auxData;
@@ -3044,7 +3078,12 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
    protected Vector<LaTeXFile> loadedPackages;
    protected Vector<LaTeXCls> loadedClasses;
 
+   private boolean parseAux = false;
+
    private Vector<AuxData> auxData;
+
+   private boolean saveDivisions;
+   protected Vector<DivisionData> divisionData;
 
    private Hashtable<String,Vector<String>> counters;
 
@@ -3077,8 +3116,6 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
    private ColorSty colorSty = null;
 
    private GlossariesSty glossariesSty = null;
-
-   private boolean parseAux = false;
 
    private TeXObjectList bibliographySection;
 
