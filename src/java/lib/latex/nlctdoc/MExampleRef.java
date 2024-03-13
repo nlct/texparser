@@ -27,18 +27,19 @@ public class MExampleRef extends Command
 {
    public MExampleRef()
    {
-      this("mExampleref");
+      this("mExampleref", true);
    }
 
-   public MExampleRef(String name)
+   public MExampleRef(String name, boolean sentence)
    {
       super(name);
+      this.sentence = sentence;
    }
 
    @Override
    public Object clone()
    {
-      return new MExampleRef(getName());
+      return new MExampleRef(getName(), sentence);
    }
 
    @Override
@@ -52,9 +53,19 @@ public class MExampleRef extends Command
       expanded.add(parser.getListener().getControlSequence("examplemarginref"));
       expanded.add(parser.getListener().createGroup(label));
 
-      expanded.add(parser.getListener().getControlSequence("Exampleref"));
+      if (sentence)
+      {
+         expanded.add(parser.getListener().getControlSequence("Exampleref"));
+      }
+      else
+      {
+         expanded.add(parser.getListener().getControlSequence("exampleref"));
+      }
+
       expanded.add(parser.getListener().createGroup(label));
 
       return expanded;
    }
+
+   protected boolean sentence;
 }

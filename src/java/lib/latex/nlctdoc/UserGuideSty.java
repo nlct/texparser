@@ -1189,6 +1189,7 @@ public class UserGuideSty extends LaTeXSty
       ));
 
       registerControlSequence(new MExampleRef());
+      registerControlSequence(new MExampleRef("mexampleref", false));
       registerControlSequence(new ExampleMarginRef());
 
       // \tableref
