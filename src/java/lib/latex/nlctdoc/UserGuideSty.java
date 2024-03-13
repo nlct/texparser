@@ -1188,6 +1188,9 @@ public class UserGuideSty extends LaTeXSty
         new TeXCsRef("refslistlastsep")
       ));
 
+      registerControlSequence(new MExampleRef());
+      registerControlSequence(new ExampleMarginRef());
+
       // \tableref
       registerControlSequence(new TextualContentCommand("tablerefprefix", "Table "));
       registerControlSequence(new TextualContentCommand("Tablerefprefix", "Table "));

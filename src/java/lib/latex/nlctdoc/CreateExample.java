@@ -62,6 +62,7 @@ public class CreateExample extends ControlSequence
       TeXObject description = null;
       String label = null;
       int[] pageList = null;
+      String backLink = null;
 
       if (options != null)
       {
@@ -78,6 +79,13 @@ public class CreateExample extends ControlSequence
          if (obj != null)
          {
             label = parser.expandToString(obj, stack);
+         }
+
+         obj = options.get("link");
+
+         if (obj != null)
+         {
+            backLink = parser.expandToString(obj, stack);
          }
 
          obj = options.get("pages");
@@ -110,6 +118,21 @@ public class CreateExample extends ControlSequence
 
       TeXObjectList substack = listener.createStack();
 
+      if (backLink == null && label != null)
+      {
+         TeXObject ref = listener.getReference(label+"-backref");
+
+         if (ref != null)
+         {
+            backLink = label+"-backref";
+         }
+      }
+
+      if (backLink != null)
+      {
+         substack.add(listener.createLink(backLink, listener.getControlSequence("upsym")));
+      }
+
       substack.add(listener.getControlSequence("refstepcounter"));
       substack.add(listener.createGroup("example"));
 
@@ -117,6 +140,7 @@ public class CreateExample extends ControlSequence
       {
          substack.add(listener.getControlSequence("label"));
          substack.add(listener.createGroup(label));
+
       }
       else
       {

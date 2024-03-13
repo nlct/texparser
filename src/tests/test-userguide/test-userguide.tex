@@ -10,7 +10,10 @@
 %\usepackage[autooneside=false]{scrlayer-scrpage}
 
 \usepackage
- [debug=showwrgloss]
+ [
+  tikzsymbols,
+  debug=showwrgloss
+ ]
 {nlctuserguide}
 
 \renewcommand*{\thispackagename}{foobarsty}
@@ -433,7 +436,11 @@ Side-by-side:
 \emph{text}
 \end{coderesult}
 
-An example:
+\subsection{Example 1}
+\label{sec:ex1}
+
+\mExampleref{ex:sample} is an example.
+
 \begin{resultbox}
 \createexample[title={An example that's created on-the-fly provided
 that the \cmd{write18} shell escape is enabled},
@@ -443,6 +450,11 @@ that the \cmd{write18} shell escape is enabled},
 {\emph{text}}
 \end{resultbox}
 
+\subsection{Example 2}
+\label{sec:sample2}
+
+\Exampleref{ex:sample2} is another example.
+
 \begin{coderesult}
 A side-by-side example.
 \cmd{emph}\marg{text}
@@ -450,7 +462,7 @@ A side-by-side example.
 \createexample*[title={Another example that's created on-the-fly provided
 that the \cmd{write18} shell escape is enabled},
  description={A document with the word `text' emphasized},
- label={ex:sample2}]
+ label={ex:sample2},link={sec:sample2}]
 {}
 {\cmd{emph}\marg{text}}
 \end{coderesult}
