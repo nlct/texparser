@@ -22,7 +22,7 @@ import java.io.IOException;
 import java.io.EOFException;
 import java.io.File;
 import java.io.PrintWriter;
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.Vector;
 import java.nio.file.Path;
 import java.nio.file.Files;
@@ -196,15 +196,49 @@ public class AuxParser extends DefaultTeXParserListener
     * Sets whether or not document divisions should be saved.
     * These correspond to the toc content line written to the aux file.
     * (That is, lines starting <code>\@writefile{toc}{\contentsline...}</code>.)
+    * Must be set before parsing to have an effect.
     */
    public void enableSaveDivisions(boolean enabled)
    {
       saveDivisions = enabled;
    }
 
+   /**
+    * Gets the state of the save divisions setting.
+    */ 
    public boolean isSaveDivisionsEnabled()
    {
       return saveDivisions;
+   }
+
+   /**
+    * Sets whether or not the label information should be saved to a hash map
+    * for faster reference. Must be set before parsing. (The information is
+    * obtained from <code>\newlabel</code>.)
+    */
+   public void enableSaveLabels(boolean enabled)
+   {
+      saveLabels = enabled;
+   }
+
+   public boolean isSaveLabelsEnabled()
+   {
+      return saveLabels;
+   }
+
+   /**
+    * Sets whether or not the citation information should be saved to a hash map
+    * for faster reference. Must be set before parsing. (The information is
+    * obtained from <code>\bibcite</code>.)
+    */
+   public void enableSaveCites(boolean enabled)
+   {
+      saveCites = enabled;
+   }
+
+   public boolean isSaveCitesEnabled()
+   {
+      return saveCites;
    }
 
    protected DivisionData createDivisionData(String unit, TeXObject prefix, TeXObject title, 
@@ -357,18 +391,44 @@ public class AuxParser extends DefaultTeXParserListener
       }
       else
       {
-         if (saveDivisions && data.getName().equals("newlabel"))
+         if (data.getName().equals("newlabel"))
          {
-            if (divisionData == null)
+            if (saveDivisions)
             {
-               initDivisionData();
+               if (divisionData == null)
+               {
+                  initDivisionData();
+               }
+
+               if (!divisionData.isEmpty())
+               {
+                  DivisionData divData = divisionData.lastElement();
+                  divData.addLabel(data.getArg(0).toString(getParser()));
+               }
             }
 
-            if (!divisionData.isEmpty())
+            if (saveLabels)
             {
-               DivisionData divData = divisionData.lastElement();
-               divData.addLabel(data.getArg(0).toString(getParser()));
+               if (labelData == null)
+               {
+                  labelData = new HashMap<String,LabelInfo>();
+               }
+
+               LabelInfo info = LabelInfo.createLabel(data, getParser());
+
+               labelData.put(info.getLabel(), info);
             }
+         }
+         else if (saveCites && data.getName().equals("bibcite"))
+         {
+            if (citeData == null)
+            {
+               citeData = new HashMap<String,CiteInfo>();
+            }
+
+            CiteInfo info = CiteInfo.createCite(data, getParser());
+
+            citeData.put(info.getLabel(), info);
          }
 
          auxData.add(data);
@@ -443,11 +503,23 @@ public class AuxParser extends DefaultTeXParserListener
       }
    }
 
+   /**
+    * Gets information about the document divisions provided save divisions
+    * was enabled before parsing. Returns null if not enabled before parsing
+    * or if no information available in the aux file. (That is, there were
+    * no lines starting with <code>\@writefile{toc}{\contentsline...}</code>.)
+    */ 
    public Vector<DivisionData> getDivisionData()
    {
       return divisionData;
    }
 
+   /**
+    * Iterates over the division data (if available) and returns the item
+    * that has the given target. Returns null if not found or no division data.
+    * The target is only available with hyperref and corresponds to the sectional
+    * unit's hyper target.
+    */ 
    public DivisionData getDivisionByTarget(String target)
    {
       if (divisionData == null) return null;
@@ -463,6 +535,12 @@ public class AuxParser extends DefaultTeXParserListener
       return null;
    }
 
+   /**
+    * Iterates over the division data (if available) and returns the item
+    * that has the given label. Returns null if not found or no division data.
+    * The label is the first instance of <code>\newlabel</code> following 
+    * a line starting <code>\@writefile{toc}{\contentsline...}</code>.
+    */ 
    public DivisionData getDivisionByLabel(String label)
    {
       if (divisionData == null) return null;
@@ -478,6 +556,12 @@ public class AuxParser extends DefaultTeXParserListener
       return null;
    }
 
+   /**
+    * Iterates over the division data (if available) and returns the item
+    * that has the given label in its label list. Returns null if not found or no division data.
+    * The label list corresponds to each <code>\newlabel</code> following 
+    * a line starting <code>\@writefile{toc}{\contentsline...}</code>.
+    */ 
    public DivisionData getDivisionContainingLabel(String label)
    {
       if (divisionData == null) return null;
@@ -493,6 +577,10 @@ public class AuxParser extends DefaultTeXParserListener
       return null;
    }
 
+   /**
+    * Gets all the information obtained identified by the command with the
+    * given control sequence name. The aux file needs to be parsed first.
+    */ 
    public Vector<AuxData> getAuxData(String name)
    {
       Vector<AuxData> list = new Vector<AuxData>();
@@ -508,9 +596,23 @@ public class AuxParser extends DefaultTeXParserListener
       return list;
    }
 
+   /**
+    * Gets all the information obtained from parsing the aux file.
+    * The list will be empty if the aux file hasn't yet been parsed.
+    */ 
    public Vector<AuxData> getAuxData()
    {
       return auxData;
+   }
+
+   public HashMap<String,LabelInfo> getLabelData()
+   {
+      return labelData;
+   }
+
+   public HashMap<String,CiteInfo> getCiteData()
+   {
+      return citeData;
    }
 
    @Override
@@ -544,11 +646,19 @@ public class AuxParser extends DefaultTeXParserListener
    }
 
    private Vector<AuxData> auxData;
+
+   private boolean saveDivisions = false;
    protected Vector<DivisionData> divisionData;
+
+   private boolean saveLabels = false;
+   protected HashMap<String,LabelInfo> labelData;
+
+   private boolean saveCites = false;
+   protected HashMap<String,CiteInfo> citeData;
+
    private TeXApp texApp;
 
    private Charset charset=null;
    private String labelPrefix = null;
    private boolean allowCatChangers = true;
-   private boolean saveDivisions = false;
 }

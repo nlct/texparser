@@ -148,6 +148,20 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
          return createUnknownReference(label);
       }
 
+      if (citeData != null)
+      {
+         CiteInfo info = citeData.get(getParser().expandToString(label, null));
+
+         if (info == null)
+         {
+            return createUnknownReference(label);
+         }
+         else
+         {
+            return info.getReference();
+         }
+      }
+
       return AuxData.getCitation(auxData, getParser(), label);
    }
 
@@ -157,6 +171,20 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       if (auxData == null)
       {
          return createUnknownReference(label);
+      }
+
+      if (citeData != null)
+      {
+         CiteInfo info = citeData.get(label);
+
+         if (info == null)
+         {
+            return createUnknownReference(label);
+         }
+         else
+         {
+            return info.getReference();
+         }
       }
 
       return AuxData.getCitation(auxData, getParser(), label);
@@ -170,6 +198,20 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
          return createUnknownReference(label);
       }
 
+      if (labelData != null)
+      {
+         LabelInfo info = labelData.get(parser.expandToString(label, null));
+
+         if (info == null)
+         {
+            return createUnknownReference(label);
+         }
+         else
+         {
+            return info.getReference();
+         }
+      }
+
       return AuxData.getReference(auxData, getParser(), label);
    }
 
@@ -179,6 +221,20 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       if (auxData == null)
       {
          return createUnknownReference(label);
+      }
+
+      if (labelData != null)
+      {
+         LabelInfo info = labelData.get(label);
+
+         if (info == null)
+         {
+            return createUnknownReference(label);
+         }
+         else
+         {
+            return info.getReference();
+         }
       }
 
       return AuxData.getReference(auxData, getParser(), label);
@@ -192,6 +248,20 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
          return createUnknownReference(label);
       }
 
+      if (labelData != null)
+      {
+         LabelInfo info = labelData.get(parser.expandToString(label, null));
+
+         if (info == null)
+         {
+            return createUnknownReference(label);
+         }
+         else
+         {
+            return info.getPage();
+         }
+      }
+
       return AuxData.getPageReference(auxData, getParser(), label);
    }
 
@@ -201,6 +271,20 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       if (auxData == null)
       {
          return createUnknownReference(label);
+      }
+
+      if (labelData != null)
+      {
+         LabelInfo info = labelData.get(label);
+
+         if (info == null)
+         {
+            return createUnknownReference(label);
+         }
+         else
+         {
+            return info.getPage();
+         }
       }
 
       return AuxData.getPageReference(auxData, getParser(), label);
@@ -214,6 +298,20 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
          return createUnknownReference(label);
       }
 
+      if (labelData != null)
+      {
+         LabelInfo info = labelData.get(parser.expandToString(label, null));
+
+         if (info == null)
+         {
+            return createUnknownReference(label);
+         }
+         else
+         {
+            return info.getTitle();
+         }
+      }
+
       return AuxData.getNameReference(auxData, getParser(), label);
    }
 
@@ -223,6 +321,20 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       if (auxData == null)
       {
          return createUnknownReference(label);
+      }
+
+      if (labelData != null)
+      {
+         LabelInfo info = labelData.get(label);
+
+         if (info == null)
+         {
+            return createUnknownReference(label);
+         }
+         else
+         {
+            return info.getTitle();
+         }
       }
 
       return AuxData.getNameReference(auxData, getParser(), label);
@@ -236,6 +348,20 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
          return createUnknownReference(label);
       }
 
+      if (labelData != null)
+      {
+         LabelInfo info = labelData.get(parser.expandToString(label, null));
+
+         if (info == null)
+         {
+            return createUnknownReference(label);
+         }
+         else
+         {
+            return createString(info.getTarget());
+         }
+      }
+
       return AuxData.getHyperReference(auxData, getParser(), label);
    }
 
@@ -245,6 +371,20 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       if (auxData == null)
       {
          return createUnknownReference(label);
+      }
+
+      if (labelData != null)
+      {
+         LabelInfo info = labelData.get(label);
+
+         if (info == null)
+         {
+            return createUnknownReference(label);
+         }
+         else
+         {
+            return createString(info.getTarget());
+         }
       }
 
       return AuxData.getHyperReference(auxData, getParser(), label);
@@ -259,6 +399,22 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
          return null;
       }
 
+      if (labelData != null)
+      {
+         String linkName = parser.expandToString(link, null);
+
+         for (String label : labelData.keySet())
+         {
+            LabelInfo info = labelData.get(label);
+
+            if (linkName.equals(info.getTarget()))
+            {
+               return createString(label);
+            }
+         }
+
+         return null;
+      }
       return AuxData.getLabelForLink(auxData, getParser(), link);
    }
 
@@ -267,6 +423,21 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
    {
       if (auxData == null)
       {
+         return null;
+      }
+
+      if (labelData != null)
+      {
+         for (String label : labelData.keySet())
+         {
+            LabelInfo info = labelData.get(label);
+
+            if (link.equals(info.getTarget()))
+            {
+               return createString(label);
+            }
+         }
+
          return null;
       }
 
@@ -1502,6 +1673,8 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
             AuxParser auxListener = new AuxParser(getTeXApp(), getCharSet(), prefix);
 
             auxListener.enableSaveDivisions(saveDivisions);
+            auxListener.enableSaveLabels(true);
+            auxListener.enableSaveCites(true);
             auxListener.parseAuxFile(auxFile);
 
             Vector<AuxData> data = auxListener.getAuxData();
@@ -1516,6 +1689,34 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
             }
 
             divisionData = auxListener.getDivisionData();
+
+            if (labelData == null)
+            {
+               labelData = auxListener.getLabelData();
+            }
+            else
+            {
+               HashMap<String,LabelInfo> auxLabelInfo = auxListener.getLabelData();
+
+               if (auxLabelInfo != null)
+               {
+                  labelData.putAll(auxLabelInfo);
+               }
+            }
+
+            if (citeData == null)
+            {
+               citeData = auxListener.getCiteData();
+            }
+            else
+            {
+               HashMap<String,CiteInfo> auxCiteInfo = auxListener.getCiteData();
+
+               if (auxCiteInfo != null)
+               {
+                  citeData.putAll(auxCiteInfo);
+               }
+            }
          }
          else
          {
@@ -2507,6 +2708,34 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       saveDivisions = auxParser.isSaveDivisionsEnabled();
 
       divisionData = auxParser.getDivisionData();
+
+      if (labelData == null)
+      {
+         labelData = auxParser.getLabelData();
+      }
+      else
+      {
+         HashMap<String,LabelInfo> auxLabelInfo = auxParser.getLabelData();
+
+         if (auxLabelInfo != null)
+         {
+            labelData.putAll(auxLabelInfo);
+         }
+      }
+
+      if (citeData == null)
+      {
+         citeData = auxParser.getCiteData();
+      }
+      else
+      {
+         HashMap<String,CiteInfo> auxCiteInfo = auxParser.getCiteData();
+
+         if (auxCiteInfo != null)
+         {
+            citeData.putAll(auxCiteInfo);
+         }
+      }
    }
 
    public void setDivisionData(Vector<DivisionData> divisionData)
@@ -3084,6 +3313,8 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
 
    private boolean saveDivisions;
    protected Vector<DivisionData> divisionData;
+   protected HashMap<String,LabelInfo> labelData;
+   protected HashMap<String,CiteInfo> citeData;
 
    private Hashtable<String,Vector<String>> counters;
 
