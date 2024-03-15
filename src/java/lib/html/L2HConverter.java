@@ -2005,6 +2005,13 @@ public class L2HConverter extends LaTeXParserListener
    {
       if (divisionData == null) return;
 
+      File currentFile = null;
+
+      if (currentNode != null)
+      {
+         currentFile = currentNode.getFile();
+      }
+
       writeliteralln("<!-- Navigation -->");
 
       writeliteral("<ul");
@@ -2054,8 +2061,23 @@ public class L2HConverter extends LaTeXParserListener
          writeliteral("<li>");
 
          String prefix = node.getPrefix();
+         String ref = node.getRef();
 
-         writeliteral(String.format("<a href=\"%s\"", node.getRef()));
+         if (currentFile != null && currentFile.equals(node.getFile()))
+         {
+            int idx = ref.indexOf("#");
+
+            if (idx > -1)
+            {
+               ref = ref.substring(idx);
+            }
+            else
+            {
+               ref = "#main";
+            }
+         }
+
+         writeliteral(String.format("<a href=\"%s\"", ref));
 
          if (node == currentNode)
          {
