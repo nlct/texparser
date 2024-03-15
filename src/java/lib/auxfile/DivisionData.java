@@ -118,6 +118,22 @@ public class DivisionData
       return location;
    }
 
+   /**
+    * Set special information specific to the TeX Parser library.
+    */ 
+   public void setSpecial(Object special)
+   {
+      this.special = special;
+   }
+
+   /**
+    * Gets special information specific to the TeX Parser library.
+    */ 
+   public Object getSpecial()
+   {
+      return special;
+   }
+
    @Override
    public boolean equals(Object other)
    {
@@ -172,6 +188,8 @@ public class DivisionData
 
    protected String target, unit;
    protected TeXObject prefix, title, location;
+
+   protected Object special;
 
    protected Vector<String> labels;
 }
