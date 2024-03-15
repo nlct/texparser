@@ -117,17 +117,17 @@ public class LabelInfo
       return page;
    }
 
-   public void setDivisionData(DivisionData divData)
+   public void setDivisionInfo(DivisionInfo divData)
    {
       divisionData = divData;
    }
 
-   public DivisionData getDivisionData()
+   public DivisionInfo getDivisionInfo()
    {
       return divisionData;
    }
 
    protected String label, target;
    protected TeXObject title, reference, page;
-   protected DivisionData divisionData;
+   protected DivisionInfo divisionData;
 }

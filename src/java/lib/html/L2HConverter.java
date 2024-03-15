@@ -1567,8 +1567,8 @@ public class L2HConverter extends LaTeXParserListener
       {
          if (title != null)
          {
-            DivisionData divData = divisionData.firstElement();
-            divData.setTitle(title);
+            DivisionInfo divInfo = divisionData.firstElement();
+            divInfo.setTitle(title);
          }
 
          createDivisionTree(stack);
@@ -1722,8 +1722,8 @@ public class L2HConverter extends LaTeXParserListener
 
       for (int i = idx-1; i >= 0; i--)
       {
-         DivisionData data = divisionData.get(i);
-         DivisionNode node = (DivisionNode)data.getSpecial();
+         DivisionInfo info = divisionData.get(i);
+         DivisionNode node = (DivisionNode)info.getSpecial();
 
          if (!node.getRef().startsWith("#"))
          {
@@ -1736,8 +1736,8 @@ public class L2HConverter extends LaTeXParserListener
 
       for (int i = idx+1; i < divisionData.size(); i++)
       {
-         DivisionData data = divisionData.get(i);
-         DivisionNode node = (DivisionNode)data.getSpecial();
+         DivisionInfo info = divisionData.get(i);
+         DivisionNode node = (DivisionNode)info.getSpecial();
 
          if (!node.getRef().startsWith("#"))
          {
@@ -1892,25 +1892,25 @@ public class L2HConverter extends LaTeXParserListener
 
       for (int i = 0; i < divisionData.size(); i++)
       {
-         DivisionData data = divisionData.get(i);
+         DivisionInfo info = divisionData.get(i);
 
          DivisionNode parent = null;
 
          if (prevNode != null)
          {
-            if (prevNode.getUnit().equals(data.getUnit()))
+            if (prevNode.getUnit().equals(info.getUnit()))
             {
                parent = prevNode.getParent();
             }
             else
             {
-               parent = prevNode.getAncestorAtUnit(data.getUnit());
+               parent = prevNode.getAncestorAtUnit(info.getUnit());
 
                if (parent == null)
                {
                   DivisionNode childNode = prevNode.getFirstChild();
 
-                  if (childNode == null || childNode.getUnit().equals(data.getUnit()))
+                  if (childNode == null || childNode.getUnit().equals(info.getUnit()))
                   {
                      parent = prevNode;
                   }
@@ -1922,15 +1922,15 @@ public class L2HConverter extends LaTeXParserListener
             }
          }
 
-         DivisionNode node = new DivisionNode(i, data, parent);
+         DivisionNode node = new DivisionNode(i, info, parent);
 
          if (i == 0) currentNode = node;
 
-         String label = data.getLabel();
+         String label = info.getLabel();
 
          if (label == null)
          {
-            label = data.getTarget();
+            label = info.getTarget();
 
             if (label == null)
             {
@@ -1966,7 +1966,7 @@ public class L2HConverter extends LaTeXParserListener
             }
          }
 
-         TeXObject obj = data.getTitle();
+         TeXObject obj = info.getTitle();
          String title = "Untitled";
 
          if (obj != null)
@@ -1976,7 +1976,7 @@ public class L2HConverter extends LaTeXParserListener
 
          node.setTitle(title);
 
-         obj = data.getPrefix();
+         obj = info.getPrefix();
 
          if (obj != null)
          {
@@ -2027,14 +2027,14 @@ public class L2HConverter extends LaTeXParserListener
 
       DivisionNode prevNode = null;
 
-      for (DivisionData divData : divisionData)
+      for (DivisionInfo divInfo : divisionData)
       {
-         DivisionNode node = (DivisionNode)divData.getSpecial();
+         DivisionNode node = (DivisionNode)divInfo.getSpecial();
 
          if (node == null)
          {
             parser.debugMessage(TeXParser.DEBUG_IO, 
-              "No node associated with: "+divData);
+              "No node associated with: "+divInfo);
 
             continue;
          }
@@ -3417,7 +3417,7 @@ public class L2HConverter extends LaTeXParserListener
       if (currentNode != null && id != null)
       {
          DivisionNode nextNode = divisionMap.get(id);
-         DivisionData nextData = null;
+         DivisionInfo nextData = null;
 
          if (nextNode != null)
          {

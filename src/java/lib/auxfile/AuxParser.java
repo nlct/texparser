@@ -241,18 +241,18 @@ public class AuxParser extends DefaultTeXParserListener
       return saveCites;
    }
 
-   protected DivisionData createDivisionData(String unit, TeXObject prefix, TeXObject title, 
+   protected DivisionInfo createDivisionInfo(String unit, TeXObject prefix, TeXObject title, 
      String target, TeXObject location)
    {
-      return new DivisionData(unit, prefix, title, target, location);
+      return new DivisionInfo(unit, prefix, title, target, location);
    }
 
-   protected void initDivisionData()
+   protected void initDivisionInfo()
    {
-      divisionData = new Vector<DivisionData>();
+      divisionData = new Vector<DivisionInfo>();
 
       // add document root
-      divisionData.add(createDivisionData("document", null, null, "Doc-Start", null));
+      divisionData.add(createDivisionInfo("document", null, null, "Doc-Start", null));
    }
 
    @Override
@@ -375,13 +375,13 @@ public class AuxParser extends DefaultTeXParserListener
 
             if (ext.equals("toc"))
             {
-               DivisionData divData = getDivisionData(data.getArg(1));
+               DivisionInfo divData = getDivisionInfo(data.getArg(1));
 
                if (divData != null)
                {
                   if (divisionData == null)
                   {
-                     initDivisionData();
+                     initDivisionInfo();
                   }
 
                   divisionData.add(divData);
@@ -393,13 +393,13 @@ public class AuxParser extends DefaultTeXParserListener
       {
          if (data.getName().equals("newlabel"))
          {
-            DivisionData divData = null;
+            DivisionInfo divData = null;
 
             if (saveDivisions)
             {
                if (divisionData == null)
                {
-                  initDivisionData();
+                  initDivisionInfo();
                }
 
                if (!divisionData.isEmpty())
@@ -420,7 +420,7 @@ public class AuxParser extends DefaultTeXParserListener
 
                if (divData != null)
                {
-                  info.setDivisionData(divData);
+                  info.setDivisionInfo(divData);
                }
 
                labelData.put(info.getLabel(), info);
@@ -437,9 +437,9 @@ public class AuxParser extends DefaultTeXParserListener
 
             if (divisionData != null && !divisionData.isEmpty())
             {
-               DivisionData divData = divisionData.lastElement();
+               DivisionInfo divData = divisionData.lastElement();
 
-               info.setDivisionData(divData);
+               info.setDivisionInfo(divData);
             }
 
             citeData.put(info.getLabel(), info);
@@ -449,7 +449,7 @@ public class AuxParser extends DefaultTeXParserListener
       }
    }
 
-   protected DivisionData getDivisionData(TeXObject content)
+   protected DivisionInfo getDivisionInfo(TeXObject content)
    {
       if (!getParser().isStack(content))
       {
@@ -504,7 +504,7 @@ public class AuxParser extends DefaultTeXParserListener
             target = TeXParserUtils.popLabelString(getParser(), stack);
          }
 
-         return createDivisionData(unit, prefix, title, target, location);
+         return createDivisionInfo(unit, prefix, title, target, location);
       }
       catch (IOException e)
       {
@@ -523,7 +523,7 @@ public class AuxParser extends DefaultTeXParserListener
     * or if no information available in the aux file. (That is, there were
     * no lines starting with <code>\@writefile{toc}{\contentsline...}</code>.)
     */ 
-   public Vector<DivisionData> getDivisionData()
+   public Vector<DivisionInfo> getDivisionData()
    {
       return divisionData;
    }
@@ -534,11 +534,11 @@ public class AuxParser extends DefaultTeXParserListener
     * The target is only available with hyperref and corresponds to the sectional
     * unit's hyper target.
     */ 
-   public DivisionData getDivisionByTarget(String target)
+   public DivisionInfo getDivisionByTarget(String target)
    {
       if (divisionData == null) return null;
 
-      for (DivisionData divData : divisionData)
+      for (DivisionInfo divData : divisionData)
       {
          if (target.equals(divData.getTarget()))
          {
@@ -555,11 +555,11 @@ public class AuxParser extends DefaultTeXParserListener
     * The label is the first instance of <code>\newlabel</code> following 
     * a line starting <code>\@writefile{toc}{\contentsline...}</code>.
     */ 
-   public DivisionData getDivisionByLabel(String label)
+   public DivisionInfo getDivisionByLabel(String label)
    {
       if (divisionData == null) return null;
 
-      for (DivisionData divData : divisionData)
+      for (DivisionInfo divData : divisionData)
       {
          if (label.equals(divData.getLabel()))
          {
@@ -576,7 +576,7 @@ public class AuxParser extends DefaultTeXParserListener
     * The label list corresponds to each <code>\newlabel</code> following 
     * a line starting <code>\@writefile{toc}{\contentsline...}</code>.
     */ 
-   public DivisionData getDivisionContainingLabel(String label)
+   public DivisionInfo getDivisionContainingLabel(String label)
    {
       if (divisionData == null) return null;
 
@@ -586,15 +586,15 @@ public class AuxParser extends DefaultTeXParserListener
       {
          LabelInfo info = labelData.get(label);
 
-         if (info != null && info.getDivisionData() != null)
+         if (info != null && info.getDivisionInfo() != null)
          {
-            return info.getDivisionData();
+            return info.getDivisionInfo();
          }
 
          return null;
       }
 
-      for (DivisionData divData : divisionData)
+      for (DivisionInfo divData : divisionData)
       {
          if (divData.containsLabel(label))
          {
@@ -676,7 +676,7 @@ public class AuxParser extends DefaultTeXParserListener
    private Vector<AuxData> auxData;
 
    private boolean saveDivisions = false;
-   protected Vector<DivisionData> divisionData;
+   protected Vector<DivisionInfo> divisionData;
 
    private boolean saveLabels = false;
    protected HashMap<String,LabelInfo> labelData;

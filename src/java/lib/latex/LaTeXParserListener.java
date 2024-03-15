@@ -2781,12 +2781,12 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       }
    }
 
-   public void setDivisionData(Vector<DivisionData> divisionData)
+   public void setDivisionData(Vector<DivisionInfo> divisionData)
    {
       this.divisionData = divisionData;
    }
 
-   public Vector<DivisionData> getDivisionData()
+   public Vector<DivisionInfo> getDivisionData()
    {
       return divisionData;
    }
@@ -3355,7 +3355,7 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
    private Vector<AuxData> auxData;
 
    private boolean saveDivisions;
-   protected Vector<DivisionData> divisionData;
+   protected Vector<DivisionInfo> divisionData;
    protected HashMap<String,LabelInfo> labelData;
    protected HashMap<String,CiteInfo> citeData;
    protected HashMap<String,String> linkLabelMap;

@@ -22,16 +22,16 @@ import java.util.Vector;
 import java.util.Iterator;
 import java.io.File;
 
-import com.dickimawbooks.texparserlib.auxfile.DivisionData;
+import com.dickimawbooks.texparserlib.auxfile.DivisionInfo;
 
 public class DivisionNode implements Comparable<DivisionNode>
 {
-   public DivisionNode(DivisionData data)
+   public DivisionNode(DivisionInfo data)
    {
      this(0, data, null);
    }
 
-   public DivisionNode(int index, DivisionData data, DivisionNode parent)
+   public DivisionNode(int index, DivisionInfo data, DivisionNode parent)
    {
       if (data == null)
       {
@@ -92,7 +92,7 @@ public class DivisionNode implements Comparable<DivisionNode>
       return level;
    }
 
-   public void addChild(int index, DivisionData childData)
+   public void addChild(int index, DivisionInfo childData)
    {
       if (childData == null)
       {
@@ -168,7 +168,7 @@ public class DivisionNode implements Comparable<DivisionNode>
       return data.getUnit();
    }
 
-   public DivisionData getData()
+   public DivisionInfo getData()
    {
       return data;
    }
@@ -224,7 +224,7 @@ public class DivisionNode implements Comparable<DivisionNode>
 
    protected final int index;
    protected final int level;
-   protected final DivisionData data;
+   protected final DivisionInfo data;
    protected final DivisionNode parent;
 
    protected Vector<DivisionNode> children;

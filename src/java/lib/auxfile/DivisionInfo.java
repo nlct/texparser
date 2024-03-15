@@ -26,9 +26,9 @@ import com.dickimawbooks.texparserlib.*;
  * Document division data.
  */
 
-public class DivisionData
+public class DivisionInfo
 {
-   public DivisionData(String unit, TeXObject prefix, TeXObject title,
+   public DivisionInfo(String unit, TeXObject prefix, TeXObject title,
      String target, TeXObject location)
    {
       if (unit == null)
@@ -139,9 +139,9 @@ public class DivisionData
    {
       if (this == other) return true;
 
-      if (!(other instanceof DivisionData)) return false;
+      if (!(other instanceof DivisionInfo)) return false;
 
-      DivisionData data = (DivisionData)other;
+      DivisionInfo data = (DivisionInfo)other;
 
       if (!unit.equals(data.unit)) return false;
 
