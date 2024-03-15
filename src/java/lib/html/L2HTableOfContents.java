@@ -109,6 +109,7 @@ public class L2HTableOfContents extends ControlSequence
 
       StartElement elem = new StartElement("nav");
       elem.putAttribute("class", "toc");
+      elem.putAttribute("aria-label", "Table of Contents");
       stack.push(elem);
 
       reg = parser.getSettings().newcount(true, "@curr@toclevel");

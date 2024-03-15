@@ -47,7 +47,7 @@ public class LabelInfo
          {
             info.reference = params.get(0);
 
-            if (parser.isStack(info.reference))
+            if (info.reference instanceof Group)
             {
                info.reference = TeXParserUtils.removeGroup((TeXObjectList)info.reference);
             }
@@ -57,7 +57,7 @@ public class LabelInfo
          {
             info.page = params.get(1);
 
-            if (parser.isStack(info.page))
+            if (info.page instanceof Group)
             {
                info.page = TeXParserUtils.removeGroup((TeXObjectList)info.page);
             }
@@ -67,7 +67,7 @@ public class LabelInfo
          {
             info.title = params.get(2);
 
-            if (parser.isStack(info.title))
+            if (info.title instanceof Group)
             {
                info.title = TeXParserUtils.removeGroup((TeXObjectList)info.title);
             }
@@ -77,7 +77,7 @@ public class LabelInfo
          {
             TeXObject obj = params.get(3);
 
-            if (parser.isStack(obj))
+            if (obj instanceof Group)
             {
                obj = TeXParserUtils.removeGroup((TeXObjectList)obj);
             }
@@ -117,6 +117,17 @@ public class LabelInfo
       return page;
    }
 
+   public void setDivisionData(DivisionData divData)
+   {
+      divisionData = divData;
+   }
+
+   public DivisionData getDivisionData()
+   {
+      return divisionData;
+   }
+
    protected String label, target;
    protected TeXObject title, reference, page;
+   protected DivisionData divisionData;
 }

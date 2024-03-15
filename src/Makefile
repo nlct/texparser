@@ -7,7 +7,8 @@ endif
 test	: test-obs test-abs test-article test-nested test-doc \
 	  test-probsoln test-lists test-datatool test-mkimages \
 	  test-jmlrutils test-glossaries test-glossaries-extra \
-	  test-fontawesome test-userguide test-input test-datatool-v3
+	  test-fontawesome test-userguide test-input test-datatool-v3 \
+	  test-article-split
 
 tests/output	:
 	mkdir -p tests/output
@@ -35,6 +36,10 @@ test-article : app tests/test-article/test-article.pdf tests/output
 
 tests/test-article/test-article.pdf	: tests/test-article/test-article.tex
 					cd tests/test-article; arara test-article
+
+test-article-split : app tests/test-article/test-article.pdf tests/output
+	rm -f -r tests/output/test-article-split
+	bin/texparsertest --debug --in tests/test-article/test-article.tex --output tests/output/test-article-split --html --split 1
 
 test-input : app tests/test-input/test-input-main.pdf tests/output
 	rm -f -r tests/output/test-input

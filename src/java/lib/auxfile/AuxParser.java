@@ -393,6 +393,8 @@ public class AuxParser extends DefaultTeXParserListener
       {
          if (data.getName().equals("newlabel"))
          {
+            DivisionData divData = null;
+
             if (saveDivisions)
             {
                if (divisionData == null)
@@ -402,7 +404,7 @@ public class AuxParser extends DefaultTeXParserListener
 
                if (!divisionData.isEmpty())
                {
-                  DivisionData divData = divisionData.lastElement();
+                  divData = divisionData.lastElement();
                   divData.addLabel(data.getArg(0).toString(getParser()));
                }
             }
@@ -416,6 +418,11 @@ public class AuxParser extends DefaultTeXParserListener
 
                LabelInfo info = LabelInfo.createLabel(data, getParser());
 
+               if (divData != null)
+               {
+                  info.setDivisionData(divData);
+               }
+
                labelData.put(info.getLabel(), info);
             }
          }
@@ -427,6 +434,13 @@ public class AuxParser extends DefaultTeXParserListener
             }
 
             CiteInfo info = CiteInfo.createCite(data, getParser());
+
+            if (divisionData != null && !divisionData.isEmpty())
+            {
+               DivisionData divData = divisionData.lastElement();
+
+               info.setDivisionData(divData);
+            }
 
             citeData.put(info.getLabel(), info);
          }
@@ -557,14 +571,28 @@ public class AuxParser extends DefaultTeXParserListener
    }
 
    /**
-    * Iterates over the division data (if available) and returns the item
-    * that has the given label in its label list. Returns null if not found or no division data.
+    * Gets the division associated with the given label.
+    * Returns null if not found or no division data.
     * The label list corresponds to each <code>\newlabel</code> following 
     * a line starting <code>\@writefile{toc}{\contentsline...}</code>.
     */ 
    public DivisionData getDivisionContainingLabel(String label)
    {
       if (divisionData == null) return null;
+
+      // First try the label map
+
+      if (labelData != null)
+      {
+         LabelInfo info = labelData.get(label);
+
+         if (info != null && info.getDivisionData() != null)
+         {
+            return info.getDivisionData();
+         }
+
+         return null;
+      }
 
       for (DivisionData divData : divisionData)
       {

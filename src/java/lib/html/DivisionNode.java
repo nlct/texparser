@@ -20,6 +20,7 @@ package com.dickimawbooks.texparserlib.html;
 
 import java.util.Vector;
 import java.util.Iterator;
+import java.io.File;
 
 import com.dickimawbooks.texparserlib.auxfile.DivisionData;
 
@@ -36,6 +37,8 @@ public class DivisionNode implements Comparable<DivisionNode>
       {
          throw new NullPointerException();
       }
+
+      data.setSpecial(this);
 
       this.index = index;
       this.data = data;
@@ -64,27 +67,24 @@ public class DivisionNode implements Comparable<DivisionNode>
    @Override
    public boolean equals(Object other)
    {
-      if (this == other) return true;
-
       if (!(other instanceof DivisionNode)) return false;
 
-      DivisionNode node = (DivisionNode)other;
-
-      if (index != node.index) return false;
-
-      if ((parent == null && node.parent != null)
-       || (parent != null && node.parent == null)
-       || level != node.level)
-      {
-         return false;
-      }
-
-      return data.equals(node.data);
+      return compareTo((DivisionNode)other) == 0;
    }
 
    public DivisionNode getParent()
    {
       return parent;
+   }
+
+   public int getIndex()
+   {
+      return index;
+   }
+
+   public int getSiblingIndex()
+   {
+      return siblingIndex;
    }
 
    public int getLevel()
@@ -94,12 +94,21 @@ public class DivisionNode implements Comparable<DivisionNode>
 
    public void addChild(int index, DivisionData childData)
    {
+      if (childData == null)
+      {
+         throw new NullPointerException();
+      }
+
       if (children == null)
       {
          children = new Vector<DivisionNode>();
       }
 
-      children.add(new DivisionNode(index, childData, this));
+      DivisionNode childNode = new DivisionNode(index, childData, this);
+
+      children.add(childNode);
+
+      childNode.siblingIndex = children.size()-1;
    }
 
    public int getChildCount()
@@ -124,44 +133,16 @@ public class DivisionNode implements Comparable<DivisionNode>
 
    public DivisionNode getNextSibling()
    {
-      if (parent == null || parent.getChildCount() == 0) return null;
+      if (parent == null || siblingIndex == parent.getChildCount()-1) return null;
 
-      for (int i = 0; i < parent.children.size(); i++)
-      {
-         DivisionNode node = parent.children.get(i);
-
-         if (node == this)
-         {
-            i++;
-
-            if (i == parent.children.size()) return null;
-
-            return parent.children.get(i);
-         }
-      }
-
-      return null;
+      return parent.children.get(siblingIndex+1);
    }
 
    public DivisionNode getPreviousSibling()
    {
-      if (parent == null || parent.getChildCount() == 0) return null;
+      if (parent == null || siblingIndex == 0) return null;
 
-      for (int i = parent.children.size() - 1; i >=0 ; i--)
-      {
-         DivisionNode node = parent.children.get(i);
-
-         if (node == this)
-         {
-            i--;
-
-            if (i < 0) return null;
-
-            return parent.children.get(i);
-         }
-      }
-
-      return null;
+      return parent.children.get(siblingIndex-1);
    }
 
    public boolean isAncestor(DivisionNode other)
@@ -173,11 +154,6 @@ public class DivisionNode implements Comparable<DivisionNode>
       return parent.isAncestor(other);
    }
 
-   public String getUnit()
-   {
-      return data.getUnit();
-   }
-
    public DivisionNode getAncestorAtUnit(String unit)
    {
       if (parent == null) return null;
@@ -185,6 +161,16 @@ public class DivisionNode implements Comparable<DivisionNode>
       if (parent.getUnit().equals(unit)) return parent;
 
       return parent.getAncestorAtUnit(unit);
+   }
+
+   public String getUnit()
+   {
+      return data.getUnit();
+   }
+
+   public DivisionData getData()
+   {
+      return data;
    }
 
    public void setRef(String ref)
@@ -197,12 +183,54 @@ public class DivisionNode implements Comparable<DivisionNode>
       return ref;
    }
 
+   public void setFile(File file)
+   {
+      this.file = file;
+   }
+
+   public File getFile()
+   {
+      return (file == null && parent != null) ? parent.getFile() : file;
+   }
+
+   public void setTitle(String title)
+   {
+      this.title = title;
+   }
+
+   public String getTitle()
+   {
+      return title;
+   }
+
+   public void setPrefix(String prefix)
+   {
+      this.prefix = prefix;
+   }
+
+   public String getPrefix()
+   {
+      return prefix;
+   }
+
+   public String toString()
+   {
+      return String.format("%s[label=%s,target=%s,prefix=%s,title=%s,ref=%s,index=%d,level=%d,siblingIndex=%d]",
+        getClass().getSimpleName(),
+        data.getLabel(), data.getTarget(),
+        prefix, title, ref,
+        index, level, siblingIndex);
+   }
+
    protected final int index;
    protected final int level;
    protected final DivisionData data;
    protected final DivisionNode parent;
 
    protected Vector<DivisionNode> children;
+   protected int siblingIndex = 0;
 
-   protected String ref;
+   protected String ref, title, prefix;
+
+   protected File file;
 }

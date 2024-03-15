@@ -80,12 +80,22 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
 {
    public LaTeXParserListener(Writeable writeable)
    {
-      this(writeable, null, false);
+      this(writeable, (AuxParser)null, false);
    }
 
    public LaTeXParserListener(Writeable writeable, boolean parseAux)
    {
-      this(writeable, null, true);
+      this(writeable, (AuxParser)null, true);
+   }
+
+   public LaTeXParserListener(Writeable writeable, AuxParser auxParser)
+   {
+      this(writeable, auxParser, false);
+   }
+
+   public LaTeXParserListener(Writeable writeable, AuxParser auxParser, boolean parseAux)
+   {
+      this(writeable, auxParser, parseAux, false);
    }
 
    public LaTeXParserListener(Writeable writeable, Vector<AuxData> auxData)
@@ -114,6 +124,27 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       verbEnv = new Vector<String>();
    }
 
+   public LaTeXParserListener(Writeable writeable, AuxParser auxParser, 
+     boolean parseAux, boolean parsePackages)
+   {
+      super(writeable);
+
+      if (auxParser != null)
+      {
+         setAuxData(auxParser);
+      }
+
+      setParseAuxEnabled(parseAux);
+      counters = new Hashtable<String,Vector<String>>();
+      indexes = new Hashtable<String,IndexRoot>();
+      this.parsePackages = parsePackages;
+
+      footnotes = new TeXObjectList();
+
+      loadedPackages = new Vector<LaTeXFile>();
+      verbEnv = new Vector<String>();
+   }
+
    public boolean isParseAuxEnabled()
    {
       return parseAux;
@@ -130,7 +161,7 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
    }
 
    // only relevant if parseAux = true
-   public void setSaveDivisionsEnabled(boolean enable)
+   public void enableSaveDivisions(boolean enable)
    {
       saveDivisions = enable;
    }
@@ -403,18 +434,16 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       {
          String linkName = parser.expandToString(link, null);
 
-         for (String label : labelData.keySet())
+         if (linkLabelMap == null)
          {
-            LabelInfo info = labelData.get(label);
-
-            if (linkName.equals(info.getTarget()))
-            {
-               return createString(label);
-            }
+            createLinkLabelMap();
          }
 
-         return null;
+         String label = linkLabelMap.get(linkName);
+
+         return label == null ? null : createString(label);
       }
+
       return AuxData.getLabelForLink(auxData, getParser(), link);
    }
 
@@ -428,20 +457,34 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
 
       if (labelData != null)
       {
-         for (String label : labelData.keySet())
+         if (linkLabelMap == null)
          {
-            LabelInfo info = labelData.get(label);
-
-            if (link.equals(info.getTarget()))
-            {
-               return createString(label);
-            }
+            createLinkLabelMap();
          }
 
-         return null;
+         String label = linkLabelMap.get(link);
+
+         return label == null ? null : createString(label);
       }
 
       return AuxData.getLabelForLink(auxData, getParser(), link);
+   }
+
+   protected void createLinkLabelMap()
+   {
+      linkLabelMap = new HashMap<String,String>();
+
+      for (String label : labelData.keySet())
+      {
+         LabelInfo info = labelData.get(label);
+
+         String target = info.getTarget();
+
+         if (target != null)
+         {
+            linkLabelMap.put(target, label);
+         }
+      }
    }
 
    public TeXObject getDivider(String name)
@@ -3315,6 +3358,7 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
    protected Vector<DivisionData> divisionData;
    protected HashMap<String,LabelInfo> labelData;
    protected HashMap<String,CiteInfo> citeData;
+   protected HashMap<String,String> linkLabelMap;
 
    private Hashtable<String,Vector<String>> counters;
 

@@ -25,12 +25,13 @@ import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.generic.*;
 import com.dickimawbooks.texparserlib.latex.*;
 import com.dickimawbooks.texparserlib.auxfile.AuxData;
+import com.dickimawbooks.texparserlib.auxfile.AuxParser;
 
 public class L2HStringConverter extends L2HConverter
 {
    public L2HStringConverter(TeXApp app)
    {
-      this(app, null, false);
+      this(app, (AuxParser)null, false);
    }
 
    public L2HStringConverter(TeXApp app, Vector<AuxData> data)
@@ -38,9 +39,21 @@ public class L2HStringConverter extends L2HConverter
       this(app, data, false);
    }
 
+   public L2HStringConverter(TeXApp app, AuxParser auxParser)
+   {
+      this(app, auxParser, false);
+   }
+
    public L2HStringConverter(TeXApp app, Vector<AuxData> data, boolean parsePackages)
    {
       super(app, true, null, data, false, null, parsePackages);
+
+      setWriteable(this);
+   }
+
+   public L2HStringConverter(TeXApp app, AuxParser auxParser, boolean parsePackages)
+   {
+      super(app, true, null, auxParser, false, null, parsePackages);
 
       setWriteable(this);
    }

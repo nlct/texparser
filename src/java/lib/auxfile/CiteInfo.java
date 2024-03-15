@@ -52,6 +52,17 @@ public class CiteInfo
       return reference;
    }
 
+   public void setDivisionData(DivisionData divData)
+   {
+      divisionData = divData;
+   }
+
+   public DivisionData getDivisionData()
+   {
+      return divisionData;
+   }
+
    protected String label;
    protected TeXObject reference;
+   protected DivisionData divisionData;
 }

@@ -35,6 +35,7 @@ import java.awt.Dimension;
 
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.plain.*;
+import com.dickimawbooks.texparserlib.auxfile.AuxParser;
 import com.dickimawbooks.texparserlib.generic.*;
 import com.dickimawbooks.texparserlib.latex.*;
 import com.dickimawbooks.texparserlib.latex2latex.*;
@@ -181,8 +182,8 @@ public class TeXParserApp implements TeXApp
             "error.exists", outDir.getAbsolutePath()));
       }
 
-      L2HConverter listener = new L2HConverter(this, mathJax, outDir, null, true,
-        outCharset, true)
+      L2HConverter listener = new L2HConverter(this, mathJax, outDir, 
+        outCharset, true, splitLevel)
       {
          public L2HImage toImage(String preamble, 
           String content, String mimeType, TeXObject alt, String name, 
@@ -220,6 +221,8 @@ public class TeXParserApp implements TeXApp
             }
          }
       };
+
+      listener.setSplitUseBaseNamePrefix(splitUseBaseNamePrefix);
 
       listener.setUseEntities(useHtmlEntities);
 
@@ -1479,6 +1482,34 @@ public class TeXParserApp implements TeXApp
          {
             useHtmlEntities = true;
          }
+         else if (args[i].equals("--split"))
+         {
+            i++;
+
+            if (i == args.length)
+            {
+               throw new InvalidSyntaxException(
+                 getMessage("error.syntax.missing_value", args[i-1]));
+            }
+
+            try
+            {
+               splitLevel = Integer.parseInt(args[i]);
+            }
+            catch (NumberFormatException e)
+            {
+               throw new InvalidSyntaxException(
+                 getMessage("error.syntax.number_expected", args[i-1], args[i]), e);
+            }
+         }
+         else if (args[i].equals("--prefix-split"))
+         {
+           splitUseBaseNamePrefix = true;
+         }
+         else if (args[i].equals("--noprefix-split"))
+         {
+           splitUseBaseNamePrefix = false;
+         }
          else if (args[i].equals("--head"))
          {
             i++;
@@ -1729,6 +1760,8 @@ public class TeXParserApp implements TeXApp
    private boolean convertImages = true;
    private boolean mathJax = true;
    private boolean useHtmlEntities = false;
+   private int splitLevel = 0;
+   private boolean splitUseBaseNamePrefix = false;
 
    public static final Pattern PNG_INFO =
     Pattern.compile(".*: PNG image data, (\\d+) x (\\d+),.*");
