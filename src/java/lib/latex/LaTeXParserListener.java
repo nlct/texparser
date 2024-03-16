@@ -480,6 +480,27 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       return AuxData.getLabelForLink(auxData, getParser(), link);
    }
 
+   public String getStringLabelForLink(String link)
+     throws IOException
+   {
+      if (auxData == null)
+      {
+         return null;
+      }
+
+      if (labelData != null)
+      {
+         if (linkLabelMap == null)
+         {
+            createLinkLabelMap();
+         }
+
+         return linkLabelMap.get(link);
+      }
+
+      return AuxData.getLabelForLink(auxData, getParser(), link).toString(getParser());
+   }
+
    protected void createLinkLabelMap()
    {
       linkLabelMap = new HashMap<String,String>();
@@ -493,6 +514,26 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
          if (target != null)
          {
             linkLabelMap.put(target, label);
+         }
+      }
+   }
+
+   public void addLabel(LabelInfo labelInfo)
+   {
+      if (labelData == null)
+      {
+         labelData = new HashMap<String,LabelInfo>();
+      }
+
+      labelData.put(labelInfo.getLabel(), labelInfo);
+
+      if (linkLabelMap != null)
+      {
+         String target = labelInfo.getTarget();
+
+         if (target != null)
+         {
+            linkLabelMap.put(target, labelInfo.getLabel());
          }
       }
    }

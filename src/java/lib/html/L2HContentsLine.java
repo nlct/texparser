@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013-2022 Nicola L.C. Talbot
+    Copyright (C) 2013-2024 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -23,6 +23,7 @@ import java.io.EOFException;
 
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.*;
+import com.dickimawbooks.texparserlib.auxfile.LabelInfo;
 
 public class L2HContentsLine extends ContentsLine
 {
@@ -55,6 +56,7 @@ public class L2HContentsLine extends ContentsLine
       String typeStr = type.toString(parser);
       TeXObjectList list = new TeXObjectList();
 
+      L2HConverter listener = (L2HConverter)parser.getListener();
       TeXSettings settings = parser.getSettings();
 
       CountRegister reg = (CountRegister)settings.getNumericRegister("@curr@toclevel@"+typeStr);
@@ -125,12 +127,32 @@ public class L2HContentsLine extends ContentsLine
 
       list.add(startElem);
 
-      startElem = new StartElement("a");
-      startElem.putAttribute("href", "#"+HtmlTag.getUriFragment(link));
-      list.add(startElem);
+      LabelInfo info = listener.getLabelInfo(link);
 
-      list.add(title);
-      list.add(new EndElement("a"));
+      if (info == null)
+      {
+         String label = listener.getStringLabelForLink(link);
+
+         if (label != null)
+         {
+            info = listener.getLabelInfo(label);
+         }
+      }
+
+      if (info == null)
+      {
+         startElem = new StartElement("a");
+         startElem.putAttribute("href", "#"+HtmlTag.getUriFragment(link));
+         list.add(startElem);
+
+         list.add(title);
+         list.add(new EndElement("a"));
+      }
+      else
+      {
+         list.add(listener.createLink(info, title), true);
+      }
+
       list.add(new EndElement(tag));
       list.add(new HtmlTag(String.format("<!-- end of toc-%s -->%n", typeStr)));
 

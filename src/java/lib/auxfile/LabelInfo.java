@@ -31,6 +31,21 @@ public class LabelInfo implements CrossRefInfo
       this.label = label;
    }
 
+   public LabelInfo(String label, String target,
+      TeXObject ref, TeXObject title, TeXObject page)
+   {
+      if (ref == null || title == null || page == null)
+      {
+         throw new NullPointerException();
+      }
+
+      this.label = label;
+      this.target = target;
+      this.reference = ref;
+      this.title = title;
+      this.page = page;
+   }
+
    public static LabelInfo createLabel(AuxData auxData, TeXParser parser)
    {
       String label = auxData.getArg(0).toString(parser);
@@ -130,6 +145,12 @@ public class LabelInfo implements CrossRefInfo
    public DivisionInfo getDivisionInfo()
    {
       return divisionData;
+   }
+
+   @Override
+   public String toString()
+   {
+      return label;
    }
 
    protected String label, target;

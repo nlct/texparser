@@ -2014,6 +2014,45 @@ public class L2HConverter extends LaTeXParserListener
             }
          }
 
+         // Is there a label corresponding to the target?
+
+         if (info.getTarget() != null)
+         {
+            String labelForLink = getStringLabelForLink(info.getTarget());
+
+            if (labelForLink == null)
+            {
+               TeXObject prefix = info.getPrefix();
+
+               if (prefix == null)
+               {
+                  prefix = createStack();
+               }
+
+               TeXObject title = info.getTitle();
+
+               if (title == null)
+               {
+                  title = createStack();
+               }
+
+               TeXObject loc = info.getLocation();
+
+               if (loc == null)
+               {
+                  loc = createStack();
+               }
+
+               LabelInfo labelInfo = new LabelInfo(label, info.getTarget(),
+                prefix, title, loc);
+
+               labelInfo.setDivisionInfo(info);
+
+               addLabel(labelInfo);
+               info.addLabel(0, labelInfo.getLabel());
+            }
+         }
+
          if (node.getLevel() == 0)
          {
             File f = new File(outPath.toFile(), baseName+"."+getSuffix());

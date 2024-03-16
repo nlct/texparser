@@ -131,6 +131,12 @@ public class CiteInfo implements CrossRefInfo
       return params[idx];
    }
 
+   @Override
+   public String toString()
+   {
+      return label;
+   }
+
    protected String label;
    protected TeXObject reference;
    protected DivisionInfo divisionInfo;

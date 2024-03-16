@@ -53,6 +53,16 @@ public class DivisionInfo
       labels.add(label);
    }
 
+   public void addLabel(int idx, String label)
+   {
+      if (labels == null)
+      {
+         labels = new Vector<String>();
+      }
+
+      labels.add(idx, label);
+   }
+
    public String getLabel()
    {
       return labels == null || labels.isEmpty() ? null : labels.firstElement();
