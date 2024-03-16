@@ -217,6 +217,21 @@ public class L2HConverter extends LaTeXParserListener
       splitUseBaseNamePrefix = usePrefix;
    }
 
+   /**
+    * Sets the file for the navigation list. If null, the list will be written
+    * in the current file, otherwise the list will be written to the given file.
+    * Only applicable with split level greater than 1.
+    */ 
+   public void setNavigationFile(File file)
+   {
+      this.navFile = file;
+   }
+
+   public File getNavigationFile()
+   {
+      return navFile;
+   }
+
    @Override
    protected void addPredefined()
    {
@@ -1380,7 +1395,7 @@ public class L2HConverter extends LaTeXParserListener
       writeliteralln(".toc-paragraph span.numberline { display: inline-block; width: 5em; }");
       writeliteralln(".toc-subparagraph span.numberline { display: inline-block; width: 6em; }");
       writeliteralln("nav ul { list-style-type: none; }");
-      writeliteralln("@media screen and (min-width: 400px)");
+      writeliteralln("@media screen and (min-width: 500px)");
       writeliteralln("{");
       writeliteralln(" nav#doc-nav { background: #fffc; padding: 5px; }");
       writeliteralln(" div.nav-content { position: fixed; top: 10px; right: 15px; max-width: 14%; max-height: 75vh; overflow: auto; z-index: 1; hyphens: auto; }");
@@ -1638,7 +1653,21 @@ public class L2HConverter extends LaTeXParserListener
 
          createDivisionTree(stack);
 
-         writeNavigationList();
+         if (navFile == null)
+         {
+            writeNavigationList();
+         }
+         else
+         {
+            try
+            {
+               writeNavigationFile(stack);
+            }
+            catch (IOException e)
+            {
+               getTeXApp().error(e);
+            }
+         }
 
          if (splitLevel > 0 && citeList != null && citeList.size() > 1)
          {
@@ -1737,7 +1766,7 @@ public class L2HConverter extends LaTeXParserListener
 
       writeliteral("<title>");
       writeliteral(currentNode.getTitle());
-      writeliteral("</title>");
+      writeliteralln("</title>");
 
       writeliteralln("<style type=\"text/css\">");
       writeCssStyles();
@@ -1762,7 +1791,10 @@ public class L2HConverter extends LaTeXParserListener
 
       writeliteralln(">");
 
-      writeNavigationList();
+      if (navFile == null)
+      {
+         writeNavigationList();
+      }
 
       writeliteralln("<div id=\"main\">");
 
@@ -1944,13 +1976,19 @@ public class L2HConverter extends LaTeXParserListener
    {
       StringWriter strWriter = new StringWriter();
 
+      boolean orgInPreamble = inPreamble;
+
       try
       {
          currentWriter = strWriter;
+
+         inPreamble = false;
+
          TeXParserUtils.process(obj, getParser(), stack);
       }
       finally
       {
+         inPreamble = orgInPreamble;
          currentWriter = writer;
       }
 
@@ -2105,6 +2143,109 @@ public class L2HConverter extends LaTeXParserListener
 
    }
 
+   protected void writeNavigationFile(TeXObjectList stack)
+    throws IOException
+   {
+      PrintWriter navWriter = null;
+
+      try
+      {
+         navWriter = new PrintWriter(Files.newBufferedWriter(navFile.toPath(),
+            htmlCharSet));
+
+         currentWriter = navWriter;
+
+         String title = null;
+
+         ControlSequence cs = parser.getControlSequence("navigationcontentsname");
+
+         if (cs == null)
+         {
+            cs = parser.getControlSequence("contentsname");
+
+            if (cs != null)
+            {
+               title = processToString(cs, stack);
+            }
+         }
+
+         if (title == null)
+         {
+            DivisionInfo divInfo = divisionData.firstElement();
+            DivisionNode divNode = (DivisionNode)divInfo.getSpecial();
+
+            if (divNode != null)
+            {
+               title = divNode.getTitle();
+            }
+         }
+
+         writeDocType();
+
+         writeliteralln("<html>");
+         writeliteralln("<head>");
+
+         writeliteralln(String.format(
+          "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=%s\">", 
+          htmlCharSet.name()));
+
+         if (!generator.isEmpty())
+         {
+            writeliteralln(String.format("<meta name=\"generator\" content=\"%s\">",
+              generator));
+         }
+
+         if (useMathJax())
+         {
+            writeMathJaxHeader();
+         }
+
+         if (extraHead != null)
+         {
+            for (String content : extraHead)
+            {
+               writeliteralln(content);
+            }
+         }
+
+         if (title != null)
+         {
+            writeliteral("<title>");
+            writeliteral(title);
+            writeliteralln("</title>");
+         }
+
+         writeliteralln("<style type=\"text/css\">");
+         writeCssStyles();
+         writeliteralln("</style>");
+
+         writeliteralln("</head>");
+
+         writeliteralln("<body>");
+
+         if (title != null)
+         {
+            writeliteral("<h1>");
+            writeliteral(title);
+            writeliteralln("</h1>");
+         }
+
+         writeNavigationList(null, null);
+
+         writeliteralln("</body>");
+         writeliteralln("</html>");
+      }
+      finally
+      {
+         currentWriter = writer;
+
+         if (navWriter != null)
+         {
+            navWriter.close();
+         }
+      }
+   }
+
    protected void writeNavigationList()
     throws IOException
    {
@@ -2122,7 +2263,7 @@ public class L2HConverter extends LaTeXParserListener
 
       File currentFile = null;
 
-      if (currentNode != null)
+      if (navFile == null && currentNode != null)
       {
          currentFile = currentNode.getFile();
       }
@@ -2194,7 +2335,7 @@ public class L2HConverter extends LaTeXParserListener
 
          writeliteral(String.format("<a href=\"%s\"", ref));
 
-         if (node == currentNode)
+         if (navFile == null && node == currentNode)
          {
             writeliteral(" class=\"current\"");
          }
@@ -2222,10 +2363,11 @@ public class L2HConverter extends LaTeXParserListener
    protected String getFileNameForNode(DivisionNode node)
    {
       String label = node.getData().getLabel();
+      String target = node.getData().getTarget();
 
-      if (label == null)
+      if (label == null || label.equals(target))
       {
-         label = node.getData().getTarget();
+         label = target;
 
          if (label == null)
          {
@@ -3844,6 +3986,8 @@ public class L2HConverter extends LaTeXParserListener
    protected String suffix = "html";
 
    protected boolean splitUseBaseNamePrefix = false;
+
+   protected File navFile = null;
 
    private Vector<String> extraHead=null;
 
