@@ -433,6 +433,11 @@ public class AuxParser extends DefaultTeXParserListener
                citeData = new HashMap<String,CiteInfo>();
             }
 
+            if (citeList == null)
+            {
+               citeList = new Vector<CiteInfo>();
+            }
+
             CiteInfo info = CiteInfo.createCite(data, getParser());
 
             if (divisionData != null && !divisionData.isEmpty())
@@ -443,6 +448,7 @@ public class AuxParser extends DefaultTeXParserListener
             }
 
             citeData.put(info.getLabel(), info);
+            citeList.add(info);
          }
 
          auxData.add(data);
@@ -643,6 +649,11 @@ public class AuxParser extends DefaultTeXParserListener
       return citeData;
    }
 
+   public Vector<CiteInfo> getCiteList()
+   {
+      return citeList;
+   }
+
    @Override
    public Charset getCharSet()
    {
@@ -683,6 +694,7 @@ public class AuxParser extends DefaultTeXParserListener
 
    private boolean saveCites = false;
    protected HashMap<String,CiteInfo> citeData;
+   protected Vector<CiteInfo> citeList;// order of reference
 
    private TeXApp texApp;
 

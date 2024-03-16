@@ -171,6 +171,11 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       return null;
    }
 
+   public CiteInfo getCiteInfo(String label)
+   {
+      return citeData == null ? null : citeData.get(label);
+   }
+
    public TeXObject getCitation(TeXObject label)
       throws IOException
    {
@@ -219,6 +224,11 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       }
 
       return AuxData.getCitation(auxData, getParser(), label);
+   }
+
+   public LabelInfo getLabelInfo(String label)
+   {
+      return labelData == null ? null : labelData.get(label);
    }
 
    public TeXObject getReference(TeXObject label)
@@ -1760,6 +1770,20 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
                   citeData.putAll(auxCiteInfo);
                }
             }
+
+            if (citeList == null)
+            {
+               citeList = auxListener.getCiteList();
+            }
+            else
+            {
+               Vector<CiteInfo> cl = auxListener.getCiteList();
+
+               if (cl != null)
+               {
+                  citeList.addAll(cl);
+               }
+            }
          }
          else
          {
@@ -2779,6 +2803,20 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
             citeData.putAll(auxCiteInfo);
          }
       }
+
+      if (citeList == null)
+      {
+         citeList = auxParser.getCiteList();
+      }
+      else
+      {
+         Vector<CiteInfo> cl = auxParser.getCiteList();
+
+         if (cl != null)
+         {
+            citeList.addAll(cl);
+         }
+      }
    }
 
    public void setDivisionData(Vector<DivisionInfo> divisionData)
@@ -3359,6 +3397,8 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
    protected HashMap<String,LabelInfo> labelData;
    protected HashMap<String,CiteInfo> citeData;
    protected HashMap<String,String> linkLabelMap;
+
+   protected Vector<CiteInfo> citeList;
 
    private Hashtable<String,Vector<String>> counters;
 

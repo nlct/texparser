@@ -24,7 +24,7 @@ import com.dickimawbooks.texparserlib.*;
  * Label information obtained from <code>\newlabel</code>.
  */
 
-public class LabelInfo
+public class LabelInfo implements CrossRefInfo
 {
    protected LabelInfo(String label)
    {
@@ -92,11 +92,13 @@ public class LabelInfo
       return info;
    }
 
+   @Override
    public String getLabel()
    {
       return label;
    }
 
+   @Override
    public String getTarget()
    {
       return target;
@@ -107,6 +109,7 @@ public class LabelInfo
       return title;
    }
 
+   @Override
    public TeXObject getReference()
    {
       return reference;
@@ -117,11 +120,13 @@ public class LabelInfo
       return page;
    }
 
+   @Override
    public void setDivisionInfo(DivisionInfo divData)
    {
       divisionData = divData;
    }
 
+   @Override
    public DivisionInfo getDivisionInfo()
    {
       return divisionData;

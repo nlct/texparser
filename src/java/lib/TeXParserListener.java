@@ -23,6 +23,7 @@ import java.io.File;
 import java.nio.charset.Charset;
 
 import com.dickimawbooks.texparserlib.generic.*;
+import com.dickimawbooks.texparserlib.auxfile.CrossRefInfo;
 
 public abstract class TeXParserListener
 {
@@ -261,6 +262,12 @@ public abstract class TeXParserListener
     */
    public abstract TeXObject createLink(String anchorName, TeXObject text)
     throws IOException;
+
+   public TeXObject createLink(CrossRefInfo info, TeXObject text)
+    throws IOException
+   {
+      return createLink(info.getTarget(), text);
+   }
 
    /**
     * Creates a new object that has the given accessibility support

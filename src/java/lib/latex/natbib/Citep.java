@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2024 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.EOFException;
 
 import com.dickimawbooks.texparserlib.*;
+import com.dickimawbooks.texparserlib.auxfile.CiteInfo;
 import com.dickimawbooks.texparserlib.latex.*;
 
 public class Citep extends Cite
@@ -84,6 +85,37 @@ public class Citep extends Cite
          list.add(sty.getSeparator());
          list.add(parser.getListener().getSpace());
       }
+   }
+
+   @Override
+   public TeXObject expandCitation(TeXParser parser, boolean isStar,
+      TeXObject opt1, TeXObject opt2, CiteInfo info)
+   throws IOException
+   {
+      if (info.getParameterCount() < 4)
+      {
+         return super.expandCitation(parser, isStar, opt1, opt2, info);
+      }
+
+      switch (sty.getCiteStyle())
+      {
+         case NatbibSty.CITE_NUMBERS:
+
+           return info.getParameter(0);
+
+         case NatbibSty.CITE_AUTHORYEAR:
+
+           TeXObjectList list = new TeXObjectList();
+
+           list.add((TeXObject)info.getParameter(isStar ? 3 : 2).clone(), true);
+           list.add(parser.getListener().getOther(','));
+           list.add(parser.getListener().getSpace());
+           list.add((TeXObject)info.getParameter(1).clone(), true);
+
+           return list;
+      }
+
+      return super.expandCitation(parser, isStar, opt1, opt2, info);
    }
 
    @Override

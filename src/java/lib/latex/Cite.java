@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013-2022 Nicola L.C. Talbot
+    Copyright (C) 2013-2024 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.EOFException;
 
 import com.dickimawbooks.texparserlib.*;
+import com.dickimawbooks.texparserlib.auxfile.CiteInfo;
 
 public class Cite extends ControlSequence
 {
@@ -60,6 +61,8 @@ public class Cite extends ControlSequence
 
       CsvList csvList = CsvList.getList(parser, arg);
 
+      LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
+
       TeXObjectList list = new TeXObjectList();
 
       addPreCite(parser, list, isStar, opt1, opt2);
@@ -67,11 +70,22 @@ public class Cite extends ControlSequence
       for (int i = 0, n = csvList.size(); i < n; i++)
       {
          TeXObject cite = csvList.get(i);
+         String label = cite.toString(parser);
 
          addCiteSep(parser, list, isStar, i, n);
 
-         addLinkCitation(parser, list, isStar, cite, 
-            expandCitation(parser, isStar, opt1, opt2, cite));
+         CiteInfo info = listener.getCiteInfo(label);
+
+         if (info == null)
+         {
+            addLinkCitation(parser, list, isStar, cite, 
+               expandCitation(parser, isStar, opt1, opt2, cite));
+         }
+         else
+         {
+            addLinkCitation(parser, list, isStar, info, 
+               expandCitation(parser, isStar, opt1, opt2, info));
+         }
       }
 
       addPostCite(parser, list, isStar, opt1, opt2);
@@ -120,6 +134,12 @@ public class Cite extends ControlSequence
       }
    }
 
+   public TeXObject expandCitation(TeXParser parser, boolean isStar,
+       TeXObject opt1, TeXObject opt2, CiteInfo info)
+   throws IOException
+   {
+      return (TeXObject)info.getReference().clone();
+   }
 
    public TeXObject expandCitation(TeXParser parser, boolean isStar,
        TeXObject opt1, TeXObject opt2, TeXObject arg)
@@ -132,6 +152,13 @@ public class Cite extends ControlSequence
       TeXObject cite = listener.getCitation(label);
 
       return cite == null ? listener.createUnknownReference(label) : cite;
+   }
+
+   public void addLinkCitation(TeXParser parser, TeXObjectList list,
+      boolean isStar, CiteInfo info, TeXObject citeText)
+    throws IOException
+   {
+      list.add(parser.getListener().createLink(info, citeText));
    }
 
    public void addLinkCitation(TeXParser parser, TeXObjectList list,

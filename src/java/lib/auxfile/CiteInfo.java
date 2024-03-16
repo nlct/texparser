@@ -22,9 +22,22 @@ import com.dickimawbooks.texparserlib.*;
 
 /**
  * Cite information obtained from <code>\bibcite</code>.
+ * Note things can go awry if the writes to the aux file end up out of
+ * order. The first <code>\bibcite</code> may end up before the
+ * <code>\@writefile</code> for the bibliography header. This is
+ * because the default definition of <code>\bibitem</code> uses
+ * an immediate write whereas the <code>\@writefile</code> and label
+ * use a delayed write. (The immediate write is needed as bibliographies
+ * are typically at the end of a document and a delayed write on the final
+ * page may be lost.)
+ *
+ * This may mean that the DivisionInfo is incorrect for the first reference.
+ * A workaround is to adjust the division for the first cite if all
+ * the other cites belong to another division, but this won't work for
+ * a document with multiple bibliographies.
  */
 
-public class CiteInfo
+public class CiteInfo implements CrossRefInfo
 {
    protected CiteInfo(String label)
    {
@@ -39,30 +52,87 @@ public class CiteInfo
 
       info.reference = auxData.getArg(1);
 
+      /* If reference consists of a series of groups then it's likely
+         that a package such as natbib has been used, and this is 
+         a set of parameters.
+       */
+
+      if (parser.isStack(info.reference) && !info.reference.isEmpty())
+      {
+         TeXObjectList list = (TeXObjectList)info.reference;
+
+         boolean hasParams = true;
+
+         for (TeXObject obj : list)
+         {
+            if (!(obj instanceof Group))
+            {
+               hasParams = false;
+               break;
+            }
+         }
+
+         if (hasParams)
+         {
+            info.params = new TeXObjectList[list.size()];
+
+            for (int i = 0; i < info.params.length; i++)
+            {
+               info.params[i] = ((Group)list.get(i)).toList();
+            }
+         }
+      }
+
       return info;
    }
 
+   @Override
    public String getLabel()
    {
       return label;
    }
 
+   @Override
+   public String getTarget()
+   {
+      return label;
+   }
+
+   @Override
    public TeXObject getReference()
    {
       return reference;
    }
 
-   public void setDivisionInfo(DivisionInfo divData)
+   @Override
+   public void setDivisionInfo(DivisionInfo divInfo)
    {
-      divisionData = divData;
+      divisionInfo = divInfo;
    }
 
+   @Override
    public DivisionInfo getDivisionInfo()
    {
-      return divisionData;
+      return divisionInfo;
+   }
+
+   public boolean hasParameters()
+   {
+      return params != null;
+   }
+
+   public int getParameterCount()
+   {
+      return params == null ? 0 : params.length;
+   }
+
+   public TeXObjectList getParameter(int idx)
+   {
+      return params[idx];
    }
 
    protected String label;
    protected TeXObject reference;
-   protected DivisionInfo divisionData;
+   protected DivisionInfo divisionInfo;
+   protected TeXObjectList[] params;
 }

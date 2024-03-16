@@ -1109,6 +1109,65 @@ public class L2HConverter extends LaTeXParserListener
    }
 
    @Override
+   public TeXObject createLink(CrossRefInfo info, TeXObject text)
+    throws IOException
+   {
+      String id = info.getLabel();
+
+      if (id == null)
+      {
+         id = info.getTarget();
+      }
+
+      if (id == null) return text;
+
+      String ref;
+
+      if (divisionMap != null && currentNode != null)
+      {
+         DivisionNode node = null;
+
+         DivisionInfo divInfo = info.getDivisionInfo();
+
+         if (divInfo != null)
+         {
+            node = (DivisionNode)divInfo.getSpecial();
+         }
+
+         if (node == null)
+         {
+            node = divisionMap.get(id);
+         }
+
+         if (node == null || node == currentNode || node.getFile().equals(currentNode.getFile()))
+         {
+            ref = "#"+HtmlTag.getUriFragment(id);
+         }
+         else
+         {
+            ref = node.getRef();
+
+            int idx = ref.indexOf("#");
+
+            if (idx < 0)
+            {
+               ref += "#"+HtmlTag.getUriFragment(id);
+            }
+            else
+            {
+               ref = ref.substring(0, idx+1) + HtmlTag.getUriFragment(id);
+            }
+         }
+      }
+      else
+      {
+         ref = "#"+HtmlTag.getUriFragment(id);
+      }
+
+      return createLinkElement(ref, text);
+   }
+
+   @Override
    public TeXObject createLink(String anchorName, TeXObject text)
     throws IOException
    {
@@ -1124,6 +1183,12 @@ public class L2HConverter extends LaTeXParserListener
          }
       }
 
+      return createLinkElement("#"+HtmlTag.getUriFragment(anchorName), text);
+   }
+
+   public TeXObjectList createLinkElement(String href, TeXObject text)
+    throws IOException
+   {
       TeXObjectList stack = createStack();
 
       StartElement elem = new StartElement("a");
@@ -1139,7 +1204,7 @@ public class L2HConverter extends LaTeXParserListener
          }
       }
 
-      elem.putAttribute("href", "#"+HtmlTag.getUriFragment(anchorName));
+      elem.putAttribute("href", href);
       stack.add(elem);
 
       stack.add(text);
@@ -1574,6 +1639,17 @@ public class L2HConverter extends LaTeXParserListener
          createDivisionTree(stack);
 
          writeNavigationList();
+
+         if (splitLevel > 0 && citeList != null && citeList.size() > 1)
+         {
+            /* Workaround for delayed vs immediate writes.
+             If the first cite doesn't have the same division as the second
+             assume this situation has occurred.
+            */
+            CiteInfo citeInfo = citeList.firstElement();
+
+            citeInfo.setDivisionInfo(citeList.get(1).getDivisionInfo());
+         }
       }
 
       writeliteralln("<div id=\"main\">");

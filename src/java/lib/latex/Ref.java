@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013-2022 Nicola L.C. Talbot
+    Copyright (C) 2013-2024 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.EOFException;
 
 import com.dickimawbooks.texparserlib.*;
+import com.dickimawbooks.texparserlib.auxfile.LabelInfo;
 
 public class Ref extends ControlSequence
 {
@@ -66,8 +67,6 @@ public class Ref extends ControlSequence
    {
       LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
 
-      TeXObject ref = listener.getReference(label);
-
       TeXObjectList list = listener.createStack();
 
       if (tags != null)
@@ -78,17 +77,37 @@ public class Ref extends ControlSequence
          }
       }
 
-      if (ref == null)
+      LabelInfo info = listener.getLabelInfo(label);
+
+      if (info == null)
       {
-         list.add(listener.createUnknownReference(label));
-      }
-      else if (hyper)
-      {
-         list.add(parser.getListener().createLink(label, ref));
+         TeXObject ref = listener.getReference(label);
+
+         if (ref == null)
+         {
+            list.add(listener.createUnknownReference(label));
+         }
+         else if (hyper)
+         {
+            list.add(parser.getListener().createLink(label, ref));
+         }
+         else
+         {
+            list.add(ref, true);
+         }
       }
       else
       {
-         list.add(ref, true);
+         TeXObject ref = (TeXObject)info.getReference().clone();
+
+         if (hyper)
+         {
+            list.add(parser.getListener().createLink(info, ref));
+         }
+         else
+         {
+            list.add(ref, true);
+         }
       }
 
       return list;
