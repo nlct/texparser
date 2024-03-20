@@ -3467,11 +3467,11 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
 
    private String inputEncoding = null;
 
-   private FontEncSty fontEncSty = null;
+   protected FontEncSty fontEncSty = null;
 
-   private ColorSty colorSty = null;
+   protected ColorSty colorSty = null;
 
-   private GlossariesSty glossariesSty = null;
+   protected GlossariesSty glossariesSty = null;
 
    private TeXObjectList bibliographySection;
 
