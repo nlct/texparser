@@ -182,6 +182,11 @@ public class L2HConverter extends LaTeXParserListener
         "gif", "GIF", "pdf", "PDF");
    }
 
+   public Charset getHtmlCharset()
+   {
+      return htmlCharSet;
+   }
+
    /**
     * Sets the split level. This must be set before the file is parsed. 
     * Has no effect if the division data isn't available. This method
@@ -2147,13 +2152,14 @@ public class L2HConverter extends LaTeXParserListener
     throws IOException
    {
       PrintWriter navWriter = null;
+      Writer prevWriter = currentWriter;
 
       try
       {
          navWriter = new PrintWriter(Files.newBufferedWriter(navFile.toPath(),
             htmlCharSet));
 
-         currentWriter = navWriter;
+         getParser().message(TeXApp.MESSAGE_WRITING, navFile);
 
          String title = null;
 
@@ -2179,6 +2185,8 @@ public class L2HConverter extends LaTeXParserListener
                title = divNode.getTitle();
             }
          }
+
+         currentWriter = navWriter;
 
          writeDocType();
 
@@ -2237,7 +2245,7 @@ public class L2HConverter extends LaTeXParserListener
       }
       finally
       {
-         currentWriter = writer;
+         currentWriter = prevWriter;
 
          if (navWriter != null)
          {
