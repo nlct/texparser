@@ -940,7 +940,8 @@ public class TeXParserApp implements TeXApp
       return execCommandAndWaitFor(cmd, envp, dir, listener, true);
    }
 
-   // adapted from http://kylecartmell.com/?p=9
+   // adapted from http://kylecartmell.com/?p=9 only it's no longer there
+   // TODO replace with ProcessBuilder
    public int execCommandAndWaitFor(String[] cmd, String[] envp, File dir, 
       ProcessListener listener, boolean writeInfo)
      throws IOException,InterruptedException
