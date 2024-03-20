@@ -30,6 +30,7 @@ import com.dickimawbooks.texparserlib.latex.glossaries.*;
 import com.dickimawbooks.texparserlib.latex.color.ColorSty;
 import com.dickimawbooks.texparserlib.html.L2HConverter;
 import com.dickimawbooks.texparserlib.html.WidgetMenu;
+import com.dickimawbooks.texparserlib.html.Widget;
 
 public class UserGuideSty extends LaTeXSty
 {
@@ -37,7 +38,14 @@ public class UserGuideSty extends LaTeXSty
      boolean loadParentOptions, ColorSty colorSty)
    throws IOException
    {
-      super(options, "nlctuserguide", listener, loadParentOptions);
+      this(options, "nlctuserguide", listener, loadParentOptions, colorSty);
+   }
+
+   public UserGuideSty(KeyValList options, String styName, LaTeXParserListener listener, 
+     boolean loadParentOptions, ColorSty colorSty)
+   throws IOException
+   {
+      super(options, styName, listener, loadParentOptions);
       this.colorSty = colorSty;
    }
 
@@ -46,10 +54,24 @@ public class UserGuideSty extends LaTeXSty
    {
       LaTeXParserListener listener = getListener();
 
-      if (listener instanceof L2HConverter)
-      {
-         ((L2HConverter)listener).addCssStyle("dfn { font-style: normal; font-weight: bold; } a { text-decoration: none; } a:hover { text-decoration: underline; } div.tablefns { border-top: solid; } div.example { border-bottom: solid silver; padding: 20px; } div.example div.title { font-weight: bold; font-size: large; } .pageimage { padding: 10px; vertical-align: top; } .boolsuffix { text-decoration: underline; }");
-      }
+      addCssStyles();
+      addSemanticCommands();
+      addExtraSyntaxSemanticCommands();
+      addCrossRefCommands();
+      addFootnoteCommands();
+      addDocRefCommands();
+      addSymbolCommands();
+      addGlsIconCommands();
+      addDiscretionaryCommands();
+      addTextCommands();
+      addListCommands();
+      addBoxCommands();
+      addInlineDefCommands();
+      addExampleCommands();
+      addLocationCommands();
+      addPrintCommands();
+      addBib2GlsCommands();
+      addGlsCommands();
 
       glossariesSty.setModifier(listener.getOther('+'), "format",
         listener.createString("glsnumberformat"));
@@ -59,6 +81,53 @@ public class UserGuideSty extends LaTeXSty
 
       registerControlSequence(new MainMatterOnly());
       registerControlSequence(new MainMatterOnly("@@mainmatteronly"));
+
+      registerControlSequence(new GuideGls());
+
+      registerControlSequence(new GenericCommand(true,
+         "thispackagename", null, new TeXCsRef("jobname")));
+
+      registerControlSequence(new GenericCommand(true, "thispackage", null, 
+          new TeXObject[]{new TeXCsRef("styfmt"), new TeXCsRef("thispackagename")}));
+
+      registerControlSequence(new TextualContentCommand("texparser@currentsection",
+        "chapter"));
+
+      registerControlSequence(new GenericCommand(true, 
+        "currentcounter", null, new TeXCsRef("texparser@currentsection")));
+
+      registerControlSequence(new TextualContentCommand("cmddefbookmarkleveloffset", "1"));
+
+
+      registerControlSequence(new AtGobble("settabcolsep"));
+      registerControlSequence(new AtGobble("tcbset"));
+
+      registerControlSequence(new AtFirstOfOne("textsmaller"));
+      registerControlSequence(new AtFirstOfOne("textlarger"));
+
+      registerControlSequence(new Relax("nlctnovref"));
+      registerControlSequence(new Relax("nlctusevref"));
+      registerControlSequence(new Relax("htmlavailable"));
+
+      registerControlSequence(new AtGobble("nlctdocatnum"));
+
+   }
+
+   protected void addCssStyles()
+   {
+      LaTeXParserListener listener = getListener();
+
+      if (listener instanceof L2HConverter)
+      {
+         ((L2HConverter)listener).addCssStyle("dfn { font-style: normal; font-weight: bold; } a { text-decoration: none; } a:hover { text-decoration: underline; } div.tablefns { border-top: solid; } div.example { border-bottom: solid silver; padding: 20px; } div.example div.title { font-weight: bold; font-size: large; } .pageimage { padding: 10px; vertical-align: top; } .boolsuffix { text-decoration: underline; }");
+      }
+   }
+
+   protected void addSemanticCommands()
+   {
+      TeXObjectList def;
+
+      registerControlSequence(new DefSemanticCmd(this));
 
       colorSty.putColor("cs", FG_CS);
       colorSty.putColor("styopt", FG_STYOPT);
@@ -72,16 +141,14 @@ public class UserGuideSty extends LaTeXSty
       colorSty.putColor("style5", new Color(0.28f,0.235f,0.545f));// SlateBlue4
       colorSty.putColor("style6", new Color(0.545f,0.352f,0.17f));// Tan4
 
-      registerControlSequence(new GuideGls());
+      addSemanticCommand("strong", TeXFontWeight.STRONG);
+      addSemanticCommand("booktitle", TeXFontShape.EM);
 
       addSemanticCommand("sidenote", 
        new TeXFontText(TeXFontSize.FOOTNOTE), false, true, FloatBoxStyle.RIGHT);
 
       addSemanticCommand("advantagefmt", "advantage", null, Color.GREEN, null, null);
       addSemanticCommand("disadvantagefmt", "disadvantage", null, Color.RED, null, null);
-
-      addSemanticCommand("strong", TeXFontWeight.STRONG);
-      addSemanticCommand("booktitle", TeXFontShape.EM);
 
       addSemanticCommand("@code", "code", 
         new TeXFontText(TeXFontFamily.VERB), null, null, null);
@@ -113,132 +180,18 @@ public class UserGuideSty extends LaTeXSty
 
       registerControlSequence(AccSuppObject.createSymbol(
         listener, "menusep", 0x279C, "menu separator", true));
-      addSemanticCommand("menufmt", TeXFontFamily.TT);
+
+      registerControlSequence(new Widget("menufmt", "menu"));
       registerControlSequence(new WidgetMenu("menu", "menusep"));
 
-      registerControlSequence(AccSuppObject.createSymbol(
-        listener, "tabsym", 0x21B9, "TAB", true));
-
-      registerControlSequence(AccSuppObject.createSymbol(
-        listener, "upsym", 0x2B71, "Up", true));
+      registerControlSequence(new TextualContentCommand("codebackslash", "\\"));
+      registerControlSequence(new TextualContentCommand("longswitch", "--"));
+      registerControlSequence(new TextualContentCommand("shortswitch", "-"));
 
       addSemanticCommand("cbeg", TeXFontFamily.VERB, null, 
         listener.createString("\\begin{"), listener.getOther('}'));
       addSemanticCommand("cend", TeXFontFamily.VERB, null, 
         listener.createString("\\end{"), listener.getOther('}'));
-
-      registerControlSequence(new GenericCommand(true,
-         "thispackagename", null, new TeXCsRef("jobname")));
-
-      registerControlSequence(new GenericCommand(true, "thispackage", null, 
-          new TeXObject[]{new TeXCsRef("styfmt"), new TeXCsRef("thispackagename")}));
-
-      registerControlSequence(new GenericCommand(true, "examplesdir", null, 
-         new TeXObject[] {new TeXCsRef("jobname"), 
-            listener.createString("-examples")}));
-
-      registerControlSequence(new GenericCommand(true, "mainfmt", null,
-         new TeXCsRef("glsnumberformat")));
-
-      addSemanticCommand("termslocfmt", TeXFontShape.IT);
-
-      registerControlSequence(new GenericCommand(true, "glsaddterm", null,
-         new TeXCsRef("glsadd")));
-
-      addSemanticCommand("crossreftag", TeXFontShape.IT);
-
-      addSemanticCommand("crossref", "crossref", null, null, null, null,
-       null, null, false, true, new UserDimension(1, FixedUnit.EM), null,
-       null, null, AlignHStyle.DEFAULT, AlignVStyle.DEFAULT, null, null
-      );
-
-      listener.addLaTeXCommand(true, "glsseeformat", true,
-       3, new TeXCsRef("seename"), TeXParserUtils.createStack(listener,
-        new TeXCsRef("crossref"), 
-        TeXParserUtils.createGroup(listener, 
-          new TeXCsRef("crossreftag"), 
-           TeXParserUtils.createGroup(listener, listener.getParam(1)),
-          listener.getSpace(),
-          new TeXCsRef("glsseelist"), 
-           TeXParserUtils.createGroup(listener, listener.getParam(2))
-        )
-      ));
-
-      listener.addLaTeXCommand("seclocfmt", true, 2, null, 
-        TeXParserUtils.createStack(listener, 
-         listener.getOther(0xA7),
-         listener.getParam(1)));
-
-      registerControlSequence(new GenericCommand(true,
-        "glsxtrchapterlocfmt", null, new TeXCsRef("seclocfmt")));
-      registerControlSequence(new GenericCommand(true,
-        "glsxtrsectionlocfmt", null, new TeXCsRef("seclocfmt")));
-      registerControlSequence(new GenericCommand(true,
-        "glsxtrsubsectionlocfmt", null, new TeXCsRef("seclocfmt")));
-      registerControlSequence(new GenericCommand(true,
-        "glsxtrsubsubsectionlocfmt", null, new TeXCsRef("seclocfmt")));
-      registerControlSequence(new GenericCommand(true,
-        "glsxtrparagraphlocfmt", null, new TeXCsRef("seclocfmt")));
-      registerControlSequence(new GenericCommand(true,
-        "glsxtrsubparagraphlocfmt", null, new TeXCsRef("seclocfmt")));
-
-      listener.addLaTeXCommand("glsxtrtablelocfmt", true, 2, null, 
-        TeXParserUtils.createStack(listener, 
-         new TeXCsRef("tablename"), listener.getSpace(),
-         listener.getParam(1)));
-
-      listener.addLaTeXCommand("glsxtrfigurelocfmt", true, 2, null, 
-        TeXParserUtils.createStack(listener, 
-         new TeXCsRef("figurename"), listener.getSpace(),
-         listener.getParam(1)));
-
-      registerControlSequence(new TextualContentCommand("bibglslocationgroupsep",
-       "; "));
-
-      registerControlSequence(new TextualContentCommand("TeXLive", "TeX Live"));
-      registerControlSequence(new TextualContentCommand("MikTeX", "MikTeX"));
-
-      registerControlSequence(new TextualContentCommand("dhyphen", "-"));
-      registerControlSequence(new TextualContentCommand("dcolon", ":"));
-      registerControlSequence(new TextualContentCommand("dcomma", ","));
-      registerControlSequence(new TextualContentCommand("dequals", "="));
-      registerControlSequence(new TextualContentCommand("dfullstop", "."));
-      registerControlSequence(new TextualContentCommand("longswitch", "--"));
-      registerControlSequence(new TextualContentCommand("shortswitch", "-"));
-      registerControlSequence(new TextualContentCommand("dunderscore", "_"));
-      registerControlSequence(new TextualContentCommand("dsb", "_"));
-      registerControlSequence(new TextualContentCommand("codebackslash", "\\"));
-
-      registerControlSequence(new TextualContentCommand("texparser@currentsection",
-        "chapter"));
-
-      registerControlSequence(new GenericCommand(true, 
-        "currentcounter", null, new TeXCsRef("texparser@currentsection")));
-
-      registerControlSequence(new TextualContentCommand("cmddefbookmarkleveloffset", "1"));
-
-      registerControlSequence(new MainGlsAdd(glossariesSty));
-
-      registerControlSequence(new ExpFunc(glossariesSty));
-      registerControlSequence(new PredCs(glossariesSty));
-
-      registerControlSequence(new TextualContentCommand("explsuffix", ""));
-      registerControlSequence(new TextualContentCommand("explTFsuffix", "TF"));
-
-      registerControlSequence(new CondCs("condcsT", "T", glossariesSty));
-      registerControlSequence(new CondCs("condcsF", "F", glossariesSty));
-
-      registerControlSequence(new GenericCommand(true,
-        "TFsyntax", null, TeXParserUtils.createStack(listener, 
-         new TeXCsRef("margm"), listener.createGroup("true"),
-         listener.getSpace(),
-         new TeXCsRef("margm"), listener.createGroup("false")
-       )));
-
-      addSemanticCommand("@explboolsyntaxfmt",
-       "boolsuffix", new TeXFontText(TeXFontShape.EM),
-        null, null, null, null, null, true, false);
-
 
       addSemanticCommand("longargfmt", TeXFontFamily.TT,
         null, new TeXCsRef("longswitch"), null);
@@ -271,7 +224,7 @@ public class UserGuideSty extends LaTeXSty
         null, null, null, null, listener.createString(": "), true, false);
 
       // \marg
-      TeXObjectList def = listener.createStack();
+      def = listener.createStack();
       def.add(listener.getOther('{'));
       def.add(listener.getParam(1));
       def.add(listener.getOther('}'));
@@ -309,242 +262,6 @@ public class UserGuideSty extends LaTeXSty
       subgrp.add(listener.getParam(1));
       registerControlSequence(new LaTeXGenericCommand(true, "oargm",
         "m", def));
-
-      // \\glscsname
-      def = listener.createStack();
-      def.add(new TeXCsRef("glslink"));
-      def.add(listener.getOther('['));
-      def.add(listener.getParam(1));
-      def.add(listener.getOther(']'));
-      def.add(TeXParserUtils.createGroup(listener, listener.getParam(2)));
-      grp = listener.createGroup();
-      def.add(grp);
-      grp.add(new TeXCsRef("csfmtfont"));
-      grp.add(TeXParserUtils.createGroup(listener, listener.getParam(2)));
-
-      registerControlSequence(new LaTeXGenericCommand(true, "glscsname",
-        "om", def, TeXParserUtils.createStack(listener, listener.createStack())));
-
-      addTaggedColourBox("important", BG_IMPORTANT, FRAME_COL_IMPORTANT);
-      addTaggedColourBox("warning", BG_WARNING, FRAME_COL_WARNING);
-      addTaggedColourBox("information", BG_INFO, FRAME_COL_INFO);
-      TaggedColourBox pinnedBox = addTaggedColourBox("pinnedbox",
-         "definition", BG_DEF, Color.BLACK);
-
-      TaggedColourBox terminalBox = 
-        addTaggedColourBox("terminal", new TeXFontText(TeXFontFamily.VERB), 
-           BG_TERMINAL, Color.BLACK);
-
-      TaggedColourBox transcriptBox = 
-        addTaggedColourBox("transcript", new TeXFontText(TeXFontFamily.VERB), 
-           BG_TERMINAL, Color.BLACK);
-
-      TaggedColourBox ctrBox = addTaggedColourBox("ctrbox",
-         "counter", BG_DEF, Color.BLACK);
-
-      TaggedColourBox codeBox = addTaggedColourBox("codebox",
-         "code", new TeXFontText(TeXFontFamily.VERB), BG_CODE, Color.BLACK);
-
-      registerControlSequence(new DuplicateEnv("codebox*", codeBox));
-
-      TaggedColourBox resultBox = addTaggedColourBox("resultbox",
-         "result", null, Color.BLACK);
-      addTaggedColourBox("badcodebox",
-         "badcode", new TeXFontText(TeXFontFamily.VERB), BG_CODE, Color.BLACK);
-      addTaggedColourBox("unicodebox",
-         "unicode", new TeXFontText(TeXFontFamily.VERB), BG_CODE, Color.BLACK);
-
-      FrameBoxEnv compactcodeBox = new FrameBoxEnv(
-        addSemanticCommand("@compactcodebox", "compactcodebox",
-        new TeXFontText(TeXFontFamily.VERB),
-        (Color)null, BG_CODE, Color.BLACK, null, null, false, true));
-
-      registerControlSequence(compactcodeBox);
-      registerControlSequence(new DuplicateEnv("compactcodebox*", compactcodeBox));
-
-      FrameBox crc = addSemanticCommand("@sidebysidecode", "sidebysidecode",
-        new TeXFontText(TeXFontFamily.VERB, TeXFontSize.SMALL),
-        (Color)null, BG_CODE, Color.BLACK, null, null, true, true, 
-         null, // left outer margin
-         new UserDimension(0.03, new PercentUnit()), // right outer margin
-         new UserDimension(), // top outer margin
-         null, // bottom outer margin
-         AlignHStyle.DEFAULT, AlignVStyle.TOP, 
-         new UserDimension(0.47, new PercentUnit()));
-
-      FrameBox crr = addSemanticCommand("@sidebysideresult", "sidebysideresult",
-         null, (Color)null, null, Color.BLACK, null, null, true, true, 
-         null, // left outer margin
-         null, // right outer margin
-         new UserDimension(), // top outer margin
-         null, // bottom outer margin
-         AlignHStyle.DEFAULT, AlignVStyle.TOP, 
-         new UserDimension(0.47, new PercentUnit()));
-
-      CodeResult codeResult = new CodeResult(
-         new ColourBox("frame@coderesult@title", BorderStyle.NONE,
-          AlignHStyle.CENTER, AlignVStyle.DEFAULT, false, true, null, null),
-        crc, crr);
-
-      registerControlSequence(codeResult);
-
-      registerControlSequence(new DuplicateEnv("coderesult*", codeResult));
-
-      CodeResult uniCodeResult = new CodeResult("unicoderesult",
-         new ColourBox("frame@unicoderesult@title", BorderStyle.NONE,
-          AlignHStyle.CENTER, AlignVStyle.DEFAULT, false, true, null, null),
-        crc, crr, "unicode");
-
-      registerControlSequence(uniCodeResult);
-
-      registerControlSequence(new DuplicateEnv("unicoderesult*", uniCodeResult));
-
-      FrameBox defnBox = addColourBox("defnbox", null, null,
-        BG_DEF, Color.BLACK);
-      FrameBox optionSummaryBox = addColourBox("optionsummarybox", null, null,
-        BG_DEF, Color.BLACK);
-      FrameBox optionValueSummaryBox = addSemanticCommand("optionvaluesummarybox",
-         new UserDimension(40, FixedUnit.BP));
-
-      FrameBox rightBox = addFloatBox("floatrightbox");
-
-      FrameBox noteBox = new ColourBox("noteBox", BorderStyle.NONE,
-        AlignHStyle.DEFAULT, AlignVStyle.DEFAULT, false, null, null);
-      listener.declareFrameBox(noteBox, false);
-
-      registerControlSequence(new CmdDef(pinnedBox, rightBox, noteBox, glossariesSty));
-      registerControlSequence(new EnvDef(pinnedBox, rightBox, noteBox, glossariesSty));
-      registerControlSequence(new CtrDef(ctrBox, rightBox, noteBox, glossariesSty));
-      registerControlSequence(new PkgDef(pinnedBox, rightBox, noteBox, glossariesSty));
-      registerControlSequence(new ClsDef(pinnedBox, rightBox, noteBox, glossariesSty));
-
-      TaggedColourBox settingsBox = addTaggedColourBox("settingsbox",
-         "valuesetting", BG_OPTION_DEF, Color.BLACK);
-
-      registerControlSequence(new OptionDef(settingsBox, rightBox, noteBox, glossariesSty));
-
-      TaggedColourBox optValBox = addTaggedColourBox("optionvaluebox",
-         "optionvalue", BG_OPTION_VALUE_DEF, Color.BLACK);
-
-      registerControlSequence(new OptionValDef(optValBox, rightBox, noteBox, glossariesSty));
-
-      registerControlSequence(new AppDef(terminalBox, rightBox, noteBox, glossariesSty));
-      registerControlSequence(new SwitchDef(settingsBox, rightBox, noteBox, glossariesSty));
-
-      registerControlSequence(new SummaryBox(defnBox, 
-        rightBox, noteBox, glossariesSty));
-
-      registerControlSequence(new SummaryCommandBox(defnBox, 
-        rightBox, noteBox, glossariesSty));
-
-      registerControlSequence(new SummaryEnvironmentBox(defnBox, 
-        rightBox, noteBox, glossariesSty));
-
-      registerControlSequence(new SummaryCommandOptionBox(optionSummaryBox, 
-        rightBox, noteBox, glossariesSty));
-
-      registerControlSequence(new SummaryCommandOptionBox(
-        "summaryglossentryoption", defnBox, 
-        rightBox, noteBox, glossariesSty));
-
-      registerControlSequence(new SummaryCommandOptionBox(
-        "summaryglossentrypackageoption", defnBox, 
-        rightBox, noteBox, glossariesSty));
-
-      registerControlSequence(new SummaryCommandOptionBox(
-        "summaryglossentryclassoption", defnBox, 
-        rightBox, noteBox, glossariesSty));
-
-      registerControlSequence(new SummaryOptionValueBox(optionValueSummaryBox, 
-        rightBox, noteBox, glossariesSty));
-
-      registerControlSequence(new SummaryPackageBox(defnBox, 
-        rightBox, noteBox, glossariesSty));
-
-      registerControlSequence(new SummaryClassBox(defnBox, 
-        rightBox, noteBox, glossariesSty));
-
-      createIndexItemBox(0);
-      createIndexItemBox(1);
-      createIndexItemBox(2);
-
-      addColourBox("nlctusernavbox", null, null, null, null);
-      addSemanticCommand("texparser@abstractheader", "abstractheader", 
-        new TeXFontText(TeXFontWeight.BF), null, null, null, null, null, 
-         false, false, null, AlignHStyle.CENTER);
-
-      addGlsFmtTextCommand("stytext", "pkg.");
-      addGlsFmtTextCommand("clstext", "cls.");
-      addGlsFmtTextCommand("opttext", "opt.");
-      addGlsFmtTextCommand("envtext", "env.");
-      addGlsFmtTextCommand("ctrtext", "ctr.");
-      addGlsFmtTextCommand("actext", "dual.");
-      addGlsFmtTextCommand("exttext", "ext.");
-      addGlsFmtTextCommand("apptext", "app.");
-      addGlsFmtTextCommand("switchtext", "switch.");
-
-      registerControlSequence(glossariesSty.createGls("sty", "pkg."));
-      registerControlSequence(glossariesSty.createGls("cls", "cls."));
-      registerControlSequence(glossariesSty.createGls("opt", "opt."));
-      registerControlSequence(glossariesSty.createGls("env", "env."));
-      registerControlSequence(glossariesSty.createGls("ctr", "ctr."));
-      registerControlSequence(glossariesSty.createGls("ac", "dual."));
-      registerControlSequence(glossariesSty.createGls("ext", "ext."));
-      registerControlSequence(glossariesSty.createGls("app", "app."));
-      registerControlSequence(glossariesSty.createGls("switch", "switch."));
-      registerControlSequence(glossariesSty.createGls("cmdmod", "idx.mod."));
-      registerControlSequence(glossariesSty.createGls("file", "file."));
-
-      registerControlSequence(new Dglsfield("sym", glossariesSty, CaseChange.NO_CHANGE,
-        "symbol"));
-
-      registerControlSequence(new InlineGlsDef(glossariesSty));
-      registerControlSequence(new InlineGlsDef("inlineidxdef", "idx.", glossariesSty));
-      registerControlSequence(new InlineGlsDef("inlineidxfdef", "idx.",
-        "first", true, glossariesSty));
-      registerControlSequence(new InlineGlsDef("inlineidxpdef", "idx.",
-        "plural", true, glossariesSty));
-
-      registerControlSequence(new InlineGlsDef("Inlineidxdef", "idx.",
-        CaseChange.SENTENCE, glossariesSty));
-
-      registerControlSequence(new InlineGlsDef("inlineswitchdef", "switch.", glossariesSty));
-      registerControlSequence(new InlineGlsDef("inlineoptdef", "opt.", glossariesSty));
-      registerControlSequence(new InlineGlsDef("inlinepkgdef", "pkg.", glossariesSty));
-      registerControlSequence(new CmdDefSyntax(glossariesSty));
-      registerControlSequence(new OptDefSyntax(glossariesSty));
-
-      registerControlSequence(new PrintTerms());
-
-      registerControlSequence(new PrintAbbrs(glossariesSty));
-      registerControlSequence(new PrintIcons(glossariesSty));
-      registerControlSequence(new PrintMain(glossariesSty));
-      registerControlSequence(new PrintSummary(glossariesSty));
-      registerControlSequence(new PrintCommandOptions(glossariesSty));
-      registerControlSequence(new PrintCommonOptions(glossariesSty));
-      registerControlSequence(new PrintIndex(glossariesSty));
-      registerControlSequence(new IndexInitPostNameHooks());
-      registerControlSequence(new AbbrPostNameHook(glossariesSty));
-
-      registerControlSequence(new Dgls("idx", CaseChange.NO_CHANGE, glossariesSty));
-      registerControlSequence(new Dgls("idxpl", 
-       CaseChange.NO_CHANGE, true, glossariesSty));
-      registerControlSequence(new Dgls("Idx", CaseChange.SENTENCE, glossariesSty));
-      registerControlSequence(new Dgls("Idxpl", CaseChange.SENTENCE, true, glossariesSty));
-      registerControlSequence(new Dglslink("idxc", false, glossariesSty));
-
-      registerControlSequence(new Dglsfield("idxn", glossariesSty, 
-         CaseChange.NO_CHANGE, "name"));
-      registerControlSequence(new Dglsfield("idxf", glossariesSty, 
-         CaseChange.NO_CHANGE, "first"));
-
-      registerControlSequence(new MirrorSampleFile());
-
-      // dual prefix list
-      def = listener.createString("dual.,idx.,idx.sym.,");
-        def.add(listener.getControlSequence("empty"));
-      registerControlSequence(new GenericCommand(true, "@glsxtr@labelprefixes",
-       null, def));
 
       // \optval
       def = listener.createStack();
@@ -792,6 +509,305 @@ public class UserGuideSty extends LaTeXSty
       registerControlSequence(new LaTeXGenericCommand(true,
        "metametafilefmt", "mmmmm", def));
 
+      // urlfootref
+      def = listener.createStack();
+      def.add(new TeXCsRef("href"));
+      def.add(TeXParserUtils.createGroup(listener, listener.getParam(1)));
+      def.add(TeXParserUtils.createGroup(listener, listener.getParam(2)));
+
+      registerControlSequence(new LaTeXGenericCommand(true,
+       "urlfootref", "mm", def));
+
+      // \cmdnotefmt
+      registerControlSequence(new AtFirstOfOne("cmdnotefmt"));
+
+      // \pkgnotefmt
+      registerControlSequence(new AtFirstOfOne("pkgnotefmt"));
+
+      // \optnotefmt
+      registerControlSequence(new AtFirstOfOne("optnotefmt"));
+
+      // \appnotefmt
+      registerControlSequence(new AtFirstOfOne("appnotefmt"));
+
+      // \switchnotefmt
+      registerControlSequence(new AtFirstOfOne("switchnotefmt"));
+
+      // \summarynotefmt
+      def = listener.createStack();
+      def.add(listener.getOther('('));
+      def.add(listener.getParam(1));
+      def.add(listener.getOther(')'));
+
+      registerControlSequence(new LaTeXGenericCommand(true,
+       "summarynotefmt", "m", def));
+
+      // \araraline
+      def = listener.createString("% arara: ");
+      def.add(listener.getParam(1));
+
+      registerControlSequence(new LaTeXGenericCommand(true, "araraline",
+       "m", def));
+
+      // \araracont
+      def = listener.createStack();
+      def.add(new TeXCsRef("araraline"));
+      def.add(TeXParserUtils.createGroup(listener, 
+       new TeXCsRef("longswitch"), listener.getOther('>'), 
+       listener.getSpace()));
+
+      registerControlSequence(new GenericCommand(true, "araracont",
+       null, def));
+
+   }
+
+   protected void addExtraSyntaxSemanticCommands()
+   {
+      TeXObjectList def;
+
+      registerControlSequence(new ExpFunc(glossariesSty));
+      registerControlSequence(new PredCs(glossariesSty));
+
+      registerControlSequence(new TextualContentCommand("explsuffix", ""));
+      registerControlSequence(new TextualContentCommand("explTFsuffix", "TF"));
+
+      registerControlSequence(new CondCs("condcsT", "T", glossariesSty));
+      registerControlSequence(new CondCs("condcsF", "F", glossariesSty));
+
+      registerControlSequence(new GenericCommand(true,
+        "TFsyntax", null, TeXParserUtils.createStack(listener, 
+         new TeXCsRef("margm"), listener.createGroup("true"),
+         listener.getSpace(),
+         new TeXCsRef("margm"), listener.createGroup("false")
+       )));
+
+      addSemanticCommand("@explboolsyntaxfmt",
+       "boolsuffix", new TeXFontText(TeXFontShape.EM),
+        null, null, null, null, null, true, false);
+
+
+      // \conditionsyntax
+      def = listener.createStack();
+      def.add(listener.getSpace());
+      def.add(new TeXCsRef("meta"));
+      def.add(listener.createGroup("true"));
+      def.add(new TeXCsRef("csfmt"));
+      def.add(listener.createGroup("else"));
+      def.add(listener.getSpace());
+      def.add(new TeXCsRef("meta"));
+      def.add(listener.createGroup("false"));
+      def.add(new TeXCsRef("csfmt"));
+      def.add(listener.createGroup("fi"));
+
+      registerControlSequence(new GenericCommand(true,
+       "conditionsyntax", null, def));
+
+   }
+
+   protected void addCrossRefCommands()
+   {
+      TeXObjectList def;
+
+      registerControlSequence(new Plabel());
+      registerControlSequence(new Pref());
+
+      // \phyperref
+      def = listener.createStack();
+      def.add(new TeXCsRef("hyperref"));
+      def.add(listener.getOther('['));
+      def.add(listener.getParam(2));
+      def.add(listener.getOther(']'));
+      def.add(TeXParserUtils.createGroup(listener, listener.getParam(1)));
+
+      registerControlSequence(new LaTeXGenericCommand(true, "phyperref",
+       "mm", def));
+
+      registerControlSequence(new Symbol("sectionrefprefix", 0x00A7));
+      registerControlSequence(new TextualContentCommand(
+        "sectionsrefprefix", "\u00A7\u00A7"));
+
+      registerControlSequence(new Symbol("Sectionrefprefix", 0x00A7));
+      registerControlSequence(new TextualContentCommand(
+        "Sectionsrefprefix", "\u00A7\u00A7"));
+
+      registerControlSequence(new TextualContentCommand(
+        "refslistsep", ", "));
+
+      registerControlSequence(new TextualContentCommand(
+        "refslistlastsep", " & "));
+
+      // \sectionref
+      registerControlSequence(new Ref("sectionref", new TeXCsRef("sectionrefprefix")));
+
+      registerControlSequence(new RefsList("sectionsref",
+        new TeXCsRef("sectionsrefprefix"), 
+        new TeXCsRef("refslistsep"),
+        new TeXCsRef("refslistlastsep")
+      ));
+
+      // \Sectionref
+      registerControlSequence(new Ref("Sectionref", new TeXCsRef("Sectionrefprefix")));
+
+      registerControlSequence(new RefsList("Sectionsref",
+        new TeXCsRef("Sectionsrefprefix"), 
+        new TeXCsRef("refslistsep"),
+        new TeXCsRef("refslistlastsep")
+      ));
+
+      registerControlSequence(new TextualContentCommand("examplerefprefix", "Example "));
+      registerControlSequence(new TextualContentCommand("Examplerefprefix", "Example "));
+
+      // \exampleref
+      registerControlSequence(new Ref("exampleref", false, 
+         new TeXCsRef("examplerefprefix")));
+
+      // \Exampleref
+      registerControlSequence(new Ref("Exampleref", false, 
+         new TeXCsRef("Examplerefprefix")));
+
+      registerControlSequence(new TextualContentCommand("examplesrefprefix", "Examples "));
+      registerControlSequence(new TextualContentCommand("Examplesrefprefix", "Examples "));
+
+      registerControlSequence(new RefsList("examplesref",
+        new TeXCsRef("examplesrefprefix"), 
+        new TeXCsRef("refslistsep"),
+        new TeXCsRef("refslistlastsep")
+      ));
+
+      registerControlSequence(new RefsList("Examplesref",
+        new TeXCsRef("Examplesrefprefix"), 
+        new TeXCsRef("refslistsep"),
+        new TeXCsRef("refslistlastsep")
+      ));
+
+      registerControlSequence(new MExampleRef());
+      registerControlSequence(new MExampleRef("mexampleref", false));
+      registerControlSequence(new ExampleMarginRef());
+
+      // \tableref
+      registerControlSequence(new TextualContentCommand("tablerefprefix", "Table "));
+      registerControlSequence(new TextualContentCommand("Tablerefprefix", "Table "));
+
+      registerControlSequence(new Ref("tableref", false,
+       new TeXCsRef("tablerefprefix")));
+      registerControlSequence(new Ref("Tableref", false,
+       new TeXCsRef("Tablerefprefix")));
+
+      registerControlSequence(new TextualContentCommand("tablesrefprefix", "Tables "));
+      registerControlSequence(new TextualContentCommand("Tablesrefprefix", "Tables "));
+
+      registerControlSequence(new RefsList("tablesref",
+        new TeXCsRef("tablesrefprefix"), 
+        new TeXCsRef("refslistsep"),
+        new TeXCsRef("refslistlastsep")
+      ));
+
+      registerControlSequence(new RefsList("Tablesref",
+        new TeXCsRef("Tablesrefprefix"), 
+        new TeXCsRef("refslistsep"),
+        new TeXCsRef("refslistlastsep")
+      ));
+
+      // \figureref
+      registerControlSequence(new TextualContentCommand("figurerefprefix", "Figure "));
+      registerControlSequence(new TextualContentCommand("Figurerefprefix", "Figure "));
+
+      registerControlSequence(new Ref("figureref", false,
+       new TeXCsRef("figurerefprefix")));
+      registerControlSequence(new Ref("Figureref", false,
+       new TeXCsRef("Figurerefprefix")));
+
+      registerControlSequence(new TextualContentCommand("figuresrefprefix", "Figures "));
+      registerControlSequence(new TextualContentCommand("Figuresrefprefix", "Figures "));
+
+      registerControlSequence(new RefsList("figuresref",
+        new TeXCsRef("figuresrefprefix"), 
+        new TeXCsRef("refslistsep"),
+        new TeXCsRef("refslistlastsep")
+      ));
+
+      registerControlSequence(new RefsList("Figuresref",
+        new TeXCsRef("Figuresrefprefix"), 
+        new TeXCsRef("refslistsep"),
+        new TeXCsRef("refslistlastsep")
+      ));
+
+      registerControlSequence(new Option());
+      registerControlSequence(new Options());
+      registerControlSequence(new Options("optionsor", "or"));
+      registerControlSequence(new OptionsTo());
+
+      registerControlSequence(new AtGobble("GetTitleStringSetup"));
+   }
+
+   protected void addFootnoteCommands()
+   {
+      TeXObjectList def;
+      Group grp;
+
+      // \tablefnmark
+      def = listener.createStack();
+      def.add(new TeXCsRef("textsuperscript"));
+      def.add(TeXParserUtils.createGroup(listener, listener.getParam(1)));
+
+      registerControlSequence(new LaTeXGenericCommand(true, "tablefnmark",
+       "m", def));
+
+      // \tablefntext
+      def = listener.createStack();
+      def.add(new TeXCsRef("tablefnfmt"));
+      grp = listener.createGroup();
+      def.add(grp);
+
+      grp.add(new TeXCsRef("tablefnmark"));
+      grp.add(TeXParserUtils.createGroup(listener, listener.getParam(1)));
+      grp.add(listener.getParam(2));
+
+      registerControlSequence(new LaTeXGenericCommand(true, "tablefntext",
+       "mm", def));
+
+      // \tablefnfmt
+      addSemanticCommand("tablefnfmt", "tablefn", 
+       new TeXFontText(TeXFontSize.FOOTNOTE), null, null, null, null, null,
+       false, true);
+
+      // \tablefn
+      addSemanticCommand("tablefns", "tablefns", null, null, null, null,
+        null, null, false, true, null, null, null, null,
+        AlignHStyle.LEFT, AlignVStyle.DEFAULT, 
+        new UserDimension(0.8f, new PercentUnit(PercentUnit.LINE_WIDTH)));
+
+      // \fnsymtext
+      def = listener.createStack();
+      def.add(new TeXCsRef("tablefntext"));
+      grp = listener.createGroup();
+      def.add(grp);
+
+      grp.add(new TeXCsRef("fnsymmarker"));
+      grp.add(TeXParserUtils.createGroup(listener, listener.getParam(1)));
+
+      def.add(TeXParserUtils.createGroup(listener, listener.getParam(2)));
+
+      registerControlSequence(new LaTeXGenericCommand(true, "fnsymtext",
+       "mm", def));
+
+      // \fnsym
+      registerControlSequence(new FnSym());
+
+      // \fnsymmark
+      registerControlSequence(new AtFirstOfOne("fnsymmark"));
+
+      registerControlSequence(new FnSymMarker());
+
+   }
+
+   protected void addDocRefCommands()
+   {
+      TeXObjectList def;
+      Group grp;
+
+      registerControlSequence(new MirrorSampleFile());
+
       // \texdocref
       def = listener.createStack();
       def.add(new TeXCsRef("begin"));
@@ -836,15 +852,6 @@ public class UserGuideSty extends LaTeXSty
 
       registerControlSequence(new LaTeXGenericCommand(true,
        "tugboat", "mmmmm", def));
-
-      // urlfootref
-      def = listener.createStack();
-      def.add(new TeXCsRef("href"));
-      def.add(TeXParserUtils.createGroup(listener, listener.getParam(1)));
-      def.add(TeXParserUtils.createGroup(listener, listener.getParam(2)));
-
-      registerControlSequence(new LaTeXGenericCommand(true,
-       "urlfootref", "mm", def));
 
       // \CTANpkg
       def = listener.createStack();
@@ -1116,129 +1123,18 @@ public class UserGuideSty extends LaTeXSty
       registerControlSequence(new DocRef("qtdocref", true, false));
       registerControlSequence(new DocRef("altdocref", false, true));
 
-      registerControlSequence(new Plabel());
-      registerControlSequence(new Pref());
+   }
 
-      // \phyperref
-      def = listener.createStack();
-      def.add(new TeXCsRef("hyperref"));
-      def.add(listener.getOther('['));
-      def.add(listener.getParam(2));
-      def.add(listener.getOther(']'));
-      def.add(TeXParserUtils.createGroup(listener, listener.getParam(1)));
+   protected void addSymbolCommands()
+   {
+      TeXObjectList def;
+      Group grp;
 
-      registerControlSequence(new LaTeXGenericCommand(true, "phyperref",
-       "mm", def));
+      registerControlSequence(AccSuppObject.createSymbol(
+        listener, "tabsym", 0x21B9, "TAB", true));
 
-      registerControlSequence(new Symbol("sectionrefprefix", 0x00A7));
-      registerControlSequence(new TextualContentCommand(
-        "sectionsrefprefix", "\u00A7\u00A7"));
-
-      registerControlSequence(new Symbol("Sectionrefprefix", 0x00A7));
-      registerControlSequence(new TextualContentCommand(
-        "Sectionsrefprefix", "\u00A7\u00A7"));
-
-      registerControlSequence(new TextualContentCommand(
-        "refslistsep", ", "));
-
-      registerControlSequence(new TextualContentCommand(
-        "refslistlastsep", " & "));
-
-      // \sectionref
-      registerControlSequence(new Ref("sectionref", new TeXCsRef("sectionrefprefix")));
-
-      registerControlSequence(new RefsList("sectionsref",
-        new TeXCsRef("sectionsrefprefix"), 
-        new TeXCsRef("refslistsep"),
-        new TeXCsRef("refslistlastsep")
-      ));
-
-      // \Sectionref
-      registerControlSequence(new Ref("Sectionref", new TeXCsRef("Sectionrefprefix")));
-
-      registerControlSequence(new RefsList("Sectionsref",
-        new TeXCsRef("Sectionsrefprefix"), 
-        new TeXCsRef("refslistsep"),
-        new TeXCsRef("refslistlastsep")
-      ));
-
-      registerControlSequence(new TextualContentCommand("examplerefprefix", "Example "));
-      registerControlSequence(new TextualContentCommand("Examplerefprefix", "Example "));
-
-      // \exampleref
-      registerControlSequence(new Ref("exampleref", false, 
-         new TeXCsRef("examplerefprefix")));
-
-      // \Exampleref
-      registerControlSequence(new Ref("Exampleref", false, 
-         new TeXCsRef("Examplerefprefix")));
-
-      registerControlSequence(new TextualContentCommand("examplesrefprefix", "Examples "));
-      registerControlSequence(new TextualContentCommand("Examplesrefprefix", "Examples "));
-
-      registerControlSequence(new RefsList("examplesref",
-        new TeXCsRef("examplesrefprefix"), 
-        new TeXCsRef("refslistsep"),
-        new TeXCsRef("refslistlastsep")
-      ));
-
-      registerControlSequence(new RefsList("Examplesref",
-        new TeXCsRef("Examplesrefprefix"), 
-        new TeXCsRef("refslistsep"),
-        new TeXCsRef("refslistlastsep")
-      ));
-
-      registerControlSequence(new MExampleRef());
-      registerControlSequence(new MExampleRef("mexampleref", false));
-      registerControlSequence(new ExampleMarginRef());
-
-      // \tableref
-      registerControlSequence(new TextualContentCommand("tablerefprefix", "Table "));
-      registerControlSequence(new TextualContentCommand("Tablerefprefix", "Table "));
-
-      registerControlSequence(new Ref("tableref", false,
-       new TeXCsRef("tablerefprefix")));
-      registerControlSequence(new Ref("Tableref", false,
-       new TeXCsRef("Tablerefprefix")));
-
-      registerControlSequence(new TextualContentCommand("tablesrefprefix", "Tables "));
-      registerControlSequence(new TextualContentCommand("Tablesrefprefix", "Tables "));
-
-      registerControlSequence(new RefsList("tablesref",
-        new TeXCsRef("tablesrefprefix"), 
-        new TeXCsRef("refslistsep"),
-        new TeXCsRef("refslistlastsep")
-      ));
-
-      registerControlSequence(new RefsList("Tablesref",
-        new TeXCsRef("Tablesrefprefix"), 
-        new TeXCsRef("refslistsep"),
-        new TeXCsRef("refslistlastsep")
-      ));
-
-      // \figureref
-      registerControlSequence(new TextualContentCommand("figurerefprefix", "Figure "));
-      registerControlSequence(new TextualContentCommand("Figurerefprefix", "Figure "));
-
-      registerControlSequence(new Ref("figureref", false,
-       new TeXCsRef("figurerefprefix")));
-      registerControlSequence(new Ref("Figureref", false,
-       new TeXCsRef("Figurerefprefix")));
-
-      registerControlSequence(new TextualContentCommand("figuresrefprefix", "Figures "));
-      registerControlSequence(new TextualContentCommand("Figuresrefprefix", "Figures "));
-
-      registerControlSequence(new RefsList("figuresref",
-        new TeXCsRef("figuresrefprefix"), 
-        new TeXCsRef("refslistsep"),
-        new TeXCsRef("refslistlastsep")
-      ));
-
-      registerControlSequence(new RefsList("Figuresref",
-        new TeXCsRef("Figuresrefprefix"), 
-        new TeXCsRef("refslistsep"),
-        new TeXCsRef("refslistlastsep")
-      ));
+      registerControlSequence(AccSuppObject.createSymbol(
+        listener, "upsym", 0x2B71, "Up", true));
 
       registerControlSequence(AccSuppObject.createSymbol(
         listener, "unlimited", 0x221E));
@@ -1320,47 +1216,6 @@ public class UserGuideSty extends LaTeXSty
       registerControlSequence(new TextualContentCommand("terminalsym", "\u232A_"));
       registerControlSequence(new Symbol("transcriptsym", 0x1F50E));
 
-      registerControlSequence(new InitValRef(glossariesSty));
-      registerControlSequence(new InitValOpt(glossariesSty));
-
-      // \aliasref
-      def = listener.createStack();
-      def.add(new TeXCsRef("glshyperlink"));
-      grp = listener.createGroup();
-      def.add(grp);
-      grp.add(listener.getParam(1));
-
-      registerControlSequence(new LaTeXGenericCommand(true,
-       "aliasref", "m", def));
-
-      listener.newcounter("icon");
-
-      // \icon
-      def = listener.createStack();
-      def.add(new TeXCsRef("stepcounter"));
-      def.add(listener.createGroup("icon"));
-      def.add(new TeXCsRef("glssymbol"));
-      def.addAll(listener.createString("[counter=icon]"));
-      grp = listener.createGroup("sym.");
-      def.add(grp);
-      grp.add(listener.getParam(1));
-
-      registerControlSequence(new LaTeXGenericCommand(true,
-       "icon", "m", def));
-
-      // \icontext
-      def = listener.createStack();
-      def.add(new TeXCsRef("stepcounter"));
-      def.add(listener.createGroup("icon"));
-      def.add(new TeXCsRef("glstext"));
-      def.addAll(listener.createString("[counter=icon]"));
-      grp = listener.createGroup("sym.");
-      def.add(grp);
-      grp.add(listener.getParam(1));
-
-      registerControlSequence(new LaTeXGenericCommand(true,
-       "icontext", "m", def));
-
       // \deprecatedsym
       def = listener.createStack();
 
@@ -1403,25 +1258,6 @@ public class UserGuideSty extends LaTeXSty
       registerControlSequence(new GenericCommand(true,
        "unicodesym", null, def));
 
-      // \cmdnotefmt
-      registerControlSequence(new AtFirstOfOne("cmdnotefmt"));
-
-      // \conditionsyntax
-      def = listener.createStack();
-      def.add(listener.getSpace());
-      def.add(new TeXCsRef("meta"));
-      def.add(listener.createGroup("true"));
-      def.add(new TeXCsRef("csfmt"));
-      def.add(listener.createGroup("else"));
-      def.add(listener.getSpace());
-      def.add(new TeXCsRef("meta"));
-      def.add(listener.createGroup("false"));
-      def.add(new TeXCsRef("csfmt"));
-      def.add(listener.createGroup("fi"));
-
-      registerControlSequence(new GenericCommand(true,
-       "conditionsyntax", null, def));
-
       // \proyes
       registerControlSequence(new GenericCommand(true, "proyes", null, 
          new TeXObject[] { new TeXCsRef("advantagefmt"), new TeXCsRef("yes")}));
@@ -1438,32 +1274,295 @@ public class UserGuideSty extends LaTeXSty
       registerControlSequence(new GenericCommand(true, "conyes", null, 
          new TeXObject[] { new TeXCsRef("disadvantagefmt"), new TeXCsRef("yes")}));
 
-      // \cmdnotefmt
-      registerControlSequence(new AtFirstOfOne("cmdnotefmt"));
+   }
 
-      // \pkgnotefmt
-      registerControlSequence(new AtFirstOfOne("pkgnotefmt"));
+   protected void addGlsIconCommands()
+   {
+      TeXObjectList def;
+      Group grp;
 
-      // \optnotefmt
-      registerControlSequence(new AtFirstOfOne("optnotefmt"));
-
-      // \appnotefmt
-      registerControlSequence(new AtFirstOfOne("appnotefmt"));
-
-      // \switchnotefmt
-      registerControlSequence(new AtFirstOfOne("switchnotefmt"));
-
-      // \summarynotefmt
+      // \icon
       def = listener.createStack();
-      def.add(listener.getOther('('));
-      def.add(listener.getParam(1));
-      def.add(listener.getOther(')'));
+      def.add(new TeXCsRef("stepcounter"));
+      def.add(listener.createGroup("icon"));
+      def.add(new TeXCsRef("glssymbol"));
+      def.addAll(listener.createString("[counter=icon]"));
+      grp = listener.createGroup("sym.");
+      def.add(grp);
+      grp.add(listener.getParam(1));
 
       registerControlSequence(new LaTeXGenericCommand(true,
-       "summarynotefmt", "m", def));
+       "icon", "m", def));
 
-      registerControlSequence(new TextualContentCommand(
-         "glsxtrpostdescdualindexabbreviation", "."));
+      // \icontext
+      def = listener.createStack();
+      def.add(new TeXCsRef("stepcounter"));
+      def.add(listener.createGroup("icon"));
+      def.add(new TeXCsRef("glstext"));
+      def.addAll(listener.createString("[counter=icon]"));
+      grp = listener.createGroup("sym.");
+      def.add(grp);
+      grp.add(listener.getParam(1));
+
+      registerControlSequence(new LaTeXGenericCommand(true,
+       "icontext", "m", def));
+
+      listener.newcounter("icon");
+
+   }
+
+   protected void addDiscretionaryCommands()
+   {
+      registerControlSequence(new TextualContentCommand("dhyphen", "-"));
+      registerControlSequence(new TextualContentCommand("dcolon", ":"));
+      registerControlSequence(new TextualContentCommand("dcomma", ","));
+      registerControlSequence(new TextualContentCommand("dequals", "="));
+      registerControlSequence(new TextualContentCommand("dfullstop", "."));
+      registerControlSequence(new TextualContentCommand("dunderscore", "_"));
+      registerControlSequence(new TextualContentCommand("dsb", "_"));
+
+   }
+
+   protected void addTextCommands()
+   {
+      registerControlSequence(new TextualContentCommand("TeXLive", "TeX Live"));
+      registerControlSequence(new TextualContentCommand("MikTeX", "MikTeX"));
+
+      registerControlSequence(new TextualContentCommand("optionlistprefix", "opt."));
+      registerControlSequence(new TextualContentCommand("optionlisttag", "Option"));
+      registerControlSequence(new TextualContentCommand("optionlisttags", "Options"));
+
+   }
+
+   protected void addListCommands()
+   {
+      TeXObjectList def;
+
+      registerControlSequence(new DefListDec());
+      registerControlSequence(new ItemDesc());
+
+      // \optionlistitemformat
+      def = listener.createStack();
+      def.add(new TeXCsRef("glsentrytext"));
+      def.add(TeXParserUtils.createGroup(listener, listener.getParam(1)));
+
+      registerControlSequence(new LaTeXGenericCommand(true, "optionlistitemformat",
+       "m", def));
+   }
+
+   protected void addBoxCommands()
+   {
+      TeXObjectList def;
+      Group grp, subgrp;
+
+      addTaggedColourBox("important", BG_IMPORTANT, FRAME_COL_IMPORTANT);
+      addTaggedColourBox("warning", BG_WARNING, FRAME_COL_WARNING);
+      addTaggedColourBox("information", BG_INFO, FRAME_COL_INFO);
+      TaggedColourBox pinnedBox = addTaggedColourBox("pinnedbox",
+         "definition", BG_DEF, Color.BLACK);
+
+      TaggedColourBox terminalBox = 
+        addTaggedColourBox("terminal", new TeXFontText(TeXFontFamily.VERB), 
+           BG_TERMINAL, Color.BLACK);
+
+      TaggedColourBox transcriptBox = 
+        addTaggedColourBox("transcript", new TeXFontText(TeXFontFamily.VERB), 
+           BG_TERMINAL, Color.BLACK);
+
+      TaggedColourBox ctrBox = addTaggedColourBox("ctrbox",
+         "counter", BG_DEF, Color.BLACK);
+
+      TaggedColourBox codeBox = addTaggedColourBox("codebox",
+         "code", new TeXFontText(TeXFontFamily.VERB), BG_CODE, Color.BLACK);
+
+      registerControlSequence(new DuplicateEnv("codebox*", codeBox));
+
+      registerControlSequence(new TextualContentCommand("codepar", 
+       String.format("%n")));
+
+      TaggedColourBox resultBox = addTaggedColourBox("resultbox",
+         "result", null, Color.BLACK);
+      addTaggedColourBox("badcodebox",
+         "badcode", new TeXFontText(TeXFontFamily.VERB), BG_CODE, Color.BLACK);
+      addTaggedColourBox("unicodebox",
+         "unicode", new TeXFontText(TeXFontFamily.VERB), BG_CODE, Color.BLACK);
+
+      FrameBoxEnv compactcodeBox = new FrameBoxEnv(
+        addSemanticCommand("@compactcodebox", "compactcodebox",
+        new TeXFontText(TeXFontFamily.VERB),
+        (Color)null, BG_CODE, Color.BLACK, null, null, false, true));
+
+      registerControlSequence(compactcodeBox);
+      registerControlSequence(new DuplicateEnv("compactcodebox*", compactcodeBox));
+
+      FrameBox crc = addSemanticCommand("@sidebysidecode", "sidebysidecode",
+        new TeXFontText(TeXFontFamily.VERB, TeXFontSize.SMALL),
+        (Color)null, BG_CODE, Color.BLACK, null, null, true, true, 
+         null, // left outer margin
+         new UserDimension(0.03, new PercentUnit()), // right outer margin
+         new UserDimension(), // top outer margin
+         null, // bottom outer margin
+         AlignHStyle.DEFAULT, AlignVStyle.TOP, 
+         new UserDimension(0.47, new PercentUnit()));
+
+      FrameBox crr = addSemanticCommand("@sidebysideresult", "sidebysideresult",
+         null, (Color)null, null, Color.BLACK, null, null, true, true, 
+         null, // left outer margin
+         null, // right outer margin
+         new UserDimension(), // top outer margin
+         null, // bottom outer margin
+         AlignHStyle.DEFAULT, AlignVStyle.TOP, 
+         new UserDimension(0.47, new PercentUnit()));
+
+      CodeResult codeResult = new CodeResult(
+         new ColourBox("frame@coderesult@title", BorderStyle.NONE,
+          AlignHStyle.CENTER, AlignVStyle.DEFAULT, false, true, null, null),
+        crc, crr);
+
+      registerControlSequence(codeResult);
+
+      registerControlSequence(new DuplicateEnv("coderesult*", codeResult));
+
+      CodeResult uniCodeResult = new CodeResult("unicoderesult",
+         new ColourBox("frame@unicoderesult@title", BorderStyle.NONE,
+          AlignHStyle.CENTER, AlignVStyle.DEFAULT, false, true, null, null),
+        crc, crr, "unicode");
+
+      registerControlSequence(uniCodeResult);
+
+      registerControlSequence(new DuplicateEnv("unicoderesult*", uniCodeResult));
+
+      FrameBox defnBox = addColourBox("defnbox", null, null,
+        BG_DEF, Color.BLACK);
+      FrameBox optionSummaryBox = addColourBox("optionsummarybox", null, null,
+        BG_DEF, Color.BLACK);
+      FrameBox optionValueSummaryBox = addSemanticCommand("optionvaluesummarybox",
+         new UserDimension(40, FixedUnit.BP));
+
+      FrameBox rightBox = addFloatBox("floatrightbox");
+
+      FrameBox noteBox = new ColourBox("noteBox", BorderStyle.NONE,
+        AlignHStyle.DEFAULT, AlignVStyle.DEFAULT, false, null, null);
+      listener.declareFrameBox(noteBox, false);
+
+      registerControlSequence(new CmdDef(pinnedBox, rightBox, noteBox, glossariesSty));
+      registerControlSequence(new EnvDef(pinnedBox, rightBox, noteBox, glossariesSty));
+      registerControlSequence(new CtrDef(ctrBox, rightBox, noteBox, glossariesSty));
+      registerControlSequence(new PkgDef(pinnedBox, rightBox, noteBox, glossariesSty));
+      registerControlSequence(new ClsDef(pinnedBox, rightBox, noteBox, glossariesSty));
+
+      TaggedColourBox settingsBox = addTaggedColourBox("settingsbox",
+         "valuesetting", BG_OPTION_DEF, Color.BLACK);
+
+      registerControlSequence(new OptionDef(settingsBox, rightBox, noteBox, glossariesSty));
+
+      TaggedColourBox optValBox = addTaggedColourBox("optionvaluebox",
+         "optionvalue", BG_OPTION_VALUE_DEF, Color.BLACK);
+
+      registerControlSequence(new OptionValDef(optValBox, rightBox, noteBox, glossariesSty));
+
+      registerControlSequence(new AppDef(terminalBox, rightBox, noteBox, glossariesSty));
+      registerControlSequence(new SwitchDef(settingsBox, rightBox, noteBox, glossariesSty));
+
+      registerControlSequence(new SummaryBox(defnBox, 
+        rightBox, noteBox, glossariesSty));
+
+      registerControlSequence(new SummaryCommandBox(defnBox, 
+        rightBox, noteBox, glossariesSty));
+
+      registerControlSequence(new SummaryEnvironmentBox(defnBox, 
+        rightBox, noteBox, glossariesSty));
+
+      registerControlSequence(new SummaryCommandOptionBox(optionSummaryBox, 
+        rightBox, noteBox, glossariesSty));
+
+      registerControlSequence(new SummaryCommandOptionBox(
+        "summaryglossentryoption", defnBox, 
+        rightBox, noteBox, glossariesSty));
+
+      registerControlSequence(new SummaryCommandOptionBox(
+        "summaryglossentrypackageoption", defnBox, 
+        rightBox, noteBox, glossariesSty));
+
+      registerControlSequence(new SummaryCommandOptionBox(
+        "summaryglossentryclassoption", defnBox, 
+        rightBox, noteBox, glossariesSty));
+
+      registerControlSequence(new SummaryOptionValueBox(optionValueSummaryBox, 
+        rightBox, noteBox, glossariesSty));
+
+      registerControlSequence(new SummaryPackageBox(defnBox, 
+        rightBox, noteBox, glossariesSty));
+
+      registerControlSequence(new SummaryClassBox(defnBox, 
+        rightBox, noteBox, glossariesSty));
+
+      createIndexItemBox(0);
+      createIndexItemBox(1);
+      createIndexItemBox(2);
+
+      addColourBox("nlctusernavbox", null, null, null, null);
+      addSemanticCommand("texparser@abstractheader", "abstractheader", 
+        new TeXFontText(TeXFontWeight.BF), null, null, null, null, null, 
+         false, false, null, AlignHStyle.CENTER);
+
+
+      // \filedef
+      FrameBox fileDefBox = addSemanticCommand("@filedefbox", "filedef",
+       new TeXFontText(TeXFontFamily.TT), null, null, null, null, null,
+       false, true, null, AlignHStyle.LEFT);
+
+      registerControlSequence(fileDefBox);
+
+      def = listener.createStack();
+      def.add(fileDefBox);
+      grp = listener.createGroup();
+      def.add(grp);
+      grp.add(new TeXCsRef("filetag"));
+      grp.add(TeXParserUtils.createGroup(listener, listener.getParam(1)));
+      grp.add(new TeXCsRef("mainglsadd"));
+      subgrp = listener.createGroup("file.");
+      grp.add(subgrp);
+      subgrp.add(listener.getParam(1));
+      grp.add(listener.createGroup("filedef"));
+      grp.add(new TeXCsRef("glsxtrglossentry"));
+      subgrp = listener.createGroup("file.");
+      grp.add(subgrp);
+      subgrp.add(listener.getParam(1));
+
+      registerControlSequence(new LaTeXGenericCommand(true, "filedef",
+       "m", def));
+
+   }
+
+   protected void addInlineDefCommands()
+   {
+      registerControlSequence(new InlineGlsDef(glossariesSty));
+      registerControlSequence(new InlineGlsDef("inlineidxdef", "idx.", glossariesSty));
+      registerControlSequence(new InlineGlsDef("inlineidxfdef", "idx.",
+        "first", true, glossariesSty));
+      registerControlSequence(new InlineGlsDef("inlineidxpdef", "idx.",
+        "plural", true, glossariesSty));
+
+      registerControlSequence(new InlineGlsDef("Inlineidxdef", "idx.",
+        CaseChange.SENTENCE, glossariesSty));
+
+      registerControlSequence(new InlineGlsDef("inlineswitchdef", "switch.", glossariesSty));
+      registerControlSequence(new InlineGlsDef("inlineoptdef", "opt.", glossariesSty));
+      registerControlSequence(new InlineGlsDef("inlinepkgdef", "pkg.", glossariesSty));
+      registerControlSequence(new CmdDefSyntax(glossariesSty));
+      registerControlSequence(new OptDefSyntax(glossariesSty));
+
+   }
+
+   protected void addExampleCommands()
+   {
+      TeXObjectList def;
+      Group grp;
+
+      registerControlSequence(new GenericCommand(true, "examplesdir", null, 
+         new TeXObject[] {new TeXCsRef("jobname"), 
+            listener.createString("-examples")}));
 
       listener.newcounter("example");
 
@@ -1552,33 +1651,82 @@ public class UserGuideSty extends LaTeXSty
 
       registerControlSequence(new LaTeXGenericCommand(true, "filetag",
        "m", def));
+   }
 
-      // \filedef
-      FrameBox fileDefBox = addSemanticCommand("@filedefbox", "filedef",
-       new TeXFontText(TeXFontFamily.TT), null, null, null, null, null,
-       false, true, null, AlignHStyle.LEFT);
+   protected void addLocationCommands()
+   {
+      addSemanticCommand("crossreftag", TeXFontShape.IT);
 
-      registerControlSequence(fileDefBox);
+      addSemanticCommand("crossref", "crossref", null, null, null, null,
+       null, null, false, true, new UserDimension(1, FixedUnit.EM), null,
+       null, null, AlignHStyle.DEFAULT, AlignVStyle.DEFAULT, null, null
+      );
 
-      def = listener.createStack();
-      def.add(fileDefBox);
-      grp = listener.createGroup();
-      def.add(grp);
-      grp.add(new TeXCsRef("filetag"));
-      grp.add(TeXParserUtils.createGroup(listener, listener.getParam(1)));
-      grp.add(new TeXCsRef("mainglsadd"));
-      subgrp = listener.createGroup("file.");
-      grp.add(subgrp);
-      subgrp.add(listener.getParam(1));
-      grp.add(listener.createGroup("filedef"));
-      grp.add(new TeXCsRef("glsxtrglossentry"));
-      subgrp = listener.createGroup("file.");
-      grp.add(subgrp);
-      subgrp.add(listener.getParam(1));
+      listener.addLaTeXCommand(true, "glsseeformat", true,
+       3, new TeXCsRef("seename"), TeXParserUtils.createStack(listener,
+        new TeXCsRef("crossref"), 
+        TeXParserUtils.createGroup(listener, 
+          new TeXCsRef("crossreftag"), 
+           TeXParserUtils.createGroup(listener, listener.getParam(1)),
+          listener.getSpace(),
+          new TeXCsRef("glsseelist"), 
+           TeXParserUtils.createGroup(listener, listener.getParam(2))
+        )
+      ));
 
-      registerControlSequence(new LaTeXGenericCommand(true, "filedef",
-       "m", def));
+      listener.addLaTeXCommand("seclocfmt", true, 2, null, 
+        TeXParserUtils.createStack(listener, 
+         listener.getOther(0xA7),
+         listener.getParam(1)));
 
+      registerControlSequence(new GenericCommand(true,
+        "glsxtrchapterlocfmt", null, new TeXCsRef("seclocfmt")));
+      registerControlSequence(new GenericCommand(true,
+        "glsxtrsectionlocfmt", null, new TeXCsRef("seclocfmt")));
+      registerControlSequence(new GenericCommand(true,
+        "glsxtrsubsectionlocfmt", null, new TeXCsRef("seclocfmt")));
+      registerControlSequence(new GenericCommand(true,
+        "glsxtrsubsubsectionlocfmt", null, new TeXCsRef("seclocfmt")));
+      registerControlSequence(new GenericCommand(true,
+        "glsxtrparagraphlocfmt", null, new TeXCsRef("seclocfmt")));
+      registerControlSequence(new GenericCommand(true,
+        "glsxtrsubparagraphlocfmt", null, new TeXCsRef("seclocfmt")));
+
+      listener.addLaTeXCommand("glsxtrtablelocfmt", true, 2, null, 
+        TeXParserUtils.createStack(listener, 
+         new TeXCsRef("tablename"), listener.getSpace(),
+         listener.getParam(1)));
+
+      listener.addLaTeXCommand("glsxtrfigurelocfmt", true, 2, null, 
+        TeXParserUtils.createStack(listener, 
+         new TeXCsRef("figurename"), listener.getSpace(),
+         listener.getParam(1)));
+
+      registerControlSequence(new TextualContentCommand("bibglslocationgroupsep",
+       "; "));
+
+   }
+
+   protected void addPrintCommands()
+   {
+      NewIf.createConditional(true, getParser(), "ifshowsummarytopgroupheaders", true);
+
+      registerControlSequence(new PrintTerms());
+
+      registerControlSequence(new PrintAbbrs(glossariesSty));
+      registerControlSequence(new PrintIcons(glossariesSty));
+      registerControlSequence(new PrintMain(glossariesSty));
+      registerControlSequence(new PrintSummary(glossariesSty));
+      registerControlSequence(new PrintCommandOptions(glossariesSty));
+      registerControlSequence(new PrintCommonOptions(glossariesSty));
+      registerControlSequence(new PrintIndex(glossariesSty));
+      registerControlSequence(new IndexInitPostNameHooks());
+      registerControlSequence(new AbbrPostNameHook(glossariesSty));
+
+   }
+
+   protected void addBib2GlsCommands()
+   {
       // provide these commands in case they are redefined in the
       // document, but they're for bib2gls so they can be ignored
       registerControlSequence(new GenericCommand("nlctuserguidecustomentryaliases"));
@@ -1589,92 +1737,103 @@ public class UserGuideSty extends LaTeXSty
       registerControlSequence(new GenericCommand("nlctuserguideextrarules"));
       registerControlSequence(new GenericCommand("nlctuserguidebibextrapreamble"));
 
-      registerControlSequence(new TextualContentCommand("codepar", 
-       String.format("%n")));
-
-      registerControlSequence(new DefSemanticCmd(this));
-
       if (atSymGroup)
       {
          registerControlSequence(new SymbolGroupLabel("bibglsothergroup"));
          registerControlSequence(new SymbolGroupTitle("bibglsothergrouptitle"));
       }
 
-      NewIf.createConditional(true, getParser(), "ifshowsummarytopgroupheaders", true);
+   }
 
-      registerControlSequence(new DefListDec());
-      registerControlSequence(new ItemDesc());
+   protected void addGlsCommands()
+   {
+      TeXObjectList def;
+      Group grp;
 
-      registerControlSequence(new TextualContentCommand("optionlistprefix", "opt."));
-      registerControlSequence(new TextualContentCommand("optionlisttag", "Option"));
-      registerControlSequence(new TextualContentCommand("optionlisttags", "Options"));
+      registerControlSequence(new MainGlsAdd(glossariesSty));
 
-      // \optionlistitemformat
+      registerControlSequence(new GenericCommand(true, "mainfmt", null,
+         new TeXCsRef("glsnumberformat")));
+
+      addSemanticCommand("termslocfmt", TeXFontShape.IT);
+
+      registerControlSequence(new GenericCommand(true, "glsaddterm", null,
+         new TeXCsRef("glsadd")));
+
+      // \\glscsname
       def = listener.createStack();
-      def.add(new TeXCsRef("glsentrytext"));
-      def.add(TeXParserUtils.createGroup(listener, listener.getParam(1)));
-
-      registerControlSequence(new LaTeXGenericCommand(true, "optionlistitemformat",
-       "m", def));
-
-      registerControlSequence(new Option());
-      registerControlSequence(new Options());
-      registerControlSequence(new Options("optionsor", "or"));
-      registerControlSequence(new OptionsTo());
-
-      // \tablefnmark
-      def = listener.createStack();
-      def.add(new TeXCsRef("textsuperscript"));
-      def.add(TeXParserUtils.createGroup(listener, listener.getParam(1)));
-
-      registerControlSequence(new LaTeXGenericCommand(true, "tablefnmark",
-       "m", def));
-
-      // \tablefntext
-      def = listener.createStack();
-      def.add(new TeXCsRef("tablefnfmt"));
-      grp = listener.createGroup();
-      def.add(grp);
-
-      grp.add(new TeXCsRef("tablefnmark"));
-      grp.add(TeXParserUtils.createGroup(listener, listener.getParam(1)));
-      grp.add(listener.getParam(2));
-
-      registerControlSequence(new LaTeXGenericCommand(true, "tablefntext",
-       "mm", def));
-
-      // \tablefnfmt
-      addSemanticCommand("tablefnfmt", "tablefn", 
-       new TeXFontText(TeXFontSize.FOOTNOTE), null, null, null, null, null,
-       false, true);
-
-      // \tablefn
-      addSemanticCommand("tablefns", "tablefns", null, null, null, null,
-        null, null, false, true, null, null, null, null,
-        AlignHStyle.LEFT, AlignVStyle.DEFAULT, 
-        new UserDimension(0.8f, new PercentUnit(PercentUnit.LINE_WIDTH)));
-
-      // \fnsymtext
-      def = listener.createStack();
-      def.add(new TeXCsRef("tablefntext"));
-      grp = listener.createGroup();
-      def.add(grp);
-
-      grp.add(new TeXCsRef("fnsymmarker"));
-      grp.add(TeXParserUtils.createGroup(listener, listener.getParam(1)));
-
+      def.add(new TeXCsRef("glslink"));
+      def.add(listener.getOther('['));
+      def.add(listener.getParam(1));
+      def.add(listener.getOther(']'));
       def.add(TeXParserUtils.createGroup(listener, listener.getParam(2)));
+      grp = listener.createGroup();
+      def.add(grp);
+      grp.add(new TeXCsRef("csfmtfont"));
+      grp.add(TeXParserUtils.createGroup(listener, listener.getParam(2)));
 
-      registerControlSequence(new LaTeXGenericCommand(true, "fnsymtext",
-       "mm", def));
+      registerControlSequence(new LaTeXGenericCommand(true, "glscsname",
+        "om", def, TeXParserUtils.createStack(listener, listener.createStack())));
 
-      // \fnsym
-      registerControlSequence(new FnSym());
 
-      // \fnsymmark
-      registerControlSequence(new AtFirstOfOne("fnsymmark"));
+      addGlsFmtTextCommand("stytext", "pkg.");
+      addGlsFmtTextCommand("clstext", "cls.");
+      addGlsFmtTextCommand("opttext", "opt.");
+      addGlsFmtTextCommand("envtext", "env.");
+      addGlsFmtTextCommand("ctrtext", "ctr.");
+      addGlsFmtTextCommand("actext", "dual.");
+      addGlsFmtTextCommand("exttext", "ext.");
+      addGlsFmtTextCommand("apptext", "app.");
+      addGlsFmtTextCommand("switchtext", "switch.");
 
-      registerControlSequence(new FnSymMarker());
+      registerControlSequence(glossariesSty.createGls("sty", "pkg."));
+      registerControlSequence(glossariesSty.createGls("cls", "cls."));
+      registerControlSequence(glossariesSty.createGls("opt", "opt."));
+      registerControlSequence(glossariesSty.createGls("env", "env."));
+      registerControlSequence(glossariesSty.createGls("ctr", "ctr."));
+      registerControlSequence(glossariesSty.createGls("ac", "dual."));
+      registerControlSequence(glossariesSty.createGls("ext", "ext."));
+      registerControlSequence(glossariesSty.createGls("app", "app."));
+      registerControlSequence(glossariesSty.createGls("switch", "switch."));
+      registerControlSequence(glossariesSty.createGls("cmdmod", "idx.mod."));
+      registerControlSequence(glossariesSty.createGls("file", "file."));
+
+      registerControlSequence(new Dglsfield("sym", glossariesSty, CaseChange.NO_CHANGE,
+        "symbol"));
+
+      registerControlSequence(new Dgls("idx", CaseChange.NO_CHANGE, glossariesSty));
+      registerControlSequence(new Dgls("idxpl", 
+       CaseChange.NO_CHANGE, true, glossariesSty));
+      registerControlSequence(new Dgls("Idx", CaseChange.SENTENCE, glossariesSty));
+      registerControlSequence(new Dgls("Idxpl", CaseChange.SENTENCE, true, glossariesSty));
+      registerControlSequence(new Dglslink("idxc", false, glossariesSty));
+
+      registerControlSequence(new Dglsfield("idxn", glossariesSty, 
+         CaseChange.NO_CHANGE, "name"));
+      registerControlSequence(new Dglsfield("idxf", glossariesSty, 
+         CaseChange.NO_CHANGE, "first"));
+
+      // dual prefix list
+      def = listener.createString("dual.,idx.,idx.sym.,");
+        def.add(listener.getControlSequence("empty"));
+      registerControlSequence(new GenericCommand(true, "@glsxtr@labelprefixes",
+       null, def));
+
+      registerControlSequence(new InitValRef(glossariesSty));
+      registerControlSequence(new InitValOpt(glossariesSty));
+
+      // \aliasref
+      def = listener.createStack();
+      def.add(new TeXCsRef("glshyperlink"));
+      grp = listener.createGroup();
+      def.add(grp);
+      grp.add(listener.getParam(1));
+
+      registerControlSequence(new LaTeXGenericCommand(true,
+       "aliasref", "m", def));
+
+      registerControlSequence(new TextualContentCommand(
+         "glsxtrpostdescdualindexabbreviation", "."));
 
       // \starredcs
       def = listener.createStack();
@@ -1689,36 +1848,6 @@ public class UserGuideSty extends LaTeXSty
       registerControlSequence(new LaTeXGenericCommand(true, "starredcs",
        "m", def));
 
-      // \araraline
-      def = listener.createString("% arara: ");
-      def.add(listener.getParam(1));
-
-      registerControlSequence(new LaTeXGenericCommand(true, "araraline",
-       "m", def));
-
-      // \araracont
-      def = listener.createStack();
-      def.add(new TeXCsRef("araraline"));
-      def.add(TeXParserUtils.createGroup(listener, 
-       new TeXCsRef("longswitch"), listener.getOther('>'), 
-       listener.getSpace()));
-
-      registerControlSequence(new GenericCommand(true, "araracont",
-       null, def));
-
-      registerControlSequence(new AtGobble("settabcolsep"));
-      registerControlSequence(new AtGobble("tcbset"));
-
-      registerControlSequence(new AtFirstOfOne("textsmaller"));
-      registerControlSequence(new AtFirstOfOne("textlarger"));
-
-      registerControlSequence(new Relax("nlctnovref"));
-      registerControlSequence(new Relax("nlctusevref"));
-      registerControlSequence(new Relax("htmlavailable"));
-
-      registerControlSequence(new AtGobble("nlctdocatnum"));
-
-      registerControlSequence(new AtGobble("GetTitleStringSetup"));
    }
 
    protected void addGlsFmtTextCommand(String name, String prefix)

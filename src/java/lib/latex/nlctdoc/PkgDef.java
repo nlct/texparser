@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2022 Nicola L.C. Talbot
+    Copyright (C) 2022-2024 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -33,11 +33,27 @@ public class PkgDef extends StandaloneDef
       this("pkgdef", taggedBox, rightBox, noteBox, sty);
    }
 
+   public PkgDef(TaggedColourBox taggedBox, FrameBox rightBox,
+     FrameBox noteBox, GlossariesSty sty, String prefix)
+   {
+      this("pkgdef", taggedBox, rightBox, noteBox, sty, prefix);
+   }
+
    public PkgDef(String name, TaggedColourBox taggedBox, FrameBox rightBox,
      FrameBox noteBox, GlossariesSty sty)
    {
+      this(name, taggedBox, rightBox, noteBox, sty, "pkg.");
+   }
+
+   public PkgDef(String name, TaggedColourBox taggedBox, FrameBox rightBox,
+     FrameBox noteBox, GlossariesSty sty, String prefix)
+   {
       super(name, taggedBox, rightBox, noteBox, sty);
-      setEntryLabelPrefix("pkg.");
+
+      if (prefix != null)
+      {
+         setEntryLabelPrefix(prefix);
+      }
    }
 
    @Override

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2022 Nicola L.C. Talbot
+    Copyright (C) 2022-2024 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -33,11 +33,27 @@ public class SwitchDef extends StandaloneDef
       this("switchdef", taggedBox, rightBox, noteBox, sty);
    }
 
+   public SwitchDef(TaggedColourBox taggedBox, FrameBox rightBox,
+     FrameBox noteBox, GlossariesSty sty, String prefix)
+   {
+      this("switchdef", taggedBox, rightBox, noteBox, sty, prefix);
+   }
+
    public SwitchDef(String name, TaggedColourBox taggedBox, FrameBox rightBox,
      FrameBox noteBox, GlossariesSty sty)
    {
+      this(name, taggedBox, rightBox, noteBox, sty, "switch.");
+   }
+
+   public SwitchDef(String name, TaggedColourBox taggedBox, FrameBox rightBox,
+     FrameBox noteBox, GlossariesSty sty, String prefix)
+   {
       super(name, taggedBox, rightBox, noteBox, sty);
-      setEntryLabelPrefix("switch.");
+
+      if (prefix != null)
+      {
+         setEntryLabelPrefix("switch.");
+      }
    }
 
    @Override
