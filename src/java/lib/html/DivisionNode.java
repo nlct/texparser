@@ -215,11 +215,11 @@ public class DivisionNode implements Comparable<DivisionNode>
 
    public String toString()
    {
-      return String.format("%s[label=%s,target=%s,prefix=%s,title=%s,ref=%s,index=%d,level=%d,siblingIndex=%d]",
+      return String.format("%s[label=%s,target=%s,prefix=%s,title=%s,ref=%s,index=%d,level=%d,siblingIndex=%d,childcount=%d]",
         getClass().getSimpleName(),
         data.getLabel(), data.getTarget(),
         prefix, title, ref,
-        index, level, siblingIndex);
+        index, level, siblingIndex, getChildCount());
    }
 
    protected final int index;
