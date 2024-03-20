@@ -27,13 +27,18 @@ public class WidgetMenu extends Command
 {
    public WidgetMenu(String name, String sepCsName)
    {
+      this(name, new TeXCsRef(sepCsName));
+   }
+
+   public WidgetMenu(String name, TeXObject sep)
+   {
       super(name);
-      this.sepCsName = sepCsName;
+      this.menuSep = sep;
    }
 
    public Object clone()
    {
-      return new WidgetMenu(getName(), sepCsName);
+      return new WidgetMenu(getName(), (TeXObject)menuSep.clone());
    }
 
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
@@ -43,31 +48,50 @@ public class WidgetMenu extends Command
 
       TeXObjectList list = parser.getListener().createStack();
 
+      // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/kbd
+
       StartElement startElem = new StartElement("kbd");
+
       startElem.putAttribute("class", "menu");
 
       list.add(startElem);
 
-      ControlSequence sepCs = parser.getListener().getControlSequence(sepCsName);
-
-      for (int i = 0; i < csvList.size(); i++)
+      if (csvList.size() == 1)
       {
-         if (i > 0)
-         {
-            list.add(sepCs);
-         }
-
-         startElem = new StartElement("kbd");
-         startElem.putAttribute("class", "menuitem");
-         list.add(startElem);
-
          list.add(new StartElement("samp"));
 
-         list.add(csvList.getValue(i));
+         list.add(csvList.getValue(0), true);
 
          list.add(new EndElement("samp"));
+      }
+      else
+      {
+         TeXObject sep = menuSep;
 
-         list.add(new EndElement("kbd"));
+         if (!menuSep.isSingleToken())
+         {
+            sep = (TeXObject)menuSep.clone();
+         }
+
+         for (int i = 0; i < csvList.size(); i++)
+         {
+            if (i > 0)
+            {
+               list.add(sep, true);
+            }
+
+            startElem = new StartElement("kbd");
+            startElem.putAttribute("class", "menuitem");
+            list.add(startElem);
+
+            list.add(new StartElement("samp"));
+
+            list.add(csvList.getValue(i), true);
+
+            list.add(new EndElement("samp"));
+
+            list.add(new EndElement("kbd"));
+         }
       }
 
       list.add(new EndElement("kbd"));
@@ -87,5 +111,5 @@ public class WidgetMenu extends Command
       return expandonce(parser);
    }
 
-   protected String sepCsName;
+   protected TeXObject menuSep;
 }
