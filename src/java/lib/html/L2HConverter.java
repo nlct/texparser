@@ -2033,6 +2033,10 @@ public class L2HConverter extends LaTeXParserListener
                   {
                      parent = prevNode;
                   }
+                  else
+                  {
+                     parent = currentNode;
+                  }
                }
                else
                {

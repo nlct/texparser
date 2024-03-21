@@ -44,7 +44,15 @@ public class DivisionNode implements Comparable<DivisionNode>
       this.data = data;
       this.parent = parent;
 
-      this.level = parent == null ? 0 : parent.level+1;
+      if (parent == null)
+      {
+         this.level = 0;
+      }
+      else
+      {
+         this.level = parent.level+1;
+         parent.addChild(this);
+      }
    }
 
    @Override
@@ -90,6 +98,23 @@ public class DivisionNode implements Comparable<DivisionNode>
    public int getLevel()
    {
       return level;
+   }
+
+   public void addChild(DivisionNode childNode)
+   {
+      if (childNode == null)
+      {
+         throw new NullPointerException();
+      }
+
+      if (children == null)
+      {
+         children = new Vector<DivisionNode>();
+      }
+
+      children.add(childNode);
+
+      childNode.siblingIndex = children.size()-1;
    }
 
    public void addChild(int index, DivisionInfo childData)
@@ -211,6 +236,27 @@ public class DivisionNode implements Comparable<DivisionNode>
    public String getPrefix()
    {
       return prefix;
+   }
+
+   public String getId()
+   {
+      String label = data.getLabel();
+ 
+      if (label == null)
+      {
+         String target = data.getTarget();
+
+         if (target == null)
+         {
+            return "node"+index;
+         }
+         else
+         {
+            return target;
+         }
+      }
+
+      return label;
    }
 
    public String toString()
