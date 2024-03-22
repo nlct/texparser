@@ -1592,6 +1592,11 @@ public class L2HConverter extends LaTeXParserListener
       putControlSequence(new L2HMathJaxCommand(getControlSequence("$")));
    }
 
+   protected String stripTags(String text)
+   {
+      return text.replaceAll("</?[^\\s]+(\\s+[a-z]+=\"[^\"]*\")*\\s*>", "");
+   }
+
    @Override
    public void beginDocument(TeXObjectList stack)
      throws IOException
@@ -1603,10 +1608,10 @@ public class L2HConverter extends LaTeXParserListener
 
       if (!(cs instanceof Undefined) && !cs.isEmpty())
       {
-         title = TeXParserUtils.expandFully(cs, getParser(), stack);
+         String strTitle = processToString(cs, stack);
 
          writeliteral("<title>");
-         write(title.purified());
+         write(stripTags(strTitle));
          writeliteralln("</title>");
       }
       else
@@ -2133,7 +2138,7 @@ public class L2HConverter extends LaTeXParserListener
 
          if (obj != null)
          {
-            title = processToString(obj, stack);
+            title = stripTags(processToString(obj, stack));
          }
 
          node.setTitle(title);
