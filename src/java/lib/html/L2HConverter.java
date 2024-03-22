@@ -1592,9 +1592,14 @@ public class L2HConverter extends LaTeXParserListener
       putControlSequence(new L2HMathJaxCommand(getControlSequence("$")));
    }
 
-   protected String stripTags(String text)
+   public String stripTags(String text)
    {
       return text.replaceAll("</?[^\\s]+(\\s+[a-z]+=\"[^\"]*\")*\\s*>", "");
+   }
+
+   public void setMetaDataTitle(String title)
+   {
+      htmlMetaTitle = title;
    }
 
    @Override
@@ -1608,10 +1613,15 @@ public class L2HConverter extends LaTeXParserListener
 
       if (!(cs instanceof Undefined) && !cs.isEmpty())
       {
-         String strTitle = processToString(cs, stack);
+         title = TeXParserUtils.expandFully(cs, getParser(), stack);
+
+         if (htmlMetaTitle == null)
+         {
+            htmlMetaTitle = stripTags(processToString(cs, stack));
+         }
 
          writeliteral("<title>");
-         write(stripTags(strTitle));
+         write(htmlMetaTitle);
          writeliteralln("</title>");
       }
       else
@@ -2134,11 +2144,18 @@ public class L2HConverter extends LaTeXParserListener
          }
 
          TeXObject obj = info.getTitle();
-         String title = "Untitled";
+         String title = htmlMetaTitle == null ? "Untitled" : htmlMetaTitle;
 
          if (obj != null)
          {
-            title = stripTags(processToString(obj, stack));
+            if (prevNode == null && htmlMetaTitle != null)
+            {
+               title = htmlMetaTitle;
+            }
+            else
+            {
+               title = stripTags(processToString(obj, stack));
+            }
          }
 
          node.setTitle(title);
@@ -4025,6 +4042,8 @@ public class L2HConverter extends LaTeXParserListener
    private int splitLevel = 0;
 
    protected String generator = "TeX Parser Library";
+
+   protected String htmlMetaTitle = null;
 
    private Stack<TrivListDec> trivListStack = new Stack<TrivListDec>();
 
