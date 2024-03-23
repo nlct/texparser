@@ -140,7 +140,7 @@ public class L2HSection extends Section
 
       substack.add(arg);
 
-      if (labelName != null)
+      if (labelName != null && listener.isLinkBoxEnabled())
       {
          substack.add(listener.createLinkBox(labelName));
       }
@@ -220,7 +220,7 @@ public class L2HSection extends Section
 
       list.add(title);
 
-      if (labelName != null)
+      if (labelName != null && listener.isLinkBoxEnabled())
       {
          list.add(listener.createLinkBox(labelName));
       }

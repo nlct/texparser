@@ -70,7 +70,10 @@ public class L2HTeXParserSection extends TeXParserSection
 
       substack.add(title);
 
-      substack.add(listener.createLinkBox(label));
+      if (listener.isLinkBoxEnabled())
+      {
+         substack.add(listener.createLinkBox(label));
+      }
 
       substack.add(new EndElement(tag == null ? "div" : tag));
 

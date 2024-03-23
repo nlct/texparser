@@ -3704,26 +3704,43 @@ public class L2HConverter extends LaTeXParserListener
       writeliteral(String.format("</div><!-- end of %s -->", name));
    }
 
+   public void enableLinkBox(boolean enable)
+   {
+      linkBoxEnabled = enable;
+   }
+
+   public boolean isLinkBoxEnabled()
+   {
+      return linkBoxEnabled;
+   }
+
    public HtmlTag createLinkBox(String label)
    {
-      ControlSequence cs = parser.getControlSequence("TeXParserLibLinkName");
-      String text = "[link]";
-
-      if (cs instanceof Expandable && cs.canExpand())
+      if (isLinkBoxEnabled())
       {
-         try
-         {
-            text = parser.expandToString(cs, parser);
-         }
-         catch (IOException e)
-         {
-            getParser().error(e);
-         }
-      }
+         ControlSequence cs = parser.getControlSequence("TeXParserLibLinkName");
+         String text = "[link]";
 
-      return new HtmlTag(String.format(
-       "<div class=\"labellink\"><a href=\"#%s\">%s</a></div>",
-         label, text));
+         if (cs instanceof Expandable && cs.canExpand())
+         {
+            try
+            {
+               text = parser.expandToString(cs, parser);
+            }
+            catch (IOException e)
+            {
+               getParser().error(e);
+            }
+         }
+
+         return new HtmlTag(String.format(
+          "<div class=\"labellink\"><a href=\"#%s\">%s</a></div>",
+            label, text));
+      }
+      else
+      {
+         return new HtmlTag("<!-- Link setting off -->");
+      }
    }
 
    public void startSection(boolean isNumbered, String tag, String name,
@@ -3785,17 +3802,36 @@ public class L2HConverter extends LaTeXParserListener
            id, currentSection));
       }
 
-      ControlSequence cs = parser.getControlSequence("TeXParserLibToTopName");
-      String text = "[top]";
+      writeToTopLink(stack);
+   }
 
-      if (cs != null)
+   public void enableToTopLink(boolean enable)
+   {
+      toTopLinkEnabled = enable;
+   }
+
+   public boolean isToTopLinkEnabled()
+   {
+      return toTopLinkEnabled;
+   }
+
+   public void writeToTopLink(TeXObjectList stack)
+    throws IOException
+   {
+      if (isToTopLinkEnabled())
       {
-         text = parser.expandToString(cs, stack);
-      }
+         ControlSequence cs = parser.getControlSequence("TeXParserLibToTopName");
+         String text = "[top]";
 
-      writeliteral(String.format(
-       "<div class=\"tomain\"><a href=\"#main\">%s</a></div>",
-       text));
+         if (cs != null)
+         {
+            text = parser.expandToString(cs, stack);
+         }
+
+         writeliteral(String.format(
+          "<div class=\"tomain\"><a href=\"#main\">%s</a></div>",
+          text));
+      }
    }
 
    @Override
@@ -4048,6 +4084,9 @@ public class L2HConverter extends LaTeXParserListener
    private HashMap<String,DivisionNode> divisionMap;
 
    private int splitLevel = 0;
+
+   private boolean linkBoxEnabled = true;
+   private boolean toTopLinkEnabled = true;
 
    protected String generator = "TeX Parser Library";
 
