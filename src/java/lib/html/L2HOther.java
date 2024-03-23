@@ -53,9 +53,9 @@ public class L2HOther extends Other
    {
       L2HConverter listener = (L2HConverter)parser.getListener();
 
-      if (!listener.isInDocEnv())
+      if (!listener.isWriteOutputAllowed())
       {
-         if (!Character.isWhitespace(getCharCode()))
+         if (!Character.isWhitespace(getCharCode()) && !listener.hasDocumentEnded())
          {
             throw new LaTeXSyntaxException(parser,
               LaTeXSyntaxException.ERROR_MISSING_BEGIN_DOC,

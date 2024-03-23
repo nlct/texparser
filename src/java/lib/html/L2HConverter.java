@@ -716,6 +716,12 @@ public class L2HConverter extends LaTeXParserListener
       this.useHtmlEntities = useEntities;
    }
 
+   public boolean isWriteOutputAllowed()
+   {
+      return !(inPreamble || hasDocumentEnded())
+           || currentWriter instanceof StringWriter;
+   }
+
    @Override
    public void writeCodePoint(int codePoint)
      throws IOException
@@ -736,7 +742,7 @@ public class L2HConverter extends LaTeXParserListener
          }
       }
 
-      if (inPreamble && !Character.isWhitespace(codePoint))
+      if (!isWriteOutputAllowed() && !Character.isWhitespace(codePoint))
       {
          throw new LaTeXSyntaxException(getParser(),
            LaTeXSyntaxException.ERROR_MISSING_BEGIN_DOC, 
@@ -795,7 +801,7 @@ public class L2HConverter extends LaTeXParserListener
          }
       }
 
-      if (inPreamble && !str.trim().isEmpty())
+      if (!isWriteOutputAllowed() && !str.trim().isEmpty())
       {
          throw new LaTeXSyntaxException(getParser(),
            LaTeXSyntaxException.ERROR_MISSING_BEGIN_DOC, str);
@@ -856,7 +862,7 @@ public class L2HConverter extends LaTeXParserListener
          }
       }
 
-      if (inPreamble && !Character.isWhitespace(c))
+      if (!isWriteOutputAllowed() && !Character.isWhitespace(c))
       {
          throw new LaTeXSyntaxException(getParser(),
            LaTeXSyntaxException.ERROR_MISSING_BEGIN_DOC, c);
@@ -911,7 +917,7 @@ public class L2HConverter extends LaTeXParserListener
          }
       }
 
-      if (inPreamble && !str.trim().isEmpty())
+      if (!isWriteOutputAllowed() && !str.trim().isEmpty())
       {
          throw new LaTeXSyntaxException(getParser(),
            LaTeXSyntaxException.ERROR_MISSING_BEGIN_DOC, str);
@@ -1509,7 +1515,7 @@ public class L2HConverter extends LaTeXParserListener
 
       if (cs != null)
       {
-         generator = processToString(cs, stack).replaceAll("\"", "");
+         generator = stripTags(processToString(cs, stack)).replaceAll("\"", "\\\"");
       }
 
       if (!generator.isEmpty())
@@ -1613,11 +1619,14 @@ public class L2HConverter extends LaTeXParserListener
 
       if (!(cs instanceof Undefined) && !cs.isEmpty())
       {
-         title = TeXParserUtils.expandFully(cs, getParser(), stack);
+         title = TeXParserUtils.expandOnce(cs, getParser(), stack);
 
          if (htmlMetaTitle == null)
          {
+            parser.startGroup();
+            parser.putControlSequence(true, new AtSecondOfTwo("texorpdfstring"));
             htmlMetaTitle = stripTags(processToString(cs, stack));
+            parser.endGroup();
          }
 
          writeliteral("<title>");
@@ -1995,21 +2004,17 @@ public class L2HConverter extends LaTeXParserListener
    throws IOException
    {
       StringWriter strWriter = new StringWriter();
-
-      boolean orgInPreamble = inPreamble;
+      Writer orgCurrentWriter = currentWriter;
 
       try
       {
          currentWriter = strWriter;
 
-         inPreamble = false;
-
          TeXParserUtils.process(obj, getParser(), stack);
       }
       finally
       {
-         inPreamble = orgInPreamble;
-         currentWriter = writer;
+         currentWriter = orgCurrentWriter;
       }
 
       return strWriter.toString();
@@ -2154,7 +2159,10 @@ public class L2HConverter extends LaTeXParserListener
             }
             else
             {
-               title = stripTags(processToString(obj, stack));
+               parser.startGroup();
+               parser.putControlSequence(true, new AtSecondOfTwo("texorpdfstring"));
+               title = stripTags(processToString((TeXObject)obj.clone(), stack));
+               parser.endGroup();
             }
          }
 
@@ -2164,7 +2172,7 @@ public class L2HConverter extends LaTeXParserListener
 
          if (obj != null)
          {
-            node.setPrefix(processToString(obj, stack));
+            node.setPrefix(processToString((TeXObject)obj.clone(), stack));
          }
 
          divisionMap.put(label, node);

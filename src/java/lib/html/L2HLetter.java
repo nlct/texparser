@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.util.Vector;
 
 import com.dickimawbooks.texparserlib.*;
+import com.dickimawbooks.texparserlib.latex.LaTeXSyntaxException;
 
 public class L2HLetter extends Letter
 {
@@ -44,18 +45,23 @@ public class L2HLetter extends Letter
    public void process(TeXParser parser)
       throws IOException
    {
-      if (((L2HConverter)parser.getListener()).isInDocEnv())
+      L2HConverter listener = (L2HConverter)parser.getListener();
+
+      if (listener.isWriteOutputAllowed())
       {
          super.process(parser);
+      }
+      else if (!listener.hasDocumentEnded())
+      {
+         throw new LaTeXSyntaxException(parser,
+              LaTeXSyntaxException.ERROR_MISSING_BEGIN_DOC,
+                new String(Character.toChars(getCharCode())));
       }
    }
 
    @Override
    public void process(TeXParser parser, TeXObjectList stack) throws IOException
    {
-      if (((L2HConverter)parser.getListener()).isInDocEnv())
-      {
-         super.process(parser, stack);
-      }
+      process(parser);
    }
 }
