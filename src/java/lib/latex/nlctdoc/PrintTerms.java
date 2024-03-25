@@ -51,9 +51,26 @@ public class PrintTerms extends ControlSequence
 
       TeXObjectList content = listener.createStack();
 
-      content.add(listener.getControlSequence("printabbrs"));
-      content.add(listener.getControlSequence("printicons"));
-      content.add(listener.getControlSequence("printmain"));
+      ControlSequence cs = parser.getControlSequence("printabbrs");
+
+      if (cs != null)
+      {
+         content.add(cs);
+      }
+
+      cs = parser.getControlSequence("printicons");
+
+      if (cs != null)
+      {
+         content.add(cs);
+      }
+
+      cs = parser.getControlSequence("printmain");
+
+      if (cs != null)
+      {
+         content.add(cs);
+      }
 
       if (optArg != null)
       {

@@ -1358,21 +1358,21 @@ public class UserGuideSty extends LaTeXSty
       addTaggedColourBox("important", BG_IMPORTANT, FRAME_COL_IMPORTANT);
       addTaggedColourBox("warning", BG_WARNING, FRAME_COL_WARNING);
       addTaggedColourBox("information", BG_INFO, FRAME_COL_INFO);
-      TaggedColourBox pinnedBox = addTaggedColourBox("pinnedbox",
+
+      pinnedBox = addTaggedColourBox("pinnedbox",
          "definition", BG_DEF, Color.BLACK);
 
-      TaggedColourBox terminalBox = 
+      terminalBox = 
         addTaggedColourBox("terminal", new TeXFontText(TeXFontFamily.VERB), 
            BG_TERMINAL, Color.BLACK);
 
-      TaggedColourBox transcriptBox = 
+      transcriptBox = 
         addTaggedColourBox("transcript", new TeXFontText(TeXFontFamily.VERB), 
            BG_TERMINAL, Color.BLACK);
 
-      TaggedColourBox ctrBox = addTaggedColourBox("ctrbox",
-         "counter", BG_DEF, Color.BLACK);
+      ctrBox = addTaggedColourBox("ctrbox", "counter", BG_DEF, Color.BLACK);
 
-      TaggedColourBox codeBox = addTaggedColourBox("codebox",
+      codeBox = addTaggedColourBox("codebox",
          "code", new TeXFontText(TeXFontFamily.VERB), BG_CODE, Color.BLACK);
 
       registerControlSequence(new DuplicateEnv("codebox*", codeBox));
@@ -1432,16 +1432,18 @@ public class UserGuideSty extends LaTeXSty
 
       registerControlSequence(new DuplicateEnv("unicoderesult*", uniCodeResult));
 
-      FrameBox defnBox = addColourBox("defnbox", null, null,
+      defnBox = addColourBox("defnbox", null, null,
         BG_DEF, Color.BLACK);
-      FrameBox optionSummaryBox = addColourBox("optionsummarybox", null, null,
+
+      optionSummaryBox = addColourBox("optionsummarybox", null, null,
         BG_DEF, Color.BLACK);
-      FrameBox optionValueSummaryBox = addSemanticCommand("optionvaluesummarybox",
+
+      optionValueSummaryBox = addSemanticCommand("optionvaluesummarybox",
          new UserDimension(40, FixedUnit.BP));
 
-      FrameBox rightBox = addFloatBox("floatrightbox");
+      rightBox = addFloatBox("floatrightbox");
 
-      FrameBox noteBox = new ColourBox("noteBox", BorderStyle.NONE,
+      noteBox = new ColourBox("noteBox", BorderStyle.NONE,
         AlignHStyle.DEFAULT, AlignVStyle.DEFAULT, false, null, null);
       listener.declareFrameBox(noteBox, false);
 
@@ -1451,12 +1453,12 @@ public class UserGuideSty extends LaTeXSty
       registerControlSequence(new PkgDef(pinnedBox, rightBox, noteBox, glossariesSty));
       registerControlSequence(new ClsDef(pinnedBox, rightBox, noteBox, glossariesSty));
 
-      TaggedColourBox settingsBox = addTaggedColourBox("settingsbox",
+      settingsBox = addTaggedColourBox("settingsbox",
          "valuesetting", BG_OPTION_DEF, Color.BLACK);
 
       registerControlSequence(new OptionDef(settingsBox, rightBox, noteBox, glossariesSty));
 
-      TaggedColourBox optValBox = addTaggedColourBox("optionvaluebox",
+      optValBox = addTaggedColourBox("optionvaluebox",
          "optionvalue", BG_OPTION_VALUE_DEF, Color.BLACK);
 
       registerControlSequence(new OptionValDef(optValBox, rightBox, noteBox, glossariesSty));
@@ -1776,6 +1778,7 @@ public class UserGuideSty extends LaTeXSty
         "om", def, TeXParserUtils.createStack(listener, listener.createStack())));
 
 
+      addGlsFmtTextCommand("filetext", "file.");
       addGlsFmtTextCommand("stytext", "pkg.");
       addGlsFmtTextCommand("clstext", "cls.");
       addGlsFmtTextCommand("opttext", "opt.");
@@ -2379,6 +2382,19 @@ public class UserGuideSty extends LaTeXSty
 
    protected GlossariesSty glossariesSty;
    protected ColorSty colorSty;
+
+   protected TaggedColourBox terminalBox;
+   protected TaggedColourBox transcriptBox; 
+   protected TaggedColourBox ctrBox;
+   protected TaggedColourBox codeBox;
+   protected TaggedColourBox pinnedBox;
+   protected FrameBox defnBox;
+   protected FrameBox optionSummaryBox;
+   protected FrameBox optionValueSummaryBox;
+   protected FrameBox rightBox;
+   protected FrameBox noteBox;
+   protected TaggedColourBox settingsBox;
+   protected TaggedColourBox optValBox;
 
    protected boolean draft=false;
 
