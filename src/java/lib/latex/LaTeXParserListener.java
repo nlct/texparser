@@ -3424,6 +3424,16 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       return frameBoxes.get(id);
    }
 
+   public FrameBox removeDeclaredFrameBox(String id)
+   {
+      if (frameBoxes != null && id != null)
+      {
+         return frameBoxes.remove(id);
+      }
+
+      return null;
+   }
+
    private Vector<String> verbEnv;
 
    protected Vector<LaTeXFile> loadedPackages;
