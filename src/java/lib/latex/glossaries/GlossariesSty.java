@@ -3458,6 +3458,34 @@ public class GlossariesSty extends LaTeXSty
             }
          }
 
+         Boolean boolVal = options.getBoolean("nonumberlist", parser, stack);
+
+         if (boolVal != null)
+         {
+            if (boolVal.booleanValue())
+            {
+               parser.putControlSequence(true, new AtGobble("glossaryentrynumbers"));
+            }
+            else
+            {
+               parser.putControlSequence(true, new AtFirstOfOne("glossaryentrynumbers"));
+            } 
+         }
+
+         boolVal = options.getBoolean("nogroupskip", parser, stack);
+
+         if (boolVal != null)
+         {
+            if (boolVal.booleanValue())
+            {
+               parser.putControlSequence(true, new IfTrue("ifglsnogroupskip"));
+            }
+            else
+            {
+               parser.putControlSequence(true, new IfFalse("ifglsnogroupskip"));
+            } 
+         }
+
          if (indexingOpt == IndexingOption.UNSRT)
          {
             TeXObject val = options.get("flatten");
