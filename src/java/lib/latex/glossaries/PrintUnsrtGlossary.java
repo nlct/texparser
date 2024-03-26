@@ -117,30 +117,9 @@ public class PrintUnsrtGlossary extends ControlSequence
       }
    }
 
-   @Override
-   public void process(TeXParser parser, TeXObjectList stack)
+   protected void doGlossary(KeyValList options, TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      boolean isStar = (popModifier(parser, stack, '*') == '*');
-
-      parser.startGroup();
-
-      KeyValList options = sty.popOptKeyValList(stack);
-
-      if (isStar)
-      {
-         TeXObject initCode = popArg(parser, stack);
-
-         if (parser == stack || stack == null)
-         {
-            initCode.process(parser);
-         }
-         else
-         {
-            initCode.process(parser, stack);
-         }
-      }
-
       Glossary glossary = sty.initPrintGloss(IndexingOption.UNSRT, options, stack);
 
       TeXParserListener listener = parser.getListener();
@@ -224,6 +203,33 @@ public class PrintUnsrtGlossary extends ControlSequence
       list.add(new TeXCsRef("glossarypostamble"));
 
       TeXParserUtils.process(list, parser, stack);
+   }
+
+   @Override
+   public void process(TeXParser parser, TeXObjectList stack)
+     throws IOException
+   {
+      boolean isStar = (popModifier(parser, stack, '*') == '*');
+
+      parser.startGroup();
+
+      KeyValList options = sty.popOptKeyValList(stack);
+
+      if (isStar)
+      {
+         TeXObject initCode = popArg(parser, stack);
+
+         if (parser == stack || stack == null)
+         {
+            initCode.process(parser);
+         }
+         else
+         {
+            initCode.process(parser, stack);
+         }
+      }
+
+      doGlossary(options, parser, stack);
 
       parser.endGroup();
    }
@@ -235,5 +241,5 @@ public class PrintUnsrtGlossary extends ControlSequence
       process(parser, parser);
    }
 
-   private GlossariesSty sty;
+   protected GlossariesSty sty;
 }
