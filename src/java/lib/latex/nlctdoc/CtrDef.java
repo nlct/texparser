@@ -27,28 +27,28 @@ import com.dickimawbooks.texparserlib.latex.glossaries.*;
 
 public class CtrDef extends StandaloneDef
 {
-   public CtrDef(TaggedColourBox taggedBox, FrameBox rightBox,
+   public CtrDef(FrameBoxEnv outerBox, FrameBox rightBox,
      FrameBox noteBox, GlossariesSty sty)
    {
-      this("ctrdef", taggedBox, rightBox, noteBox, sty);
+      this("ctrdef", outerBox, rightBox, noteBox, sty);
    }
 
-   public CtrDef(TaggedColourBox taggedBox, FrameBox rightBox,
+   public CtrDef(FrameBoxEnv outerBox, FrameBox rightBox,
      FrameBox noteBox, GlossariesSty sty, String prefix)
    {
-      this("ctrdef", taggedBox, rightBox, noteBox, sty, prefix);
+      this("ctrdef", outerBox, rightBox, noteBox, sty, prefix);
    }
 
-   public CtrDef(String name, TaggedColourBox taggedBox, FrameBox rightBox,
+   public CtrDef(String name, FrameBoxEnv outerBox, FrameBox rightBox,
      FrameBox noteBox, GlossariesSty sty)
    {
-      this(name, taggedBox, rightBox, noteBox, sty, "ctr.");
+      this(name, outerBox, rightBox, noteBox, sty, "ctr.");
    }
 
-   public CtrDef(String name, TaggedColourBox taggedBox, FrameBox rightBox,
+   public CtrDef(String name, FrameBoxEnv outerBox, FrameBox rightBox,
      FrameBox noteBox, GlossariesSty sty, String prefix)
    {
-      super(name, taggedBox, rightBox, noteBox, sty);
+      super(name, outerBox, rightBox, noteBox, sty);
 
       if (prefix != null)
       {
@@ -59,7 +59,7 @@ public class CtrDef extends StandaloneDef
    @Override
    public Object clone()
    {
-      return new CtrDef(getName(), taggedBox, rightBox, noteBox, getSty());
+      return new CtrDef(getName(), outerBox, rightBox, noteBox, getSty());
    }
 
 }

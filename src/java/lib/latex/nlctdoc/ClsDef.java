@@ -27,28 +27,28 @@ import com.dickimawbooks.texparserlib.latex.glossaries.*;
 
 public class ClsDef extends StandaloneDef
 {
-   public ClsDef(TaggedColourBox taggedBox, FrameBox rightBox,
+   public ClsDef(FrameBoxEnv outerBox, FrameBox rightBox,
      FrameBox noteBox, GlossariesSty sty)
    {
-      this("clsdef", taggedBox, rightBox, noteBox, sty);
+      this("clsdef", outerBox, rightBox, noteBox, sty);
    }
 
-   public ClsDef(TaggedColourBox taggedBox, FrameBox rightBox,
+   public ClsDef(FrameBoxEnv outerBox, FrameBox rightBox,
      FrameBox noteBox, GlossariesSty sty, String prefix)
    {
-      this("clsdef", taggedBox, rightBox, noteBox, sty, prefix);
+      this("clsdef", outerBox, rightBox, noteBox, sty, prefix);
    }
 
-   public ClsDef(String name, TaggedColourBox taggedBox, FrameBox rightBox,
+   public ClsDef(String name, FrameBoxEnv outerBox, FrameBox rightBox,
      FrameBox noteBox, GlossariesSty sty)
    {
-      this(name, taggedBox, rightBox, noteBox, sty, "cls.");
+      this(name, outerBox, rightBox, noteBox, sty, "cls.");
    }
 
-   public ClsDef(String name, TaggedColourBox taggedBox, FrameBox rightBox,
+   public ClsDef(String name, FrameBoxEnv outerBox, FrameBox rightBox,
      FrameBox noteBox, GlossariesSty sty, String prefix)
    {
-      super(name, taggedBox, rightBox, noteBox, sty);
+      super(name, outerBox, rightBox, noteBox, sty);
 
       if (prefix != null)
       {
@@ -59,7 +59,7 @@ public class ClsDef extends StandaloneDef
    @Override
    public Object clone()
    {
-      return new ClsDef(getName(), taggedBox, rightBox, noteBox, getSty());
+      return new ClsDef(getName(), outerBox, rightBox, noteBox, getSty());
    }
 
    @Override
@@ -98,28 +98,33 @@ public class ClsDef extends StandaloneDef
    protected void postArgHook(GlsLabel glslabel, TeXParser parser, TeXObjectList stack)
    throws IOException
    {
-      TeXObject statusVal = glslabel.getField("status");
-      TeXObjectList title = null;
-
-      if (statusVal != null)
+      if (outerBox instanceof TaggedColourBox)
       {
-         String status = parser.expandToString(statusVal, parser);
+         TaggedColourBox taggedBox = (TaggedColourBox)outerBox;
 
-         if (!status.equals("default"))
+         TeXObject statusVal = glslabel.getField("status");
+         TeXObjectList title = null;
+
+         if (statusVal != null)
          {
-            title = parser.getListener().createStack();
-            title.add(parser.getListener().getControlSequence("icon"));
-            title.add(parser.getListener().createGroup(status));
-         }
-      }
+            String status = parser.expandToString(statusVal, parser);
 
-      if (title == null)
-      {
-         taggedBox.restoreTitle();
-      }
-      else
-      {
-         taggedBox.setTitle(title);
+            if (!status.equals("default"))
+            {
+               title = parser.getListener().createStack();
+               title.add(parser.getListener().getControlSequence("icon"));
+               title.add(parser.getListener().createGroup(status));
+            }
+         }
+
+         if (title == null)
+         {
+            taggedBox.restoreTitle();
+         }
+         else
+         {
+            taggedBox.setTitle(title);
+         }
       }
    }
 

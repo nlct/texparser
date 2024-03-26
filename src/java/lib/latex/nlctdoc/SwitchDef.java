@@ -27,28 +27,28 @@ import com.dickimawbooks.texparserlib.latex.glossaries.*;
 
 public class SwitchDef extends StandaloneDef
 {
-   public SwitchDef(TaggedColourBox taggedBox, FrameBox rightBox,
+   public SwitchDef(FrameBoxEnv outerBox, FrameBox rightBox,
      FrameBox noteBox, GlossariesSty sty)
    {
-      this("switchdef", taggedBox, rightBox, noteBox, sty);
+      this("switchdef", outerBox, rightBox, noteBox, sty);
    }
 
-   public SwitchDef(TaggedColourBox taggedBox, FrameBox rightBox,
+   public SwitchDef(FrameBoxEnv outerBox, FrameBox rightBox,
      FrameBox noteBox, GlossariesSty sty, String prefix)
    {
-      this("switchdef", taggedBox, rightBox, noteBox, sty, prefix);
+      this("switchdef", outerBox, rightBox, noteBox, sty, prefix);
    }
 
-   public SwitchDef(String name, TaggedColourBox taggedBox, FrameBox rightBox,
+   public SwitchDef(String name, FrameBoxEnv outerBox, FrameBox rightBox,
      FrameBox noteBox, GlossariesSty sty)
    {
-      this(name, taggedBox, rightBox, noteBox, sty, "switch.");
+      this(name, outerBox, rightBox, noteBox, sty, "switch.");
    }
 
-   public SwitchDef(String name, TaggedColourBox taggedBox, FrameBox rightBox,
+   public SwitchDef(String name, FrameBoxEnv outerBox, FrameBox rightBox,
      FrameBox noteBox, GlossariesSty sty, String prefix)
    {
-      super(name, taggedBox, rightBox, noteBox, sty);
+      super(name, outerBox, rightBox, noteBox, sty);
 
       if (prefix != null)
       {
@@ -59,7 +59,7 @@ public class SwitchDef extends StandaloneDef
    @Override
    public Object clone()
    {
-      return new SwitchDef(getName(), taggedBox, rightBox, noteBox, getSty());
+      return new SwitchDef(getName(), outerBox, rightBox, noteBox, getSty());
    }
 
    @Override
@@ -84,40 +84,45 @@ public class SwitchDef extends StandaloneDef
    protected void postArgHook(GlsLabel glslabel, TeXParser parser, TeXObjectList stack)
    throws IOException
    {
-      TeXObject syntax = glslabel.getField("syntax");
-
-      TeXObjectList title = parser.getListener().createStack();
-      title.add(parser.getListener().getControlSequence("icon"));
-
-      if (syntax == null)
+      if (outerBox instanceof TaggedColourBox)
       {
-         title.add(parser.getListener().createGroup("novaluesetting"));
-      }
-      else
-      {
-         String syntaxVal = syntax.toString(parser);
+         TaggedColourBox taggedBox = (TaggedColourBox)outerBox;
 
-         if (syntaxVal.equals("\\meta{boolean}"))
+         TeXObject syntax = glslabel.getField("syntax");
+
+         TeXObjectList title = parser.getListener().createStack();
+         title.add(parser.getListener().getControlSequence("icon"));
+
+         if (syntax == null)
          {
-            TeXObject val = glslabel.getField("initvalue");
-            String toggle = "off";
-
-            if (val != null)
-            {
-               if (val.toString(parser).equals("true"))
-               {
-                  toggle = "on";
-               }
-            }
-
-            title.add(parser.getListener().createGroup("toggle"+toggle+"setting"));
+            title.add(parser.getListener().createGroup("novaluesetting"));
          }
          else
          {
-            title.add(parser.getListener().createGroup("valuesetting"));
-         }
-      }
+            String syntaxVal = syntax.toString(parser);
 
-      taggedBox.setTitle(title);
+            if (syntaxVal.equals("\\meta{boolean}"))
+            {
+               TeXObject val = glslabel.getField("initvalue");
+               String toggle = "off";
+
+               if (val != null)
+               {
+                  if (val.toString(parser).equals("true"))
+                  {
+                     toggle = "on";
+                  }
+               }
+
+               title.add(parser.getListener().createGroup("toggle"+toggle+"setting"));
+            }
+            else
+            {
+               title.add(parser.getListener().createGroup("valuesetting"));
+            }
+         }
+
+         taggedBox.setTitle(title);
+      }
    }
 }

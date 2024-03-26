@@ -27,22 +27,22 @@ import com.dickimawbooks.texparserlib.latex.glossaries.*;
 
 public class CmdDef extends StandaloneDef
 {
-   public CmdDef(TaggedColourBox taggedBox, FrameBox rightBox,
+   public CmdDef(FrameBoxEnv outerBox, FrameBox rightBox,
      FrameBox noteBox, GlossariesSty sty)
    {
-      this("cmddef", taggedBox, rightBox, noteBox, sty);
+      this("cmddef", outerBox, rightBox, noteBox, sty);
    }
 
-   public CmdDef(String name, TaggedColourBox taggedBox, FrameBox rightBox,
+   public CmdDef(String name, FrameBoxEnv outerBox, FrameBox rightBox,
      FrameBox noteBox, GlossariesSty sty)
    {
-      super(name, taggedBox, rightBox, noteBox, sty);
+      super(name, outerBox, rightBox, noteBox, sty);
    }
 
    @Override
    public Object clone()
    {
-      return new CmdDef(getName(), taggedBox, rightBox, noteBox, getSty());
+      return new CmdDef(getName(), outerBox, rightBox, noteBox, getSty());
    }
 
    @Override
@@ -60,28 +60,33 @@ public class CmdDef extends StandaloneDef
    protected void postArgHook(GlsLabel glslabel, TeXParser parser, TeXObjectList stack)
    throws IOException
    {
-      TeXObject statusVal = glslabel.getField("status");
-      TeXObjectList title = null;
-
-      if (statusVal != null)
+      if (outerBox instanceof TaggedColourBox)
       {
-         String status = parser.expandToString(statusVal, parser);
+         TaggedColourBox taggedBox = (TaggedColourBox)outerBox;
 
-         if (!status.equals("default"))
+         TeXObject statusVal = glslabel.getField("status");
+         TeXObjectList title = null;
+
+         if (statusVal != null)
          {
-            title = parser.getListener().createStack();
-            title.add(parser.getListener().getControlSequence("icon"));
-            title.add(parser.getListener().createGroup(status));
-         }
-      }
+            String status = parser.expandToString(statusVal, parser);
 
-      if (title == null)
-      {
-         taggedBox.restoreTitle();
-      }
-      else
-      {
-         taggedBox.setTitle(title);
+            if (!status.equals("default"))
+            {
+               title = parser.getListener().createStack();
+               title.add(parser.getListener().getControlSequence("icon"));
+               title.add(parser.getListener().createGroup(status));
+            }
+         }
+
+         if (title == null)
+         {
+            taggedBox.restoreTitle();
+         }
+         else
+         {
+            taggedBox.setTitle(title);
+         }
       }
    }
 

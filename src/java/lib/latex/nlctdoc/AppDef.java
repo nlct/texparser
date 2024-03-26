@@ -27,28 +27,28 @@ import com.dickimawbooks.texparserlib.latex.glossaries.*;
 
 public class AppDef extends StandaloneDef
 {
-   public AppDef(TaggedColourBox taggedBox, FrameBox rightBox,
+   public AppDef(FrameBoxEnv outerBox, FrameBox rightBox,
      FrameBox noteBox, GlossariesSty sty)
    {
-      this("appdef", taggedBox, rightBox, noteBox, sty);
+      this("appdef", outerBox, rightBox, noteBox, sty);
    }
 
-   public AppDef(TaggedColourBox taggedBox, FrameBox rightBox,
+   public AppDef(FrameBoxEnv outerBox, FrameBox rightBox,
      FrameBox noteBox, GlossariesSty sty, String prefix)
    {
-      this("appdef", taggedBox, rightBox, noteBox, sty, prefix);
+      this("appdef", outerBox, rightBox, noteBox, sty, prefix);
    }
 
-   public AppDef(String name, TaggedColourBox taggedBox, FrameBox rightBox,
+   public AppDef(String name, FrameBoxEnv outerBox, FrameBox rightBox,
      FrameBox noteBox, GlossariesSty sty)
    {
-      this(name, taggedBox, rightBox, noteBox, sty, "app.");
+      this(name, outerBox, rightBox, noteBox, sty, "app.");
    }
 
-   public AppDef(String name, TaggedColourBox taggedBox, FrameBox rightBox,
+   public AppDef(String name, FrameBoxEnv outerBox, FrameBox rightBox,
      FrameBox noteBox, GlossariesSty sty, String prefix)
    {
-      super(name, taggedBox, rightBox, noteBox, sty);
+      super(name, outerBox, rightBox, noteBox, sty);
 
       if (prefix != null)
       {
@@ -59,7 +59,7 @@ public class AppDef extends StandaloneDef
    @Override
    public Object clone()
    {
-      return new AppDef(getName(), taggedBox, rightBox, noteBox, getSty());
+      return new AppDef(getName(), outerBox, rightBox, noteBox, getSty());
    }
 
    @Override

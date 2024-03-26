@@ -28,22 +28,22 @@ import com.dickimawbooks.texparserlib.latex.glossaries.*;
 
 public class OptionValDef extends StandaloneDef
 {
-   public OptionValDef(TaggedColourBox taggedBox, FrameBox rightBox,
+   public OptionValDef(FrameBoxEnv outerBox, FrameBox rightBox,
      FrameBox noteBox, GlossariesSty sty)
    {
-      this("optionvaldef", taggedBox, rightBox, noteBox, sty);
+      this("optionvaldef", outerBox, rightBox, noteBox, sty);
    }
 
-   public OptionValDef(String name, TaggedColourBox taggedBox, FrameBox rightBox,
+   public OptionValDef(String name, FrameBoxEnv outerBox, FrameBox rightBox,
      FrameBox noteBox, GlossariesSty sty)
    {
-      super(name, taggedBox, rightBox, noteBox, sty);
+      super(name, outerBox, rightBox, noteBox, sty);
    }
 
    @Override
    public Object clone()
    {
-      return new OptionValDef(getName(), taggedBox, rightBox, noteBox, getSty());
+      return new OptionValDef(getName(), outerBox, rightBox, noteBox, getSty());
    }
 
    @Override

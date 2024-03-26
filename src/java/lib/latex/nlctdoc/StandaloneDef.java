@@ -28,11 +28,11 @@ import com.dickimawbooks.texparserlib.latex.glossaries.*;
 
 public class StandaloneDef extends AbstractGlsCommand
 {
-   public StandaloneDef(String name, TaggedColourBox taggedBox, 
+   public StandaloneDef(String name, FrameBoxEnv outerBox, 
       FrameBox rightBox, FrameBox noteBox, GlossariesSty sty)
    {
       super(name, sty);
-      this.taggedBox = taggedBox;
+      this.outerBox = outerBox;
       this.rightBox = rightBox;
       this.noteBox = noteBox;
    }
@@ -40,7 +40,7 @@ public class StandaloneDef extends AbstractGlsCommand
    @Override
    public Object clone()
    {
-      return new StandaloneDef(getName(), taggedBox, rightBox, noteBox, getSty());
+      return new StandaloneDef(getName(), outerBox, rightBox, noteBox, getSty());
    }
 
    @Override
@@ -317,7 +317,7 @@ public class StandaloneDef extends AbstractGlsCommand
       initHook(glslabel, parser, stack);
 
       TeXObjectList content = listener.createStack();
-      content.add(taggedBox);
+      content.add(outerBox);
 
       GlossaryEntry entry = glslabel.getEntry();
 
@@ -402,7 +402,7 @@ public class StandaloneDef extends AbstractGlsCommand
          }
       }
 
-      content.add(taggedBox.getEndDeclaration());
+      content.add(outerBox.getEndDeclaration());
 
       TeXParserUtils.process(content, parser, stack);
 
@@ -416,6 +416,6 @@ public class StandaloneDef extends AbstractGlsCommand
       process(parser, parser);
    }
 
-   protected TaggedColourBox taggedBox;
+   protected FrameBoxEnv outerBox;
    protected FrameBox rightBox, noteBox;
 }

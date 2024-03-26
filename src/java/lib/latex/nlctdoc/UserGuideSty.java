@@ -1352,15 +1352,18 @@ public class UserGuideSty extends LaTeXSty
 
    protected void addBoxCommands()
    {
-      TeXObjectList def;
-      Group grp, subgrp;
+      addBasicBoxCommands();
+      addStandaloneDefCommands();
+      addCodeBoxCommands();
+      addSummaryBoxCommands();
+      addIndexBoxCommands();
+   }
 
+   protected void addBasicBoxCommands()
+   {
       addTaggedColourBox("important", BG_IMPORTANT, FRAME_COL_IMPORTANT);
       addTaggedColourBox("warning", BG_WARNING, FRAME_COL_WARNING);
       addTaggedColourBox("information", BG_INFO, FRAME_COL_INFO);
-
-      pinnedBox = addTaggedColourBox("pinnedbox",
-         "definition", BG_DEF, Color.BLACK);
 
       terminalBox = 
         addTaggedColourBox("terminal", new TeXFontText(TeXFontFamily.VERB), 
@@ -1370,8 +1373,84 @@ public class UserGuideSty extends LaTeXSty
         addTaggedColourBox("transcript", new TeXFontText(TeXFontFamily.VERB), 
            BG_TERMINAL, Color.BLACK);
 
+      rightBox = addFloatBox("floatrightbox");
+
+      noteBox = new ColourBox("noteBox", BorderStyle.NONE,
+        AlignHStyle.DEFAULT, AlignVStyle.DEFAULT, false, null, null);
+      listener.declareFrameBox(noteBox, false);
+
+   }
+
+   protected FrameBoxEnv createPinnedBox()
+   {
+      return addTaggedColourBox("pinnedbox", "definition", BG_DEF, Color.BLACK);
+   }
+
+   protected FrameBoxEnv createSettingsBox()
+   {
+      return addTaggedColourBox("settingsbox",
+         "valuesetting", BG_OPTION_DEF, Color.BLACK);
+   }
+
+   protected void addStandaloneDefCommands()
+   {
+      TeXObjectList def;
+      Group grp, subgrp;
+
+      pinnedBox = createPinnedBox();
+
+      settingsBox = createSettingsBox();
+
       ctrBox = addTaggedColourBox("ctrbox", "counter", BG_DEF, Color.BLACK);
 
+      registerControlSequence(new CmdDef(pinnedBox, rightBox, noteBox, glossariesSty));
+      registerControlSequence(new EnvDef(pinnedBox, rightBox, noteBox, glossariesSty));
+      registerControlSequence(new CtrDef(ctrBox, rightBox, noteBox, glossariesSty));
+      registerControlSequence(new PkgDef(pinnedBox, rightBox, noteBox, glossariesSty));
+      registerControlSequence(new ClsDef(pinnedBox, rightBox, noteBox, glossariesSty));
+
+      registerControlSequence(new OptionDef(settingsBox, rightBox, noteBox, glossariesSty));
+
+      optValBox = addTaggedColourBox("optionvaluebox",
+         "optionvalue", BG_OPTION_VALUE_DEF, Color.BLACK);
+
+      registerControlSequence(new OptionValDef(optValBox, rightBox, noteBox, glossariesSty));
+
+      registerControlSequence(new AppDef(terminalBox, rightBox, noteBox, glossariesSty));
+      registerControlSequence(new SwitchDef(settingsBox, rightBox, noteBox, glossariesSty));
+
+
+
+      // \filedef
+      FrameBox fileDefBox = addSemanticCommand("@filedefbox", "filedef",
+       new TeXFontText(TeXFontFamily.TT), null, null, null, null, null,
+       false, true, null, AlignHStyle.LEFT);
+
+      registerControlSequence(fileDefBox);
+
+      def = listener.createStack();
+      def.add(fileDefBox);
+      grp = listener.createGroup();
+      def.add(grp);
+      grp.add(new TeXCsRef("filetag"));
+      grp.add(TeXParserUtils.createGroup(listener, listener.getParam(1)));
+      grp.add(new TeXCsRef("mainglsadd"));
+      subgrp = listener.createGroup("file.");
+      grp.add(subgrp);
+      subgrp.add(listener.getParam(1));
+      grp.add(listener.createGroup("filedef"));
+      grp.add(new TeXCsRef("glsxtrglossentry"));
+      subgrp = listener.createGroup("file.");
+      grp.add(subgrp);
+      subgrp.add(listener.getParam(1));
+
+      registerControlSequence(new LaTeXGenericCommand(true, "filedef",
+       "m", def));
+
+   }
+
+   protected void addCodeBoxCommands()
+   {
       codeBox = addTaggedColourBox("codebox",
          "code", new TeXFontText(TeXFontFamily.VERB), BG_CODE, Color.BLACK);
 
@@ -1431,40 +1510,18 @@ public class UserGuideSty extends LaTeXSty
       registerControlSequence(uniCodeResult);
 
       registerControlSequence(new DuplicateEnv("unicoderesult*", uniCodeResult));
+   }
 
-      defnBox = addColourBox("defnbox", null, null,
-        BG_DEF, Color.BLACK);
-
+   protected void addSummaryBoxCommands()
+   {
       optionSummaryBox = addColourBox("optionsummarybox", null, null,
         BG_DEF, Color.BLACK);
 
       optionValueSummaryBox = addSemanticCommand("optionvaluesummarybox",
          new UserDimension(40, FixedUnit.BP));
 
-      rightBox = addFloatBox("floatrightbox");
-
-      noteBox = new ColourBox("noteBox", BorderStyle.NONE,
-        AlignHStyle.DEFAULT, AlignVStyle.DEFAULT, false, null, null);
-      listener.declareFrameBox(noteBox, false);
-
-      registerControlSequence(new CmdDef(pinnedBox, rightBox, noteBox, glossariesSty));
-      registerControlSequence(new EnvDef(pinnedBox, rightBox, noteBox, glossariesSty));
-      registerControlSequence(new CtrDef(ctrBox, rightBox, noteBox, glossariesSty));
-      registerControlSequence(new PkgDef(pinnedBox, rightBox, noteBox, glossariesSty));
-      registerControlSequence(new ClsDef(pinnedBox, rightBox, noteBox, glossariesSty));
-
-      settingsBox = addTaggedColourBox("settingsbox",
-         "valuesetting", BG_OPTION_DEF, Color.BLACK);
-
-      registerControlSequence(new OptionDef(settingsBox, rightBox, noteBox, glossariesSty));
-
-      optValBox = addTaggedColourBox("optionvaluebox",
-         "optionvalue", BG_OPTION_VALUE_DEF, Color.BLACK);
-
-      registerControlSequence(new OptionValDef(optValBox, rightBox, noteBox, glossariesSty));
-
-      registerControlSequence(new AppDef(terminalBox, rightBox, noteBox, glossariesSty));
-      registerControlSequence(new SwitchDef(settingsBox, rightBox, noteBox, glossariesSty));
+      defnBox = addColourBox("defnbox", null, null,
+        BG_DEF, Color.BLACK);
 
       registerControlSequence(new SummaryBox(defnBox, 
         rightBox, noteBox, glossariesSty));
@@ -1498,7 +1555,10 @@ public class UserGuideSty extends LaTeXSty
 
       registerControlSequence(new SummaryClassBox(defnBox, 
         rightBox, noteBox, glossariesSty));
+   }
 
+   protected void addIndexBoxCommands()
+   {
       createIndexItemBox(0);
       createIndexItemBox(1);
       createIndexItemBox(2);
@@ -1507,34 +1567,6 @@ public class UserGuideSty extends LaTeXSty
       addSemanticCommand("texparser@abstractheader", "abstractheader", 
         new TeXFontText(TeXFontWeight.BF), null, null, null, null, null, 
          false, false, null, AlignHStyle.CENTER);
-
-
-      // \filedef
-      FrameBox fileDefBox = addSemanticCommand("@filedefbox", "filedef",
-       new TeXFontText(TeXFontFamily.TT), null, null, null, null, null,
-       false, true, null, AlignHStyle.LEFT);
-
-      registerControlSequence(fileDefBox);
-
-      def = listener.createStack();
-      def.add(fileDefBox);
-      grp = listener.createGroup();
-      def.add(grp);
-      grp.add(new TeXCsRef("filetag"));
-      grp.add(TeXParserUtils.createGroup(listener, listener.getParam(1)));
-      grp.add(new TeXCsRef("mainglsadd"));
-      subgrp = listener.createGroup("file.");
-      grp.add(subgrp);
-      subgrp.add(listener.getParam(1));
-      grp.add(listener.createGroup("filedef"));
-      grp.add(new TeXCsRef("glsxtrglossentry"));
-      subgrp = listener.createGroup("file.");
-      grp.add(subgrp);
-      subgrp.add(listener.getParam(1));
-
-      registerControlSequence(new LaTeXGenericCommand(true, "filedef",
-       "m", def));
-
    }
 
    protected void addInlineDefCommands()
@@ -2394,17 +2426,19 @@ public class UserGuideSty extends LaTeXSty
    protected GlossariesSty glossariesSty;
    protected ColorSty colorSty;
 
-   protected TaggedColourBox terminalBox;
-   protected TaggedColourBox transcriptBox; 
-   protected TaggedColourBox ctrBox;
-   protected TaggedColourBox codeBox;
-   protected TaggedColourBox pinnedBox;
+   protected FrameBoxEnv terminalBox;
+   protected FrameBoxEnv transcriptBox; 
+   protected FrameBoxEnv ctrBox;
+   protected FrameBoxEnv codeBox;
+   protected FrameBoxEnv pinnedBox;
+
    protected FrameBox defnBox;
    protected FrameBox optionSummaryBox;
    protected FrameBox optionValueSummaryBox;
    protected FrameBox rightBox;
    protected FrameBox noteBox;
-   protected TaggedColourBox settingsBox;
+
+   protected FrameBoxEnv settingsBox;
    protected TaggedColourBox optValBox;
 
    protected boolean draft=false;

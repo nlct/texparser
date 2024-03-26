@@ -27,28 +27,28 @@ import com.dickimawbooks.texparserlib.latex.glossaries.*;
 
 public class OptionDef extends StandaloneDef
 {
-   public OptionDef(TaggedColourBox taggedBox, FrameBox rightBox,
+   public OptionDef(FrameBoxEnv outerBox, FrameBox rightBox,
      FrameBox noteBox, GlossariesSty sty)
    {
-      this("optiondef", taggedBox, rightBox, noteBox, sty);
+      this("optiondef", outerBox, rightBox, noteBox, sty);
    }
 
-   public OptionDef(TaggedColourBox taggedBox, FrameBox rightBox,
+   public OptionDef(FrameBoxEnv outerBox, FrameBox rightBox,
      FrameBox noteBox, GlossariesSty sty, String prefix)
    {
-      this("optiondef", taggedBox, rightBox, noteBox, sty, prefix);
+      this("optiondef", outerBox, rightBox, noteBox, sty, prefix);
    }
 
-   public OptionDef(String name, TaggedColourBox taggedBox, FrameBox rightBox,
+   public OptionDef(String name, FrameBoxEnv outerBox, FrameBox rightBox,
      FrameBox noteBox, GlossariesSty sty)
    {
-      this(name, taggedBox, rightBox, noteBox, sty, "opt.");
+      this(name, outerBox, rightBox, noteBox, sty, "opt.");
    }
 
-   public OptionDef(String name, TaggedColourBox taggedBox, FrameBox rightBox,
+   public OptionDef(String name, FrameBoxEnv outerBox, FrameBox rightBox,
      FrameBox noteBox, GlossariesSty sty, String prefix)
    {
-      super(name, taggedBox, rightBox, noteBox, sty);
+      super(name, outerBox, rightBox, noteBox, sty);
 
       if (prefix != null)
       {
@@ -59,7 +59,7 @@ public class OptionDef extends StandaloneDef
    @Override
    public Object clone()
    {
-      return new OptionDef(getName(), taggedBox, rightBox, noteBox, getSty());
+      return new OptionDef(getName(), outerBox, rightBox, noteBox, getSty());
    }
 
    @Override
@@ -98,54 +98,59 @@ public class OptionDef extends StandaloneDef
         parser.getListener().getControlSequence("optiondefhook"),
         parser, stack);
 
-      TeXObject syntax = glslabel.getField("syntax");
-
-      TeXObjectList title = parser.getListener().createStack();
-      title.add(parser.getListener().getControlSequence("icon"));
-
-      if (syntax == null)
+      if (outerBox instanceof TaggedColourBox)
       {
-         title.add(parser.getListener().createGroup("novaluesetting"));
-      }
-      else
-      {
-         String syntaxVal = syntax.toString(parser);
+         TaggedColourBox taggedBox = (TaggedColourBox)outerBox;
 
-         if (syntaxVal.equals("\\meta{boolean}"))
+         TeXObject syntax = glslabel.getField("syntax");
+
+         TeXObjectList title = parser.getListener().createStack();
+         title.add(parser.getListener().getControlSequence("icon"));
+
+         if (syntax == null)
          {
-            TeXObject val = glslabel.getField("initvalue");
-            String toggle = "off";
-
-            if (val != null)
-            {
-               if (val.toString(parser).equals("true"))
-               {
-                  toggle = "on";
-               }
-            }
-
-            title.add(parser.getListener().createGroup("toggle"+toggle+"setting"));
+            title.add(parser.getListener().createGroup("novaluesetting"));
          }
          else
          {
-            title.add(parser.getListener().createGroup("valuesetting"));
+            String syntaxVal = syntax.toString(parser);
+
+            if (syntaxVal.equals("\\meta{boolean}"))
+            {
+               TeXObject val = glslabel.getField("initvalue");
+               String toggle = "off";
+
+               if (val != null)
+               {
+                  if (val.toString(parser).equals("true"))
+                  {
+                     toggle = "on";
+                  }
+               }
+
+               title.add(parser.getListener().createGroup("toggle"+toggle+"setting"));
+            }
+            else
+            {
+               title.add(parser.getListener().createGroup("valuesetting"));
+            }
          }
-      }
 
-      TeXObject statusVal = glslabel.getField("status");
+         TeXObject statusVal = glslabel.getField("status");
 
-      if (statusVal != null)
-      {
-         String status = parser.expandToString(statusVal, parser);
-
-         if (!status.equals("default"))
+         if (statusVal != null)
          {
-            title.add(parser.getListener().getControlSequence("icon"));
-            title.add(parser.getListener().createGroup(status));
-         }
-      }
+            String status = parser.expandToString(statusVal, parser);
 
-      taggedBox.setTitle(title);
+            if (!status.equals("default"))
+            {
+               title.add(parser.getListener().getControlSequence("icon"));
+               title.add(parser.getListener().createGroup(status));
+            }
+         }
+
+         taggedBox.setTitle(title);
+      }
    }
 
 }
