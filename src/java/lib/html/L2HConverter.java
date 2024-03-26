@@ -716,6 +716,17 @@ public class L2HConverter extends LaTeXParserListener
       this.useHtmlEntities = useEntities;
    }
 
+   public void separateCss(File file)
+   {
+      this.separateCss = (file != null);
+      this.cssFile = file;
+   }
+
+   public void setSeparateCss(boolean separate)
+   {
+      this.separateCss = separate;
+   }
+
    public boolean isWriteOutputAllowed()
    {
       return !(inPreamble || hasDocumentEnded())
@@ -1353,7 +1364,7 @@ public class L2HConverter extends LaTeXParserListener
    public void writeCssStyles()
      throws IOException
    {
-      writeliteralln("#main {margin-left: 5%; margin-right: 15%}");
+      writeliteralln("#main {margin-left: 5%; margin-right: 15%; }");
       writeliteralln("div.tomain {position: absolute; left: 0pt; width: 5%; text-align: right; font-size: x-small;}");
       writeliteralln("div.tomain a {text-decoration: none;}");
       writeliteralln("div.labellink {display: inline; font-size: x-small; margin-left: 1em; margin-right: 1em;}");
@@ -1638,11 +1649,26 @@ public class L2HConverter extends LaTeXParserListener
          writeliteralln("<!-- no title found -->");
       }
 
-      writeliteralln("<style type=\"text/css\">");
-
       addDefaultTabularStyles();
-      writeCssStyles();
-      writeliteralln("</style>");
+
+      if (separateCss)
+      {
+         if (cssFile == null)
+         {
+            cssFile = new File(outPath.toFile(), parser.getJobname()+".css");
+            writeCssFile();
+         }
+
+         writeliteral("<link rel=\"stylesheet\" type=\"text/css\" href=\"");
+         writeliteral(cssFile.getName());
+         writeliteralln("\">");
+      }
+      else
+      {
+         writeliteralln("<style type=\"text/css\">");
+         writeCssStyles();
+         writeliteralln("</style>");
+      }
 
       writeliteralln("</head>");
       writeliteral("<body");
@@ -2020,6 +2046,35 @@ public class L2HConverter extends LaTeXParserListener
       return strWriter.toString();
    }
 
+   protected void writeCssFile()
+     throws IOException
+   {
+      Writer prevWriter = currentWriter;
+
+      PrintWriter out = null;
+
+      try
+      {
+         out = new PrintWriter(Files.newBufferedWriter(cssFile.toPath(),
+            htmlCharSet));
+
+         currentWriter = out;
+
+         writeliteralln(String.format("@charset \"%s\"", htmlCharSet.name()));
+
+         writeCssStyles();
+      }
+      finally
+      {
+         currentWriter = prevWriter;
+
+         if (out != null)
+         {
+            out.close();
+         }
+      }
+   }
+
    protected void createDivisionTree(TeXObjectList stack)
     throws IOException
    {
@@ -2257,9 +2312,18 @@ public class L2HConverter extends LaTeXParserListener
             writeliteralln("</title>");
          }
 
-         writeliteralln("<style type=\"text/css\">");
-         writeCssStyles();
-         writeliteralln("</style>");
+         if (separateCss)
+         {
+            writeliteral("<link rel=\"stylesheet\" type=\"text/css\" href=\"");
+            writeliteral(cssFile.getName());
+            writeliteralln("\">");
+         }
+         else
+         {
+            writeliteralln("<style type=\"text/css\">");
+            writeCssStyles();
+            writeliteralln("</style>");
+         }
 
          writeliteralln("</head>");
 
@@ -4091,6 +4155,9 @@ public class L2HConverter extends LaTeXParserListener
    protected String generator = "TeX Parser Library";
 
    protected String htmlMetaTitle = null;
+
+   protected boolean separateCss = false;
+   protected File cssFile;
 
    private Stack<TrivListDec> trivListStack = new Stack<TrivListDec>();
 
