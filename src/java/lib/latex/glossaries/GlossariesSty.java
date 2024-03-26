@@ -2838,28 +2838,36 @@ public class GlossariesSty extends LaTeXSty
       return glossaries.get(label);
    }
 
-   public void createGlossary(String label, TeXObject title)
+   public Glossary createGlossary(String label, TeXObject title)
      throws TeXSyntaxException
    {
-      createGlossary(label, title, false);
+      return createGlossary(label, title, false);
    }
 
-   public void createGlossary(String label, TeXObject title, boolean isIgnored)
+   public Glossary createGlossary(String label, TeXObject title, boolean isIgnored)
      throws TeXSyntaxException
    {
-      createGlossary(label, title, null, null, null, null, isIgnored, false,
+      return createGlossary(label, title, null, null, null, null, isIgnored, false,
         Overwrite.FORBID);
    }
 
-   public void createGlossary(String label, TeXObject title,
+   public Glossary createGlossary(String label, TeXObject title, boolean isIgnored,
+     boolean noHyper)
+     throws TeXSyntaxException
+   {
+      return createGlossary(label, title, null, null, null, null, isIgnored, noHyper,
+        Overwrite.FORBID);
+   }
+
+   public Glossary createGlossary(String label, TeXObject title,
     String counter, String glg, String gls, String glo)
      throws TeXSyntaxException
    {
-      createGlossary(label, title, counter, glg, gls, glo, false, false,
+      return createGlossary(label, title, counter, glg, gls, glo, false, false,
         Overwrite.FORBID);
    }
 
-   public void createGlossary(String label, TeXObject title,
+   public Glossary createGlossary(String label, TeXObject title,
     String counter, String glg, String gls, String glo, boolean isIgnored,
     boolean noHyper, Overwrite overwrite)
      throws TeXSyntaxException
@@ -2873,7 +2881,7 @@ public class GlossariesSty extends LaTeXSty
          }
          else if (overwrite == Overwrite.SKIP)
          {
-            return;
+            return null;
          }
       }
 
@@ -2895,6 +2903,8 @@ public class GlossariesSty extends LaTeXSty
       {
          glossaryTypes.add(label);
       }
+
+      return glossary;
    }
 
    public Vector<String> getNonIgnoredGlossaries()
