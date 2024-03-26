@@ -2354,10 +2354,16 @@ public class UserGuideSty extends LaTeXSty
       getListener().declareFrameBox(titleFrame, false);
       getListener().declareFrameBox(boxFrame, false);
 
-      TaggedColourBox taggedBox = new TaggedColourBox(boxFrame, titleFrame, tag);
+      TaggedColourBox taggedBox = createTaggedColourBox(boxFrame, titleFrame, tag);
       registerControlSequence(taggedBox);
 
       return taggedBox;
+   }
+
+   protected TaggedColourBox createTaggedColourBox(
+    FrameBox boxFrame, FrameBox titleFrame, TeXObject tag)
+   {
+      return new TaggedColourBox(boxFrame, titleFrame, tag);
    }
 
    protected void createIndexItemBox(int level)
@@ -2368,6 +2374,11 @@ public class UserGuideSty extends LaTeXSty
       idxBox.setOuterMarginLeft(new UserDimension(level*20, FixedUnit.BP));
 
       getListener().declareFrameBox(idxBox, false);
+   }
+
+   public GlossariesSty getGlossariesSty()
+   {
+      return glossariesSty;
    }
 
    public ColorSty getColorSty()
