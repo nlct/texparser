@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Vector;
 import java.util.Iterator;
+import java.util.Set;
 
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.primitives.NewIf;
@@ -2817,6 +2818,11 @@ public class GlossariesSty extends LaTeXSty
       return entries.containsKey(label);
    }
 
+   public Set<String> entryLabelSet()
+   {
+      return entries.keySet();
+   }
+
    public boolean isGlossaryDefined(String label)
    {
       return glossaries.containsKey(label);
@@ -3370,6 +3376,23 @@ public class GlossariesSty extends LaTeXSty
       category.setAttribute(attrName, attrVal);
    }
 
+   public void setGlossaryStyle(String style, TeXObjectList stack)
+    throws IOException
+   {
+      ControlSequence cs = getParser().getControlSequence("@glsstyle@"+style);
+
+      if (cs == null)
+      {
+         TeXApp texApp = getListener().getTeXApp();
+         texApp.warning(getParser(), 
+           texApp.getMessage(GLOSSARY_STYLE_NOT_DEFINED, style));
+      }
+      else
+      {
+         TeXParserUtils.process(cs, getParser(), stack);
+      }
+   }
+
    public Glossary initPrintGloss(KeyValList options, 
      TeXObjectList stack) throws IOException
    {
@@ -3572,18 +3595,7 @@ public class GlossariesSty extends LaTeXSty
       {
          String style = parser.expandToString(styleObj, stack);
 
-         ControlSequence cs = parser.getControlSequence("@glsstyle@"+style);
-
-         if (cs == null)
-         {
-            TeXApp texApp = getListener().getTeXApp();
-            texApp.warning(parser, 
-              texApp.getMessage(GLOSSARY_STYLE_NOT_DEFINED, style));
-         }
-         else
-         {
-            TeXParserUtils.process(cs, parser, stack);
-         }
+         setGlossaryStyle(style, stack);
       }
 
       ControlSequence cs = getListener().getControlSequence("glossentry");
