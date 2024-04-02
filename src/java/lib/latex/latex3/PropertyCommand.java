@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2023 Nicola L.C. Talbot
+    Copyright (C) 2023-2024 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -26,7 +26,7 @@ import java.util.Collection;
 
 import com.dickimawbooks.texparserlib.*;
 
-public class PropertyCommand<T> extends ControlSequence
+public class PropertyCommand<T> extends ControlSequence implements L3StorageObject 
 {
    public PropertyCommand(String name)
    {
@@ -62,6 +62,7 @@ public class PropertyCommand<T> extends ControlSequence
       return hashtable.size();
    }
 
+   @Override
    public void clear()
    {
       hashtable.clear();

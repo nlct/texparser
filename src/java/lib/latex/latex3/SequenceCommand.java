@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2023 Nicola L.C. Talbot
+    Copyright (C) 2023-2024 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -24,7 +24,7 @@ import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.LaTeXSyntaxException;
 import com.dickimawbooks.texparserlib.latex.CsvList;
 
-public class SequenceCommand extends Command
+public class SequenceCommand extends Command implements L3StorageObject 
 {
    public SequenceCommand(String name)
    {
@@ -247,6 +247,7 @@ public class SequenceCommand extends Command
    /**
     * Clears the sequence (<code>\seq_clear:N</code>).
     */ 
+   @Override
    public void clear()
    {
       content.clear();

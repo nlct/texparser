@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2023 Nicola L.C. Talbot
+    Copyright (C) 2023-2024 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -22,7 +22,7 @@ import java.io.IOException;
 
 import com.dickimawbooks.texparserlib.*;
 
-public class TokenListCommand extends Command
+public class TokenListCommand extends Command implements L3StorageObject 
 {
    public TokenListCommand(String name)
    {
@@ -212,6 +212,7 @@ public class TokenListCommand extends Command
    /**
     * Clears the list.
     */ 
+   @Override
    public void clear()
    {
       content.clear();
