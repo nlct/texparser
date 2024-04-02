@@ -60,7 +60,7 @@ public class ClearL3Object extends ControlSequence
       else
       {
          cs = popControlSequence(parser, stack);
-         csname = cs.getName()
+         csname = cs.getName();
       }
 
       if (name.startsWith("tl_"))

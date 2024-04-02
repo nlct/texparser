@@ -22,7 +22,7 @@ import java.io.IOException;
 
 import com.dickimawbooks.texparserlib.*;
 
-public class TokenListCommand extends Command implements L3StorageObject 
+public class TokenListCommand extends Command implements L3StorageCommand 
 {
    public TokenListCommand(String name)
    {

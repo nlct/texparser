@@ -26,7 +26,7 @@ import java.util.Collection;
 
 import com.dickimawbooks.texparserlib.*;
 
-public class PropertyCommand<T> extends ControlSequence implements L3StorageObject 
+public class PropertyCommand<T> extends ControlSequence implements L3StorageCommand 
 {
    public PropertyCommand(String name)
    {

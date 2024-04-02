@@ -24,7 +24,7 @@ import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.LaTeXSyntaxException;
 import com.dickimawbooks.texparserlib.latex.CsvList;
 
-public class SequenceCommand extends Command implements L3StorageObject 
+public class SequenceCommand extends Command implements L3StorageCommand 
 {
    public SequenceCommand(String name)
    {

@@ -22,7 +22,7 @@ import java.io.IOException;
 
 import com.dickimawbooks.texparserlib.*;
 
-public interface L3StorageObject extends TeXObject
+public interface L3StorageCommand extends TeXObject
 {
    /**
     * Clears the object content.
