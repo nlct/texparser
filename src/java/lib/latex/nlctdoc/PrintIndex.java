@@ -34,13 +34,20 @@ public class PrintIndex extends AbstractGlsCommand
 
    public PrintIndex(String name, GlossariesSty sty)
    {
+      this(name, "index", "index", sty);
+   }
+
+   public PrintIndex(String name, String type, String label, GlossariesSty sty)
+   {
       super(name, sty);
+      this.glosType = type;
+      this.glosLabel = label;
    }
 
    @Override
    public Object clone()
    {
-      return new PrintIndex(getName(), getSty());
+      return new PrintIndex(getName(), glosType, glosLabel, getSty());
    }
 
    @Override
@@ -107,8 +114,8 @@ public class PrintIndex extends AbstractGlsCommand
 
       KeyValList options = popOptKeyValList(stack);
 
-      String type = "index";
-      String sectionLabel = "index";
+      String type = glosType;
+      String sectionLabel = glosLabel;
 
       TeXObject title = null;
 
@@ -293,4 +300,7 @@ public class PrintIndex extends AbstractGlsCommand
    {
       process(parser, parser);
    }
+
+   protected String glosType = "index";
+   protected String glosLabel = "index";
 }
