@@ -61,7 +61,7 @@ public class GlsXtrAtTitleAtField extends AbstractGlsCommand
          content.add(listener.getOther('['));
          content.add(opts, true);
          content.add(listener.getOther(']'));
-         content.add(glslabel);
+         content.add(TeXParserUtils.createGroup(parser, glslabel));
          content.add(listener.getOther('['));
          content.add(listener.getOther(']'));
       }
