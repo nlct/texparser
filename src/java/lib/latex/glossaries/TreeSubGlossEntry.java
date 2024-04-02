@@ -92,6 +92,11 @@ public class TreeSubGlossEntry extends AbstractGlsCommand
                sublist.add(pending.pop());
             }
          }
+         else
+         {
+            sublist.add(new StartElement("dd"));
+            pending.push(new EndElement("dd"));
+         }
 
          sublist.add(new StartElement("dt"));
          sublist.add(listener.getControlSequence("glsentryitem"));
