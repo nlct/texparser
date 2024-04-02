@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2022 Nicola L.C. Talbot
+    Copyright (C) 2022-2024 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -35,58 +35,68 @@ public class LoadGlsEntries extends Input
       super(name);
    }
 
+   @Override
    public Object clone()
    {
       return new LoadGlsEntries(getName());
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
       LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
 
-      ControlSequence orgTypeCs = null;
-
       String type = popOptLabelString(parser, stack);
 
       if (type != null)
       {
-         orgTypeCs = listener.getControlSequence("glsdefaulttype");
+         ControlSequence orgTypeCs = listener.getControlSequence("glsdefaulttype");
+         String orgType = parser.expandToString(orgTypeCs, stack);
+
+         String filename = popLabelString(parser, stack);
 
          listener.putControlSequence(true, 
            new TextualContentCommand("glsdefaulttype", type));
+
+         stack.push(new AddControlSequenceObject(orgTypeCs));
+
+         TeXPath path = new TeXPath(parser, filename, getDefaultExtension());
+
+         stack.push(new TeXPathObject(path));
       }
 
       super.process(parser, stack);
 
-      if (orgTypeCs != null)
-      {
-         listener.putControlSequence(true, orgTypeCs);
-      }
    }
 
+   @Override
    public void process(TeXParser parser)
      throws IOException
    {
       LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
 
-      ControlSequence orgTypeCs = null;
-
       String type = popOptLabelString(parser, parser);
 
       if (type != null)
       {
-         orgTypeCs = listener.getControlSequence("glsdefaulttype");
+         ControlSequence orgTypeCs = listener.getControlSequence("glsdefaulttype");
+         String orgType = parser.expandToString(orgTypeCs, parser);
+
+         String filename = popLabelString(parser, parser);
 
          listener.putControlSequence(true, 
            new TextualContentCommand("glsdefaulttype", type));
+
+         parser.push(listener.createGroup(orgType));
+         parser.push(new TeXCsRef("glsdefaulttype"));
+         parser.push(new TeXCsRef("def"));
+
+         TeXPath path = new TeXPath(parser, filename, getDefaultExtension());
+
+         parser.push(new TeXPathObject(path));
       }
 
       super.process(parser);
-
-      if (orgTypeCs != null)
-      {
-         listener.putControlSequence(true, orgTypeCs);
-      }
    }
 }
