@@ -1472,6 +1472,51 @@ public class GlossariesSty extends LaTeXSty
            GlossaryStyleSty.STATUS_IMPLEMENTED);
    }
 
+   protected GlossaryStyleSty addTreeStyles() throws IOException
+   {
+      registerControlSequence(new GobbleOpt("glsfindwidesttoplevelname", 1, 0));
+      registerControlSequence(new GobbleOpt("glssetwidest", 1, 1));
+      registerControlSequence(new AtSecondOfTwo("glstreenamebox"));
+
+      registerControlSequence(new AtFirstOfOne("glstreenamefmt"));
+      registerControlSequence(new AtFirstOfOne("glstreegroupheaderfmt"));
+      registerControlSequence(new AtFirstOfOne("glstreenavigationfmt"));
+      registerControlSequence(new GenericCommand(true, "glstreepredesc", null, new TeXCsRef("space")));
+      registerControlSequence(new GenericCommand(true, "glstreechildpredesc", null, new TeXCsRef("space")));
+
+      registerControlSequence(new L2HGlsStyleTree("tree", "inlinetitle", this));
+      registerControlSequence(
+        new L2HGlsStyleTree("treegroup", "inlinetitle", false, true, this));
+      registerControlSequence(
+        new L2HGlsStyleTree("treehypergroup", "inlinetitle", false, true, this));
+
+      registerControlSequence(
+        new L2HGlsStyleTree("treenoname", "inlinetitle", false, false, false, this));
+      registerControlSequence(
+        new L2HGlsStyleTree("treenonamegroup", "inlinetitle", false, true, this));
+      registerControlSequence(
+        new L2HGlsStyleTree("treenonamehypergroup", "inlinetitle", false, true, this));
+
+
+      // Make the alttree and index styles the same as the tree style
+
+      registerControlSequence(new L2HGlsStyleTree("alttree", "inlinetitle", this));
+      registerControlSequence(
+        new L2HGlsStyleTree("alttreegroup", "inlinetitle", false, true, this));
+      registerControlSequence(
+        new L2HGlsStyleTree("alttreehypergroup", "inlinetitle", false, true, this));
+
+      registerControlSequence(
+        new L2HGlsStyleTree("index", "inlinetitle", this));
+      registerControlSequence(
+         new L2HGlsStyleTree("indexgroup", "inlinetitle", false, true, this));
+      registerControlSequence(
+         new L2HGlsStyleTree("indexhypergroup", "inlinetitle", true, true, this));
+
+      return new GlossaryStyleSty(this, "tree",
+           GlossaryStyleSty.STATUS_IMPLEMENTED);
+   }
+
    protected GlossaryStyleSty addTableStyle() throws IOException
    {
       TeXParser parser = getParser();
@@ -2243,13 +2288,22 @@ public class GlossariesSty extends LaTeXSty
 
       if (loadTree)
       {
-         substack.add(TeXParserActionObject.createInputAction(
-           getParser(), "glossary-tree.sty")); 
+         if (listener instanceof L2HConverter)
+         {
+            listener.addPackage(addTreeStyles());
 
-         loadTree = false;
+            loadTree = false;
+         }
+         else
+         {
+            substack.add(TeXParserActionObject.createInputAction(
+              getParser(), "glossary-tree.sty")); 
 
-         listener.addPackage(new GlossaryStyleSty(this, "tree",
-           GlossaryStyleSty.STATUS_PARSED));
+            loadTree = false;
+
+            listener.addPackage(new GlossaryStyleSty(this, "tree",
+              GlossaryStyleSty.STATUS_PARSED));
+         }
       }
 
       if (extra)

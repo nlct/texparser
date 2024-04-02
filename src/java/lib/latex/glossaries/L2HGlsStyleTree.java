@@ -22,6 +22,7 @@ import java.io.IOException;
 
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.*;
+import com.dickimawbooks.texparserlib.latex.latex3.TokenListCommand;
 import com.dickimawbooks.texparserlib.html.L2HConverter;
 import com.dickimawbooks.texparserlib.html.StartElement;
 import com.dickimawbooks.texparserlib.html.EndElement;
@@ -29,34 +30,45 @@ import com.dickimawbooks.texparserlib.html.EndElement;
 /**
  * Implementation of list styles for use with L2HConverter.
  */
-public class L2HGlsStyleList extends ControlSequence
+public class L2HGlsStyleTree extends ControlSequence
 {
-   public L2HGlsStyleList(String styleName, String cssClass)
+   public L2HGlsStyleTree(String styleName, String cssClass, GlossariesSty sty)
    {
-      this(styleName, cssClass, false, false);
+      this(styleName, cssClass, false, false, sty);
    }
 
-   public L2HGlsStyleList(String styleName, String cssClass,
-      boolean hasNavHeader, boolean hasGroupHeadings)
+   public L2HGlsStyleTree(String styleName, String cssClass,
+      boolean hasNavHeader, boolean hasGroupHeadings,
+      GlossariesSty sty)
+   {
+      this(styleName, cssClass, hasNavHeader, hasGroupHeadings, true, sty);
+   }
+
+   public L2HGlsStyleTree(String styleName, String cssClass,
+      boolean hasNavHeader, boolean hasGroupHeadings, boolean showChildName,
+      GlossariesSty sty)
    {
       this("@glsstyle@"+styleName, styleName, cssClass,
-         hasNavHeader, hasGroupHeadings);
+         hasNavHeader, hasGroupHeadings, showChildName, sty);
    }
 
-   public L2HGlsStyleList(String csname, String styleName, String cssClass,
-     boolean hasNavHeader, boolean hasGroupHeadings)
+   public L2HGlsStyleTree(String csname, String styleName, String cssClass,
+     boolean hasNavHeader, boolean hasGroupHeadings, boolean showChildName,
+     GlossariesSty sty)
    {
       super(csname);
       this.styleName = styleName;
       this.cssClass = cssClass;
       this.hasNavHeader = hasNavHeader;
       this.hasGroupHeadings = hasGroupHeadings;
+      this.showChildName = showChildName;
+      this.sty = sty;
    }
 
    public Object clone()
    {
-      return new L2HGlsStyleList(getName(), styleName, cssClass,
-        hasNavHeader, hasGroupHeadings);
+      return new L2HGlsStyleTree(getName(), styleName, cssClass,
+        hasNavHeader, hasGroupHeadings, showChildName, sty);
    }
 
    @Override
@@ -66,13 +78,6 @@ public class L2HGlsStyleList extends ControlSequence
       L2HConverter listener = (L2HConverter)parser.getListener();
 
       TeXObjectList beginCode = listener.createStack();
-
-      ControlSequence cs = parser.getControlSequence("glslistinit");
-
-      if (cs != null)
-      {
-         beginCode.add(cs);
-      }
 
       StartElement startElem = new StartElement("dl", true);
 
@@ -86,9 +91,12 @@ public class L2HGlsStyleList extends ControlSequence
       }
 
       beginCode.add(startElem);
+      beginCode.add(new TeXCsRef("tl_clear:N"));
+      beginCode.add(new TeXCsRef(PENDING_CSNAME));
 
       TeXObjectList endCode = listener.createStack();
 
+      endCode.add(new TeXCsRef(PENDING_CSNAME));
       endCode.add(new EndElement("dl", true));
 
       listener.newenvironment(Overwrite.ALLOW, "renewenvironment",
@@ -100,7 +108,7 @@ public class L2HGlsStyleList extends ControlSequence
       {
          def = listener.createStack();
 
-         def.add(new TeXCsRef("glslistnavigation"));
+         def.add(new TeXCsRef("glstreenavigation"));
          def.add(TeXParserUtils.createGroup(listener, new TeXCsRef("glsnavigation")));
       }
       else
@@ -117,7 +125,7 @@ public class L2HGlsStyleList extends ControlSequence
          startElem.putAttribute("class", "header");
 
          def.add(startElem);
-         def.add(new TeXCsRef("glslistgroupheaderfmt"));
+         def.add(new TeXCsRef("glstreegroupheaderfmt"));
 
          Group grp = listener.createGroup();
          def.add(grp);
@@ -146,86 +154,8 @@ public class L2HGlsStyleList extends ControlSequence
          listener.putControlSequence(true, new AtGobble("glsgroupheading"));
       }
 
-      def = listener.createStack();
-
-      def.add(new StartElement("dt"));
-      def.add(new TeXCsRef("glsentryitem"));
-      def.add(TeXParserUtils.createGroup(listener, listener.getParam(1)));
-      def.add(new TeXCsRef("glstarget"));
-      def.add(TeXParserUtils.createGroup(listener, listener.getParam(1)));
-      def.add(TeXParserUtils.createGroup(listener,
-        new TeXCsRef("glossentryname"),
-           TeXParserUtils.createGroup(listener, listener.getParam(1))));
-      def.add(new EndElement("dt"));
-
-      def.add(new StartElement("dd"));
-
-      if (parser.getControlSequence("glslistdesc") != null)
-      {
-         def.add(new TeXCsRef("glslistdesc"));
-         def.add(TeXParserUtils.createGroup(listener, listener.getParam(1)));
-      }
-      else
-      {
-         def.add(new TeXCsRef("glossentrydesc"));
-         def.add(TeXParserUtils.createGroup(listener, listener.getParam(1)));
-         def.add(new TeXCsRef("glspostdescription"));
-      }
-
-      if (parser.getControlSequence("glslistprelocation") != null)
-      {
-         def.add(new TeXCsRef("glslistprelocation"));
-      }
-      else
-      {
-         def.add(new TeXCsRef("space"));
-      }
-
-      def.add(listener.getParam(2));
-      def.add(new EndElement("dd"));
-
-      listener.putControlSequence(true,
-        new LaTeXGenericCommand(true, "glossentry", "mm", def));
-
-      def = listener.createStack();
-
-      def.add(new StartElement("dt"));
-      def.add(new TeXCsRef("glssubentryitem"));
-      def.add(TeXParserUtils.createGroup(listener, listener.getParam(2)));
-      def.add(new TeXCsRef("glstarget"));
-      def.add(TeXParserUtils.createGroup(listener, listener.getParam(2)));
-      def.add(listener.createGroup());
-      def.add(new EndElement("dt"));
-
-      def.add(new StartElement("dd"));
-      def.add(new TeXCsRef("glossentrydesc"));
-      def.add(TeXParserUtils.createGroup(listener, listener.getParam(2)));
-      def.add(new TeXCsRef("glspostdescription"));
-
-      if (parser.getControlSequence("glslistchildprelocation") != null)
-      {
-         def.add(new TeXCsRef("glslistchildprelocation"));
-      }
-      else
-      {
-         def.add(new TeXCsRef("space"));
-      }
-
-      def.add(listener.getParam(3));
-
-      if (parser.getControlSequence("glslistchildpostlocation") != null)
-      {
-         def.add(new TeXCsRef("glslistchildpostlocation"));
-      }
-      else
-      {
-         def.add(listener.getOther('.'));
-      }
-
-      def.add(new EndElement("dd"));
-
-      listener.putControlSequence(true,
-        new LaTeXGenericCommand(true, "subglossentry", "mmm", def));
+      listener.putControlSequence(true, new TreeGlossEntry(this));
+      listener.putControlSequence(true, new TreeSubGlossEntry(this));
 
       def = listener.createStack();
 
@@ -244,6 +174,66 @@ public class L2HGlsStyleList extends ControlSequence
       process(parser, parser);
    }
 
+   public GlossariesSty getGlossariesSty()
+   {
+      return sty;
+   }
+
+   public String getStyleName()
+   {
+      return styleName;
+   }
+
+   public String getCssClass()
+   {
+      return cssClass;
+   }
+
+   public boolean hasNavHeader()
+   {
+      return hasNavHeader;
+   }
+
+   public boolean hasGroupHeadings()
+   {
+      return hasGroupHeadings;
+   }
+
+   public boolean showChildName()
+   {
+      return showChildName;
+   }
+
+   public IntegerContentCommand getLevelCommand()
+   {
+      ControlSequence cs = sty.getParser().getControlSequence(LEVEL_CSNAME);
+
+      if (cs == null)
+      {
+         cs = new IntegerContentCommand(LEVEL_CSNAME, 0);
+         sty.getParser().putControlSequence(true, cs);
+      }
+
+      return (IntegerContentCommand)cs;
+   }
+
+   public TokenListCommand getPendingCommand()
+   {
+      ControlSequence cs = sty.getParser().getControlSequence(PENDING_CSNAME);
+
+      if (cs == null)
+      {
+         cs = new TokenListCommand(PENDING_CSNAME);
+         sty.getParser().putControlSequence(true, cs);
+      }
+
+      return (TokenListCommand)cs;
+   }
+
    protected String styleName, cssClass;
-   protected boolean hasNavHeader=false, hasGroupHeadings;
+   protected boolean hasNavHeader=false, hasGroupHeadings=false, showChildName=true;
+   protected GlossariesSty sty;
+
+   public static final String LEVEL_CSNAME = "texparser@glstree@level";
+   public static final String PENDING_CSNAME = "texparser@glstree@pending";
 }
