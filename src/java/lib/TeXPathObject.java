@@ -28,6 +28,12 @@ public class TeXPathObject extends AbstractTeXObject
    }
 
    @Override
+   public boolean isDataObject()
+   {
+      return true;
+   }
+
+   @Override
    public void process(TeXParser parser) throws IOException
    {
       process(parser, parser);
