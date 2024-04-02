@@ -1084,6 +1084,26 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       parser.putControlSequence(new ExplSyntaxOff());
       parser.putControlSequence(new CharSetCatCodeNN());
 
+      parser.putControlSequence(new ClearL3Object("tl_clear:N"));
+      parser.putControlSequence(new ClearL3Object("tl_gclear:N"));
+      parser.putControlSequence(new ClearL3Object("tl_clear:c"));
+      parser.putControlSequence(new ClearL3Object("tl_gclear:c"));
+
+      parser.putControlSequence(new ClearL3Object("seq_clear:N"));
+      parser.putControlSequence(new ClearL3Object("seq_gclear:N"));
+      parser.putControlSequence(new ClearL3Object("seq_clear:c"));
+      parser.putControlSequence(new ClearL3Object("seq_gclear:c"));
+
+      parser.putControlSequence(new ClearL3Object("prop_clear:N"));
+      parser.putControlSequence(new ClearL3Object("prop_gclear:N"));
+      parser.putControlSequence(new ClearL3Object("prop_clear:c"));
+      parser.putControlSequence(new ClearL3Object("prop_gclear:c"));
+
+      parser.putControlSequence(new ClearL3Object("clist_clear:N"));
+      parser.putControlSequence(new ClearL3Object("clist_gclear:N"));
+      parser.putControlSequence(new ClearL3Object("clist_clear:c"));
+      parser.putControlSequence(new ClearL3Object("clist_gclear:c"));
+
       // Booleans
       parser.putControlSequence(new LaTeX3Boolean("c_false_bool", false));
       parser.putControlSequence(new LaTeX3Boolean("c_true_bool", true));
