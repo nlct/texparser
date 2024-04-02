@@ -1472,6 +1472,22 @@ public class GlossariesSty extends LaTeXSty
            GlossaryStyleSty.STATUS_IMPLEMENTED);
    }
 
+   protected GlossaryStyleSty addTopicStyles() throws IOException
+   {
+      L2HConverter l2h = (L2HConverter)listener;
+
+      l2h.addCssStyle("dl.topic dt { display: block; }");
+      l2h.addCssStyle("dl.topic dt dl dt { display: inline-block; }");
+      l2h.addCssStyle("dl.topic dt dl dd { display: inline; }");
+      l2h.addCssStyle("dl.topic dt dl dd::after { display: block; content: ''; }");
+
+      registerControlSequence(new L2HGlsStyleTree("topic", "topic", this));
+      registerControlSequence(new L2HGlsStyleTree("topicmcols", "topic", this));
+
+      return new GlossaryStyleSty(this, "topic",
+           GlossaryStyleSty.STATUS_IMPLEMENTED);
+   }
+
    protected GlossaryStyleSty addTreeStyles() throws IOException
    {
       registerControlSequence(new GobbleOpt("glsfindwidesttoplevelname", 1, 0));
@@ -2247,6 +2263,10 @@ public class GlossariesSty extends LaTeXSty
             else if (style.equals("table"))
             {
                listener.addPackage(addTableStyle());
+            }
+            else if (style.equals("topic") && listener instanceof L2HConverter)
+            {
+               listener.addPackage(addTopicStyles());
             }
             else
             {
