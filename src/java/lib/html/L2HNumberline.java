@@ -51,7 +51,7 @@ public class L2HNumberline extends ControlSequence
 
       arg.process(parser);
 
-      listener.writeliteral("</span>");
+      listener.writeliteral("</span> ");
    }
 
    public void process(TeXParser parser, TeXObjectList stack)
@@ -65,6 +65,6 @@ public class L2HNumberline extends ControlSequence
 
       arg.process(parser);
 
-      listener.writeliteral("</span>");
+      listener.writeliteral("</span> ");
    }
 }
