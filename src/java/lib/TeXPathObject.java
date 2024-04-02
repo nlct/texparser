@@ -24,6 +24,11 @@ public class TeXPathObject extends AbstractTeXObject
 {
    public TeXPathObject(TeXPath texPath)
    {
+      if (texPath == null)
+      {
+         throw new NullPointerException();
+      }
+
       this.texPath = texPath;
    }
 
