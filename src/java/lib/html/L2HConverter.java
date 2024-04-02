@@ -1449,11 +1449,13 @@ public class L2HConverter extends LaTeXParserListener
       writeliteralln(".inlinelist { display: inline; }");
 
       writeliteralln("dl.inlinetitle dt { display: inline-block; margin-left: 0; margin-right: 1em;}");
+      writeliteralln("dl.inlinetitle dt.header { display: block; }");
       writeliteralln("dl.inlinetitle dd { display: inline; margin: 0; }");
       writeliteralln("dl.inlinetitle dd::after { display: block; content: ''; }");
 
       // TODO The inlineblock needs adjusting
       writeliteralln("dl.inlineblock dt { display: inline-block; margin-left: 0; margin-right: 1em;}");
+      writeliteralln("dl.inlineblock dt.header { display: block; }");
       writeliteralln("dl.inlineblock dd { display: inline; margin: 0; }");
       writeliteralln("dl.inlineblock dd::after { display: block; content: ''; }");
 

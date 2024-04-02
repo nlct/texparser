@@ -37,6 +37,9 @@ import com.dickimawbooks.texparserlib.latex.hyperref.HyperTarget;
 import com.dickimawbooks.texparserlib.latex.hyperref.HyperLink;
 import com.dickimawbooks.texparserlib.latex.mfirstuc.MfirstucSty;
 import com.dickimawbooks.texparserlib.html.L2HConverter;
+import com.dickimawbooks.texparserlib.html.HtmlTag;
+import com.dickimawbooks.texparserlib.html.StartElement;
+import com.dickimawbooks.texparserlib.html.EndElement;
 
 /**
  * Limited support for the glossaries and glossaries-extra packages. They are
@@ -1414,6 +1417,61 @@ public class GlossariesSty extends LaTeXSty
                   GlossaryStyleSty.STATUS_IMPLEMENTED));
    }
 
+   protected GlossaryStyleSty addListStyles() throws IOException
+   {
+      registerControlSequence(new AtFirstOfOne("glslistgroupheaderfmt"));
+
+      TeXObjectList def = listener.createStack();
+
+      StartElement startElem = new StartElement("dt");
+      startElem.putAttribute("class", "header");
+
+      def.add(startElem);
+      def.add(listener.getParam(1));
+      def.add(new EndElement("dt"));
+
+      registerControlSequence(new LaTeXGenericCommand(true,
+        "glslistnavigationitem", "m", def));
+
+      if (isExtra())
+      {
+         if (getParser().getControlSequence("glsxtrprelocation") == null)
+         {
+            registerControlSequence(new GenericCommand(true,
+             "glsxtrprelocation",  null, new TeXCsRef("space")));
+         }
+
+         registerControlSequence(new GenericCommand(true,
+          "glslistprelocation", null, new TeXCsRef("glsxtrprelocation")));
+         registerControlSequence(new GenericCommand(true,
+          "glslistchildprelocation", null, new TeXCsRef("glslistprelocation")));
+
+         registerControlSequence(
+           new TextualContentCommand("glslistchildpostlocation", "."));
+
+         def = listener.createStack();
+         def.add(new TeXCsRef("glossentrydesc"));
+         def.add(TeXParserUtils.createGroup(listener, listener.getParam(1)));
+         def.add(new TeXCsRef("glspostdescription"));
+
+         registerControlSequence(new LaTeXGenericCommand(true,
+           "glslistdesc", "m", def));
+      }
+
+      registerControlSequence(new L2HGlsStyleList("list", "inlinetitle"));
+      registerControlSequence(new L2HGlsStyleList("listgroup", "inlinetitle", false, true));
+      registerControlSequence(new L2HGlsStyleList("listhypergroup", "inlinetitle", true, true));
+
+      registerControlSequence(new L2HGlsStyleList("altlist", "displaytitle"));
+      registerControlSequence(new L2HGlsStyleList("altlistgroup", "displaytitle", false, true));
+      registerControlSequence(new L2HGlsStyleList("altlisthypergroup", "displaytitle", true, true));
+
+      // TODO implement dotted styles
+
+      return new GlossaryStyleSty(this, "list",
+           GlossaryStyleSty.STATUS_IMPLEMENTED);
+   }
+
    protected GlossaryStyleSty addTableStyle() throws IOException
    {
       TeXParser parser = getParser();
@@ -2165,13 +2223,22 @@ public class GlossariesSty extends LaTeXSty
 
       if (loadList)
       {
-         substack.add(TeXParserActionObject.createInputAction(
-           getParser(), "glossary-list.sty")); 
+         if (listener instanceof L2HConverter)
+         {
+            listener.addPackage(addListStyles());
 
-         loadList = false;
+            loadList = false;
+         }
+         else
+         {
+            substack.add(TeXParserActionObject.createInputAction(
+              getParser(), "glossary-list.sty")); 
 
-         listener.addPackage(new GlossaryStyleSty(this, "list",
-           GlossaryStyleSty.STATUS_PARSED));
+            loadList = false;
+
+            listener.addPackage(new GlossaryStyleSty(this, "list",
+              GlossaryStyleSty.STATUS_PARSED));
+         }
       }
 
       if (loadTree)
