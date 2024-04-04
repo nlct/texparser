@@ -34,7 +34,6 @@ import com.dickimawbooks.texparserlib.generic.Symbol;
 import com.dickimawbooks.texparserlib.generic.ParCs;
 import com.dickimawbooks.texparserlib.latex.*;
 import com.dickimawbooks.texparserlib.latex.hyperref.HyperTarget;
-import com.dickimawbooks.texparserlib.latex.hyperref.HyperLink;
 import com.dickimawbooks.texparserlib.latex.mfirstuc.MfirstucSty;
 import com.dickimawbooks.texparserlib.html.L2HConverter;
 import com.dickimawbooks.texparserlib.html.HtmlTag;
@@ -226,13 +225,19 @@ public class GlossariesSty extends LaTeXSty
 
       NewIf.createConditional(true, getParser(), "ifKV@glslink@hyper", isHyper);
 
+      registerControlSequence(new AtGobble("glsdohypertargethook", 2));
+      registerControlSequence(new AtGobble("glsdohyperlinkhook", 2));
+      registerControlSequence(new AtGobble("glslabelhypertarget", 2));
+
+      registerControlSequence(new GlsDoHyperLink());
+
       if (isHyper)
       {
          registerControlSequence(new AtGlsTarget());
 
          if (extra)
          {
-            registerControlSequence(new HyperLink("glsxtr@org@dohyperlink"));
+            registerControlSequence(new GlsDoHyperLink("glsxtr@org@dohyperlink"));
             registerControlSequence(new LaTeXGenericCommand(true,
               "@glslink", "mm", 
               TeXParserUtils.createStack(listener, 
@@ -244,7 +249,13 @@ public class GlossariesSty extends LaTeXSty
          }
          else
          {
-            registerControlSequence(new HyperLink("@glslink"));
+            registerControlSequence(new LaTeXGenericCommand(true,
+             "@glslink", "mm", 
+             TeXParserUtils.createStack(listener,
+               new TeXCsRef("glsdohyperlink"),
+               TeXParserUtils.createGroup(listener, listener.getParam(1)),
+               TeXParserUtils.createGroup(listener, listener.getParam(2))
+              )));
          }
 
          registerControlSequence(new GenericCommand(true, "glsifhyperon", null,
@@ -296,7 +307,6 @@ public class GlossariesSty extends LaTeXSty
       registerControlSequence(new AtSecondOfTwo("glsdonohypertarget"));
       registerControlSequence(new AtSecondOfTwo("glsdonohyperlink"));
       registerControlSequence(new HyperTarget("glsdohypertarget"));
-      registerControlSequence(new HyperLink("glsdohyperlink"));
       registerControlSequence(new GlsHyperlink());
 
       registerControlSequence(new AtGobble("glsentryitem"));
@@ -571,7 +581,7 @@ public class GlossariesSty extends LaTeXSty
 
    protected void addExtraDefinitions()
    {
-      registerControlSequence(new HyperLink("glsxtrhyperlink"));
+      registerControlSequence(new GlsDoHyperLink("glsxtrhyperlink"));
 
       registerControlSequence(new GlsXtrSetStarModifier(this));
       registerControlSequence(new GlsXtrSetPlusModifier(this));
