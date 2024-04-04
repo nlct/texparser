@@ -102,6 +102,8 @@ public class UserGuideSty extends LaTeXSty
       registerControlSequence(new AtGobble("settabcolsep"));
       registerControlSequence(new AtGobble("tcbset"));
 
+      registerControlSequence(new GobbleOpt("RedeclareSectionCommand", 1, 1));
+
       registerControlSequence(new AtFirstOfOne("textsmaller"));
       registerControlSequence(new AtFirstOfOne("textlarger"));
 
