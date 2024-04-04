@@ -171,6 +171,41 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       return null;
    }
 
+   public CrossRefInfo getCrossRefInfo(String id)
+   {
+      CrossRefInfo info = null;
+
+      if (labelData != null)
+      {
+         info = labelData.get(id);
+      }
+
+      if (info == null && citeData != null)
+      {
+         info = citeData.get(id);
+      }
+
+      if (info == null && linkLabelMap != null)
+      {
+         String label = linkLabelMap.get(id);
+
+         if (label != null)
+         {
+            if (labelData != null)
+            {
+               info = labelData.get(label);
+            }
+
+            if (info == null && citeData != null)
+            {
+               info = citeData.get(label);
+            }
+         }
+      }
+
+      return info;
+   }
+
    public CiteInfo getCiteInfo(String label)
    {
       return citeData == null ? null : citeData.get(label);

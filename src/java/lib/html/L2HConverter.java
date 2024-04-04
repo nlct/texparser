@@ -1242,6 +1242,13 @@ public class L2HConverter extends LaTeXParserListener
    public TeXObject createLink(String anchorName, TeXObject text)
     throws IOException
    {
+      CrossRefInfo info = getCrossRefInfo(anchorName);
+
+      if (info != null)
+      {
+         return createLink(info, text);
+      }
+
       Vector<AuxData> auxData = getAuxData();
 
       if (auxData != null)
