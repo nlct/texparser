@@ -178,6 +178,13 @@ public class UserGuideSty extends LaTeXSty
       addSemanticCommand("deprecatedorbannedfmt", FG_DEPRECATED_OR_BANNED);
       addSemanticCommand("summarylocfmt", TeXFontShape.IT);
 
+      registerControlSequence(new LaTeXGenericCommand(true, "commentnl", "m", 
+        TeXParserUtils.createStack(listener, 
+         new TeXCsRef("comment"),
+         TeXParserUtils.createGroup(listener, listener.getParam(1)),
+         new TeXCsRef("newline")
+       )));
+
       registerControlSequence(new GenericCommand("optiondefhook"));
 
       registerControlSequence(AccSuppObject.createSymbol(
