@@ -1144,39 +1144,43 @@ public class L2HConverter extends LaTeXParserListener
 
       if (currentNode != null)
       {
-         LabelInfo labelInfo = labelData.get(id);
-
-         if (labelInfo == null)
-         {
-            String label = linkLabelMap.get(id);
-
-            if (label != null)
-            {
-               labelInfo = labelData.get(label);
-            }
-         }
-
-         if (labelInfo == null)
-         {
-            /*
-             This adds the target to the list of labels
-             but any links in an earlier file won't work.
-             It's likely that the target was created by \hypertarget
-             without a corresponding label.
-            */
-
-            DivisionInfo divInfo = currentNode.getData();
-
-            labelInfo = new LabelInfo(id, id,
-               new TeXObjectList(), (TeXObject)text.clone(), new TeXObjectList());
-            labelInfo.setDivisionInfo(divInfo);
-
-            divInfo.addLabel(id);
-            labelData.put(id, labelInfo);
-         }
+         ensureLabelDefined(id, text);
       }
 
       return stack;
+   }
+
+  /**
+    Adds the target to the list of labels
+    but any links in an earlier file (if split enabled) won't work.
+    It's likely that the target was created by <code>\hypertarget</code>
+    without a corresponding label.
+  */
+   protected void ensureLabelDefined(String id, TeXObject text)
+   {
+      LabelInfo labelInfo = labelData.get(id);
+
+      if (labelInfo == null)
+      {
+         String label = linkLabelMap.get(id);
+
+         if (label != null)
+         {
+            labelInfo = labelData.get(label);
+         }
+      }
+
+      if (labelInfo == null)
+      {
+         DivisionInfo divInfo = currentNode.getData();
+
+         labelInfo = new LabelInfo(id, id,
+            new TeXObjectList(), (TeXObject)text.clone(), new TeXObjectList());
+            labelInfo.setDivisionInfo(divInfo);
+
+         divInfo.addLabel(id);
+         labelData.put(id, labelInfo);
+      }
    }
 
    @Override
