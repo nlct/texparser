@@ -1239,6 +1239,8 @@ public class L2HConverter extends LaTeXParserListener
          ref = "#"+HtmlTag.getUriFragment(id);
       }
 
+      createLinkHook(id, text, ref);
+
       return createLinkElement(ref, text);
    }
 
@@ -1265,7 +1267,16 @@ public class L2HConverter extends LaTeXParserListener
          }
       }
 
-      return createLinkElement("#"+HtmlTag.getUriFragment(anchorName), text);
+      String ref = "#"+HtmlTag.getUriFragment(anchorName);
+
+      createLinkHook(anchorName, text, ref);
+
+      return createLinkElement(ref, text);
+   }
+
+   protected void createLinkHook(String anchorName, TeXObject text, String ref)
+    throws IOException
+   {
    }
 
    public TeXObjectList createLinkElement(String href, TeXObject text)
@@ -4199,7 +4210,7 @@ public class L2HConverter extends LaTeXParserListener
 
    private String currentSection = null;
 
-   private DivisionNode currentNode = null;
+   protected DivisionNode currentNode = null;
 
    private HashMap<String,DivisionNode> divisionMap;
 
