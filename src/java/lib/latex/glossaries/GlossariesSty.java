@@ -36,7 +36,6 @@ import com.dickimawbooks.texparserlib.latex.*;
 import com.dickimawbooks.texparserlib.latex.hyperref.HyperTarget;
 import com.dickimawbooks.texparserlib.latex.mfirstuc.MfirstucSty;
 import com.dickimawbooks.texparserlib.html.L2HConverter;
-import com.dickimawbooks.texparserlib.html.HtmlTag;
 import com.dickimawbooks.texparserlib.html.StartElement;
 import com.dickimawbooks.texparserlib.html.EndElement;
 

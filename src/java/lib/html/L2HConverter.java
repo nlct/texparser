@@ -374,7 +374,7 @@ public class L2HConverter extends LaTeXParserListener
       putControlSequence(new Relax("allowbreak"));
 
       putControlSequence(new GenericCommand(true, "newline", null,
-       new HtmlTag("<br>")));
+       createVoidElement("br")));
 
       putControlSequence(new AtGobble("pagenumbering"));
       putControlSequence(new Input("include"));
@@ -507,7 +507,23 @@ public class L2HConverter extends LaTeXParserListener
    @Override
    public TeXObject getDivider(String name)
    {
-      return new HtmlTag(String.format("<div class=\"%s\"><hr></div>", name));
+      return new HtmlTag(String.format("<div class=\"%s\">%s</div>", name,
+        isXml() ? "<hr/>" : "<hr>"));
+   }
+
+   public VoidElement createVoidElement(String name)
+   {
+      return createVoidElement(name, false);
+   }
+
+   public VoidElement createVoidElement(String name, boolean insertCR)
+   {
+      return new VoidElement(name, insertCR, isXml());
+   }
+
+   public boolean isXml()
+   {
+      return false;
    }
 
    @Override

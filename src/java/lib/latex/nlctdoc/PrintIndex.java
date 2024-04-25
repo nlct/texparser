@@ -281,16 +281,22 @@ public class PrintIndex extends AbstractGlsCommand
 
             addStatus(content, glslabel, parser);
 
-            TeXObject loc = entry.get("location");
-
-            if (loc != null)
-            {
-               content.add(listener.getControlSequence("qquad"));
-               content.add(loc);
-            }
+            addLocationList(glslabel, content, listener);
 
             TeXParserUtils.process(list, parser, stack);
          }
+      }
+   }
+
+   protected void addLocationList(GlsLabel glslabel, TeXObjectList content,
+     TeXParserListener listener)
+   {
+      TeXObject loc = glslabel.getField("location");
+
+      if (loc != null)
+      {
+         content.add(listener.getControlSequence("qquad"));
+         content.add(loc);
       }
    }
 

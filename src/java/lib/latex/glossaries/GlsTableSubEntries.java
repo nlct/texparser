@@ -90,6 +90,8 @@ public class GlsTableSubEntries extends GatherEnvContents
 
       if (listener instanceof L2HConverter)
       {
+         L2HConverter l2h = (L2HConverter)listener;
+
          TeXObjectList list = contents;
          contents = listener.createStack();
 
@@ -119,7 +121,7 @@ public class GlsTableSubEntries extends GatherEnvContents
                   if (name.equals("tabularnewline") || name.equals("\\")
                       || name.equals("cr"))
                   {
-                     obj = new HtmlTag("<br>");
+                     obj = l2h.createVoidElement("br", true);
                   }
                }
             }

@@ -39,10 +39,17 @@ public class L2HImage extends AbstractTeXObject implements Expandable
    public L2HImage(Path path, String mimetype, 
      int width, int height, String name, TeXObject alt)
    {
+      this(path, mimetype, width, height, name, alt, false);
+   }
+
+   public L2HImage(Path path, String mimetype, 
+     int width, int height, String name, TeXObject alt, boolean useImgTag)
+   {
       this.path = path;
       this.width = width;
       this.height = height;
       this.alt = alt;
+      this.useImgTag = useImgTag;
 
       if (mimetype == null)
       {
@@ -112,9 +119,9 @@ public class L2HImage extends AbstractTeXObject implements Expandable
    public String toString()
    {
       return String.format(
-       "%s[path=%s,width=%d,height=%d,type=%s,name=%s,alt=%s]",
+       "%s[path=%s,width=%d,height=%d,type=%s,name=%s,alt=%s,useImgTag=%s]",
         getClass().getName(), path, width, height, mimetype,
-        name, alt);
+        name, alt, useImgTag);
    }
 
    @Override
@@ -148,50 +155,87 @@ public class L2HImage extends AbstractTeXObject implements Expandable
    }
 
    @Override
-   public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
+   public TeXObjectList expandonce(TeXParser parser)
     throws IOException
    {
-      return expandonce(parser);
+      return expandonce(parser, parser);
    }
 
    @Override
-   public TeXObjectList expandonce(TeXParser parser)
+   public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
     throws IOException
    {
       TeXObjectList list = new TeXObjectList();
 
-      StartElement startElem = new StartElement("object");
-
-      startElem.putAttribute("data", getData());
-
-      if (width != 0)
+      if (useImgTag && mimetype.startsWith("image"))
       {
-         startElem.putAttribute("width", ""+width);
-      }
+         L2HConverter listener = (L2HConverter)parser.getListener();
 
-      if (height != 0)
+         VoidElement imgElem = listener.createVoidElement("img");
+
+         imgElem.putAttribute("src", getData());
+
+         if (width != 0)
+         {
+            imgElem.putAttribute("width", ""+width);
+         }
+
+         if (height != 0)
+         {
+            imgElem.putAttribute("height", ""+height);
+         }
+
+         if (name != null)
+         {
+            imgElem.putAttribute("id", name);
+         }
+
+         if (alt != null)
+         {
+           /* NB straight double quotes are not automatically escaped
+              but they shouldn't occur if `` and '' are used for
+              double-quotes. */
+
+            imgElem.putAttribute("alt", parser.expandToString(alt, stack));
+         }
+
+         list.add(imgElem);
+      }
+      else
       {
-         startElem.putAttribute("height", ""+height);
+         StartElement startElem = new StartElement("object");
+
+         startElem.putAttribute("data", getData());
+
+         if (width != 0)
+         {
+            startElem.putAttribute("width", ""+width);
+         }
+
+         if (height != 0)
+         {
+            startElem.putAttribute("height", ""+height);
+         }
+
+         if (mimetype != null)
+         {
+            startElem.putAttribute("type", mimetype);
+         }
+
+         if (name != null)
+         {
+            startElem.putAttribute("id", name);
+         }
+
+         list.add(startElem);
+
+         if (alt != null)
+         {
+            list.add(alt);
+         }
+
+         list.add(new EndElement("object"));
       }
-
-      if (mimetype != null)
-      {
-         startElem.putAttribute("type", mimetype);
-      }
-
-      if (name != null)
-      {
-         startElem.putAttribute("id", name);
-      }
-
-      list.add(startElem);
-
-      if (alt != null)
-      {
-         list.add(alt);
-      }
-
-      list.add(new EndElement("object"));
 
       return list;
    }
@@ -209,40 +253,73 @@ public class L2HImage extends AbstractTeXObject implements Expandable
    {
       TeXObjectList list = new TeXObjectList();
 
-      StartElement startElem = new StartElement("object");
-
-      startElem.putAttribute("data", getData());
-
-      if (width != 0)
+      if (useImgTag && mimetype.startsWith("image"))
       {
-         startElem.putAttribute("width", ""+width);
-      }
+         L2HConverter listener = (L2HConverter)parser.getListener();
 
-      if (height != 0)
+         VoidElement imgElem = listener.createVoidElement("img");
+
+         imgElem.putAttribute("src", getData());
+
+         if (width != 0)
+         {
+            imgElem.putAttribute("width", ""+width);
+         }
+
+         if (height != 0)
+         {
+            imgElem.putAttribute("height", ""+height);
+         }
+
+         if (name != null)
+         {
+            imgElem.putAttribute("id", name);
+         }
+
+         if (alt != null)
+         {
+            imgElem.putAttribute("alt", parser.expandToString(alt, stack));
+         }
+
+         list.add(imgElem);
+      }
+      else
       {
-         startElem.putAttribute("height", ""+height);
+         StartElement startElem = new StartElement("object");
+
+         startElem.putAttribute("data", getData());
+
+         if (width != 0)
+         {
+            startElem.putAttribute("width", ""+width);
+         }
+
+         if (height != 0)
+         {
+            startElem.putAttribute("height", ""+height);
+         }
+
+         if (mimetype != null)
+         {
+            startElem.putAttribute("type", mimetype);
+         }
+
+         if (name != null)
+         {
+            startElem.putAttribute("id", name);
+         }
+
+         list.add(startElem);
+
+         if (alt != null)
+         {
+            alt = TeXParserUtils.expandFully(alt, parser, stack);
+
+            list.add(alt, true);
+         }
+
+         list.add(new EndElement("object"));
       }
-
-      if (mimetype != null)
-      {
-         startElem.putAttribute("type", mimetype);
-      }
-
-      if (name != null)
-      {
-         startElem.putAttribute("id", name);
-      }
-
-      list.add(startElem);
-
-      if (alt != null)
-      {
-         alt = TeXParserUtils.expandFully(alt, parser, stack);
-
-         list.add(alt, true);
-      }
-
-      list.add(new EndElement("object"));
 
       return list;
    }
@@ -290,47 +367,95 @@ public class L2HImage extends AbstractTeXObject implements Expandable
 
       Writeable writer = parser.getListener().getWriteable();
 
-      writer.writeliteral(String.format("<object data=\"%s\"", getData()));
-
-      if (width != 0)
+      if (useImgTag && mimetype.startsWith("image"))
       {
-         writer.writeliteral(String.format(" width=\"%d\"", width));
-      }
+         L2HConverter listener = (L2HConverter)parser.getListener();
 
-      if (height != 0)
-      {
-         writer.writeliteral(String.format(" height=\"%d\"", height));
-      }
+         writer.writeliteral(String.format("<img src=\"%s\"", getData()));
 
-      if (mimetype != null)
-      {
-         writer.writeliteral(String.format(" type=\"%s\"", mimetype));
-      }
-
-      if (name != null)
-      {
-         writer.writeliteral(String.format(" id=\"%s\"", name));
-      }
-
-      writer.writeliteral(">");
-
-      if (alt != null)
-      {
-         if (parser == stack)
+         if (width != 0)
          {
-            alt.process(parser);
+            writer.writeliteral(String.format(" width=\"%d\"", width));
          }
-         else
-         {
-            alt.process(parser, stack);
-         }
-      }
 
-      writer.writeliteral("</object>");
+         if (height != 0)
+         {
+            writer.writeliteral(String.format(" height=\"%d\"", height));
+         }
+
+         if (name != null)
+         {
+            writer.writeliteral(String.format(" id=\"%s\"", name));
+         }
+
+         if (alt != null)
+         {
+            writer.writeliteral(" alt=\"");
+
+            if (parser == stack)
+            {
+               alt.process(parser);
+            }
+            else
+            {
+               alt.process(parser, stack);
+            }
+
+            writer.writeliteral("\"");
+         }
+
+         if (listener.isXml())
+         {
+            writer.writeliteral("/");
+         }
+
+         writer.writeliteral(">");
+      }
+      else
+      {
+         writer.writeliteral(String.format("<object data=\"%s\"", getData()));
+
+         if (width != 0)
+         {
+            writer.writeliteral(String.format(" width=\"%d\"", width));
+         }
+
+         if (height != 0)
+         {
+            writer.writeliteral(String.format(" height=\"%d\"", height));
+         }
+
+         if (mimetype != null)
+         {
+            writer.writeliteral(String.format(" type=\"%s\"", mimetype));
+         }
+
+         if (name != null)
+         {
+            writer.writeliteral(String.format(" id=\"%s\"", name));
+         }
+
+         writer.writeliteral(">");
+
+         if (alt != null)
+         {
+            if (parser == stack)
+            {
+               alt.process(parser);
+            }
+            else
+            {
+               alt.process(parser, stack);
+            }
+         }
+
+         writer.writeliteral("</object>");
+      }
    }
 
    private Path path;
    private String mimetype, name;
    private int width=0, height=0;
    private TeXObject alt;
+   protected boolean useImgTag = false;
 }
