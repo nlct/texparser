@@ -1658,7 +1658,7 @@ public class L2HConverter extends LaTeXParserListener
       writeliteralln("#main {margin-left: 5%; margin-right: 15%; }");
       writeliteralln("div.tomain {position: absolute; left: 0pt; width: 5%; text-align: right; font-size: x-small;}");
       writeliteralln("div.tomain a {text-decoration: none;}");
-      writeliteralln("div.labellink {display: inline; font-size: x-small; margin-left: 1em; margin-right: 1em;}");
+      writeliteralln(".labellink { font-size: x-small; margin-left: 1em; margin-right: 1em;}");
       writeliteralln("div.marginleft {position: absolute; left: 0pt; width: 5%;}");
       writeliteralln("div.marginright {position: absolute; right: 0pt; width: 15%;}");
 
@@ -4231,7 +4231,7 @@ public class L2HConverter extends LaTeXParserListener
          }
 
          return new HtmlTag(String.format(
-          "<div class=\"labellink\"><a href=\"#%s\">%s</a></div>",
+          "<span class=\"labellink\"><a href=\"#%s\">%s</a></span>",
             label, text));
       }
       else
