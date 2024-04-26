@@ -45,9 +45,11 @@ public class L2HEqnarray extends L2HMathDeclaration
    {
       L2HConverter listener = (L2HConverter)parser.getListener();
 
+      listener.setCurrentBlockType(DocumentBlockType.BLOCK);
+
       listener.putControlSequence(new L2HMathAlignNewline(isNumbered()));
 
-      listener.writeliteralln("<table>");
+      listener.writeliteralln("<table class=\"eqnarray\">");
 
       TeXSettings settings = parser.getSettings();
 
@@ -107,6 +109,8 @@ public class L2HEqnarray extends L2HMathDeclaration
       listener.writeliteralln("</div>");
 
       revertModeSwitch(parser);
+
+      listener.setCurrentBlockType(DocumentBlockType.BODY);
 
       parser.endGroup();
    }

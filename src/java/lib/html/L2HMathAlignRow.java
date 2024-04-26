@@ -55,6 +55,19 @@ public class L2HMathAlignRow extends L2HAlignRow
       {
          TeXObject object = cellContents.get(i);
 
+         if (object instanceof Label && i < cellContents.size()-1)
+         {
+            TeXObject arg = cellContents.get(i+1);
+
+            if (arg instanceof Group)
+            {
+               cellContents.remove(i+1);
+               String label = parser.expandToString(((Group)arg).toList(), stack);
+
+               object = new HtmlTag(String.format("<a id=\"%s\"></a>", label));
+            }
+         }
+
          if (object instanceof HtmlTag)
          {
             cellContents.remove(i);
@@ -70,7 +83,7 @@ public class L2HMathAlignRow extends L2HAlignRow
    {// don't push to stack
       super.startRow(parser, stack);
 
-      parser.getListener().getWriteable().writeliteral("<td style=\"width: 50%; \"></td>");
+      parser.getListener().getWriteable().writeliteral("<td class=\"left-outer\"></td>");
    }
 
    @Override
@@ -84,7 +97,7 @@ public class L2HMathAlignRow extends L2HAlignRow
       {
          listener.stepcounter("equation");
 
-         writeable.writeliteral("<td style=\"width: 50%; align: right;\"><span class=\"eqno\">");
+         writeable.writeliteral("<td class=\"right-outer\"><span class=\"eqno\">");
          writeable.write('(');
 
          ControlSequence cs = parser.getListener().getControlSequence("theequation");
@@ -98,7 +111,7 @@ public class L2HMathAlignRow extends L2HAlignRow
       }
       else
       {
-         writeable.writeliteral("<td style=\"width: 50%; \"></td>");
+         writeable.writeliteral("<td class=\"right-outer\"></td>");
       }
 
       super.endRow(parser, stack);

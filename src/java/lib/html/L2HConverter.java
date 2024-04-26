@@ -865,7 +865,8 @@ public class L2HConverter extends LaTeXParserListener
    @Override
    public void writeliteralln(String string) throws IOException
    {
-      writeliteral(String.format("%s%n", string));
+      writeliteral(string);
+      writeln();
    }
 
    @Override
@@ -938,8 +939,7 @@ public class L2HConverter extends LaTeXParserListener
              new String(Character.toChars(codePoint)));
       }
 
-      if (isXml() && 
-         currentDocumentBlockType == DocumentBlockType.BODY
+      if (currentDocumentBlockType == DocumentBlockType.BODY
          && !isBlank)
       {
          setCurrentBlockType(DocumentBlockType.PARAGRAPH);
@@ -1007,8 +1007,7 @@ public class L2HConverter extends LaTeXParserListener
            LaTeXSyntaxException.ERROR_MISSING_BEGIN_DOC, str);
       }
 
-      if (isXml() && 
-         currentDocumentBlockType == DocumentBlockType.BODY
+      if (currentDocumentBlockType == DocumentBlockType.BODY
          && !isBlank)
       {
          setCurrentBlockType(DocumentBlockType.PARAGRAPH);
@@ -1079,8 +1078,7 @@ public class L2HConverter extends LaTeXParserListener
            LaTeXSyntaxException.ERROR_MISSING_BEGIN_DOC, c);
       }
 
-      if (isXml() && 
-         currentDocumentBlockType == DocumentBlockType.BODY
+      if (currentDocumentBlockType == DocumentBlockType.BODY
          && !isBlank)
       {
          setCurrentBlockType(DocumentBlockType.PARAGRAPH);
@@ -1145,8 +1143,7 @@ public class L2HConverter extends LaTeXParserListener
            LaTeXSyntaxException.ERROR_MISSING_BEGIN_DOC, str);
       }
 
-      if (isXml() && 
-         currentDocumentBlockType == DocumentBlockType.BODY
+      if (currentDocumentBlockType == DocumentBlockType.BODY
          && !isBlank)
       {
          setCurrentBlockType(DocumentBlockType.PARAGRAPH);
@@ -1641,7 +1638,7 @@ public class L2HConverter extends LaTeXParserListener
 
       if (halign != null)
       {
-         writeliteralln("  align: "+halign+";");
+         writeliteralln("  text-align: "+halign+";");
       }
 
       if (valign != null)
@@ -1665,6 +1662,9 @@ public class L2HConverter extends LaTeXParserListener
       writeliteralln("div.displaymath { display: block; text-align: center; }");
       writeliteralln("span.eqno { float: right; }");
       writeliteralln("div.table { display: block; text-align: center; }");
+
+      writeliteralln("td.left-outer { width: 50%; text-align: left; }");
+      writeliteralln("td.right-outer { width: 50%; text-align: right; }");
 
       writeliteralln(".linkicon { display: inline-block; }");
       writeliteralln(".linkiconleft { display: inline-block; padding-right: .25em; }");
@@ -1983,6 +1983,9 @@ public class L2HConverter extends LaTeXParserListener
       {
          writeliteralln("<!-- no title found -->");
       }
+
+
+      addDefaultArrayStyles();
 
       addDefaultTabularStyles();
 
@@ -4474,6 +4477,48 @@ public class L2HConverter extends LaTeXParserListener
       css.put("border-left", "none");
       css.put("border-right", "none");
       css.put("border-top", "none");
+
+      return css;
+   }
+
+   protected void addDefaultArrayStyles()
+    throws IOException
+   {
+      Register reg = parser.getSettings().getRegister("arraycolsep");
+
+      if (reg == null || !(reg instanceof DimenRegister))
+      {
+         throw new TeXSyntaxException(parser,
+           TeXSyntaxException.ERROR_DIMEN_EXPECTED,
+           String.format("%sarraycolsep",
+             new String(Character.toChars(parser.getEscChar()))));
+      }
+
+      TeXDimension dim = ((DimenRegister)reg).getDimension();
+
+      if (dim instanceof TeXGlue)
+      {
+         dim = ((TeXGlue)dim).getFixed();
+      }
+
+      String colSep = dim.format();
+
+      addDefaultStyle("left-cell", createEqnCellCss("left", colSep));
+      addDefaultStyle("mid-cell", createEqnCellCss("center", colSep));
+      addDefaultStyle("right-cell", createEqnCellCss("right", colSep));
+   }
+
+   protected HashMap<String,String> createEqnCellCss(String textAlign, String colSep)
+    throws IOException
+   {
+      HashMap<String,String> css = new HashMap<String,String>();
+
+      css.put("border-top", "none");
+      css.put("border-right", "none");
+      css.put("border-left", "none");
+      css.put("padding-left", colSep);
+      css.put("padding-right", colSep);
+      css.put("text-align", textAlign);
 
       return css;
    }

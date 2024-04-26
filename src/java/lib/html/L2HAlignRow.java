@@ -94,7 +94,10 @@ public class L2HAlignRow extends AlignRow
          case 2: css.put("border-top", "double"); break;
       }
 
-      startElem.putStyle(listener, css);
+      if (!css.isEmpty())
+      {
+         startElem.putStyle(listener, css);
+      }
 
       substack.add(startElem);
 
@@ -112,7 +115,11 @@ public class L2HAlignRow extends AlignRow
             }
 
             startElem = new StartElement("td");
-            startElem.putStyle(listener, css);
+
+            if (!css.isEmpty())
+            {
+               startElem.putStyle(listener, css);
+            }
 
             substack.add(startElem);
             substack.add(new EndElement("td"));
