@@ -492,9 +492,37 @@ public class L2HConverter extends LaTeXParserListener
       return new L2HPar();
    }
 
+   public void addDocumentBlockTypeListener(DocumentBlockTypeListener listener)
+   {
+      if (documentBlockListeners == null)
+      {
+         documentBlockListeners = new Vector<DocumentBlockTypeListener>();
+      }
+
+      documentBlockListeners.add(listener);
+   }
+
    public void setCurrentBlockType(DocumentBlockType type)
    {
+      DocumentBlockType old = currentDocumentBlockType;
+
       currentDocumentBlockType = type;
+
+      if (documentBlockListeners != null)
+      {
+         DocumentBlockTypeEvent evt = new DocumentBlockTypeEvent(
+           this, currentWriter, old, type);
+
+         for (int i = documentBlockListeners.size()-1 ; i >= 0; i--)
+         {
+            documentBlockListeners.get(i). documentBlockUpdate(evt);
+
+            if (evt.isConsumed())
+            {
+               break;
+            }
+         }
+      }
    }
 
    public DocumentBlockType getCurrentBlockType()
@@ -588,6 +616,59 @@ public class L2HConverter extends LaTeXParserListener
       {
          writeliteral("/");
       }
+
+      if (insertCR)
+      {
+         writeliteralln(">");
+      }
+      else
+      {
+         writeliteral(">");
+      }
+   }
+
+   public void writeStartHtml5OrDiv(String name, String attributes, boolean insertCR)
+   throws IOException
+   {
+      writeliteral("<");
+
+      if (isXml())
+      {
+         writeliteral("div");
+
+         if (attributes != null && !attributes.contains("class=\""))
+         {
+            writeliteral(" class=\"");
+            writeliteral(name);
+            writeliteral("\"");
+         }
+      }
+      else
+      {
+         writeliteral(name);
+      }
+
+      if (attributes != null && !attributes.isEmpty())
+      {
+         writeliteral(" ");
+         writeliteral(attributes);
+      }
+
+      if (insertCR)
+      {
+         writeliteralln(">");
+      }
+      else
+      {
+         writeliteral(">");
+      }
+   }
+
+   public void writeEndHtml5OrDiv(String name, boolean insertCR)
+   throws IOException
+   {
+      writeliteral("</");
+      writeliteral(isXml() ? "div" : name);
 
       if (insertCR)
       {
@@ -1626,7 +1707,16 @@ public class L2HConverter extends LaTeXParserListener
       writeliteralln(".toc-subsubsection span.numberline { display: inline-block; width: 4em; }");
       writeliteralln(".toc-paragraph span.numberline { display: inline-block; width: 5em; }");
       writeliteralln(".toc-subparagraph span.numberline { display: inline-block; width: 6em; }");
-      writeliteralln("nav ul { list-style-type: none; }");
+
+      if (isXml())
+      {
+         writeliteralln("div.nav ul { list-style-type: none; }");
+      }
+      else
+      {
+         writeliteralln("nav ul { list-style-type: none; }");
+      }
+
       writeliteralln("@media screen and (min-width: 500px)");
       writeliteralln("{");
       writeliteralln(" nav#doc-nav { background: #fffc; padding: 5px; }");
@@ -2000,7 +2090,9 @@ public class L2HConverter extends LaTeXParserListener
 
       if (currentSection != null)
       {
-         writeliteral(String.format("%n</section><!-- end of section %s -->%n", currentSection));
+         writeln();
+         writeEndHtml5OrDiv("section", false);
+         writeliteral(String.format("<!-- end of section %s -->%n", currentSection));
 
          currentSection = null;
       }
@@ -2125,7 +2217,9 @@ public class L2HConverter extends LaTeXParserListener
 
       if (currentSection != null)
       {
-         writeliteral(String.format("%n</section><!-- end of section %s -->%n", currentSection));
+         writeln();
+         writeEndHtml5OrDiv("section", false);
+         writeliteral(String.format("<!-- end of section %s -->%n", currentSection));
 
          currentSection = null;
       }
@@ -2643,9 +2737,14 @@ public class L2HConverter extends LaTeXParserListener
       setCurrentBlockType(DocumentBlockType.BLOCK);
 
       writeliteralln("<div class=\"nav-content\">");
-      writeliteralln("<nav id=\"doc-nav\" aria-label=\"Document Navigation\">");
+
+      writeStartHtml5OrDiv("nav",
+        "id=\"doc-nav\" aria-label=\"Document Navigation\">", true);
+
       writeNavigationList(null, null);
-      writeliteralln("</nav>");
+
+      writeEndHtml5OrDiv("nav", true);
+
       writeliteralln("</div>");
 
       setCurrentBlockType(DocumentBlockType.BODY);
@@ -4149,7 +4248,9 @@ public class L2HConverter extends LaTeXParserListener
 
       if (currentSection != null)
       {
-         writeliteral(String.format("%n</section><!-- end of section %s -->%n", currentSection));
+         writeln();
+         writeEndHtml5OrDiv("section", false);
+         writeliteral(String.format("<!-- end of section %s -->%n", currentSection));
       }
 
       if (currentNode != null && id != null)
@@ -4192,14 +4293,18 @@ public class L2HConverter extends LaTeXParserListener
       {
          currentSection = tag+"-"+name;
 
-         writeliteral(String.format("%n<section><!-- start of section %s -->", currentSection));
+         writeln();
+         writeStartHtml5OrDiv("section", null, false);
+         writeliteral(String.format("<!-- start of section %s -->", currentSection));
       }
       else
       {
          currentSection = id;
 
-         writeliteral(String.format("%n<section id=\"%s\"><!-- start of section %s -->",
-           id, currentSection));
+         writeln();
+         writeStartHtml5OrDiv("section", String.format("id=\"%s\"", id), false);
+         writeliteral(String.format("<!-- start of section %s -->",
+           currentSection));
       }
 
       writeToTopLink(stack);
@@ -4478,6 +4583,8 @@ public class L2HConverter extends LaTeXParserListener
    private HashMap<HashMap<String,String>,String> defaultStyleMaps;
 
    private DocumentBlockType currentDocumentBlockType = DocumentBlockType.OUTSIDE;
+
+   private Vector<DocumentBlockTypeListener> documentBlockListeners;
 
    private String currentSection = null;
 
