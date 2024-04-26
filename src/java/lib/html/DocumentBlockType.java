@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2024 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -18,33 +18,7 @@
 */
 package com.dickimawbooks.texparserlib.html;
 
-import java.io.IOException;
-import java.util.Vector;
-
-import com.dickimawbooks.texparserlib.*;
-
-public class L2HPar extends Par
+public enum DocumentBlockType
 {
-   public L2HPar()
-   {
-      super();
-   }
-
-   public Object clone()
-   {
-      return new L2HPar();
-   }
-
-   public void process(TeXParser parser) throws IOException
-   {
-      L2HConverter listener = (L2HConverter)parser.getListener();
-
-      listener.startParagraph();
-   }
-
-   public void process(TeXParser parser, TeXObjectList list) throws IOException
-   {
-      process(parser);
-   }
-
+   HEAD, BODY, HEADING, PARAGRAPH, BLOCK, OUTSIDE;
 }

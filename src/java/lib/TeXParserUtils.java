@@ -932,5 +932,42 @@ public class TeXParserUtils
 
       return list;
    }
+
+   public static boolean isBlank(int cp)
+   {
+      return (cp == ' ' || cp == '\r' || cp == '\n' || cp == '\f' || cp == '\t');
+   }
+
+   public static boolean isBlank(String str)
+   {
+      for (int i = 0; i < str.length(); )
+      {
+         int cp = str.codePointAt(i);
+         i += Character.charCount(cp);
+
+         if (!isBlank(cp))
+         {
+            return false;
+         }
+      }
+
+      return true;
+   }
+
+   public static boolean isBlank(StringBuilder str)
+   {
+      for (int i = 0; i < str.length(); )
+      {
+         int cp = str.codePointAt(i);
+         i += Character.charCount(cp);
+
+         if (!isBlank(cp))
+         {
+            return false;
+         }
+      }
+
+      return true;
+   }
 }
 

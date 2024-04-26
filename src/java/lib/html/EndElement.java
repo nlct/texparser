@@ -34,6 +34,11 @@ public class EndElement extends HtmlTag
 
    public EndElement(String name, boolean appendCR)
    {
+      this(name, appendCR, name.equals("div"));
+   }
+
+   public EndElement(String name, boolean appendCR, boolean isBlock)
+   {
       super(String.format("</%s>", name));
 
       if (name.contains("[^a-zA-Z]"))
@@ -44,6 +49,7 @@ public class EndElement extends HtmlTag
 
       this.name = name;
       this.appendCR = appendCR;
+      this.isBlock = isBlock;
    }
 
    @Override
@@ -61,14 +67,22 @@ public class EndElement extends HtmlTag
    public void process(TeXParser parser)
     throws IOException
    {
+      L2HConverter listener = (L2HConverter)parser.getListener();
+
+      if (isBlock)
+      {
+         listener.endParagraph();
+         listener.setCurrentBlockType(DocumentBlockType.BODY);
+      }
+
       super.process(parser);
 
       if (appendCR)
       {
-         parser.getListener().getWriteable().writeliteralln("");
+         listener.writeln();
       }
    }
 
    private String name;
-   private boolean appendCR=false;
+   private boolean appendCR=false, isBlock=false;
 }

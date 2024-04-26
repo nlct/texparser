@@ -43,16 +43,28 @@ public class L2HAbstract extends AbstractDec
 
    public void process(TeXParser parser) throws IOException
    {
+      L2HConverter listener = (L2HConverter)parser.getListener();
+
+      listener.endParagraph();
+
       parser.getListener().getWriteable().writeliteral(
         String.format("%n<div class=\"%s\">", getName()));
+
+      listener.setCurrentBlockType(DocumentBlockType.BLOCK);
 
       super.process(parser);
    }
 
    public void process(TeXParser parser, TeXObjectList stack) throws IOException
    {
-      parser.getListener().getWriteable().writeliteral(
+      L2HConverter listener = (L2HConverter)parser.getListener();
+
+      listener.endParagraph();
+
+      listener.writeliteral(
        String.format("%n<div class=\"%s\">", getName()));
+
+      listener.setCurrentBlockType(DocumentBlockType.BLOCK);
 
       super.process(parser, stack);
    }
@@ -61,7 +73,12 @@ public class L2HAbstract extends AbstractDec
    public void end(TeXParser parser, TeXObjectList stack)
     throws IOException
    {
-      parser.getListener().getWriteable().writeliteral(
+      L2HConverter listener = (L2HConverter)parser.getListener();
+
+      listener.writeliteral(
        String.format("</div><!-- end of %s -->%n", getName()));
+
+      listener.setCurrentBlockType(DocumentBlockType.BODY);
+
    }
 }

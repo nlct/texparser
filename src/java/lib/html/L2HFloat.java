@@ -51,6 +51,8 @@ public class L2HFloat extends LaTeXFloat
    {
       L2HConverter listener = (L2HConverter)parser.getListener();
 
+      listener.endParagraph();
+
       if (getName().equals("figure"))
       {
          listener.writeliteral("<figure>");
@@ -59,6 +61,8 @@ public class L2HFloat extends LaTeXFloat
       {
          listener.writeliteral("<div class=\""+getName()+"\">");
       }
+
+      listener.setCurrentBlockType(DocumentBlockType.BLOCK);
    }
 
    @Override
@@ -75,5 +79,7 @@ public class L2HFloat extends LaTeXFloat
       {
          listener.writeliteral("</div>");
       }
+
+      listener.setCurrentBlockType(DocumentBlockType.BODY);
    }
 }

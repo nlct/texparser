@@ -492,6 +492,45 @@ public class L2HConverter extends LaTeXParserListener
       return new L2HPar();
    }
 
+   public void setCurrentBlockType(DocumentBlockType type)
+   {
+      currentDocumentBlockType = type;
+   }
+
+   public DocumentBlockType getCurrentBlockType()
+   {
+      return currentDocumentBlockType;
+   }
+
+   public void startParagraph()
+   throws IOException
+   {
+      if (isInDocEnv())
+      {
+         if (isXml() && currentDocumentBlockType == DocumentBlockType.PARAGRAPH)
+         {
+            writeliteralln("</p>");
+         }
+
+         writeln();
+
+         setCurrentBlockType(DocumentBlockType.PARAGRAPH);
+
+         writeliteralln("<p>");
+      }
+   }
+
+   public void endParagraph()
+   throws IOException
+   {
+      if (isXml() && currentDocumentBlockType == DocumentBlockType.PARAGRAPH)
+      {
+         writeliteralln("</p>");
+      }
+
+      setCurrentBlockType(DocumentBlockType.BODY);
+   }
+
    @Override
    public Paragraph createParagraph()
    {
@@ -521,6 +560,46 @@ public class L2HConverter extends LaTeXParserListener
       return new VoidElement(name, insertCR, isXml());
    }
 
+   public void writeVoidElement(String name)
+   throws IOException
+   {
+      writeVoidElement(name, null);
+   }
+
+   public void writeVoidElement(String name, String attributes)
+   throws IOException
+   {
+      writeVoidElement(name, attributes, false);
+   }
+
+   public void writeVoidElement(String name, String attributes, boolean insertCR)
+   throws IOException
+   {
+      writeliteral("<");
+      writeliteral(name);
+
+      if (attributes != null && !attributes.isEmpty())
+      {
+         writeliteral(" ");
+         writeliteral(attributes);
+      }
+
+      if (isXml())
+      {
+         writeliteral("/");
+      }
+
+      if (insertCR)
+      {
+         writeliteralln(">");
+      }
+      else
+      {
+         writeliteral(">");
+      }
+   }
+
+   // Work in progress
    public boolean isXml()
    {
       return false;
@@ -753,13 +832,15 @@ public class L2HConverter extends LaTeXParserListener
    public void writeCodePoint(int codePoint)
      throws IOException
    {
+      boolean isBlank = TeXParserUtils.isBlank(codePoint);
+
       if (currentWriter == null)
       {
          currentWriter = writer;
 
          if (currentWriter == null)
          {
-            if (!Character.isWhitespace(codePoint))
+            if (!isBlank)
             {
                parser.debugMessage(TeXParser.DEBUG_IO, 
                  "No writer available. writeCodePoint: "+codePoint);
@@ -774,6 +855,15 @@ public class L2HConverter extends LaTeXParserListener
          throw new LaTeXSyntaxException(getParser(),
            LaTeXSyntaxException.ERROR_MISSING_BEGIN_DOC, 
              new String(Character.toChars(codePoint)));
+      }
+
+      if (isXml() && 
+         currentDocumentBlockType == DocumentBlockType.BODY
+         && !isBlank)
+      {
+         setCurrentBlockType(DocumentBlockType.PARAGRAPH);
+
+         writeliteralln("<p>");
       }
 
       if (codePoint == '<')
@@ -812,13 +902,15 @@ public class L2HConverter extends LaTeXParserListener
    public void write(String str)
      throws IOException
    {
+      boolean isBlank = TeXParserUtils.isBlank(str);
+
       if (currentWriter == null)
       {
          currentWriter = writer;
 
          if (currentWriter == null)
          {
-            if (!str.trim().isEmpty())
+            if (!isBlank)
             {
                parser.debugMessage(TeXParser.DEBUG_IO, 
                   "No writer available. write: "+str);
@@ -828,10 +920,19 @@ public class L2HConverter extends LaTeXParserListener
          }
       }
 
-      if (!isWriteOutputAllowed() && !str.trim().isEmpty())
+      if (!isWriteOutputAllowed() && !isBlank)
       {
          throw new LaTeXSyntaxException(getParser(),
            LaTeXSyntaxException.ERROR_MISSING_BEGIN_DOC, str);
+      }
+
+      if (isXml() && 
+         currentDocumentBlockType == DocumentBlockType.BODY
+         && !isBlank)
+      {
+         setCurrentBlockType(DocumentBlockType.PARAGRAPH);
+
+         writeliteralln("<p>");
       }
 
       if (useHtmlEntities)
@@ -873,13 +974,15 @@ public class L2HConverter extends LaTeXParserListener
    public void write(char c)
      throws IOException
    {
+      boolean isBlank = TeXParserUtils.isBlank(c);
+
       if (currentWriter == null)
       {
          currentWriter = writer;
 
          if (currentWriter == null)
          {
-            if (!Character.isWhitespace(c))
+            if (!isBlank)
             {
                parser.debugMessage(TeXParser.DEBUG_IO, 
                  "No writer available. write(char): "+c);
@@ -889,10 +992,19 @@ public class L2HConverter extends LaTeXParserListener
          }
       }
 
-      if (!isWriteOutputAllowed() && !Character.isWhitespace(c))
+      if (!isWriteOutputAllowed() && !isBlank)
       {
          throw new LaTeXSyntaxException(getParser(),
            LaTeXSyntaxException.ERROR_MISSING_BEGIN_DOC, c);
+      }
+
+      if (isXml() && 
+         currentDocumentBlockType == DocumentBlockType.BODY
+         && !isBlank)
+      {
+         setCurrentBlockType(DocumentBlockType.PARAGRAPH);
+
+         writeliteralln("<p>");
       }
 
       if (useHtmlEntities)
@@ -928,13 +1040,15 @@ public class L2HConverter extends LaTeXParserListener
    public void writeln(String str)
      throws IOException
    {
+      boolean isBlank = TeXParserUtils.isBlank(str);
+
       if (currentWriter == null)
       {
          currentWriter = writer;
 
          if (currentWriter == null)
          {
-            if (!str.trim().isEmpty())
+            if (!isBlank)
             {
                parser.debugMessage(TeXParser.DEBUG_IO, 
                  "No writer available. writeln: "+str);
@@ -944,14 +1058,38 @@ public class L2HConverter extends LaTeXParserListener
          }
       }
 
-      if (!isWriteOutputAllowed() && !str.trim().isEmpty())
+      if (!isWriteOutputAllowed() && !isBlank)
       {
          throw new LaTeXSyntaxException(getParser(),
            LaTeXSyntaxException.ERROR_MISSING_BEGIN_DOC, str);
       }
 
-      write(String.format("%s%n", str));
-      currentWriter.flush();
+      if (isXml() && 
+         currentDocumentBlockType == DocumentBlockType.BODY
+         && !isBlank)
+      {
+         setCurrentBlockType(DocumentBlockType.PARAGRAPH);
+
+         writeliteralln("<p>");
+      }
+
+      write(str);
+      writeln();
+   }
+
+   public void writeln() throws IOException
+   {
+      if (currentWriter != null)
+      {
+         if (currentWriter instanceof PrintWriter)
+         {
+            ((PrintWriter)currentWriter).println();
+         }
+         else
+         {
+            write(String.format("%n"));
+         }
+      }
    }
 
    @Override
@@ -1573,7 +1711,39 @@ public class L2HConverter extends LaTeXParserListener
    protected void writeDocType()
      throws IOException
    {
-      writeliteralln("<!DOCTYPE html>");
+      setCurrentBlockType(DocumentBlockType.HEAD);
+
+      if (isXml())
+      {
+         writeliteralln("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\"");
+         writeliteralln("\"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">");
+      }
+      else
+      {
+         writeliteralln("<!DOCTYPE html>");
+      }
+   }
+
+   /**
+    * Writes the <code>&lt;html&gt;</code> start tag.
+    */ 
+   protected void writeHtmlStart()
+     throws IOException
+   {
+      if (isXml())
+      {
+         writeliteralln("<html xmlns=\"http://www.w3.org/1999/xhtml\">");
+      }
+      else
+      {
+         writeliteralln("<html>");
+      }
+   }
+
+   public void writeMeta(String attributes)
+     throws IOException
+   {
+      writeVoidElement("meta", attributes, true);
    }
 
    @Override
@@ -1589,11 +1759,12 @@ public class L2HConverter extends LaTeXParserListener
       }
 
       writeDocType();
-      writeliteralln("<html>");
+      writeHtmlStart();
+
       writeliteralln("<head>");
 
-      writeliteralln(String.format(
-       "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=%s\">", 
+      writeMeta(String.format(
+       "http-equiv=\"Content-Type\" content=\"text/html; charset=%s\"", 
        htmlCharSet.name()));
 
       ControlSequence cs = parser.getControlSequence("TeXParserLibGeneratorName");
@@ -1605,7 +1776,7 @@ public class L2HConverter extends LaTeXParserListener
 
       if (!generator.isEmpty())
       {
-         writeliteralln(String.format("<meta name=\"generator\" content=\"%s\">",
+         writeMeta(String.format("name=\"generator\" content=\"%s\"",
            generator));
       }
 
@@ -1747,6 +1918,8 @@ public class L2HConverter extends LaTeXParserListener
       writeliteralln("</head>");
       writeliteral("<body");
 
+      setCurrentBlockType(DocumentBlockType.BODY);
+
       Color fgCol = getParser().getSettings().getFgColor();
       Color bgCol = getParser().getSettings().getBgColor();
 
@@ -1823,6 +1996,8 @@ public class L2HConverter extends LaTeXParserListener
             LaTeXSyntaxException.ERROR_NO_BEGIN_DOC);
       }
 
+      endParagraph();
+
       if (currentSection != null)
       {
          writeliteral(String.format("%n</section><!-- end of section %s -->%n", currentSection));
@@ -1860,6 +2035,8 @@ public class L2HConverter extends LaTeXParserListener
       documentEnded = true;
       writer.close();
 
+      setCurrentBlockType(DocumentBlockType.OUTSIDE);
+
       throw new EOFException();
    }
 
@@ -1867,16 +2044,17 @@ public class L2HConverter extends LaTeXParserListener
    throws IOException
    {
       writeDocType();
-      writeliteralln("<html>");
+      writeHtmlStart();
+
       writeliteralln("<head>");
 
-      writeliteralln(String.format(
-       "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=%s\">", 
+      writeMeta(String.format(
+       "http-equiv=\"Content-Type\" content=\"text/html; charset=%s\"", 
        htmlCharSet.name()));
 
       if (!generator.isEmpty())
       {
-         writeliteralln(String.format("<meta name=\"generator\" content=\"%s\">",
+         writeMeta(String.format("name=\"generator\" content=\"%s\"",
            generator));
       }
 
@@ -1913,6 +2091,8 @@ public class L2HConverter extends LaTeXParserListener
       writeliteralln("</head>");
       writeliteral("<body");
 
+      setCurrentBlockType(DocumentBlockType.BODY);
+
       Color fgCol = getParser().getSettings().getFgColor();
       Color bgCol = getParser().getSettings().getBgColor();
 
@@ -1941,6 +2121,8 @@ public class L2HConverter extends LaTeXParserListener
    protected void endDivisionFile(TeXObjectList stack)
    throws IOException
    {
+      endParagraph();
+
       if (currentSection != null)
       {
          writeliteral(String.format("%n</section><!-- end of section %s -->%n", currentSection));
@@ -1956,6 +2138,8 @@ public class L2HConverter extends LaTeXParserListener
 
       writeliteralln("</body>");
       writeliteralln("</html>");
+
+      setCurrentBlockType(DocumentBlockType.OUTSIDE);
    }
 
    protected void footerNav() throws IOException
@@ -2079,8 +2263,10 @@ public class L2HConverter extends LaTeXParserListener
       {
          footnoteWriter = new StringWriter();
       }
-      else
+
+      if (currentDocumentBlockType != DocumentBlockType.PARAGRAPH)
       {
+         setCurrentBlockType(DocumentBlockType.PARAGRAPH);
          footnoteWriter.write("<p>");
       }
 
@@ -2088,6 +2274,16 @@ public class L2HConverter extends LaTeXParserListener
       {
          currentWriter = footnoteWriter;
          TeXParserUtils.process(footnote, getParser(), stack);
+
+         if (currentDocumentBlockType == DocumentBlockType.PARAGRAPH)
+         {
+            if (isXml())
+            {
+               footnoteWriter.write("</p>");
+            }
+
+            setCurrentBlockType(DocumentBlockType.BODY);
+         }
       }
       finally
       {
@@ -2361,17 +2557,17 @@ public class L2HConverter extends LaTeXParserListener
          currentWriter = navWriter;
 
          writeDocType();
+         writeHtmlStart();
 
-         writeliteralln("<html>");
          writeliteralln("<head>");
 
-         writeliteralln(String.format(
-          "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=%s\">", 
+         writeMeta(String.format(
+          "http-equiv=\"Content-Type\" content=\"text/html; charset=%s\"", 
           htmlCharSet.name()));
 
          if (!generator.isEmpty())
          {
-            writeliteralln(String.format("<meta name=\"generator\" content=\"%s\">",
+            writeMeta(String.format("name=\"generator\" content=\"%s\"",
               generator));
          }
 
@@ -2414,15 +2610,21 @@ public class L2HConverter extends LaTeXParserListener
 
          if (title != null)
          {
+            setCurrentBlockType(DocumentBlockType.HEADING);
+
             writeliteral("<h1>");
             writeliteral(title);
             writeliteralln("</h1>");
          }
 
+         setCurrentBlockType(DocumentBlockType.BODY);
+
          writeNavigationList(null, null);
 
          writeliteralln("</body>");
          writeliteralln("</html>");
+
+         setCurrentBlockType(DocumentBlockType.OUTSIDE);
       }
       finally
       {
@@ -2438,11 +2640,15 @@ public class L2HConverter extends LaTeXParserListener
    protected void writeNavigationList()
     throws IOException
    {
+      setCurrentBlockType(DocumentBlockType.BLOCK);
+
       writeliteralln("<div class=\"nav-content\">");
       writeliteralln("<nav id=\"doc-nav\" aria-label=\"Document Navigation\">");
       writeNavigationList(null, null);
       writeliteralln("</nav>");
       writeliteralln("</div>");
+
+      setCurrentBlockType(DocumentBlockType.BODY);
    }
 
    protected void writeNavigationList(String cssClass, String cssId)
@@ -2725,12 +2931,18 @@ public class L2HConverter extends LaTeXParserListener
 
    public void beginVerbatim() throws IOException
    {
+      endParagraph();
+
+      setCurrentBlockType(DocumentBlockType.BLOCK);
+
       writeliteral("<pre>");
    }
 
    public void endVerbatim() throws IOException
    {
       writeliteral("</pre>");
+
+      setCurrentBlockType(DocumentBlockType.BODY);
    }
 
    public String getImagePreamble() throws IOException
@@ -3241,6 +3453,10 @@ public class L2HConverter extends LaTeXParserListener
    public void marginpar(TeXObject leftText, TeXObject rightText)
      throws IOException
    {
+      DocumentBlockType orgType = currentDocumentBlockType;
+
+      setCurrentBlockType(DocumentBlockType.BLOCK);
+
       writeliteral("<div class=\"margin");
 
       try
@@ -3259,12 +3475,15 @@ public class L2HConverter extends LaTeXParserListener
       finally
       {
          writeliteral("</div>");
+
+         setCurrentBlockType(orgType);
       }
    }
 
    public void doFootnoteRule() throws IOException
    {
-      writeliteralln("<p><hr><p>");
+      endParagraph();
+      writeVoidElement("hr", null, true);
    }
 
    public IndexLocation createIndexLocation(String indexLabel)
@@ -3294,7 +3513,11 @@ public class L2HConverter extends LaTeXParserListener
 
    public void startList(TrivListDec trivlist) throws IOException
    {
+      endParagraph();
+
       super.startList(trivlist);
+
+      setCurrentBlockType(DocumentBlockType.BLOCK);
 
       if (trivlist instanceof DescriptionDec)
       {
@@ -3329,6 +3552,8 @@ public class L2HConverter extends LaTeXParserListener
 
    public void endList(TrivListDec trivlist) throws IOException
    {
+      setCurrentBlockType(DocumentBlockType.BODY);
+
       if (trivlist instanceof DescriptionDec)
       {
          writeliteral(String.format("%n</dl>%n"));
@@ -3789,6 +4014,13 @@ public class L2HConverter extends LaTeXParserListener
    public void startFrameBox(FrameBox fbox)
     throws IOException
    {
+      if (!fbox.isInLine())
+      {
+         endParagraph();
+
+         setCurrentBlockType(DocumentBlockType.BLOCK);
+      }
+
       String tag = getElementTag(fbox);
 
       writeliteral(String.format("<%s ", tag));
@@ -3837,10 +4069,20 @@ public class L2HConverter extends LaTeXParserListener
       {
          writeliteralln(String.format("<!-- end of %s -->", fbox.getId()));
       }
+
+      if (!fbox.isInLine())
+      {
+         setCurrentBlockType(DocumentBlockType.BODY);
+      }
+
    }
 
    public void startTheorem(String name) throws IOException
    {
+      endParagraph();
+
+      setCurrentBlockType(DocumentBlockType.BLOCK);
+
       writeliteral("<div class=\"");
       writeliteral(name);
       writeliteral("\">");
@@ -3848,7 +4090,16 @@ public class L2HConverter extends LaTeXParserListener
 
    public void endTheorem(String name) throws IOException
    {
+      if (isXml() && currentDocumentBlockType == DocumentBlockType.PARAGRAPH)
+      {
+         writeliteral("</p>");
+
+         setCurrentBlockType(DocumentBlockType.BLOCK);
+      }
+
       writeliteral(String.format("</div><!-- end of %s -->", name));
+
+      setCurrentBlockType(DocumentBlockType.BODY);
    }
 
    public void enableLinkBox(boolean enable)
@@ -3894,6 +4145,8 @@ public class L2HConverter extends LaTeXParserListener
      String id, TeXObjectList stack)
     throws IOException
    {
+      endParagraph();
+
       if (currentSection != null)
       {
          writeliteral(String.format("%n</section><!-- end of section %s -->%n", currentSection));
@@ -4223,6 +4476,8 @@ public class L2HConverter extends LaTeXParserListener
    private HashMap<String,String> defaultStyles;
 
    private HashMap<HashMap<String,String>,String> defaultStyleMaps;
+
+   private DocumentBlockType currentDocumentBlockType = DocumentBlockType.OUTSIDE;
 
    private String currentSection = null;
 

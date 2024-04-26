@@ -47,11 +47,15 @@ public class L2HLongTable extends Tabular
      int verticalAlignment, TeXObject columnSpecs)
      throws IOException
    {
+      L2HConverter listener = (L2HConverter)parser.getListener();
+
+      listener.endParagraph();
+
+      listener.setCurrentBlockType(DocumentBlockType.BLOCK);
+
       parser.startGroup();
 
       super.startTabular(parser, stack, verticalAlignment, columnSpecs);
-
-      Writeable writeable = parser.getListener().getWriteable();
 
       String cls = "longtable-";
 
@@ -70,11 +74,11 @@ public class L2HLongTable extends Tabular
 
       if (id == null)
       {
-         writeable.writeliteralln(String.format("<table class=\"%s\">", cls));
+         listener.writeliteralln(String.format("<table class=\"%s\">", cls));
       }
       else
       {
-         writeable.writeliteralln(String.format("<table id=\"%s\" class=\"%s\">", id, cls));
+         listener.writeliteralln(String.format("<table id=\"%s\" class=\"%s\">", id, cls));
       }
    }
 
@@ -367,13 +371,15 @@ public class L2HLongTable extends Tabular
    @Override
    public void end(TeXParser parser, TeXObjectList stack) throws IOException
    {
-      Writeable writeable = parser.getListener().getWriteable();
+      L2HConverter listener = (L2HConverter)parser.getListener();
 
-      writeable.writeliteralln("</table>");
+      listener.writeliteralln("</table>");
 
       super.end(parser, stack);
 
       parser.endGroup();
+
+      listener.setCurrentBlockType(DocumentBlockType.BODY);
    }
 
    protected AlignHStyle horizontalAlignment = AlignHStyle.CENTER;

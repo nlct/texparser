@@ -75,9 +75,13 @@ public class L2HMathGroup extends MathGroup
 
       if (!isInLine())
       {
+         listener.endParagraph();
+
          parser.getSettings().setMode(TeXMode.DISPLAY_MATH);
 
          listener.writeliteral("<div class=\"displaymath\">");
+
+         listener.setCurrentBlockType(DocumentBlockType.BLOCK);
       }
       else
       {
@@ -117,6 +121,7 @@ public class L2HMathGroup extends MathGroup
       if (!isInLine())
       {
          listener.writeliteral("</div>");
+         listener.setCurrentBlockType(DocumentBlockType.BODY);
       }
 
       parser.endGroup();

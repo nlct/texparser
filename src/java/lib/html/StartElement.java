@@ -33,6 +33,11 @@ public class StartElement extends HtmlTag
 
    public StartElement(String name, boolean insertCR)
    {
+      this(name, insertCR, name.equals("div"));
+   }
+
+   public StartElement(String name, boolean insertCR, boolean isBlock)
+   {
       super(String.format("<%s>", name));
 
       if (name.contains("[^a-zA-Z]"))
@@ -43,12 +48,13 @@ public class StartElement extends HtmlTag
 
       this.name = name;
       this.insertCR = insertCR;
+      this.isBlock = isBlock;
    }
 
    @Override
    public Object clone()
    {
-      StartElement elem = new StartElement(getName(), insertCR);
+      StartElement elem = new StartElement(getName(), insertCR, isBlock);
 
       if (attributes != null)
       {
@@ -97,30 +103,36 @@ public class StartElement extends HtmlTag
    public void process(TeXParser parser)
       throws IOException
    {
-      Writeable writeable = parser.getListener().getWriteable();
+      L2HConverter listener = (L2HConverter)parser.getListener();
+
+      if (isBlock)
+      {
+         listener.endParagraph();
+         listener.setCurrentBlockType(DocumentBlockType.BLOCK);
+      }
 
       if (insertCR)
       {
-         writeable.writeliteralln("");
+         listener.writeln();
       }
 
       if (attributes == null || attributes.isEmpty())
       {
-         writeable.writeliteral(getTag());
+         listener.writeliteral(getTag());
       }
       else
       {
-         writeable.writeliteral("<"+name);
+         listener.writeliteral("<"+name);
 
          for (Iterator<String> it = attributes.keySet().iterator(); it.hasNext(); )
          {
             String key = it.next();
             String val = attributes.get(key);
 
-            writeable.writeliteral(String.format(" %s=\"%s\"", key, val));
+            listener.writeliteral(String.format(" %s=\"%s\"", key, val));
          }
 
-         writeable.writeliteral(">");
+         listener.writeliteral(">");
       }
    }
 
@@ -184,6 +196,6 @@ public class StartElement extends HtmlTag
    }
 
    private String name;
-   private boolean insertCR=false;
+   private boolean insertCR=false, isBlock=false;
    private HashMap<String,String> attributes;
 }
