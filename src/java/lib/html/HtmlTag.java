@@ -87,6 +87,42 @@ public class HtmlTag extends AbstractTeXObject
       return tag;
    }
 
+   /**
+    * Encodes string for use in quoted attribute value.
+    * The string should have first been processed or expanded if it was
+    * obtained from TeX source, so it may already contain entities.
+    */ 
+   public static String encodeAttributeValue(String value, boolean url)
+   {
+      StringBuilder builder = new StringBuilder();
+
+      for (int i = 0; i < value.length(); )
+      {
+         int cp = value.codePointAt(i);
+         i += Character.charCount(cp);
+
+         if (cp == '\\' || cp == '"' || cp == '\'' || cp == '<' || cp == '>')
+         {
+            if (url)
+            {
+               builder.append('%');
+            }
+            else
+            {
+               builder.append("\\x");
+            }
+
+            builder.append(String.format("%X", cp));
+         }
+         else
+         {
+            builder.appendCodePoint(cp);
+         }
+      }
+
+      return builder.toString();
+   }
+
    public static String getUriFragment(String label)
    {
       try

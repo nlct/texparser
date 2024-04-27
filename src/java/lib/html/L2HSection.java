@@ -150,15 +150,11 @@ public class L2HSection extends Section
       substack.add(new HtmlTag(
             String.format("<!-- end of %s header -->%n", getName())));
 
-      if (parser == stack || stack == null)
-      {
-         substack.process(parser);
-      }
-      else
-      {
-         substack.process(parser, stack);
-      }
+      listener.setCurrentBlockType(DocumentBlockType.HEADING);
 
+      TeXParserUtils.process(substack, parser, stack);
+
+      listener.setCurrentBlockType(DocumentBlockType.BODY);
    }
 
    @Override
@@ -235,7 +231,11 @@ public class L2HSection extends Section
          list.add(listener.getPar());
       }
 
+      listener.setCurrentBlockType(DocumentBlockType.HEADING);
+
       TeXParserUtils.process(list, parser, stack);
+
+      listener.setCurrentBlockType(DocumentBlockType.BODY);
    }
 
    public String getTag()

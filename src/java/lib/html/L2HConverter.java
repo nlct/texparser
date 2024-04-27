@@ -627,6 +627,39 @@ public class L2HConverter extends LaTeXParserListener
       }
    }
 
+   public StartElement newHtml5StartElement(String name)
+   {
+      StartElement elem;
+
+      if (isXml())
+      {
+         elem = new StartElement("div");
+         elem.putAttribute("class", name);
+      }
+      else
+      {
+         elem = new StartElement(name);
+      }
+
+      return elem;
+   }
+
+   public EndElement newHtml5EndElement(String name)
+   {
+      EndElement elem;
+
+      if (isXml())
+      {
+         elem = new EndElement("div");
+      }
+      else
+      {
+         elem = new EndElement(name);
+      }
+
+      return elem;
+   }
+
    public void writeStartHtml5OrDiv(String name, String attributes, boolean insertCR)
    throws IOException
    {
@@ -683,7 +716,41 @@ public class L2HConverter extends LaTeXParserListener
    // Work in progress
    public boolean isXml()
    {
-      return false;
+      return isXml;
+   }
+
+   public void setXml(boolean useXml)
+   {
+      if (currentDocumentBlockType == DocumentBlockType.OUTSIDE
+           && !documentEnded)
+      {
+         isXml = useXml;
+      }
+      else
+      {
+         throw new IllegalArgumentException("Too late to use setXml");
+      }
+   }
+
+   public void setAutoInsertPar(boolean enable)
+   {
+      autoInsertPar = enable;
+   }
+
+   public boolean isAutoInsertParOn()
+   {
+      return autoInsertPar;
+   }
+
+   public void insertParIfRequired()
+   throws IOException
+   {
+      if (autoInsertPar && currentDocumentBlockType == DocumentBlockType.BODY)
+      {
+         setCurrentBlockType(DocumentBlockType.PARAGRAPH);
+
+         writeliteralln("<p>");
+      }
    }
 
    @Override
@@ -729,7 +796,7 @@ public class L2HConverter extends LaTeXParserListener
       }
       else
       {
-         writeliteral(String.format("<br>%n"));
+         writeVoidElement("br", null, true);
       }
    }
 
@@ -901,7 +968,15 @@ public class L2HConverter extends LaTeXParserListener
 
    public void setSeparateCss(boolean separate)
    {
-      this.separateCss = separate;
+      if (currentDocumentBlockType == DocumentBlockType.OUTSIDE
+           && !documentEnded)
+      {
+         this.separateCss = separate;
+      }
+      else
+      {
+         throw new IllegalArgumentException("Too late to use setSeparateCss");
+      }
    }
 
    public boolean isWriteOutputAllowed()
@@ -939,12 +1014,9 @@ public class L2HConverter extends LaTeXParserListener
              new String(Character.toChars(codePoint)));
       }
 
-      if (currentDocumentBlockType == DocumentBlockType.BODY
-         && !isBlank)
+      if (!isBlank)
       {
-         setCurrentBlockType(DocumentBlockType.PARAGRAPH);
-
-         writeliteralln("<p>");
+         insertParIfRequired();
       }
 
       if (codePoint == '<')
@@ -1007,12 +1079,9 @@ public class L2HConverter extends LaTeXParserListener
            LaTeXSyntaxException.ERROR_MISSING_BEGIN_DOC, str);
       }
 
-      if (currentDocumentBlockType == DocumentBlockType.BODY
-         && !isBlank)
+      if (!isBlank)
       {
-         setCurrentBlockType(DocumentBlockType.PARAGRAPH);
-
-         writeliteralln("<p>");
+         insertParIfRequired();
       }
 
       if (useHtmlEntities)
@@ -1078,12 +1147,9 @@ public class L2HConverter extends LaTeXParserListener
            LaTeXSyntaxException.ERROR_MISSING_BEGIN_DOC, c);
       }
 
-      if (currentDocumentBlockType == DocumentBlockType.BODY
-         && !isBlank)
+      if (!isBlank)
       {
-         setCurrentBlockType(DocumentBlockType.PARAGRAPH);
-
-         writeliteralln("<p>");
+         insertParIfRequired();
       }
 
       if (useHtmlEntities)
@@ -1143,12 +1209,9 @@ public class L2HConverter extends LaTeXParserListener
            LaTeXSyntaxException.ERROR_MISSING_BEGIN_DOC, str);
       }
 
-      if (currentDocumentBlockType == DocumentBlockType.BODY
-         && !isBlank)
+      if (!isBlank)
       {
-         setCurrentBlockType(DocumentBlockType.PARAGRAPH);
-
-         writeliteralln("<p>");
+         insertParIfRequired();
       }
 
       write(str);
@@ -1159,14 +1222,7 @@ public class L2HConverter extends LaTeXParserListener
    {
       if (currentWriter != null)
       {
-         if (currentWriter instanceof PrintWriter)
-         {
-            ((PrintWriter)currentWriter).println();
-         }
-         else
-         {
-            write(String.format("%n"));
-         }
+         currentWriter.write(String.format("%n"));
       }
    }
 
@@ -1174,21 +1230,13 @@ public class L2HConverter extends LaTeXParserListener
    public void href(String url, TeXObject text)
      throws IOException
    {
-      if (currentWriter == null)
-      {
-         currentWriter = writer;
+      insertParIfRequired();
 
-         if (currentWriter == null)
-         {
-            throw new IOException("No writer available");
-         }
-      }
+      writeliteral("<a href=\"");
 
-      currentWriter.write("<a href=\"");
+      writeliteral(HtmlTag.encodeAttributeValue(url, true));
 
-      write(url);// escape HTML entities
-
-      currentWriter.write("\"");
+      writeliteral("\"");
 
       if (text instanceof AccSuppObject)
       {
@@ -1270,7 +1318,8 @@ public class L2HConverter extends LaTeXParserListener
 
                   if (text != null)
                   {
-                     elem.putAttribute(attr, text);
+                     elem.putAttribute(attr,
+                       HtmlTag.encodeAttributeValue(text, false));
                   }
 
                   return object;
@@ -1297,11 +1346,13 @@ public class L2HConverter extends LaTeXParserListener
       {
          if (attr == null)
          {
-            startElem.putAttribute("title", text);
+            startElem.putAttribute("title",
+              HtmlTag.encodeAttributeValue(text, false));
          }
          else
          {
-            startElem.putAttribute(attr, text);
+            startElem.putAttribute(attr, 
+              HtmlTag.encodeAttributeValue(text, false));
          }
       }
 
@@ -1446,7 +1497,8 @@ public class L2HConverter extends LaTeXParserListener
             node = divisionMap.get(id);
          }
 
-         if (node == null || node == currentNode || node.getFile().equals(currentNode.getFile()))
+         if (node == null || node == currentNode
+              || node.getFile().equals(currentNode.getFile()))
          {
             ref = "#"+HtmlTag.getUriFragment(id);
          }
@@ -1529,7 +1581,7 @@ public class L2HConverter extends LaTeXParserListener
          }
       }
 
-      elem.putAttribute("href", href);
+      elem.putAttribute("href", HtmlTag.encodeAttributeValue(href, true));
       stack.add(elem);
 
       stack.add(text);
@@ -1774,6 +1826,30 @@ public class L2HConverter extends LaTeXParserListener
          writeliteralln(String.format(".%s {%s}", defaultStyles.get(style), style));
       }
 
+      Color fgCol = getParser().getSettings().getFgColor();
+      Color bgCol = getParser().getSettings().getBgColor();
+
+      boolean addFg = (fgCol != null && fgCol != Color.BLACK);
+      boolean addBg = (bgCol != null && bgCol != Color.WHITE);
+
+      if (addFg || addBg)
+      {
+         writeliteral("body { ");
+
+         if (addFg)
+         {
+            writeliteral(String.format("color: %s; ", getHtmlColor(fgCol)));
+         }
+
+         if (addBg)
+         {
+            writeliteral(String.format("background-color: %s; ", 
+              getHtmlColor(bgCol)));
+         }
+
+         writeliteralln("}");
+      }
+
       for (String style : extraCssStyles)
       {
          writeliteralln(style);
@@ -1861,13 +1937,13 @@ public class L2HConverter extends LaTeXParserListener
 
       if (cs != null)
       {
-         generator = stripTags(processToString(cs, stack)).replaceAll("\"", "\\\"");
+         generator = stripTags(processToString(cs, stack));
       }
 
       if (!generator.isEmpty())
       {
          writeMeta(String.format("name=\"generator\" content=\"%s\"",
-           generator));
+           HtmlTag.encodeAttributeValue(generator, false)));
       }
 
       if (useMathJax())
@@ -1998,7 +2074,7 @@ public class L2HConverter extends LaTeXParserListener
          }
 
          writeliteral("<link rel=\"stylesheet\" type=\"text/css\" href=\"");
-         writeliteral(cssFile.getName());
+         writeliteral(HtmlTag.encodeAttributeValue(cssFile.getName(), true));
          writeliteralln("\">");
       }
       else
@@ -2009,25 +2085,9 @@ public class L2HConverter extends LaTeXParserListener
       }
 
       writeliteralln("</head>");
-      writeliteral("<body");
+      writeliteralln("<body>");
 
       setCurrentBlockType(DocumentBlockType.BODY);
-
-      Color fgCol = getParser().getSettings().getFgColor();
-      Color bgCol = getParser().getSettings().getBgColor();
-
-      if (fgCol != null && fgCol != Color.BLACK)
-      {
-         writeliteral(String.format(" text=\"%s\"", getHtmlColor(fgCol)));
-      }
-
-      if (bgCol != null && bgCol != Color.WHITE)
-      {
-         writeliteral(String.format(" background=\"%s\"", 
-           getHtmlColor(bgCol)));
-      }
-
-      writeliteralln(">");
 
       super.beginDocument(stack);
 
@@ -2150,7 +2210,7 @@ public class L2HConverter extends LaTeXParserListener
       if (!generator.isEmpty())
       {
          writeMeta(String.format("name=\"generator\" content=\"%s\"",
-           generator));
+           HtmlTag.encodeAttributeValue(generator, false)));
       }
 
       if (useMathJax())
@@ -2172,9 +2232,11 @@ public class L2HConverter extends LaTeXParserListener
 
       if (separateCss && cssFile != null)
       {
-         writeliteral("<link rel=\"stylesheet\" type=\"text/css\" href=\"");
-         writeliteral(cssFile.getName());
-         writeliteralln("\">");
+         writeVoidElement("link",
+            String.format("rel=\"stylesheet\" type=\"text/css\" href=\"%s\"",
+              HtmlTag.encodeAttributeValue(cssFile.getName(), true)),
+          true);
+
       }
       else
       {
@@ -2184,25 +2246,9 @@ public class L2HConverter extends LaTeXParserListener
       }
 
       writeliteralln("</head>");
-      writeliteral("<body");
+      writeliteralln("<body>");
 
       setCurrentBlockType(DocumentBlockType.BODY);
-
-      Color fgCol = getParser().getSettings().getFgColor();
-      Color bgCol = getParser().getSettings().getBgColor();
-
-      if (fgCol != null && fgCol != Color.BLACK)
-      {
-         writeliteral(String.format(" text=\"%s\"", getHtmlColor(fgCol)));
-      }
-
-      if (bgCol != null && bgCol != Color.WHITE)
-      {
-         writeliteral(String.format(" background=\"%s\"", 
-           getHtmlColor(bgCol)));
-      }
-
-      writeliteralln(">");
 
       if (navFile == null)
       {
@@ -2241,7 +2287,9 @@ public class L2HConverter extends LaTeXParserListener
 
    protected void footerNav() throws IOException
    {
-      writeliteralln("<footer class=\"doc-nav\">");
+      setCurrentBlockType(DocumentBlockType.FOOTER);
+
+      writeStartHtml5OrDiv("footer", "class=\"doc-nav\"", true);
 
       int idx = currentNode.getIndex();
 
@@ -2348,42 +2396,37 @@ public class L2HConverter extends LaTeXParserListener
          writeliteralln("</div>");
       }
 
-      writeliteralln("</footer>");
+      writeEndHtml5OrDiv("footer", true);
 
+      setCurrentBlockType(DocumentBlockType.BODY);
    }
 
    @Override
    public void addFootnote(TeXObject footnote, TeXObjectList stack)
    throws IOException
    {
+      DocumentBlockType orgType = currentDocumentBlockType;
+
       if (footnoteWriter == null)
       {
          footnoteWriter = new StringWriter();
       }
 
-      if (currentDocumentBlockType != DocumentBlockType.PARAGRAPH)
-      {
-         setCurrentBlockType(DocumentBlockType.PARAGRAPH);
-         footnoteWriter.write("<p>");
-      }
-
       try
       {
          currentWriter = footnoteWriter;
+
+         setCurrentBlockType(DocumentBlockType.PARAGRAPH);
+         writeliteral("<p>");
+
          TeXParserUtils.process(footnote, getParser(), stack);
 
-         if (currentDocumentBlockType == DocumentBlockType.PARAGRAPH)
-         {
-            if (isXml())
-            {
-               footnoteWriter.write("</p>");
-            }
-
-            setCurrentBlockType(DocumentBlockType.BODY);
-         }
+         endParagraph();
+         writeln();
       }
       finally
       {
+         setCurrentBlockType(orgType);
          currentWriter = writer;
       }
    }
@@ -2396,7 +2439,11 @@ public class L2HConverter extends LaTeXParserListener
       {
          doFootnoteRule();
 
+         setCurrentBlockType(DocumentBlockType.BLOCK);
+
          writer.write(footnoteWriter.toString());
+
+         setCurrentBlockType(DocumentBlockType.BODY);
 
          footnoteWriter = null;
       }
@@ -2422,17 +2469,22 @@ public class L2HConverter extends LaTeXParserListener
       return strWriter.toString();
    }
 
+   protected Writer newCssWriter(Path path)
+   throws IOException
+   {
+      return new PrintWriter(Files.newBufferedWriter(path, htmlCharSet));
+   }
+
    protected void writeCssFile()
      throws IOException
    {
       Writer prevWriter = currentWriter;
 
-      PrintWriter out = null;
+      Writer out = null;
 
       try
       {
-         out = new PrintWriter(Files.newBufferedWriter(cssFile.toPath(),
-            htmlCharSet));
+         out = newCssWriter(cssFile.toPath());
 
          currentWriter = out;
 
@@ -2613,16 +2665,21 @@ public class L2HConverter extends LaTeXParserListener
 
    }
 
+   protected Writer newNavWriter(Path path)
+   throws IOException
+   {
+      return new PrintWriter(Files.newBufferedWriter(path, htmlCharSet));
+   }
+
    protected void writeNavigationFile(TeXObjectList stack)
     throws IOException
    {
-      PrintWriter navWriter = null;
+      Writer navWriter = null;
       Writer prevWriter = currentWriter;
 
       try
       {
-         navWriter = new PrintWriter(Files.newBufferedWriter(navFile.toPath(),
-            htmlCharSet));
+         navWriter = newNavWriter(navFile.toPath());
 
          getParser().message(TeXApp.MESSAGE_WRITING, navFile);
 
@@ -2665,7 +2722,7 @@ public class L2HConverter extends LaTeXParserListener
          if (!generator.isEmpty())
          {
             writeMeta(String.format("name=\"generator\" content=\"%s\"",
-              generator));
+              HtmlTag.encodeAttributeValue(generator, false)));
          }
 
          if (useMathJax())
@@ -2690,9 +2747,11 @@ public class L2HConverter extends LaTeXParserListener
 
          if (separateCss)
          {
-            writeliteral("<link rel=\"stylesheet\" type=\"text/css\" href=\"");
-            writeliteral(cssFile.getName());
-            writeliteralln("\">");
+            writeVoidElement("link",
+               String.format("rel=\"stylesheet\" type=\"text/css\" href=\"%s\"",
+                 HtmlTag.encodeAttributeValue(cssFile.getName(), true)),
+             true);
+
          }
          else
          {
@@ -2779,7 +2838,7 @@ public class L2HConverter extends LaTeXParserListener
       if (cssClass != null)
       {
          writeliteral(" class=\"");
-         writeliteral(cssClass);
+         writeliteral(HtmlTag.encodeAttributeValue(cssClass, false));
          writeliteral("\"");
       }
 
@@ -2830,7 +2889,8 @@ public class L2HConverter extends LaTeXParserListener
             }
          }
 
-         writeliteral(String.format("<a href=\"%s\"", ref));
+         writeliteral(String.format("<a href=\"%s\"", 
+           HtmlTag.encodeAttributeValue(ref, true)));
 
          if (navFile == null && node == currentNode)
          {
@@ -3024,6 +3084,8 @@ public class L2HConverter extends LaTeXParserListener
      String text)
     throws IOException
    {
+      insertParIfRequired();
+
       writeliteral("<code style=\"white-space: pre;\">");
 
       super.verb(name, isStar, delim, text);
@@ -3151,6 +3213,8 @@ public class L2HConverter extends LaTeXParserListener
        KeyValList options, String filename)
     throws IOException
    {
+      insertParIfRequired();
+
       File file = getImageFile(filename);
 
       if (file == null || !file.exists())
@@ -3201,11 +3265,13 @@ public class L2HConverter extends LaTeXParserListener
             }
             else if (key.equals("class"))
             {
-               cssClass = parser.expandToString(value, stack);
+               cssClass = HtmlTag.encodeAttributeValue(
+                  processToString(value, stack), false);
             }
             else if (key.equals("style"))
             {
-               cssStyle = parser.expandToString(value, stack);
+               cssStyle = HtmlTag.encodeAttributeValue(
+                  processToString(value, stack), false);
             }
             else if (key.equals("scale"))
             {
@@ -3269,7 +3335,7 @@ public class L2HConverter extends LaTeXParserListener
 
          Dimension dim = getImageSize(file, type);
 
-         String uri = getUri(relPath);
+         String uri = HtmlTag.encodeAttributeValue(getUri(relPath), true);
 
          if (MIME_TYPE_PDF.equals(type))
          {
@@ -3526,9 +3592,14 @@ public class L2HConverter extends LaTeXParserListener
 
          getParser().message(TeXApp.MESSAGE_ENCODING, htmlCharSet);
 
-         writer = new PrintWriter(Files.newBufferedWriter(outFile.toPath(),
-            htmlCharSet));
+         writer = newHtmlWriter(outFile.toPath());
       }
+   }
+
+   protected Writer newHtmlWriter(Path path)
+   throws IOException
+   {
+      return new PrintWriter(Files.newBufferedWriter(path, htmlCharSet));
    }
 
    public void setSuffix(String suffix)
@@ -4221,11 +4292,11 @@ public class L2HConverter extends LaTeXParserListener
          ControlSequence cs = parser.getControlSequence("TeXParserLibLinkName");
          String text = "[link]";
 
-         if (cs instanceof Expandable && cs.canExpand())
+         if (cs != null)
          {
             try
             {
-               text = parser.expandToString(cs, parser);
+               text = processToString(cs, parser);
             }
             catch (IOException e)
             {
@@ -4235,7 +4306,7 @@ public class L2HConverter extends LaTeXParserListener
 
          return new HtmlTag(String.format(
           "<span class=\"labellink\"><a href=\"#%s\">%s</a></span>",
-            label, text));
+            HtmlTag.encodeAttributeValue(label, true), text));
       }
       else
       {
@@ -4278,8 +4349,7 @@ public class L2HConverter extends LaTeXParserListener
 
                writer.close();
 
-               writer = new PrintWriter(Files.newBufferedWriter(file.toPath(),
-                 htmlCharSet));
+               writer = newHtmlWriter(file.toPath());
 
                setWriter(writer);
 
@@ -4333,7 +4403,7 @@ public class L2HConverter extends LaTeXParserListener
 
          if (cs != null)
          {
-            text = parser.expandToString(cs, stack);
+            text = processToString(cs, stack);
          }
 
          writeliteral(String.format(
@@ -4569,10 +4639,12 @@ public class L2HConverter extends LaTeXParserListener
 
       if (name != null)
       {
-         return String.format(" class=\"%s\"", name);
+         return String.format(" class=\"%s\"",
+           HtmlTag.encodeAttributeValue(name, false));
       }
 
-      return String.format(" style=\"%s\"", cssAttributesToString(css));
+      return String.format(" style=\"%s\"", 
+         HtmlTag.encodeAttributeValue(cssAttributesToString(css), false));
    }
 
    public String cssAttributesToString(HashMap<String,String> css)
@@ -4626,6 +4698,9 @@ public class L2HConverter extends LaTeXParserListener
    private HashMap<String,String> defaultStyles;
 
    private HashMap<HashMap<String,String>,String> defaultStyleMaps;
+
+   private boolean autoInsertPar = false;
+   private boolean isXml = false;
 
    private DocumentBlockType currentDocumentBlockType = DocumentBlockType.OUTSIDE;
 

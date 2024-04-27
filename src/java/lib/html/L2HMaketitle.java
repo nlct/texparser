@@ -43,6 +43,28 @@ public class L2HMaketitle extends Maketitle
    }
 
    @Override
+   public void preProcess(TeXParser parser)
+      throws IOException
+   {
+      L2HConverter listener = (L2HConverter)parser.getListener();
+
+      listener.setCurrentBlockType(DocumentBlockType.HEADING);
+
+      super.preProcess(parser);
+   }
+
+   @Override
+   public void postProcess(TeXParser parser)
+      throws IOException
+   {
+      L2HConverter listener = (L2HConverter)parser.getListener();
+
+      super.postProcess(parser);
+
+      listener.setCurrentBlockType(DocumentBlockType.BODY);
+   }
+
+   @Override
    protected TeXObjectList createTitle(TeXParser parser)
     throws IOException
    {
@@ -50,7 +72,7 @@ public class L2HMaketitle extends Maketitle
 
       TeXObjectList list = listener.createStack();
 
-      list.add(new StartElement("header"));
+      list.add(listener.newHtml5StartElement("header"));
 
       StartElement elem = new StartElement("div");
       elem.putAttribute("class", "title");
@@ -76,7 +98,7 @@ public class L2HMaketitle extends Maketitle
       list.add(new EndElement("div"));
       list.add(new HtmlTag("<!-- end of date -->"));
 
-      list.add(new EndElement("header"));
+      list.add(listener.newHtml5EndElement("header"));
 
       return list;
    }

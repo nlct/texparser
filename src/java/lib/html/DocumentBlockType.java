@@ -20,5 +20,5 @@ package com.dickimawbooks.texparserlib.html;
 
 public enum DocumentBlockType
 {
-   HEAD, BODY, HEADING, PARAGRAPH, BLOCK, OUTSIDE;
+   HEAD, BODY, HEADING, PARAGRAPH, BLOCK, FOOTER, OUTSIDE;
 }
