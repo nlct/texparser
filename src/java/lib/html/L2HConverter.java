@@ -503,6 +503,7 @@ public class L2HConverter extends LaTeXParserListener
    }
 
    public void setCurrentBlockType(DocumentBlockType type)
+    throws IOException
    {
       DocumentBlockType old = currentDocumentBlockType;
 
@@ -2190,12 +2191,23 @@ public class L2HConverter extends LaTeXParserListener
       writeliteralln("</body>");
       writeliteralln("</html>");
 
+      setCurrentBlockType(DocumentBlockType.OUTSIDE);
+
       documentEnded = true;
       writer.close();
 
-      setCurrentBlockType(DocumentBlockType.OUTSIDE);
+      endDocumentHook();
 
       throw new EOFException();
+   }
+
+   /**
+    * Hook used after output file has been closed and all content
+    * has been parsed.
+    */
+   @Override
+   protected void endDocumentHook() throws IOException
+   {
    }
 
    protected void startDivisionFile(TeXObjectList stack)
@@ -2668,7 +2680,7 @@ public class L2HConverter extends LaTeXParserListener
 
    }
 
-   protected Writer newNavWriter(Path path)
+   protected PrintWriter newNavWriter(Path path)
    throws IOException
    {
       return new PrintWriter(Files.newBufferedWriter(path, htmlCharSet));
@@ -4315,6 +4327,11 @@ public class L2HConverter extends LaTeXParserListener
       {
          return new HtmlTag("<!-- Link setting off -->");
       }
+   }
+
+   public DivisionNode getCurrentNode()
+   {
+      return currentNode;
    }
 
    public void startSection(boolean isNumbered, String tag, String name,
