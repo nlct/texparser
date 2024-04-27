@@ -551,12 +551,15 @@ public class L2HConverter extends LaTeXParserListener
    public void endParagraph()
    throws IOException
    {
-      if (isXml() && currentDocumentBlockType == DocumentBlockType.PARAGRAPH)
+      if (currentDocumentBlockType == DocumentBlockType.PARAGRAPH)
       {
-         writeliteralln("</p>");
-      }
+         if (isXml())
+         {
+            writeliteralln("</p>");
+         }
 
-      setCurrentBlockType(DocumentBlockType.BODY);
+         setCurrentBlockType(DocumentBlockType.BODY);
+      }
    }
 
    @Override
@@ -4381,6 +4384,53 @@ public class L2HConverter extends LaTeXParserListener
       }
 
       writeToTopLink(stack);
+   }
+
+   public void startPhantomSection(String name, String id, TeXObjectList stack)
+    throws IOException
+   {
+      endParagraph();
+
+      if (currentDocumentBlockType != DocumentBlockType.BODY)
+      {
+         writeliteralln(String.format("<!-- phantom section %s -->", name));
+
+         if (id == null)
+         {
+            writeliteral(String.format("<a id=\"%s\"></a>", name));
+         }
+         else
+         {
+            writeliteral(String.format("<a id=\"%s\"></a>", id));
+         }
+      }
+      else
+      {
+         if (currentSection != null)
+         {
+            writeln();
+            writeEndHtml5OrDiv("section", false);
+            writeliteral(String.format("<!-- end of section %s -->%n", currentSection));
+         }
+
+         if (id == null)
+         {
+            currentSection = name;
+
+            writeln();
+            writeStartHtml5OrDiv("section", null, false);
+         }
+         else
+         {
+            currentSection = id;
+
+            writeln();
+            writeStartHtml5OrDiv("section", String.format("id=\"%s\"", id), false);
+         }
+
+         writeliteral(String.format("<!-- start of section %s -->",
+           currentSection));
+      }
    }
 
    public void enableToTopLink(boolean enable)

@@ -41,30 +41,68 @@ public class L2HAbstract extends AbstractDec
       return new L2HAbstract(getName());
    }
 
+   @Override
+   protected TeXObjectList getHeader(TeXParser parser, TeXObjectList stack)
+     throws IOException
+   {
+      L2HConverter listener = (L2HConverter)parser.getListener();
+
+      ControlSequence cs = parser.getControlSequence("chapter");
+
+      TeXObjectList substack;
+
+      if (cs == null)
+      {
+         substack = listener.createStack();
+
+         substack.add(new StartElement("h2"));
+         substack.add(new TeXCsRef("abstractname"));
+         substack.add(new EndElement("h2"));
+      }
+      else
+      {
+         substack = super.getHeader(parser, stack);
+      }
+
+      return substack;
+   }
+
+   @Override
    public void process(TeXParser parser) throws IOException
    {
       L2HConverter listener = (L2HConverter)parser.getListener();
 
-      listener.endParagraph();
+      ControlSequence cs = parser.getControlSequence("chapter");
 
-      parser.getListener().getWriteable().writeliteral(
-        String.format("%n<div class=\"%s\">", getName()));
+      if (cs == null)
+      {
+         listener.startPhantomSection("abstract", null, parser);
 
-      listener.setCurrentBlockType(DocumentBlockType.BLOCK);
+         parser.getListener().getWriteable().writeliteral(
+           String.format("%n<div class=\"%s\">", getName()));
+
+         listener.setCurrentBlockType(DocumentBlockType.BLOCK);
+      }
 
       super.process(parser);
    }
 
+   @Override
    public void process(TeXParser parser, TeXObjectList stack) throws IOException
    {
       L2HConverter listener = (L2HConverter)parser.getListener();
 
-      listener.endParagraph();
+      ControlSequence cs = parser.getControlSequence("chapter");
 
-      listener.writeliteral(
-       String.format("%n<div class=\"%s\">", getName()));
+      if (cs == null)
+      {
+         listener.startPhantomSection("abstract", null, stack);
 
-      listener.setCurrentBlockType(DocumentBlockType.BLOCK);
+         listener.writeliteral(
+          String.format("%n<div class=\"%s\">", getName()));
+
+         listener.setCurrentBlockType(DocumentBlockType.BLOCK);
+      }
 
       super.process(parser, stack);
    }
@@ -75,10 +113,15 @@ public class L2HAbstract extends AbstractDec
    {
       L2HConverter listener = (L2HConverter)parser.getListener();
 
-      listener.writeliteral(
-       String.format("</div><!-- end of %s -->%n", getName()));
+      ControlSequence cs = parser.getControlSequence("chapter");
 
-      listener.setCurrentBlockType(DocumentBlockType.BODY);
+      if (cs == null)
+      {
+         listener.writeliteral(
+          String.format("</div><!-- end of %s -->%n", getName()));
+
+         listener.setCurrentBlockType(DocumentBlockType.BODY);
+      }
 
    }
 }
