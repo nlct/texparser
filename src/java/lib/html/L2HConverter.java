@@ -2205,7 +2205,6 @@ public class L2HConverter extends LaTeXParserListener
     * Hook used after output file has been closed and all content
     * has been parsed.
     */
-   @Override
    protected void endDocumentHook() throws IOException
    {
    }
