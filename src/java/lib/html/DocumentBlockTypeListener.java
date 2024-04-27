@@ -18,7 +18,10 @@
 */
 package com.dickimawbooks.texparserlib.html;
 
+import java.io.IOException;
+
 public interface DocumentBlockTypeListener
 {
-   public void documentBlockUpdate(DocumentBlockTypeEvent evt);
+   public void documentBlockUpdate(DocumentBlockTypeEvent evt)
+    throws IOException;
 }
