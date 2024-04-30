@@ -2089,7 +2089,7 @@ public class L2HConverter extends LaTeXParserListener
       }
 
       writeliteralln("</head>");
-      writeliteralln("<body>");
+      startBody();
 
       setCurrentBlockType(DocumentBlockType.BODY);
 
@@ -2143,6 +2143,17 @@ public class L2HConverter extends LaTeXParserListener
       writeliteralln("<div id=\"main\">");
    }
 
+   // Used for node HTML files not for the navigation HTML file
+   protected void startBody() throws IOException
+   {
+      writeliteralln("<body>");
+   }
+
+   protected void endBody() throws IOException
+   {
+      writeliteralln("</body>");
+   }
+
    @Override
    public void endDocument(TeXObjectList stack)
      throws IOException
@@ -2188,7 +2199,7 @@ public class L2HConverter extends LaTeXParserListener
          }
       }
 
-      writeliteralln("</body>");
+      endBody();
       writeliteralln("</html>");
 
       setCurrentBlockType(DocumentBlockType.OUTSIDE);
@@ -2260,7 +2271,7 @@ public class L2HConverter extends LaTeXParserListener
       }
 
       writeliteralln("</head>");
-      writeliteralln("<body>");
+      startBody();
 
       setCurrentBlockType(DocumentBlockType.BODY);
 
@@ -2293,7 +2304,7 @@ public class L2HConverter extends LaTeXParserListener
 
       writeliteralln("</div><!-- end of main -->");// ends <div id="main">
 
-      writeliteralln("</body>");
+      endBody();
       writeliteralln("</html>");
 
       setCurrentBlockType(DocumentBlockType.OUTSIDE);
@@ -2775,7 +2786,6 @@ public class L2HConverter extends LaTeXParserListener
          }
 
          writeliteralln("</head>");
-
          writeliteralln("<body>");
 
          if (title != null)
