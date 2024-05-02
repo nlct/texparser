@@ -226,24 +226,11 @@ public class PrintIndex extends AbstractGlsCommand
 
                if (!grpLabel.equals(currentGrpLabel))
                {
-                  list.add(subSectionCs);
-
                   ControlSequence cs = parser.getControlSequence(
                      "glsxtr@grouptitle@"+grpLabel);
-                  TeXObject grpTitle;
 
-                  if (cs == null)
-                  {
-                     list.add(listener.createGroup(grpLabel));
-                     grpTitle = listener.createString(grpLabel);
-                  }
-                  else
-                  {
-                     list.add(cs);
-                     grpTitle = cs;
-                  }
-
-                  list.add(listener.createGroup(grpLabel));
+                  addGroupHeading(subSectionCs, grpLabel, cs, list,
+                   parser, stack);
 
                   currentGrpLabel = grpLabel;
                }
@@ -288,8 +275,28 @@ public class PrintIndex extends AbstractGlsCommand
       }
    }
 
+   protected void addGroupHeading(ControlSequence subSectionCs,
+     String grpLabel, ControlSequence groupTitleCs,
+     TeXObjectList content, TeXParser parser, TeXObjectList stack)
+   throws IOException
+   {
+      content.add(subSectionCs);
+
+      if (groupTitleCs == null)
+      {
+         content.add(parser.getListener().createGroup(grpLabel));
+      }
+      else
+      {
+         content.add(groupTitleCs);
+      }
+
+      content.add(parser.getListener().createGroup(grpLabel));
+   }
+
    protected void addLocationList(GlsLabel glslabel, TeXObjectList content,
      TeXParserListener listener)
+   throws IOException
    {
       TeXObject loc = glslabel.getField("location");
 
