@@ -2513,7 +2513,7 @@ public class L2HConverter extends LaTeXParserListener
 
          currentWriter = out;
 
-         writeliteralln(String.format("@charset \"%s\"", htmlCharSet.name()));
+         writeliteralln(String.format("@charset \"%s\";", htmlCharSet.name()));
 
          writeCssStyles();
       }
