@@ -635,14 +635,14 @@ public class L2HConverter extends LaTeXParserListener
    {
       StartElement elem;
 
-      if (isXml())
+      if (isHtml5())
       {
-         elem = new StartElement("div");
-         elem.putAttribute("class", name);
+         elem = new StartElement(name);
       }
       else
       {
-         elem = new StartElement(name);
+         elem = new StartElement("div");
+         elem.putAttribute("class", name);
       }
 
       return elem;
@@ -652,13 +652,13 @@ public class L2HConverter extends LaTeXParserListener
    {
       EndElement elem;
 
-      if (isXml())
+      if (isHtml5())
       {
-         elem = new EndElement("div");
+         elem = new EndElement(name);
       }
       else
       {
-         elem = new EndElement(name);
+         elem = new EndElement("div");
       }
 
       return elem;
@@ -669,7 +669,11 @@ public class L2HConverter extends LaTeXParserListener
    {
       writeliteral("<");
 
-      if (isXml())
+      if (isHtml5())
+      {
+         writeliteral(name);
+      }
+      else
       {
          writeliteral("div");
 
@@ -679,10 +683,6 @@ public class L2HConverter extends LaTeXParserListener
             writeliteral(name);
             writeliteral("\"");
          }
-      }
-      else
-      {
-         writeliteral(name);
       }
 
       if (attributes != null && !attributes.isEmpty())
@@ -705,7 +705,7 @@ public class L2HConverter extends LaTeXParserListener
    throws IOException
    {
       writeliteral("</");
-      writeliteral(isXml() ? "div" : name);
+      writeliteral(isHtml5() ? name : "div");
 
       if (insertCR)
       {
@@ -734,6 +734,11 @@ public class L2HConverter extends LaTeXParserListener
       {
          throw new IllegalArgumentException("Too late to use setXml");
       }
+   }
+
+   public boolean isHtml5()
+   {
+      return !isXml();
    }
 
    public void setAutoInsertPar(boolean enable)
@@ -1764,13 +1769,13 @@ public class L2HConverter extends LaTeXParserListener
       writeliteralln(".toc-paragraph span.numberline { display: inline-block; width: 5em; }");
       writeliteralln(".toc-subparagraph span.numberline { display: inline-block; width: 6em; }");
 
-      if (isXml())
+      if (isHtml5())
       {
-         writeliteralln("div.nav ul { list-style-type: none; }");
+         writeliteralln("nav ul { list-style-type: none; }");
       }
       else
       {
-         writeliteralln("nav ul { list-style-type: none; }");
+         writeliteralln("div.nav ul { list-style-type: none; }");
       }
 
       writeliteralln("@media screen and (min-width: 500px)");
@@ -3366,11 +3371,22 @@ public class L2HConverter extends LaTeXParserListener
             uri += String.format("?#zoom=%d", zoom);
          }
 
-         writeliteral(String.format("<object data=\"%s\"", uri));
+         String imgTag = getImageTag(type);
 
-         if (type != null)
+         writeliteral(String.format("<%s ", imgTag));
+
+         if (imgTag.equals("img"))
          {
-            writeliteral(String.format(" type=\"%s\"", type));
+            writeliteral(String.format("src=\"%s\"", uri));
+         }
+         else
+         {
+            writeliteral(String.format("data=\"%s\"", uri));
+
+            if (type != null)
+            {
+               writeliteral(String.format(" type=\"%s\"", type));
+            }
          }
 
          if (cssClass != null)
@@ -3389,18 +3405,47 @@ public class L2HConverter extends LaTeXParserListener
               (int)Math.round(scale*dim.width), (int)Math.round(scale*dim.height)));
          }
 
-         writeliteral(">");
-
-         try
+         if (imgTag.equals("img"))
          {
             if (alt != null)
             {
-               TeXParserUtils.process(alt, parser, stack);
+               String altVal = "";
+
+               try
+               {
+                  altVal = processToString(alt, stack);
+                  altVal = HtmlTag.encodeAttributeValue(altVal, false);
+               }
+               catch (IOException e)
+               {
+                  getTeXApp().error(e);
+               }
+
+               writeliteral(String.format(" alt=\"%s\"", altVal));
             }
+
+            if (isXml())
+            {
+               writeliteral("/");
+            }
+
+            writeliteral(">");
          }
-         finally
+         else
          {
-            writeliteral("</object>");
+            writeliteral(">");
+
+            try
+            {
+               if (alt != null)
+               {
+                  TeXParserUtils.process(alt, parser, stack);
+               }
+            }
+            finally
+            {
+               writeliteral("</object>");
+            }
          }
 
          try
@@ -3412,6 +3457,11 @@ public class L2HConverter extends LaTeXParserListener
             getParser().error(e);
          }
       }
+   }
+
+   protected String getImageTag(String mimeType)
+   {
+      return "object";
    }
 
    protected void writeTransform(String tag, String property)

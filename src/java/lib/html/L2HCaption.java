@@ -92,7 +92,7 @@ public class L2HCaption extends ControlSequence
       String tag;
       String classAttr = null;
 
-      if ("figure".equals(type))
+      if ("figure".equals(type) && listener.isHtml5())
       {
          tag = "figcaption";
       }

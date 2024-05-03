@@ -53,13 +53,13 @@ public class L2HFloat extends LaTeXFloat
 
       listener.endParagraph();
 
-      if (getName().equals("figure"))
+      if (getName().equals("figure") && listener.isHtml5())
       {
          listener.writeliteral("<figure>");
       }
       else
       {
-         listener.writeliteral("<div class=\""+getName()+"\">");
+         listener.writeliteralln("<div class=\""+getName()+"\">");
       }
 
       listener.setCurrentBlockType(DocumentBlockType.BLOCK);
@@ -73,11 +73,11 @@ public class L2HFloat extends LaTeXFloat
 
       if (getName().equals("figure"))
       {
-         listener.writeliteral("</figure>");
+         listener.writeEndHtml5OrDiv("figure", true);
       }
       else
       {
-         listener.writeliteral("</div>");
+         listener.writeliteralln("</div>");
       }
 
       listener.setCurrentBlockType(DocumentBlockType.BODY);

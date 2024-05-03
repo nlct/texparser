@@ -86,8 +86,10 @@ public class L2HTableOfContents extends ControlSequence
 
       listener.stepcounter(counter);
 
+      String navTag = listener.isHtml5() ? "nav" : "div";
+
       stack.push(new HtmlTag("<!-- end of toc -->"));
-      stack.push(new EndElement("nav"));
+      stack.push(new EndElement(navTag));
       stack.push(listener.getControlSequence("endgroup"));
 
       ControlSequence tagCs = new GenericCommand(true, "@toc@endtags");
@@ -109,7 +111,7 @@ public class L2HTableOfContents extends ControlSequence
       stack.push(listener.getOther('*'));
       stack.push(cs);
 
-      StartElement elem = new StartElement("nav");
+      StartElement elem = new StartElement(navTag);
       elem.putAttribute("class", "toc");
       elem.putAttribute("aria-label", "Table of Contents");
       stack.push(elem);
