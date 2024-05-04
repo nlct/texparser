@@ -3229,6 +3229,12 @@ public class L2HConverter extends LaTeXParserListener
          return MIME_TYPE_JPEG;
       }
 
+      if (ext.equals("tex") || ext.equals("ltx") || ext.equals("sty")
+          || ext.equals("cls") || ext.equals("def") || ext.equals("ldf"))
+      {
+         return MIME_TYPE_TEX;
+      }
+
       return null;
    }
 
@@ -3273,7 +3279,6 @@ public class L2HConverter extends LaTeXParserListener
       String cssStyle = null;
 
       String type=getMimeType(file.getName());
-      L2HImage image=null;
 
       double scale = 1;
       int zoom = 100;
@@ -3334,25 +3339,8 @@ public class L2HConverter extends LaTeXParserListener
          }
       }
 
-      if (optionsBuilder.length() > 0)
-      {
-         StringBuilder content = new StringBuilder("\\includegraphics[");
-         String sep = null;
-
-         content.append(optionsBuilder);
-
-         content.append("]{");
-         content.append(filename);
-         content.append('}');
-
-         if (getParser().isDebugMode(TeXParser.DEBUG_IO))
-         {
-            getParser().logMessage("Creating image "+content.toString());
-         }
-
-         image = toImage(getImagePreamble(),
-          content.toString(), type, alt, null, true);
-      }
+      L2HImage image = createImage(imagePath, filename, optionsBuilder, type,
+          scale, zoom, alt, cssClass, cssStyle);
 
       if (image != null)
       {
@@ -3457,6 +3445,36 @@ public class L2HConverter extends LaTeXParserListener
             getParser().error(e);
          }
       }
+   }
+
+   protected L2HImage createImage(Path imagePath, String filename,
+     StringBuilder optionsBuilder,
+     String type, double scale, int zoom,
+     TeXObject alt, String cssClass, String cssStyle)
+    throws IOException
+   {
+      L2HImage image = null;
+
+      if (optionsBuilder.length() > 0)
+      {
+         StringBuilder content = new StringBuilder("\\includegraphics[");
+
+         content.append(optionsBuilder);
+
+         content.append("]{");
+         content.append(filename);
+         content.append('}');
+
+         if (getParser().isDebugMode(TeXParser.DEBUG_IO))
+         {
+            getParser().logMessage("Creating image "+content.toString());
+         }
+
+         image = toImage(getImagePreamble(),
+          content.toString(), type, alt, null, true);
+      }
+
+      return image;
    }
 
    protected String getImageTag(String mimeType)
@@ -4855,4 +4873,5 @@ public class L2HConverter extends LaTeXParserListener
    public static final String MIME_TYPE_PDF = "application/pdf";
    public static final String MIME_TYPE_PNG = "image/png";
    public static final String MIME_TYPE_JPEG = "image/jpeg";
+   public static final String MIME_TYPE_TEX = "text/x-tex";
 }
