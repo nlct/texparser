@@ -1139,6 +1139,142 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       parser.putControlSequence(new ClearL3Object("clist_clear:c"));
       parser.putControlSequence(new ClearL3Object("clist_gclear:c"));
 
+      // Token list append and prepend
+      parser.putControlSequence(new AddToL3Object("tl_put_right:Nn"));
+      parser.putControlSequence(new AddToL3Object("tl_put_right:NV"));
+      parser.putControlSequence(new AddToL3Object("tl_put_right:Nv"));
+      parser.putControlSequence(new AddToL3Object("tl_put_right:Ne"));
+      parser.putControlSequence(new AddToL3Object("tl_put_right:No"));
+      parser.putControlSequence(new AddToL3Object("tl_put_right:cn"));
+      parser.putControlSequence(new AddToL3Object("tl_put_right:cV"));
+      parser.putControlSequence(new AddToL3Object("tl_put_right:cv"));
+      parser.putControlSequence(new AddToL3Object("tl_put_right:ce"));
+      parser.putControlSequence(new AddToL3Object("tl_put_right:co"));
+
+      parser.putControlSequence(new AddToL3Object("tl_gput_right:Nn"));
+      parser.putControlSequence(new AddToL3Object("tl_gput_right:NV"));
+      parser.putControlSequence(new AddToL3Object("tl_gput_right:Nv"));
+      parser.putControlSequence(new AddToL3Object("tl_gput_right:Ne"));
+      parser.putControlSequence(new AddToL3Object("tl_gput_right:No"));
+      parser.putControlSequence(new AddToL3Object("tl_gput_right:cn"));
+      parser.putControlSequence(new AddToL3Object("tl_gput_right:cV"));
+      parser.putControlSequence(new AddToL3Object("tl_gput_right:cv"));
+      parser.putControlSequence(new AddToL3Object("tl_gput_right:ce"));
+      parser.putControlSequence(new AddToL3Object("tl_gput_right:co"));
+
+      parser.putControlSequence(new AddToL3Object("tl_put_left:Nn"));
+      parser.putControlSequence(new AddToL3Object("tl_put_left:NV"));
+      parser.putControlSequence(new AddToL3Object("tl_put_left:Nv"));
+      parser.putControlSequence(new AddToL3Object("tl_put_left:Ne"));
+      parser.putControlSequence(new AddToL3Object("tl_put_left:No"));
+      parser.putControlSequence(new AddToL3Object("tl_put_left:cn"));
+      parser.putControlSequence(new AddToL3Object("tl_put_left:cV"));
+      parser.putControlSequence(new AddToL3Object("tl_put_left:cv"));
+      parser.putControlSequence(new AddToL3Object("tl_put_left:ce"));
+      parser.putControlSequence(new AddToL3Object("tl_put_left:co"));
+
+      parser.putControlSequence(new AddToL3Object("tl_gput_left:Nn"));
+      parser.putControlSequence(new AddToL3Object("tl_gput_left:NV"));
+      parser.putControlSequence(new AddToL3Object("tl_gput_left:Nv"));
+      parser.putControlSequence(new AddToL3Object("tl_gput_left:Ne"));
+      parser.putControlSequence(new AddToL3Object("tl_gput_left:No"));
+      parser.putControlSequence(new AddToL3Object("tl_gput_left:cn"));
+      parser.putControlSequence(new AddToL3Object("tl_gput_left:cV"));
+      parser.putControlSequence(new AddToL3Object("tl_gput_left:cv"));
+      parser.putControlSequence(new AddToL3Object("tl_gput_left:ce"));
+      parser.putControlSequence(new AddToL3Object("tl_gput_left:co"));
+
+      // sequences append and prepend
+      parser.putControlSequence(new AddToL3Object("seq_put_right:Nn"));
+      parser.putControlSequence(new AddToL3Object("seq_put_right:NV"));
+      parser.putControlSequence(new AddToL3Object("seq_put_right:Nv"));
+      parser.putControlSequence(new AddToL3Object("seq_put_right:Ne"));
+      parser.putControlSequence(new AddToL3Object("seq_put_right:No"));
+      parser.putControlSequence(new AddToL3Object("seq_put_right:cn"));
+      parser.putControlSequence(new AddToL3Object("seq_put_right:cV"));
+      parser.putControlSequence(new AddToL3Object("seq_put_right:cv"));
+      parser.putControlSequence(new AddToL3Object("seq_put_right:ce"));
+      parser.putControlSequence(new AddToL3Object("seq_put_right:co"));
+
+      parser.putControlSequence(new AddToL3Object("seq_gput_right:Nn"));
+      parser.putControlSequence(new AddToL3Object("seq_gput_right:NV"));
+      parser.putControlSequence(new AddToL3Object("seq_gput_right:Nv"));
+      parser.putControlSequence(new AddToL3Object("seq_gput_right:Ne"));
+      parser.putControlSequence(new AddToL3Object("seq_gput_right:No"));
+      parser.putControlSequence(new AddToL3Object("seq_gput_right:cn"));
+      parser.putControlSequence(new AddToL3Object("seq_gput_right:cV"));
+      parser.putControlSequence(new AddToL3Object("seq_gput_right:cv"));
+      parser.putControlSequence(new AddToL3Object("seq_gput_right:ce"));
+      parser.putControlSequence(new AddToL3Object("seq_gput_right:co"));
+
+      parser.putControlSequence(new AddToL3Object("seq_put_left:Nn"));
+      parser.putControlSequence(new AddToL3Object("seq_put_left:NV"));
+      parser.putControlSequence(new AddToL3Object("seq_put_left:Nv"));
+      parser.putControlSequence(new AddToL3Object("seq_put_left:Ne"));
+      parser.putControlSequence(new AddToL3Object("seq_put_left:No"));
+      parser.putControlSequence(new AddToL3Object("seq_put_left:cn"));
+      parser.putControlSequence(new AddToL3Object("seq_put_left:cV"));
+      parser.putControlSequence(new AddToL3Object("seq_put_left:cv"));
+      parser.putControlSequence(new AddToL3Object("seq_put_left:ce"));
+      parser.putControlSequence(new AddToL3Object("seq_put_left:co"));
+
+      parser.putControlSequence(new AddToL3Object("seq_gput_left:Nn"));
+      parser.putControlSequence(new AddToL3Object("seq_gput_left:NV"));
+      parser.putControlSequence(new AddToL3Object("seq_gput_left:Nv"));
+      parser.putControlSequence(new AddToL3Object("seq_gput_left:Ne"));
+      parser.putControlSequence(new AddToL3Object("seq_gput_left:No"));
+      parser.putControlSequence(new AddToL3Object("seq_gput_left:cn"));
+      parser.putControlSequence(new AddToL3Object("seq_gput_left:cV"));
+      parser.putControlSequence(new AddToL3Object("seq_gput_left:cv"));
+      parser.putControlSequence(new AddToL3Object("seq_gput_left:ce"));
+      parser.putControlSequence(new AddToL3Object("seq_gput_left:co"));
+
+      // CSV list append and prepend
+      parser.putControlSequence(new AddToL3Object("clist_put_right:Nn"));
+      parser.putControlSequence(new AddToL3Object("clist_put_right:NV"));
+      parser.putControlSequence(new AddToL3Object("clist_put_right:Nv"));
+      parser.putControlSequence(new AddToL3Object("clist_put_right:Ne"));
+      parser.putControlSequence(new AddToL3Object("clist_put_right:No"));
+      parser.putControlSequence(new AddToL3Object("clist_put_right:cn"));
+      parser.putControlSequence(new AddToL3Object("clist_put_right:cV"));
+      parser.putControlSequence(new AddToL3Object("clist_put_right:cv"));
+      parser.putControlSequence(new AddToL3Object("clist_put_right:ce"));
+      parser.putControlSequence(new AddToL3Object("clist_put_right:co"));
+
+      parser.putControlSequence(new AddToL3Object("clist_gput_right:Nn"));
+      parser.putControlSequence(new AddToL3Object("clist_gput_right:NV"));
+      parser.putControlSequence(new AddToL3Object("clist_gput_right:Nv"));
+      parser.putControlSequence(new AddToL3Object("clist_gput_right:Ne"));
+      parser.putControlSequence(new AddToL3Object("clist_gput_right:No"));
+      parser.putControlSequence(new AddToL3Object("clist_gput_right:cn"));
+      parser.putControlSequence(new AddToL3Object("clist_gput_right:cV"));
+      parser.putControlSequence(new AddToL3Object("clist_gput_right:cv"));
+      parser.putControlSequence(new AddToL3Object("clist_gput_right:ce"));
+      parser.putControlSequence(new AddToL3Object("clist_gput_right:co"));
+
+      parser.putControlSequence(new AddToL3Object("clist_put_left:Nn"));
+      parser.putControlSequence(new AddToL3Object("clist_put_left:NV"));
+      parser.putControlSequence(new AddToL3Object("clist_put_left:Nv"));
+      parser.putControlSequence(new AddToL3Object("clist_put_left:Ne"));
+      parser.putControlSequence(new AddToL3Object("clist_put_left:No"));
+      parser.putControlSequence(new AddToL3Object("clist_put_left:cn"));
+      parser.putControlSequence(new AddToL3Object("clist_put_left:cV"));
+      parser.putControlSequence(new AddToL3Object("clist_put_left:cv"));
+      parser.putControlSequence(new AddToL3Object("clist_put_left:ce"));
+      parser.putControlSequence(new AddToL3Object("clist_put_left:co"));
+
+      parser.putControlSequence(new AddToL3Object("clist_gput_left:Nn"));
+      parser.putControlSequence(new AddToL3Object("clist_gput_left:NV"));
+      parser.putControlSequence(new AddToL3Object("clist_gput_left:Nv"));
+      parser.putControlSequence(new AddToL3Object("clist_gput_left:Ne"));
+      parser.putControlSequence(new AddToL3Object("clist_gput_left:No"));
+      parser.putControlSequence(new AddToL3Object("clist_gput_left:cn"));
+      parser.putControlSequence(new AddToL3Object("clist_gput_left:cV"));
+      parser.putControlSequence(new AddToL3Object("clist_gput_left:cv"));
+      parser.putControlSequence(new AddToL3Object("clist_gput_left:ce"));
+      parser.putControlSequence(new AddToL3Object("clist_gput_left:co"));
+
+
       // Booleans
       parser.putControlSequence(new LaTeX3Boolean("c_false_bool", false));
       parser.putControlSequence(new LaTeX3Boolean("c_true_bool", true));

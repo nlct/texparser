@@ -611,6 +611,59 @@ public class TeXParserUtils
       return toKeyValList(arg, parser);
    }
 
+   public static TeXObject popL3Arg(TeXParser parser, TeXObjectList stack,
+     char argType)
+     throws IOException
+   {
+      switch (argType)
+      {
+         case 'o':
+            return popArgExpandOnce(parser, stack);
+         case 'x':
+         case 'e':
+            return popArgExpandFully(parser, stack);
+         case 'N':
+            return (stack == null ? parser.popToken() : stack.popToken());
+         case 'c':
+            String csn = popLabelString(parser, stack);
+            ControlSequence cseq = parser.getControlSequence(csn);
+            return cseq == null ? new TeXCsRef(csn) : cseq;
+      }
+
+      if (argType == 'v' || argType == 'V')
+      {
+         ControlSequence cs;
+
+         if (argType == 'v')
+         {
+            String csname = popLabelString(parser, stack);
+
+            cs = parser.getListener().getControlSequence(csname);
+         }
+         else
+         {
+            cs = popControlSequence(parser, stack);
+         }
+
+         TeXObject arg = resolve(cs, parser);
+
+         if (arg instanceof GenericCommand)
+         {
+            return (TeXObject)((GenericCommand)arg).getDefinition().clone();
+         }
+         else if (arg instanceof InternalQuantity)
+         {
+            return ((InternalQuantity)arg).getQuantity(parser, stack);
+         }
+         else
+         {
+            return expandOnce(arg, parser, stack);
+         }
+      }
+
+      return popArg(parser, stack);
+   }
+
    public static boolean isTrue(String csname, TeXParser parser)
    {
       TeXBoolean bool = toBoolean(csname, parser);

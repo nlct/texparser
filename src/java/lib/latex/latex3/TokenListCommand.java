@@ -92,6 +92,28 @@ public class TokenListCommand extends Command implements L3StorageCommand
       return content;
    }
 
+   @Override
+   public void setQuantity(TeXParser parser, TeXObject obj)
+    throws TeXSyntaxException
+   {
+      if (obj instanceof TeXObjectList)
+      {
+         content = (TeXObjectList)obj;
+      }
+      else
+      {
+         content = new TeXObjectList();
+         content.add(obj);
+      }
+   }
+
+   @Override
+   public TeXObject getQuantity(TeXParser parser, TeXObjectList stack)
+    throws TeXSyntaxException
+   {
+      return (TeXObject)content.clone();
+   }
+
    /**
     * Appends an element to the token list.
     */ 

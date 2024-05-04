@@ -68,6 +68,16 @@ public class PropertyCommand<T> extends ControlSequence implements L3StorageComm
       hashtable.clear();
    }
 
+   @Override
+   public void append(TeXObject obj)
+   {
+   }
+
+   @Override
+   public void prepend(TeXObject obj)
+   {
+   }
+
    public TeXObject get(T key)
    {
       return hashtable.get(key);
@@ -116,6 +126,27 @@ public class PropertyCommand<T> extends ControlSequence implements L3StorageComm
    public Hashtable<T,TeXObject> getHashtable()
    {
       return hashtable;
+   }
+
+   @Override
+   public void setQuantity(TeXParser parser, TeXObject obj)
+    throws TeXSyntaxException
+   {
+// TODO
+   }
+
+   @Override
+   public TeXObject getQuantity(TeXParser parser, TeXObjectList stack)
+    throws TeXSyntaxException
+   {
+// TODO
+      return new TeXObjectList();
+   }
+
+   @Override
+   public TeXObject getContent()
+   {
+      return new TeXObjectList();
    }
 
    @Override

@@ -22,11 +22,26 @@ import java.io.IOException;
 
 import com.dickimawbooks.texparserlib.*;
 
-public interface L3StorageCommand extends TeXObject
+public interface L3StorageCommand extends TeXObject, InternalQuantity
 {
    /**
-    * Clears the object content.
+    * Clears this object content.
     */ 
    public void clear();
+
+   /**
+    * Gets this object's content.
+    */ 
+   public TeXObject getContent();
+
+   /**
+    * Appends an element to this object.
+    */ 
+   public void append(TeXObject obj);
+
+   /**
+    * Prepends an element to this object.
+    */ 
+   public void prepend(TeXObject obj);
 
 }

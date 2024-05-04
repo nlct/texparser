@@ -23,23 +23,31 @@ import java.util.Vector;
 
 import com.dickimawbooks.texparserlib.*;
 
-public class ClearL3Object extends ControlSequence
+public class AddToL3Object extends ControlSequence
 {
-   public ClearL3Object(String name)
+   public AddToL3Object(String name)
    {
-      this(name, name.contains("_gclear:"), name.charAt(name.length()-1));
+      this(name,
+            name.contains("_gput_"),
+            name.contains("_right"),
+            name.charAt(name.length()-2),
+            name.charAt(name.length()-1)
+          );
    }
 
-   public ClearL3Object(String name, boolean global, char suffix)
+   public AddToL3Object(String name, boolean global,
+     boolean append, char suffix1, char suffix2)
    {
       super(name);
       this.global = global;
-      this.suffix = suffix;
+      this.append = append;
+      this.suffix1 = suffix1;
+      this.suffix2 = suffix2;
    }
 
    public Object clone()
    {
-      return new ClearL3Object(getName(), global, suffix);
+      return new AddToL3Object(getName(), global, append, suffix1, suffix2);
    }
 
    public void process(TeXParser parser) throws IOException
@@ -52,7 +60,7 @@ public class ClearL3Object extends ControlSequence
       ControlSequence cs;
       String csname;
 
-      if (suffix=='c')
+      if (suffix1=='c')
       {
          csname = popLabelString(parser, stack);
          cs = parser.getControlSequence(csname);
@@ -63,41 +71,44 @@ public class ClearL3Object extends ControlSequence
          csname = cs.getName();
       }
 
+      TeXObject obj = TeXParserUtils.popL3Arg(parser, stack, suffix2);
+
+      L3StorageCommand l3cs;
+
       if (cs instanceof L3StorageCommand)
       {
-         L3StorageCommand l3cs = (L3StorageCommand)cs;
+         l3cs = (L3StorageCommand)cs;
 
          if (!global)
          {
             l3cs = (L3StorageCommand)cs.clone();
          }
-
-         l3cs.clear();
-
-         parser.putControlSequence(!global, (ControlSequence)l3cs);
-      }
-      else if (name.startsWith("tl_"))
-      {
-         parser.putControlSequence(!global, new TokenListCommand(csname));
       }
       else if (name.startsWith("seq_"))
       {
-         parser.putControlSequence(!global, new SequenceCommand(csname));
+         l3cs = new SequenceCommand(csname);
       }
       else if (name.startsWith("clist_"))
       {
-         parser.putControlSequence(!global, new ClistCommand(csname));
-      }
-      else if (name.startsWith("prop_"))
-      {
-         parser.putControlSequence(!global, new PropertyCommand(csname));
+         l3cs = new ClistCommand(csname);
       }
       else
       {
-         parser.putControlSequence(!global, new GenericCommand(true, csname));
+         l3cs = new TokenListCommand(csname);
       }
+
+      if (append)
+      {
+         l3cs.append(obj);
+      }
+      else
+      {
+         l3cs.prepend(obj);
+      }
+
+      parser.putControlSequence(!global, (ControlSequence)l3cs);
    }
 
-   protected boolean global=false;
-   protected char suffix = 'N';
+   protected boolean global=false, append=true;
+   protected char suffix1 = 'N', suffix2='n';
 }

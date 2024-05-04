@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2023-2024 Nicola L.C. Talbot
+    Copyright (C) 2024 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -24,73 +24,30 @@ import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.LaTeXSyntaxException;
 import com.dickimawbooks.texparserlib.latex.CsvList;
 
-public class SequenceCommand extends Command implements L3StorageCommand 
+public class ClistCommand extends Command implements L3StorageCommand 
 {
-   public SequenceCommand(String name)
+   public ClistCommand(String name)
    {
       super(name);
       content = new TeXObjectList();
    }
 
-   public SequenceCommand(String name, int capacity)
+   public ClistCommand(String name, int capacity)
    {
       super(name);
       content = new TeXObjectList(capacity);
    }
 
-   public SequenceCommand(String name, SequenceCommand other)
+   public ClistCommand(String name, ClistCommand other)
    {
       super(name);
       content = (TeXObjectList)other.content.clone();
    }
 
-   public static SequenceCommand createFromSeqContent(TeXParser parser, String name,
-     TeXObjectList otherContent)
-   throws IOException
-   {
-      SequenceCommand seq = new SequenceCommand(name);
-
-      if (!otherContent.isEmpty())
-      {
-         boolean foundStart = false;
-
-         while (!otherContent.isEmpty())
-         {
-            TeXObject obj = otherContent.popStack(parser,
-              TeXObjectList.POP_IGNORE_LEADING_SPACE);
-
-            if (foundStart)
-            {
-               if (obj instanceof ControlSequence
-                   && ((ControlSequence)obj).getName().equals("__seq_item:n"))
-               {
-                  obj = otherContent.popArg(parser);
-                  seq.append(obj);
-               }
-            }
-            else if (!(obj instanceof WhiteSpace))
-            {
-               if (obj instanceof ControlSequence
-                   && ((ControlSequence)obj).getName().equals("s__seq"))
-               {
-                  foundStart = true;
-               }
-               else
-               {
-                  throw new LaTeXSyntaxException(parser, 
-                    LaTeXSyntaxException.ERROR_NOT_SEQUENCE, name);
-               }
-            }
-         }
-      }
-
-      return seq;
-   }
-
-   public static SequenceCommand createFromClist(TeXParser parser,
+   public static ClistCommand createFromClist(TeXParser parser,
      String name, CsvList csvList)
    {
-      SequenceCommand seq = new SequenceCommand(name, csvList.capacity());
+      ClistCommand clist = new ClistCommand(name, csvList.capacity());
 
       for (int i = 0; i < csvList.size(); i++)
       {
@@ -100,24 +57,24 @@ public class SequenceCommand extends Command implements L3StorageCommand
          {
             TeXObject item = csvList.getValue(i, true);
 
-            seq.append(item);
+            clist.append(item);
          }
       }
 
-      return seq;
+      return clist;
    }
 
    @Override
    public Object clone()
    {
-      SequenceCommand seq = new SequenceCommand(getName(), content.capacity());
+      ClistCommand clist = new ClistCommand(getName(), content.capacity());
 
       for (TeXObject obj : content)
       {
-         seq.append((TeXObject)obj.clone());
+         clist.append((TeXObject)obj.clone());
       }
 
-      return seq;
+      return clist;
    }
 
    @Override
@@ -125,28 +82,11 @@ public class SequenceCommand extends Command implements L3StorageCommand
       TeXObjectList stack)
      throws IOException
    {
-      TeXObjectList list = TeXParserUtils.createStack(parser);
+      CsvList list = new CsvList();
 
-      if (!content.isEmpty())
-      {
-         list.add(new TeXCsRef("s__seq"));
-
-         for (TeXObject obj : content)
-         {
-            list.add(new TeXCsRef("__seq_item:n"));
-            list.add(TeXParserUtils.createGroup(parser, obj));
-         }
-      }
+      list.addAll(content);
 
       return list;
-   }
-
-   @Override
-   public TeXObjectList expandfully(TeXParser parser,
-      TeXObjectList stack)
-     throws IOException
-   {
-      return expandonce(parser, stack);
    }
 
    /**
@@ -188,7 +128,7 @@ public class SequenceCommand extends Command implements L3StorageCommand
    }
 
    /**
-    * Appends an element to the sequence (<code>\seq_put_right:Nn</code>).
+    * Appends an element to the sequence (<code>\clist_put_right:Nn</code>).
     */ 
    public void append(TeXObject obj)
    {
@@ -196,7 +136,7 @@ public class SequenceCommand extends Command implements L3StorageCommand
    }
 
    /**
-    * Prepends an element to the sequence (<code>\seq_put_left:Nn</code>).
+    * Prepends an element to the sequence (<code>\clist_put_left:Nn</code>).
     */ 
    public void prepend(TeXObject obj)
    {
@@ -204,22 +144,7 @@ public class SequenceCommand extends Command implements L3StorageCommand
    }
 
    /**
-    * Replaces existing item with a new item
-    * (<code>\seq_set_item:Nnn</code>). Indexing starts at 1.
-    */ 
-   public void setItem(int index, TeXObject item)
-   throws ArrayIndexOutOfBoundsException
-   {
-      if (index < 1 || index > content.size())
-      {
-         throw new ArrayIndexOutOfBoundsException(index);
-      }
-
-      content.set(index-1, item);
-   }
-
-   /**
-    * Sets an element in the sequence (0-indexing), replacing the
+    * Sets an element in the underlying list (0-indexing), replacing the
     * existing element.
     */ 
    public TeXObject set(int index, TeXObject item)
@@ -229,7 +154,7 @@ public class SequenceCommand extends Command implements L3StorageCommand
    }
 
    /**
-    * Gets an element in the sequence (0-indexing).
+    * Gets an element in the list (0-indexing).
     */ 
    public TeXObject get(int index)
    {
@@ -237,7 +162,7 @@ public class SequenceCommand extends Command implements L3StorageCommand
    }
 
    /**
-    * Gets an element in the sequence (<code>\seq_item:Nn</code>).
+    * Gets an element in the sequence (<code>\clist_item:Nn</code>).
     * Note that this doesn't include <code>\exp_not:n</code> to
     * prevent further expansion. Note that this returns an empty
     * list if the index is larger than the total number of items.
@@ -267,7 +192,7 @@ public class SequenceCommand extends Command implements L3StorageCommand
    }
 
    /**
-    * Clears the sequence (<code>\seq_clear:N</code>).
+    * Clears the list (<code>\clist_clear:N</code>).
     */ 
    @Override
    public void clear()
@@ -276,7 +201,7 @@ public class SequenceCommand extends Command implements L3StorageCommand
    }
 
    /**
-    * Gets the first element in the sequence (<code>\seq_get_left:NN</code>).
+    * Gets the first element in the list.
     */ 
    public TeXObject firstElement()
    {
@@ -291,7 +216,7 @@ public class SequenceCommand extends Command implements L3StorageCommand
    }
 
    /**
-    * Gets the last element in the sequence (<code>\seq_get_right:NN</code>).
+    * Gets the last element in the list.
     */ 
    public TeXObject lastElement()
    {
@@ -306,7 +231,7 @@ public class SequenceCommand extends Command implements L3StorageCommand
    }
 
    /**
-    * Pops the first element in the sequence (<code>\seq_pop_left:NN</code>).
+    * Pops the first element in the list (<code>\clist_pop:NN</code>).
     */ 
    public TeXObject popFirst()
    {
@@ -321,7 +246,7 @@ public class SequenceCommand extends Command implements L3StorageCommand
    }
 
    /**
-    * Pops the last element in the sequence (<code>\seq_pop_right:NN</code>).
+    * Pops the last element in the list.
     */ 
    public TeXObject popLast()
    {
