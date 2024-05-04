@@ -600,6 +600,16 @@ public class GlossariesSty extends LaTeXSty
       registerControlSequence(new TextualContentCommand("glsxtrhiernamesep", 
         "\u2006\u25C1\u2006"));
 
+      registerControlSequence(new GlsXtrHierName(this));
+      registerControlSequence(new GlsXtrHierName("Glsxtrhiername",
+        CaseChange.SENTENCE, true, this));
+      registerControlSequence(new GlsXtrHierName("GlsXtrhiername",
+        CaseChange.SENTENCE, false, this));
+      registerControlSequence(new GlsXtrHierName("GLSxtrhiername",
+        CaseChange.TO_UPPER, true, this));
+      registerControlSequence(new GlsXtrHierName("GLSXTRhiername",
+        CaseChange.TO_UPPER, false, this));
+
       listener.newtoks(true, "glsshortpltok");
       listener.newtoks(true, "glslongpltok");
 
