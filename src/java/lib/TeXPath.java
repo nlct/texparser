@@ -25,6 +25,8 @@ import java.nio.charset.Charset;
 
 import java.util.Iterator;
 
+import com.dickimawbooks.texparserlib.latex.latex3.SequenceCommand;
+
 public class TeXPath
 {
    public TeXPath(TeXParser parser, String texPath)
@@ -117,6 +119,13 @@ public class TeXPath
 
    private void init(TeXParser parser, String texPath,
      boolean useKpsewhich, String... defExt)
+     throws IOException
+   {
+      init(parser, texPath, useKpsewhich, true, defExt);
+   }
+
+   private void init(TeXParser parser, String texPath,
+     boolean useKpsewhich, boolean useL3SearchPath, String... defExt)
      throws IOException
    {
       File parent = getDefaultBaseDir(parser);
@@ -240,26 +249,40 @@ public class TeXPath
                return;
             }
 
-            if (useKpsewhich && parser != null)
+            if (parser != null)
             {
-               // Can kpsewhich find the file?
-
-               try
+               if (useL3SearchPath && !root.isAbsolute())
                {
-                  String loc = parser.getListener().getTeXApp().kpsewhich(split[n]);
+                  File f = trySearchPath(parser, split);
 
-                  if (loc != null && !loc.isEmpty())
+                  if (f != null)
                   {
-                     foundByKpsewhich = true;
-
-                     init(parser, loc, false, "");
-
-                     return;
+                     base = f.getParentFile().toPath();
+                     relative = base.relativize(f.toPath());
                   }
                }
-               catch (IOException|InterruptedException e)
+
+               if (useKpsewhich)
                {
-                  // kpsewhich couldn't find the file
+                  // Can kpsewhich find the file?
+
+                  try
+                  {
+                     String loc = parser.getListener().getTeXApp().kpsewhich(split[n]);
+
+                     if (loc != null && !loc.isEmpty())
+                     {
+                        foundByKpsewhich = true;
+
+                        init(parser, loc, false, "");
+
+                        return;
+                     }
+                  }
+                  catch (IOException|InterruptedException e)
+                  {
+                     // kpsewhich couldn't find the file
+                  }
                }
             }
          }
@@ -282,26 +305,93 @@ public class TeXPath
 
       // Does file exist?
 
-      if (!file.exists() && useKpsewhich && parser != null)
+      if (!file.exists() && parser != null)
       {
-         // Can kpsewhich find the file?
-
-         try
+         if (useL3SearchPath && !root.isAbsolute())
          {
-            String loc = parser.getListener().getTeXApp().kpsewhich(split[n]);
+            File f = trySearchPath(parser, split);
 
-            if (loc != null && !loc.isEmpty())
+            if (f != null)
             {
-               foundByKpsewhich = true;
-
-               init(parser, loc, false, "");
+               base = f.getParentFile().toPath();
+               relative = base.relativize(f.toPath());
             }
          }
-         catch (IOException|InterruptedException e)
+
+         if (useKpsewhich)
          {
-            // kpsewhich couldn't find the file
+            // Can kpsewhich find the file?
+
+            try
+            {
+               String loc = parser.getListener().getTeXApp().kpsewhich(split[n]);
+
+               if (loc != null && !loc.isEmpty())
+               {
+                  foundByKpsewhich = true;
+
+                  init(parser, loc, false, "");
+               }
+            }
+            catch (IOException|InterruptedException e)
+            {
+               // kpsewhich couldn't find the file
+            }
          }
       }
+   }
+
+   protected File trySearchPath(TeXParser parser, String[] split)
+     throws IOException
+   {
+      // has a search path been provided?
+
+      ControlSequence cs = parser.getControlSequence(
+         "l_file_search_path_seq");
+
+      if (cs instanceof SequenceCommand)
+      {
+         for (TeXObject item : ((SequenceCommand)cs).getContent())
+         {
+            String itemStr = parser.expandToString(
+              (TeXObject)item.clone(), null);
+
+            if (!itemStr.equals(".") && !itemStr.isEmpty())
+            {
+               String[] itemSplit = itemStr.split("/");
+
+               File itemRoot = new File(
+                 itemSplit.length == 1 ?
+                   itemSplit[0] : itemSplit[0]+File.separator);
+
+               File f = (itemRoot.isAbsolute() ? itemRoot : null);
+
+               for (int j = (f == null ? 0 : 1);
+                    j < itemSplit.length; j++)
+               {
+                  if (!itemSplit[j].isEmpty())
+                  {
+                     f = new File(f, itemSplit[j]);
+                  }
+               }
+
+               for (int j = 0; j < split.length; j++)
+               {
+                  if (!split[j].isEmpty())
+                  {
+                     f = new File(f, split[j]);
+                  }
+               }
+
+               if (f.exists())
+               {
+                  return f;
+               }
+            }
+         }
+      }
+
+      return null;
    }
 
    public Path getRelativePath()
