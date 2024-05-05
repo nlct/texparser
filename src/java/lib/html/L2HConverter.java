@@ -254,6 +254,13 @@ public class L2HConverter extends LaTeXParserListener
 
       putControlSequence(new HCode());
 
+      /* Ignore fontspec commands to set the main, sans and mono
+       fonts. The CSS should ideally be customised as applicable.
+       */
+      parser.putControlSequence(new GobbleOptMandOpt("setmainfont", 1, 1, 1));
+      parser.putControlSequence(new GobbleOptMandOpt("setsansfont", 1, 1, 1));
+      parser.putControlSequence(new GobbleOptMandOpt("setmonofont", 1, 1, 1));
+
       parser.putControlSequence(new TextualContentCommand("TeX", "TeX"));
       parser.putControlSequence(new TextualContentCommand("LaTeX", "LaTeX"));
       parser.putControlSequence(new TextualContentCommand("LaTeXe", "LaTeX2e"));
