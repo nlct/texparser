@@ -2980,6 +2980,8 @@ public class L2HConverter extends LaTeXParserListener
          {
             label = label.substring(idx+1);
          }
+
+         label = label.replaceAll("\\.", "_");
       }
 
       if (splitUseBaseNamePrefix)
