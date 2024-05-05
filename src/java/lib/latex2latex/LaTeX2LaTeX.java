@@ -66,7 +66,12 @@ public class LaTeX2LaTeX extends LaTeXParserListener
      throws IOException
    {
       super(null);
-      this.outPath = outDir.toPath();
+
+      if (outDir != null)
+      {
+         this.outPath = outDir.toPath();
+      }
+
       this.texApp = texApp;
       setReplaceGraphicsPath(replaceGraphicsPath);
 
@@ -97,6 +102,7 @@ public class LaTeX2LaTeX extends LaTeXParserListener
    {
       super.addPredefined();
 
+      putControlSequence(new L2LJobname());
       putControlSequence(new L2LMathDeclaration("math"));
 
       L2LMathDeclaration begMathDecl = new L2LMathDeclaration("(");
@@ -141,17 +147,21 @@ public class LaTeX2LaTeX extends LaTeXParserListener
    @Override
    public ControlSequence getControlSequence(String name)
    {
-      if (isSkipCmd(name))
+      ControlSequence cs = super.getControlSequence(name);
+
+      if (!(isReplaceCmd(name) || cs instanceof L2LControlSequence))
       {
-         return new L2LIgnoreable(name);
+         if (isSkipCmd(name))
+         {
+            cs = new L2LIgnoreable(name);
+         }
+         else
+         {
+            cs = new L2LControlSequence(name);
+         }
       }
 
-      if (isReplaceCmd(name))
-      {
-         return super.getControlSequence(name);
-      }
-
-      return new L2LControlSequence(name);
+      return cs;
    }
 
    @Override
@@ -502,6 +512,8 @@ public class LaTeX2LaTeX extends LaTeXParserListener
    public Path copyImageFile(String[] grpaths, TeXPath path)
     throws IOException,InterruptedException
    {
+      if (outPath == null) return null;
+
       if (grpaths == null)
       {
          File file = path.getFile();
@@ -668,7 +680,7 @@ public class LaTeX2LaTeX extends LaTeXParserListener
 
          File file = bibPaths[i].getFile();
 
-         if (file.exists())
+         if (file.exists() && outPath != null)
          {
              Path dest = bibPaths[i].getRelativePath();
 
@@ -994,11 +1006,11 @@ public class LaTeX2LaTeX extends LaTeXParserListener
    public void beginParse(File file, Charset encoding)
      throws IOException
    {
-      getParser().message(TeXApp.MESSAGE_READING, file);
+      getParser().message(TeXApp.MESSAGE_READING, file.toString());
 
       if (encoding != null)
       {
-         getParser().message(TeXApp.MESSAGE_ENCODING, encoding);
+         getParser().message(TeXApp.MESSAGE_ENCODING, encoding.name());
       }
 
       basePath = file.getParentFile().toPath();
@@ -1140,12 +1152,23 @@ public class LaTeX2LaTeX extends LaTeXParserListener
       write(bg + endDefinition.toString(parser) + eg);
    }
 
+   public boolean isReplaceJobnameOn()
+   {
+      return replaceJobname;
+   }
+
+   public void enableReplaceJobname(boolean enable)
+   {
+      this.replaceJobname = enable;
+   }
+
    private Path outPath, basePath;
    private PrintWriter writer;
 
    private Charset outCharset=null;
 
    private boolean replaceGraphicsPath = false;
+   private boolean replaceJobname = false; 
 
    private TeXApp texApp;
 

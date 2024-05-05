@@ -3195,7 +3195,7 @@ public class L2HConverter extends LaTeXParserListener
             builder.append(String.format("{%s}%n", lf.getName()));
          }
 
-         builder.append("\\pagestyle{empty}%n");
+         builder.append(String.format("\\pagestyle{empty}%n"));
 
          preamble = builder.toString();
       }
