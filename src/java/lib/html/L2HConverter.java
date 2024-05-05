@@ -3248,8 +3248,6 @@ public class L2HConverter extends LaTeXParserListener
        KeyValList options, String filename)
     throws IOException
    {
-      insertParIfRequired();
-
       File file = getImageFile(filename);
 
       if (file == null || !file.exists())
