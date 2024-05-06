@@ -32,6 +32,12 @@ public class AssignedControlSequence extends Command
    public AssignedControlSequence(String name, TeXObject underlying, boolean isRobust)
    {
       super(name);
+
+      if (underlying == null)
+      {
+         throw new NullPointerException("Underlying object is null");
+      }
+
       this.underlying = underlying;
       this.isRobust = isRobust;
 
