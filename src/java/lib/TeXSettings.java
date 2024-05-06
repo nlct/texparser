@@ -1036,17 +1036,17 @@ public class TeXSettings
          cs = reg;
       }
 
-      ControlSequence parentCs = parser.removeControlSequence(false, name);
+      ControlSequence parentCs = null;
 
-      if (parentCs != null)
+      if (parent == null)
       {
-         cs = parentCs;
-      }
+         parentCs = parser.removeControlSequence(false, name);
 
-      TeXSettings root = parser.getSettings();
+         if (parentCs != null)
+         {
+            cs = parentCs;
+         }
 
-      if (this == root || parent == null)
-      {
          return cs;
       }
 
