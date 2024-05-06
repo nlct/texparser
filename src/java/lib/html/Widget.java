@@ -39,21 +39,27 @@ public class Widget extends Command
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
+      L2HConverter listener = (L2HConverter)parser.getListener();
+
       TeXObject arg = popArg(parser, stack);
 
-      TeXObjectList list = parser.getListener().createStack();
+      TeXObjectList list = listener.createStack();
 
-      StartElement startElem = new StartElement("kbd");
+      boolean isHtml5 = listener.isHtml5();
+
+      String kbdTag = isHtml5 ? "kbd" : "span";
+
+      StartElement startElem = new StartElement(kbdTag);
 
       startElem.putAttribute("class", cssClassName);
 
-      list.add(new StartElement("samp"));
+      list.add(listener.newHtml5StartElement("samp", true));
 
       list.add(arg, true);
 
-      list.add(new EndElement("samp"));
+      list.add(listener.newHtml5EndElement("samp", true));
 
-      list.add(new EndElement("kbd"));
+      list.add(new EndElement(kbdTag));
 
       return list;
    }

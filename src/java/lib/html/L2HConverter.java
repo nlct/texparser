@@ -640,6 +640,16 @@ public class L2HConverter extends LaTeXParserListener
 
    public StartElement newHtml5StartElement(String name)
    {
+      return newHtml5StartElement(name, "div");
+   }
+
+   public StartElement newHtml5StartElement(String name, boolean inline)
+   {
+      return newHtml5StartElement(name, inline ? "span" : "div");
+   }
+
+   public StartElement newHtml5StartElement(String name, String non5tag)
+   {
       StartElement elem;
 
       if (isHtml5())
@@ -648,7 +658,7 @@ public class L2HConverter extends LaTeXParserListener
       }
       else
       {
-         elem = new StartElement("div");
+         elem = new StartElement(non5tag);
          elem.putAttribute("class", name);
       }
 
@@ -656,6 +666,16 @@ public class L2HConverter extends LaTeXParserListener
    }
 
    public EndElement newHtml5EndElement(String name)
+   {
+      return newHtml5EndElement(name, "div");
+   }
+
+   public EndElement newHtml5EndElement(String name, boolean inline)
+   {
+      return newHtml5EndElement(name, inline ? "span" : "div");
+   }
+
+   public EndElement newHtml5EndElement(String name, String non5tag)
    {
       EndElement elem;
 
@@ -665,7 +685,7 @@ public class L2HConverter extends LaTeXParserListener
       }
       else
       {
-         elem = new EndElement("div");
+         elem = new EndElement(non5tag);
       }
 
       return elem;
