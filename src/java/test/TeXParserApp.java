@@ -194,7 +194,7 @@ public class TeXParserApp implements TeXApp
             {
                try
                {
-                  return createImage(getParser(), preamble, content, mimeType, alt, 
+                  return createL2HImage(getParser(), preamble, content, mimeType, alt, 
                     name, crop);
                }
                catch (InterruptedException e)
@@ -273,7 +273,7 @@ public class TeXParserApp implements TeXApp
       tmpDir.delete();
    }
 
-   public L2HImage createImage(TeXParser parser, String preamble, 
+   public L2HImage createL2HImage(TeXParser parser, String preamble, 
     String content, String mimetype, TeXObject alt, String name,
     boolean crop)
    throws IOException,InterruptedException
@@ -1723,9 +1723,9 @@ public class TeXParserApp implements TeXApp
 
    // TeXParser class now has its own version and date.
    // As from 0.9.2.2b these now refer to the test application only.
-   public static final String APP_VERSION = "0.9.2.7b";
+   public static final String APP_VERSION = "0.9.2.8b";
    public static final String APP_NAME = "texparsertest";
-   public static final String APP_DATE = "2023-08-23";
+   public static final String APP_DATE = "2024-05-07";
 
    public static long MAX_PROCESS_TIME=0L;
 
