@@ -37,18 +37,22 @@ public class WidgetKeyStroke extends Command
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
+      L2HConverter listener = (L2HConverter)parser.getListener();
+
       TeXObject arg = popArg(parser, stack);
 
-      TeXObjectList list = parser.getListener().createStack();
+      TeXObjectList list = listener.createStack();
 
-      StartElement startElem = new StartElement("kbd");
+      String kbdTag = listener.isHtml5() ? "kbd" : "span";
+
+      StartElement startElem = new StartElement(kbdTag);
       startElem.putAttribute("class", "keystroke");
 
       list.add(startElem);
 
       list.add(arg);
 
-      list.add(new EndElement("kbd"));
+      list.add(new EndElement(kbdTag));
 
       return list;
    }

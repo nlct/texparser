@@ -44,13 +44,17 @@ public class WidgetMenu extends Command
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
+      L2HConverter listener = (L2HConverter)parser.getListener();
+
       CsvList csvList = TeXParserUtils.popCsvList(parser, stack);
 
-      TeXObjectList list = parser.getListener().createStack();
+      TeXObjectList list = listener.createStack();
+
+      String kbdTag = listener.isHtml5() ? "kbd" : "span";
 
       // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/kbd
 
-      StartElement startElem = new StartElement("kbd");
+      StartElement startElem = new StartElement(kbdTag);
 
       startElem.putAttribute("class", "menu");
 
@@ -58,11 +62,11 @@ public class WidgetMenu extends Command
 
       if (csvList.size() == 1)
       {
-         list.add(new StartElement("samp"));
+         list.add(listener.newHtml5StartElement("samp", true));
 
          list.add(csvList.getValue(0), true);
 
-         list.add(new EndElement("samp"));
+         list.add(listener.newHtml5EndElement("samp"));
       }
       else
       {
@@ -80,21 +84,21 @@ public class WidgetMenu extends Command
                list.add(sep, true);
             }
 
-            startElem = new StartElement("kbd");
+            startElem = new StartElement(kbdTag);
             startElem.putAttribute("class", "menuitem");
             list.add(startElem);
 
-            list.add(new StartElement("samp"));
+            list.add(listener.newHtml5StartElement("samp", true));
 
             list.add(csvList.getValue(i), true);
 
-            list.add(new EndElement("samp"));
+            list.add(listener.newHtml5EndElement("samp"));
 
-            list.add(new EndElement("kbd"));
+            list.add(new EndElement(kbdTag));
          }
       }
 
-      list.add(new EndElement("kbd"));
+      list.add(new EndElement(kbdTag));
 
       return list;
    }

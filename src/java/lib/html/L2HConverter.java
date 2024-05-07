@@ -1313,6 +1313,13 @@ public class L2HConverter extends LaTeXParserListener
       String attr = accsupp.getAttribute();
       String text = accsupp.getText();
       String id = accsupp.getId();
+      String cssClass = null;
+
+      if (tag != null && !isHtml5() && !tag.equals(AccSupp.TAG_IMG))
+      {
+         cssClass = tag;
+         tag = "span";
+      }
 
       TeXObjectList list;
 
@@ -1376,6 +1383,11 @@ public class L2HConverter extends LaTeXParserListener
       if (id != null)
       {
          startElem.putAttribute("id", id);
+      }
+
+      if (cssClass != null)
+      {
+         startElem.putAttribute("class", cssClass);
       }
 
       if (text != null)

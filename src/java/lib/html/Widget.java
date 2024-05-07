@@ -45,9 +45,7 @@ public class Widget extends Command
 
       TeXObjectList list = listener.createStack();
 
-      boolean isHtml5 = listener.isHtml5();
-
-      String kbdTag = isHtml5 ? "kbd" : "span";
+      String kbdTag = listener.isHtml5() ? "kbd" : "span";
 
       StartElement startElem = new StartElement(kbdTag);
 
