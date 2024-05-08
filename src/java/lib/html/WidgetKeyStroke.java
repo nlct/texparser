@@ -43,7 +43,11 @@ public class WidgetKeyStroke extends Command
 
       TeXObjectList list = listener.createStack();
 
-      String kbdTag = listener.isHtml5() ? "kbd" : "span";
+      /*
+        Swing's HTMLDocument only has limited support so this assumes the HTML
+        output is for Swing if not HTML5.
+       */
+      String kbdTag = listener.isHtml5() ? "kbd" : "font";
 
       StartElement startElem = new StartElement(kbdTag);
       startElem.putAttribute("class", "keystroke");
