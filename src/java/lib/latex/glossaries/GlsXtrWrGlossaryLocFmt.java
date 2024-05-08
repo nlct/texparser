@@ -27,17 +27,28 @@ public class GlsXtrWrGlossaryLocFmt extends ControlSequence
 {
    public GlsXtrWrGlossaryLocFmt()
    {
-      this("glsxtrwrglossarylocfmt");
+      this(true);
+   }
+
+   public GlsXtrWrGlossaryLocFmt(boolean showLocation)
+   {
+      this("glsxtrwrglossarylocfmt", showLocation);
    }
 
    public GlsXtrWrGlossaryLocFmt(String name)
    {
+      this(name, true);
+   }
+
+   public GlsXtrWrGlossaryLocFmt(String name, boolean showLocation)
+   {
       super(name);
+      this.showLocation = showLocation;
    }
 
    public Object clone()
    {
-      return new GlsXtrWrGlossaryLocFmt(getName());
+      return new GlsXtrWrGlossaryLocFmt(getName(), showLocation);
    }
 
    @Override
@@ -61,9 +72,17 @@ public class GlsXtrWrGlossaryLocFmt extends ControlSequence
          TeXParserUtils.process(substack, parser, stack);
       }
 
-      parser.putControlSequence(true, new AtSecondOfTwo("glsxtr@wrglossarylocation"));
+      if (showLocation)
+      {
+         parser.putControlSequence(true,
+            new AtSecondOfTwo("glsxtr@wrglossarylocation"));
 
-      TeXParserUtils.process(location, parser, stack);
+         TeXParserUtils.process(location, parser, stack);
+      }
+      else
+      {
+         TeXParserUtils.process(title, parser, stack);
+      }
 
       parser.endGroup();
    }
@@ -73,4 +92,6 @@ public class GlsXtrWrGlossaryLocFmt extends ControlSequence
    {
       process(parser, parser);
    }
+
+   protected boolean showLocation = true;
 }
