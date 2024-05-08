@@ -173,15 +173,7 @@ public class Gls extends AbstractGlsCommand
             cs = listener.getControlSequence("glsentryfmt");
          }
 
-         substack.add(listener.getControlSequence("@gls@link"));
-
-         if (keyValList != null)
-         {
-            substack.add(keyValList);
-         }
-
-         substack.add(glslabel);
-         substack.add(cs);
+         addLinkText(substack, keyValList, cs, glslabel, parser, stack);
 
          TeXParserUtils.process(substack, parser, stack);
 
@@ -194,6 +186,23 @@ public class Gls extends AbstractGlsCommand
       substack.add(listener.getControlSequence("glspostlinkhook"));
 
       TeXParserUtils.process(substack, parser, stack);
+   }
+
+   protected void addLinkText(TeXObjectList substack,
+     KeyValList glslinkOptions,
+     ControlSequence entryfmtCs, GlsLabel glslabel,
+     TeXParser parser, TeXObjectList stack)
+   throws IOException
+   {
+      substack.add(parser.getListener().getControlSequence("@gls@link"));
+
+      if (glslinkOptions != null)
+      {
+         substack.add(glslinkOptions);
+      }
+
+      substack.add(glslabel);
+      substack.add(entryfmtCs);
    }
 
    public void process(TeXParser parser)
