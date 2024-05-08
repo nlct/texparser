@@ -4456,12 +4456,7 @@ public class L2HConverter extends LaTeXParserListener
    {
       endParagraph();
 
-      if (currentSection != null)
-      {
-         writeln();
-         writeEndHtml5OrDiv("section", false);
-         writeliteral(String.format("<!-- end of section %s -->%n", currentSection));
-      }
+      boolean doEndSec = (currentSection != null);
 
       if (currentNode != null && id != null)
       {
@@ -4479,6 +4474,8 @@ public class L2HConverter extends LaTeXParserListener
 
             if (file != null && !file.equals(currentNode.getFile()))
             {
+               doEndSec = false;
+
                endDivisionFile(stack);
 
                currentNode = nextNode;
@@ -4497,6 +4494,14 @@ public class L2HConverter extends LaTeXParserListener
             }
          }
       }
+
+      if (doEndSec)
+      {
+         writeln();
+         writeEndHtml5OrDiv("section", false);
+         writeliteral(String.format("<!-- end of section %s -->%n", currentSection));
+      }
+
 
       if (id == null)
       {
