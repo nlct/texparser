@@ -2221,15 +2221,13 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
          {
             newcounter("chapter");
             newcounter("chapter*");
-            addtoreset("section", "chapter");
+
+            updateChapterDependentCounter("section");
             addtoreset("section*", "chapter*");
 
-            parser.putControlSequence(new GenericCommand(true, "thesection", null,
-             new TeXObject[] {
-               new TeXCsRef("thechapter"),
-               getOther('.'),
-               new TeXCsRef("number"),
-               new TeXCsRef("c@section")}));
+            updateChapterDependentCounter("figure");
+            updateChapterDependentCounter("table");
+            updateChapterDependentCounter("equation");
 
             NewIf.createConditional(true, parser, "if@mainmatter", true);
             parser.putControlSequence(new FrontMatter());
@@ -2243,6 +2241,19 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       {
          docCls.processOptions(stack);
       }
+   }
+
+   protected void updateChapterDependentCounter(String ctrname)
+   {
+      addtoreset(ctrname, "chapter");
+
+      parser.putControlSequence(new GenericCommand(true, "the"+ctrname, null,
+       new TeXObject[] {
+         new TeXCsRef("thechapter"),
+         getOther('.'),
+         new TeXCsRef("number"),
+         new TeXCsRef("c@"+ctrname)}));
+
    }
 
    protected boolean isBookClass(String name)
