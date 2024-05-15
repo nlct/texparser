@@ -1473,12 +1473,17 @@ public class L2HConverter extends LaTeXParserListener
 
       stack.add(new EndElement(tag));
 
+      provideLabel(id, text);
+
+      return stack;
+   }
+
+   public void provideLabel(String id, TeXObject text)
+   {
       if (currentNode != null)
       {
          ensureLabelDefined(id, text);
       }
-
-      return stack;
    }
 
   /**
