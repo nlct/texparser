@@ -430,6 +430,11 @@ public class TeXParserAppSettings extends Properties
 
    public String getDictionary()
    {
+      return getDictionary(RESOURCE, "en-GB");
+   }
+
+   public String getDictionary(String prefix, String defLangTag)
+   {
       String prop = getProperty("dictionary");
 
       if (prop == null)
@@ -439,17 +444,17 @@ public class TeXParserAppSettings extends Properties
          String language = locale.getLanguage();
          String country = locale.getCountry();
 
-         URL url = getClass().getResource(DICT_DIR + RESOURCE
+         URL url = getClass().getResource(DICT_DIR + prefix
           + "-" + language + "-" + country  + ".xml");
 
          if (url == null)
          {
-            url = getClass().getResource(DICT_DIR + RESOURCE
+            url = getClass().getResource(DICT_DIR + prefix
               + "-" + language + ".xml");
 
             if (url == null)
             {
-               prop = "en-GB";
+               prop = defLangTag;
             }
             else
             {
@@ -465,6 +470,33 @@ public class TeXParserAppSettings extends Properties
       }
 
       return prop;
+   }
+
+   public URL getDictionaryURL(String prefix, String defLangTag)
+   {
+      URL url = null;
+
+      Locale locale = Locale.getDefault();
+
+      String language = locale.getLanguage();
+      String country = locale.getCountry();
+
+      url = getClass().getResource(DICT_DIR + prefix
+          + "-" + language + "-" + country  + ".xml");
+
+      if (url == null)
+      {
+         url = getClass().getResource(DICT_DIR + prefix
+           + "-" + language + ".xml");
+
+         if (url == null)
+         {
+            url = getClass().getResource(DICT_DIR + prefix
+              + "-" + defLangTag + ".xml");
+         }
+      }
+
+      return url;
    }
 
    public void setDictionary(String dictionary)

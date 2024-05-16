@@ -1242,35 +1242,27 @@ public class TeXParserApp implements TeXApp
       }
    }
 
-   public void loadDictionary()
-      throws IOException
+   protected void addDictionary(String prefix, String defLangTag,
+       Properties dictionary)
+   throws IOException
    {
-      String dictLanguage = settings.getDictionary();
-
       InputStream in = null;
 
       try
       {
-         String dict = String.format("%s-%s.xml",
-            settings.getDictionaryLocation(),
-            dictLanguage);
-
-         URL url = getClass().getResource(dict);
+         URL url = settings.getDictionaryURL(prefix, defLangTag);
 
          if (url == null)
          {
             throw new FileNotFoundException
             (
-               "Can't find dictionary resource file " +dict
+               String.format("Can't find dictionary resource file %s-%s.xml", prefix, defLangTag)
             );
          }
 
          in = url.openStream();
 
-         Properties dictionary = new Properties();
          dictionary.loadFromXML(in);
-
-         messages = new TeXParserAppMessages(dictionary);
       }
       finally
       {
@@ -1279,6 +1271,17 @@ public class TeXParserApp implements TeXApp
             in.close();
          }
       }
+   }
+
+   public void loadDictionary()
+      throws IOException
+   {
+      Properties dictionary = new Properties();
+
+      addDictionary("texparserlib", "en", dictionary);
+      addDictionary(TeXParserAppSettings.RESOURCE, "en-GB", dictionary);
+
+      messages = new TeXParserAppMessages(dictionary);
    }
 
    public String getMessage(String label, Object... params)
