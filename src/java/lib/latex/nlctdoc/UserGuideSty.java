@@ -1766,6 +1766,18 @@ public class UserGuideSty extends LaTeXSty
       registerControlSequence(new IndexInitPostNameHooks());
       registerControlSequence(new AbbrPostNameHook(glossariesSty));
 
+
+      registerControlSequence(
+        new TextualContentCommand("idxenvname", "environment"));
+
+      registerControlSequence(
+        new TextualContentCommand("idxpackagename", "package"));
+
+      registerControlSequence(
+        new TextualContentCommand("idxclassname", "class"));
+
+      registerControlSequence(
+        new TextualContentCommand("idxcountername", "counter"));
    }
 
    protected void addBib2GlsCommands()

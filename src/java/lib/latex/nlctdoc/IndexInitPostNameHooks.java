@@ -48,21 +48,27 @@ public class IndexInitPostNameHooks extends ControlSequence
    public void process(TeXParser parser, TeXObjectList stack)
    throws IOException
    {
-      parser.putControlSequence(true, 
-        new TextualContentCommand("glsxtrpostnameenvironment", 
-         " environment"));
+      TeXParserListener listener = parser.getListener();
 
       parser.putControlSequence(true, 
-        new TextualContentCommand("glsxtrpostnamepackage", 
-         " package"));
+        new GenericCommand(true, "glsxtrpostnameenvironment", null,
+         TeXParserUtils.createStack(listener,
+          listener.getSpace(), new TeXCsRef("idxenvname"))));
 
       parser.putControlSequence(true, 
-        new TextualContentCommand("glsxtrpostnameclass", 
-          " class"));
+        new GenericCommand(true, "glsxtrpostnamepackage", null,
+         TeXParserUtils.createStack(listener,
+          listener.getSpace(), new TeXCsRef("idxpackagename"))));
 
       parser.putControlSequence(true, 
-        new TextualContentCommand("glsxtrpostnamecounter", 
-          " counter"));
+        new GenericCommand(true, "glsxtrpostnameclass", null,
+         TeXParserUtils.createStack(listener,
+          listener.getSpace(), new TeXCsRef("idxclassname"))));
+
+      parser.putControlSequence(true, 
+        new GenericCommand(true, "glsxtrpostnamecounter", null,
+         TeXParserUtils.createStack(listener,
+          listener.getSpace(), new TeXCsRef("idxcountername"))));
 
       parser.putControlSequence(true,
         new GenericCommand(true, "glsxtrpostnameacronym", null, 
