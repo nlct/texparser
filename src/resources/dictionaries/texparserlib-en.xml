@@ -7,9 +7,10 @@
 <entry key="message.reading">Reading {0}...</entry>
 <entry key="message.writing">Writing {0}...</entry>
 <entry key="message.running">Running {0}</entry>
+<entry key="message.process.result">Process returned: {0}</entry>
 <entry key="message.processing">Processing {0}</entry>
-<entry key="message.copying">Copying {0} -> {0}</entry>
-<entry key="message.moving">Moving {0} -> {0}</entry>
+<entry key="message.copying">Copying {0} -> {1}</entry>
+<entry key="message.moving">Moving {0} -> {1}</entry>
 <entry key="message.no.read">No read access for {0}...</entry>
 <entry key="message.no.write">No write access for {0}...</entry>
 <entry key="message.charset">Encoding: {0}</entry>
@@ -57,7 +58,7 @@
 <entry key="tex.error.improper_alphabetic_constant">Improper alphabetic constant {0}</entry>
 <entry key="tex.error.register_expected">Register expected</entry>
 <entry key="tex.error.register_expected_but_found">Register expected (found ''{0}'')</entry>
-<entry key="tex.error.numeric register_expected">Numeric register expected</entry>
+<entry key="tex.error.numeric_register_expected">Numeric register expected</entry>
 <entry key="tex.error.register_not_numeric">Register ''{0}'' not numeric</entry>
 <entry key="tex.error.register_not_token">Register ''{0}'' not a token register</entry>
 <entry key="tex.error.internal_quantity_expected">Internal_quantity expected</entry>
