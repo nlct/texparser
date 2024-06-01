@@ -518,6 +518,17 @@ public class UserGuideSty extends LaTeXSty
       registerControlSequence(new LaTeXGenericCommand(true,
        "metametafilefmt", "mmmmm", def));
 
+      // homefilefmt
+      def = listener.createStack();
+      def.add(new TeXCsRef("filefmt"));
+      def.add(TeXParserUtils.createGroup(listener, new TeXCsRef("homedir"),
+       listener.getOther('/'), listener.getParam(1)));
+
+      registerControlSequence(new LaTeXGenericCommand(true,
+       "homefilefmt", "m", def));
+
+      registerControlSequence(new Symbol("homedir", '~'));
+
       // urlfootref
       def = listener.createStack();
       def.add(new TeXCsRef("href"));
@@ -1198,7 +1209,7 @@ public class UserGuideSty extends LaTeXSty
         listener, "florettemarker", 0x273E, // six petalled B&W florette
         "florette marker"));
 
-      registerControlSequence(new Symbol("dash", 0x2015));
+      registerControlSequence(new Symbol("dash", 0x2014));
 
       registerControlSequence(new Symbol("nlctopensqbracket", '['));
       registerControlSequence(new Symbol("nlctclosesqbracket", ']'));
