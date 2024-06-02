@@ -143,6 +143,24 @@ public class TeXParserUtils
       return parser.expandToString(arg, stack);
    }
 
+   public static TeXPath popTeXPath(TeXParser parser, TeXObjectList stack)
+     throws IOException
+   {
+      TeXObject arg = popArg(parser, stack);
+
+      if (parser.isStack(arg) && ((TeXObjectList)arg).size() == 1)
+      {
+         arg = ((TeXObjectList)arg).firstElement();
+      }
+
+      if (arg instanceof TeXPath)
+      {
+         return (TeXPath)arg;
+      }
+
+      return new TeXPath(parser, parser.expandToString(arg, stack));
+   }
+
    /**
      * Pops a mandatory argument.
      * @param parser the TeX parser
