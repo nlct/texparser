@@ -388,6 +388,8 @@ public class L2HConverter extends LaTeXParserListener
 
       putControlSequence(new L2HNewFontFamily());
 
+      putControlSequence(new L2HVerbatimInput());
+
       try
       {
          LaTeXSty sty = requirepackage("hyperref", getParser());
