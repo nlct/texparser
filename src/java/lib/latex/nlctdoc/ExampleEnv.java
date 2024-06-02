@@ -69,13 +69,16 @@ public class ExampleEnv extends Declaration
       if (listener instanceof L2HConverter)
       {
          listener.stepcounter("example");
+         L2HConverter l2h = (L2HConverter)listener;
 
-         ((L2HConverter)listener).writeliteral(
+         l2h.writeliteral(
            String.format("<div class=\"example\" id=\"%s\">", label));
 
-         ((L2HConverter)listener).writeliteral("<div class=\"title\">");
+         l2h.writeliteral("<div class=\"title\">");
 
-         content.add(listener.getControlSequence("nlctexampletag"));
+         ControlSequence cs = listener.getControlSequence("nlctexampletag");
+
+         content.add(cs);
 
          if (!title.isEmpty())
          {
@@ -84,9 +87,11 @@ public class ExampleEnv extends Declaration
             content.add(title);
          }
 
+         l2h.provideLabel(label, TeXParserUtils.expandFully(cs, parser, stack));
+
          TeXParserUtils.process(content, parser, stack);
 
-         ((L2HConverter)listener).writeliteral("</div>");
+         l2h.writeliteral("</div>");
       }
       else
       {
