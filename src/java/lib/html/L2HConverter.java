@@ -1047,9 +1047,19 @@ public class L2HConverter extends LaTeXParserListener
 
       if (!isWriteOutputAllowed() && !Character.isWhitespace(codePoint))
       {
-         throw new LaTeXSyntaxException(getParser(),
-           LaTeXSyntaxException.ERROR_MISSING_BEGIN_DOC, 
-             new String(Character.toChars(codePoint)));
+         if (inPreamble)
+         {
+            throw new LaTeXSyntaxException(getParser(),
+              LaTeXSyntaxException.ERROR_MISSING_BEGIN_DOC, 
+                new String(Character.toChars(codePoint)));
+         }
+         else
+         { 
+            parser.debugMessage(TeXParser.DEBUG_IO, 
+              String.format("Write output not allowed. Can't write codepoint %d (%s)",
+                codePoint, new String(Character.toChars(codePoint))));
+            return;
+         }
       }
 
       if (!isBlank)
@@ -1113,8 +1123,17 @@ public class L2HConverter extends LaTeXParserListener
 
       if (!isWriteOutputAllowed() && !isBlank)
       {
-         throw new LaTeXSyntaxException(getParser(),
-           LaTeXSyntaxException.ERROR_MISSING_BEGIN_DOC, str);
+         if (inPreamble)
+         {
+            throw new LaTeXSyntaxException(getParser(),
+              LaTeXSyntaxException.ERROR_MISSING_BEGIN_DOC, str);
+         }
+         else
+         { 
+            parser.debugMessage(TeXParser.DEBUG_IO, 
+              "Write output not allowed. Can't write string "+str);
+            return;
+         }
       }
 
       if (!isBlank)
@@ -1181,8 +1200,17 @@ public class L2HConverter extends LaTeXParserListener
 
       if (!isWriteOutputAllowed() && !isBlank)
       {
-         throw new LaTeXSyntaxException(getParser(),
-           LaTeXSyntaxException.ERROR_MISSING_BEGIN_DOC, c);
+         if (inPreamble)
+         {
+            throw new LaTeXSyntaxException(getParser(),
+              LaTeXSyntaxException.ERROR_MISSING_BEGIN_DOC, c);
+         }
+         else
+         { 
+            parser.debugMessage(TeXParser.DEBUG_IO, 
+              "Write output not allowed. Can't write char "+c);
+            return;
+         }
       }
 
       if (!isBlank)
@@ -1243,8 +1271,17 @@ public class L2HConverter extends LaTeXParserListener
 
       if (!isWriteOutputAllowed() && !isBlank)
       {
-         throw new LaTeXSyntaxException(getParser(),
-           LaTeXSyntaxException.ERROR_MISSING_BEGIN_DOC, str);
+         if (inPreamble)
+         {
+            throw new LaTeXSyntaxException(getParser(),
+              LaTeXSyntaxException.ERROR_MISSING_BEGIN_DOC, str);
+         }
+         else
+         { 
+            parser.debugMessage(TeXParser.DEBUG_IO, 
+              "Write output not allowed. Can't write string "+str);
+            return;
+         }
       }
 
       if (!isBlank)
