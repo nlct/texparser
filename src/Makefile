@@ -1,5 +1,6 @@
 ifeq ($(shell javac -version 2>&1 | grep 1.8),)
-  target_version := --release 8
+# Java 8 extended support until December 2030
+  target_version := --release 8 -Xlint:-options
 else
   target_version = 
 endif

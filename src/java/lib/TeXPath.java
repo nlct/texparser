@@ -219,71 +219,28 @@ public class TeXPath
 
       if (defExt.length > 0 && !hasExtension)
       {
+         boolean noExtTried = false;
+
          for (String ext : defExt)
          {
-            if (ext.isEmpty())
+            if (tryExt(parser, useKpsewhich, useL3SearchPath, root, parent,
+                  split, baseName, ext))
             {
-               split[n] = baseName;
-            }
-            else
-            {
-               split[n] = baseName+"."+ext;
-            }
-
-            file = (parent == null ? new File(split[n]) : 
-              new File(parent, split[n]));
-
-            // Does file exist?
-
-            if (file.exists())
-            {
-               if (base == null)
-               {
-                  relative = file.toPath();
-               }
-               else
-               {
-                  relative = base.relativize(file.toPath());
-               }
-
                return;
             }
 
-            if (parser != null)
+            if (ext == null || ext.isEmpty())
             {
-               if (useL3SearchPath && !root.isAbsolute())
-               {
-                  File f = trySearchPath(parser, split);
+               noExtTried = true;
+            }
+         }
 
-                  if (f != null)
-                  {
-                     base = f.getParentFile().toPath();
-                     relative = base.relativize(f.toPath());
-                  }
-               }
-
-               if (useKpsewhich)
-               {
-                  // Can kpsewhich find the file?
-
-                  try
-                  {
-                     String loc = parser.getListener().getTeXApp().kpsewhich(split[n]);
-
-                     if (loc != null && !loc.isEmpty())
-                     {
-                        foundByKpsewhich = true;
-
-                        init(parser, loc, false, "");
-
-                        return;
-                     }
-                  }
-                  catch (IOException|InterruptedException e)
-                  {
-                     // kpsewhich couldn't find the file
-                  }
-               }
+         if (!noExtTried)
+         {
+            if (tryExt(parser, useKpsewhich, useL3SearchPath, root, parent,
+                 split, baseName, null))
+            {
+               return;
             }
          }
 
@@ -339,6 +296,81 @@ public class TeXPath
             }
          }
       }
+   }
+
+   protected boolean tryExt(TeXParser parser,
+      boolean useKpsewhich, boolean useL3SearchPath,
+      File root, File parent, String[] split, String baseName, String ext)
+   throws IOException
+   {
+      int n = split.length-1;
+
+      if (ext == null || ext.isEmpty())
+      {
+         split[n] = baseName;
+      }
+      else
+      {
+         split[n] = baseName+"."+ext;
+      }
+
+      File file = (parent == null ? new File(split[n]) : 
+        new File(parent, split[n]));
+
+      // Does file exist?
+
+      if (file.exists())
+      {
+         if (base == null)
+         {
+            relative = file.toPath();
+         }
+         else
+         {
+            relative = base.relativize(file.toPath());
+         }
+
+         return true;
+      }
+
+      if (parser != null)
+      {
+         if (useL3SearchPath && !root.isAbsolute())
+         {
+            File f = trySearchPath(parser, split);
+
+            if (f != null)
+            {
+               base = f.getParentFile().toPath();
+               relative = base.relativize(f.toPath());
+            }
+         }
+
+         if (useKpsewhich)
+         {
+            // Can kpsewhich find the file?
+
+            try
+            {
+               String loc = parser.getListener().getTeXApp().kpsewhich(split[n]);
+
+               if (loc != null && !loc.isEmpty())
+               {
+                  foundByKpsewhich = true;
+
+                  init(parser, loc, false, "");
+
+                  return true;
+               }
+            }
+            catch (IOException|InterruptedException e)
+            {
+               // kpsewhich couldn't find the file
+            }
+         }
+      }
+
+      return false;
    }
 
    protected File trySearchPath(TeXParser parser, String[] split)
