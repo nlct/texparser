@@ -217,28 +217,22 @@ public class TeXPath
          }
       }
 
+      if (!hasExtension)
+      {
+         // First try without extension
+         if (tryExt(parser, useKpsewhich, useL3SearchPath, root, parent,
+              split, baseName, null))
+         {
+            return;
+         }
+      }
+
       if (defExt.length > 0 && !hasExtension)
       {
-         boolean noExtTried = false;
-
          for (String ext : defExt)
          {
             if (tryExt(parser, useKpsewhich, useL3SearchPath, root, parent,
                   split, baseName, ext))
-            {
-               return;
-            }
-
-            if (ext == null || ext.isEmpty())
-            {
-               noExtTried = true;
-            }
-         }
-
-         if (!noExtTried)
-         {
-            if (tryExt(parser, useKpsewhich, useL3SearchPath, root, parent,
-                 split, baseName, null))
             {
                return;
             }
