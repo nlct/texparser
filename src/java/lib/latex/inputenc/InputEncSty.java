@@ -258,7 +258,7 @@ public class InputEncSty extends LaTeXSty
       return texCharset;
    }
 
-   public boolean isKnownEncoding(String value)
+   public static boolean isKnownEncoding(String value)
    {
       for (int i = 0; i < KNOWN_ENCODINGS.length; i++)
       {
