@@ -1,8 +1,7 @@
 % DBTEX 3.0 utf8
 % Created by datatool 2023/11/23 v3.0 (NLCT) on November 23, 2023
 \DTLdbProvideData{datum}%
-\DTLreconstructdatabase
-{2}{4}
+\DTLreconstructdbdata
 {% Header
 \dtldbheaderreconstruct{1}{product}{0}{product}%
 \dtldbheaderreconstruct{2}{quantity}{1}{quantity}%
@@ -51,6 +50,7 @@
   }% End of Column 4 Content
 }%
 }% End of Content
+{2}{4}
 {% Key to index
 \dtldbreconstructkeyindex{product}{1}%
 \dtldbreconstructkeyindex{quantity}{2}%
