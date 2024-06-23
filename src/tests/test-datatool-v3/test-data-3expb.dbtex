@@ -1,8 +1,7 @@
 % DBTEX 3.0 utf8
 % Created by datatool 2023/11/23 v3.0 (NLCT) on November 23, 2023
 \DTLdbProvideData{data3}%
-\DTLreconstructdatabase
-{3}{2}
+\DTLreconstructdbdata
 {% Header
 \dtldbheaderreconstruct{1}{name}{0}{Name}%
 \dtldbheaderreconstruct{2}{score}{2}{Score (\%)}%
@@ -45,6 +44,7 @@
   }% End of Column 2 Content
 }%
 }% End of Content
+{3}{2}
 {% Key to index
 \dtldbreconstructkeyindex{name}{1}%
 \dtldbreconstructkeyindex{score}{2}%

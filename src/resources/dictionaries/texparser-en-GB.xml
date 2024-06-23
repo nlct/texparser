@@ -6,6 +6,7 @@
 <!--  About dialog -->
 <entry key="about.title">About {0}</entry>
 <entry key="about.version">{0} ({1})</entry>
+<entry key="about.library.version">Bundled with {0} version {1} ({2})</entry>
 <entry key="about.licence">License</entry>
 <entry key="about.legal">License GPLv3+: GNU GPL version 3 or later &lt;http://gnu.org/licenses/gpl.html&gt;
 This is free software: you are free to change and redistribute it.

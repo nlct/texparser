@@ -191,6 +191,7 @@ public class DataToolSty extends LaTeXSty
       registerControlSequence(new DTLdbNewRow(this));
       registerControlSequence(new DTLdbNewEntry(this));
       registerControlSequence(new DTLdbSetHeader(this));
+      registerControlSequence(new DTLreconstructdatabase(this));
       registerControlSequence(new DTLreconstructdbdata(this));
       registerControlSequence(new DTLreconstructdata(this));
 

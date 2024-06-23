@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2023 Nicola L.C. Talbot
+    Copyright (C) 2024 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -24,19 +24,14 @@ import java.io.EOFException;
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.*;
 
-/**
- * Experimental command DTLreconstructdbdata was replaced
- * with DTLreconstructdatabase for DBTEX v3.0 but retained to support
- * files created by the experimental version.
- */
-public class DTLreconstructdbdata extends ControlSequence
+public class DTLreconstructdatabase extends ControlSequence
 {
-   public DTLreconstructdbdata(DataToolSty sty)
+   public DTLreconstructdatabase(DataToolSty sty)
    {
-      this("DTLreconstructdbdata", sty);
+      this("DTLreconstructdatabase", sty);
    }
 
-   public DTLreconstructdbdata(String name, DataToolSty sty)
+   public DTLreconstructdatabase(String name, DataToolSty sty)
    {
       super(name);
       this.sty = sty;
@@ -45,7 +40,7 @@ public class DTLreconstructdbdata extends ControlSequence
    @Override
    public Object clone()
    {
-      return new DTLreconstructdbdata(getName(), sty);
+      return new DTLreconstructdatabase(getName(), sty);
    }
 
    @Override
@@ -61,10 +56,11 @@ public class DTLreconstructdbdata extends ControlSequence
       String name = parser.expandToString(
         listener.getControlSequence("dtllastloadeddb"), stack);
 
-      TeXObjectList headerArg = TeXParserUtils.toList(popArg(parser, stack), parser);
-      TeXObjectList contentArg = TeXParserUtils.toList(popArg(parser, stack), parser);
       int numRows = popInt(parser, stack);
       int numCols = popInt(parser, stack);
+
+      TeXObjectList headerArg = TeXParserUtils.toList(popArg(parser, stack), parser);
+      TeXObjectList contentArg = TeXParserUtils.toList(popArg(parser, stack), parser);
       TeXObjectList mapArg = TeXParserUtils.toList(popArg(parser, stack), parser);
 
       DataBase db = sty.getDataBase(name);

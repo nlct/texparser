@@ -387,7 +387,15 @@ public class DataBase
                   writer.print(name);
                   writer.println("}%");
 
-                  writer.println("\\DTLreconstructdbdata");
+                  writer.println("\\DTLreconstructdatabase");
+
+                  writer.print("{");
+                  writer.print(getRowCount());
+                  writer.print("}");
+                  writer.print("{");
+                  writer.print(getColumnCount());
+                  writer.println("}");
+
                   writer.println("{% Header");
 
                   for (DataToolHeader header : headerRow)
@@ -476,13 +484,6 @@ public class DataBase
                   }
 
                   writer.println("}% End of Content");
-
-                  writer.print("{");
-                  writer.print(getRowCount());
-                  writer.print("}");
-                  writer.print("{");
-                  writer.print(getColumnCount());
-                  writer.println("}");
 
                   writer.println("{% Key to index");
 
