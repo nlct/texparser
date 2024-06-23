@@ -1,4 +1,4 @@
 #!/bin/sh
 
 bindir=`dirname $0`
-java -Djava.locale.providers=CLDR,JRE,SPI -jar "$bindir/../lib/texparsertest.jar" $@
+java -jar "$bindir/../lib/texparsertest.jar" $@
