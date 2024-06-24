@@ -2360,6 +2360,13 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       return sty;
    }
 
+   /**
+    * Register that the given package has been loaded.
+    * Note that this doesn't implement any package options or add
+    * definitions provided by the package. Use
+    * LaTeXSty.usepackage(LaTeXSty,TeXObjectList) to ensure supplied commands are
+    * available.
+    */
    public void usepackage(LaTeXSty sty)
    {
       if (isStyLoaded(sty.getName()))
@@ -2374,6 +2381,39 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
 
       addFileReference(sty);
       loadedPackages.add(sty);
+   }
+
+   /**
+    * Register that the given package has been loaded and ensure
+    * all definitions and post option actions are implemented.
+    */
+   public void usepackage(LaTeXSty sty, TeXObjectList stack)
+     throws IOException
+   {
+      usepackage(sty, null, stack);
+   }
+
+   /**
+    * Register that the given package has been loaded, add the
+    * supplied options and ensure all definitions and post option actions
+    * are implemented.
+    * @param sty the package implementation
+    * @param options the package options to add or null if no
+    * options required
+    * @param stack the current stack (which may be null or the
+    * parser if no local stack)
+    */
+   public void usepackage(LaTeXSty sty, KeyValList options, TeXObjectList stack)
+     throws IOException
+   {
+      usepackage(sty);
+
+      if (options != null)
+      {
+         sty.addOptions(options);
+      }
+
+      sty.processOptions(stack);
    }
 
    public void addPackage(LaTeXSty sty)
