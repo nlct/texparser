@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2024 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -52,20 +52,8 @@ public class NewProblem extends ControlSequence
    public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      TeXObject object = stack.peekStack();
-
-      if (object instanceof CharObject
-      && ((CharObject)object).getCharCode() == (int)'*')
+      if (popModifier(parser, stack, '*') != -1)
       {
-         if (stack == parser)
-         {
-            parser.popStack();
-         }
-         else
-         {
-            stack.popStack(parser);
-         }
-
          processStar(parser, stack);
       }
       else
@@ -77,93 +65,26 @@ public class NewProblem extends ControlSequence
    private void processUnstar(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      Numerical numArgs = null;
+      int numArgs = TeXParserUtils.popOptInt(parser, stack, 0);
+
       TeXObjectList defArgs = null;
       TeXObject problem = null;
       TeXObject solution = null;
 
-      String label;
-
-      if (parser == stack)
+      if (numArgs > 0)
       {
-         numArgs = parser.popNumericalArg('[', ']');
+         TeXObject obj = popOptArg(parser, stack);
 
-         if (numArgs != null)
+         if (obj != null)
          {
-            TeXObject obj = parser.popNextArg('[', ']');
-
-            if (obj instanceof TeXObjectList)
-            {
-               defArgs = (TeXObjectList)obj;
-            }
-            else if (obj != null)
-            {
-               defArgs = new TeXObjectList();
-               defArgs.add(obj);
-            }
+            defArgs = TeXParserUtils.toList(obj, parser);
          }
-
-         TeXObject labObj = parser.popNextArg();
-
-         TeXObjectList expanded = null;
-
-         if (labObj instanceof Expandable)
-         {
-            expanded = ((Expandable)labObj).expandfully(parser);
-         }
-
-         if (expanded == null)
-         {
-            label = labObj.toString(parser);
-         }
-         else
-         {
-            label = expanded.toString(parser);
-         }
-
-         problem = parser.popNextArg();
-         solution = parser.popNextArg();
       }
-      else
-      {
-         numArgs = stack.popNumericalArg(parser, '[', ']');
 
-         if (numArgs != null)
-         {
-            TeXObject obj = stack.popArg(parser, '[', ']');
+      String label = popLabelString(parser, stack);
 
-            if (obj instanceof TeXObjectList)
-            {
-               defArgs = (TeXObjectList)obj;
-            }
-            else if (obj != null)
-            {
-               defArgs = new TeXObjectList();
-               defArgs.add(obj);
-            }
-         }
-
-         TeXObject labObj = stack.popArg(parser);
-
-         TeXObjectList expanded = null;
-
-         if (labObj instanceof Expandable)
-         {
-            expanded = ((Expandable)labObj).expandfully(parser, stack);
-         }
-
-         if (expanded == null)
-         {
-            label = labObj.toString(parser);
-         }
-         else
-         {
-            label = expanded.toString(parser);
-         }
-
-         problem = stack.popArg(parser);
-         solution = stack.popArg(parser);
-      }
+      problem = popArg(parser, stack);
+      solution = popArg(parser, stack);
 
       TeXObjectList contents = new TeXObjectList();
 
@@ -201,8 +122,7 @@ public class NewProblem extends ControlSequence
       contents.add(new TeXCsRef("end"));
       contents.add(parser.getListener().createGroup("onlysolution"));
 
-      ProbSolnData data = new ProbSolnData(label,
-        numArgs == null ? 0 : numArgs.number(parser),
+      ProbSolnData data = new ProbSolnData(label, numArgs,
         defArgs, contents);
 
       sty.addProblem(data);
@@ -211,110 +131,23 @@ public class NewProblem extends ControlSequence
    private void processStar(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      Numerical numArgs = null;
+      int numArgs = TeXParserUtils.popOptInt(parser, stack, 0);
+
       TeXObjectList defArgs = null;
-      TeXObjectList contents = null;
 
-      String label;
-
-      if (parser == stack)
+      if (numArgs > 0)
       {
-         numArgs = parser.popNumericalArg('[', ']');
+         TeXObject obj = popOptArg(parser, stack);
 
-         if (numArgs != null)
+         if (obj != null)
          {
-            TeXObject obj = parser.popNextArg('[', ']');
-
-            if (obj instanceof TeXObjectList)
-            {
-               defArgs = (TeXObjectList)obj;
-            }
-            else if (obj != null)
-            {
-               defArgs = new TeXObjectList();
-               defArgs.add(obj);
-            }
-         }
-
-         TeXObject labObj = parser.popNextArg();
-
-         TeXObjectList expanded = null;
-
-         if (labObj instanceof Expandable)
-         {
-            expanded = ((Expandable)labObj).expandfully(parser);
-         }
-
-         if (expanded == null)
-         {
-            label = labObj.toString(parser);
-         }
-         else
-         {
-            label = expanded.toString(parser);
-         }
-
-         TeXObject object = parser.popNextArg();
-
-         if (object instanceof TeXObjectList)
-         {
-            contents = (TeXObjectList)object;
-         }
-         else
-         {
-            contents = new TeXObjectList();
-            contents.add(object);
+            defArgs = TeXParserUtils.toList(obj, parser);
          }
       }
-      else
-      {
-         numArgs = stack.popNumericalArg(parser, '[', ']');
 
-         if (numArgs != null)
-         {
-            TeXObject obj = stack.popArg(parser, '[', ']');
+      String label = popLabelString(parser, stack);
 
-            if (obj instanceof TeXObjectList)
-            {
-               defArgs = (TeXObjectList)obj;
-            }
-            else if (obj != null)
-            {
-               defArgs = new TeXObjectList();
-               defArgs.add(obj);
-            }
-         }
-
-         TeXObject labObj = stack.popArg(parser);
-
-         TeXObjectList expanded = null;
-
-         if (labObj instanceof Expandable)
-         {
-            expanded = ((Expandable)labObj).expandfully(parser, stack);
-         }
-
-         if (expanded == null)
-         {
-            label = labObj.toString(parser);
-         }
-         else
-         {
-            label = expanded.toString(parser);
-         }
-
-         TeXObject object = stack.popArg(parser);
-
-         if (object instanceof TeXObjectList)
-         {
-            contents = (TeXObjectList)object;
-         }
-         else
-         {
-            contents = new TeXObjectList();
-            contents.add(object);
-         }
-      }
+      TeXObjectList contents = TeXParserUtils.toList(popArg(parser, stack), parser);
 
       contents.push(parser.getListener().createGroup("probsolnquestion"));
       contents.push(new TeXCsRef("begin"));
@@ -322,8 +155,7 @@ public class NewProblem extends ControlSequence
       contents.add(new TeXCsRef("end"));
       contents.add(parser.getListener().createGroup("probsolnquestion"));
 
-      ProbSolnData data = new ProbSolnData(label,
-        numArgs == null ? 0 : numArgs.number(parser),
+      ProbSolnData data = new ProbSolnData(label, numArgs,
         defArgs, contents);
 
       sty.addProblem(data);

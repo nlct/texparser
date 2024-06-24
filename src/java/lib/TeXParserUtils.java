@@ -351,6 +351,24 @@ public class TeXParserUtils
    }
 
    /**
+    * Pops an optional argument that should be an integer.
+    * @param parser the TeX parser
+    * @param stack the stack or the parser or null
+    * @param defVal the default value to return if no optional
+    * argument
+    * @return the integer value of the argument
+    * @throws TeXSyntaxException if the argument isn't numerical
+    */ 
+   public static int popOptInt(TeXParser parser, TeXObjectList stack,
+      int defVal)
+     throws IOException
+   {
+      Numerical num = popOptNumericalArg(parser, stack);
+   
+      return num == null ? defVal : num.number(parser);
+   }
+
+   /**
     * Pops an argument that should be a numerical value.
     * @param parser the TeX parser
     * @param stack the stack or the parser or null
@@ -367,6 +385,26 @@ public class TeXParserUtils
       else
       {
          return stack.popNumericalArg(parser);
+      }
+   }
+
+   /**
+    * Pops an optional argument that should be a numerical value.
+    * @param parser the TeX parser
+    * @param stack the stack or the parser or null
+    * @return the numerical argument
+    * @throws TeXSyntaxException if the argument isn't numerical
+    */ 
+   public static Numerical popOptNumericalArg(TeXParser parser, TeXObjectList stack)
+     throws IOException
+   {
+      if (parser == stack || stack == null)
+      {
+         return parser.popNumericalArg('[', ']');
+      }
+      else
+      {
+         return stack.popNumericalArg(parser, '[', ']');
       }
    }
 
