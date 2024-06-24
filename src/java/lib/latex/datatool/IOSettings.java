@@ -305,6 +305,11 @@ public class IOSettings
       return fileVersion;
    }
 
+   public TeXParser getParser()
+   {
+      return sty == null ? null : sty.getParser();
+   }
+
    public void setFileVersion(String version)
    throws TeXSyntaxException
    {
@@ -313,7 +318,7 @@ public class IOSettings
           && !(version.equals("2.0") || version.equals("3.0"))
          )
       {
-         throw new LaTeXSyntaxException(sty.getParser(),
+         throw new LaTeXSyntaxException(getParser(),
            DataBase.ERROR_FILE_FORMAT_VERSION, version, format);
       }
       else
@@ -455,6 +460,11 @@ public class IOSettings
    public DataToolSty getSty()
    {
       return sty;
+   }
+
+   public void setSty(DataToolSty sty)
+   {
+      this.sty = sty;
    }
 
    DataToolSty sty;
