@@ -886,6 +886,12 @@ public class DataToolSty extends LaTeXSty
    {
       ControlSequence cs = getParser().getControlSequence(SEPARATOR);
 
+      if (cs == null)
+      {
+         throw new TeXSyntaxException(getParser(),
+            TeXSyntaxException.ERROR_UNDEFINED, "\\"+SEPARATOR);
+      }
+
       int separator = -1;
 
       if (cs instanceof TextualContentCommand)
@@ -905,6 +911,12 @@ public class DataToolSty extends LaTeXSty
    throws IOException
    {
       ControlSequence cs = getParser().getControlSequence(DELIMITER);
+
+      if (cs == null)
+      {
+         throw new TeXSyntaxException(getParser(),
+            TeXSyntaxException.ERROR_UNDEFINED, "\\"+DELIMITER);
+      }
 
       int delimiter = -1;
 
