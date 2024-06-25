@@ -4197,6 +4197,8 @@ public class TeXParser extends TeXObjectList
          logMessage("Expanding to string: "+object);
       }
 
+      if (object == null) return null;
+
       if (isDebugMode(DEBUG_EXPANSION))
       {
          logMessage("Expanding to string: "+object.toString(this));
