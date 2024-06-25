@@ -68,16 +68,29 @@ public class PostReadHook extends ControlSequence
          fileVersion = parser.expandToString(fileVersionCs, stack);
       }
 
-      if (fileType.equals("dbtex"))
+      if (dbLabel != null && !dbLabel.isEmpty())
       {
-         sty.setLatestDataBase(dbLabel);
+         if (fileType.equals("dbtex"))
+         {
+            sty.setLatestDataBase(dbLabel);
+         }
+         else
+         {
+            sty.updateInternals(true, dbLabel);
+         }
+
+         sty.registerFileLoaded(dbLabel, fileType, fileVersion, texPath);
       }
       else
       {
-         sty.updateInternals(true, dbLabel);
-      }
+         DataBase db = sty.getLatestDataBase();
 
-      sty.registerFileLoaded(dbLabel, fileType, fileVersion, texPath);
+         if (db != null)
+         {
+            sty.registerFileLoaded(db.getName(),
+               fileType, fileVersion, texPath);
+         }
+      }
    }
 
    @Override
