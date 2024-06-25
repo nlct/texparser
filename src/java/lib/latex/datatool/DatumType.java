@@ -69,6 +69,31 @@ public enum DatumType
       throw new IllegalArgumentException("Invalid DatumType id "+type);
    }
 
+   /**
+    * Returns true if this type overrides the other type.
+    */
+   public boolean overrides(DatumType other)
+   {
+      if (this == other) return false;
+
+      // Everything takes precedence over unknown
+
+      if (this == UNKNOWN) return false;
+      if (other == UNKNOWN) return true;
+
+      // Otherwise string takes precedence over numeric 
+      if (this == STRING) return true;
+      if (other == STRING) return false;
+
+      // Otherwise currency takes precedence over non-currency numeric 
+      if (this == CURRENCY) return true;
+      if (other == CURRENCY) return false;
+
+      // Otherwise decimal takes precedence over integer 
+      if (this == DECIMAL) return true;
+      return false;
+   }
+
    private final int id;
    private final String csname;
 }
