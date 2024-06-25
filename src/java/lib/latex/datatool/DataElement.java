@@ -48,4 +48,9 @@ public interface DataElement extends TeXObject
     * Gets the currency symbol or null if not currency.
     */
    public TeXObject getCurrencySymbol();
+
+   /**
+    * Gets this data as an ordinary TeXObject.
+    */
+   public TeXObject getContent(TeXParser parser);
 }

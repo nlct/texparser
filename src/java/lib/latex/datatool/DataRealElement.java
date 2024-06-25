@@ -79,6 +79,19 @@ public class DataRealElement extends AbstractTeXObject
    }
 
    @Override
+   public TeXObject getContent(TeXParser parser)
+   {
+      if (original == null)
+      {
+         return new TeXFloatingPoint(doubleValue());
+      }
+      else
+      {
+         return original;
+      }
+   }
+
+   @Override
    public TeXObject getCurrencySymbol()
    {
       return null;

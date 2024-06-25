@@ -97,6 +97,19 @@ public class DataIntElement extends UserNumber implements DataNumericElement
    }
 
    @Override
+   public TeXObject getContent(TeXParser parser)
+   {
+      if (original == null)
+      {
+         return new UserNumber(intValue());
+      }
+      else
+      {
+         return original;
+      }
+   }
+
+   @Override
    public TeXObject getCurrencySymbol()
    {
       return null;

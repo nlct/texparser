@@ -79,6 +79,23 @@ public class DataCurrencyElement extends DataRealElement
    }
 
    @Override
+   public TeXObject getContent(TeXParser parser)
+   {
+      if (original == null)
+      {
+         TeXObjectList list = parser.getListener().createString(
+           String.format("%.2f", doubleValue()));
+         list.push((TeXObject)symbol.clone());
+
+         return list;
+      }
+      else
+      {
+         return original;
+      }
+   }
+
+   @Override
    public TeXObject getCurrencySymbol()
    {
       return getSymbol();

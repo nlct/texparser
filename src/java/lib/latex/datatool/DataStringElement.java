@@ -78,4 +78,10 @@ public class DataStringElement extends DataObjectList implements DataElement
    {
       return null;
    }
+
+   @Override
+   public TeXObject getContent(TeXParser parser)
+   {
+      return toList();
+   }
 }

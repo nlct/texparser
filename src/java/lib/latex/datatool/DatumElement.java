@@ -272,6 +272,7 @@ public class DatumElement extends AbstractTeXObject
       }
    }
 
+   @Override
    public TeXObject getContent(TeXParser parser)
    {
       TeXParserListener listener = parser.getListener();
