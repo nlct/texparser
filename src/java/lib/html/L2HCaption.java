@@ -64,9 +64,18 @@ public class L2HCaption extends ControlSequence
 
          listener.stepcounter(type);
 
-         numArg.add(listener.getControlSequence(type+"name"));
-         numArg.add(listener.getControlSequence("nobreakspace"));
-         numArg.add(listener.getControlSequence("the"+type));
+         ControlSequence cs = parser.getControlSequence("fnum@"+type);
+
+         if (cs == null)
+         {
+            numArg.add(listener.getControlSequence(type+"name"));
+            numArg.add(listener.getControlSequence("nobreakspace"));
+            numArg.add(listener.getControlSequence("the"+type));
+         }
+         else
+         {
+            numArg.add(cs);
+         }
       }
 
       // Is there a label following the caption?
