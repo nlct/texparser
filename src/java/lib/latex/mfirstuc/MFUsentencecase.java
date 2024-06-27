@@ -89,9 +89,55 @@ public class MFUsentencecase extends Command
          {
             list.add(obj);
          }
-         else if (obj instanceof Other || obj instanceof WhiteSpace)
-         {// punctuation or space
+         else if (obj instanceof WhiteSpace)
+         {
             list.add(obj);
+         }
+         else if (obj instanceof CharObject)
+         {
+            int cp = ((CharObject)obj).getCharCode();
+
+            if (Character.isAlphabetic(cp))
+            {
+               String ucp = obj.toString(parser).toUpperCase();
+
+               if (ucp.length() != Character.charCount(cp))
+               {
+                  for (int i = 0; i < ucp.length(); )
+                  {
+                     int c = ucp.codePointAt(i);
+                     i += Character.charCount(i);
+
+                     if (obj instanceof Other)
+                     {
+                        list.add(parser.getListener().getOther(c));
+                     }
+                     else
+                     {
+                        list.add(parser.getListener().getLetter(c));
+                     }
+                  }
+               }
+               else
+               {
+                  int tcp = Character.toTitleCase(cp);
+
+                  if (obj instanceof Other)
+                  {
+                     list.add(parser.getListener().getOther(tcp));
+                  }
+                  else
+                  {
+                     list.add(parser.getListener().getLetter(tcp));
+                  }
+               }
+
+               done = true;
+            }
+            else
+            {
+               list.add(obj);
+            }
          }
          else if (obj instanceof TeXObjectList)
          {
