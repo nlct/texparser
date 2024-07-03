@@ -302,7 +302,7 @@ public class StandaloneDef extends AbstractGlsCommand
    public void process(TeXParser parser, TeXObjectList stack)
    throws IOException
    {
-      popModifier(parser, stack, '*');
+      isStar = (popModifier(parser, stack, '*') == '*');
 
       preArgHook(parser, stack);
 
@@ -418,4 +418,5 @@ public class StandaloneDef extends AbstractGlsCommand
 
    protected FrameBoxEnv outerBox;
    protected FrameBox rightBox, noteBox;
+   protected boolean isStar = false;
 }
