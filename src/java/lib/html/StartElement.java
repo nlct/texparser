@@ -116,6 +116,25 @@ public class StartElement extends HtmlTag
          listener.writeln();
       }
 
+      if (listener.isNameAnchorRequired() && attributes != null)
+      {
+         String id = attributes.get("id");
+
+         if (id != null)
+         {
+            if (name.equals("a"))
+            {
+               attributes.put("name", id);
+            }
+            else
+            {
+               listener.writeliteral(String.format("<a name=\"%s\"></a>", id));
+            }
+
+            attributes.remove("id");
+         }
+      }
+
       if (attributes == null || attributes.isEmpty())
       {
          listener.writeliteral(getTag());
@@ -127,6 +146,7 @@ public class StartElement extends HtmlTag
          for (Iterator<String> it = attributes.keySet().iterator(); it.hasNext(); )
          {
             String key = it.next();
+
             String val = attributes.get(key);
 
             listener.writeliteral(String.format(" %s=\"%s\"", key, val));

@@ -770,6 +770,12 @@ public class L2HConverter extends LaTeXParserListener
       return !isXml();
    }
 
+   // For old browsers (including JEditorPane) that don't support id as an anchor
+   public boolean isNameAnchorRequired()
+   {
+      return nameAnchorRequired;
+   }
+
    public void setAutoInsertPar(boolean enable)
    {
       autoInsertPar = enable;
@@ -4933,6 +4939,7 @@ public class L2HConverter extends LaTeXParserListener
 
    private boolean autoInsertPar = false;
    private boolean isXml = false;
+   protected boolean nameAnchorRequired = false;
 
    private DocumentBlockType currentDocumentBlockType = DocumentBlockType.OUTSIDE;
 
