@@ -362,9 +362,9 @@ public class L2HConverter extends LaTeXParserListener
       putControlSequence(new L2Hhfill("hfil"));
 
       putControlSequence(new GenericCommand(true, "quad", null, 
-       new TeXObject[] {new HtmlTag("<span class=\"quad\"> </span>")}));
+       new TeXObject[] {new HtmlTag("<span class=\"quad\">  </span>")}));
       putControlSequence(new GenericCommand(true, "qquad", null, 
-       new TeXObject[] {new HtmlTag("<span class=\"qquad\"> </span>")}));
+       new TeXObject[] {new HtmlTag("<span class=\"qquad\">    </span>")}));
 
       // ignore \\addvspace
       putControlSequence(new AtGobble("addvspace"));
