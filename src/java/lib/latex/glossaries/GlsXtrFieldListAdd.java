@@ -73,6 +73,12 @@ public class GlsXtrFieldListAdd extends ControlSequence
 
       ControlSequence cs = parser.getListener().getControlSequence(csname);
 
+      if (parser.isDebugMode(TeXParser.DEBUG_STY_DATA))
+      {
+         parser.logMessage("ADD TO FIELD "+field+" using "+cs.toString(parser)
+           + " for "+label + " via "+toString(parser));
+      }
+
       TeXObjectList substack = parser.getListener().createStack();
 
       substack.add(cs);

@@ -51,15 +51,17 @@ public class GlossaryEntry
            it.hasNext(); )
       {
          String key = it.next();
-         TeXObject value;
+         TeXObject value = options.getValue(key);
 
          if (sty.isFieldExpansionOn(key))
          {
-            value = options.getExpandedValue(key, parser, stack);
-         }
-         else
-         {
-            value = options.getValue(key);
+            if (parser.isDebugMode(TeXParser.DEBUG_STY_DATA))
+            {
+               parser.logMessage("FIELD "+key+" expansion on -> "
+                 + value.toString(parser));
+            }
+
+            value = parser.expandfully(value, stack);
          }
 
          if (parser.isDebugMode(TeXParser.DEBUG_STY_DATA))
