@@ -64,4 +64,24 @@ public class IfGlsEntryExists extends AbstractGlsCommand
       }
    }
 
+   @Override
+   public void process(TeXParser parser, TeXObjectList stack)
+     throws IOException
+   {
+      GlsLabel glslabel = popEntryLabel(parser, stack);
+
+      TeXObject trueCode = popArg(parser, stack);
+      TeXObject falseCode = popArg(parser, stack);
+
+      TeXObject obj = glslabel.getEntry() == null ? falseCode : trueCode;
+
+      TeXParserUtils.process(obj, parser, stack);
+   }
+
+   @Override
+   public void process(TeXParser parser)
+     throws IOException
+   {
+      process(parser, parser);
+   }
 }
