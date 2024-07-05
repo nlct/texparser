@@ -49,6 +49,30 @@ public class GlsXtrAtTitleAtField extends AbstractGlsCommand
       TeXObjectList content = listener.createStack();
 
       TeXObject cs = popArg(parser, stack);
+      String label = popLabelString(parser, stack);
+
+      TeXObject opts = TeXParserUtils.expandOnce(
+        listener.getControlSequence("glsxtrtitleopts"), parser, stack);
+
+      content.add(cs, true);
+      content.add(listener.getOther('['));
+      content.add(opts, true);
+      content.add(listener.getOther(']'));
+      content.add(listener.createGroup(label));
+      content.add(listener.getOther('['));
+      content.add(listener.getOther(']'));
+
+      return content;
+   }
+
+   @Override
+   public void process(TeXParser parser, TeXObjectList stack)
+     throws IOException
+   {
+      TeXParserListener listener = parser.getListener();
+      TeXObjectList content = listener.createStack();
+
+      TeXObject cs = popArg(parser, stack);
       GlsLabel glslabel = popEntryLabel(parser, stack);
 
       GlossaryEntry entry = glslabel.getEntry();
@@ -72,7 +96,13 @@ public class GlsXtrAtTitleAtField extends AbstractGlsCommand
            glslabel.getLabel());
       }
 
-      return content;
+      TeXParserUtils.process(content, parser, stack);
    }
 
+   @Override
+   public void process(TeXParser parser)
+     throws IOException
+   {
+      process(parser, parser);
+   }
 }
