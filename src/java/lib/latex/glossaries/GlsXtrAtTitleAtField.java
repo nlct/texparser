@@ -41,11 +41,12 @@ public class GlsXtrAtTitleAtField extends AbstractGlsCommand
       return new GlsXtrAtTitleAtField(getName(), getSty());
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
       TeXParserListener listener = parser.getListener();
-      TeXObjectList content= listener.createStack();
+      TeXObjectList content = listener.createStack();
 
       TeXObject cs = popArg(parser, stack);
       GlsLabel glslabel = popEntryLabel(parser, stack);
@@ -64,6 +65,11 @@ public class GlsXtrAtTitleAtField extends AbstractGlsCommand
          content.add(TeXParserUtils.createGroup(parser, glslabel));
          content.add(listener.getOther('['));
          content.add(listener.getOther(']'));
+      }
+      else
+      {
+         sty.undefWarnOrError(stack, GlossariesSty.ENTRY_NOT_DEFINED, 
+           glslabel.getLabel());
       }
 
       return content;
