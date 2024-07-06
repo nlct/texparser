@@ -642,25 +642,32 @@ public class L2HConverter extends LaTeXParserListener
 
    public StartElement newHtml5StartElement(String name)
    {
-      return newHtml5StartElement(name, "div");
+      return newHtml5StartElement(name, "div", false, true);
    }
 
+   @Deprecated
    public StartElement newHtml5StartElement(String name, boolean inline)
    {
-      return newHtml5StartElement(name, inline ? "span" : "div");
+      return newHtml5StartElement(name, inline ? "span" : "div", false, !inline);
    }
 
    public StartElement newHtml5StartElement(String name, String non5tag)
+   {
+      return newHtml5StartElement(name, non5tag, false, non5tag.equals("div"));
+   }
+
+   public StartElement newHtml5StartElement(String name, String non5tag,
+     boolean insertCr, boolean isBlock)
    {
       StartElement elem;
 
       if (isHtml5())
       {
-         elem = new StartElement(name);
+         elem = new StartElement(name, insertCr, isBlock);
       }
       else
       {
-         elem = new StartElement(non5tag);
+         elem = new StartElement(non5tag, insertCr, isBlock);
          elem.putAttribute("class", name);
       }
 
@@ -672,6 +679,7 @@ public class L2HConverter extends LaTeXParserListener
       return newHtml5EndElement(name, "div");
    }
 
+   @Deprecated
    public EndElement newHtml5EndElement(String name, boolean inline)
    {
       return newHtml5EndElement(name, inline ? "span" : "div");
@@ -679,15 +687,21 @@ public class L2HConverter extends LaTeXParserListener
 
    public EndElement newHtml5EndElement(String name, String non5tag)
    {
+      return newHtml5EndElement(name, non5tag, false, non5tag.equals("div"));
+   }
+
+   public EndElement newHtml5EndElement(String name, String non5tag,
+     boolean appendCR, boolean isBlock)
+   {
       EndElement elem;
 
       if (isHtml5())
       {
-         elem = new EndElement(name);
+         elem = new EndElement(name, appendCR, isBlock);
       }
       else
       {
-         elem = new EndElement(non5tag);
+         elem = new EndElement(non5tag, appendCR, isBlock);
       }
 
       return elem;

@@ -51,11 +51,11 @@ public class Widget extends Command
 
       startElem.putAttribute("class", cssClassName);
 
-      list.add(listener.newHtml5StartElement("samp", true));
+      list.add(listener.newHtml5StartElement("samp", "span"));
 
       list.add(arg, true);
 
-      list.add(listener.newHtml5EndElement("samp", true));
+      list.add(listener.newHtml5EndElement("samp", "span"));
 
       list.add(new EndElement(kbdTag));
 

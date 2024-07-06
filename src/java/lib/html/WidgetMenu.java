@@ -62,11 +62,11 @@ public class WidgetMenu extends Command
 
       if (csvList.size() == 1)
       {
-         list.add(listener.newHtml5StartElement("samp", true));
+         list.add(listener.newHtml5StartElement("samp", "span"));
 
          list.add(csvList.getValue(0), true);
 
-         list.add(listener.newHtml5EndElement("samp"));
+         list.add(listener.newHtml5EndElement("samp", "span"));
       }
       else
       {
@@ -88,11 +88,11 @@ public class WidgetMenu extends Command
             startElem.putAttribute("class", "menuitem");
             list.add(startElem);
 
-            list.add(listener.newHtml5StartElement("samp", true));
+            list.add(listener.newHtml5StartElement("samp", "span"));
 
             list.add(csvList.getValue(i), true);
 
-            list.add(listener.newHtml5EndElement("samp"));
+            list.add(listener.newHtml5EndElement("samp", "span"));
 
             list.add(new EndElement(kbdTag));
          }
