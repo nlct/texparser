@@ -50,23 +50,55 @@ public class WidgetMenu extends Command
 
       TeXObjectList list = listener.createStack();
 
-      String kbdTag = listener.isHtml5() ? "kbd" : "span";
-
-      // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/kbd
-
-      StartElement startElem = new StartElement(kbdTag);
-
-      startElem.putAttribute("class", "menu");
-
-      list.add(startElem);
-
-      if (csvList.size() == 1)
+      if (listener.isHtml5())
       {
-         list.add(listener.newHtml5StartElement("samp", "span"));
+         // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/kbd
 
-         list.add(csvList.getValue(0), true);
+         StartElement startElem = new StartElement("kbd");
 
-         list.add(listener.newHtml5EndElement("samp", "span"));
+         startElem.putAttribute("class", "menu");
+
+         list.add(startElem);
+
+         if (csvList.size() == 1)
+         {
+            list.add(new StartElement("samp"));
+
+            list.add(csvList.getValue(0), true);
+
+            list.add(new EndElement("samp"));
+         }
+         else
+         {
+            TeXObject sep = menuSep;
+
+            if (!menuSep.isSingleToken())
+            {
+               sep = (TeXObject)menuSep.clone();
+            }
+
+            for (int i = 0; i < csvList.size(); i++)
+            {
+               if (i > 0)
+               {
+                  list.add(sep, true);
+               }
+
+               startElem = new StartElement("kbd");
+               startElem.putAttribute("class", "menuitem");
+               list.add(startElem);
+
+               list.add(new StartElement("samp"));
+
+               list.add(csvList.getValue(i), true);
+
+               list.add(new EndElement("samp"));
+
+               list.add(new EndElement("kbd"));
+            }
+         }
+
+         list.add(new EndElement("kbd"));
       }
       else
       {
@@ -84,21 +116,15 @@ public class WidgetMenu extends Command
                list.add(sep, true);
             }
 
-            startElem = new StartElement(kbdTag);
+            StartElement startElem = new StartElement("span");
             startElem.putAttribute("class", "menuitem");
             list.add(startElem);
 
-            list.add(listener.newHtml5StartElement("samp", "span"));
-
             list.add(csvList.getValue(i), true);
 
-            list.add(listener.newHtml5EndElement("samp", "span"));
-
-            list.add(new EndElement(kbdTag));
+            list.add(new EndElement("span"));
          }
       }
-
-      list.add(new EndElement(kbdTag));
 
       return list;
    }

@@ -45,19 +45,38 @@ public class Widget extends Command
 
       TeXObjectList list = listener.createStack();
 
-      String kbdTag = listener.isHtml5() ? "kbd" : "span";
+      if (listener.isHtml5())
+      {
+         StartElement startElem = new StartElement("kbd");
 
-      StartElement startElem = new StartElement(kbdTag);
+         startElem.putAttribute("class", cssClassName);
 
-      startElem.putAttribute("class", cssClassName);
+         list.add(new StartElement("samp"));
 
-      list.add(listener.newHtml5StartElement("samp", "span"));
+         list.add(arg, true);
 
-      list.add(arg, true);
+         list.add(new EndElement("samp"));
 
-      list.add(listener.newHtml5EndElement("samp", "span"));
+         list.add(new EndElement("kbd"));
+      }
+      else
+      {
+         StartElement startElem = new StartElement("span");
 
-      list.add(new EndElement(kbdTag));
+         if (cssClassName == null || cssClassName.isEmpty())
+         {
+            startElem.putAttribute("class", "kbd samp");
+         }
+         else
+         {
+            startElem.putAttribute("class", 
+              String.format("%s kbd samp", cssClassName));
+         }
+
+         list.add(arg, true);
+
+         list.add(new EndElement("span"));
+      }
 
       return list;
    }
