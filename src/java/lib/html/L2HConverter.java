@@ -784,10 +784,23 @@ public class L2HConverter extends LaTeXParserListener
       return !isXml();
    }
 
-   // For old browsers (including JEditorPane) that don't support id as an anchor
-   public boolean isNameAnchorRequired()
+   /**
+    Indicates whether or not an anchor must be set with the "name" attribute
+    of the "a" tag. Simply returns false regardless of the parameters. Sub-classes
+    may override this method for particular elements or block/inline type.
+    This is intended for use with old browsers (including JEditorPane) 
+    that don't support id as an anchor. Don't have this method return true
+    if isHtml5() returns true as it's deprecated with HTML5.
+    Note that this method is only checked by StartElement and won't affect
+    tags explicitly written with HtmlTag or any of the writeliteral methods.
+    @param elemTag the element tag
+    @param isBlock true if the element tag is a block
+    @return true if "a" tag needs to be inserted and "id" attribute removed from
+    the given element type
+   */
+   public boolean isNameAnchorRequired(String elemTag, boolean isBlock)
    {
-      return nameAnchorRequired;
+      return false;
    }
 
    public void setAutoInsertPar(boolean enable)
@@ -4953,7 +4966,6 @@ public class L2HConverter extends LaTeXParserListener
 
    private boolean autoInsertPar = false;
    private boolean isXml = false;
-   protected boolean nameAnchorRequired = false;
 
    private DocumentBlockType currentDocumentBlockType = DocumentBlockType.OUTSIDE;
 

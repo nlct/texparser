@@ -116,7 +116,9 @@ public class StartElement extends HtmlTag
          listener.writeln();
       }
 
-      if (listener.isNameAnchorRequired() && attributes != null)
+      String appendAnchor = null;
+
+      if (listener.isNameAnchorRequired(name, isBlock) && attributes != null)
       {
          String id = attributes.get("id");
 
@@ -128,7 +130,16 @@ public class StartElement extends HtmlTag
             }
             else
             {
-               listener.writeliteral(String.format("<a name=\"%s\"></a>", id));
+               String anchor = String.format("<a name=\"%s\"></a>", id);
+
+               if (name.equals("div"))
+               {
+                  appendAnchor = anchor;
+               }
+               else
+               {
+                  listener.writeliteral(anchor);
+               }
             }
 
             attributes.remove("id");
@@ -153,6 +164,11 @@ public class StartElement extends HtmlTag
          }
 
          listener.writeliteral(">");
+      }
+
+      if (appendAnchor != null)
+      {
+         listener.writeliteral(appendAnchor);
       }
    }
 
