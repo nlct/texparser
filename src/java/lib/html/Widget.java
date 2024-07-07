@@ -69,15 +69,7 @@ public class Widget extends Command
       {
          StartElement startElem = new StartElement(nonHtml5Tag);
 
-         if (cssClassName == null || cssClassName.isEmpty())
-         {
-            startElem.putAttribute("class", "kbd samp");
-         }
-         else
-         {
-            startElem.putAttribute("class", 
-              String.format("%s kbd samp", cssClassName));
-         }
+         startElem.putAttribute("class", cssClassName);
 
          list.add(startElem);
 
