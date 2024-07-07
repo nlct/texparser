@@ -32,13 +32,19 @@ public class WidgetMenu extends Command
 
    public WidgetMenu(String name, TeXObject sep)
    {
+      this(name, sep, "font");
+   }
+
+   public WidgetMenu(String name, TeXObject sep, String nonHtml5Tag)
+   {
       super(name);
       this.menuSep = sep;
+      this.nonHtml5Tag = nonHtml5Tag;
    }
 
    public Object clone()
    {
-      return new WidgetMenu(getName(), (TeXObject)menuSep.clone());
+      return new WidgetMenu(getName(), (TeXObject)menuSep.clone(), nonHtml5Tag);
    }
 
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
@@ -116,13 +122,13 @@ public class WidgetMenu extends Command
                list.add(sep, true);
             }
 
-            StartElement startElem = new StartElement("span");
+            StartElement startElem = new StartElement(nonHtml5Tag);
             startElem.putAttribute("class", "menuitem");
             list.add(startElem);
 
             list.add(csvList.getValue(i), true);
 
-            list.add(new EndElement("span"));
+            list.add(new EndElement(nonHtml5Tag));
          }
       }
 
@@ -142,4 +148,5 @@ public class WidgetMenu extends Command
    }
 
    protected TeXObject menuSep;
+   protected String nonHtml5Tag;
 }

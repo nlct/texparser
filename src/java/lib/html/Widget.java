@@ -27,21 +27,25 @@ public class Widget extends Command
 {
    public Widget(String name, String cssClassName)
    {
+      this(name, cssClassName, "font");
+   }
+
+   public Widget(String name, String cssClassName, String nonHtml5Tag)
+   {
       super(name);
       this.cssClassName = cssClassName;
+      this.nonHtml5Tag = nonHtml5Tag;
    }
 
    public Object clone()
    {
-      return new Widget(getName(), cssClassName);
+      return new Widget(getName(), cssClassName, nonHtml5Tag);
    }
 
-   public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
+   protected TeXObjectList expand(TeXObject arg, TeXParser parser, TeXObjectList stack)
       throws IOException
    {
       L2HConverter listener = (L2HConverter)parser.getListener();
-
-      TeXObject arg = popArg(parser, stack);
 
       TeXObjectList list = listener.createStack();
 
@@ -50,6 +54,8 @@ public class Widget extends Command
          StartElement startElem = new StartElement("kbd");
 
          startElem.putAttribute("class", cssClassName);
+
+         list.add(startElem);
 
          list.add(new StartElement("samp"));
 
@@ -61,7 +67,7 @@ public class Widget extends Command
       }
       else
       {
-         StartElement startElem = new StartElement("span");
+         StartElement startElem = new StartElement(nonHtml5Tag);
 
          if (cssClassName == null || cssClassName.isEmpty())
          {
@@ -73,25 +79,37 @@ public class Widget extends Command
               String.format("%s kbd samp", cssClassName));
          }
 
+         list.add(startElem);
+
          list.add(arg, true);
 
-         list.add(new EndElement("span"));
+         list.add(new EndElement(nonHtml5Tag));
       }
 
       return list;
    }
 
+   public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
+      throws IOException
+   {
+      TeXObject arg = popArg(parser, stack);
+
+      return expand(arg, parser, stack);
+   }
+
    public TeXObjectList expandfully(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
-      return expandonce(parser, stack);
+      TeXObject arg = popArg(parser, stack);
+
+      return expand(TeXParserUtils.expandFully(arg, parser, stack), parser, stack);
    }
 
    public TeXObjectList expandfully(TeXParser parser)
       throws IOException
    {
-      return expandonce(parser);
+      return expandfully(parser, parser);
    }
 
-   protected String cssClassName;
+   protected String cssClassName, nonHtml5Tag;
 }
