@@ -1378,6 +1378,11 @@ public class L2HConverter extends LaTeXParserListener
       return false;
    }
 
+   protected String getNonHtml5AccSuppTag(String tag)
+   {
+      return tag.equals(AccSupp.TAG_IMG) ? tag : "span";
+   }
+
    @Override
    public TeXObject applyAccSupp(AccSupp accsupp, TeXObject object)
    {
@@ -1387,10 +1392,14 @@ public class L2HConverter extends LaTeXParserListener
       String id = accsupp.getId();
       String cssClass = null;
 
-      if (tag != null && !isHtml5() && !tag.equals(AccSupp.TAG_IMG))
+      if (tag != null && !isHtml5())
       {
-         cssClass = tag;
-         tag = "span";
+         tag = getNonHtml5AccSuppTag(tag);
+
+         if (!tag.equals(accsupp.getTag()))
+         {
+            cssClass = accsupp.getTag();
+         }
       }
 
       TeXObjectList list;
