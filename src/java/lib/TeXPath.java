@@ -74,6 +74,13 @@ public class TeXPath
       init(parser, file);
    }
 
+   public TeXPath(TeXParser parser, File file, Charset charset)
+     throws IOException
+   {
+      init(parser, file);
+      setEncoding(charset);
+   }
+
    protected File getDefaultBaseDir(TeXParser parser)
    {
       if (parser == null)
