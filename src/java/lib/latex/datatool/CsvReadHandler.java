@@ -31,6 +31,39 @@ import com.dickimawbooks.texparserlib.latex.latex3.PropertyCommand;
  * The FileMapHandler used to read CSV files by DataBase.read().
  * This is designed to approximate the way that <code>\DTLread</code>
  * parses a CSV file, although there may be some differences.
+ *
+ * Behaviour of datatool.sty v3.0:
+ *
+ * With csv-content=tex, the content includes LaTeX markup.
+ * These means that grouping can also be used to delimit values.
+ * The file is read line by line, but any line break occurring 
+ * within a group will ensure that subsequent lines are appended
+ * until the grouping is balanced. Once the line has been read,
+ * it will then be split on the separator and the delimiter pairs 
+ * will be removed.  Any escape backslashes will be stripped according
+ * to the csv-escape-chars option.
+ *
+ * With csv-content=literal, the content should be interpreted
+ * literally. Each line in the file is read in as a detokenized 
+ * string, which is then split according to the separator and
+ * delimiter. Each element is then processed according to the following steps:
+ * <ol>
+ * <li> strip any backslashes according to the csv-escape-chars
+ * option;
+ * <li> perform a "replace all cases" regular expression which
+ * substitutes the sequences <code>\n</code>, <code>\r</code> and
+ * <code>\f</code> with a space character, the sequence
+ * <code>\t</code> with a tab character and the TeX special characters
+ * with LaTeX commands;
+ * <li> rescan the value to ensure all tokens have their correct
+ * category code according to the current setting;
+ * <li> apply user mappings.
+ * </ol>
+ * The regular expression in the second step uses
+ * <code>\regex_replace_case_all:nN</code> with the cases provided in the token
+ * list variable <code>\l_datatool_str_csv_regex_cases_tl</code>.
+ * Since LaTeX3 regular expressions aren't currently implemented in
+ * the TeX Parser Library, the mappings are handled differently.
  */
 public class CsvReadHandler implements FileMapHandler
 {
@@ -42,7 +75,8 @@ public class CsvReadHandler implements FileMapHandler
 
       headers = new Vector<DataToolHeader>();
 
-      parser = settings.getSty().getParser();
+      sty = settings.getSty();
+      parser = sty.getParser();
 
       ControlSequence cs = parser.getControlSequence(
         DataToolSty.CSV_HEADERS_PROP);
@@ -353,39 +387,34 @@ public class CsvReadHandler implements FileMapHandler
          }
          else
          {
-            builder.append(obj.toString(parser));
+            String str = obj.toString(parser);
+
+            for (int i = 0; i < str.length(); )
+            {
+               int cp = str.codePointAt(i);
+               i += Character.charCount(cp);
+
+               sty.appendCsvLiteral(cp, builder);
+            }
          }
       }
-      else if (obj instanceof CharObject)
+      else if (obj instanceof SingleToken)
       {
-         int cp = ((CharObject)obj).getCharCode();
+         int cp = ((SingleToken)obj).getCharCode();
 
-         if (cp == '#' || cp == '$' || cp == '%' || cp == '&'
-             || cp == '_' || cp == '{' || cp == '}')
-         {
-            builder.append('\\');
-            builder.appendCodePoint(cp);
-         }
-         else if (cp == '\\')
-         {
-            builder.append("\\textbackslash ");
-         }
-         else if (cp == '^')
-         {
-            builder.append("\\textasciicircum ");
-         }
-         else if (cp == '~')
-         {
-            builder.append("\\textasciitilde ");
-         }
-         else
-         {
-            builder.appendCodePoint(cp);
-         }
+         sty.appendCsvLiteral(cp, builder);
       }
       else
       {
-         builder.append(obj.toString(parser));
+         String str = obj.toString(parser);
+
+         for (int i = 0; i < str.length(); )
+         {
+            int cp = str.codePointAt(i);
+            i += Character.charCount(cp);
+
+            sty.appendCsvLiteral(cp, builder);
+         }
       }
    }
 
@@ -399,6 +428,15 @@ public class CsvReadHandler implements FileMapHandler
       if (pendingCell != null)
       {
          // continue parsing from previous line
+
+         if (pendingCell.isEmpty())
+         {
+            pendingCell.add(parser.getListener().getControlSequence("DTLpar"));
+         }
+         else if (!(pendingCell.lastElement() instanceof Comment))
+         {
+            pendingCell.add(parser.getListener().getEol());
+         }
 
          needsClosingDelim = true;
       }
@@ -705,4 +743,5 @@ public class CsvReadHandler implements FileMapHandler
    PropertyCommand<Integer> colHeadersProp;
    Vector<DataToolHeader> headers;
    TeXParser parser;
+   DataToolSty sty;
 }

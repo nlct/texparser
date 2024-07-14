@@ -107,13 +107,23 @@ public class DataBase
    throws IOException
    {
       TeXParserListener listener = parser.getListener();
-      TeXApp texApp = listener.getTeXApp();
       Charset charset = texPath.getEncoding();
 
       if (charset == null)
       {
          charset = listener.getCharSet();
       }
+
+      read(sty, texPath, settings, charset, parser, stack);
+   }
+
+   public static void read(DataToolSty sty, TeXPath texPath,
+       IOSettings settings, Charset charset,
+       TeXParser parser, TeXObjectList stack)
+   throws IOException
+   {
+      TeXParserListener listener = parser.getListener();
+      TeXApp texApp = listener.getTeXApp();
 
       if (charset != null)
       {

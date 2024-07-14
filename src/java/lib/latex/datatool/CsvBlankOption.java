@@ -20,5 +20,30 @@ package com.dickimawbooks.texparserlib.latex.datatool;
 
 public enum CsvBlankOption
 {
-   IGNORE, EMPTY_ROW, END;
+   IGNORE("ignore"), EMPTY_ROW("empty-row"), END("end");
+
+   CsvBlankOption(String option)
+   {
+      this.name = option;
+   }
+
+   public String getName()
+   {
+      return name;
+   }
+
+   public static CsvBlankOption fromOptionName(String optionName)
+   {
+      for (CsvBlankOption opt : values())
+      {
+         if (opt.name.equals(optionName))
+         {
+            return opt;
+         }
+      }
+
+      return null;
+   }
+
+   final String name;
 }

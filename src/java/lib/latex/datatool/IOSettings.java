@@ -113,29 +113,16 @@ public class IOSettings
          val = TeXParserUtils.getControlSequenceValue(
           DataToolSty.CSV_ESCAPE_CHARS, "double-delim", parser, stack);
 
-         if (val.equals("none"))
-         {
-            escCharsOpt = EscapeCharsOption.NONE;
-         }
-         else if (val.equals("double-delim"))
-         {
-            escCharsOpt = EscapeCharsOption.DOUBLE_DELIM;
-         }
-         else if (val.equals("delim"))
-         {
-            escCharsOpt = EscapeCharsOption.ESC_DELIM;
-         }
-         else if (val.equals("delim+bksl"))
-         {
-            escCharsOpt = EscapeCharsOption.ESC_DELIM_BKSL;
-         }
-         else
+         EscapeCharsOption opt = EscapeCharsOption.fromOptionName(val);
+
+         if (opt == null)
          {
             throw new LaTeXSyntaxException(parser,
              LaTeXSyntaxException.ERROR_UNKNOWN_OPTION,
                "csv-escape-chars="+val, "datatool/io");
          }
 
+         escCharsOpt = opt;
       }
 
       if (isRead)
@@ -151,19 +138,9 @@ public class IOSettings
             val = TeXParserUtils.getControlSequenceValue(DataToolSty.CSV_BLANK,
              "ignore", parser, stack);
 
-            if (val.equals("ignore"))
-            {
-               csvBlankOpt = CsvBlankOption.IGNORE;
-            }
-            else if (val.equals("empty-row"))
-            {
-               csvBlankOpt = CsvBlankOption.EMPTY_ROW;
-            }
-            else if (val.equals("end"))
-            {
-               csvBlankOpt = CsvBlankOption.END;
-            }
-            else
+            CsvBlankOption opt = CsvBlankOption.fromOptionName(val);
+
+            if (opt == null)
             {
                throw new LaTeXSyntaxException(parser,
                 LaTeXSyntaxException.ERROR_UNKNOWN_OPTION,
@@ -191,48 +168,32 @@ public class IOSettings
          val = TeXParserUtils.getControlSequenceValue(DataToolSty.IO_OVERWRITE,
           "error", parser, stack);
 
-         if (val.equals("allow"))
-         {
-            fileOverwriteOpt = FileOverwriteOption.WARN;
-         }
-         else if (val.equals("warn"))
-         {
-            fileOverwriteOpt = FileOverwriteOption.WARN;
-         }
-         else if (val.equals("error"))
-         {
-            fileOverwriteOpt = FileOverwriteOption.ERROR;
-         }
-         else
+         FileOverwriteOption fopt = FileOverwriteOption.fromOptionName(val);
+
+         if (fopt == null)
          {
             throw new LaTeXSyntaxException(parser,
              LaTeXSyntaxException.ERROR_UNKNOWN_OPTION,
                "overwrite="+val, "datatool/io");
          }
 
+         fileOverwriteOpt = fopt;
+
          if (format != FileFormatType.DBTEX)
          {
             val = TeXParserUtils.getControlSequenceValue(DataToolSty.IO_EXPAND,
              "none", parser, stack);
 
-            if (val.equals("none"))
-            {
-               expandOpt = IOExpandOption.NONE;
-            }
-            else if (val.equals("protected"))
-            {
-               expandOpt = IOExpandOption.PROTECTED;
-            }
-            else if (val.equals("full"))
-            {
-               expandOpt = IOExpandOption.FULL;
-            }
-            else
+            IOExpandOption expOpt = IOExpandOption.fromOptionName(val);
+
+            if (expOpt == null)
             {
                throw new LaTeXSyntaxException(parser,
                 LaTeXSyntaxException.ERROR_UNKNOWN_OPTION,
                   "expand="+val, "datatool/io");
             }
+
+            expandOpt = expOpt;
          }
 
          if (format == FileFormatType.CSV || format == FileFormatType.TSV)

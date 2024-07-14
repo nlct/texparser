@@ -20,5 +20,30 @@ package com.dickimawbooks.texparserlib.latex.datatool;
 
 public enum IOExpandOption
 {
-   NONE, PROTECTED, FULL;
+   NONE("none"), PROTECTED("protected"), FULL("full");
+
+   IOExpandOption(String option)
+   {
+      this.name = option;
+   }
+
+   public String getName()
+   {
+      return name;
+   }
+
+   public static IOExpandOption fromOptionName(String optionName)
+   {
+      for (IOExpandOption opt : values())
+      {
+         if (opt.name.equals(optionName))
+         {
+            return opt;
+         }
+      }
+
+      return null;
+   }
+
+   final String name;
 }

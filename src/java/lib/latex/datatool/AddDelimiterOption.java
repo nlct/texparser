@@ -20,5 +20,30 @@ package com.dickimawbooks.texparserlib.latex.datatool;
 
 public enum AddDelimiterOption
 {
-   ALWAYS, DETECT, NEVER;
+   ALWAYS("always"), DETECT("detect"), NEVER("never");
+
+   AddDelimiterOption(String option)
+   {
+      this.name = option;
+   }
+
+   public String getName()
+   {
+      return name;
+   }
+
+   public static AddDelimiterOption fromOptionName(String optionName)
+   {
+      for (AddDelimiterOption opt : values())
+      {
+         if (opt.name.equals(optionName))
+         {
+            return opt;
+         }
+      }
+
+      return null;
+   }
+
+   final String name;
 }

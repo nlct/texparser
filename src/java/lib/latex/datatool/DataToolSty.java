@@ -21,6 +21,7 @@ package com.dickimawbooks.texparserlib.latex.datatool;
 import java.util.Vector;
 import java.util.Iterator;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.io.IOException;
 
@@ -45,6 +46,23 @@ public class DataToolSty extends LaTeXSty
    throws IOException
    {
       super(options, "datatool", listener, loadParentOptions);
+
+      initCsvLiteralMap();
+   }
+
+   protected void initCsvLiteralMap()
+   {
+      csvLiteralMap = new HashMap<Integer,String>();
+      csvLiteralMap.put(Integer.valueOf((int)'\\'), "\\textbackslash ");
+      csvLiteralMap.put(Integer.valueOf((int)'#'), "\\#");
+      csvLiteralMap.put(Integer.valueOf((int)'$'), "\\$");
+      csvLiteralMap.put(Integer.valueOf((int)'%'), "\\%");
+      csvLiteralMap.put(Integer.valueOf((int)'&'), "\\&");
+      csvLiteralMap.put(Integer.valueOf((int)'_'), "\\_");
+      csvLiteralMap.put(Integer.valueOf((int)'{'), "\\{");
+      csvLiteralMap.put(Integer.valueOf((int)'}'), "\\}");
+      csvLiteralMap.put(Integer.valueOf((int)'^'), "\\textasciicircum ");
+      csvLiteralMap.put(Integer.valueOf((int)'~'), "\\textasciitilde ");
    }
 
    @Override
@@ -601,6 +619,11 @@ public class DataToolSty extends LaTeXSty
       return entry;
    }
 
+   public void removeDataBase(String name)
+   {
+      removeDataBase(name, true);
+   }
+
    public void removeDataBase(String name, boolean global)
    {
       DataBase db = null;
@@ -1137,30 +1160,7 @@ public class DataToolSty extends LaTeXSty
          {
             String str = (val == null ? "protected" : parser.expandToString(val, stack));
 
-            ControlSequence cs;
-
-            if (str.equals("none"))
-            {
-               parser.putControlSequence(true, 
-                 new TextualContentCommand(IO_EXPAND, str));
-
-               cs = getParser().getListener().getControlSequence("dtlnoexpandnewvalue");
-            }
-            else if (str.equals("protected") || str.equals("full"))
-            {
-               parser.putControlSequence(true, 
-                 new TextualContentCommand(IO_EXPAND, str));
-
-               cs = getParser().getListener().getControlSequence("dtlexpandnewvalue");
-            }
-            else
-            {
-               throw new LaTeXSyntaxException(parser, 
-                LaTeXSyntaxException.ERROR_UNKNOWN_OPTION,
-                key+"="+str, "datatool/io");
-            }
-
-            TeXParserUtils.process(cs, getParser(), stack);
+            setIOExpandOption(str, stack);
          }
          else if (key.equals("format"))
          {
@@ -1213,7 +1213,9 @@ public class DataToolSty extends LaTeXSty
 
             String str = parser.expandToString(val, stack);
 
-            if (str.equals("always") || str.equals("detect") || str.equals("never"))
+            AddDelimiterOption opt = AddDelimiterOption.fromOptionName(str);
+
+            if (opt != null)
             {
                parser.putControlSequence(true,
                  new TextualContentCommand(IO_ADD_DELIMITER, str));
@@ -1234,9 +1236,9 @@ public class DataToolSty extends LaTeXSty
             }
 
             String str = parser.expandToString(val, stack);
+            EscapeCharsOption escCharsOpt = EscapeCharsOption.fromOptionName(str);
 
-            if (str.equals("none") || str.equals("double-delim")
-             || str.equals("delim") || str.equals("delim+bksl"))
+            if (escCharsOpt != null)
             {
                parser.putControlSequence(true,
                  new TextualContentCommand(CSV_ESCAPE_CHARS, str));
@@ -1287,8 +1289,9 @@ public class DataToolSty extends LaTeXSty
             }
 
             String str = parser.expandToString(val, stack);
+            CsvBlankOption opt = CsvBlankOption.fromOptionName(str);
 
-            if (str.equals("ignore") || str.equals("empty-row") || str.equals("end"))
+            if (opt != null)
             {
                parser.putControlSequence(true,
                  new TextualContentCommand(CSV_BLANK, str));
@@ -1365,7 +1368,9 @@ public class DataToolSty extends LaTeXSty
 
             String str = parser.expandToString(val, stack);
 
-            if (str.equals("error") || str.equals("warn") || str.equals("allow"))
+            FileOverwriteOption opt = FileOverwriteOption.fromOptionName(str);
+
+            if (opt != null)
             {
                parser.putControlSequence(true,
                  new TextualContentCommand(IO_OVERWRITE, str));
@@ -1431,6 +1436,182 @@ public class DataToolSty extends LaTeXSty
             setSeparator(str.codePointAt(0));
          }
       }
+   }
+
+   public void processIOSettings(IOSettings ioSettings, TeXObjectList stack)
+     throws IOException
+   {
+      TeXParser parser = getParser();
+
+      String defaultName = ioSettings.getDefaultName();
+
+      if (defaultName != null)
+      {
+         parser.putControlSequence(true,
+            new TextualContentCommand(IO_NAME, defaultName));
+      }
+
+      String defExt = ioSettings.getDefaultExtension();
+
+      if (defExt != null)
+      {
+         parser.putControlSequence(true,
+            new TextualContentCommand(DEFAULT_EXT, defExt));
+      }
+
+      if (ioSettings.isHeaderIncluded())
+      {
+         parser.putControlSequence(true, new IfFalse("ifdtlnoheader"));
+      }
+      else
+      {
+         parser.putControlSequence(true, new IfTrue("ifdtlnoheader"));
+      }
+
+      FileFormatType format = ioSettings.getFormat();
+      String fmtStr = format.toString();
+
+      if (format == FileFormatType.DBTEX
+       || format == FileFormatType.DTLTEX)
+      {
+         String fmtVersion = ioSettings.getFileVersion();
+
+         if ("3.0".equals(fmtVersion))
+         {
+            fmtStr += "-3";
+         }
+         else if ("2.0".equals(fmtVersion))
+         {
+            fmtStr += "-2";
+         }
+      }
+
+      parser.putControlSequence(true,
+        new TextualContentCommand(FORMAT, fmtStr));
+
+      setSeparator(ioSettings.getSeparator());
+      setDelimiter(ioSettings.getDelimiter());
+
+      parser.putControlSequence(true,
+        new TextualContentCommand(CSV_ESCAPE_CHARS,
+          ioSettings.getEscapeCharsOption().getName()));
+
+      if (ioSettings.isAutoKeysOn())
+      {
+         parser.putControlSequence(true, new IfTrue("ifdtlautokeys"));
+      }
+      else
+      {
+         parser.putControlSequence(true, new IfFalse("ifdtlautokeys"));
+      }
+
+      parser.getSettings().localSetRegister(OMIT_LINES, ioSettings.getSkipLines());
+
+      parser.putControlSequence(true,
+        new TextualContentCommand(CSV_BLANK,
+          ioSettings.getCsvBlankOption().getName()));
+
+      parser.putControlSequence(true,
+        new LaTeX3Boolean(CSV_LITERAL_CONTENT_BOOL, ioSettings.isCsvLiteral()));
+
+      parser.putControlSequence(true,
+        new LaTeX3Boolean(APPEND_ALLOWED_BOOL, ioSettings.isAppendAllowed()));
+
+      parser.putControlSequence(true,
+        new LaTeX3Boolean(NEW_ELEMENT_TRIM_BOOL, ioSettings.isTrimElementOn()));
+
+      parser.putControlSequence(true,
+        new TextualContentCommand(IO_OVERWRITE,
+          ioSettings.getOverwriteOption().getName()));
+
+      setIOExpandOption(ioSettings.getExpandOption().getName(), stack);
+
+      parser.putControlSequence(true,
+         new TextualContentCommand(IO_ADD_DELIMITER,
+            ioSettings.getAddDelimiterOption().getName()));
+   }
+
+   public void setCsvKeys(String... keys)
+   {
+      PropertyCommand<Integer> prop 
+         = new PropertyCommand<Integer>(CSV_KEYS_PROP);
+
+      for (int i = 0; i < keys.length; i++)
+      {
+         prop.put(Integer.valueOf(i+1),
+           getListener().createString(keys[i]));
+      }
+
+      getParser().putControlSequence(true, prop);
+   }
+
+   public void setCsvKeys(TeXObject... keys)
+   {
+      PropertyCommand<Integer> prop 
+         = new PropertyCommand<Integer>(CSV_KEYS_PROP);
+
+      for (int i = 0; i < keys.length; i++)
+      {
+         prop.put(Integer.valueOf(i+1), keys[i]);
+      }
+
+      getParser().putControlSequence(true, prop);
+   }
+
+   public void setCsvHeaders(String... headers)
+   {
+      PropertyCommand<Integer> prop 
+         = new PropertyCommand<Integer>(CSV_HEADERS_PROP);
+
+      for (int i = 0; i < headers.length; i++)
+      {
+         prop.put(Integer.valueOf(i+1), 
+           getListener().createString(headers[i]));
+      }
+
+      getParser().putControlSequence(true, prop);
+   }
+
+   public void setCsvHeaders(TeXObject... headers)
+   {
+      PropertyCommand<Integer> prop 
+         = new PropertyCommand<Integer>(CSV_HEADERS_PROP);
+
+      for (int i = 0; i < headers.length; i++)
+      {
+         prop.put(Integer.valueOf(i+1), headers[i]);
+      }
+
+      getParser().putControlSequence(true, prop);
+   }
+
+   public void setIOExpandOption(String optionValue, TeXObjectList stack)
+   throws IOException
+   {
+      ControlSequence cs;
+
+      if (optionValue.equals("none"))
+      {
+         getParser().putControlSequence(true, 
+           new TextualContentCommand(IO_EXPAND, optionValue));
+
+         cs = getParser().getListener().getControlSequence("dtlnoexpandnewvalue");
+      }
+      else if (optionValue.equals("protected") || optionValue.equals("full"))
+      {
+         getParser().putControlSequence(true, 
+           new TextualContentCommand(IO_EXPAND, optionValue));
+
+         cs = getParser().getListener().getControlSequence("dtlexpandnewvalue");
+      }
+      else
+      {
+         throw new LaTeXSyntaxException(getParser(), 
+          LaTeXSyntaxException.ERROR_UNKNOWN_OPTION,
+          "expand="+optionValue, "datatool/io");
+      }
+
+      TeXParserUtils.process(cs, getParser(), stack);
    }
 
    public void processDisplayKeys(TeXObject arg, TeXObjectList stack)
@@ -3089,6 +3270,67 @@ public class DataToolSty extends LaTeXSty
       }
    }
 
+   public void setCsvLiteralMappingOn(boolean on)
+   {
+      csvLiteralMappingOn = on;
+   }
+
+   public boolean isCsvLiteralMappingOn()
+   {
+      return csvLiteralMappingOn;
+   }
+
+   public String getCsvLiteralMap(int codePoint)
+   {
+      return getCsvLiteralMap(Integer.valueOf(codePoint));
+   }
+
+   public String getCsvLiteralMap(Integer codePoint)
+   {
+      return csvLiteralMap.get(codePoint);
+   }
+
+   public void appendCsvLiteral(int codePoint, StringBuilder builder)
+   {
+      if (csvLiteralMappingOn)
+      {
+         String val = getCsvLiteralMap(codePoint);
+
+         if (val == null)
+         {
+            builder.appendCodePoint(codePoint);
+         }
+         else
+         {
+            builder.append(val);
+         }
+      }
+      else
+      {
+         builder.appendCodePoint(codePoint);
+      }
+   }
+
+   public void putCsvLiteralMap(int codePoint, String value)
+   {
+      putCsvLiteralMap(Integer.valueOf(codePoint), value);
+   }
+
+   public void putCsvLiteralMap(Integer codePoint, String value)
+   {
+      csvLiteralMap.put(codePoint, value);
+   }
+
+   public void removeCsvLiteralMap(int codePoint)
+   {
+      removeCsvLiteralMap(Integer.valueOf(codePoint));
+   }
+
+   public void removeCsvLiteralMap(Integer codePoint)
+   {
+      csvLiteralMap.remove(codePoint);
+   }
+
    private DataToolBaseSty dataToolBaseSty;
 
    private ConcurrentHashMap<String,DataBase> databases;
@@ -3096,6 +3338,9 @@ public class DataToolSty extends LaTeXSty
    private DataBase latestDatabase = null;
 
    private Vector<FileLoadedListener> fileLoadedListeners;
+
+   private HashMap<Integer,String> csvLiteralMap;
+   private boolean csvLiteralMappingOn = true;
 
    public static final String ERROR_DB_EXISTS="datatool.db_exists";
    public static final String ERROR_DB_DOESNT_EXIST="datatool.db_doesnt_exist";

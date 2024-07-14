@@ -20,5 +20,30 @@ package com.dickimawbooks.texparserlib.latex.datatool;
 
 public enum FileOverwriteOption
 {
-   ERROR, ALLOW, WARN;
+   ERROR("error"), ALLOW("allow"), WARN("warn");
+
+   FileOverwriteOption(String option)
+   {
+      this.name = option;
+   }
+
+   public String getName()
+   {
+      return name;
+   }
+
+   public static FileOverwriteOption fromOptionName(String optionName)
+   {
+      for (FileOverwriteOption opt : values())
+      {
+         if (opt.name.equals(optionName))
+         {
+            return opt;
+         }
+      }
+
+      return null;
+   }
+
+   final String name;
 }

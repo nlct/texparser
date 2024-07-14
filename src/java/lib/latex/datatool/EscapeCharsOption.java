@@ -20,5 +20,31 @@ package com.dickimawbooks.texparserlib.latex.datatool;
 
 public enum EscapeCharsOption
 {
-   NONE, DOUBLE_DELIM, ESC_DELIM, ESC_DELIM_BKSL;
+   NONE("none"), DOUBLE_DELIM("double-delim"), ESC_DELIM("delim"),
+   ESC_DELIM_BKSL("delim+bksl");
+
+   EscapeCharsOption(String option)
+   {
+      this.name = option;
+   }
+
+   public String getName()
+   {
+      return name;
+   }
+
+   public static EscapeCharsOption fromOptionName(String optionName)
+   {
+      for (EscapeCharsOption opt : values())
+      {
+         if (opt.name.equals(optionName))
+         {
+            return opt;
+         }
+      }
+
+      return null;
+   }
+
+   final String name;
 }
