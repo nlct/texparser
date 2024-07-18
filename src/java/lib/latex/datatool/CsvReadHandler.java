@@ -446,6 +446,8 @@ public class CsvReadHandler implements FileMapHandler
          pendingRow = new TeXObjectList();
       }
 
+      boolean ignoreTrailing = false;
+
       while (!line.isEmpty())
       {
          TeXObject obj = line.pop();
@@ -503,10 +505,20 @@ public class CsvReadHandler implements FileMapHandler
                          Delimiter not followed by separator or
                          eol or (with csv-escape-chars=double-delim)
                          another delimiter.
-                         Assume literal?
                         */ 
 
-                        pendingCell.add(obj);
+                        if (settings.isCsvStrictQuotes())
+                        {
+                           // End of cell
+                           pendingRow.add(pendingCell);
+                           pendingCell = null;
+                           needsClosingDelim = false;
+                           ignoreTrailing = true;
+                        }
+                        else
+                        {
+                           pendingCell.add(obj);
+                        }
                      }
                   }
                }
@@ -515,6 +527,10 @@ public class CsvReadHandler implements FileMapHandler
                   pendingCell.add(obj);
                }
             }
+            else if (ignoreTrailing && cp != separator)
+            {
+               // do nothing
+            }
             else if (cp == delimiter)
             {
                if (pendingCell == null)
@@ -522,7 +538,7 @@ public class CsvReadHandler implements FileMapHandler
                   pendingCell = new TeXObjectList();
                   needsClosingDelim = true;
                }
-               else if (pendingCell.isBlank())
+               else if (pendingCell.isBlank() || settings.isCsvStrictQuotes())
                {
                   pendingCell.clear();
                   needsClosingDelim = true;
@@ -535,6 +551,8 @@ public class CsvReadHandler implements FileMapHandler
             else if (cp == separator)
             {
                // new cell
+
+               ignoreTrailing = false;
 
                if (pendingCell != null)
                {

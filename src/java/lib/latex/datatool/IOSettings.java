@@ -348,6 +348,16 @@ public class IOSettings
       escCharsOpt = opt;
    }
 
+   public boolean isCsvStrictQuotes()
+   {
+      return strictQuotes;
+   }
+
+   public void setCsvStrictQuotes(boolean on)
+   {
+      strictQuotes = on;
+   }
+
    public CsvBlankOption getCsvBlankOption()
    {
       return csvBlankOpt;
@@ -446,4 +456,10 @@ public class IOSettings
    boolean autoKeys = false;
    int skipLines = 0;
    boolean trimElement = true;
+
+   /*
+    * This setting isn't supported with datatool.sty but is with
+    * datatooltk.
+    */
+   boolean strictQuotes = false;
 }
