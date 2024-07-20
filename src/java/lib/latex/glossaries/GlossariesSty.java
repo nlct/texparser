@@ -418,6 +418,8 @@ public class GlossariesSty extends LaTeXSty
       registerControlSequence(new GlsEntryField("glsunexpandedfieldvalue", 
         true, this));
       registerControlSequence(new GlsEntryField("@gls@entry@field", this));
+      registerControlSequence(new GlsEntryField("@Gls@entry@field",
+         CaseChange.SENTENCE, this));
 
       registerControlSequence(new GlsEntryType(this));
       registerControlSequence(new GlsEntryParent(this));

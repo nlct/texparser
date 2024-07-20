@@ -40,6 +40,11 @@ public class GlsEntryField extends AbstractGlsCommand
       this(name, null, CaseChange.NO_CHANGE, protect, sty);
    }
 
+   public GlsEntryField(String name, CaseChange caseChange, GlossariesSty sty)
+   {
+      this(name, null, caseChange, false, sty);
+   }
+
    public GlsEntryField(String name, String field, CaseChange caseChange, GlossariesSty sty)
    {
       this(name, field, caseChange, false, sty);
