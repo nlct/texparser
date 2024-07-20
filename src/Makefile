@@ -9,7 +9,7 @@ test	: test-obs test-abs test-article test-nested test-doc \
 	  test-probsoln test-lists test-datatool test-mkimages \
 	  test-jmlrutils test-glossaries test-glossaries-extra \
 	  test-fontawesome test-userguide test-input test-datatool-v3 \
-	  test-article-split
+	  test-article-split test-graphics
 
 tests/output	:
 	mkdir -p tests/output
@@ -112,6 +112,10 @@ test-mkimages : app tests/output
 app     : lib lib/texparserlib.jar lib/texparsertest.jar \
 	  lib/resources \
 	  bin/texparsertest
+
+test-graphics	: app tests/output
+	rm -f -r tests/output/test-graphics
+	bin/texparsertest --debug --image-dest images --in tests/test-graphics/test-graphics.tex --output tests/output/test-graphics
 
 lib/texparserlib.jar      : lib classes/com/dickimawbooks/texparserlib/TeXParser.class 
 	cd classes; \

@@ -43,41 +43,10 @@ public class DeclareGraphicsExtensions extends ControlSequence
    public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      TeXObject arg;
+      String list = popLabelString(parser, stack);
 
-      if (parser == stack || stack == null)
-      {
-         arg = parser.popNextArg();
-      }
-      else
-      {
-         arg = stack.popArg(parser);
-      }
-
-      CsvList csvlist = CsvList.getList(parser, arg);
-
-      int n = csvlist.size();
-
-      String[] extensions = new String[n];
-
-      for (int i = 0; i < n; i++)
-      {
-         TeXObject val = csvlist.getValue(i);
-
-         if (val instanceof Expandable)
-         {
-            TeXObjectList expanded = ((Expandable)val).expandfully(parser);
-
-            if (expanded != null)
-            {
-               val = expanded;
-            }
-         }
-
-         extensions[i] = val.toString(parser);
-      }
-
-      ((LaTeXParserListener)parser.getListener()).setImageExtensions(extensions);
+      ((LaTeXParserListener)parser.getListener()).setImageExtensions(
+        list.split("\\s*,[\\s,]*"));
    }
 
    public void process(TeXParser parser)

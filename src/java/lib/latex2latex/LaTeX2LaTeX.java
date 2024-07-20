@@ -97,6 +97,20 @@ public class LaTeX2LaTeX extends LaTeXParserListener
       return replaceGraphicsPath;
    }
 
+   /**
+    * Set the destination path for images. If null, the relative
+    * path structure of the original document will be maintained.
+    */ 
+   public void setImageDestinationPath(Path p)
+   {
+      imageDestPath = p;
+   }
+
+   public Path getImageDestinationPath()
+   {
+      return imageDestPath;
+   }
+
    @Override
    protected void addPredefined()
    {
@@ -556,6 +570,53 @@ public class LaTeX2LaTeX extends LaTeXParserListener
       return null;
    }
 
+   public Path copyImageFile(String[] grpaths, TeXPath orgPath, Path destPath)
+    throws IOException,InterruptedException
+   {
+      if (outPath == null) return null;
+
+      if (grpaths == null)
+      {
+         File file = orgPath.getFile();
+
+         if (file.exists())
+         {
+            File destFile = outPath.resolve(destPath).toFile();
+
+            copyImageFile(file, destFile);
+
+            return destPath;
+         }
+      }
+      else
+      {
+         Path basePath = orgPath.getBaseDir();
+
+         for (int i = 0; i < grpaths.length; i++)
+         {
+            Path subPath = 
+            (new File(File.separatorChar == '/' ?
+              grpaths[i] : 
+              grpaths[i].replaceAll("/", File.separator)
+            ).toPath()).resolve(orgPath.getRelativePath());
+
+            File file = (basePath == null ?  subPath :
+              basePath.resolve(subPath)).toFile();
+
+            if (file.exists())
+            {
+               File destFile = outPath.resolve(destPath).toFile();
+
+               copyImageFile(file, destFile);
+
+               return destPath;
+            }
+         }
+      }
+
+      return null;
+   }
+
    @Override
    public void includegraphics(TeXObjectList stack, KeyValList options, String imgName)
      throws IOException
@@ -570,17 +631,35 @@ public class LaTeX2LaTeX extends LaTeXParserListener
          {
             TeXPath path = new TeXPath(parser, imgName);
 
-            imagePath = copyImageFile(grpaths, path);
+            if (imageDestPath == null)
+            {
+               imagePath = copyImageFile(grpaths, path);
+            }
+            else
+            {
+               imagePath =
+                  copyImageFile(grpaths, path, 
+                    imageDestPath.resolve(path.getLeaf()));
+            }
          }
          else
          {
             for (int i = 0; i < imageExtensions.length; i++)
             {
-                String name = imgName+"."+imageExtensions[i];
+                String name = imgName+imageExtensions[i];
 
                 TeXPath path = new TeXPath(parser, name);
 
-                imagePath = copyImageFile(grpaths, path);
+                if (imageDestPath == null)
+                {
+                   imagePath = copyImageFile(grpaths, path);
+                }
+                else
+                {
+                   imagePath =
+                      copyImageFile(grpaths, path, 
+                        imageDestPath.resolve(path.getLeaf()));
+                }
 
                 if (imagePath != null)
                 {
@@ -594,7 +673,8 @@ public class LaTeX2LaTeX extends LaTeXParserListener
          getParser().error(e);
       }
 
-      if (isReplaceGraphicsPathEnabled() && imagePath != null)
+      if (imagePath != null
+           && (isReplaceGraphicsPathEnabled() || imageDestPath != null))
       {
          StringBuilder builder = new StringBuilder();
 
@@ -1162,7 +1242,7 @@ public class LaTeX2LaTeX extends LaTeXParserListener
       this.replaceJobname = enable;
    }
 
-   private Path outPath, basePath;
+   private Path outPath, basePath, imageDestPath;
    private PrintWriter writer;
 
    private Charset outCharset=null;

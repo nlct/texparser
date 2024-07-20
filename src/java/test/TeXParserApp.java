@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013-2022 Nicola L.C. Talbot
+    Copyright (C) 2013-2024 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -30,6 +30,7 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.charset.Charset;
 import java.awt.Dimension;
 
@@ -145,6 +146,7 @@ public class TeXParserApp implements TeXApp
       }
 
       LaTeX2LaTeX listener = new LaTeX2LaTeX(this, outDir, outCharset);
+      listener.setImageDestinationPath(imageDest);
 
       TeXParser parser = new TeXParser(listener);
 
@@ -1158,6 +1160,12 @@ public class TeXParserApp implements TeXApp
       System.out.println(getMessage("syntax.head", "--head"));
       System.out.println(getMessage("syntax.mathjax", "--[no]mathjax"));
       System.out.println(getMessage("syntax.entities", "--entities"));
+      System.out.println(getMessage("syntax.convert_images", "--convert-images"));
+      System.out.println();
+      System.out.println(getMessage("syntax.output.options"));
+      System.out.println();
+      System.out.println(getMessage("syntax.image_dest", "--image-dest"));
+      System.out.println(getMessage("syntax.no_image_dest", "--no-image-dest"));
       System.out.println();
       System.out.println(getMessage("syntax.bugreport", 
         "https://github.com/nlct/texparser"));
@@ -1650,6 +1658,23 @@ public class TeXParserApp implements TeXApp
          {
             convertImages = true;
          }
+         else if (args[i].equals("--image-dest"))
+         {
+            i++;
+
+            if (i == args.length)
+            {
+               throw new InvalidSyntaxException(
+                 getMessage("error.syntax.missing_filename",
+                   args[i-1]));
+            }
+
+            imageDest = Paths.get(args[i]);
+         }
+         else if (args[i].equals("--no-image-dest"))
+         {
+            imageDest = null;
+         }
          else if (args[i].charAt(0) == '-')
          {
             throw new InvalidSyntaxException(
@@ -1726,9 +1751,9 @@ public class TeXParserApp implements TeXApp
 
    // TeXParser class now has its own version and date.
    // As from 0.9.2.2b these now refer to the test application only.
-   public static final String APP_VERSION = "0.9.2.8b";
+   public static final String APP_VERSION = "0.9.2.9b";
    public static final String APP_NAME = "texparsertest";
-   public static final String APP_DATE = "2024-05-07";
+   public static final String APP_DATE = "2024-07-20";
 
    public static long MAX_PROCESS_TIME=0L;
 
@@ -1762,6 +1787,7 @@ public class TeXParserApp implements TeXApp
 
    private boolean deleteTempDirOnExit = true;
    private boolean convertImages = true;
+   private Path imageDest = null;
    private boolean mathJax = true;
    private boolean useHtmlEntities = false;
    private int splitLevel = 0;

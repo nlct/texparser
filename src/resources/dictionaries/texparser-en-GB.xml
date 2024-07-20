@@ -54,6 +54,10 @@ There is NO WARRANTY, to the extent permitted by law.</entry>
 <entry key="syntax.head">{0} &lt;html&gt;			Add &lt;head&gt; code to HTML header.</entry>
 <entry key="syntax.mathjax">{0} 			Use MathJax.</entry>
 <entry key="syntax.entities">{0} 			Use HTML entities for non-ASCII characters.</entry>
+<entry key="syntax.convert_images">{0} 			Convert images.</entry>
+<entry key="syntax.latex.options">LaTeX2LaTeX Options:</entry>
+<entry key="syntax.image_dest">{0} &lt;path&gt;	Copy images to the given relative path.</entry>
+<entry key="syntax.no_image_dest">{0}	Copy images to match the original relative path (default).</entry>
 <entry key="syntax.bugreport">Report bugs to: {0}</entry>
 <entry key="syntax.homepage">{0} home page: {1}</entry>
 
