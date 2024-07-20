@@ -2891,7 +2891,31 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
 
    public void setImageExtensions(String... ext)
    {
-      imageExtensions = ext;
+      setImageExtensions(true, ext);
+   }
+
+   public void setImageExtensions(boolean addLeadingDotIfMissing, String... ext)
+   {
+      if (addLeadingDotIfMissing)
+      {
+         imageExtensions = new String[ext.length];
+
+         for (int i = 0; i < ext.length; i++)
+         {
+            if (ext[i].startsWith("."))
+            {
+               imageExtensions[i] = ext[i];
+            }
+            else
+            {
+               imageExtensions[i] = "."+ext[i];
+            }
+         }
+      }
+      else
+      {
+         imageExtensions = ext;
+      }
    }
 
    public String[] getImageExtensions()
@@ -3013,7 +3037,7 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
          {
             for (int i = 0; i < imageExtensions.length; i++)
             {
-                String name = imgName+"."+imageExtensions[i];
+                String name = imgName+imageExtensions[i];
 
                 TeXPath path = new TeXPath(parser, name);
 
@@ -3709,8 +3733,8 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
 
    protected String[] imageExtensions = new String[]
    {
-      "pdf", "PDF", "png", "PNG", "jpg", "JPG", "jpeg", "JPEG",
-      "eps", "EPS", "ps", "PS", "gif", "GIF"
+      ".pdf", ".PDF", ".png", ".PNG", ".jpg", ".JPG", ".jpeg", ".JPEG",
+      ".eps", ".EPS", ".ps", ".PS", ".gif", ".GIF"
    };
 
    private boolean docEnvFound = false;
