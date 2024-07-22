@@ -20,8 +20,14 @@ package com.dickimawbooks.texparserlib.latex.datatool;
 
 import java.io.IOException;
 
+import java.util.Iterator;
+
 import com.dickimawbooks.texparserlib.*;
+import com.dickimawbooks.texparserlib.latex.CsvList;
+import com.dickimawbooks.texparserlib.latex.KeyValList;
 import com.dickimawbooks.texparserlib.latex.LaTeXSyntaxException;
+
+import com.dickimawbooks.texparserlib.latex.latex3.PropertyCommand;
 
 public class IOSettings
 {
@@ -131,6 +137,52 @@ public class IOSettings
          {
             autoKeys = TeXParserUtils.isTrue("ifdtlautokeys", parser);
 
+            ControlSequence cs = parser.getControlSequence(DataToolSty.CSV_KEYS_PROP);
+
+            if (cs != null && !cs.isEmpty() && cs instanceof PropertyCommand)
+            {
+               PropertyCommand propCs = (PropertyCommand)cs;
+               keys = new String[propCs.size()];
+
+               for (int i = 0; i < keys.length; i++)
+               {
+                  @SuppressWarnings("unchecked")
+                  TeXObject kv = propCs.get(Integer.valueOf(i+1));
+
+                  if (kv != null)
+                  {
+                     keys[i] = parser.expandToString((TeXObject)kv.clone(), stack);
+                  }
+               }
+            }
+            else
+            {
+               keys = null;
+            }
+
+            cs = parser.getControlSequence(DataToolSty.CSV_HEADERS_PROP);
+
+            if (cs != null && !cs.isEmpty() && cs instanceof PropertyCommand)
+            {
+               PropertyCommand propCs = (PropertyCommand)cs;
+               headers = new TeXObject[propCs.size()];
+
+               for (int i = 0; i < headers.length; i++)
+               {
+                  @SuppressWarnings("unchecked")
+                  TeXObject kv = propCs.get(Integer.valueOf(i+1));
+
+                  if (kv != null)
+                  {
+                     headers[i] = (TeXObject)kv.clone();
+                  }
+               }
+            }
+            else
+            {
+               headers = null;
+            }
+
             skipLines = TeXParserUtils.toInt(
               parser.getListener().getControlSequence(DataToolSty.OMIT_LINES),
               parser, stack);
@@ -220,6 +272,407 @@ public class IOSettings
                   "add-delimiter="+val, "datatool/io");
             }
 
+         }
+      }
+   }
+
+   /**
+    * Applies settings from CSV list without changing underlying
+    * control sequences or package settings.
+    */
+   public void apply(KeyValList options, TeXParser parser, TeXObjectList stack)
+    throws IOException
+   {
+      for (Iterator<String> it = options.keySet().iterator();
+           it.hasNext(); )
+      {
+         String key = it.next();
+
+         TeXObject val = options.get(key);
+
+         if (key.equals("name"))
+         {
+            if (val == null)
+            {
+               defaultName = null;
+            }
+            else
+            {
+               defaultName = parser.expandToString(val, stack);
+            }
+         }
+         else if (key.equals("keys"))
+         {
+            if (val == null)
+            {
+               keys = null;
+            }
+            else
+            {
+               String strVal = parser.expandToString(val, stack).trim();
+
+               if (strVal.isEmpty())
+               {
+                  keys = null;
+               }
+               else
+               {
+                  keys = strVal.split(" *, *");
+               }
+            }
+         }
+         else if (key.equals("headers"))
+         {
+            if (val == null && val.isEmpty())
+            {
+               headers = null;
+            }
+            else
+            {
+               CsvList csvList = TeXParserUtils.toCsvList(val, parser);
+               headers = new TeXObject[csvList.size()];
+
+               for (int i = 0; i < headers.length; i++)
+               {
+                  TeXObject kv = csvList.getValue(i);
+
+                  if (!kv.isEmpty())
+                  {
+                     headers[i] = kv;
+                  }
+               }
+            }
+         }
+         else if (key.equals("expand"))
+         {
+            String strVal = (val == null ?
+               "protected" : parser.expandToString(val, stack).trim());
+
+            IOExpandOption optVal = IOExpandOption.fromOptionName(strVal);
+
+            if (optVal == null)
+            {
+               throw new TeXSyntaxException(parser,
+                 LaTeXSyntaxException.ERROR_INVALID_OPTION_VALUE, key, strVal);
+            }
+
+            expandOpt = optVal;
+         }
+         else if (key.equals("format"))
+         {
+            if (val == null)
+            {
+               throw new TeXSyntaxException(parser,
+                 LaTeXSyntaxException.ERROR_MISSING_KEY_VALUE, key);
+            }
+
+            String strVal = parser.expandToString(val, stack).trim();
+
+            if (strVal.endsWith("-3"))
+            {
+               fileVersion = "3.0";
+               strVal = strVal.substring(0, strVal.length()-2);
+            }
+            else if (strVal.endsWith("-2"))
+            {
+               fileVersion = "2.0";
+               strVal = strVal.substring(0, strVal.length()-2);
+            }
+            else if (strVal.equals("tex"))
+            {
+               strVal = "dbtex";
+               fileVersion = "2.0";
+            }
+            else if (!(strVal.equals("tsv") || strVal.equals("csv")))
+            {
+               fileVersion = "3.0";
+            }
+
+            FileFormatType optVal = FileFormatType.valueOf(strVal.toUpperCase());
+
+            if (optVal == null)
+            {
+               throw new TeXSyntaxException(parser,
+                 LaTeXSyntaxException.ERROR_INVALID_OPTION_VALUE, key, strVal);
+            }
+
+            format = optVal;
+
+            switch (format)
+            {
+               case CSV:
+                  defaultExtension = "csv";
+               break;
+               case TSV:
+                  separator = '\t';
+                  defaultExtension = "tsv";
+               break;
+               case DBTEX:
+                  defaultExtension = "dbtex";
+               break;
+               case DTLTEX:
+                  defaultExtension = "dtltex";
+               break;
+            }
+         }
+         else if (key.equals("add-delimiter"))
+         {
+            if (val == null)
+            {
+               throw new TeXSyntaxException(parser,
+                 LaTeXSyntaxException.ERROR_MISSING_KEY_VALUE, key);
+            }
+
+            String strVal = parser.expandToString(val, stack).trim();
+
+            AddDelimiterOption optVal = AddDelimiterOption.fromOptionName(strVal);
+
+            if (optVal == null)
+            {
+               throw new TeXSyntaxException(parser,
+                 LaTeXSyntaxException.ERROR_INVALID_OPTION_VALUE, key, strVal);
+            }
+
+            addDelimOpt = optVal;
+         }
+         else if (key.equals("csv-escape-chars"))
+         {
+            if (val == null)
+            {
+               throw new TeXSyntaxException(parser,
+                 LaTeXSyntaxException.ERROR_MISSING_KEY_VALUE, key);
+            }
+
+            String strVal = parser.expandToString(val, stack).trim();
+
+            EscapeCharsOption optVal = EscapeCharsOption.fromOptionName(strVal);
+
+            if (optVal == null)
+            {
+               throw new TeXSyntaxException(parser,
+                 LaTeXSyntaxException.ERROR_INVALID_OPTION_VALUE, key, strVal);
+            }
+
+            escCharsOpt = optVal;
+         }
+         else if (key.equals("csv-content"))
+         {
+            if (val == null)
+            {
+               throw new TeXSyntaxException(parser,
+                 LaTeXSyntaxException.ERROR_MISSING_KEY_VALUE, key);
+            }
+
+            String strVal = parser.expandToString(val, stack).trim();
+
+            if (strVal.equals("literal"))
+            {
+               csvLiteral = true;
+            }
+            else if (strVal.equals("tex"))
+            {
+               csvLiteral = false;
+            }
+            else
+            {
+               throw new TeXSyntaxException(parser,
+                 LaTeXSyntaxException.ERROR_INVALID_OPTION_VALUE, key, strVal);
+            }
+         }
+         else if (key.equals("csv-blank"))
+         {
+            if (val == null)
+            {
+               throw new TeXSyntaxException(parser,
+                 LaTeXSyntaxException.ERROR_MISSING_KEY_VALUE, key);
+            }
+
+            String strVal = parser.expandToString(val, stack).trim();
+
+            CsvBlankOption optVal = CsvBlankOption.fromOptionName(strVal);
+
+            if (optVal == null)
+            {
+               throw new TeXSyntaxException(parser,
+                 LaTeXSyntaxException.ERROR_INVALID_OPTION_VALUE, key, strVal);
+            }
+
+            csvBlankOpt = optVal;
+         }
+         else if (key.equals("csv-skip-lines") || key.equals("omitlines"))
+         {
+            if (val == null)
+            {
+               throw new TeXSyntaxException(parser,
+                 LaTeXSyntaxException.ERROR_MISSING_KEY_VALUE, key);
+            }
+
+            String strVal = val.toString(parser).trim();
+
+            if (strVal.equals("false"))
+            {
+               skipLines = 0;
+            }
+            else
+            {
+               try
+               {
+                  skipLines = Integer.parseInt(strVal);
+               }
+               catch (NumberFormatException e)
+               {
+                  skipLines = TeXParserUtils.toInt(val, parser, stack);
+               }
+            }
+         }
+         else if (key.equals("no-header") || key.equals("noheader"))
+         {
+            String strVal = (val == null ? "" : val.toString(parser).trim());
+
+            if (strVal.equals("") || strVal.equals("true"))
+            {
+               incHeader = false;
+            }
+            else if (strVal.equals("false"))
+            {
+               incHeader = true;
+            }
+            else
+            {
+               throw new TeXSyntaxException(parser,
+                 LaTeXSyntaxException.ERROR_INVALID_OPTION_VALUE, key, strVal);
+            }
+         }
+         else if (key.equals("auto-keys") || key.equals("autokeys"))
+         {
+            String strVal = (val == null ? "" : val.toString(parser).trim());
+
+            if (strVal.equals("") || strVal.equals("true"))
+            {
+               autoKeys = true;
+            }
+            else if (strVal.equals("false"))
+            {
+               autoKeys = false;
+            }
+            else
+            {
+               throw new TeXSyntaxException(parser,
+                 LaTeXSyntaxException.ERROR_INVALID_OPTION_VALUE, key, strVal);
+            }
+         }
+         else if (key.equals("overwrite"))
+         {
+            if (val == null)
+            {
+               throw new TeXSyntaxException(parser,
+                 LaTeXSyntaxException.ERROR_MISSING_KEY_VALUE, key);
+            }
+
+            String strVal = parser.expandToString(val, stack).trim();
+
+            FileOverwriteOption optVal = FileOverwriteOption.fromOptionName(strVal);
+
+            if (optVal == null)
+            {
+               throw new TeXSyntaxException(parser,
+                 LaTeXSyntaxException.ERROR_INVALID_OPTION_VALUE, key, strVal);
+            }
+
+            fileOverwriteOpt = optVal;
+         }
+         else if (key.equals("load-action"))
+         {
+            if (val == null)
+            {
+               throw new TeXSyntaxException(parser,
+                 LaTeXSyntaxException.ERROR_MISSING_KEY_VALUE, key);
+            }
+
+            String strVal = parser.expandToString(val, stack).trim();
+            boolean boolVal;
+
+            if (strVal.equals("detect") || strVal.equals("append"))
+            {
+               boolVal = true;
+            }
+            else if (strVal.equals("create") || strVal.equals("old-style"))
+            {
+               boolVal = false;
+            }
+            else
+            {
+               throw new TeXSyntaxException(parser,
+                 LaTeXSyntaxException.ERROR_INVALID_OPTION_VALUE, key, strVal);
+            }
+
+            appendAllowed = boolVal;
+         }
+         else if (key.equals("delimiter"))
+         {
+            if (val == null)
+            {
+               throw new TeXSyntaxException(parser,
+                 LaTeXSyntaxException.ERROR_MISSING_KEY_VALUE, key);
+            }
+
+            String strVal = parser.expandToString(val, stack);
+            delimiter = strVal.codePointAt(0);
+         }
+         else if (key.equals("separator"))
+         {
+            if (val == null)
+            {
+               throw new TeXSyntaxException(parser,
+                 LaTeXSyntaxException.ERROR_MISSING_KEY_VALUE, key);
+            }
+
+            String strVal = parser.expandToString(val, stack);
+            separator = strVal.codePointAt(0);
+         }
+         else if (key.equals("strict-quotes"))
+         {// not supported with datatool.sty
+            String strVal = (val == null ? "" : val.toString(parser).trim());
+
+            if (strVal.equals("") || strVal.equals("true"))
+            {
+               strictQuotes = true;
+            }
+            else if (strVal.equals("false"))
+            {
+               strictQuotes = false;
+            }
+            else
+            {
+               throw new TeXSyntaxException(parser,
+                 LaTeXSyntaxException.ERROR_INVALID_OPTION_VALUE, key, strVal);
+            }
+         }
+         else if (key.equals("trim-element"))
+         {// not supported with datatool.sty in io key set
+            String strVal = (val == null ? "" : val.toString(parser).trim());
+
+            if (strVal.equals("") || strVal.equals("true"))
+            {
+               trimElement = true;
+            }
+            else if (strVal.equals("false"))
+            {
+               trimElement = false;
+            }
+            else
+            {
+               throw new TeXSyntaxException(parser,
+                 LaTeXSyntaxException.ERROR_INVALID_OPTION_VALUE, key, strVal);
+            }
+         }
+         else
+         {
+            TeXApp texApp = parser.getListener().getTeXApp();
+
+            texApp.warning(parser,
+              texApp.getMessage(LaTeXSyntaxException.ERROR_UNKNOWN_OPTION,
+               key));
          }
       }
    }
@@ -428,6 +881,32 @@ public class IOSettings
       trimElement = on;
    }
 
+   public String getColumnKey(int colIdx)
+   {
+      if (keys == null || keys.length < colIdx)
+      {
+         return null;
+      }
+      else
+      {
+         String key = keys[colIdx-1];
+
+         return (key == null || "".equals(key)) ? null : key;
+      }
+   }
+
+   public TeXObject getColumnHeader(int colIdx)
+   {
+      if (headers == null || headers.length < colIdx)
+      {
+         return null;
+      }
+      else
+      {
+         return headers[colIdx-1];
+      }
+   }
+
    public DataToolSty getSty()
    {
       return sty;
@@ -456,6 +935,9 @@ public class IOSettings
    boolean autoKeys = false;
    int skipLines = 0;
    boolean trimElement = true;
+
+   String[] keys = null;
+   TeXObject[] headers = null;
 
    /*
     * This setting isn't supported with datatool.sty but is with

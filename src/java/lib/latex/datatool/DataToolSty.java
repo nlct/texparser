@@ -1336,7 +1336,7 @@ public class DataToolSty extends LaTeXSty
          {
             String strVal = (val == null ? "" : val.toString(parser).trim());
 
-            if (val.equals("") || val.equals("true"))
+            if (strVal.equals("") || strVal.equals("true"))
             {
                parser.putControlSequence(true, new IfTrue("ifdtlnoheader"));
             }
@@ -1349,7 +1349,7 @@ public class DataToolSty extends LaTeXSty
          {
             String strVal = (val == null ? "" : val.toString(parser).trim());
 
-            if (val.equals("") || val.equals("true"))
+            if (strVal.equals("") || strVal.equals("true"))
             {
                parser.putControlSequence(true, new IfTrue("ifdtlautokeys"));
             }
@@ -1434,6 +1434,14 @@ public class DataToolSty extends LaTeXSty
 
             String str = parser.expandToString(val, stack);
             setSeparator(str.codePointAt(0));
+         }
+         else
+         {
+            TeXApp texApp = getListener().getTeXApp();
+
+            texApp.warning(parser,
+              texApp.getMessage(LaTeXSyntaxException.ERROR_UNKNOWN_OPTION,
+               key));
          }
       }
    }

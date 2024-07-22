@@ -78,27 +78,6 @@ public class CsvReadHandler implements FileMapHandler
       sty = settings.getSty();
       parser = sty.getParser();
 
-      ControlSequence cs = parser.getControlSequence(
-        DataToolSty.CSV_HEADERS_PROP);
-
-      if (cs instanceof PropertyCommand)
-      {
-         @SuppressWarnings("unchecked")
-         PropertyCommand<Integer> prop = (PropertyCommand<Integer>)cs;
-
-         colHeadersProp = prop;
-      }
-
-      cs = parser.getControlSequence(DataToolSty.CSV_KEYS_PROP);
-
-      if (cs instanceof PropertyCommand)
-      {
-         @SuppressWarnings("unchecked")
-         PropertyCommand<Integer> prop = (PropertyCommand<Integer>)cs;
-
-         colKeysProp = prop;
-      }
-
       headers = new Vector<DataToolHeader>();
    }
 
@@ -190,18 +169,17 @@ public class CsvReadHandler implements FileMapHandler
          }
          else
          {
-            TeXObject key = (colKeysProp == null ? null : colKeysProp.get(colIdx));
+            colKey = settings.getColumnKey(colIdx);
 
-            if (key == null)
+            if (colKey == null)
             {
                cell = processCell(row.get(i));
+               colKey = cell.toString(parser);
             }
             else
             {
-               cell = key;
+               cell = parser.getListener().createString(colKey);
             }
-
-            colKey = cell.toString(parser);
 
             if (colKey.isEmpty())
             {
@@ -211,7 +189,7 @@ public class CsvReadHandler implements FileMapHandler
             }
          }
 
-         TeXObject title = (colHeadersProp == null ? null : colHeadersProp.get(colIdx));
+         TeXObject title = settings.getColumnHeader(colIdx);
 
          if (title == null)
          {
@@ -290,19 +268,13 @@ public class CsvReadHandler implements FileMapHandler
          {
             Integer colIdx = Integer.valueOf(i+1);
 
-            TeXObject key = (colKeysProp == null ? null : colKeysProp.get(colIdx));
+            String colKey = settings.getColumnKey(colIdx);
 
-            String colKey;
-
-            if (key == null)
+            if (colKey == null)
             {
                colKey = parser.expandToString(
                  parser.getListener().getControlSequence("dtldefaultkey"),
                     currentStack) + colIdx;
-            }
-            else
-            {
-               colKey = parser.expandToString(key, currentStack);
             }
 
             header = new DataToolHeader(settings.getSty(), headerRow.size()+1, colKey);
@@ -757,8 +729,6 @@ public class CsvReadHandler implements FileMapHandler
    TeXObjectList pendingRow = null;
    TeXObjectList pendingCell = null;
    TeXObjectList currentStack = null;
-   PropertyCommand<Integer> colKeysProp;
-   PropertyCommand<Integer> colHeadersProp;
    Vector<DataToolHeader> headers;
    TeXParser parser;
    DataToolSty sty;
