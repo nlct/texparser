@@ -208,6 +208,9 @@ public class IOSettings
 
          trimElement = !TeXParserUtils.isFalse(
            DataToolSty.NEW_ELEMENT_TRIM_BOOL, parser);
+
+         strictQuotes = !TeXParserUtils.isFalse(
+           DataToolSty.IO_STRICT_QUOTES_BOOL, parser);
       }
       else
       {
@@ -648,8 +651,8 @@ public class IOSettings
                  LaTeXSyntaxException.ERROR_INVALID_OPTION_VALUE, key, strVal);
             }
          }
-         else if (key.equals("trim-element"))
-         {// not supported with datatool.sty in io key set
+         else if (key.equals("trim"))
+         {
             String strVal = (val == null ? "" : val.toString(parser).trim());
 
             if (strVal.equals("") || strVal.equals("true"))

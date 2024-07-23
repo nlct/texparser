@@ -1435,6 +1435,30 @@ public class DataToolSty extends LaTeXSty
             String str = parser.expandToString(val, stack);
             setSeparator(str.codePointAt(0));
          }
+         else if (key.equals("trim"))
+         {
+            boolean boolVal = true;
+
+            if (val != null)
+            {
+               boolVal = Boolean.parseBoolean(getParser().expandToString(val, stack));
+            }
+
+            getParser().putControlSequence(true,
+              new LaTeX3Boolean(NEW_ELEMENT_TRIM_BOOL, boolVal));
+         }
+         else if (key.equals("strict-quotes"))
+         {
+            boolean boolVal = true;
+
+            if (val != null)
+            {
+               boolVal = Boolean.parseBoolean(getParser().expandToString(val, stack));
+            }
+
+            getParser().putControlSequence(true,
+              new LaTeX3Boolean(IO_STRICT_QUOTES_BOOL, boolVal));
+         }
          else
          {
             TeXApp texApp = getListener().getTeXApp();
@@ -1527,6 +1551,9 @@ public class DataToolSty extends LaTeXSty
 
       parser.putControlSequence(true,
         new LaTeX3Boolean(NEW_ELEMENT_TRIM_BOOL, ioSettings.isTrimElementOn()));
+
+      parser.putControlSequence(true,
+        new LaTeX3Boolean(IO_STRICT_QUOTES_BOOL, ioSettings.isCsvStrictQuotes()));
 
       parser.putControlSequence(true,
         new TextualContentCommand(IO_OVERWRITE,
@@ -3427,6 +3454,8 @@ public class DataToolSty extends LaTeXSty
 
    public static final String IO_OVERWRITE = "l__texparser_io_overwrite_tl";
    public static final String IO_EXPAND = "l__texparser_io_expand_tl";
+   public static final String IO_STRICT_QUOTES_BOOL
+      = "l__texparser_io_strict_quotes_tl";
    public static final String IO_ADD_DELIMITER
       = "l__texparser_io_add_delimiter_tl";
    public static final String CSV_ESCAPE_CHARS
