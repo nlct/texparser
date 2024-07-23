@@ -383,8 +383,15 @@ public class IOSettings
             }
             else if (strVal.equals("tex"))
             {
-               strVal = "dbtex";
-               fileVersion = "2.0";
+               if ("dtltex".equals(defaultExtension))
+               {
+                  strVal = defaultExtension;
+               }
+               else
+               {
+                  strVal = "dbtex";
+                  fileVersion = "2.0";
+               }
             }
             else if (!(strVal.equals("tsv") || strVal.equals("csv")))
             {
