@@ -322,6 +322,13 @@ public class TeXPath
 
       if (file.exists())
       {
+         // if no extension and file is a directory, skip
+
+         if (file.isDirectory() && (ext == null || ext.isEmpty()))
+         {
+            return false;
+         }
+
          if (base == null)
          {
             relative = file.toPath();
