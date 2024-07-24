@@ -191,8 +191,17 @@ public class TeXPath
       }
       else
       {
-         texPath.base = (parent == null ? null : parent.toPath());
-         texPath.relative = (texPath.base == null ? path : texPath.base.relativize(path));
+         try
+         {
+            texPath.base = (parent == null ? null : parent.toPath());
+            texPath.relative = (texPath.base == null
+               ?  path : texPath.base.relativize(path));
+         }
+         catch (IllegalArgumentException e)
+         {
+            texPath.base = null;
+            texPath.relative = path;
+         }
       }
 
       return texPath;
@@ -212,10 +221,17 @@ public class TeXPath
       }
       else
       {
-         base = (parent == null ? null : parent.toPath());
-         relative = (base == null ? path : base.relativize(path));
+         try
+         {
+            base = (parent == null ? null : parent.toPath());
+            relative = (base == null ? path : base.relativize(path));
+         }
+         catch (IllegalArgumentException e)
+         {
+            base = null;
+            relative = path;
+         }
       }
-
    }
 
    private void init(TeXParser parser, String texPath, String... defExt)
