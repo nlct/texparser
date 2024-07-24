@@ -87,6 +87,12 @@ public class LaTeX2LaTeX extends LaTeXParserListener
       setWriteable(this);
    }
 
+   @Override
+   public File getOutputDir()
+   {
+      return outPath == null ? null : outPath.toFile();
+   }
+
    public void setReplaceGraphicsPath(boolean replaceGraphicsPath)
    {
       this.replaceGraphicsPath = replaceGraphicsPath;

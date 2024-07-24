@@ -38,7 +38,7 @@ public class TeXPath
    public TeXPath(TeXParser parser, String texPath, Charset charset)
      throws IOException
    {
-      this(parser, texPath, true, "tex");
+      this(parser, texPath, !texPath.contains("/"), "tex");
       setEncoding(charset);
    }
 
@@ -51,7 +51,7 @@ public class TeXPath
    public TeXPath(TeXParser parser, String texPath, String... defExt)
      throws IOException
    {
-      this(parser, texPath, true, defExt);
+      this(parser, texPath, !texPath.contains("/"), defExt);
    }
 
    public TeXPath(TeXParser parser, String texPath, String defExt,
@@ -81,6 +81,10 @@ public class TeXPath
       setEncoding(charset);
    }
 
+   private TeXPath()
+   {
+   }
+
    protected File getDefaultBaseDir(TeXParser parser)
    {
       if (parser == null)
@@ -96,6 +100,102 @@ public class TeXPath
       }
 
       return file;
+   }
+
+   /**
+    * References an output file that may not exist.
+    */
+   public static TeXPath newOutputPath(TeXParser parser, String texPathStr,
+     String defExt)
+   {
+      File parent = null;
+
+      if (parser != null)
+      {
+         parent = parser.getListener().getOutputDir();
+      }
+
+      return newOutputPath(parent, texPathStr, defExt);
+   }
+
+   public static TeXPath newOutputPath(File outputDir, String texPathStr,
+     String defExt)
+   {
+      File parent = outputDir;
+
+      if (texPathStr.startsWith("\"") && texPathStr.endsWith("\""))
+      {
+         texPathStr = texPathStr.substring(1, texPathStr.length()-1);
+      }
+
+      String[] split = texPathStr.split("/");
+
+      File root = new File(split.length == 1 ? split[0] : split[0] + File.separator);
+
+      TeXPath texPath = new TeXPath();
+
+      int i = 0;
+
+      if (root.isAbsolute())
+      {
+         texPath.base = null;
+         parent = root;
+         i = 1;
+      }
+
+      int n = split.length-1;
+
+      for (; i < n; i++)
+      {
+         if (split[i].isEmpty())
+         {
+            continue;
+         }
+
+         if (parent == null)
+         {
+            parent = new File(split[i]);
+         }
+         else
+         {
+            parent = new File(parent, split[i]);
+         }
+      }
+
+      // This deals with the case where the last element is obtained
+      // from \jobname
+      if (split[n].startsWith("\"") && split[n].endsWith("\""))
+      {
+         split[n] = split[n].substring(1, split[n].length()-1);
+      }
+
+      String baseName = split[n];
+
+      if (defExt != null && !defExt.isEmpty())
+      {
+         boolean hasExtension = baseName.contains(".");
+
+         if (!hasExtension)
+         {
+            baseName += "."+defExt;
+         }
+      }
+
+      File file = new File(parent, baseName);
+
+      Path path = file.toPath();
+
+      if (path.isAbsolute())
+      {
+         texPath.relative = path;
+      }
+      else
+      {
+         texPath.base = (parent == null ? null : parent.toPath());
+         texPath.relative = (texPath.base == null ? path : texPath.base.relativize(path));
+      }
+
+      return texPath;
    }
 
    private void init(TeXParser parser, File file)
@@ -121,7 +221,7 @@ public class TeXPath
    private void init(TeXParser parser, String texPath, String... defExt)
      throws IOException
    {
-      init(parser, texPath, true, defExt);
+      init(parser, texPath, !texPath.contains("/"), defExt);
    }
 
    private void init(TeXParser parser, String texPath,
@@ -176,6 +276,7 @@ public class TeXPath
 
       if (root.isAbsolute())
       {
+         useKpsewhich = false;
          base = null;
          parent = root;
          i = 1;

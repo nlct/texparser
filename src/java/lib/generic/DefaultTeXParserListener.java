@@ -589,6 +589,12 @@ public abstract class DefaultTeXParserListener extends TeXParserListener
       return text;
    }
 
+   @Override
+   public File getOutputDir()
+   {
+      return getParser().getBaseDir();
+   }
+
    public Writeable getWriteable()
    {
       return writeable;

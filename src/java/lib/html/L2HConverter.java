@@ -187,6 +187,12 @@ public class L2HConverter extends LaTeXParserListener
       return htmlCharSet;
    }
 
+   @Override
+   public File getOutputDir()
+   {
+      return outPath == null ? null : outPath.toFile();
+   }
+
    /**
     * Sets the split level. This must be set before the file is parsed. 
     * Has no effect if the division data isn't available. This method

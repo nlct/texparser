@@ -314,11 +314,9 @@ public class DataBase
    {
       IOSettings settings = IOSettings.fetchWriteSettings(sty, parser, stack);
 
-      TeXApp texApp = parser.getListener().getTeXApp();
-
       String defExt = settings.getDefaultExtension();
 
-      TeXPath path = new TeXPath(parser, filename, defExt, false);
+      TeXPath path = TeXPath.newOutputPath(parser, filename, defExt);
 
       String name = settings.getDefaultName();
 

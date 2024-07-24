@@ -36,6 +36,8 @@ public abstract class TeXParserListener
    public abstract void endParse(File file)
       throws IOException;
 
+   public abstract File getOutputDir();
+
    // Gets control sequence identified by name (doesn't include
    // leading backslash)
 
