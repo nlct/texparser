@@ -59,7 +59,7 @@ public class DTLreconstructdata extends ControlSequence
       parser.setCatCode(true, '@', TeXParser.TYPE_LETTER);
 
       String name = parser.expandToString(
-        listener.getControlSequence("dtllastloadeddb"), stack);
+        listener.getControlSequence(DataToolSty.LAST_LOADED_NAME), stack);
 
       TeXObjectList headerArg = TeXParserUtils.toList(popArg(parser, stack), parser);
       TeXObjectList contentArg = TeXParserUtils.toList(popArg(parser, stack), parser);

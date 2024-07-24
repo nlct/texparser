@@ -56,7 +56,7 @@ public class PostReadHook extends ControlSequence
         DataToolSty.CURRENT_FILE_VERSION);
 
       String dbLabel = parser.expandToString(
-        parser.getControlSequence("dtllastloadeddb"), stack);
+        parser.getControlSequence(DataToolSty.LAST_LOADED_NAME), stack);
 
       if (fileTypeCs != null)
       {

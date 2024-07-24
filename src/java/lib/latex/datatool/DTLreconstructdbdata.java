@@ -59,7 +59,7 @@ public class DTLreconstructdbdata extends ControlSequence
         DataToolSty.CURRENT_FILE_TYPE, "dbtex"));
 
       String name = parser.expandToString(
-        listener.getControlSequence("dtllastloadeddb"), stack);
+        listener.getControlSequence(DataToolSty.LAST_LOADED_NAME), stack);
 
       TeXObjectList headerArg = TeXParserUtils.toList(popArg(parser, stack), parser);
       TeXObjectList contentArg = TeXParserUtils.toList(popArg(parser, stack), parser);

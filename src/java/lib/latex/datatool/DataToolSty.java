@@ -3432,6 +3432,8 @@ public class DataToolSty extends LaTeXSty
    public static final String SEPARATOR = "@dtl@separator";
    public static final String OMIT_LINES = "dtl@omitlines";
 
+   public static final String LAST_LOADED_NAME = "dtllastloadeddb";
+
    public static final String DEFAULT_NAME = "l__datatool_default_dbname_tl";
    public static final String IO_NAME = "l__datatool_io_name_tl";
    public static final String DEFAULT_EXT = "l__datatool_default_ext_tl";

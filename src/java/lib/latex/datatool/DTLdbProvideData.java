@@ -64,7 +64,7 @@ public class DTLdbProvideData extends ControlSequence
        new TextualContentCommand(DataToolSty.DEFAULT_NAME, label));
 
       parser.putControlSequence(true, 
-       new TextualContentCommand("dtllastloadeddb", label));
+       new TextualContentCommand(DataToolSty.LAST_LOADED_NAME, label));
 
       parser.putControlSequence(true,
         new TextualContentCommand(DataToolSty.CURRENT_FILE_TYPE, "dtltex"));

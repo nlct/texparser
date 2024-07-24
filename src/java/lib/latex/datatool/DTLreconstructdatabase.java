@@ -54,7 +54,7 @@ public class DTLreconstructdatabase extends ControlSequence
         DataToolSty.CURRENT_FILE_TYPE, "dbtex"));
 
       String name = parser.expandToString(
-        listener.getControlSequence("dtllastloadeddb"), stack);
+        listener.getControlSequence(DataToolSty.LAST_LOADED_NAME), stack);
 
       int numRows = popInt(parser, stack);
       int numCols = popInt(parser, stack);

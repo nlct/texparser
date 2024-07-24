@@ -267,7 +267,7 @@ public class DataBase
             }
 
             parser.putControlSequence(true, 
-              new TextualContentCommand("dtllastloadeddb", name));
+              new TextualContentCommand(DataToolSty.LAST_LOADED_NAME, name));
 
             int separator = settings.getSeparator();
             int delimiter = settings.getDelimiter();
@@ -669,7 +669,7 @@ public class DataBase
                      writer.println("}%");
                   }
 
-                  writer.print("\\def\\dtllastloadeddb{");
+                  writer.format("\\def\\%s{", DataToolSty.LAST_LOADED_NAME);
                   writer.print(name);
                   writer.println("}%");
                }
@@ -833,7 +833,7 @@ public class DataBase
                      }
                   }
 
-                  writer.print("\\def\\dtllastloadeddb{");
+                  writer.format("\\def\\%s{", DataToolSty.LAST_LOADED_NAME);
                   writer.print(name);
                   writer.println("}%");
                }

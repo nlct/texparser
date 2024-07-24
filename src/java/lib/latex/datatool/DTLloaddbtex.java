@@ -76,7 +76,7 @@ public class DTLloaddbtex extends ControlSequence
            LaTeXSyntaxException.ERROR_DEFINED, cs.toString(parser));
       }
 
-      stack.push(new TeXCsRef("dtllastloadeddb"));
+      stack.push(new TeXCsRef(DataToolSty.LAST_LOADED_NAME));
       stack.push(csArg);
       stack.push(new TeXCsRef("let"));
       stack.push(new TeXPathObject(texPath));

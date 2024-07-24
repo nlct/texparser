@@ -45,7 +45,7 @@ public class EndRead extends ControlSequence
    public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      ControlSequence cs = parser.getControlSequence("dtllastloadeddb");
+      ControlSequence cs = parser.getControlSequence(DataToolSty.LAST_LOADED_NAME);
 
       parser.endGroup();
 
