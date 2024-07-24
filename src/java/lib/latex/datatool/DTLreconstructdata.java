@@ -49,8 +49,10 @@ public class DTLreconstructdata extends ControlSequence
    {
       TeXParserListener listener = parser.getListener();
 
-      listener.getTeXApp().warning(parser,
-       listener.getTeXApp().getMessage("datatool.warn.dbtex3exp"));
+      TeXApp texApp = listener.getTeXApp();
+
+      texApp.warning(parser,
+       texApp.getMessage("datatool.warn.dbtex3exp"));
 
       parser.putControlSequence(true,
         new TextualContentCommand(
@@ -121,6 +123,10 @@ public class DTLreconstructdata extends ControlSequence
          headerReg = (TokenRegister)cs;
       }
 
+      int maxProgress = numCols+numRows;
+      int progress = 0;
+      texApp.progress(progress);
+
       DataToolHeaderRow headers = new DataToolHeaderRow(sty, numCols);
       TeXObjectList headerTokenList = listener.createStack();
 
@@ -175,6 +181,8 @@ public class DTLreconstructdata extends ControlSequence
          headerTokenList.add(new UserNumber(colIdx));
          headerTokenList.add(new TeXCsRef("db@col@id@end@"));
          headerTokenList.add(new TeXCsRef("db@plist@elt@end@"));
+
+         texApp.progress((100*(++progress))/maxProgress);
       }
 
       DataToolRows rows = new DataToolRows(sty, numRows);
@@ -305,6 +313,7 @@ public class DTLreconstructdata extends ControlSequence
          contentTokenList.add(new UserNumber(rowIdx));
          contentTokenList.add(new TeXCsRef("db@row@id@end@"));
 
+         texApp.progress((100*(++progress))/maxProgress);
       }
 
       contentsReg.setContents(parser, contentTokenList);
