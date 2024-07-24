@@ -682,7 +682,7 @@ public class IOSettings
 
             texApp.warning(parser,
               texApp.getMessage(LaTeXSyntaxException.ERROR_UNKNOWN_OPTION,
-               key));
+               key, "datatool/io"));
          }
       }
    }
