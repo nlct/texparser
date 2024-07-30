@@ -48,6 +48,8 @@ public class GlossEntryField extends GlsEntryField
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
+      TeXParserListener listener = parser.getListener();
+
       GlsLabel glslabel = popEntryLabel(parser, stack);
 
       String fieldLabel = field;
@@ -109,19 +111,29 @@ public class GlossEntryField extends GlsEntryField
             }
          }
 
-         Group grp = parser.getListener().createGroup();
+         Group grp = listener.createGroup();
          grp.addAll(list);
 
          list.clear();
-         list.add(parser.getListener().getControlSequence(csname));
+         list.add(listener.getControlSequence(csname));
          list.add(grp);
 
          if (sty.isExtra())
          {
-            list.add(parser.getListener().getControlSequence("glsxtrpostnamehook"));
-            grp = parser.getListener().createGroup();
+            list.add(listener.getControlSequence("glsxtrpostnamehook"));
+            grp = listener.createGroup();
             list.add(grp);
             grp.add(glslabel);
+
+            ControlSequence cs = listener.getControlSequence("glsxtrprenamehook");
+
+            if (!(cs instanceof AtGobble))
+            {
+               grp = listener.createGroup();
+               list.push(grp);
+               grp.add(glslabel);
+               list.push(cs);
+            }
          }
       }
       else if (category != null)
@@ -141,7 +153,7 @@ public class GlossEntryField extends GlsEntryField
             }
          }
          else if (fieldLabel.equals("symbol"))
-         {
+         {// currently no attributes relating to the symbol field
          }
       }
 

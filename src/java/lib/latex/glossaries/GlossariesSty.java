@@ -685,6 +685,7 @@ public class GlossariesSty extends LaTeXSty
       registerControlSequence(new TextualContentCommand(
         "printunsrtglossarypredoglossary", ""));
       registerControlSequence(new GlsXtrPostNameHook(this));
+      registerControlSequence(new AtGobble("glsxtrprenamehook"));
       registerControlSequence(new AtGobble("glsextrapostnamehook"));
 
       registerControlSequence(new GlsDefHook("glsdefpostname", 
