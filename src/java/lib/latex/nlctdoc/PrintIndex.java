@@ -166,6 +166,14 @@ public class PrintIndex extends AbstractGlsCommand
 
          list.add(listener.getControlSequence("nlctguideindexinitpostnamehooks"));
 
+         ControlSequence initExtraCs =
+            parser.getControlSequence("nlctguideindexinitextra");
+
+         if (initExtraCs != null)
+         {
+            list.add(initExtraCs);
+         }
+
          TeXParserUtils.process(list, parser, stack);
 
          ControlSequence nameCs = listener.getControlSequence("glossentryname");
