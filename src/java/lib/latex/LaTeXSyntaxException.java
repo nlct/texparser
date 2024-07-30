@@ -83,6 +83,8 @@ public class LaTeXSyntaxException extends TeXSyntaxException
    "latex.not.sequence";
    public static final String ERROR_NOT_TOKEN_LIST =
    "latex.not.tokenlist";
+   public static final String ERROR_NOT_PROPERTY =
+   "latex.not.property";
    public static final String ERROR_NOT_BOOLEAN =
    "latex.not.boolean";
    public static final String ERROR_TRAILING_CONTENT =

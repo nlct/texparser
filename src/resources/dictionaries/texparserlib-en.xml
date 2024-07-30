@@ -98,6 +98,7 @@
 <entry key="latex.unknown.option">Unknown option ''{0}'' in {1}</entry>
 <entry key="latex.invalid.option.value">Invalid value ''{1}'' in {0}={1}</entry>
 <entry key="latex.not.sequence">Not a sequence command: {0}</entry>
+<entry key="latex.not.property">Not a property command: {0}</entry>
 <entry key="latex.not.tokenlist">Not a token list command: {0}</entry>
 <entry key="latex.not.boolean">Not a boolean command: {0}</entry>
 <entry key="latex.trailing_content">Trailing content found while processing ''{0}'': {1}</entry>
