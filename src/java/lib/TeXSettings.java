@@ -982,6 +982,18 @@ public class TeXSettings
       return reg;
    }
 
+   public boolean isDefinedInCurrentScope(String name)
+   {
+      ControlSequence cs = csTable.get(name);
+
+      if (cs == null)
+      {
+         cs = localRegisters.get(name);
+      }
+
+      return cs != null;
+   }
+
    public ControlSequence getControlSequence(String name)
    {
       ControlSequence cs = csTable.get(name);
