@@ -77,14 +77,14 @@ public class TextualContentCommand extends ControlSequence implements Expandable
    public TeXObjectList expandonce(TeXParser parser)
      throws IOException
    {
-      return parser.getListener().createString(text);
+      return expandonce(parser, parser);
    }
 
    @Override
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      return expandonce(parser);
+      return parser.getListener().createString(text);
    }
 
    @Override
@@ -98,19 +98,19 @@ public class TextualContentCommand extends ControlSequence implements Expandable
    public TeXObjectList expandfully(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      return expandonce(parser);
+      return expandonce(parser, stack);
    }
 
    public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      process(parser);
+      parser.getListener().getWriteable().write(text);
    }
 
    public void process(TeXParser parser)
      throws IOException
    {
-      parser.getListener().getWriteable().write(text);
+      process(parser, parser);
    }
 
    public String getText()
