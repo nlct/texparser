@@ -122,7 +122,7 @@ public class AssignedControlSequence extends Command
    {
       if (parser.isDebugMode(TeXParser.DEBUG_PROCESSING))
       {
-         parser.logMessage("PROCESSING "+toString());
+         parser.logMessage("PROCESSING "+toString()+" STACK: "+stack);
       }
 
       underlying.process(parser, stack);
