@@ -77,7 +77,8 @@ public class Group extends TeXObjectList
 
       if (parser.isDebugMode(TeXParser.DEBUG_PROCESSING_STACK_LIST))
       {
-         parser.logMessage("PROCESSING GROUP: " + toString()+stack);
+         parser.logMessage("PROCESSING GROUP: " + toString()
+          +" SUBSTACK: "+stack);
       }
 
       StackMarker marker = new StackMarker();
