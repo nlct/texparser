@@ -1322,53 +1322,113 @@ public class TeXObjectList extends Vector<TeXObject>
      int openDelim, int closeDelim)
    throws IOException
    {
-      TeXObject sp = null;
+      boolean skipIgnoreables = !isRetainIgnoreables(popStyle);
+      boolean skipLeadingWhiteSpace = isIgnoreLeadingSpace(popStyle);
 
-      if (!isEmpty() && isIgnoreLeadingSpace(popStyle)
-            && firstElement() instanceof WhiteSpace)
+      TeXObjectList skipped = null;
+      TeXObject object = null;
+
+      if (skipIgnoreables && skipLeadingWhiteSpace)
       {
-         sp = remove(0);
-      }
-
-      TeXObject object = popStack(parser, popStyle);
-
-      if (object == null && !(this instanceof TeXParser))
-      {
-         object = parser.popStack(popStyle);
-      }
-
-      if (!(object instanceof CharObject))
-      {
-         push(object);
-
-         if (sp != null)
+         while (size() > 0)
          {
-            push(sp);
+            object = get(0);
+
+            if (!((object instanceof Ignoreable) || (object instanceof WhiteSpace)))
+            {
+               break;
+            }
+
+            pop();
+
+            if (skipped == null)
+            {
+               skipped = new TeXObjectList();
+            }
+
+            skipped.add(object);
+            object = null;
+         }
+      }
+      else if (skipIgnoreables)
+      {
+         while (size() > 0)
+         {
+            object = get(0);
+
+            if (!(object instanceof Ignoreable))
+            {
+               break;
+            }
+
+            pop();
+
+            if (skipped == null)
+            {
+               skipped = new TeXObjectList();
+            }
+
+            skipped.add(object);
+            object = null;
+         }
+      }
+      else if (skipLeadingWhiteSpace)
+      {
+         while (size() > 0)
+         {
+            object = get(0);
+
+            if (!(object instanceof WhiteSpace))
+            {
+               break;
+            }
+
+            pop();
+
+            if (skipped == null)
+            {
+               skipped = new TeXObjectList();
+            }
+
+            skipped.add(object);
+            object = null;
+         }
+      }
+
+      if (size() == 0 || object == null)
+      {
+         if (skipped != null)
+         {
+            addAll(skipped);
          }
 
          return null;
       }
 
-      CharObject charObj = (CharObject)object;
-
-      if (charObj.getCharCode() != openDelim)
+      if (!(object instanceof CharObject)
+         || (((CharObject)object).getCharCode() != openDelim))
       {
-         push(object);
-
-         if (sp != null)
+         if (skipped != null)
          {
-            push(sp);
+            addAll(0, skipped);
          }
 
          return null;
       }
+
+      if (isIgnoreLeadingSpace(popStyle))
+      {
+         popStyle = (byte)(popStyle^POP_IGNORE_LEADING_SPACE);
+      }
+
+      pop();
 
       int lineNum = parser.getLineNumber();
 
       TeXObjectList list = new TeXObjectList();
       boolean isShort = isShort(popStyle);
 
-      while (true)
+      while (!isEmpty())
       {
          object = pop();
 
@@ -1378,9 +1438,7 @@ public class TeXObjectList extends Vector<TeXObject>
 
          if (object instanceof CharObject)
          {
-            charObj = (CharObject)object;
-
-            if (charObj.getCharCode() == closeDelim)
+            if (((CharObject)object).getCharCode() == closeDelim)
             {
                return list;
             }
@@ -2140,7 +2198,7 @@ public class TeXObjectList extends Vector<TeXObject>
          {
             if (parser.isDebugMode(TeXParser.DEBUG_PROCESSING))
             {
-               parser.logMessage("PROCESSING "+object);
+               parser.logMessage("PROCESSING "+object+" STACK: "+toString());
             }
 
             object.process(parser, this);
@@ -2151,6 +2209,11 @@ public class TeXObjectList extends Vector<TeXObject>
       {
          stack.addAll(0, this);
          clear();
+
+         if (parser.isDebugMode(TeXParser.DEBUG_PROCESSING_STACK))
+         {
+            parser.logMessage("REMAINING STACK "+stack);
+         }
       }
    }
 

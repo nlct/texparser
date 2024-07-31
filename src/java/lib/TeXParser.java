@@ -3248,7 +3248,176 @@ public class TeXParser extends TeXObjectList
    public TeXObject popArg(byte popStyle, int openDelim, int closeDelim)
    throws IOException
    {
-      return super.popArg(this, popStyle, openDelim, closeDelim);
+      boolean skipIgnoreables = !isRetainIgnoreables(popStyle);
+      boolean skipLeadingWhiteSpace = isIgnoreLeadingSpace(popStyle);
+
+      TeXObjectList skipped = null;
+      TeXObject object = null;
+
+      if (skipIgnoreables && skipLeadingWhiteSpace)
+      {
+         while (true)
+         {
+            if (isEmpty())
+            {
+               fetchNext();
+
+               if (isEmpty()) break;
+            }
+
+            object = get(0);
+
+            if (!((object instanceof Ignoreable) || (object instanceof WhiteSpace)))
+            {
+               break;
+            }
+
+            remove(0);
+
+            if (skipped == null)
+            {
+               skipped = new TeXObjectList();
+            }
+
+            skipped.add(object);
+            object = null;
+         }
+      }
+      else if (skipIgnoreables)
+      {
+         while (true)
+         {
+            if (isEmpty())
+            {
+               fetchNext();
+
+               if (isEmpty()) break;
+            }
+
+            object = get(0);
+
+            if (!(object instanceof Ignoreable))
+            {
+               break;
+            }
+
+            remove(0);
+
+            if (skipped == null)
+            {
+               skipped = new TeXObjectList();
+            }
+
+            skipped.add(object);
+            object = null;
+         }
+      }
+      else if (skipLeadingWhiteSpace)
+      {
+         while (true)
+         {
+            if (isEmpty())
+            {
+               fetchNext();
+
+               if (isEmpty()) break;
+            }
+
+            object = get(0);
+
+            if (!(object instanceof WhiteSpace))
+            {
+               break;
+            }
+
+            remove(0);
+
+            if (skipped == null)
+            {
+               skipped = new TeXObjectList();
+            }
+
+            skipped.add(object);
+            object = null;
+         }
+      }
+
+      if (size() == 0 || object == null)
+      {
+         if (skipped != null)
+         {
+            addAll(skipped);
+         }
+
+         return null;
+      }
+
+      if (!(object instanceof CharObject)
+         || (((CharObject)object).getCharCode() != openDelim))
+      {
+         if (skipped != null)
+         {
+            addAll(0, skipped);
+         }
+
+         return null;
+      }
+
+      remove(0);
+
+      if (isIgnoreLeadingSpace(popStyle))
+      {
+         popStyle = (byte)(popStyle^POP_IGNORE_LEADING_SPACE);
+      }
+
+      int lineNum = getLineNumber();
+
+      TeXObjectList list = new TeXObjectList();
+      boolean isShort = isShort(popStyle);
+
+      while (true)
+      {
+         object = pop();
+
+         if (object == null) break;
+
+         BgChar bgChar = isBeginGroup(object);
+
+         if (object instanceof CharObject)
+         {
+            if (((CharObject)object).getCharCode() == closeDelim)
+            {
+               return list;
+            }
+         }
+         else if (bgChar != null)
+         {
+            Group group = getListener().createGroup();
+            popRemainingGroup(group, popStyle, bgChar);
+            object = group;
+         }
+         else if (isShort && object.isPar())
+         {
+            break;
+         }
+
+         list.add(object);
+      }
+
+      if (lineNum > 0)
+      {
+         throw new TeXSyntaxException(this,
+                  TeXSyntaxException.ERROR_MISSING_CLOSING_FROM_OPEN,
+                  new String(Character.toChars(closeDelim)),
+                  new String(Character.toChars(openDelim)),
+                  lineNum);
+      }
+      else
+      {
+         throw new TeXSyntaxException(this,
+                  TeXSyntaxException.ERROR_MISSING_CLOSING,
+                  new String(Character.toChars(closeDelim)));
+      }
    }
 
    public TeXObject expandedPopStack(TeXParser parser) throws IOException
@@ -4461,6 +4630,6 @@ public class TeXParser extends TeXObjectList
    public static final int DEBUG_READ = 32768;
    public static final int DEBUG_SETTINGS = 65536;
 
-   public static final String VERSION = "0.9.9b-20240730";
-   public static final String VERSION_DATE = "2024-07-30";
+   public static final String VERSION = "0.9.9b-20240731";
+   public static final String VERSION_DATE = "2024-07-31";
 }
