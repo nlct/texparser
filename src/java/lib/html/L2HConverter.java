@@ -879,6 +879,9 @@ public class L2HConverter extends LaTeXParserListener
 
    public void setWriter(Writer writer)
    {
+      getParser().debugMessage(TeXParser.DEBUG_IO,
+        "SETTING writer "+writer);
+
       this.writer = writer;
       currentWriter = writer;
    }
@@ -2341,6 +2344,9 @@ public class L2HConverter extends LaTeXParserListener
       setCurrentBlockType(DocumentBlockType.OUTSIDE);
 
       documentEnded = true;
+
+      getParser().debugMessage(TeXParser.DEBUG_IO,
+        "CLOSING writer (end of document)");
       writer.close();
 
       endDocumentHook();
@@ -2647,6 +2653,9 @@ public class L2HConverter extends LaTeXParserListener
       {
          out = newCssWriter(cssFile.toPath());
 
+         getParser().debugMessage(TeXParser.DEBUG_IO,
+           "SWITCHING writer (CSS file)");
+
          currentWriter = out;
 
          writeliteralln(String.format("@charset \"%s\";", htmlCharSet.name()));
@@ -2655,6 +2664,9 @@ public class L2HConverter extends LaTeXParserListener
       }
       finally
       {
+         getParser().debugMessage(TeXParser.DEBUG_IO,
+            "REVERTING current writer (closing CSS file)");
+
          currentWriter = prevWriter;
 
          if (out != null)
@@ -2869,6 +2881,9 @@ public class L2HConverter extends LaTeXParserListener
             }
          }
 
+         getParser().debugMessage(TeXParser.DEBUG_IO,
+           "SWITCHING writer (nav file)");
+
          currentWriter = navWriter;
 
          writeDocType();
@@ -2944,6 +2959,9 @@ public class L2HConverter extends LaTeXParserListener
       }
       finally
       {
+         getParser().debugMessage(TeXParser.DEBUG_IO,
+           "SWITCHING writer (nav file)");
+
          currentWriter = prevWriter;
 
          if (navWriter != null)
@@ -4571,6 +4589,9 @@ public class L2HConverter extends LaTeXParserListener
                endDivisionFile(stack);
 
                currentNode = nextNode;
+
+               getParser().debugMessage(TeXParser.DEBUG_IO,
+                 "CLOSING writer (end of section) "+writer);
 
                writer.close();
 
