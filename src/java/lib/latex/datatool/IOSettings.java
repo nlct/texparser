@@ -891,6 +891,11 @@ public class IOSettings
       trimElement = on;
    }
 
+   public int getColumnKeyCount()
+   {
+      return keys == null ? 0 : keys.length;
+   }
+
    public String getColumnKey(int colIdx)
    {
       if (keys == null || keys.length < colIdx)
@@ -903,6 +908,11 @@ public class IOSettings
 
          return (key == null || "".equals(key)) ? null : key;
       }
+   }
+
+   public int getColumnHeaderCount()
+   {
+      return headers == null ? 0 : headers.length;
    }
 
    public TeXObject getColumnHeader(int colIdx)
