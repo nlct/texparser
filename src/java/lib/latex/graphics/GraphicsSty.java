@@ -43,7 +43,7 @@ public class GraphicsSty extends LaTeXSty
    @Override
    public void addDefinitions()
    {
-      registerControlSequence(new IncludeGraphics(this));
+      registerControlSequence(new IncludeGraphics());
       registerControlSequence(new RotateBox());
       registerControlSequence(new ScaleBox());
       registerControlSequence(new ReflectBox());

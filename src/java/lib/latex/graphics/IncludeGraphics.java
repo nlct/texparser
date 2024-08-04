@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2024 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -25,222 +25,95 @@ import com.dickimawbooks.texparserlib.latex.*;
 
 public class IncludeGraphics extends ControlSequence
 {
-   public IncludeGraphics(GraphicsSty sty)
+   public IncludeGraphics()
    {
-      this("includegraphics", sty);
+      this("includegraphics");
    }
 
-   public IncludeGraphics(String name, GraphicsSty sty)
+   public IncludeGraphics(String name)
    {
       super(name);
-      this.sty = sty;
    }
 
    public Object clone()
    {
-      return new IncludeGraphics(getName(), getSty());
+      return new IncludeGraphics(getName());
    }
 
-   protected void processGraphics(TeXParser parser, TeXObjectList list)
+   public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      TeXObject option1 = (list == parser ? 
-         parser.popNextArg('[', ']') : list.popArg(parser, '[', ']'));
+      LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
 
-      TeXObject option2 = null;
+      boolean isStar = popModifier(parser, stack, '*') == '*';
 
-      TeXObjectList option1List = null;
-      TeXObjectList option2List = null;
-
-      if (option1 != null)
-      {
-         if (option1 instanceof TeXObjectList)
-         {
-            option1List = (TeXObjectList)option1;
-         }
-         else
-         {
-            option1List = new TeXObjectList();
-            option1List.add(option1);
-         }
-
-         option2 = (list == parser ? 
-            parser.popNextArg('[', ']') : list.popArg(parser, '[', ']'));
-
-         if (option2 != null)
-         {
-            if (option2 instanceof TeXObjectList)
-            {
-               option2List = (TeXObjectList)option2;
-            }
-            else
-            {
-               option2List = new TeXObjectList();
-               option2List.add(option2);
-            }
-         }
-
-      }
-
-      TeXObjectList llx = null;
-      TeXObjectList lly = null;
-      TeXObjectList urx = null;
-      TeXObjectList ury = null;
-
-      KeyValList keyValList = new KeyValList();
-
-      if (option1List != null)
-      {
-         llx = new TeXObjectList();
-
-         while (option1List.size() > 0)
-         {
-            TeXObject obj = option1List.pop();
-
-            if ((obj instanceof CharObject)
-             && ((CharObject)obj).getCharCode() == (int)',')
-            {
-               lly = new TeXObjectList();
-               continue;
-            }
-
-            if (obj instanceof Ignoreable
-             || obj instanceof WhiteSpace)
-            {
-               continue;
-            }
-
-            if (lly == null)
-            {
-               llx.add(obj);
-            }
-            else
-            {
-               lly.add(obj);
-            }
-         }
-
-         if (option2List != null)
-         {
-            urx = new TeXObjectList();
-
-            while (option2List.size() > 0)
-            {
-               TeXObject obj = option2List.pop();
-
-               if ((obj instanceof CharObject)
-                && ((CharObject)obj).getCharCode() == (int)',')
-               {
-                  ury = new TeXObjectList();
-                  continue;
-               }
-
-               if (obj instanceof Ignoreable
-                || obj instanceof WhiteSpace)
-               {
-                  continue;
-               }
-
-               if (ury == null)
-               {
-                  urx.add(obj);
-               }
-               else
-               {
-                  ury.add(obj);
-               }
-            }
-         }
-
-         if (llx != null)
-         {
-            keyValList.put("bbllx", llx);
-         }
-
-         if (lly != null)
-         {
-            keyValList.put("bblly", lly);
-         }
-
-         if (urx != null)
-         {
-            keyValList.put("bburx", urx);
-         }
-
-         if (ury != null)
-         {
-            keyValList.put("bblly", ury);
-         }
-      }
-
-      process(parser, list, keyValList);
-   }
-
-   protected void processGraphicx(TeXParser parser, TeXObjectList list)
-     throws IOException
-   {
-      TeXObject options = list.popArg(parser, '[', ']');
-
+      TeXObject opt = popOptArg(parser, stack);
       KeyValList keyValList = null;
 
-      if (options != null)
+      if (opt != null && !opt.isEmpty())
       {
-         keyValList = KeyValList.getList(parser, options);
-      }
+         TeXObjectList optList = TeXParserUtils.toList(opt, parser);
 
-      process(parser, list, keyValList);
-   }
+         TeXObject opt2 = popOptArg(parser, stack);
 
-   public void process(TeXParser parser, TeXObjectList list,
-    KeyValList keyValList)
-     throws IOException
-   {
-      TeXObject imgFile = (list == parser ? parser.popNextArg()
-        : list.popArg(parser));
-
-      TeXObjectList expanded = null;
-
-      if (imgFile instanceof Expandable)
-      {
-         if (list == parser)
+         if (opt2 == null && optList.contains(listener.getOther('=')))
          {
-            expanded = ((Expandable)imgFile).expandfully(parser);
+            keyValList = KeyValList.getList(parser, opt);
          }
          else
          {
-            expanded = ((Expandable)imgFile).expandfully(parser, list);
+            keyValList = new KeyValList();
+            TeXDimension dim = optList.popDimension(parser);
+
+            keyValList.put("bbllx", dim);
+
+            TeXObject obj = optList.popToken(TeXObjectList.POP_IGNORE_LEADING_SPACE);
+
+            if (!(obj instanceof SingleToken
+                 && ((SingleToken)obj).getCharCode() == ','))
+            {
+               throw new TeXSyntaxException(parser,
+                 TeXSyntaxException.ERROR_NOT_FOUND, ",");
+            }
+
+            dim = optList.popDimension(parser);
+            keyValList.put("bblly", dim);
+
+            if (opt2 != null)
+            {
+               optList = TeXParserUtils.toList(opt2, parser);
+
+               dim = optList.popDimension(parser);
+               keyValList.put("bburx", dim);
+
+               obj = optList.popToken(TeXObjectList.POP_IGNORE_LEADING_SPACE);
+
+               if (!(obj instanceof SingleToken
+                    && ((SingleToken)obj).getCharCode() == ','))
+               {
+                  throw new TeXSyntaxException(parser,
+                    TeXSyntaxException.ERROR_NOT_FOUND, ",");
+               }
+
+               dim = optList.popDimension(parser);
+               keyValList.put("bbury", dim);
+            }
          }
       }
 
-      String imgName;
-
-      if (expanded == null)
+      if (isStar)
       {
-         imgName = imgFile.toString(parser);
-      }
-      else
-      {
-         imgName = expanded.toString(parser);
+         if (keyValList == null)
+         {
+            keyValList = new KeyValList();
+         }
+
+         keyValList.put("clip", new MissingValue());
       }
 
-      LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
+      String imgName = popLabelString(parser, stack);
 
-      listener.includegraphics(list, keyValList, imgName);
-   }
-
-   public void process(TeXParser parser, TeXObjectList list)
-     throws IOException
-   {
-      LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
-
-      if (this != null && this.getName().equals("graphics"))
-      {
-         processGraphics(parser, list);
-      }
-      else
-      {
-         processGraphicx(parser, list);
-      }
+      listener.includegraphics(stack, keyValList, imgName);
    }
 
    public void process(TeXParser parser)
@@ -248,11 +121,4 @@ public class IncludeGraphics extends ControlSequence
    {
       process(parser, parser);
    }
-
-   public GraphicsSty getSty()
-   {
-      return sty;
-   }
-
-   private GraphicsSty sty;
 }

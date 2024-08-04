@@ -441,7 +441,7 @@ public class LaTeX2LaTeX extends LaTeXParserListener
 
       if (graphicsSty != null)
       {
-         graphicsSty.registerControlSequence(new IncludeGraphics(graphicsSty));
+         graphicsSty.registerControlSequence(new IncludeGraphics());
       }
 
       LaTeXSty sty = getLaTeXSty(options, styName, loadParentOptions, stack);

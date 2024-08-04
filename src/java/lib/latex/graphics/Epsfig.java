@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2024 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -40,91 +40,46 @@ public class Epsfig extends ControlSequence
       return new Epsfig(getName());
    }
 
-   public void process(TeXParser parser, TeXObjectList list)
+   public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      TeXObjectList original = new TeXObjectList();
-      TeXObjectList replacement = new TeXObjectList();
-      original.add(this);
+      TeXParserListener listener = parser.getListener();
 
-      ControlSequence gcs 
-         = parser.getListener().getControlSequence("includegraphics");
+      StringBuilder original = new StringBuilder();
+      original.append(toString(parser));
 
-      IncludeGraphics incGraphics = null;
+      KeyValList keyValList = TeXParserUtils.popKeyValList(parser, stack);
 
-      if (gcs instanceof IncludeGraphics)
+      original.appendCodePoint(parser.getBgChar());
+      original.append(keyValList.toString(parser));
+      original.appendCodePoint(parser.getEgChar());
+
+      TeXObject file = keyValList.getValue("file");
+
+      if (file == null)
       {
-         incGraphics = (IncludeGraphics)gcs;;
+         throw new TeXSyntaxException(parser, 
+          LaTeXSyntaxException.ERROR_MISSING_KEY, "file");
       }
 
-      replacement.add(gcs);
+      keyValList.remove("file");
 
-      TeXObject arg = list.popStack(parser);
+      TeXObjectList replacement = listener.createStack();
+      replacement.add(listener.getControlSequence("includegraphics"));
 
-      Group grp;
-
-      if (arg instanceof Group)
+      if (!keyValList.isEmpty())
       {
-         grp = (Group)arg;
-      }
-      else
-      {
-         grp = parser.getListener().createGroup();
-         grp.add(arg);
+         replacement.add(listener.getOther('['));
+         replacement.add(keyValList);
+         replacement.add(listener.getOther(']'));
       }
 
-      original.add(grp);
+      replacement.add(TeXParserUtils.createGroup(listener, file));
 
-      String originalStr = original.toString(parser);
+      listener.getTeXApp().substituting(parser,
+        original.toString(), replacement.toString(parser));
 
-      KeyValList keyValList = null;
-
-      keyValList = KeyValList.getList(parser, arg);
-
-      TeXObject fileArg = keyValList.remove("file");
-
-      if (fileArg == null)
-      {
-         fileArg = keyValList.remove("figure");
-      }
-
-      if (fileArg == null)
-      {
-         throw new LaTeXSyntaxException(parser,
-            LaTeXSyntaxException.ERROR_MISSING_KEY, "file");
-      }
-
-      grp = parser.getListener().createGroup();
-
-      if (fileArg instanceof TeXObjectList)
-      {
-         grp.addAll(0, (TeXObjectList)fileArg);
-      }
-      else
-      {
-         grp.add(0, fileArg);
-      }
-
-      LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
-
-      replacement.add(listener.getOther('['));
-      replacement.add(keyValList);
-      replacement.add(listener.getOther(']'));
-      replacement.add(grp);
-
-      listener.substituting(originalStr, replacement.toString(parser));
-
-      list.push(grp);
-
-      if (incGraphics == null)
-      {
-         replacement.pop();
-         gcs.process(parser, replacement);
-      }
-      else
-      {
-         incGraphics.process(parser, list, keyValList);
-      }
+      TeXParserUtils.process(replacement, parser, stack);
    }
 
    public void process(TeXParser parser)
