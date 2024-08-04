@@ -83,12 +83,27 @@ public class Group extends TeXObjectList
 
       StackMarker marker = new StackMarker();
 
+      if (parser.isDebugMode(TeXParser.DEBUG_SETTINGS))
+      {
+         parser.logMessage("CREATED GROUP STACK MARKER "+marker);
+      }
+
       stack.push(marker);
       stack.addAll(0, this);
       clear();
 
       startGroup(parser);
-      stack.processList(parser, marker);
+      boolean markerFound = stack.processList(parser, marker);
+
+      if (parser.isDebugMode(TeXParser.DEBUG_SETTINGS))
+      {
+         parser.logMessage("ENDING GROUP AFTER PROCESSING "
+          + toString() + " REMAINING SUBSTACK: "+stack
+          + " marker " + marker + " found: "+markerFound);
+      }
+
+      processEndDeclarations(parser);
+
       endGroup(parser);
 
    }
@@ -109,17 +124,35 @@ public class Group extends TeXObjectList
       }
 
       StackMarker marker = new StackMarker();
+
+      if (parser.isDebugMode(TeXParser.DEBUG_SETTINGS))
+      {
+         parser.logMessage("CREATED GROUP STACK MARKER "+marker);
+      }
+
       TeXObjectList stack = toList();
       stack.add(marker);
       clear();
 
       startGroup(parser);
 
-      stack.processList(parser, marker);
+      boolean markerFound = stack.processList(parser, marker);
+
+      if (parser.isDebugMode(TeXParser.DEBUG_SETTINGS))
+      {
+         parser.logMessage("ENDING GROUP AFTER PROCESSING "
+          + toString()+" LEFT OVER STACK: "+stack
+          + " marker " + marker + " found: "+markerFound);
+      }
+
+      processEndDeclarations(parser);
 
       endGroup(parser);
 
-      parser.push(stack, true);
+      if (!stack.isEmpty())
+      {
+         parser.push(stack, true);
+      }
    }
 
    public void startGroup(TeXParser parser)
@@ -131,6 +164,11 @@ public class Group extends TeXObjectList
    public void endGroup(TeXParser parser)
     throws IOException
    {
+      if (parser.isDebugMode(TeXParser.DEBUG_SETTINGS))
+      {
+         parser.logMessage("GROUP END " + toString());
+      }
+
       parser.endGroup();
    }
 

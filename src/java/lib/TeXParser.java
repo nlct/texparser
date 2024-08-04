@@ -1529,6 +1529,11 @@ public class TeXParser extends TeXObjectList
       }
       finally
       {
+         if (isDebugMode(DEBUG_SETTINGS) || isDebugMode(DEBUG_POPPED))
+         {
+            logMessage("FINISHED POPPING REMAINING GROUP");
+         }
+
          endGroup();
       }
    }
@@ -1603,6 +1608,11 @@ public class TeXParser extends TeXObjectList
       }
       finally
       {
+         if (isDebugMode(DEBUG_SETTINGS) || isDebugMode(DEBUG_READ))
+         {
+            logMessage("FINISHED READING GROUP");
+         }
+
          endGroup();
       }
 
@@ -1668,6 +1678,11 @@ public class TeXParser extends TeXObjectList
       }
       finally
       {
+         if (isDebugMode(DEBUG_SETTINGS) || isDebugMode(DEBUG_READ))
+         {
+            logMessage("FINISHED READING INLINE MATH GROUP");
+         }
+
          endGroup();
       }
 
@@ -1725,6 +1740,11 @@ public class TeXParser extends TeXObjectList
       }
       finally
       {
+         if (isDebugMode(DEBUG_SETTINGS) || isDebugMode(DEBUG_READ))
+         {
+            logMessage("FINISHED READING DISPLAY MATH GROUP");
+         }
+
          endGroup();
       }
 

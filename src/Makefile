@@ -72,7 +72,7 @@ tests/test-fontawesome/test-fontawesome.pdf	: tests/test-fontawesome/test-fontaw
 
 test-userguide : app tests/test-userguide/test-userguide.pdf tests/output
 	rm -f -r tests/output/test-userguide
-	bin/texparsertest --no-convert-images --debug-mode process-generic-cs,expansion,process,process-stack,io --log tests/output/test-userguide.log --in tests/test-userguide/test-userguide.tex --output tests/output/test-userguide --html
+	bin/texparsertest --no-convert-images --debug-mode process-generic-cs,expansion,process,process-stack,io,settings,popped --log tests/output/test-userguide.log --in tests/test-userguide/test-userguide.tex --output tests/output/test-userguide --html
 
 tests/test-userguide/test-userguide.pdf	: tests/test-userguide/test-userguide.tex
 					cd tests/test-userguide; arara test-userguide

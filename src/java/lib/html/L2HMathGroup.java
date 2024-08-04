@@ -42,15 +42,18 @@ public class L2HMathGroup extends MathGroup
       return math;
    }
 
-   public void processList(TeXParser parser, StackMarker marker)
+   @Override
+   public boolean processList(TeXParser parser, StackMarker marker)
     throws IOException
    {
       L2HConverter listener = (L2HConverter)parser.getListener();
+      boolean markerFound = false;
 
       while (size() > 0)
       {
          if (get(0).equals(marker))
          {
+            markerFound = true;
             remove(0);
             break;
          }
@@ -64,6 +67,8 @@ public class L2HMathGroup extends MathGroup
 
          object.process(parser, this);
       }
+
+      return markerFound;
    }
 
    public void startGroup(TeXParser parser)
@@ -122,6 +127,11 @@ public class L2HMathGroup extends MathGroup
       {
          listener.writeliteral("</div>");
          listener.setCurrentBlockType(DocumentBlockType.BODY);
+      }
+
+      if (parser.isDebugMode(TeXParser.DEBUG_SETTINGS))
+      {
+         parser.logMessage("GROUP END " + toString());
       }
 
       parser.endGroup();

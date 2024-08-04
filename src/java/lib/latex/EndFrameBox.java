@@ -43,6 +43,12 @@ public class EndFrameBox extends AbstractTeXObject
 
       listener.endFrameBox(fbox);
 
+      if (parser.isDebugMode(TeXParser.DEBUG_SETTINGS))
+      {
+         parser.logMessage("ENDING GROUP AFTER PROCESSING "
+          + toString()+" REMAINING STACK: "+stack);
+      }
+
       parser.endGroup();
    }
 
@@ -53,6 +59,12 @@ public class EndFrameBox extends AbstractTeXObject
       LaTeXParserListener listener = ((LaTeXParserListener)parser.getListener());
 
       listener.endFrameBox(fbox);
+
+      if (parser.isDebugMode(TeXParser.DEBUG_SETTINGS))
+      {
+         parser.logMessage("ENDING GROUP AFTER PROCESSING "
+          + toString());
+      }
 
       parser.endGroup();
    }

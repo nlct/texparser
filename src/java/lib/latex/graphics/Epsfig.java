@@ -74,7 +74,10 @@ public class Epsfig extends ControlSequence
          replacement.add(listener.getOther(']'));
       }
 
-      replacement.add(TeXParserUtils.createGroup(listener, file));
+      Group grp = listener.createGroup();
+      grp.add(file, true);
+
+      replacement.add(grp);
 
       listener.getTeXApp().substituting(parser,
         original.toString(), replacement.toString(parser));

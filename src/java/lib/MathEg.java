@@ -99,6 +99,12 @@ public class MathEg extends EgChar implements Expandable,MultiToken
       TeXObjectList list = new TeXObjectList(1);
       list.add(this);
       parser.getSettings().setMode(TeXMode.INHERIT);
+
+      if (parser.isDebugMode(TeXParser.DEBUG_SETTINGS))
+      {
+         parser.logMessage("ENDING MATH GROUP "+toString(parser));
+      }
+
       parser.endGroup();
 
       return list;

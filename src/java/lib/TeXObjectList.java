@@ -2092,7 +2092,8 @@ public class TeXObjectList extends Vector<TeXObject>
 
          if (parser.isDebugMode(TeXParser.DEBUG_POPPED))
          {
-            parser.logMessage("POPPED "+object);
+            parser.logMessage("POPPED "+object 
+             + " FROM " + getClass().getSimpleName()+"#"+stackID);
          }
 
          object = TeXParserUtils.resolve(object, parser);
@@ -2148,7 +2149,7 @@ public class TeXObjectList extends Vector<TeXObject>
 
       StackMarker marker = null;
 
-      if (stack != parser && stack != null)
+      if (stack != parser && stack != null && !stack.isEmpty())
       {
          marker = new StackMarker();
          add(marker);
@@ -2163,7 +2164,8 @@ public class TeXObjectList extends Vector<TeXObject>
 
          if (parser.isDebugMode(TeXParser.DEBUG_POPPED))
          {
-            parser.logMessage("POPPED "+object);
+            parser.logMessage("POPPED "+object 
+             + " FROM " + getClass().getSimpleName()+"#"+stackID);
          }
 
          if (object.equals(marker))
@@ -2223,9 +2225,11 @@ public class TeXObjectList extends Vector<TeXObject>
     * @param parser the parser
     * @param marker the marker
     */
-   protected void processList(TeXParser parser, StackMarker marker)
+   protected boolean processList(TeXParser parser, StackMarker marker)
     throws IOException
    {
+      boolean markerFound = false;
+
       TeXObjectList before = new TeXObjectList();
       TeXObjectList after = new TeXObjectList();
 
@@ -2235,7 +2239,9 @@ public class TeXObjectList extends Vector<TeXObject>
       {
          TeXObject object = get(i);
 
-         if (object.equals(marker))
+         markerFound = object.equals(marker);
+
+         if (markerFound)
          {
             break;
          }
@@ -2267,6 +2273,7 @@ public class TeXObjectList extends Vector<TeXObject>
       {
          before = null;
          after = null;
+         markerFound = false;
 
          while (size() != 0)
          {
@@ -2274,10 +2281,18 @@ public class TeXObjectList extends Vector<TeXObject>
 
             if (parser.isDebugMode(TeXParser.DEBUG_PROCESSING))
             {
-               parser.logMessage("PROCESS LIST OBJ: "+object);
+               parser.logMessage("PROCESS LIST OBJ: "+object
+                + " TERMINATING MARKER: "+marker);
             }
 
-            if (object.equals(marker) || object == null)
+            if (object == null)
+            {
+               break;
+            }
+
+            markerFound = object.equals(marker);
+
+            if (markerFound)
             {
                break;
             }
@@ -2314,7 +2329,17 @@ public class TeXObjectList extends Vector<TeXObject>
          midcs.process(parser, before, after);
       }
 
-      processEndDeclarations(parser);
+      if (markerFound && parser.isDebugMode(TeXParser.DEBUG_PROCESSING))
+      {
+         parser.logMessage("FOUND MARKER: "+marker);
+      }
+
+      if (isEmpty())
+      {
+         processEndDeclarations(parser);
+      }
+
+      return markerFound;
    }
 
    protected String toStringExtraIdentifier()
@@ -2522,6 +2547,11 @@ public class TeXObjectList extends Vector<TeXObject>
    public void processEndDeclarations(TeXParser parser)
      throws IOException
    {
+      if (parser.isDebugMode(TeXParser.DEBUG_PROCESSING_STACK_LIST))
+      {
+         parser.logMessage("PROCESSING END DECLARATIONS: "+declarations);
+      }
+
       while (declarations.size() > 0)
       {
          declarations.remove(declarations.size()-1).end(parser, this);

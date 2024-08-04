@@ -312,6 +312,7 @@ public class StandaloneDef extends AbstractGlsCommand
 
       TeXParserListener listener = parser.getListener();
 
+parser.logMessage("STANDALONE STARTING GROUP");
       parser.startGroup();
 
       initHook(glslabel, parser, stack);
@@ -404,7 +405,16 @@ public class StandaloneDef extends AbstractGlsCommand
 
       content.add(outerBox.getEndDeclaration());
 
+parser.logMessage("STANDALONE PROCESSING "+content.toString(parser));
       TeXParserUtils.process(content, parser, stack);
+
+parser.logMessage("STANDALONE END GROUP");
+
+      if (parser.isDebugMode(TeXParser.DEBUG_SETTINGS))
+      {
+         parser.logMessage("ENDING GROUP AFTER PROCESSING "
+          + toString() + " REMAINING STACK: "+stack);
+      }
 
       parser.endGroup();
    }

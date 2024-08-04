@@ -112,6 +112,11 @@ public class L2HEqnarray extends L2HMathDeclaration
 
       listener.setCurrentBlockType(DocumentBlockType.BODY);
 
+      if (parser.isDebugMode(TeXParser.DEBUG_SETTINGS))
+      {
+         parser.logMessage("GROUP END " + toString());
+      }
+
       parser.endGroup();
    }
 }

@@ -68,6 +68,12 @@ public class InlineCode extends ControlSequence
 
       TeXParserUtils.process(content, parser, stack);
 
+      if (parser.isDebugMode(TeXParser.DEBUG_SETTINGS))
+      {
+         parser.logMessage("ENDING GROUP AFTER PROCESSING "
+          + toString() + " REMAINING STACK: "+stack);
+      }
+
       parser.endGroup();
    }
 
