@@ -18,6 +18,8 @@
 */
 package com.dickimawbooks.texparserlib.latex.nlctdoc;
 
+import java.util.Vector;
+import java.util.HashMap;
 import java.io.IOException;
 import java.awt.Color;
 
@@ -25,6 +27,8 @@ import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.primitives.NewIf;
 import com.dickimawbooks.texparserlib.primitives.Relax;
 import com.dickimawbooks.texparserlib.generic.Symbol;
+import com.dickimawbooks.texparserlib.auxfile.AuxCommand;
+import com.dickimawbooks.texparserlib.auxfile.AuxData;
 import com.dickimawbooks.texparserlib.latex.*;
 import com.dickimawbooks.texparserlib.latex.glossaries.*;
 import com.dickimawbooks.texparserlib.latex.color.ColorSty;
@@ -33,6 +37,7 @@ import com.dickimawbooks.texparserlib.html.WidgetMenu;
 import com.dickimawbooks.texparserlib.html.Widget;
 
 public class UserGuideSty extends LaTeXSty
+  implements BeginDocumentListener
 {
    public UserGuideSty(KeyValList options, LaTeXParserListener listener, 
      boolean loadParentOptions, ColorSty colorSty)
@@ -47,12 +52,19 @@ public class UserGuideSty extends LaTeXSty
    {
       super(options, styName, listener, loadParentOptions);
       this.colorSty = colorSty;
+
+      listener.addBeginDocumentListener(this);
    }
 
    @Override
    public void addDefinitions()
    {
       LaTeXParserListener listener = getListener();
+
+      registerControlSequence(new VersionDate());
+      registerControlSequence(new AtFirstOfOne("hologoRobust"));
+      registerControlSequence(new GenericCommand(true,
+        "visiblespace", null, new TeXCsRef("textvisiblespace")));
 
       addCssStyles();
       addSemanticCommands();
@@ -1604,6 +1616,7 @@ public class UserGuideSty extends LaTeXSty
       registerControlSequence(new InlineGlsDef("inlineswitchdef", "switch.", glossariesSty));
       registerControlSequence(new InlineGlsDef("inlineoptdef", "opt.", glossariesSty));
       registerControlSequence(new InlineGlsDef("inlinepkgdef", "pkg.", glossariesSty));
+      registerControlSequence(new InlineGlsDef("inlineappdef", "app.", glossariesSty));
       registerControlSequence(new CmdDefSyntax(glossariesSty));
       registerControlSequence(new OptDefSyntax(glossariesSty));
 
@@ -1705,6 +1718,60 @@ public class UserGuideSty extends LaTeXSty
 
       registerControlSequence(new LaTeXGenericCommand(true, "filetag",
        "m", def));
+
+      getParser().getSettings().newcount(true,
+        "l_nlctdoc_extag_item_threshold_int", 4);
+
+      registerControlSequence(new ExampleTagRef(this));
+      registerControlSequence(new AtRefAtNumName());
+      registerControlSequence(new AtRefAtNumName("s@ref@numname", true));
+
+      getListener().addAuxCommand(new AuxCommand("nlctdoc@extag", 2));
+   }
+
+   @Override
+   public void documentBegun(BeginDocumentEvent evt)
+    throws IOException
+   {
+      Vector<AuxData> auxData = evt.getListener().getAuxData();
+      TeXObjectList stack = evt.getStack();
+
+      for (AuxData d : auxData)
+      {
+         if (d.getName().equals("nlctdoc@extag"))
+         {
+            TeXObject tagArg = d.getArg(0);
+            TeXObject labelArg = d.getArg(0);
+
+            String tag = getParser().expandToString(tagArg, stack);
+            String label = getParser().expandToString(labelArg, stack);
+
+            if (tagGroups == null)
+            {
+               tagGroups = new HashMap<String,Vector<String>>();
+            }
+
+            Vector<String> list = tagGroups.get(tag);
+
+            if (list == null)
+            {
+               list = new Vector<String>();
+               tagGroups.put(tag, list);
+            }
+
+            list.add(label);
+         }
+      }
+   }
+
+   public Vector<String> getTagGroup(String tag)
+   {
+      if (tagGroups == null)
+      {
+         return null;
+      }
+
+      return tagGroups.get(tag);
    }
 
    protected void addLocationCommands()
@@ -2477,6 +2544,8 @@ public class UserGuideSty extends LaTeXSty
 
    protected boolean atSymGroup = true;
 
+   protected HashMap<String,Vector<String>> tagGroups;
+
    public static final Color BG_DEF = new Color(1.0f, 1.0f, 0.75f);
    public static final Color BG_OPTION_DEF = new Color(1.0f, 1.0f, 0.89f);
    public static final Color BG_OPTION_VALUE_DEF = new Color(1.0f, 1.0f, 0.96f);
@@ -2500,4 +2569,6 @@ public class UserGuideSty extends LaTeXSty
    public static final Color BG_INFO = new Color(0.94f,1.0f,1.0f);
 
    public static final Color FADED = Color.GRAY;
+
+   public static final String ERROR_UNKNOWN_TAG_GROUP = "nlctdoc.unknown_tag_group";
 }

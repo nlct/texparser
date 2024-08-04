@@ -260,6 +260,8 @@ public class L2HConverter extends LaTeXParserListener
 
       putControlSequence(new HCode());
 
+      putControlSequence(new AtGobble("discretionary", 3));
+
       /* Ignore fontspec commands to set the main, sans and mono
        fonts. The CSS should ideally be customised as applicable.
        */

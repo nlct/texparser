@@ -1957,6 +1957,14 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
 
             AuxParser auxListener = new AuxParser(getTeXApp(), getCharSet(), prefix);
 
+            if (customAuxCommands != null)
+            {
+               for (AuxCommand auxCommand : customAuxCommands)
+               {
+                  auxListener.putControlSequence(auxCommand);
+               }
+            }
+
             auxListener.enableSaveDivisions(saveDivisions);
             auxListener.enableSaveLabels(true);
             auxListener.enableSaveCites(true);
@@ -2051,6 +2059,21 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
 
       parseAux(getAuxFile());
 
+      if (beginDocumentListeners != null)
+      {
+         BeginDocumentEvent evt = new BeginDocumentEvent(this, stack);
+
+         for (BeginDocumentListener l : beginDocumentListeners)
+         {
+            l.documentBegun(evt);
+
+            if (evt.isConsumed())
+            {
+               break;
+            }
+         }
+      }
+
       ControlSequence cs = parser.getControlSequence(
         "@begindocumenthook");
 
@@ -2063,6 +2086,16 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
 
          TeXParserUtils.process(cs, parser, stack);
       }
+   }
+
+   public void addBeginDocumentListener(BeginDocumentListener l)
+   {
+      if (beginDocumentListeners == null)
+      {
+         beginDocumentListeners = new Vector<BeginDocumentListener>();
+      }
+
+      beginDocumentListeners.add(l);
    }
 
    @Deprecated
@@ -3151,6 +3184,17 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       return getAuxFile("aux");
    }
 
+   // needs to be done before aux file is parsed
+   public void addAuxCommand(AuxCommand auxCommand)
+   {
+      if (customAuxCommands == null)
+      {
+         customAuxCommands = new Vector<AuxCommand>();
+      }
+
+      customAuxCommands.add(auxCommand);
+   }
+
    public File getBblFile()
    {
       return getAuxFile("bbl");
@@ -3708,6 +3752,9 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
    private boolean parseAux = false;
 
    private Vector<AuxData> auxData;
+
+   protected Vector<AuxCommand> customAuxCommands;
+   protected Vector<BeginDocumentListener> beginDocumentListeners;
 
    private boolean saveDivisions;
    protected Vector<DivisionInfo> divisionData;

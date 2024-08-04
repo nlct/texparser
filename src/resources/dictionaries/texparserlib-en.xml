@@ -183,6 +183,10 @@
 
 <entry key="fontawesome.unknown.icon_name">Unknown icon name ''{0}''.</entry>
 
+<!--  nlctuserguide.sty/texjavahelp.sty messages -->
+
+<entry key="nlctdoc.unknown_tag_group">Unknown tag group ''{0}''.</entry>
+
 <!--  Image drawing messages -->
 
 <entry key="teximage.error.no_path">No path defined on which to operate</entry>
