@@ -1956,6 +1956,7 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
             parser.debugMessage(TeXParser.DEBUG_IO, "Parsing AUX file: "+auxFile);
 
             AuxParser auxListener = new AuxParser(getTeXApp(), getCharSet(), prefix);
+            TeXParser auxTeXParser = new TeXParser(auxListener);
 
             if (customAuxCommands != null)
             {
@@ -1968,7 +1969,7 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
             auxListener.enableSaveDivisions(saveDivisions);
             auxListener.enableSaveLabels(true);
             auxListener.enableSaveCites(true);
-            auxListener.parseAuxFile(auxFile);
+            auxListener.parseAuxFile(auxTeXParser, auxFile, null);
 
             Vector<AuxData> data = auxListener.getAuxData();
 
@@ -3187,6 +3188,11 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
    // needs to be done before aux file is parsed
    public void addAuxCommand(AuxCommand auxCommand)
    {
+      if (auxCommand == null)
+      {
+         throw new NullPointerException();
+      }
+
       if (customAuxCommands == null)
       {
          customAuxCommands = new Vector<AuxCommand>();
