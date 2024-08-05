@@ -891,6 +891,37 @@ public class IOSettings
       trimElement = on;
    }
 
+   public void setColumnKeys(String[] keys)
+   {
+      this.keys = keys;
+   }
+
+   public void setColumnHeaders(TeXObject[] headers)
+   {
+      this.headers = headers;
+   }
+
+   public void setColumnHeaders(String[] strHeaders, TeXParser parser)
+   throws IOException
+   {
+      if (strHeaders == null)
+      {
+         headers = null;
+      }
+      else
+      {
+         headers = new TeXObject[strHeaders.length];
+
+         for (int i = 0; i < strHeaders.length; i++)
+         {
+            TeXObjectList stack = parser.getListener().createStack();
+
+            parser.scan(strHeaders[i], stack);
+            headers[i] = stack;
+         }
+      }
+   }
+
    public int getColumnKeyCount()
    {
       return keys == null ? 0 : keys.length;
