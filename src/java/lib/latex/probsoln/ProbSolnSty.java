@@ -341,6 +341,36 @@ public class ProbSolnSty extends LaTeXSty
       random.setSeed(seed);
    }
 
+   public void clearAllData()
+   {
+      clearTmpDatabase();
+
+      if (allEntries != null)
+      {
+         allEntries.clear();
+      }
+
+      ProbSolnDatabase db = databases.get("default");
+      
+      if (db != null)
+      {
+         if (databases.size() > 1)
+         {
+            databases.clear();
+            databases.put("default", db);
+         }
+
+         db.clear();
+      }
+      else
+      {
+         databases.clear();
+         db = new ProbSolnDatabase(dbInitialCapacity, "default");
+
+         databases.put("default", db);
+      }
+   }
+
    private ConcurrentHashMap<String,ProbSolnDatabase> databases;
 
    private ProbSolnDatabase tmpDatabase;
