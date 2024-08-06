@@ -1617,6 +1617,7 @@ public class UserGuideSty extends LaTeXSty
       registerControlSequence(new InlineGlsDef("inlineoptdef", "opt.", glossariesSty));
       registerControlSequence(new InlineGlsDef("inlinepkgdef", "pkg.", glossariesSty));
       registerControlSequence(new InlineGlsDef("inlineappdef", "app.", glossariesSty));
+      registerControlSequence(new InlineGlsDef("inlinefiledef", "file.", glossariesSty));
       registerControlSequence(new CmdDefSyntax(glossariesSty));
       registerControlSequence(new OptDefSyntax(glossariesSty));
 
@@ -1718,6 +1719,23 @@ public class UserGuideSty extends LaTeXSty
 
       registerControlSequence(new LaTeXGenericCommand(true, "filetag",
        "m", def));
+
+      registerControlSequence(
+        new TextualContentCommand("nl", String.format("%n")));
+      registerControlSequence(
+        new TextualContentCommand("nlsp", String.format("%n ")));
+      registerControlSequence(
+        new TextualContentCommand("dbspace", String.format("  ")));
+      registerControlSequence(
+        new TextualContentCommand("dbdbspace", String.format("    ")));
+      registerControlSequence(
+        new TextualContentCommand("dbdbdbspace", String.format("      ")));
+      registerControlSequence(
+        new TextualContentCommand("nldbsp", String.format("%n  ")));
+      registerControlSequence(
+        new TextualContentCommand("nldbdbsp", String.format("%n    ")));
+      registerControlSequence(
+        new TextualContentCommand("nldbdbdbsp", String.format("%n      ")));
 
       getParser().getSettings().newcount(true,
         "l_nlctdoc_extag_item_threshold_int", 4);
