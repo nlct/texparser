@@ -2698,6 +2698,65 @@ public class TeXObjectList extends Vector<TeXObject>
       }
    }
 
+   public void trimEmptyIgnoreablesAndEol()
+   {
+      while (size() > 0)
+      {
+         TeXObject object = firstElement();
+
+         if (object instanceof Comment)
+         {
+            String commentText = ((Comment)object).getText().trim();
+
+            if (commentText.isEmpty())
+            {
+               remove(0);
+            }
+            else
+            {
+               break;
+            }
+         }
+         else if (object instanceof Eol
+           || object instanceof SkippedEols)
+         {
+            remove(0);
+         }
+         else
+         {
+            break;
+         }
+      }
+
+      while (size() > 0)
+      {
+         TeXObject object = lastElement();
+
+         if (object instanceof Comment)
+         {
+            String commentText = ((Comment)object).getText().trim();
+
+            if (commentText.isEmpty())
+            {
+               remove(size()-1);
+            }
+            else
+            {
+               break;
+            }
+         }
+         else if (object instanceof Eol
+           || object instanceof SkippedEols)
+         {
+            remove(size()-1);
+         }
+         else
+         {
+            break;
+         }
+      }
+   }
+
    @Override
    public String purified()
    {
