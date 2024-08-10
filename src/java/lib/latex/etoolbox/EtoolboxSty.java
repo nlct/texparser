@@ -155,5 +155,13 @@ public class EtoolboxSty extends LaTeXSty
       registerControlSequence(new IfDef("ifcsdef", true));
       registerControlSequence(new IfUndef());
       registerControlSequence(new IfUndef("ifcsundef", true));
+
+      registerControlSequence(new NewToggle());
+      registerControlSequence(new SetToggleState(true));
+      registerControlSequence(new SetToggleState(false));
+      registerControlSequence(new IfToggle());
    }
+
+   public static final String TOGGLE_ALREADY_DEFINED
+     = "etoolbox.toggle_already_defined";
 }
