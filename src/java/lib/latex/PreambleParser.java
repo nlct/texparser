@@ -243,10 +243,15 @@ public class PreambleParser extends LaTeXParserListener
      throws IOException
    {
       super.beginDocument(stack);
-      endDocument(stack);
+
+      if (stopAtBeginDoc)
+      {
+         endDocument(stack);
+      }
    }
 
    private TeXApp texApp;
 
    private File file;
+   boolean stopAtBeginDoc = true;
 }

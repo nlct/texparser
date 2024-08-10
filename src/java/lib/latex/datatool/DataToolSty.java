@@ -899,6 +899,16 @@ public class DataToolSty extends LaTeXSty
       return dataToolBaseSty.getIfThenSty();
    }
 
+   public DataGidxSty getDataGidxSty()
+   {
+      return datagidxSty;
+   }
+
+   public void setDataGidxSty(DataGidxSty datagidxSty)
+   {
+      this.datagidxSty = datagidxSty;
+   }
+
    public Iterator<String> getDataBaseKeySetIterator()
    {
       return databases == null ? null : databases.keySet().iterator();
@@ -3367,6 +3377,8 @@ public class DataToolSty extends LaTeXSty
    }
 
    private DataToolBaseSty dataToolBaseSty;
+
+   private DataGidxSty datagidxSty;
 
    private ConcurrentHashMap<String,DataBase> databases;
 

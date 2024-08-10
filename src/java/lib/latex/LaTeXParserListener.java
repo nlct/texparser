@@ -2614,6 +2614,11 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
          return new DataToolBaseSty(options, this, loadParentOptions);
       }
 
+      if (styName.equals("datagidx"))
+      {
+         return new DataGidxSty(options, this, loadParentOptions);
+      }
+
       if (styName.equals("doc"))
       {
          return new DocSty(options, this, loadParentOptions);

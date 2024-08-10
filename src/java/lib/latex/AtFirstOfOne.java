@@ -27,99 +27,141 @@ public class AtFirstOfOne extends Command
 {
    public AtFirstOfOne()
    {
-      this("@firstofone");
+      this("@firstofone", true);
    }
 
    public AtFirstOfOne(String name)
    {
-      super(name);
+      this(name, true);
    }
 
+   public AtFirstOfOne(String name, boolean canExpand)
+   {
+      super(name);
+      this.canExpand = canExpand;
+   }
+
+   @Override
    public Object clone()
    {
-      return new AtFirstOfOne(getName());
+      return new AtFirstOfOne(getName(), canExpand);
    }
 
+   @Override
+   public boolean canExpand()
+   {
+      return canExpand;
+   }
+
+   @Override
    public TeXObjectList expandonce(TeXParser parser)
      throws IOException
    {
-      TeXObject arg1 = parser.popNextArg();
+      if (canExpand)
+      {
+         TeXObject arg1 = parser.popNextArg();
 
-      if (arg1 instanceof TeXObjectList) return (TeXObjectList)arg1;
+         if (arg1 instanceof TeXObjectList) return (TeXObjectList)arg1;
 
-      TeXObjectList list = new TeXObjectList();
-      list.add(arg1);
+         TeXObjectList list = new TeXObjectList();
+         list.add(arg1);
 
-      return list;
+         return list;
+      }
+      else
+      {
+         return null;
+      }
    }
 
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      TeXObject arg1 = stack.popArg(parser);
+      if (canExpand)
+      {
+         TeXObject arg1 = stack.popArg(parser);
 
-      if (arg1 instanceof TeXObjectList) return (TeXObjectList)arg1;
+         if (arg1 instanceof TeXObjectList) return (TeXObjectList)arg1;
 
-      TeXObjectList list = new TeXObjectList();
-      list.add(arg1);
+         TeXObjectList list = new TeXObjectList();
+         list.add(arg1);
 
-      return list;
+         return list;
+      }
+      else
+      {
+         return null;
+      }
    }
 
    public TeXObjectList expandfully(TeXParser parser)
      throws IOException
    {
-      TeXObject arg1 = parser.popNextArg();
-
-      TeXObjectList list;
-
-      if (arg1 instanceof Expandable)
+      if (canExpand)
       {
-         list = ((Expandable)arg1).expandfully(parser);
+         TeXObject arg1 = parser.popNextArg();
 
-         if (list != null)
+         TeXObjectList list;
+
+         if (arg1 instanceof Expandable)
          {
-            return list;
+            list = ((Expandable)arg1).expandfully(parser);
+
+            if (list != null)
+            {
+               return list;
+            }
+
+            if (arg1 instanceof TeXObjectList)
+            {
+               return (TeXObjectList)arg1;
+            }
          }
 
-         if (arg1 instanceof TeXObjectList)
-         {
-            return (TeXObjectList)arg1;
-         }
+         list = new TeXObjectList();
+         list.add(arg1);
+
+         return list;
       }
-
-      list = new TeXObjectList();
-      list.add(arg1);
-
-      return list;
+      else
+      {
+         return null;
+      }
    }
 
    public TeXObjectList expandfully(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      TeXObject arg1 = stack.popArg(parser);
-
-      TeXObjectList list;
-
-      if (arg1 instanceof Expandable)
+      if (canExpand)
       {
-         list = ((Expandable)arg1).expandfully(parser, stack);
+         TeXObject arg1 = stack.popArg(parser);
 
-         if (list != null)
+         TeXObjectList list;
+
+         if (arg1 instanceof Expandable)
          {
-            return list;
+            list = ((Expandable)arg1).expandfully(parser, stack);
+
+            if (list != null)
+            {
+               return list;
+            }
+
+            if (arg1 instanceof TeXObjectList)
+            {
+               return (TeXObjectList)arg1;
+            }
          }
 
-         if (arg1 instanceof TeXObjectList)
-         {
-            return (TeXObjectList)arg1;
-         }
+         list = new TeXObjectList();
+         list.add(arg1);
+
+         return list;
       }
-
-      list = new TeXObjectList();
-      list.add(arg1);
-
-      return list;
+      else
+      {
+         return null;
+      }
    }
 
    public void process(TeXParser parser) throws IOException
@@ -136,4 +178,5 @@ public class AtFirstOfOne extends Command
       arg1.process(parser, list);
    }
 
+   boolean canExpand;
 }

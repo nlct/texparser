@@ -148,6 +148,10 @@
 <entry key="datatool.warn.dbtex3exp">Detected DBTEX v3.0 experimental format. Resave database file as DBTEX v3.0</entry>
 <entry key="datatool.unsupported.action">Unsupported action: ''{0}''</entry>
 
+<entry key="datagidx.term_not_defined">Term ''{0}'' not defined</entry>
+<entry key="datagidx.database_not_defined">Index database ''{0}'' not defined</entry>
+<entry key="datagidx.no_databases">No index databases defined</entry>
+
 <!--  ifthen messages -->
 
 <entry key="ifthen.invalid.condition">Invalid condition ''{0}''.</entry>
