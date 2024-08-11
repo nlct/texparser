@@ -160,8 +160,11 @@ public class CsvReadHandler implements FileMapHandler
          String colKey;
          TeXObject cell;
 
+         boolean missingTitleUseKey;
+
          if (autokeys)
          {
+            missingTitleUseKey = false;
             colKey = parser.expandToString(
                parser.getListener().getControlSequence("dtldefaultkey"),
                  currentStack) + colIdx;
@@ -173,11 +176,13 @@ public class CsvReadHandler implements FileMapHandler
 
             if (colKey == null)
             {
+               missingTitleUseKey = false;
                cell = processCell(row.get(i));
                colKey = cell.toString(parser);
             }
             else
             {
+               missingTitleUseKey = false;
                cell = parser.getListener().createString(colKey);
             }
 
@@ -193,7 +198,14 @@ public class CsvReadHandler implements FileMapHandler
 
          if (title == null)
          {
-            title = cell;
+            if (missingTitleUseKey)
+            {
+               title = cell;
+            }
+            else
+            {
+               title = processCell(row.get(i));
+            }
          }
 
          DataToolHeader header;
