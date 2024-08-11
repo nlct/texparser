@@ -33,7 +33,17 @@ import com.dickimawbooks.texparserlib.generic.*;
 import com.dickimawbooks.texparserlib.primitives.Undefined;
 
 /**
- * Parses LaTeX document preamble
+ * Parses LaTeX document preamble. Allows picking up information
+ * from document preamble or from files that may be input into the
+ * document that are likely to just contain the required
+ * information. For example, convertgls2bib (provided with bib2gls)
+ * picks up glossary entry definitions or datatooltk can pick up
+ * probsoln or database construction commands from a .tex file.
+ *
+ * In general, parsing an entire document is liable to trigger
+ * multiple unknown commands, but may be needed if the required data
+ * occurs in the document environment of a single-file document.
+ * In which case, use setStopAtBeginDocument(false) before parsing.
  */
 
 public class PreambleParser extends LaTeXParserListener
@@ -248,6 +258,17 @@ public class PreambleParser extends LaTeXParserListener
       {
          endDocument(stack);
       }
+   }
+
+   public void setStopAtBeginDocument(boolean stop)
+     throws IOException
+   {
+      if (stop && isInDocEnv())
+      {
+         endDocument(null);
+      }
+
+      stopAtBeginDoc = stop;
    }
 
    private TeXApp texApp;
