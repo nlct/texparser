@@ -96,7 +96,7 @@ public class CsvReadHandler implements FileMapHandler
 
             if (row != null)
             {
-               if (row.isEmpty())
+               if (isRowEmpty(row))
                {
                   switch (settings.getCsvBlankOption())
                   {
@@ -125,7 +125,7 @@ public class CsvReadHandler implements FileMapHandler
 
          if (row != null)
          {
-            if (row.isEmpty())
+            if (isRowEmpty(row))
             {
                switch (settings.getCsvBlankOption())
                {
@@ -139,6 +139,18 @@ public class CsvReadHandler implements FileMapHandler
             rowIdx++;
          }
       }
+   }
+
+   protected boolean isRowEmpty(TeXObjectList row)
+   {
+      if (row.isEmpty()) return true;
+
+      for (TeXObject obj : row)
+      {
+         if (!obj.isEmpty()) return false;
+      }
+
+      return true;
    }
 
    protected void parseHeader(TeXObjectList row)
