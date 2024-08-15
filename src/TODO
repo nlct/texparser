@@ -1,3 +1,5 @@
+File marked for removal (move outstanding items to issue tracker).
+
 Check for \graphicspath
 
 Check for verbatim environment
@@ -5,5 +7,7 @@ Check for verbatim environment
 Check for listings package
 
 Check for erroneous use of \\ instead of paragraph break
+
+LaTeX2LaTeX -> check for \GlsXtrLoadResources and copy over bib files
 
 Lots of other stuff!
