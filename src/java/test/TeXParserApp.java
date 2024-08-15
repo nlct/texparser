@@ -44,6 +44,17 @@ import com.dickimawbooks.texparserlib.html.*;
 
 import com.dickimawbooks.texparsertest.io.*;
 
+/**
+ * Application to test the TeX parser library.
+ * There are two types of test: LaTeX to HTML (--html switch), which 
+ * tests how commands are processed and expanded, and LaTeX to LaTeX
+ * (--latex) which will flatten (produce a single LaTeX file) and
+ * replace obsolete code. Both need a separate output directory and
+ * will copy image files over.
+ *
+ * This application may spawn processes: kpsewhich is used to find files, and
+ * latex or conversion tools are used to create or process images.
+ */
 public class TeXParserApp implements TeXApp
 {
    public TeXParserApp() 
