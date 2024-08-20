@@ -756,7 +756,7 @@ public class TeXParserApp implements TeXApp
      String[] outOptions, File outFile)
      throws IOException,InterruptedException
    {
-      convertimage(inPage, inOptions, inFile, outOptions, outFile, "convert");
+      convertimage(inPage, inOptions, inFile, outOptions, outFile, magick);
    }
 
    public void convertimage(int inPage, String[] inOptions, File inFile,
@@ -1563,6 +1563,18 @@ public class TeXParserApp implements TeXApp
          {
            splitUseBaseNamePrefix = false;
          }
+         else if (args[i].equals("--magick"))
+         {
+            i++;
+
+            if (i == args.length)
+            {
+               throw new InvalidSyntaxException(
+                 getMessage("error.syntax.missing_filename", args[i-1]));
+            }
+
+            magick = args[i];
+         }
          else if (args[i].equals("--head"))
          {
             i++;
@@ -1794,7 +1806,7 @@ public class TeXParserApp implements TeXApp
    // As from 0.9.2.2b these now refer to the test application only.
    public static final String APP_VERSION = "0.9.2.9b";
    public static final String APP_NAME = "texparsertest";
-   public static final String APP_DATE = "2024-07-20";
+   public static final String APP_DATE = "2024-08-20";
 
    public static long MAX_PROCESS_TIME=0L;
 
@@ -1833,6 +1845,8 @@ public class TeXParserApp implements TeXApp
    private boolean useHtmlEntities = false;
    private int splitLevel = 0;
    private boolean splitUseBaseNamePrefix = false;
+
+   private String magick = "magick";
 
    public static final Pattern PNG_INFO =
     Pattern.compile(".*: PNG image data, (\\d+) x (\\d+),.*");
