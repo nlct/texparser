@@ -28,23 +28,43 @@ public class TeXReader implements Readable,Closeable
    public TeXReader(TeXReader parent, String string)
     throws IOException
    {
+      this(parent == null ? null : parent.getTeXApp(), string);
+   }
+
+   public TeXReader(TeXApp texApp, TeXReader parent, String string)
+    throws IOException
+   {
       this.parent = parent;
       this.source = string;
+      this.texApp = texApp;
+
       reader = new StringReader(string);
       isOpen = true;
    }
 
-   public TeXReader(String string)
+   public TeXReader(TeXApp texApp, String string)
     throws IOException
    {
-      this(null, string);
+      this(texApp, null, string);
    }
 
    public TeXReader(TeXReader parent, File file, Charset charset)
     throws IOException
    {
+      this(parent == null ? null : parent.getTeXApp(), parent, file, charset);
+   }
+
+   public TeXReader(TeXApp texApp, TeXReader parent, File file, Charset charset)
+    throws IOException
+   {
+      if (texApp == null)
+      {
+         throw new NullPointerException("Null TeXApp");
+      }
+
       this.parent = parent;
       this.source = file;
+      this.texApp = texApp;
 
       if (charset == null)
       {
@@ -59,7 +79,7 @@ public class TeXReader implements Readable,Closeable
       }
 
       reader = new LineNumberReader(
-        new LineNumberReader(Files.newBufferedReader(file.toPath(),
+        new LineNumberReader(texApp.createBufferedReader(file.toPath(),
          charset)));
 
       this.charset = charset;
@@ -73,16 +93,16 @@ public class TeXReader implements Readable,Closeable
       this(parent, file, null);
    }
 
-   public TeXReader(File file)
+   public TeXReader(TeXApp texApp, File file)
     throws IOException
    {
-      this(null, file, null);
+      this(texApp, null, file, null);
    }
 
-   public TeXReader(File file, Charset charset)
+   public TeXReader(TeXApp texApp, File file, Charset charset)
     throws IOException
    {
-      this(null, file, charset);
+      this(texApp, null, file, charset);
    }
 
    public int getLineNumber()
@@ -213,9 +233,10 @@ public class TeXReader implements Readable,Closeable
       return eofFound;
    }
 
-   // forcibly close this and all ancestors and clear any pending
-   // stacks
-   public void closeAll(TeXApp app)
+   /** Forcibly closes this and all ancestors and clear any pending
+       stacks.
+    */
+   public void closeAll()
    {
       try
       {
@@ -223,14 +244,14 @@ public class TeXReader implements Readable,Closeable
       }
       catch (IOException e)
       {
-         app.error(e);
+         texApp.error(e);
       }
 
       pending = null;
 
       if (parent != null)
       {
-         parent.closeAll(app);
+         parent.closeAll();
       }
    }
 
@@ -317,6 +338,12 @@ public class TeXReader implements Readable,Closeable
       return charset;
    }
 
+   public TeXApp getTeXApp()
+   {
+      return texApp;
+   }
+
+   private TeXApp texApp;
    private Reader reader;
    private TeXReader parent;
    private Object source;

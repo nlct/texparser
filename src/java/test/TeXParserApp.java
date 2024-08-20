@@ -851,6 +851,36 @@ public class TeXParserApp implements TeXApp
       return Charset.defaultCharset();
    }
 
+   @Override
+   public BufferedReader createBufferedReader(Path path,
+     Charset charset) throws IOException, SecurityException
+   {
+      try
+      {
+         return Files.newBufferedReader(path, charset);
+      }
+      catch (Throwable e)
+      {
+         return new BufferedReader(
+          new InputStreamReader(new FileInputStream(path.toFile()), charset));
+      } 
+   }
+
+   @Override
+   public BufferedWriter createBufferedWriter(Path path,
+     Charset charset) throws IOException, SecurityException
+   {
+      try
+      {
+         return Files.newBufferedWriter(path, charset);
+      }
+      catch (Throwable e)
+      {
+         return new BufferedWriter(
+            new OutputStreamWriter(new FileOutputStream(path.toFile()), charset));
+      }
+   }
+
    public void copyFile(File src, File dest)
    throws IOException
    {

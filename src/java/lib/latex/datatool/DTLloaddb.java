@@ -185,7 +185,7 @@ public class DTLloaddb extends ControlSequence
 
       try
       {
-         reader = new TeXReader(null, file, 
+         reader = new TeXReader(parser.getTeXApp(), null, file, 
            parser.getListener().getCharSet());
 
          boolean headerSet = noheader;

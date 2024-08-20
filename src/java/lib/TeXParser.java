@@ -430,7 +430,7 @@ public class TeXParser extends TeXObjectList
          {
             if (e instanceof TeXSyntaxException)
             {
-               logWriter.println(((TeXSyntaxException)e).getMessage(getListener().getTeXApp()));
+               logWriter.println(((TeXSyntaxException)e).getMessage(getTeXApp()));
             }
 
             e.printStackTrace(logWriter);
@@ -450,7 +450,7 @@ public class TeXParser extends TeXObjectList
 
    public void warning(String msg)
    {
-      getListener().getTeXApp().warning(this, msg);
+      getTeXApp().warning(this, msg);
       logMessage(msg);
    }
 
@@ -458,12 +458,12 @@ public class TeXParser extends TeXObjectList
    {
       if (e instanceof TeXSyntaxException)
       {
-         getListener().getTeXApp().warning(this, 
-          ((TeXSyntaxException)e).getMessage(getListener().getTeXApp()));
+         getTeXApp().warning(this, 
+          ((TeXSyntaxException)e).getMessage(getTeXApp()));
       }
       else
       {
-         getListener().getTeXApp().warning(this, e.getMessage());
+         getTeXApp().warning(this, e.getMessage());
       }
 
       logMessage(e);
@@ -471,18 +471,18 @@ public class TeXParser extends TeXObjectList
 
    public void warningMessage(String msgTag, Object... params)
    {
-      warning(getListener().getTeXApp().getMessage(msgTag, params));
+      warning(getTeXApp().getMessage(msgTag, params));
    }
 
    public void error(Exception e)
    {
-      getListener().getTeXApp().error(e);
+      getTeXApp().error(e);
       logMessage(e);
    }
 
    public void error(Exception e, int mode, String msg)
    {
-      getListener().getTeXApp().error(e);
+      getTeXApp().error(e);
 
       if (isDebugMode(mode))
       {
@@ -494,7 +494,7 @@ public class TeXParser extends TeXObjectList
 
    public void message(String msgTag, Object... params)
    {
-      TeXApp texapp = getListener().getTeXApp();
+      TeXApp texapp = getTeXApp();
       String msg = texapp.getMessage(msgTag, params);
       texapp.message(msg);
       logMessage(msg);
@@ -502,7 +502,7 @@ public class TeXParser extends TeXObjectList
 
    public void message(TeXSyntaxException e)
    {
-      TeXApp texapp = getListener().getTeXApp();
+      TeXApp texapp = getTeXApp();
       String msg = e.getMessage(texapp);
       texapp.message(msg);
       logMessage(msg);
@@ -511,7 +511,7 @@ public class TeXParser extends TeXObjectList
    public void message(TeXObject obj)
    {
       String msg = obj.toString(this);
-      getListener().getTeXApp().message(msg);
+      getTeXApp().message(msg);
       logMessage(msg);
    }
 
@@ -680,14 +680,14 @@ public class TeXParser extends TeXObjectList
    {
       debugMessage(DEBUG_IO, "TERMINATE closing all open readers");
 
-      reader.closeAll(listener.getTeXApp());
+      reader.closeAll();
    }
 
    public void scan(String text, TeXObjectList list)
      throws IOException
    {
       TeXReader orgReader = reader;
-      TeXReader strReader = new TeXReader(reader, text);
+      TeXReader strReader = new TeXReader(getTeXApp(), reader, text);
       reader = strReader;
 
       while (reader == strReader)
@@ -2454,6 +2454,8 @@ public class TeXParser extends TeXObjectList
    public void parse(File file, Charset charset, TeXObjectList stack)
      throws IOException
    {
+      TeXApp texApp = getTeXApp();
+
       if (baseDir == null)
       {
          setBaseDir(file.getParentFile());
@@ -2466,12 +2468,12 @@ public class TeXParser extends TeXObjectList
 
       if (charset == null)
       {
-         charset = getListener().getTeXApp().getDefaultCharset();
+         charset = texApp.getDefaultCharset();
       }
 
       currentInputCharset = charset;
 
-      if (!getListener().getTeXApp().isReadAccessAllowed(file))
+      if (!texApp.isReadAccessAllowed(file))
       {
          warningMessage(TeXApp.MESSAGE_NO_READ, file);
 
@@ -2495,7 +2497,8 @@ public class TeXParser extends TeXObjectList
          debugMessage(DEBUG_IO, "PARSE FILE: "+file);
          listener.beginParse(file, charset);
 
-         TeXReader nextReader = new TeXReader(this.reader, file, charset);
+         TeXReader nextReader
+            = new TeXReader(texApp, this.reader, file, charset);
 
          if (stack != null && stack != this && !stack.isEmpty())
          {
@@ -2541,6 +2544,8 @@ public class TeXParser extends TeXObjectList
    public void parse(TeXPath path, Charset charset, TeXObjectList stack)
      throws IOException
    {
+      TeXApp texApp = getTeXApp();
+
       if (baseDir == null)
       {
          setBaseDir(path.getBaseDir());
@@ -2553,10 +2558,10 @@ public class TeXParser extends TeXObjectList
 
       if (charset == null)
       {
-         charset = getListener().getTeXApp().getDefaultCharset();
+         charset = texApp.getDefaultCharset();
       }
 
-      if (!getListener().getTeXApp().isReadAccessAllowed(path))
+      if (!texApp.isReadAccessAllowed(path))
       {
          warningMessage(TeXApp.MESSAGE_NO_READ, path);
 
@@ -2581,7 +2586,8 @@ public class TeXParser extends TeXObjectList
       {
          listener.beginParse(file, charset);
 
-         TeXReader nextReader = new TeXReader(this.reader, file, charset);
+         TeXReader nextReader
+            = new TeXReader(texApp, this.reader, file, charset);
 
          if (stack != null && stack != this && !stack.isEmpty())
          {
@@ -2617,7 +2623,7 @@ public class TeXParser extends TeXObjectList
    public void fileMap(TeXPath texPath, FileMapType mapType, FileMapHandler handler)
    throws IOException
    {
-      TeXApp texApp = getListener().getTeXApp();
+      TeXApp texApp = getTeXApp();
 
       if (!texApp.isReadAccessAllowed(texPath))
       {
@@ -2647,7 +2653,7 @@ public class TeXParser extends TeXObjectList
 
       try
       {
-         reader = new TeXReader(texPath.getFile(), charset);
+         reader = new TeXReader(texApp, texPath.getFile(), charset);
 
          if (!isEmpty())
          {
@@ -3950,6 +3956,11 @@ public class TeXParser extends TeXObjectList
       return listener;
    }
 
+   public TeXApp getTeXApp()
+   {
+      return listener.getTeXApp();
+   }
+
    public File getCurrentFile()
    {
       if (reader == null)
@@ -4650,6 +4661,6 @@ public class TeXParser extends TeXObjectList
    public static final int DEBUG_READ = 32768;
    public static final int DEBUG_SETTINGS = 65536;
 
-   public static final String VERSION = "0.9.9b-20240813";
-   public static final String VERSION_DATE = "2024-08-13";
+   public static final String VERSION = "0.9.9b-20240820";
+   public static final String VERSION_DATE = "2024-08-20";
 }

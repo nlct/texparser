@@ -2641,7 +2641,7 @@ public class L2HConverter extends LaTeXParserListener
    protected Writer newCssWriter(Path path)
    throws IOException
    {
-      return new PrintWriter(Files.newBufferedWriter(path, htmlCharSet));
+      return new PrintWriter(getTeXApp().createBufferedWriter(path, htmlCharSet));
    }
 
    protected void writeCssFile()
@@ -2843,7 +2843,7 @@ public class L2HConverter extends LaTeXParserListener
    protected PrintWriter newNavWriter(Path path)
    throws IOException
    {
-      return new PrintWriter(Files.newBufferedWriter(path, htmlCharSet));
+      return new PrintWriter(getTeXApp().createBufferedWriter(path, htmlCharSet));
    }
 
    protected void writeNavigationFile(TeXObjectList stack)
@@ -3842,7 +3842,7 @@ public class L2HConverter extends LaTeXParserListener
    protected Writer newHtmlWriter(Path path)
    throws IOException
    {
-      return new PrintWriter(Files.newBufferedWriter(path, htmlCharSet));
+      return new PrintWriter(getTeXApp().createBufferedWriter(path, htmlCharSet));
    }
 
    public void setSuffix(String suffix)

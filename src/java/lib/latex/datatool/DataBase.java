@@ -147,7 +147,7 @@ public class DataBase
 
             try
             {
-               in = Files.newBufferedReader(texPath.getPath(), charset);
+               in = texApp.createBufferedReader(texPath.getPath(), charset);
                String line = in.readLine();
 
                if (line != null)
@@ -367,7 +367,8 @@ public class DataBase
 
       try
       {
-         writer = new PrintWriter(Files.newBufferedWriter(path.getPath(), charset));
+         writer = new PrintWriter(
+          texApp.createBufferedWriter(path.getPath(), charset));
 
          texApp.message(texApp.getMessage(TeXApp.MESSAGE_WRITING, path));
 

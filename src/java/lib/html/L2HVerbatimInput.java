@@ -90,7 +90,7 @@ public class L2HVerbatimInput extends ControlSequence
 
       try
       {
-         reader = Files.newBufferedReader(path, charset);
+         reader = listener.getTeXApp().createBufferedReader(path, charset);
 
          String line;
 

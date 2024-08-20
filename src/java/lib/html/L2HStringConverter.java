@@ -91,7 +91,7 @@ public class L2HStringConverter extends L2HConverter
          parser.setCatCode('@', TeXParser.TYPE_LETTER);
       }
 
-      parser.parse(new TeXReader(str));
+      parser.parse(new TeXReader(getTeXApp(), str));
 
       String html = writer.toString();
       setWriter(null);
@@ -115,7 +115,7 @@ public class L2HStringConverter extends L2HConverter
          parser.setCatCode('@', TeXParser.TYPE_LETTER);
       }
 
-      parser.parse(new TeXReader(str));
+      parser.parse(new TeXReader(getTeXApp(), str));
 
       String html = writer.toString();
       setWriter(null);

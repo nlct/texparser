@@ -19,8 +19,12 @@
 package com.dickimawbooks.texparserlib;
 
 import java.nio.charset.Charset;
-import java.io.IOException;
+import java.nio.file.Path;
+
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.IOException;
 
 /**
  * Application interface for TeXParser.
@@ -222,6 +226,40 @@ public interface TeXApp
     * @return the default encoding
     */
    public Charset getDefaultCharset();
+
+   /**
+    * Creates a buffered reader for the given file and encoding.
+    * This method may simply use
+    * java.nio.Files.newBufferedReader(Path,Charset)
+    * or may impose extra restrictions.
+    *
+    * @param path the path to the file
+    * @param charset the charset to use for decoding
+    * @return a new buffered reader
+    * @throws IOException if an I/O error occurs when opening the
+    * file
+    * @throws SecurityException if the request trips the
+    * application's security protocol
+    */
+   public BufferedReader createBufferedReader(Path path,
+     Charset charset) throws IOException, SecurityException;
+
+   /**
+    * Creates a buffered writer for the given file and encoding.
+    * This method may simply use
+    * java.nio.Files.newBufferedWriter(Path,Charset)
+    * or may impose extra restrictions.
+    *
+    * @param path the path to the file
+    * @param charset the charset to use for decoding
+    * @return a new buffered writer
+    * @throws IOException if an I/O error occurs when opening the
+    * file
+    * @throws SecurityException if the request trips the
+    * application's security protocol
+    */
+   public BufferedWriter createBufferedWriter(Path path,
+     Charset charset) throws IOException, SecurityException;
 
    /**
     * Gets the application name.

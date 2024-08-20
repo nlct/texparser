@@ -1111,7 +1111,7 @@ public class LaTeX2LaTeX extends LaTeXParserListener
 
          getParser().message(TeXApp.MESSAGE_ENCODING, outCharset);
 
-         writer = new PrintWriter(Files.newBufferedWriter(outFile.toPath(),
+         writer = new PrintWriter(getTeXApp().createBufferedWriter(outFile.toPath(),
            outCharset));
       }
    }
