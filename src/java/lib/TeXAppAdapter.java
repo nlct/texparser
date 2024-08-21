@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013-2022 Nicola L.C. Talbot
+    Copyright (C) 2013-2024 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -35,11 +35,10 @@ import com.dickimawbooks.texparserlib.latex.LaTeXSyntaxException;
  *
  * You may want to override the isReadAccessAllowed
  * and isWriteAccessAllowed methods to check TeXLive's
- * openin_any and openout_any settings. This adapter simply
- * uses File.canRead() and File.canWrite().
+ * openin_any and openout_any settings.
  */
 
-public class TeXAppAdapter implements TeXApp
+public class TeXAppAdapter extends AbstractTeXApp
 {
    @Override
    public String kpsewhich(String arg)
@@ -68,12 +67,6 @@ public class TeXAppAdapter implements TeXApp
    }
 
    @Override
-   public void substituting(TeXParser parser, String original, String replacement)
-   {
-      message(original+" -> "+replacement);
-   }
-
-   @Override
    public String getMessage(String label, Object... params)
    {
       if (params.length == 0)
@@ -97,31 +90,6 @@ public class TeXAppAdapter implements TeXApp
    }
 
    @Override
-   public void message(String text)
-   {
-      System.out.println(text);
-   }
-
-   @Override
-   public void warning(TeXParser parser, String message)
-   {
-      System.err.println(message);
-   }
-
-   @Override
-   public void error(Exception e)
-   {
-      if (e instanceof TeXSyntaxException)
-      {
-         System.err.println(((TeXSyntaxException)e).getMessage(this));
-      }
-      else
-      {
-         e.printStackTrace();
-      }
-   }
-
-   @Override
    public void progress(int percentage)
    {
    }
@@ -137,86 +105,6 @@ public class TeXAppAdapter implements TeXApp
      throws IOException
    {
       return javax.swing.JOptionPane.showInputDialog(null, message);
-   }
-
-   @Override
-   public boolean isReadAccessAllowed(TeXPath path)
-   {
-      return isReadAccessAllowed(path.getFile());
-   }
-
-   @Override
-   public boolean isReadAccessAllowed(File file)
-   {
-      return file.canRead();
-   }
-
-   @Override
-   public boolean isWriteAccessAllowed(TeXPath path)
-   {
-      return isWriteAccessAllowed(path.getFile());
-   }
-
-   @Override
-   public boolean isWriteAccessAllowed(File file)
-   {
-      if (file.exists())
-      {
-         return file.canWrite();
-      }
-
-      File dir = file.getParentFile();
-
-      if (dir != null)
-      {
-         return dir.canWrite();
-      }
-
-      return (new File(System.getProperty("user.dir"))).canWrite();
-   }
-
-   @Override
-   public Charset getDefaultCharset()
-   {
-      return Charset.defaultCharset();
-   }
-
-   @Override
-   public BufferedReader createBufferedReader(Path path,
-     Charset charset) throws IOException, SecurityException
-   {
-      /*
-       * The use of Files.newBufferedReader(Path,Charset)
-       * can cause an exception when running inside a 
-       * restricted container (see https://github.com/nlct/bib2gls/issues/30)
-       * so first try the newer method but if that fails fallback
-       * on the older method.
-       */
-
-      try
-      {
-         return Files.newBufferedReader(path, charset);
-      }
-      catch (Throwable e)
-      {
-         return new BufferedReader(
-          new InputStreamReader(new FileInputStream(path.toFile()), charset));
-      } 
-   }
-
-   @Override
-   public BufferedWriter createBufferedWriter(Path path,
-     Charset charset) throws IOException, SecurityException
-   {
-      try
-      {
-         return Files.newBufferedWriter(path, charset);
-      }
-      catch (Throwable e)
-      {
-         return new BufferedWriter(
-            new OutputStreamWriter(new FileOutputStream(path.toFile()), charset));
-      }
    }
 
    @Override
