@@ -19,9 +19,14 @@
 package com.dickimawbooks.texparserlib.latex.datatool;
 
 import java.util.Vector;
+import java.util.regex.Pattern;
+
 import java.io.IOException;
+
 import java.text.DecimalFormat;
 import java.text.ParseException;
+
+import java.math.BigDecimal;
 
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.*;
@@ -435,6 +440,17 @@ public class DataToolBaseSty extends LaTeXSty
             return ((NumericFormatter)cs).parse(str).doubleValue();
          }
 
+         if (SCIENTIFIC_PATTERN.matcher(str).matches())
+         {
+            try
+            {
+               return (new BigDecimal(str)).doubleValue();
+            }
+            catch (NumberFormatException e)
+            {// shouldn't happen
+            }
+         }
+
          return Double.parseDouble(str);
       }
       catch (NumberFormatException | ParseException e)
@@ -628,6 +644,17 @@ public class DataToolBaseSty extends LaTeXSty
          {
             value = ((NumericFormatter)cs).parse(str).doubleValue();
          }
+         else if (SCIENTIFIC_PATTERN.matcher(str).matches())
+         {
+            try
+            {
+               value = (new BigDecimal(str)).doubleValue();
+            }
+            catch (NumberFormatException e)
+            {// shouldn't happen
+               value = Double.parseDouble(str);
+            }
+         }
          else
          {
             value = Double.parseDouble(str);
@@ -756,4 +783,7 @@ public class DataToolBaseSty extends LaTeXSty
 
    public static final String TMPA_VAR = "l__datatool_tmpa_tl";
    public static final String TMPB_VAR = "l__datatool_tmpb_tl";
+
+   public static final Pattern SCIENTIFIC_PATTERN =
+     Pattern.compile("[+\\-]?\\d+(\\.\\d+)?[Ee][+\\-]?\\d+");
 }
