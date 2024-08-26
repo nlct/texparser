@@ -601,6 +601,29 @@ public class DataToolBaseSty extends LaTeXSty
 
       String str = entry.toString(parser).trim();
 
+      // is it scientific notation?
+
+      if (SCIENTIFIC_PATTERN.matcher(str).matches())
+      {
+         try
+         {
+            double value = (new BigDecimal(str)).doubleValue();
+
+            if (useDatum)
+            {
+               return new DatumElement(original, new TeXFloatingPoint(value),
+                 null, DatumType.DECIMAL);
+            }
+            else
+            {
+               return new DataRealElement(value, original);
+            }
+         }
+         catch (NumberFormatException e)
+         {// shouldn't happen
+         }
+      }
+
       // is it an integer?
 
       try
@@ -643,17 +666,6 @@ public class DataToolBaseSty extends LaTeXSty
          if (cs instanceof NumericFormatter)
          {
             value = ((NumericFormatter)cs).parse(str).doubleValue();
-         }
-         else if (SCIENTIFIC_PATTERN.matcher(str).matches())
-         {
-            try
-            {
-               value = (new BigDecimal(str)).doubleValue();
-            }
-            catch (NumberFormatException e)
-            {// shouldn't happen
-               value = Double.parseDouble(str);
-            }
          }
          else
          {
