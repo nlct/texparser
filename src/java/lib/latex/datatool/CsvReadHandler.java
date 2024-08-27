@@ -274,12 +274,14 @@ public class CsvReadHandler implements FileMapHandler
 
       for (int i = 0; i < row.size(); i++)
       {
-         TeXObject cell = processCell(row.get(i));
+         TeXObject obj = row.get(i);
 
-         if (sty.isNull(cell))
+         if (sty.isNull(obj))
          {
             continue;
          }
+
+         TeXObject cell = processCell(obj);
 
          DataElement element = settings.getSty().getElement(cell);
          boolean update = true;
