@@ -933,7 +933,7 @@ public class DataToolSty extends LaTeXSty
       return accept;
    }
 
-   public void addRowReadListener(NewRowReadListener listener)
+   public void addNewRowReadListener(NewRowReadListener listener)
    {
       if (newRowReadListeners == null)
       {
@@ -943,7 +943,7 @@ public class DataToolSty extends LaTeXSty
       newRowReadListeners.add(listener);
    }
 
-   public void removeRowReadListener(NewRowReadListener listener)
+   public void removeNewRowReadListener(NewRowReadListener listener)
    {
       if (newRowReadListeners != null)
       {
@@ -951,7 +951,7 @@ public class DataToolSty extends LaTeXSty
       }
    }
 
-   public void removeAllRowReadListeners()
+   public void removeAllNewRowReadListeners()
    {
       if (newRowReadListeners != null)
       {
