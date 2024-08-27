@@ -507,6 +507,81 @@ public class TeXParserUtils
            TeXSyntaxException.ERROR_DIMEN_EXPECTED);
    }
 
+   public static boolean onlyContainsControlSequence(
+     TeXObjectList list, String... csnames)
+   {
+      return onlyContainsControlSequence(TeXObjectList.POP_RETAIN_IGNOREABLES,
+       list, csnames);
+   }
+
+   public static boolean onlyContainsControlSequence(byte popStyle,
+     TeXObjectList list, String... csnames)
+   {
+      if (list.isEmpty()) return false;
+
+      boolean skipIgnoreables = !list.isRetainIgnoreables(popStyle);
+      boolean skipLeadingWhiteSpace = list.isIgnoreLeadingSpace(popStyle);
+
+      int idx = 0;
+      TeXObject object = null;
+
+      for ( ; idx < list.size(); idx++)
+      {
+         TeXObject obj = list.get(idx);
+
+         if ( ! (
+                  (skipIgnoreables && (obj instanceof Ignoreable))
+               || (skipLeadingWhiteSpace && (obj instanceof WhiteSpace))
+              ) )
+         {
+            object = obj;
+            break;
+         }
+      }
+
+      if (object == null)
+      {
+         if (idx < list.size())
+         {
+            object = list.get(idx);
+            idx++;
+         }
+         else
+         {
+            return false;
+         }
+      }
+
+      if (!isControlSequence(object, csnames))
+      {
+         return false;
+      }
+
+      if (skipIgnoreables)
+      {
+         // if any trailing content, is it all ignoreable?
+
+         for ( ; idx < list.size(); idx++)
+         {
+            TeXObject obj = list.get(idx);
+
+            if (!(object instanceof Ignoreable))
+            {
+               return false;
+            }
+         }
+      }
+
+      if (idx < list.size())
+      {
+         // trailing content
+
+         return false;
+      }
+
+      return true;
+   }
+
    public static boolean isControlSequence(TeXObject obj, String... csnames)
    {
       if (obj instanceof ControlSequence)

@@ -728,8 +728,9 @@ public class DataToolBaseSty extends LaTeXSty
          String name = ((ControlSequence)object).getName();
 
          if (name.equals(NULL_VALUE_CSNAME)
-         || name.equals(NUMBER_NULL_CSNAME)
-         || name.equals(STRING_NULL_CSNAME)
+          || name.equals(NUMBER_NULL_CSNAME)
+          || name.equals(STRING_NULL_CSNAME)
+          || name.equals(OLD_NULL_VALUE_CSNAME)
             )
          {
             return true;
@@ -737,24 +738,10 @@ public class DataToolBaseSty extends LaTeXSty
       }
       else if (getParser().isStack(object))
       {
-         if (((TeXObjectList)object).size() == 1)
-         {
-            object = ((TeXObjectList)object).firstElement();
-
-            if (object instanceof ControlSequence)
-            {
-                String name = ((ControlSequence)object).getName();
-
-                if (name.equals(NULL_VALUE_CSNAME)
-                || name.equals(NUMBER_NULL_CSNAME)
-                || name.equals(STRING_NULL_CSNAME)
-                )
-                {
-                   return true;
-                }
-            }
-         }
-         else if (((TeXObjectList)object).equalsMatchCatCode(nullMarker))
+         if (TeXParserUtils.onlyContainsControlSequence(
+               (TeXObjectList)object, NULL_VALUE_CSNAME,
+                 NUMBER_NULL_CSNAME, STRING_NULL_CSNAME, OLD_NULL_VALUE_CSNAME)
+          || ((TeXObjectList)object).equalsMatchCatCode(nullMarker))
          {
             return true;
          }
@@ -786,6 +773,20 @@ public class DataToolBaseSty extends LaTeXSty
       = "__texparser_fmt_currency_value:n";
 
    public static final String DATUM_NNNN = "__datatool_datum:nnnn";
+
+   /**
+    * The old control sequence name for the token representing a
+    * missing value.
+    * Note that datatool.sty v3.0 has replaced the internal command
+    * representing null with a constant token list, but datatooltk
+    * still uses the old name as representing a missing value. 
+    */
+   public static final String OLD_NULL_VALUE_CSNAME = "@dtlnovalue";
+
+   /**
+    * The new control sequence name for the token representing a
+    * missing value.
+    */
 
    public static final String NULL_VALUE_CSNAME = "c_datatool_nullvalue_tl";
    public static final String NUMBER_NULL_CSNAME = "@dtlnumbernull";

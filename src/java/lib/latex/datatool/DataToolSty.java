@@ -576,6 +576,11 @@ public class DataToolSty extends LaTeXSty
       return dataToolBaseSty.getElement(entry);
    }
 
+   public boolean isNull(TeXObject object)
+   {
+      return dataToolBaseSty.isNull(object);
+   }
+
    public DataToolEntry addNewEntry(String dbName, String colLabel, 
      TeXObject element)
    throws IOException
@@ -882,6 +887,76 @@ public class DataToolSty extends LaTeXSty
       }
 
       return db;
+   }
+
+   /**
+    * Called by CsvReadHandler before processing a new row.
+    * This method is called after testing for empty and before
+    * applying any mappings. This method may alter the row list.
+    * Note that this list doesn't represent a stack. (The delimiters
+    * and separators have already been removed.) Each item in
+    * the list represents an element in the row. An item may be set
+    * to one of the null commands (recognised by isNull(TeXObject))
+    * to indicate that item should be omitted from the row.
+    *
+    * This method is not applied for the header row.
+    *
+    * @param settings the current I/O settings
+    * @param database the database under construction
+    * @param row a list of all the elements in the row
+    * @return false if one or more registered NewRowReadListener
+    * does not accept the row otherwise returns true
+    */
+   public boolean acceptNewRowRead(IOSettings settings, DataBase database,
+     DataObjectList row)
+   {
+      boolean accept = true;
+
+      if (newRowReadListeners != null)
+      {
+         NewRowReadEvent event = new NewRowReadEvent(settings, database, row);
+
+         for (NewRowReadListener listener : newRowReadListeners)
+         {
+            if (!listener.acceptNewRowRead(event))
+            {
+               accept = false;
+            }
+
+            if (event.isConsumed())
+            {
+               break;
+            }
+         }
+      }
+
+      return accept;
+   }
+
+   public void addRowReadListener(NewRowReadListener listener)
+   {
+      if (newRowReadListeners == null)
+      {
+         newRowReadListeners = new Vector<NewRowReadListener>();
+      }
+
+      newRowReadListeners.add(listener);
+   }
+
+   public void removeRowReadListener(NewRowReadListener listener)
+   {
+      if (newRowReadListeners != null)
+      {
+         newRowReadListeners.remove(listener);
+      }
+   }
+
+   public void removeAllRowReadListeners()
+   {
+      if (newRowReadListeners != null)
+      {
+         newRowReadListeners.clear();
+      }
    }
 
    public boolean isDbGlobalOn()
@@ -3385,6 +3460,7 @@ public class DataToolSty extends LaTeXSty
    private DataBase latestDatabase = null;
 
    private Vector<FileLoadedListener> fileLoadedListeners;
+   private Vector<NewRowReadListener> newRowReadListeners;
 
    private HashMap<Integer,String> csvLiteralMap;
    private boolean csvLiteralMappingOn = true;

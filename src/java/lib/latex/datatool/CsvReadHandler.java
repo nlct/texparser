@@ -92,7 +92,7 @@ public class CsvReadHandler implements FileMapHandler
       {
          if (settings.getSkipLines() < lineNumber)
          {
-            TeXObjectList row = splitRow(line);
+            DataObjectList row = splitRow(line);
 
             if (row != null)
             {
@@ -111,7 +111,7 @@ public class CsvReadHandler implements FileMapHandler
                   parseHeader(row);
                   rowIdx = 1;
                }
-               else
+               else if (sty.acceptNewRowRead(settings, database, row))
                {
                   parseRow(row);
                   rowIdx++;
@@ -121,7 +121,7 @@ public class CsvReadHandler implements FileMapHandler
       }
       else
       {
-         TeXObjectList row = splitRow(line);
+         DataObjectList row = splitRow(line);
 
          if (row != null)
          {
@@ -135,13 +135,16 @@ public class CsvReadHandler implements FileMapHandler
                }
             }
 
-            parseRow(row);
-            rowIdx++;
+            if (sty.acceptNewRowRead(settings, database, row))
+            {
+               parseRow(row);
+               rowIdx++;
+            }
          }
       }
    }
 
-   protected boolean isRowEmpty(TeXObjectList row)
+   protected boolean isRowEmpty(DataObjectList row)
    {
       if (row.isEmpty()) return true;
 
@@ -153,7 +156,7 @@ public class CsvReadHandler implements FileMapHandler
       return true;
    }
 
-   protected void parseHeader(TeXObjectList row)
+   protected void parseHeader(DataObjectList row)
    throws IOException
    {
       boolean autokeys = settings.isAutoKeysOn();
@@ -245,7 +248,7 @@ public class CsvReadHandler implements FileMapHandler
       }
    }
 
-   protected void parseRow(TeXObjectList row)
+   protected void parseRow(DataObjectList row)
    throws IOException
    {
       DataToolHeaderRow headerRow = database.getHeaders();
@@ -272,6 +275,11 @@ public class CsvReadHandler implements FileMapHandler
       for (int i = 0; i < row.size(); i++)
       {
          TeXObject cell = processCell(row.get(i));
+
+         if (sty.isNull(cell))
+         {
+            continue;
+         }
 
          DataElement element = settings.getSty().getElement(cell);
          boolean update = true;
@@ -414,7 +422,7 @@ public class CsvReadHandler implements FileMapHandler
       }
    }
 
-   protected TeXObjectList splitRow(TeXObjectList line)
+   protected DataObjectList splitRow(TeXObjectList line)
    throws IOException
    {
       int delimiter = settings.getDelimiter();
@@ -439,7 +447,7 @@ public class CsvReadHandler implements FileMapHandler
 
       if (pendingRow == null)
       {
-         pendingRow = new TeXObjectList();
+         pendingRow = new DataObjectList();
       }
 
       boolean ignoreTrailing = false;
@@ -463,7 +471,7 @@ public class CsvReadHandler implements FileMapHandler
                   {
                      // end of row
                      pendingRow.add(pendingCell);
-                     TeXObjectList row = pendingRow;
+                     DataObjectList row = pendingRow;
 
                      pendingCell = null;
                      pendingRow = null;
@@ -531,7 +539,7 @@ public class CsvReadHandler implements FileMapHandler
             {
                if (pendingCell == null)
                {
-                  pendingCell = new TeXObjectList();
+                  pendingCell = parser.getListener().createStack();
                   needsClosingDelim = true;
                }
                else if (pendingCell.isBlank() || settings.isCsvStrictQuotes())
@@ -567,7 +575,7 @@ public class CsvReadHandler implements FileMapHandler
                }
                else
                {
-                  pendingRow.add(new TeXObjectList());
+                  pendingRow.add(parser.getListener().createStack());
                }
             }
             else if (parser.isCatCode(TeXParser.TYPE_SPACE, cp))
@@ -579,7 +587,7 @@ public class CsvReadHandler implements FileMapHandler
                {
                   if (!settings.isTrimElementOn())
                   {
-                     pendingCell = new TeXObjectList();
+                     pendingCell = parser.getListener().createStack();
                      pendingCell.add(space);
                   }
                }
@@ -592,7 +600,7 @@ public class CsvReadHandler implements FileMapHandler
             {
                if (pendingCell == null)
                {
-                  pendingCell = new TeXObjectList();
+                  pendingCell = parser.getListener().createStack();
                }
 
                pendingCell.add(obj);
@@ -604,7 +612,7 @@ public class CsvReadHandler implements FileMapHandler
             {
                if (!settings.isTrimElementOn())
                {
-                  pendingCell = new TeXObjectList();
+                  pendingCell = parser.getListener().createStack();
                   pendingCell.add(obj);
                }
             }
@@ -617,7 +625,7 @@ public class CsvReadHandler implements FileMapHandler
          {
             if (pendingCell == null)
             {
-               pendingCell = new TeXObjectList();
+               pendingCell = parser.getListener().createStack();
             }
 
             if (settings.getEscapeCharsOption() == EscapeCharsOption.DOUBLE_DELIM)
@@ -649,7 +657,7 @@ public class CsvReadHandler implements FileMapHandler
          {
             if (pendingCell == null)
             {
-               pendingCell = new TeXObjectList();
+               pendingCell = parser.getListener().createStack();
             }
 
             pendingCell.add(obj);
@@ -676,7 +684,7 @@ public class CsvReadHandler implements FileMapHandler
 
             if (pendingRow == null)
             {
-               pendingRow = new TeXObjectList();
+               pendingRow = new DataObjectList();
             }
 
             pendingRow.add(pendingCell);
@@ -685,11 +693,11 @@ public class CsvReadHandler implements FileMapHandler
 
          if (pendingRow == null)
          {
-            return new TeXObjectList();
+            return new DataObjectList();
          }
          else
          {
-            TeXObjectList row = pendingRow;
+            DataObjectList row = pendingRow;
             pendingRow = null;
 
             return row;
@@ -750,7 +758,7 @@ public class CsvReadHandler implements FileMapHandler
    IOSettings settings;
    boolean appending = false;
    int rowIdx = 0;
-   TeXObjectList pendingRow = null;
+   DataObjectList pendingRow = null;
    TeXObjectList pendingCell = null;
    TeXObjectList currentStack = null;
    Vector<DataToolHeader> headers;
