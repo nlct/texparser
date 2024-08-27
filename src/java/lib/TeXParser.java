@@ -4644,6 +4644,8 @@ public class TeXParser extends TeXObjectList
 
    private Charset currentInputCharset = null;
 
+   public static final int MAX_TEX_INT = 0x7FFFFFFF;
+
    public static final int DEBUG_IO = 1;
    public static final int DEBUG_POPPED = 2;
    public static final int DEBUG_DECL = 4;
