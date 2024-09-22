@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2023 Nicola L.C. Talbot
+    Copyright (C) 2024 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -23,27 +23,26 @@ import java.io.IOException;
 import com.dickimawbooks.texparserlib.*;
 
 /*
- * A command that simply expands to a floating point number.
+ * A command that simply expands to a long integer.
  */
-public class FloatingPointContentCommand extends TextualContentCommand
- implements TeXNumber
+public class LongContentCommand extends TextualContentCommand implements TeXNumber
 {
-   public FloatingPointContentCommand(String name, double num)
+   public LongContentCommand(String name, long num)
    {
-      this(name, num, false);
+     this(name, num, false);
    }
 
-   public FloatingPointContentCommand(String name, double num, boolean isConstant)
+   public LongContentCommand(String name, long num, boolean isConstant)
    {
-      this(name, ""+num, new TeXFloatingPoint(num), isConstant);
+      this(name, ""+num, new TeXLongNumber(num), isConstant);
    }
 
-   protected FloatingPointContentCommand(String name, String text, TeXFloatingPoint num)
+   protected LongContentCommand(String name, String text, TeXLongNumber num)
    {
       this(name, text, num, false);
    }
 
-   protected FloatingPointContentCommand(String name, String text, TeXFloatingPoint num, boolean isConstant)
+   protected LongContentCommand(String name, String text, TeXLongNumber num, boolean isConstant)
    {
       super(name, text, num);
       this.isConstant = isConstant;
@@ -53,41 +52,36 @@ public class FloatingPointContentCommand extends TextualContentCommand
    public Object clone()
    {
       return isConstant ? this :
-        new FloatingPointContentCommand(getName(), getText(),
-          (TeXFloatingPoint)getNumber().clone());
+        new LongContentCommand(getName(), getText(),
+          (TeXLongNumber)getNumber().clone());
    }
 
    @Override
    public TextualContentCommand duplicate(String newcsname)
    {
-      return new FloatingPointContentCommand(newcsname, getText(),
-         new TeXFloatingPoint(getValue()), false);
+      return new LongContentCommand(newcsname, getText(),
+         new TeXLongNumber(longValue()), false);
    }
 
    @Override
    public int getValue()
    {
-      return getNumber().getValue();
+      return (int)longValue();
    }
 
    @Override
    public long longValue()
    {
-      return (long)doubleValue();
+      return getNumber().getValue();
    }
 
    @Override
    public double doubleValue()
    {
-      return getNumber().doubleValue();
+      return (double)longValue();
    }
 
-   public void setValue(int val)
-   {
-      setValue((double)val);
-   }
-
-   public void setValue(double val)
+   public void setValue(long val)
    {
       if (!isConstant)
       {
@@ -96,9 +90,9 @@ public class FloatingPointContentCommand extends TextualContentCommand
       }
    }
 
-   public TeXFloatingPoint getNumber()
+   public TeXLongNumber getNumber()
    {
-      return (TeXFloatingPoint)data;
+      return (TeXLongNumber)data;
    }
 
    @Override
@@ -113,7 +107,7 @@ public class FloatingPointContentCommand extends TextualContentCommand
       if (!isConstant)
       {
          getNumber().multiply(factor);
-         text = ""+getValue();
+         text = ""+longValue();
       }
    }
 
@@ -123,7 +117,7 @@ public class FloatingPointContentCommand extends TextualContentCommand
       if (!isConstant)
       {
          getNumber().divide(divisor);
-         text = ""+getValue();
+         text = ""+longValue();
       }
    }
 
@@ -139,7 +133,7 @@ public class FloatingPointContentCommand extends TextualContentCommand
       else
       {
          getNumber().advance(parser, increment);
-         text = ""+getValue();
+         text = ""+longValue();
       }
    }
 

@@ -80,6 +80,12 @@ public class DataStringElement extends DataObjectList implements DataElement
    }
 
    @Override
+   public TeXObject getTeXValue(TeXParser parser)
+   {
+      return null;
+   }
+
+   @Override
    public TeXObject getContent(TeXParser parser)
    {
       return toList();

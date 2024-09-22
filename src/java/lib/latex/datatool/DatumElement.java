@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2023 Nicola L.C. Talbot
+    Copyright (C) 2023-2024 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -41,8 +41,16 @@ public class DatumElement extends AbstractTeXObject
    public DatumElement(TeXObject content, TeXNumber number,
       TeXObject currencySymbol, DatumType datumType)
    {
+      this(content, number, number, currencySymbol, datumType);
+   }
+
+   public DatumElement(TeXObject content, TeXNumber number,
+      TeXObject objectValue,
+      TeXObject currencySymbol, DatumType datumType)
+   {
       this.content = content;
       this.number = number;
+      this.objectValue = objectValue;
       this.currencySymbol = currencySymbol;
       this.datumType = datumType;
    }
@@ -55,6 +63,11 @@ public class DatumElement extends AbstractTeXObject
       if (number != null)
       {
          element.number = (TeXNumber)number.clone();
+      }
+
+      if (objectValue != null)
+      {
+         element.objectValue = (TeXObject)objectValue.clone();
       }
 
       if (currencySymbol != null)
@@ -103,6 +116,18 @@ public class DatumElement extends AbstractTeXObject
       return number == null ? 0 : number.getValue();
    }
 
+   @Override
+   public long longValue()
+   {
+      return number == null ? 0 : number.longValue();
+   }
+
+   @Override
+   public TeXObject getTeXValue(TeXParser parser)
+   {
+      return objectValue;
+   }
+
    public Number getNumber()
    {
       if (number == null)
@@ -113,6 +138,11 @@ public class DatumElement extends AbstractTeXObject
       if (datumType == DatumType.INTEGER)
       {
          return Integer.valueOf(number.getValue());
+      }
+
+      if (datumType == DatumType.DATETIME)
+      {
+         return Long.valueOf(number.longValue());
       }
 
       return Double.valueOf(number.doubleValue());
@@ -250,9 +280,9 @@ public class DatumElement extends AbstractTeXObject
          writer.print(content.toString(parser));
          writer.print("}{");
 
-         if (number != null)
+         if (objectValue != null)
          {
-            writer.print(number);
+            writer.print(objectValue.toString(parser));
          }
 
          writer.print("}{");
@@ -286,9 +316,9 @@ public class DatumElement extends AbstractTeXObject
       grp = listener.createGroup();
       stack.add(grp);
 
-      if (number != null)
+      if (objectValue != null)
       {
-         grp.add(number);
+         grp.add((TeXObject)objectValue.clone());
       }
 
       grp = listener.createGroup();
@@ -319,8 +349,8 @@ public class DatumElement extends AbstractTeXObject
    @Override
    public String toString()
    {
-      return String.format("%s[content=%s,number=%s,symbol=%s,type=%s]",
-        getClass().getSimpleName(), content, number, currencySymbol, datumType);
+      return String.format("%s[content=%s,number=%s,objectValue=%s,,symbol=%s,type=%s]",
+        getClass().getSimpleName(), content, number, objectValue, currencySymbol, datumType);
    }
 
    @Override
@@ -332,5 +362,6 @@ public class DatumElement extends AbstractTeXObject
 
    private TeXObject content, currencySymbol;
    private TeXNumber number;
+   private TeXObject objectValue;
    private DatumType datumType;
 }

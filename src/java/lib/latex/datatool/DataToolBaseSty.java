@@ -18,6 +18,7 @@
 */
 package com.dickimawbooks.texparserlib.latex.datatool;
 
+import java.util.Date;
 import java.util.Vector;
 import java.util.regex.Pattern;
 
@@ -25,12 +26,14 @@ import java.io.IOException;
 
 import java.text.DecimalFormat;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 
 import java.math.BigDecimal;
 
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.*;
 import com.dickimawbooks.texparserlib.latex.ifthen.IfThenSty;
+import com.dickimawbooks.texparserlib.latex.latex3.LaTeX3Boolean;
 import com.dickimawbooks.texparserlib.primitives.EndGraf;
 import com.dickimawbooks.texparserlib.primitives.NewIf;
 
@@ -50,6 +53,9 @@ public class DataToolBaseSty extends LaTeXSty
 
       sortCountReg = parser.getSettings().newcount(false, "dtl@sortresult");
       NewIf.createConditional(true, parser, "ifDTLlistskipempty", true);
+
+      registerControlSequence(new LaTeX3Boolean(PARSE_DATETIME_BOOL, false));
+      registerControlSequence(new LaTeX3Boolean(REFORMAT_DATETIME_BOOL, false));
 
       CountRegister reg;
 
@@ -84,6 +90,8 @@ public class DataToolBaseSty extends LaTeXSty
       registerControlSequence(new TextualContentCommand("@dtl@numbergroupchar", ","));
       registerControlSequence(new TextualContentCommand("@dtl@decimal", "."));
 
+      registerControlSequence(new AtFirstOfTwo("DTLtemporalvalue"));
+
       registerControlSequence(
         new NumericFormatter(FMT_INTEGER_VALUE, new DecimalFormat("#,##0"), "."));
 
@@ -92,6 +100,15 @@ public class DataToolBaseSty extends LaTeXSty
 
       registerControlSequence(
         new NumericFormatter(FMT_CURRENCY_VALUE, new DecimalFormat("#,##0.00")));
+
+      registerControlSequence(
+        new DateFormatter(FMT_DATETIME_VALUE, DATE_TIME_FORMAT));
+
+      registerControlSequence(
+        new DateFormatter(FMT_DATE_VALUE, DATE_FORMAT));
+
+      registerControlSequence(
+        new DateFormatter(FMT_TIME_VALUE, TIME_FORMAT));
 
       registerControlSequence(new DTLpadleadingzeros());
       registerControlSequence(new TextualContentCommand(
@@ -227,6 +244,9 @@ public class DataToolBaseSty extends LaTeXSty
       registerControlSequence(new DTLsetup(this));
       registerControlSequence(new DatumMarker());
 
+      registerControlSequence(new DTLparse(this));
+      registerControlSequence(new DTLparse("xDTLparse", true, this));
+
       registerControlSequence(new IntegerContentCommand(
         DatumType.STRING.getCsName(),
         DatumType.STRING.getValue(), true));
@@ -271,6 +291,43 @@ public class DataToolBaseSty extends LaTeXSty
       }
       else if (key.equals("lists"))
       {// TODO
+      }
+      else if (key.equals("datetime"))
+      {
+         if (value == null)
+         {
+            throw new LaTeXSyntaxException(getParser(),
+              LaTeXSyntaxException.ERROR_MISSING_KEY_VALUE,
+              key);
+         }
+
+         String strVal = getParser().expandToString(value, stack).trim();
+
+         if (strVal.equals("false"))
+         {
+            getParser().putControlSequence(true,
+              new LaTeX3Boolean(PARSE_DATETIME_BOOL, false));
+         }
+         else if (strVal.equals("parse-only"))
+         {
+            getParser().putControlSequence(true,
+              new LaTeX3Boolean(PARSE_DATETIME_BOOL, true));
+            getParser().putControlSequence(true,
+              new LaTeX3Boolean(REFORMAT_DATETIME_BOOL, false));
+         }
+         else if (strVal.equals("reformat"))
+         {
+            getParser().putControlSequence(true,
+              new LaTeX3Boolean(PARSE_DATETIME_BOOL, true));
+            getParser().putControlSequence(true,
+              new LaTeX3Boolean(REFORMAT_DATETIME_BOOL, true));
+         }
+         else
+         {
+            throw new LaTeXSyntaxException(getParser(),
+              LaTeXSyntaxException.ERROR_INVALID_OPTION_VALUE,
+              key, strVal);
+         }
       }
       else if (key.equals("utf8") || key.equals("math") 
          || key.equals("locales") || key.equals("nolocale"))
@@ -485,15 +542,21 @@ public class DataToolBaseSty extends LaTeXSty
    public DataElement getElement(TeXObject entry)
      throws IOException
    {
+      boolean useDatum
+        = TeXParserUtils.isTrue(DataToolSty.DB_STORE_DATUM_BOOL, getParser());
+
+      return getElement(entry, useDatum);
+   }
+
+   public DataElement getElement(TeXObject entry, boolean useDatum)
+     throws IOException
+   {
+      TeXParser parser = getListener().getParser();
+
       if (entry instanceof DatumElement)
       {
          return (DatumElement)entry;
       }
-
-      TeXParser parser = getListener().getParser();
-
-      boolean useDatum
-        = TeXParserUtils.isTrue(DataToolSty.DB_STORE_DATUM_BOOL, parser);
 
       if (entry instanceof DataElement)
       {
@@ -515,6 +578,15 @@ public class DataToolBaseSty extends LaTeXSty
                  return new DatumElement(entry,
                     new TeXFloatingPoint(((DataNumericElement)entry).doubleValue()),
                     ((DataElement)entry).getCurrencySymbol(), type);
+               case DATETIME:
+               case TIME:
+                 return new DatumElement(entry,
+                   new TeXFloatingPoint(((DataNumericElement)entry).doubleValue()),
+                   ((DataElement)entry).getTeXValue(parser), type);
+               case DATE:
+                 return new DatumElement(entry,
+                   new TeXLongNumber(((DataNumericElement)entry).longValue()),
+                   ((DataElement)entry).getTeXValue(parser), type);
                default:
                  return new DatumElement(entry);
             }
@@ -525,7 +597,7 @@ public class DataToolBaseSty extends LaTeXSty
          }
       }
 
-      TeXObject original = original = (TeXObject)entry.clone();
+      TeXObject original = (TeXObject)entry.clone();
 
       if (entry instanceof TeXObjectList)
       {
@@ -686,6 +758,14 @@ public class DataToolBaseSty extends LaTeXSty
       {
       }
 
+      if (isParseTemporalOn())
+      {
+         // is it date/time?
+         DataElement elem = parseTemporal(str, entry, useDatum);
+
+         if (elem != null) return elem;
+      }
+
       if (useDatum)
       {
          if (entry.isEmpty())
@@ -708,6 +788,215 @@ public class DataToolBaseSty extends LaTeXSty
          elem.add(entry);
          return elem;
       }
+   }
+
+// TODO needs changing to better mimic datatool-base.sty
+// calculations
+   protected DataElement parseTemporal(String str, TeXObject original, boolean useDatum)
+     throws IOException
+   {
+      TeXParser parser = getParser();
+
+      Date date = null;
+
+      try
+      {
+         ControlSequence cs = parser.getControlSequence(
+           FMT_DATETIME_VALUE);
+
+         if (cs instanceof DateFormatter)
+         {
+            date = ((DateFormatter)cs).parse(str);
+         }
+      }
+      catch (ParseException e)
+      {
+      }
+
+      if (date == null)
+      {
+         try
+         {
+            date = DATE_TIME_FORMAT.parse(str);
+         }
+         catch (ParseException e)
+         {
+         }
+      }
+
+      if (date == null)
+      {
+         try
+         {
+            date = LOCAL_DATE_TIME_FORMAT.parse(str);
+         }
+         catch (ParseException e)
+         {
+         }
+      }
+
+      if (date != null)
+      {
+         double jdt = toJulianDate(date);
+
+         if (useDatum)
+         {
+            TeXNumber texNum = new TeXFloatingPoint(jdt);
+            TeXObjectList valueList = getListener().createStack();
+            valueList.add(new TeXCsRef("DTLtemporalvalue"));
+            valueList.add(TeXParserUtils.createGroup(parser,
+              texNum));
+            valueList.add(getListener().createGroup(str));
+
+            TeXObject content = original;
+
+            if (isReformatTemporalOn())
+            {
+               // TODO
+            }
+
+            return new DatumElement(content, 
+              texNum, valueList, null, DatumType.DATETIME);
+         }
+         else
+         {
+            return new DataDateTimeElement(jdt, original);
+         }
+      }
+
+      // Try parsing for just the date (no time)
+      try
+      {
+         ControlSequence cs = parser.getControlSequence(
+           FMT_DATE_VALUE);
+
+         if (cs instanceof DateFormatter)
+         {
+            date = ((DateFormatter)cs).parse(str);
+         }
+      }
+      catch (ParseException e)
+      {
+      }
+
+      if (date == null)
+      {
+         try
+         {
+            date = DATE_FORMAT.parse(str);
+         }
+         catch (ParseException e)
+         {
+         }
+      }
+
+      if (date != null)
+      {
+         long jd = (long)Math.round(toJulianDate(date));
+
+         if (useDatum)
+         {
+            TeXNumber texNum = new TeXLongNumber(jd);
+            TeXObjectList valueList = getListener().createStack();
+            valueList.add(new TeXCsRef("DTLtemporalvalue"));
+            valueList.add(TeXParserUtils.createGroup(parser,
+              texNum));
+            valueList.add(getListener().createGroup(str));
+
+            return new DatumElement(original, 
+              texNum, valueList, null, DatumType.DATE);
+         }
+         else
+         {
+            return new DataDateElement(jd, original);
+         }
+      }
+
+      // Try parsing just time (no date)
+
+      try
+      {
+         ControlSequence cs = parser.getControlSequence(
+           FMT_TIME_VALUE);
+
+         if (cs instanceof DateFormatter)
+         {
+            date = ((DateFormatter)cs).parse(str);
+         }
+      }
+      catch (ParseException e)
+      {
+      }
+
+      if (date == null)
+      {
+         try
+         {
+            date = TIME_FORMAT.parse(str);
+         }
+         catch (ParseException e)
+         {
+         }
+      }
+
+      if (date != null)
+      {
+         double jt = toJulianDate(date);
+
+         if (useDatum)
+         {
+            TeXNumber texNum = new TeXFloatingPoint(jt);
+            TeXObjectList valueList = getListener().createStack();
+            valueList.add(new TeXCsRef("DTLtemporalvalue"));
+            valueList.add(TeXParserUtils.createGroup(parser,
+              texNum));
+            valueList.add(getListener().createGroup(str));
+
+            return new DatumElement(original, 
+              texNum, valueList, null, DatumType.TIME);
+         }
+         else
+         {
+            return new DataTimeElement(jt, original);
+         }
+      }
+
+      return null;
+   }
+
+   public boolean isParseTemporalOn()
+   {
+      return TeXParserUtils.isTrue(PARSE_DATETIME_BOOL, getParser());
+   }
+
+   public boolean isReformatTemporalOn()
+   {
+      return TeXParserUtils.isTrue(REFORMAT_DATETIME_BOOL, getParser());
+   }
+
+   public double toJulianDate(Date date)
+   {
+      return unixEpochToJulianDate(date.getTime());
+   }
+
+   public static double unixEpochToJulianDate(long time)
+   {
+      return time / 86400.0 + 2440587.5;
+   }
+
+   public static long unixEpochFromJulianDate(long jd)
+   {
+      return unixEpochFromJulianDate((double)jd);
+   }
+
+   public static long unixEpochFromJulianDate(double jdt)
+   {
+      return (long)Math.round((jdt - 2440587.5) * 86400.0);
+   }
+
+   public static String formatDateTime(Number num)
+   {
+      return DATE_TIME_FORMAT.format(unixEpochFromJulianDate(num.doubleValue()));
    }
 
    public boolean isNull(TeXObject object)
@@ -772,6 +1061,24 @@ public class DataToolBaseSty extends LaTeXSty
    public static final String FMT_CURRENCY_VALUE
       = "__texparser_fmt_currency_value:n";
 
+   public static final String FMT_DATETIME_VALUE
+      = "__texparser_fmt_datetime_value:n";
+
+   public static final String FMT_DATE_VALUE
+      = "__texparser_fmt_date_value:n";
+
+   public static final String FMT_TIME_VALUE
+      = "__texparser_fmt_time_value:n";
+
+   static final SimpleDateFormat DATE_TIME_FORMAT
+      = new SimpleDateFormat("y-MM-dd'T'HH:mm:ssX");
+   static final SimpleDateFormat LOCAL_DATE_TIME_FORMAT
+      = new SimpleDateFormat("y-MM-dd'T'HH:mm:ss");
+   static final SimpleDateFormat DATE_FORMAT
+      = new SimpleDateFormat("y-MM-dd");
+   static final SimpleDateFormat TIME_FORMAT
+      = new SimpleDateFormat("HH:mm:ss");
+
    public static final String DATUM_NNNN = "__datatool_datum:nnnn";
 
    /**
@@ -793,6 +1100,9 @@ public class DataToolBaseSty extends LaTeXSty
    public static final String STRING_NULL_CSNAME = "@dtlstringnull";
 
    public static final String DTL_CURRENCY_CSNAME = "@dtl@currency";
+
+   public static final String PARSE_DATETIME_BOOL = "l__datatool_parse_datetime_bool";
+   public static final String REFORMAT_DATETIME_BOOL = "l__datatool_reformat_datetime_bool";
 
    public static final String TMPA_VAR = "l__datatool_tmpa_tl";
    public static final String TMPB_VAR = "l__datatool_tmpb_tl";

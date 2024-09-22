@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013-2023 Nicola L.C. Talbot
+    Copyright (C) 2024 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -19,35 +19,37 @@
 package com.dickimawbooks.texparserlib.latex.datatool;
 
 import java.io.IOException;
+
+import java.util.Date;
 import java.util.Vector;
 
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.*;
 
-public class DataRealElement extends AbstractTeXObject
-  implements DataNumericElement,Expandable
+public class DataDateTimeElement extends AbstractTeXObject
+  implements DataTemporalElement,Expandable
 {
-   public DataRealElement()
+   public DataDateTimeElement()
    {
       this(0.0);
    }
 
-   public DataRealElement(Number num)
+   public DataDateTimeElement(Number num)
    {
       this(num.doubleValue());
    }
 
-   public DataRealElement(TeXNumber num)
+   public DataDateTimeElement(TeXNumber num)
    {
       this(num.doubleValue());
    }
 
-   public DataRealElement(double value)
+   public DataDateTimeElement(double value)
    {
       this.value = value;
    }
 
-   public DataRealElement(double value, TeXObject original)
+   public DataDateTimeElement(double value, TeXObject original)
    {
       this.value = value;
       this.original = original;
@@ -56,7 +58,7 @@ public class DataRealElement extends AbstractTeXObject
    @Override
    public Object clone()
    {
-      return new DataRealElement(value,
+      return new DataDateTimeElement(value,
         original == null ? null : (TeXObject)original.clone());
    }
 
@@ -87,7 +89,35 @@ public class DataRealElement extends AbstractTeXObject
    @Override
    public TeXObject getTeXValue(TeXParser parser)
    {
-      return new TeXFloatingPoint(doubleValue());
+      TeXParserListener listener = parser.getListener();
+
+      TeXObjectList list = listener.createStack();
+
+      list.add(new TeXCsRef("DTLtemporalvalue"));
+
+      Group grp = listener.createGroup();
+      list.add(grp);
+      grp.add(new TeXFloatingPoint(value));
+
+      if (original == null)
+      {
+         String timestamp = DataToolBaseSty.DATE_TIME_FORMAT.format(getDate());
+         list.add(listener.createGroup(timestamp));
+      }
+      else
+      {
+         grp = listener.createGroup();
+         grp.add((TeXObject)original.clone(), true);
+         list.add(grp);
+      }
+
+      return list;
+   }
+
+   @Override
+   public Date getDate()
+   {
+      return new Date(DataToolBaseSty.unixEpochFromJulianDate(value));
    }
 
    @Override
@@ -95,7 +125,8 @@ public class DataRealElement extends AbstractTeXObject
    {
       if (original == null)
       {
-         return new TeXFloatingPoint(doubleValue());
+         return parser.getListener().createString(
+          DataToolBaseSty.DATE_TIME_FORMAT.format(getDate()));
       }
       else
       {
@@ -140,13 +171,13 @@ public class DataRealElement extends AbstractTeXObject
    @Override
    public byte getDataType()
    {
-      return DataToolHeader.TYPE_REAL;
+      return DataToolHeader.TYPE_DATETIME;
    }
 
    @Override
    public DatumType getDatumType()
    {
-      return DatumType.DECIMAL;
+      return DatumType.DATETIME;
    }
 
    @Override
@@ -178,7 +209,7 @@ public class DataRealElement extends AbstractTeXObject
       if (original == null)
       {
          expanded.add(listener.getControlSequence(
-           DataToolBaseSty.FMT_DECIMAL_VALUE));
+           DataToolBaseSty.FMT_DATETIME_VALUE));
          expanded.add(new TeXFloatingPoint(doubleValue()));
       }
       else
@@ -208,7 +239,7 @@ public class DataRealElement extends AbstractTeXObject
    {
       if (original == null)
       {
-         return "" + value;
+         return DataToolBaseSty.DATE_TIME_FORMAT.format(getDate());
       }
       else
       {
@@ -221,7 +252,7 @@ public class DataRealElement extends AbstractTeXObject
    {
       if (original == null)
       {
-         return "" + value;
+         return DataToolBaseSty.DATE_TIME_FORMAT.format(getDate());
       }
       else
       {
@@ -251,7 +282,7 @@ public class DataRealElement extends AbstractTeXObject
          TeXObjectList expanded = listener.createStack();
 
          expanded.add(listener.getControlSequence(
-           DataToolBaseSty.FMT_DECIMAL_VALUE));
+           DataToolBaseSty.FMT_DATETIME_VALUE));
          expanded.add(new TeXFloatingPoint(doubleValue()));
 
          TeXParserUtils.process(expanded, parser, stack);

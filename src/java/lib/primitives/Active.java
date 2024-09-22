@@ -49,6 +49,12 @@ public class Active extends Primitive implements Expandable,TeXNumber
    }
 
    @Override
+   public long longValue()
+   {
+      return value.longValue();
+   }
+
+   @Override
    public double doubleValue()
    {
       return value.doubleValue();

@@ -113,27 +113,7 @@ public class DataToolHeader extends AbstractTeXObject implements TeXObject
 
    public void updateType(DataElement element)
    {
-      byte newType = element.getDataType();
-
-      switch (type)
-      {
-         case UNKNOWN:
-         case INTEGER:
-           setType(newType);
-         break;
-         case DECIMAL:
-           if (newType != TYPE_INT)
-           {
-              setType(newType);
-           }
-         break;
-         case CURRENCY:
-           if (newType == TYPE_STRING)
-           {
-              setType(newType);
-           }
-         break;
-      }
+      setType(DatumType.getDominant(element.getDatumType(), type));
    }
 
    public TeXObject getTitle()
@@ -384,5 +364,8 @@ public class DataToolHeader extends AbstractTeXObject implements TeXObject
    public static final byte TYPE_INT=1;
    public static final byte TYPE_REAL=2;
    public static final byte TYPE_CURRENCY=3;
+   public static final byte TYPE_DATETIME=4;
+   public static final byte TYPE_DATE=5;
+   public static final byte TYPE_TIME=6;
 
 }

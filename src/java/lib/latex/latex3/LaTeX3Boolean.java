@@ -64,6 +64,12 @@ public class LaTeX3Boolean extends Command
    }
 
    @Override
+   public long longValue()
+   {
+      return (long)getValue();
+   }
+
+   @Override
    public double doubleValue()
    {
       return (double)getValue();

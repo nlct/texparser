@@ -131,6 +131,10 @@ public abstract class Action
          {
             action.dataType = DatumType.CURRENCY;
          }
+         else if (typeStr.equals("datetime"))
+         {
+            action.dataType = DatumType.DATETIME;
+         }
          else
          {
             throw new LaTeXSyntaxException(parser, 

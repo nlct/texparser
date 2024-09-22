@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2024 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -18,12 +18,9 @@
 */
 package com.dickimawbooks.texparserlib.latex.datatool;
 
-import com.dickimawbooks.texparserlib.Numerical;
+import java.util.Date;
 
-public interface DataNumericElement extends DataElement,Numerical
+public interface DataTemporalElement extends DataNumericElement
 {
-   public double doubleValue();
-   public float floatValue();
-   public int intValue();
-   public long longValue();
+   public Date getDate();
 }

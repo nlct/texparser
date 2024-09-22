@@ -72,6 +72,12 @@ public class DataIntElement extends UserNumber implements DataNumericElement
    }
 
    @Override
+   public long longValue()
+   {
+      return (long)intValue();
+   }
+
+   @Override
    public double doubleValue()
    {
       return (double)intValue();
@@ -94,6 +100,12 @@ public class DataIntElement extends UserNumber implements DataNumericElement
    {
       super.setValue(newValue);
       original = null;
+   }
+
+   @Override
+   public TeXObject getTeXValue(TeXParser parser)
+   {
+      return new UserNumber(intValue());
    }
 
    @Override

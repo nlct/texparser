@@ -60,6 +60,12 @@ public class CountRegister extends NumericRegister implements TeXNumber
    }
 
    @Override
+   public long longValue()
+   {
+      return (long)value;
+   }
+
+   @Override
    public double doubleValue()
    {
       return (double)value;

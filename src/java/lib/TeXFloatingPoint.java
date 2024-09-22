@@ -76,6 +76,11 @@ public class TeXFloatingPoint extends AbstractTeXObject implements TeXNumber
       return value;
    }
 
+   public long longValue()
+   {
+      return (long)value;
+   }
+
    public void setValue(int newValue)
    {
       value = newValue;
@@ -107,7 +112,14 @@ public class TeXFloatingPoint extends AbstractTeXObject implements TeXNumber
    public void advance(TeXParser parser, Numerical increment)
     throws TeXSyntaxException
    {
-      value += increment.number(parser);
+      if (increment instanceof TeXNumber)
+      {
+         advance((TeXNumber)increment);
+      }
+      else
+      {
+         value += increment.number(parser);
+      }
    }
 
    public void advance(TeXNumber num)

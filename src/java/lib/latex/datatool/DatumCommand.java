@@ -27,9 +27,36 @@ public class DatumCommand extends Command
    public DatumCommand(String name, TeXObject original, 
      Number numValue, TeXObject currencySym, DatumType type)
    {
+      this(name, original, numValue, null, currencySym, type);
+   }
+
+   public DatumCommand(String name, TeXObject original, 
+     Number numValue, TeXObject objValue, TeXObject currencySym, DatumType type)
+   {
       super(name);
       this.original = original;
       this.numValue = numValue;
+
+      if (objValue == null && numValue != null)
+      {
+         switch (type)
+         {
+            case INTEGER:
+               objValue = new UserNumber(numValue.intValue());
+            break;
+            case DATE:
+               objValue = new TeXLongNumber(numValue.longValue());
+            break;
+            default:
+               objValue = new TeXFloatingPoint(numValue.doubleValue());
+            break;
+         }
+      }
+      else
+      {
+         this.objValue = objValue;
+      }
+
       this.currencySym = currencySym;
       this.type = type;
    }
@@ -38,7 +65,8 @@ public class DatumCommand extends Command
    public Object clone()
    {
       return new DatumCommand(getName(), (TeXObject)original.clone(),
-       numValue, currencySym == null ? null : (TeXObject)currencySym.clone(),
+       numValue, objValue == null ? null : (TeXObject)objValue.clone(),
+       currencySym == null ? null : (TeXObject)currencySym.clone(),
        type);
    }
 
@@ -66,7 +94,28 @@ public class DatumCommand extends Command
         DatumType.CURRENCY);
    }
 
-   public static DatumCommand create(String name, DataElement element)
+   public static DatumCommand createDateTime(String name, TeXObject content,
+    double value, TeXObject objValue)
+   {
+      return new DatumCommand(name, content, Double.valueOf(value), objValue, 
+        DatumType.DATETIME);
+   }
+
+   public static DatumCommand createDate(String name, TeXObject content,
+    long value, TeXObject objValue)
+   {
+      return new DatumCommand(name, content, Long.valueOf(value), objValue, 
+        DatumType.DATE);
+   }
+
+   public static DatumCommand createTime(String name, TeXObject content,
+    double value, TeXObject objValue)
+   {
+      return new DatumCommand(name, content, Double.valueOf(value), objValue, 
+        DatumType.TIME);
+   }
+
+   public static DatumCommand create(TeXParser parser, String name, DataElement element)
    {
       DatumType type = element.getDatumType();
 
@@ -92,6 +141,24 @@ public class DatumCommand extends Command
              Double.valueOf(currElem.doubleValue()),
              currElem.getSymbol(), type);
 
+         case DATETIME:
+
+           return new DatumCommand(name, element, 
+             Double.valueOf(((DataNumericElement)element).doubleValue()),
+             element.getTeXValue(parser), type);
+
+         case DATE:
+
+           return new DatumCommand(name, element, 
+             Long.valueOf(((DataNumericElement)element).longValue()),
+             element.getTeXValue(parser), type);
+
+         case TIME:
+
+           return new DatumCommand(name, element, 
+             Double.valueOf(((DataNumericElement)element).doubleValue()),
+             element.getTeXValue(parser), type);
+
          default:
            return new DatumCommand(name, element, null, null, type);
       }
@@ -102,7 +169,7 @@ public class DatumCommand extends Command
    {
       if (contents instanceof DataElement)
       {
-         return create(csname, (DataElement)contents);
+         return create(sty.getParser(), csname, (DataElement)contents);
       }
 
       if (contents.isEmpty())
@@ -110,7 +177,7 @@ public class DatumCommand extends Command
          return new DatumCommand(csname, contents, null, null, DatumType.UNKNOWN);
       }
 
-      return create(csname, sty.getElement(contents));
+      return create(sty.getParser(), csname, sty.getElement(contents));
    }
 
    public static DatumCommand create(DataToolBaseSty sty, String csname, TeXObject contents)
@@ -118,7 +185,7 @@ public class DatumCommand extends Command
    {
       if (contents instanceof DataElement)
       {
-         return create(csname, (DataElement)contents);
+         return create(sty.getParser(), csname, (DataElement)contents);
       }
 
       if (contents.isEmpty())
@@ -126,7 +193,7 @@ public class DatumCommand extends Command
          return new DatumCommand(csname, contents, null, null, DatumType.UNKNOWN);
       }
 
-      return create(csname, sty.getElement(contents));
+      return create(sty.getParser(), csname, sty.getElement(contents));
    }
 
    public TeXObject getOriginal()
@@ -142,6 +209,11 @@ public class DatumCommand extends Command
    public Number getNumericValue()
    {
       return numValue;
+   }
+
+   public TeXObject getTeXValue()
+   {
+      return objValue;
    }
 
    public DatumType getType()
@@ -172,16 +244,9 @@ public class DatumCommand extends Command
 
       grp = listener.createGroup();
 
-      if (numValue != null)
+      if (objValue != null)
       {
-         switch (type)
-         {
-            case INTEGER:
-              grp.add(new UserNumber(numValue.intValue()));
-            break;
-            default:
-              grp.add(new TeXFloatingPoint(numValue.doubleValue()));
-         }
+         grp.add((TeXObject)objValue.clone());
       }
 
       expanded.add(grp);
@@ -227,7 +292,7 @@ public class DatumCommand extends Command
       process(parser, parser);
    }
 
-   protected TeXObject original, currencySym;
+   protected TeXObject original, currencySym, objValue;
    protected Number numValue;
    protected DatumType type;
 }

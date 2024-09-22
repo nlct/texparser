@@ -70,6 +70,12 @@ public class IntegerContentCommand extends TextualContentCommand implements TeXN
    }
 
    @Override
+   public long longValue()
+   {
+      return (long)getValue();
+   }
+
+   @Override
    public double doubleValue()
    {
       return (double)getValue();

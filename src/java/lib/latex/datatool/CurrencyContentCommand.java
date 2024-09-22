@@ -48,6 +48,12 @@ public class CurrencyContentCommand extends Command
    }
 
    @Override
+   public long longValue()
+   {
+      return (long)value;
+   }
+
+   @Override
    public int getValue()
    {
       return (int)value;

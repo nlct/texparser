@@ -4,9 +4,20 @@
 % see https://www.dickimaw-books.com/expl/
 \usepackage{datatool}[=v3.0]
 
-\DTLsetup{store-datum}
+\DTLsetup{store-datum,datetime=parse-only}
 
 \begin{document}
+\DTLparse\mydatum{2000-01-01 18:00:00}\show\mydatum
+\DTLparse\mydatum{2000-01-01 07:00:00+01:00}\show\mydatum
+
+\DTLsettemporaldatum{\mydatum}
+ {29th Aug 2024 10:02 BST}
+ {2024-08-29T10:02:20+01:00}
+\show\mydatum
+
+String value: \mydatum. Numeric value: \DTLdatumvalue{\mydatum}.
+{\renewcommand\DTLtemporalvalue[2]{#2}ISO: \DTLdatumvalue{\mydatum}}.
+
 \DTLread[format=dtltex]{test-data-3}
 
 Last loaded: \dtllastloadeddb.
