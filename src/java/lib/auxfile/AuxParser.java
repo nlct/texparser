@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013-2020 Nicola L.C. Talbot
+    Copyright (C) 2013-2024 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -116,7 +116,7 @@ public class AuxParser extends DefaultTeXParserListener
    {
       super.addPredefined();
 
-      putControlSequence(new Input("@input", Input.NOT_FOUND_ACTION_WARN));
+      putControlSequence(new Input("@input", Input.NOT_FOUND_ACTION_WARN, false));
 
       addAuxCommand("newlabel", 2, labelPrefix);
       addAuxCommand("bibstyle", 1);
@@ -158,6 +158,7 @@ public class AuxParser extends DefaultTeXParserListener
               || cs instanceof AuxIgnoreable 
               || cs instanceof AssignedControlSequence
               || cs instanceof AuxProvideCommand
+              || cs instanceof AuxActionCommand
               || cs instanceof Primitive);
    }
 
