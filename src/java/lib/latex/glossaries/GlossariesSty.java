@@ -1275,6 +1275,8 @@ public class GlossariesSty extends LaTeXSty
         "GlsXtrNoGlsWarningNoOut", "m", def));
 
       registerControlSequence(new GlsXtrNoGlsWarningAutoMake());
+
+      registerControlSequence(new AtGobble("BibGlsOptions"));
    }
 
    protected void addFloatsHook()
