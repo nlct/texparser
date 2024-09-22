@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013-2022 Nicola L.C. Talbot
+    Copyright (C) 2013-2024 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -37,14 +37,20 @@ public class Input extends ControlSequence
 
    public Input(String name, byte notFoundAction)
    {
+      this(name, notFoundAction, true);
+   }
+
+   public Input(String name, byte notFoundAction, boolean tryKpsewhich)
+   {
       super(name);
       this.notFoundAction = notFoundAction;
+      this.tryKpsewhich = tryKpsewhich;
    }
 
    @Override
    public Object clone()
    {
-      return new Input(getName(), notFoundAction);
+      return new Input(getName(), notFoundAction, tryKpsewhich);
    }
 
    @Override
@@ -107,7 +113,10 @@ public class Input extends ControlSequence
       }
       else
       {
-         texPath = new TeXPath(parser, toBasename(parser, arg),
+         String basename = toBasename(parser, arg);
+
+         texPath = new TeXPath(parser, basename,
+           tryKpsewhich && !basename.contains("/"),
            getDefaultExtension());
       }
 
@@ -116,6 +125,7 @@ public class Input extends ControlSequence
       return listener.input(texPath, stack);
   }
 
+  private boolean tryKpsewhich = true;
   private byte notFoundAction=NOT_FOUND_ACTION_ERROR;
 
   public static final byte NOT_FOUND_ACTION_ERROR=0;
