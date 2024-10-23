@@ -807,7 +807,7 @@ public class UserGuideSty extends LaTeXSty
       addSemanticCommand("tablefns", "tablefns", null, null, null, null,
         null, null, false, true, null, null, null, null,
         AlignHStyle.LEFT, AlignVStyle.DEFAULT, 
-        new UserDimension(0.8f, new PercentUnit(PercentUnit.LINE_WIDTH)));
+        new UserDimension(80.0f, new PercentUnit(PercentUnit.LINE_WIDTH)));
 
       // \fnsymtext
       def = listener.createStack();
@@ -1510,11 +1510,11 @@ public class UserGuideSty extends LaTeXSty
         new TeXFontText(TeXFontFamily.VERB, TeXFontSize.SMALL),
         (Color)null, BG_CODE, Color.BLACK, null, null, true, true, 
          null, // left outer margin
-         new UserDimension(0.03, new PercentUnit()), // right outer margin
+         new UserDimension(3.0f, new PercentUnit()), // right outer margin
          new UserDimension(), // top outer margin
          null, // bottom outer margin
          AlignHStyle.DEFAULT, AlignVStyle.TOP, 
-         new UserDimension(0.47, new PercentUnit()));
+         new UserDimension(47.0f, new PercentUnit()));
 
       FrameBox crr = addSemanticCommand("@sidebysideresult", "sidebysideresult",
          null, (Color)null, null, Color.BLACK, null, null, true, true, 
@@ -1523,7 +1523,7 @@ public class UserGuideSty extends LaTeXSty
          new UserDimension(), // top outer margin
          null, // bottom outer margin
          AlignHStyle.DEFAULT, AlignVStyle.TOP, 
-         new UserDimension(0.47, new PercentUnit()));
+         new UserDimension(47.0f, new PercentUnit()));
 
       CodeResult codeResult = new CodeResult(
          new ColourBox("frame@coderesult@title", BorderStyle.NONE,

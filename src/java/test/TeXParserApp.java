@@ -235,6 +235,13 @@ public class TeXParserApp implements TeXApp
          }
       };
 
+      // Try to provide selection of reasonable matching fonts
+      // (generic name will be appended)
+
+      listener.setSerifCssFontNames("\"DejaVu Serif\", \"Liberation Serif\", \"Noto Serif\"");
+      listener.setSansSerifCssFontNames("\"DejaVu Sans\", \"Liberation Sans\", \"Noto Sans\"");
+      listener.setMonospaceCssFontNames("\"DejaVu Mono\", \"Liberation Mono\", \"Noto Sans Mono\"");
+
       listener.setSplitUseBaseNamePrefix(splitUseBaseNamePrefix);
 
       listener.setUseEntities(useHtmlEntities);

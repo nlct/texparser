@@ -22,6 +22,15 @@ import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 import java.io.IOException;
 
+/**
+ * Represents a dimension specified as <em>value</em> <em>unit</em>
+ * such as 2pt. Note that a PercentUnit should have the value
+ * specified as the percentage. For example
+ * <pre>
+ * new UserDimension(50, new PercentUnit(PercentUnit.LINE_WIDTH))
+ * </pre>
+ * This is <code>0.5\linewidth</code>.
+ */
 public class UserDimension extends AbstractTeXObject implements TeXDimension, Expandable
 {
    public UserDimension()
