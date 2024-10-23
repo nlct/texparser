@@ -4076,7 +4076,7 @@ public class L2HConverter extends LaTeXParserListener
       }
       else if (unit instanceof PercentUnit)
       {
-         return String.format("%f%%", value*100);
+         return String.format("%f%%", value);
       }
 
       return String.format("%fpt", unit.toUnit(getParser(), value, TeXUnit.BP));
