@@ -893,6 +893,58 @@ public class L2HConverter extends LaTeXParserListener
       return writer;
    }
 
+   protected String concatNames(String name1, String name2)
+   {
+      if (name1 == null || name1.isEmpty())
+      {
+         return name2;
+      }
+      else
+      {
+         return name1 + ", " + name2;
+      }
+   }
+
+   public void setSerifCssFontNames(String names)
+   {
+      cssSerifFontNames = names;
+   }
+
+   public String getSerifCssFontNames()
+   {
+      return concatNames(cssSerifFontNames, "serif");
+   }
+
+   public void setSansSerifCssFontNames(String names)
+   {
+      cssSansSerifFontNames = names;
+   }
+
+   public String getSansSerifCssFontNames()
+   {
+      return concatNames(cssSansSerifFontNames, "sans-serif");
+   }
+
+   public void setMonospaceCssFontNames(String names)
+   {
+      cssMonoFontNames = names;
+   }
+
+   public String getMonospaceCssFontNames()
+   {
+      return concatNames(cssMonoFontNames, "monospace");
+   }
+
+   public void setCursiveCssFontNames(String names)
+   {
+      cssCursiveFontNames = names;
+   }
+
+   public String getCursiveCssFontNames()
+   {
+      return concatNames(cssCursiveFontNames, "cursive");
+   }
+
    public String getStyle()
    {
       String style = "";
@@ -904,17 +956,17 @@ public class L2HConverter extends LaTeXParserListener
          switch (settings.getCurrentFontFamily())
          {
             case RM:
-               style = "font-family: serif; ";
+               style = "font-family: "+getSerifCssFontNames()+"; ";
                break;
             case SF:
-               style = "font-family: sans-serif; ";
+               style = "font-family: "+getSansSerifCssFontNames()+"; ";
                break;
             case TT:
             case VERB:
-               style = "font-family: monospace; ";
+               style = "font-family: "+getMonospaceCssFontNames()+"; ";
                break;
             case CAL:
-               style = "font-family: cursive; ";
+               style = "font-family: "+getCursiveCssFontNames()+"; ";
                break;
          }
 
@@ -5026,6 +5078,12 @@ public class L2HConverter extends LaTeXParserListener
 
    protected boolean separateCss = false;
    protected File cssFile;
+
+   // CSS font names
+   protected String cssSerifFontNames = "";
+   protected String cssSansSerifFontNames = "";
+   protected String cssMonoFontNames = "";
+   protected String cssCursiveFontNames = "";
 
    private Stack<TrivListDec> trivListStack = new Stack<TrivListDec>();
 

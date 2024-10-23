@@ -20,6 +20,8 @@ package com.dickimawbooks.texparserlib;
 
 import java.awt.Font;
 
+import com.dickimawbooks.texparserlib.html.L2HConverter;
+
 public class TeXFontText
 {
    public TeXFontText()
@@ -276,6 +278,54 @@ public class TeXFontText
       return new Font(name, fontStyle, fontSize);
    }
 
+   protected String getSerifCssFontNames(TeXParserListener listener)
+   {
+      if (listener instanceof L2HConverter)
+      {
+         return ((L2HConverter)listener).getSerifCssFontNames();
+      }
+      else
+      {
+         return "serif";
+      }
+   }
+
+   protected String getSansSerifCssFontNames(TeXParserListener listener)
+   {
+      if (listener instanceof L2HConverter)
+      {
+         return ((L2HConverter)listener).getSansSerifCssFontNames();
+      }
+      else
+      {
+         return "sans-serif";
+      }
+   }
+
+   protected String getMonospaceCssFontNames(TeXParserListener listener)
+   {
+      if (listener instanceof L2HConverter)
+      {
+         return ((L2HConverter)listener).getMonospaceCssFontNames();
+      }
+      else
+      {
+         return "monospace";
+      }
+   }
+
+   protected String getCursiveCssFontNames(TeXParserListener listener)
+   {
+      if (listener instanceof L2HConverter)
+      {
+         return ((L2HConverter)listener).getCursiveCssFontNames();
+      }
+      else
+      {
+         return "cursive";
+      }
+   }
+
    public String getCss(TeXParser parser)
     throws TeXSyntaxException
    {
@@ -286,6 +336,7 @@ public class TeXFontText
       if (family != TeXFontFamily.INHERIT)
       {
          builder.append("font-family:");
+         boolean addSep = false;
 
          if (name != null)
          {
@@ -297,22 +348,36 @@ public class TeXFontText
             {
                builder.append(name);
             }
+
+            addSep = true;
          }
 
          switch (family)
          {
             case RM:
-               builder.append(" serif");
+               if (addSep) builder.append(',');
+
+               builder.append(' ');
+               builder.append(getSerifCssFontNames(parser.getListener()));
             break;
             case SF:
-               builder.append(" sans-serif");
+               if (addSep) builder.append(',');
+
+               builder.append(' ');
+               builder.append(getSansSerifCssFontNames(parser.getListener()));
             break;
             case TT:
             case VERB:
-               builder.append(" monospace");
+               if (addSep) builder.append(',');
+
+               builder.append(' ');
+               builder.append(getMonospaceCssFontNames(parser.getListener()));
             break;
             case CAL:
-               builder.append(" cursive");
+               if (addSep) builder.append(',');
+
+               builder.append(' ');
+               builder.append(getCursiveCssFontNames(parser.getListener()));
             break;
          }
 

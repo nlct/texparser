@@ -47,19 +47,21 @@ public class L2HFontFamilyDeclaration extends FontFamilyDeclaration
    {
       super.process(parser);
 
+      L2HConverter listener = (L2HConverter)parser.getListener();
+
       String spec = "";
       String tag = "span";
 
       switch (getFamily())
       {
          case RM:
-            spec = "font-family: serif; ";
+            spec = "font-family: "+listener.getSerifCssFontNames()+"; ";
          break;
          case SF:
-            spec = "font-family: sans-serif; ";
+            spec = "font-family: "+listener.getSansSerifCssFontNames()+"; ";
          break;
          case TT:
-            spec = "font-family: monospace; ";
+            spec = "font-family: "+listener.getMonospaceCssFontNames()+"; ";
          break;
          case VERB:
             tag = "code";
@@ -68,7 +70,7 @@ public class L2HFontFamilyDeclaration extends FontFamilyDeclaration
 
       if (spec.isEmpty())
       {
-         parser.getListener().getWriteable().writeliteral(String.format("<%s>", tag));
+         listener.writeliteral(String.format("<%s>", tag));
       }
       else
       {
