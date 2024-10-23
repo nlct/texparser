@@ -74,7 +74,7 @@ public class Twemoji extends Command
 
       String id = popLabelString(parser, stack);
 
-      return parser.getListener().createString(id);
+      return parser.getListener().createString(getSequence(id));
    }
 
    @Override
