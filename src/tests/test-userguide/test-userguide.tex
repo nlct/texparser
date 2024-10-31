@@ -412,6 +412,15 @@ A counter:
 
 \section{Section About \stytext{foobarsty}}
 
+In the following, the referenced command won't be indexed (but will
+have a hyperlink):
+\begin{codebox}
+\cmd{renewcommand}\marg{\gls{fooname}}\marg{foooo}
+\end{codebox}
+The above has a common command (\csfmt{renewcommand}) that doesn't
+need to be indexed or defined as well as a command provided by the
+package that's being described.
+
 \gls{foobarcs} is defined as:
 \begin{compactcodebox}
 \comment{a comment}
@@ -439,6 +448,15 @@ Side-by-side:
 \tcblower
 \emph{text}
 \end{coderesult}
+
+In the following, the referenced command will be indexed and will
+have a hyperlink:
+\begin{codebox*}
+\cmd{renewcommand}\marg{\gls{fooname}}\marg{foooo}
+\end{codebox*}
+The above has a common command (\csfmt{renewcommand}) that doesn't
+need to be indexed or defined as well as a command provided by the
+package that's being described.
 
 \subsection{Example 1}
 \label{sec:ex1}

@@ -262,6 +262,10 @@ public class L2HConverter extends LaTeXParserListener
 
       putControlSequence(new AtGobble("discretionary", 3));
 
+      // Treat newpage and clearpage as par
+      putControlSequence(new ParCs("newpage"));
+      putControlSequence(new ParCs("clearpage"));
+
       /* Ignore fontspec commands to set the main, sans and mono
        fonts. The CSS should ideally be customised as applicable.
        */
@@ -507,6 +511,13 @@ public class L2HConverter extends LaTeXParserListener
    public Par getPar()
    {
       return new L2HPar();
+   }
+
+   @Override
+   public Eol getEol()
+   {
+      // retain new lines in HTML
+      return new Eol(true);
    }
 
    public void addDocumentBlockTypeListener(DocumentBlockTypeListener listener)

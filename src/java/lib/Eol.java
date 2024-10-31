@@ -24,12 +24,23 @@ public class Eol extends WhiteSpace
 {
    public Eol()
    {
-      this(String.format("%n"));
+      this(false, String.format("%n"));
    }
 
    public Eol(String eol)
    {
+      this(false, eol);
+   }
+
+   public Eol(boolean obey, String eol)
+   {
       setEol(eol);
+      this.obey = obey;
+   }
+
+   public Eol(boolean obey)
+   {
+      this(obey, String.format("%n"));
    }
 
    public void setEol(String eol)
@@ -51,7 +62,7 @@ public class Eol extends WhiteSpace
    @Override
    public String toString()
    {
-      return eol;
+      return String.format("%s%s", getClass().getSimpleName(), format());
    }
 
    @Override
@@ -63,14 +74,20 @@ public class Eol extends WhiteSpace
    @Override
    public Object clone()
    {
-      return new Eol(eol);
+      return new Eol(obey, eol);
    }
 
    @Override
    public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      if (parser.getSettings().getFontFamily() == TeXFontFamily.VERB)
+      if (parser.isDebugMode(TeXParser.DEBUG_PROCESSING))
+      {
+         parser.logMessage("PROCESSING "+toString()
+          +" obey="+obey+" font family: "+parser.getSettings().getFontFamily());
+      }
+
+      if (obey || parser.getSettings().getFontFamily() == TeXFontFamily.VERB)
       {
           parser.getListener().getWriteable().write(eol);
       }
@@ -81,5 +98,6 @@ public class Eol extends WhiteSpace
    }
 
    private String eol;
+   protected boolean obey = false;
 }
 
