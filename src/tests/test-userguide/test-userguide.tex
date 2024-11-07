@@ -19,6 +19,7 @@
  ]
 {nlctuserguide}
 
+\newcommand{\samplecomment}{\comment{sample command}}
 
 \renewcommand*{\thispackagename}{foobarsty}
 
@@ -424,7 +425,9 @@ package that's being described.
 \gls{foobarcs} is defined as:
 \begin{compactcodebox}
 \comment{a comment}
-\cmd{newcommand}\marg{\gls{foobarcs}}\oarg{1}\marg{\cmd{emph}\marg{\#1}}
+\cmd{newcommand}\marg{\gls{foobarcs}}\oarg{1}\marg{\samplecomment
+ \cmd{emph}\marg{\#1}\comment{}
+}
 \end{compactcodebox}
 Plus modifier: \sty+{foobarsty}.
 Star modifier: \sty*{foobarsty}.

@@ -171,7 +171,11 @@ public class UserGuideSty extends LaTeXSty
         listener.getOther('\\'), null);
       registerControlSequence(new InlineCode());
 
-      addSemanticCommand("comment", FG_COMMENT, listener.createString("% "));
+      addSemanticCommand("code@comment", "comment",
+        null, FG_COMMENT, listener.createString("% "), null);
+
+      registerControlSequence(new CodeComment());
+
       addSemanticCommand("csfmt", TeXFontFamily.VERB, FG_CS, 
         listener.getOther('\\'), null);
       addSemanticCommand("csfmtfont", TeXFontFamily.TT);
