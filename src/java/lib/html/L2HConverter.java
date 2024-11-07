@@ -4702,6 +4702,22 @@ public class L2HConverter extends LaTeXParserListener
       writeToTopLink(stack);
    }
 
+   public void endSection()
+    throws IOException
+   {
+      if (currentSection != null)
+      {
+         endParagraph();
+
+         writeln();
+         writeEndHtml5OrDiv("section", false);
+         writeliteral(String.format("<!-- end of section %s -->%n", currentSection));
+         currentSection = null;
+
+         setCurrentBlockType(DocumentBlockType.BODY);
+      }
+   }
+
    public void startPhantomSection(String name, String id, TeXObjectList stack)
     throws IOException
    {

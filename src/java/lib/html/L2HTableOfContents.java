@@ -50,8 +50,6 @@ public class L2HTableOfContents extends ControlSequence
    {
       L2HConverter listener = (L2HConverter)parser.getListener();
 
-      listener.setCurrentBlockType(DocumentBlockType.BLOCK);
-
       int level = -1;
       CountRegister reg;
 

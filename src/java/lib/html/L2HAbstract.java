@@ -120,7 +120,7 @@ public class L2HAbstract extends AbstractDec
          listener.writeliteral(
           String.format("</div><!-- end of %s -->%n", getName()));
 
-         listener.setCurrentBlockType(DocumentBlockType.BODY);
+         listener.endSection();
       }
 
    }

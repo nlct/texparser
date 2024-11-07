@@ -36,18 +36,18 @@ bar}
 \begin{document}
 \maketitle
 
-\tableofcontents
-
 \begin{abstract}
 \lipsum[1]
 \end{abstract}
 
-Token register contents: \the\mytoks.
-\longfoo{test paragraph insert}.\marginpar{A marginal note.}
-This paragraph has a marginal note.
+\tableofcontents
 
 \section*{An Unnumbered Section}
 \addcontentsline{toc}{section}{An Unnumbered Section}
+
+Token register contents: \the\mytoks.
+\longfoo{test paragraph insert}.\marginpar{A marginal note.}
+This paragraph has a marginal note.
 
 Chars: \symbol{98}, \texttt{\char98}, \texttt{\char`b}, \texttt{\char'142},
 \texttt{\char"62}, \texttt{\char`\b}, \texttt{\char`\\ foo}.
