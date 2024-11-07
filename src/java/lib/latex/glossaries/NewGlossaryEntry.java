@@ -89,7 +89,8 @@ public class NewGlossaryEntry extends AbstractGlsCommand
                   name = (TeXObject)parentName.clone();
                }
 
-               keyValList.put("parent", new GlsLabel("@@parent@label", entry));
+               keyValList.put("parent",
+                 new GlsLabel("@@parent@label", entry.getLabel(), entry));
             }
          }
 

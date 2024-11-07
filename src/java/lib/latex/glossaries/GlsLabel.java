@@ -30,6 +30,7 @@ public class GlsLabel extends TextualContentCommand
       this("glslabel", entry.getLabel(), entry);
    }
 
+   @Deprecated
    public GlsLabel(String label, GlossaryEntry entry)
    {
       this("glslabel", label, entry);

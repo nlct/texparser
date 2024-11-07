@@ -533,7 +533,7 @@ public class GlossaryEntry
       }
 
       level = entry.getLevel()+1;
-      setField("parent", new GlsLabel("@@parent@label", entry), stack);
+      setField("parent", new GlsLabel("@@parent@label", entry.getLabel(), entry), stack);
 
       return entry;
    }

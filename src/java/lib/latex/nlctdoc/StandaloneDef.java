@@ -369,7 +369,7 @@ parser.logMessage("STANDALONE STARTING GROUP");
                      modEntries = new Vector<GlsLabel>();
                   }
 
-                  modEntries.add(new GlsLabel("glslabelmod", altEntry));
+                  modEntries.add(new GlsLabel("glslabelmod", altEntry.getLabel(), altEntry));
                }
             }
          }
