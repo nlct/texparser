@@ -752,6 +752,8 @@ public class GlossariesSty extends LaTeXSty
          "abbreviationname", "Abbreviations"));
 
       registerControlSequence(new GlossEntryField("glossentrynameother", this));
+      registerControlSequence(new GlossEntryField("Glossentrynameother",
+        CaseChange.SENTENCE, this));
 
       registerControlSequence(new GlsAddStorageKey("glsxtrprovidestoragekey",
         Overwrite.SKIP, this));

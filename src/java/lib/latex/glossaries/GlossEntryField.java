@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2022 Nicola L.C. Talbot
+    Copyright (C) 2022-2024 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -33,6 +33,11 @@ public class GlossEntryField extends GlsEntryField
    public GlossEntryField(String name, GlossariesSty sty)
    {
       this(name, null, CaseChange.NO_CHANGE, sty);
+   }
+
+   public GlossEntryField(String name, CaseChange caseChange, GlossariesSty sty)
+   {
+      this(name, null, caseChange, sty);
    }
 
    public GlossEntryField(String name, String field, CaseChange caseChange, GlossariesSty sty)

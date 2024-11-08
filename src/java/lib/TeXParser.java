@@ -4663,6 +4663,6 @@ public class TeXParser extends TeXObjectList
    public static final int DEBUG_READ = 32768;
    public static final int DEBUG_SETTINGS = 65536;
 
-   public static final String VERSION = "0.9.9b-20241107";
-   public static final String VERSION_DATE = "2024-11-07";
+   public static final String VERSION = "0.9.9b-20241108";
+   public static final String VERSION_DATE = "2024-11-08";
 }

@@ -84,7 +84,7 @@ public class GlsXtrGlossEntryOther extends AbstractGlsCommand
 
       content.add(glslabel);
 
-      content.add(listener.getControlSequence("GlsXtrStandaloneEntryHeadOther"));
+      content.add(listener.getControlSequence("GlsXtrStandaloneEntryOther"));
       content.add(glslabel);
       content.add(listener.createGroup(field));
 

@@ -100,9 +100,19 @@ public class InlineGlsDef extends AbstractGlsCommand
 
       if (caseChange == CaseChange.SENTENCE)
       {
+
          content.add(listener.getControlSequence("let"));
-         content.add(new TeXCsRef("glossentryname"));
-         content.add(listener.getControlSequence("Glossentryname"));
+
+         if (field == null)
+         {
+            content.add(new TeXCsRef("glossentryname"));
+            content.add(listener.getControlSequence("Glossentryname"));
+         }
+         else
+         {
+            content.add(new TeXCsRef("glossentrynameother"));
+            content.add(listener.getControlSequence("Glossentrynameother"));
+         }
       }
 
       content.add(listener.getControlSequence("glsadd"));
