@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2022 Nicola L.C. Talbot
+    Copyright (C) 2022-2024 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -27,18 +27,19 @@ public class GlsXtrStandaloneEntryHeadOther extends AbstractGlsCommand
 {
    public GlsXtrStandaloneEntryHeadOther(GlossariesSty sty)
    {
-      this("GlsXtrStandaloneEntryHeadOther", sty);
+      this("GlsXtrStandaloneEntryHeadOther", CaseChange.NO_CHANGE, sty);
    }
 
-   public GlsXtrStandaloneEntryHeadOther(String name, GlossariesSty sty)
+   public GlsXtrStandaloneEntryHeadOther(String name, CaseChange caseChange, GlossariesSty sty)
    {
       super(name, sty);
+      this.caseChange = caseChange;
    }
 
    @Override
    public Object clone()
    {
-      return new GlsXtrStandaloneEntryHeadOther(getName(), getSty());
+      return new GlsXtrStandaloneEntryHeadOther(getName(), caseChange, getSty());
    }
 
    @Override
@@ -62,11 +63,30 @@ public class GlsXtrStandaloneEntryHeadOther extends AbstractGlsCommand
       GlsLabel glslabel = popEntryLabel(parser, stack);
       String field = popLabelString(parser, stack);
 
-      ControlSequence cs = parser.getControlSequence("glsxtrhead"+field);
+      String csname;
+
+      if (caseChange == CaseChange.SENTENCE)
+      {
+         csname = "Glsxtrhead"+field;
+      }
+      else
+      {
+         csname = "glsxtrhead"+field;
+      }
+
+      ControlSequence cs = parser.getControlSequence(csname);
 
       if (cs == null)
       {
-         content.add(listener.getControlSequence("@gls@entry@field"));
+         if (caseChange == CaseChange.SENTENCE)
+         {
+            content.add(listener.getControlSequence("@Gls@entry@field"));
+         }
+         else
+         {
+            content.add(listener.getControlSequence("@gls@entry@field"));
+         }
+
          content.add(glslabel);
          content.add(listener.createGroup(field));
       }
@@ -84,4 +104,6 @@ public class GlsXtrStandaloneEntryHeadOther extends AbstractGlsCommand
    {
       process(parser, parser);
    }
+
+   private CaseChange caseChange = CaseChange.NO_CHANGE;
 }

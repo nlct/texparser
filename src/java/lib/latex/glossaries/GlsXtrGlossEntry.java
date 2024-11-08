@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2022 Nicola L.C. Talbot
+    Copyright (C) 2022-2024 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -27,18 +27,19 @@ public class GlsXtrGlossEntry extends AbstractGlsCommand
 {
    public GlsXtrGlossEntry(GlossariesSty sty)
    {
-      this("glsxtrglossentry", sty);
+      this("glsxtrglossentry", CaseChange.NO_CHANGE, sty);
    }
 
-   public GlsXtrGlossEntry(String name, GlossariesSty sty)
+   public GlsXtrGlossEntry(String name, CaseChange caseChange, GlossariesSty sty)
    {
       super(name, sty);
+      this.caseChange = caseChange;
    }
 
    @Override
    public Object clone()
    {
-      return new GlsXtrGlossEntry(getName(), getSty());
+      return new GlsXtrGlossEntry(getName(), caseChange, getSty());
    }
 
    @Override
@@ -82,7 +83,15 @@ public class GlsXtrGlossEntry extends AbstractGlsCommand
 
       content.add(glslabel);
 
-      content.add(listener.getControlSequence("GlsXtrStandaloneEntryName"));
+      if (caseChange == CaseChange.SENTENCE)
+      {
+         content.add(listener.getControlSequence("GlsXtrStandaloneEntryNameFirstUc"));
+      }
+      else
+      {
+         content.add(listener.getControlSequence("GlsXtrStandaloneEntryName"));
+      }
+
       content.add(glslabel);
 
       TeXParserUtils.process(content, parser, stack);
@@ -95,4 +104,6 @@ public class GlsXtrGlossEntry extends AbstractGlsCommand
    {
       process(parser, parser);
    }
+
+   private CaseChange caseChange = CaseChange.NO_CHANGE;
 }

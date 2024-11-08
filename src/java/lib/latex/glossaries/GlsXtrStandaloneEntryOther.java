@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2022 Nicola L.C. Talbot
+    Copyright (C) 2022-2024 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -27,18 +27,19 @@ public class GlsXtrStandaloneEntryOther extends AbstractGlsCommand
 {
    public GlsXtrStandaloneEntryOther(GlossariesSty sty)
    {
-      this("GlsXtrStandaloneEntryOther", sty);
+      this("GlsXtrStandaloneEntryOther", CaseChange.NO_CHANGE, sty);
    }
 
-   public GlsXtrStandaloneEntryOther(String name, GlossariesSty sty)
+   public GlsXtrStandaloneEntryOther(String name, CaseChange caseChange, GlossariesSty sty)
    {
       super(name, sty);
+      this.caseChange = caseChange;
    }
 
    @Override
    public Object clone()
    {
-      return new GlsXtrStandaloneEntryOther(getName(), getSty());
+      return new GlsXtrStandaloneEntryOther(getName(), caseChange, getSty());
    }
 
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
@@ -56,11 +57,20 @@ public class GlsXtrStandaloneEntryOther extends AbstractGlsCommand
       Group grp = listener.createGroup();
       content.add(grp);
 
-      grp.add(listener.getControlSequence("glossentrynameother"));
+      if (caseChange == CaseChange.SENTENCE)
+      {
+         grp.add(listener.getControlSequence("Glossentrynameother"));
+      }
+      else
+      {
+         grp.add(listener.getControlSequence("glossentrynameother"));
+      }
+
       grp.add(glslabel);
       grp.add(listener.createGroup(fieldLabel));
 
       return content;
    }
 
+   private CaseChange caseChange = CaseChange.NO_CHANGE;
 }

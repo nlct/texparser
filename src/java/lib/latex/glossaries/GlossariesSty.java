@@ -1170,19 +1170,40 @@ public class GlossariesSty extends LaTeXSty
 
       registerControlSequence(new GlsXtrGlossEntry(this));
       registerControlSequence(new AtGlsXtrGlossEntry(this));
+
+      registerControlSequence(
+       new GlsXtrGlossEntry("Glsxtrglossentry", CaseChange.SENTENCE, this));
+      registerControlSequence(
+       new AtGlsXtrGlossEntry("@Glsxtrglossentry", CaseChange.SENTENCE, this));
+
       registerControlSequence(new GlsXtrStandaloneEntryName(this));
       registerControlSequence(new GenericCommand(true,
         "GlsXtrStandaloneGlossaryType", null, 
         TeXParserUtils.createStack(getListener(), new TeXCsRef("glsentrytype"),
           new TeXCsRef("glscurrententrylabel"))));
+
       registerControlSequence(new LaTeXGenericCommand(true,
         "GlsXtrStandaloneEntryHeadName", "m", 
         TeXParserUtils.createStack(getListener(), new TeXCsRef("glsentryname"),
           getListener().getParam(1))));
+
+      registerControlSequence(new LaTeXGenericCommand(true,
+        "GlsXtrStandaloneEntryHeadNameFirstUc", "m", 
+        TeXParserUtils.createStack(getListener(), new TeXCsRef("Glsentryname"),
+          getListener().getParam(1))));
+
       registerControlSequence(new GlsXtrStandaloneSubEntryItem(this));
+
       registerControlSequence(new GlsXtrStandaloneEntryOther(this));
       registerControlSequence(new GlsXtrGlossEntryOther(this));
       registerControlSequence(new GlsXtrStandaloneEntryHeadOther(this));
+
+      registerControlSequence(new GlsXtrStandaloneEntryOther(
+        "GlsXtrStandaloneEntryOtherFirstUc", CaseChange.SENTENCE, this));
+      registerControlSequence(new GlsXtrGlossEntryOther(
+        "Glsxtrglossentryother", CaseChange.SENTENCE, this));
+      registerControlSequence(new GlsXtrStandaloneEntryHeadOther(
+         "GlsXtrStandaloneEntryHeadOtherFirstUc", CaseChange.SENTENCE, this));
 
       registerControlSequence(new TextualContentCommand("glsxtrtitleopts",
         "noindex,hyper=false"));

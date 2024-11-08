@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2022 Nicola L.C. Talbot
+    Copyright (C) 2022-2024 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -27,18 +27,19 @@ public class AtGlsXtrGlossEntry extends AbstractGlsCommand
 {
    public AtGlsXtrGlossEntry(GlossariesSty sty)
    {
-      this("@glsxtrglossentry", sty);
+      this("@glsxtrglossentry", CaseChange.NO_CHANGE, sty);
    }
 
-   public AtGlsXtrGlossEntry(String name, GlossariesSty sty)
+   public AtGlsXtrGlossEntry(String name, CaseChange caseChange, GlossariesSty sty)
    {
       super(name, sty);
+      this.caseChange = caseChange;
    }
 
    @Override
    public Object clone()
    {
-      return new AtGlsXtrGlossEntry(getName(), getSty());
+      return new AtGlsXtrGlossEntry(getName(), caseChange, getSty());
    }
 
    @Override
@@ -61,7 +62,15 @@ public class AtGlsXtrGlossEntry extends AbstractGlsCommand
 
       GlsLabel glslabel = popEntryLabel(parser, stack);
 
-      content.add(listener.getControlSequence("GlsXtrStandaloneEntryHeadName"));
+      if (caseChange == CaseChange.SENTENCE)
+      {
+         content.add(listener.getControlSequence("GlsXtrStandaloneEntryHeadNameFirstUc"));
+      }
+      else
+      {
+         content.add(listener.getControlSequence("GlsXtrStandaloneEntryHeadName"));
+      }
+
       content.add(glslabel);
 
       TeXParserUtils.process(content, parser, stack);
@@ -72,4 +81,6 @@ public class AtGlsXtrGlossEntry extends AbstractGlsCommand
    {
       process(parser, parser);
    }
+
+   private CaseChange caseChange = CaseChange.NO_CHANGE;
 }
