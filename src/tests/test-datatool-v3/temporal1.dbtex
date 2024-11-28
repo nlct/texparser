@@ -1,0 +1,39 @@
+% DBTEX 3.0 utf8
+% Created by datatool 2024/03/07 v3.0 (NLCT) on September 4, 2024
+\DTLdbProvideData{temporal1}%
+\DTLreconstructdatabase
+{2}{3}
+{% Header
+\dtldbheaderreconstruct{1}{Date}{5}{Date}%
+\dtldbheaderreconstruct{2}{Time}{6}{Time}%
+\dtldbheaderreconstruct{3}{Timestamp}{4}{Timestamp}%
+}% End of Header
+{% Content
+% Row 1
+\dtldbrowreconstruct{1}%
+{% Row 1 Content
+  \dtldbcolreconstruct{1}% Column 1
+  {\dtldbdatumreconstruct{\DataToolDateFmt {2024}{08}{31}{5}}{2460554}{}{5}}%
+  \dtldbcolreconstruct{2}% Column 2
+  {\dtldbdatumreconstruct{\DataToolTimeFmt {06}{00}{00}}{-0.25}{}{6}}%
+  \dtldbcolreconstruct{3}% Column 3
+  {\dtldbdatumreconstruct{\DataToolTimeStampFmt
+{{2024}{08}{31}{5}}{{06}{00}{00}}{{+00}{00}}}{2460553.75}{}{4}}%
+}%
+% Row 2
+\dtldbrowreconstruct{2}%
+{% Row 2 Content
+  \dtldbcolreconstruct{1}% Column 1
+  {\dtldbdatumreconstruct{\DataToolDateFmt {2024}{09}{01}{6}}{2460555}{}{5}}%
+  \dtldbcolreconstruct{2}% Column 2
+  {\dtldbdatumreconstruct{\DataToolTimeFmt {18}{00}{00}}{0.25}{}{6}}%
+  \dtldbcolreconstruct{3}% Column 3
+  {\dtldbdatumreconstruct{\DataToolTimeStampFmt
+{{2024}{09}{01}{6}}{{18}{00}{00}}{{+01}{00}}}{2460555.208333333}{}{4}}%
+}%
+}% End of Content
+{% Key to index
+\dtldbreconstructkeyindex{Date}{1}%
+\dtldbreconstructkeyindex{Time}{2}%
+\dtldbreconstructkeyindex{Timestamp}{3}%
+}% End of key to index

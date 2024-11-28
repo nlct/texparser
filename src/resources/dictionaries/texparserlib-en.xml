@@ -140,6 +140,7 @@
 <entry key="datatool.row.not.found">Row index ''{0}'' doesn''t exist.</entry>
 <entry key="datatool.loaddb.message">Database ''{0}'' loaded from ''{1}'' (column count={2}, row count={3}).</entry>
 <entry key="datatool.index.outofrange">Index ''{0}'' out of range.</entry>
+<entry key="datatool.invalid.datetime">Invalid date/time format ''{0}''</entry>
 <entry key="datatool.no.columns">No columns available for database ''{0}''</entry>
 <entry key="datatool.file_info">Identified file format {0} version {1} (encoding {2})</entry>
 <entry key="datatool.file_info_failed">Failed to parse file identifier on first line of file {0} (assuming {1})</entry>

@@ -116,6 +116,14 @@ public class DataToolBaseSty extends LaTeXSty
       registerControlSequence(new TextualContentCommand(
         "dtlpadleadingzerosplus", ""));
 
+      registerControlSequence(new DataToolDateFmt());
+      registerControlSequence(new DataToolTimeFmt());
+      registerControlSequence(new DTLformattimezone());
+      registerControlSequence(new TextualContentCommand(
+        "DTLformattimestampsep", " "));
+
+      registerControlSequence(new DataToolTimeStampFmt());
+
       // Currency
 
       addCurrencySymbol("$");
@@ -243,6 +251,10 @@ public class DataToolBaseSty extends LaTeXSty
 
       registerControlSequence(new DTLsetup(this));
       registerControlSequence(new DatumMarker());
+      registerControlSequence(new AtNumberOfNumber("datatool_datum_value:Nnnnn", 3, 5));
+
+      registerControlSequence(new DTLdatumvalue(this));
+      registerControlSequence(new DTLsettemporaldatum(this));
 
       registerControlSequence(new DTLparse(this));
       registerControlSequence(new DTLparse("xDTLparse", true, this));
@@ -696,6 +708,14 @@ public class DataToolBaseSty extends LaTeXSty
          }
       }
 
+      if (isParseTemporalOn())
+      {
+         // is it date/time?
+         DataElement elem = parseTemporal(str, entry, useDatum);
+
+         if (elem != null) return elem;
+      }
+
       // is it an integer?
 
       try
@@ -758,14 +778,6 @@ public class DataToolBaseSty extends LaTeXSty
       {
       }
 
-      if (isParseTemporalOn())
-      {
-         // is it date/time?
-         DataElement elem = parseTemporal(str, entry, useDatum);
-
-         if (elem != null) return elem;
-      }
-
       if (useDatum)
       {
          if (entry.isEmpty())
@@ -790,178 +802,28 @@ public class DataToolBaseSty extends LaTeXSty
       }
    }
 
-// TODO needs changing to better mimic datatool-base.sty
-// calculations
-   protected DataElement parseTemporal(String str, TeXObject original, boolean useDatum)
+   protected DataElement parseTemporal(String str, TeXObject original,
+       boolean useDatum)
      throws IOException
    {
-      TeXParser parser = getParser();
+      return parseTemporal(str, original, useDatum, isReformatTemporalOn());
+   }
 
-      Date date = null;
-
+   protected DataElement parseTemporal(String str, TeXObject original,
+      boolean useDatum, boolean reformatOriginal)
+     throws IOException
+   {
       try
       {
-         ControlSequence cs = parser.getControlSequence(
-           FMT_DATETIME_VALUE);
+         Julian julian = Julian.create(str);
 
-         if (cs instanceof DateFormatter)
-         {
-            date = ((DateFormatter)cs).parse(str);
-         }
+         return julian.toDataElement(getListener(), original,
+           useDatum, reformatOriginal);
       }
-      catch (ParseException e)
+      catch (IllegalArgumentException e)
       {
+         return null;
       }
-
-      if (date == null)
-      {
-         try
-         {
-            date = DATE_TIME_FORMAT.parse(str);
-         }
-         catch (ParseException e)
-         {
-         }
-      }
-
-      if (date == null)
-      {
-         try
-         {
-            date = LOCAL_DATE_TIME_FORMAT.parse(str);
-         }
-         catch (ParseException e)
-         {
-         }
-      }
-
-      if (date != null)
-      {
-         double jdt = toJulianDate(date);
-
-         if (useDatum)
-         {
-            TeXNumber texNum = new TeXFloatingPoint(jdt);
-            TeXObjectList valueList = getListener().createStack();
-            valueList.add(new TeXCsRef("DTLtemporalvalue"));
-            valueList.add(TeXParserUtils.createGroup(parser,
-              texNum));
-            valueList.add(getListener().createGroup(str));
-
-            TeXObject content = original;
-
-            if (isReformatTemporalOn())
-            {
-               // TODO
-            }
-
-            return new DatumElement(content, 
-              texNum, valueList, null, DatumType.DATETIME);
-         }
-         else
-         {
-            return new DataDateTimeElement(jdt, original);
-         }
-      }
-
-      // Try parsing for just the date (no time)
-      try
-      {
-         ControlSequence cs = parser.getControlSequence(
-           FMT_DATE_VALUE);
-
-         if (cs instanceof DateFormatter)
-         {
-            date = ((DateFormatter)cs).parse(str);
-         }
-      }
-      catch (ParseException e)
-      {
-      }
-
-      if (date == null)
-      {
-         try
-         {
-            date = DATE_FORMAT.parse(str);
-         }
-         catch (ParseException e)
-         {
-         }
-      }
-
-      if (date != null)
-      {
-         long jd = (long)Math.round(toJulianDate(date));
-
-         if (useDatum)
-         {
-            TeXNumber texNum = new TeXLongNumber(jd);
-            TeXObjectList valueList = getListener().createStack();
-            valueList.add(new TeXCsRef("DTLtemporalvalue"));
-            valueList.add(TeXParserUtils.createGroup(parser,
-              texNum));
-            valueList.add(getListener().createGroup(str));
-
-            return new DatumElement(original, 
-              texNum, valueList, null, DatumType.DATE);
-         }
-         else
-         {
-            return new DataDateElement(jd, original);
-         }
-      }
-
-      // Try parsing just time (no date)
-
-      try
-      {
-         ControlSequence cs = parser.getControlSequence(
-           FMT_TIME_VALUE);
-
-         if (cs instanceof DateFormatter)
-         {
-            date = ((DateFormatter)cs).parse(str);
-         }
-      }
-      catch (ParseException e)
-      {
-      }
-
-      if (date == null)
-      {
-         try
-         {
-            date = TIME_FORMAT.parse(str);
-         }
-         catch (ParseException e)
-         {
-         }
-      }
-
-      if (date != null)
-      {
-         double jt = toJulianDate(date);
-
-         if (useDatum)
-         {
-            TeXNumber texNum = new TeXFloatingPoint(jt);
-            TeXObjectList valueList = getListener().createStack();
-            valueList.add(new TeXCsRef("DTLtemporalvalue"));
-            valueList.add(TeXParserUtils.createGroup(parser,
-              texNum));
-            valueList.add(getListener().createGroup(str));
-
-            return new DatumElement(original, 
-              texNum, valueList, null, DatumType.TIME);
-         }
-         else
-         {
-            return new DataTimeElement(jt, original);
-         }
-      }
-
-      return null;
    }
 
    public boolean isParseTemporalOn()
@@ -1051,6 +913,7 @@ public class DataToolBaseSty extends LaTeXSty
    private DataToolSty datatoolSty;
 
    public static final String INDEX_OUT_OF_RANGE="datatool.index.outofrange";
+   public static final String INVALID_DATE_TIME="datatool.invalid.datetime";
 
    public static final String FMT_INTEGER_VALUE
       = "__texparser_fmt_integer_value:n";
@@ -1078,6 +941,9 @@ public class DataToolBaseSty extends LaTeXSty
       = new SimpleDateFormat("y-MM-dd");
    static final SimpleDateFormat TIME_FORMAT
       = new SimpleDateFormat("HH:mm:ss");
+
+   static final Pattern TIMESTAMP_PATTERN
+     = Pattern.compile("([+\\-]?\\d+)-(\\d{2})-(\\d{2})[ T](\\d{2}):(\\d{2})(?:(\\d{2}))?(Z|[+\\-]\\d{2}:\\d{2})?");
 
    public static final String DATUM_NNNN = "__datatool_datum:nnnn";
 

@@ -14,10 +14,19 @@
 %\usepackage{showkeys}
 \usepackage
  [
+  deephierarchy,
+  numberedsection,
+  abbreviations,
+  indexmarks,
+  novref,
   tikzsymbols,
   %debug=showwrgloss
  ]
 {nlctuserguide}
+
+\hypersetup{pdfauthor={Nicola Talbot},
+ pdftitle={Sample Document},
+ bookmarksdepth=5}
 
 \newcommand{\samplecomment}{\comment{sample command}}
 
@@ -470,12 +479,12 @@ package that's being described.
 \mExampleref{ex:sample} is an example.
 
 \begin{resultbox}
-\createexample[title={An example that's created on-the-fly provided
+\createexample*[title={An example that's created on-the-fly provided
 that the \cmd{write18} shell escape is enabled},
  description={A document with the word `text' emphasized},
  label={ex:sample}]
 {}
-{\emph{text}}
+{\cmd{emph}\marg{text}}
 \end{resultbox}
 
 \subsection{Example 2}

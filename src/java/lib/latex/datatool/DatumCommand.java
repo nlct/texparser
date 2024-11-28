@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2023 Nicola L.C. Talbot
+    Copyright (C) 2023-2024 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -45,6 +45,7 @@ public class DatumCommand extends Command
                objValue = new UserNumber(numValue.intValue());
             break;
             case DATE:
+               // date no time (integer Julian Day)
                objValue = new TeXLongNumber(numValue.longValue());
             break;
             default:
@@ -119,18 +120,29 @@ public class DatumCommand extends Command
    {
       DatumType type = element.getDatumType();
 
+      if (element instanceof DatumElement)
+      {
+         DatumElement datum = (DatumElement)element;
+
+         return new DatumCommand(name, element, 
+           datum.getNumber(), datum.getTeXValue(parser),
+           datum.getCurrencySymbol(), type);
+      }
+
       switch (type)
       {
          case INTEGER:
 
            return new DatumCommand(name, element, 
              Integer.valueOf(((DataNumericElement)element).intValue()),
+             element.getTeXValue(parser),
              null, type);
 
          case DECIMAL:
 
            return new DatumCommand(name, element, 
              Double.valueOf(((DataNumericElement)element).doubleValue()),
+             element.getTeXValue(parser),
              null, type);
 
          case CURRENCY:
@@ -139,6 +151,7 @@ public class DatumCommand extends Command
 
            return new DatumCommand(name, element, 
              Double.valueOf(currElem.doubleValue()),
+             element.getTeXValue(parser),
              currElem.getSymbol(), type);
 
          case DATETIME:
@@ -228,6 +241,7 @@ public class DatumCommand extends Command
       TeXParserListener listener = parser.getListener();
 
       TeXObjectList expanded = listener.createStack();
+
       expanded.add(listener.getControlSequence(DataToolBaseSty.DATUM_NNNN));
 
       Group grp = listener.createGroup();
@@ -290,6 +304,13 @@ public class DatumCommand extends Command
      throws IOException
    {
       process(parser, parser);
+   }
+
+   public String toString()
+   {
+      return String.format("%s[name=%s,original=%s,type=%s,currencySym=%s,number=%s,value=%s]",
+       getClass().getSimpleName(), getName(), original, type,
+        currencySym, numValue, objValue);
    }
 
    protected TeXObject original, currencySym, objValue;

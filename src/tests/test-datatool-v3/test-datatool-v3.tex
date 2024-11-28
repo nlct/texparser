@@ -4,16 +4,29 @@
 % see https://www.dickimaw-books.com/expl/
 \usepackage{datatool}[=v3.0]
 
-\DTLsetup{store-datum,datetime=parse-only}
+\DTLsetup{store-datum,
+ %datetime=parse-only
+ datetime=reformat
+}
+
+\renewcommand{\DataToolTimeFmt}[3]{#1:#2}
+\renewcommand{\DataToolDateFmt}[4]{#3/#2/#1}
 
 \begin{document}
-\DTLparse\mydatum{2000-01-01 18:00:00}\show\mydatum
-\DTLparse\mydatum{2000-01-01 07:00:00+01:00}\show\mydatum
+% The Julian day number should be 2451545.25
+\DTLparse\mydatum{2000-01-01 18:00:00}%\show\mydatum
+String value: \mydatum. Numeric value: \DTLdatumvalue{\mydatum}.
+{\renewcommand\DTLtemporalvalue[2]{#2}ISO: \DTLdatumvalue{\mydatum}}.
+
+% The Julian day number should be 2451544.75 (2000-01-01 06:00 UT)
+\DTLparse\mydatum{2000-01-01 07:00:00+01:00}%\show\mydatum
+String value: \mydatum. Numeric value: \DTLdatumvalue{\mydatum}.
+{\renewcommand\DTLtemporalvalue[2]{#2}ISO: \DTLdatumvalue{\mydatum}}.
 
 \DTLsettemporaldatum{\mydatum}
  {29th Aug 2024 10:02 BST}
  {2024-08-29T10:02:20+01:00}
-\show\mydatum
+%\show\mydatum
 
 String value: \mydatum. Numeric value: \DTLdatumvalue{\mydatum}.
 {\renewcommand\DTLtemporalvalue[2]{#2}ISO: \DTLdatumvalue{\mydatum}}.
@@ -55,4 +68,14 @@ Last loaded: \dtllastloadeddb.
 Pad leading zeros: \dtlpadleadingzeros{3}{4},
 \dtlpadleadingzeros{4}{1.5}, \dtlpadleadingzeros{5}{-.3},
 \dtlpadleadingzeros{7}{12}, \dtlpadleadingzeros{2}{.8}.
+
+
+\DTLread[format=dbtex,name=temporal1]{temporal1}
+
+\DTLdisplaydb{temporal1}
+
+
+\DTLread[format=dbtex,name=temporal2]{temporal2}
+
+\DTLdisplaydb{temporal2}
 \end{document}

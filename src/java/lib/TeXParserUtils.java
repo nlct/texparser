@@ -605,6 +605,11 @@ public class TeXParserUtils
    {
       TeXObject arg = popArg(parser, stack);
 
+      if (parser.isStack(arg) && ((TeXObjectList)arg).size() == 1)
+      {
+         arg = ((TeXObjectList)arg).firstElement();
+      }
+
       if (arg instanceof ControlSequence)
       {
          return (ControlSequence)arg;
@@ -622,6 +627,66 @@ public class TeXParserUtils
          }
 
          arg = popArg(parser, stack);
+
+         if (arg instanceof ControlSequence)
+         {
+            return (ControlSequence)arg;
+         }
+      }
+
+      throw new TeXSyntaxException(parser,
+         TeXSyntaxException.ERROR_CS_EXPECTED,
+         arg.format(), arg.getClass().getSimpleName());
+   }
+
+   public static ControlSequence popResolvedControlSequence(
+       TeXParser parser, TeXObjectList stack)
+     throws IOException
+   {
+      TeXObject arg = popArg(parser, stack);
+
+      if (parser.isStack(arg) && ((TeXObjectList)arg).size() == 1)
+      {
+         arg = ((TeXObjectList)arg).firstElement();
+      }
+
+      if (arg instanceof TeXCsRef)
+      {
+         arg = parser.getListener().getControlSequence(((TeXCsRef)arg).getName());
+      }
+
+      if (arg instanceof AssignedControlSequence)
+      {
+         arg = resolve(arg, parser);
+      }
+
+      if (arg instanceof ControlSequence)
+      {
+         return (ControlSequence)arg;
+      }
+
+      if (parser.isStack(arg))
+      {
+         if (stack == null)
+         {
+            parser.push(arg, true);
+         }
+         else
+         {
+            stack.push(arg, true);
+         }
+
+         arg = popArg(parser, stack);
+
+         if (arg instanceof TeXCsRef)
+         {
+            arg = parser.getListener().getControlSequence(((TeXCsRef)arg).getName());
+         }
+
+         if (arg instanceof AssignedControlSequence)
+         {
+            arg = resolve(arg, parser);
+         }
 
          if (arg instanceof ControlSequence)
          {

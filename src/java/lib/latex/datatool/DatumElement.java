@@ -140,7 +140,7 @@ public class DatumElement extends AbstractTeXObject
          return Integer.valueOf(number.getValue());
       }
 
-      if (datumType == DatumType.DATETIME)
+      if (datumType == DatumType.DATE)
       {
          return Long.valueOf(number.longValue());
       }
@@ -349,7 +349,7 @@ public class DatumElement extends AbstractTeXObject
    @Override
    public String toString()
    {
-      return String.format("%s[content=%s,number=%s,objectValue=%s,,symbol=%s,type=%s]",
+      return String.format("%s[content=%s,number=%s,objectValue=%s,symbol=%s,type=%s]",
         getClass().getSimpleName(), content, number, objectValue, currencySymbol, datumType);
    }
 

@@ -37,7 +37,7 @@ public enum DatumType
    CURRENCY(3, "c_datatool_currency_int"),
    DATETIME(4, "c_datatool_datetime_int"),
    DATE(5, "c_datatool_date_int"),
-   TIME(4, "c_datatool_time_int");
+   TIME(6, "c_datatool_time_int");
 
    DatumType(int id, String csname)
    {
