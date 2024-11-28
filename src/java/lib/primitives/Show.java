@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2024 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -35,22 +35,29 @@ public class Show extends Primitive
       super(name);
    }
 
+   @Override
    public Object clone()
    {
       return new Show(getName());
    }
 
-   // not implemented, but pop token off stack
-
+   @Override
    public void process(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
-      stack.popToken();
+      TeXObject obj = stack.popToken();
+
+      String msg = String.format("%s %s: %n%s",
+        toString(parser), obj.toString(parser), obj);
+
+      parser.getListener().getTeXApp().message(msg);
+      parser.logMessage(msg);
    }
 
+   @Override
    public void process(TeXParser parser)
       throws IOException
    {
-      parser.popToken();
+      process(parser, parser);
    }
 }
