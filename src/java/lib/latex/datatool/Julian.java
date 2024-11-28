@@ -18,7 +18,9 @@
 */
 package com.dickimawbooks.texparserlib.latex.datatool;
 
+import java.util.Calendar;
 import java.util.Locale;
+import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -26,9 +28,114 @@ import com.dickimawbooks.texparserlib.*;
 
 /**
  * Approximate datatool-base.sty temporal data.
+ * Julian date calculations from https://aa.usno.navy.mil/faq/JD_formula
  */
 public class Julian
 {
+   /**
+    * Creates a new instance for the given time. The value 0.0
+    * indicates midday. The value -0.5 indicates 00:00:00 and
+    * the value 0.5 indicates 24:00:00.
+    * @param jt the Julian time (-0.5 &lt;= jt &lt;= 0.5)
+    */
+   public static Julian createTime(double jt)
+   {
+      Julian julian = new Julian();
+
+      julian.julianTime = jt;
+      julian.hasTime = true;
+
+      double dayfrac = 0.5 + jt;
+
+      julian.hour = (int)(dayfrac * 24);
+
+      julian.minute = (int)(dayfrac*1440) % 60;
+
+      julian.second = (int)(dayfrac * 86400) % 60;
+
+      julian.timestamp = String.format((Locale)null,
+        "%02d:%02d:%02d", julian.hour, julian.minute, julian.second);
+
+      julian.setLocals();
+
+      return julian;
+   }
+
+   /**
+    * Creates a new instance for the given day (no time).
+    * @param jd the Julian day
+    */
+   public static Julian createDay(int jd)
+   {
+      Julian julian = new Julian();
+
+      julian.julianDay = jd;
+      julian.julianDate = (double)jd;
+
+      julian.hasDate = true;
+
+      julian.updateYMD(false, jd);
+
+      julian.timestamp = String.format((Locale)null,
+        "%d-%02d-%02d", julian.year, julian.month, julian.day);
+
+      julian.setLocals();
+
+      return julian;
+   }
+
+   /**
+    * Creates a new instance for the given UTC datetime.
+    * @param jdt the Julian date
+    */
+   public static Julian createDate(double jdt)
+   {
+      Julian julian = new Julian();
+
+      julian.julianDate = jdt;
+      julian.julianDay = (int)Math.round(jdt);
+      julian.julianTime = jdt - julian.julianDay;
+
+      julian.hasTime = true;
+      julian.hasDate = true;
+
+      julian.updateYMD(false, julian.julianDay);
+
+      double dayfrac = 0.5 + julian.julianTime;
+
+      julian.hour = (int)(dayfrac * 24);
+
+      julian.minute = (int)(dayfrac*1440) % 60;
+
+      julian.second = (int)(dayfrac * 86400) % 60;
+
+      julian.timestamp = String.format((Locale)null,
+        "%d-%02d-%02dT%02d:%02d:%02d", 
+        julian.year, julian.month, julian.day,
+        julian.hour, julian.minute, julian.second);
+
+      julian.setLocals();
+
+      return julian;
+   }
+
+   /**
+    * Creates a new instance for the given UTC datetime with local
+    * time set according to the given time zone offsets.
+    * @param jdt the Julian date
+    */
+   public static Julian createDate(double jdt, int timeZoneHr, int timeZoneMin)
+   {
+      Julian julian = createDate(jdt);
+
+      julian.adjustTimeZone(timeZoneHr, timeZoneMin);
+
+      julian.timestamp += String.format((Locale)null, "%s:%02d",
+        signedTwoDigits(julian.tzh), julian.tzm);
+
+      return julian;
+   }
+
    public static Julian create(String iso)
     throws IllegalArgumentException
    {
@@ -172,6 +279,41 @@ public class Julian
       }
 
       return julian;
+   }
+
+   public Calendar toCalendar()
+   {
+      Calendar.Builder builder = new Calendar.Builder();
+
+      builder.setCalendarType("iso8601");
+
+      if (hasDate)
+      {
+         builder.setDate(localYear, localMonth, localDay);
+      }
+
+      if (hasTime)
+      {
+         builder.setTimeOfDay(localHour, localMinute, localSecond);
+      }
+
+      if (hasTimeZone)
+      {
+         String tzId;
+
+         if (tzm == 0)
+         {
+            tzId = String.format("GMT%+2d", tzh);
+         }
+         else
+         {
+            tzId = String.format("GMT%s%02d", signedTwoDigits(tzh), tzm);
+         }
+
+         builder.setTimeZone(TimeZone.getTimeZone(tzId));
+      }
+
+      return builder.build();
    }
 
    public static String signedTwoDigits(int num)
@@ -345,6 +487,11 @@ public class Julian
       return DatumType.TIME;
    }
 
+   public long toUnixEpoch()
+   {
+      return DataToolBaseSty.unixEpochFromJulianDate(julianDate);
+   }
+
    public int getYear(boolean local)
    {
       return local ? localYear : year;
@@ -390,6 +537,75 @@ public class Julian
       return tzm;
    }
 
+   /**
+    * Sets the local time according to the given time zone relative
+    * to the stored UTC information.
+    */
+   public void adjustTimeZone(int newTimeZoneHr, int newTimeZoneMin)
+   {
+      setLocals();
+
+      int localJD = julianDay;
+
+      if (newTimeZoneMin != 0)
+      {
+         localMinute += newTimeZoneMin;
+
+         if (localMinute < 0)
+         {
+            localMinute += 60;
+            localHour--;
+         }
+         else if (localMinute >= 60)
+         {
+            localMinute -= 60;
+            localHour++;
+         }
+      }
+
+      if (newTimeZoneHr != 0)
+      {
+         localHour += newTimeZoneHr;
+      }
+
+      if (localHour < 0)
+      {
+         localHour += 23;
+         localDow--;
+         localJD--;
+
+         if (localDow < 0)
+         {
+            localDow += 7;
+         }
+      }
+      else if (localHour >= 24)
+      {
+         localHour -= 24;
+         localDow = (localDow+1)%7;
+         localJD++;
+      }
+
+      if (localJD != julianDay)
+      {
+         updateYMD(true, localJD);
+      }
+
+      tzh = newTimeZoneHr;
+      tzm = newTimeZoneMin;
+   }
+
+   public void adjustTimeZone(TimeZone timeZone)
+   {
+      int offset = timeZone.getOffset(toUnixEpoch());
+
+      int offsetHr = offset / 3600000;
+      int offsetMin = (((int)Math.abs(offset)) / 60000)
+                    - (int)Math.abs(offsetHr * 60);
+
+      adjustTimeZone(offsetHr, offsetMin);
+   }
+
    protected void setLocals()
    {
       localYear = year;
@@ -398,6 +614,7 @@ public class Julian
       localHour = hour;
       localMinute = minute;
       localSecond = second;
+      localDow = dow;
    }
 
    protected void calcJulianDate()
@@ -415,6 +632,11 @@ public class Julian
             minute += 60;
             hour--;
          }
+         else if (minute >= 60)
+         {
+            minute -= 60;
+            hour++;
+         }
       }
 
       if (tzh != 0)
@@ -426,6 +648,11 @@ public class Julian
       {
          hour += 23;
          julianDay--;
+      }
+      else if (hour >= 24)
+      {
+         hour -= 24;
+         julianDay++;
       }
 
       calcJulianTime();
@@ -453,6 +680,35 @@ public class Julian
       julianTime = ( (double)hour - 12.0 ) / 24.0
                  + (double)minute / 1440.0
                  + (double)second / 86400.0;
+   }
+
+   protected void updateYMD(boolean local, int jd)
+   {
+      int yr, mth, dy, l, n;
+
+      l = jd + 68569;
+      n = 4 * l / 146097;
+      l = l - (146097 * n + 3) / 4;
+      yr = 4000 * (l + 1) / 1461001;
+      l = l - 1461 * yr/4 + 31;
+      mth = 80 * l / 2447;
+      dy = l - 2447 * mth / 80;
+      l = mth / 11;
+      mth = mth + 2 - 12 * l;
+      yr = 100 * (n - 49) + yr + l;
+
+      if (local)
+      {
+         localYear = yr;
+         localMonth = mth;
+         localDay = dy;
+      }
+      else
+      {
+         year = yr;
+         month = mth;
+         day = dy;
+      }
    }
 
    @Override
