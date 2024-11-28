@@ -164,6 +164,11 @@ public class UserGuideSty extends LaTeXSty
       addSemanticCommand("advantagefmt", "advantage", null, Color.GREEN, null, null);
       addSemanticCommand("disadvantagefmt", "disadvantage", null, Color.RED, null, null);
 
+      registerControlSequence(new LaTeXGenericCommand(true,
+       "smcode", "m", TeXParserUtils.createStack(listener, 
+         new TeXCsRef("code"),
+         TeXParserUtils.createGroup(listener, listener.getParam(1)))));
+
       addSemanticCommand("@code", "code", 
         new TeXFontText(TeXFontFamily.VERB), null, null, null);
       addSemanticCommand("cmd", TeXFontFamily.VERB, null, listener.getOther('\\'), null);
