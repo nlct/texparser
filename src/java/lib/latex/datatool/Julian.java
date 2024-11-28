@@ -209,7 +209,6 @@ public class Julian
         texNum));
       valueList.add(listener.createGroup(timestamp));
 
-System.out.println("REFORMAT ORIGINAL: "+reformatOriginal);
       if (reformatOriginal)
       {
          TeXObjectList list = listener.createStack();
@@ -267,7 +266,6 @@ System.out.println("REFORMAT ORIGINAL: "+reformatOriginal);
 
          strVal = list;
       }
-System.out.println("STRING VALUE: "+strVal.toString(listener.getParser()));
 
       return new DatumElement(strVal, 
         texNum, valueList, null, getDatumType());
