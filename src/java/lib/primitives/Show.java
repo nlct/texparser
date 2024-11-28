@@ -47,6 +47,11 @@ public class Show extends Primitive
    {
       TeXObject obj = stack.popToken();
 
+      if (obj instanceof TeXCsRef)
+      {
+         obj = parser.getListener().getControlSequence(((TeXCsRef)obj).getName());
+      }
+
       String msg = String.format("%s %s: %n%s",
         toString(parser), obj.toString(parser), obj);
 
