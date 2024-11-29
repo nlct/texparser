@@ -252,28 +252,20 @@ public class DataToolBaseSty extends LaTeXSty
       registerControlSequence(new DTLsetup(this));
       registerControlSequence(new DatumMarker());
       registerControlSequence(new AtNumberOfNumber("datatool_datum_value:Nnnnn", 3, 5));
+      registerControlSequence(new AtNumberOfNumber("datatool_datum_type:Nnnnn", 5, 5));
 
+      registerControlSequence(new DTLdatumtype(this));
       registerControlSequence(new DTLdatumvalue(this));
       registerControlSequence(new DTLsettemporaldatum(this));
 
       registerControlSequence(new DTLparse(this));
       registerControlSequence(new DTLparse("xDTLparse", true, this));
 
-      registerControlSequence(new IntegerContentCommand(
-        DatumType.STRING.getCsName(),
-        DatumType.STRING.getValue(), true));
-      registerControlSequence(new IntegerContentCommand(
-        DatumType.INTEGER.getCsName(),
-        DatumType.INTEGER.getValue(), true));
-      registerControlSequence(new IntegerContentCommand(
-        DatumType.DECIMAL.getCsName(),
-        DatumType.DECIMAL.getValue(), true));
-      registerControlSequence(new IntegerContentCommand(
-        DatumType.CURRENCY.getCsName(),
-        DatumType.CURRENCY.getValue(), true));
-      registerControlSequence(new IntegerContentCommand(
-        DatumType.UNKNOWN.getCsName(),
-        DatumType.UNKNOWN.getValue(), true));
+      for (DatumType type : DatumType.values())
+      {
+         registerControlSequence(new IntegerContentCommand(
+           type.getCsName(), type.getValue(), true));
+      }
    }
 
    @Override

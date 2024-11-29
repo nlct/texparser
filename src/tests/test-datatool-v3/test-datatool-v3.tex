@@ -6,22 +6,26 @@
 
 \DTLsetup{store-datum,
  %datetime=parse-only
- datetime=reformat
+ %datetime=reformat
 }
 
 \renewcommand{\DataToolTimeFmt}[3]{#1:#2}
 \renewcommand{\DataToolDateFmt}[4]{#3/#2/#1}
 
 \begin{document}
+No value: \dtlnovalue. Data type: \DTLdatumtype{\dtlnovalue}.
+
 % The Julian day number should be 2451545.25
 \DTLparse\mydatum{2000-01-01 18:00:00}%\show\mydatum
 String value: \mydatum. Numeric value: \DTLdatumvalue{\mydatum}.
 {\renewcommand\DTLtemporalvalue[2]{#2}ISO: \DTLdatumvalue{\mydatum}}.
+Data type: \DTLdatumtype{\mydatum}.
 
 % The Julian day number should be 2451544.75 (2000-01-01 06:00 UT)
 \DTLparse\mydatum{2000-01-01 07:00:00+01:00}%\show\mydatum
 String value: \mydatum. Numeric value: \DTLdatumvalue{\mydatum}.
 {\renewcommand\DTLtemporalvalue[2]{#2}ISO: \DTLdatumvalue{\mydatum}}.
+Data type: \DTLdatumtype{\mydatum}.
 
 \DTLsettemporaldatum{\mydatum}
  {29th Aug 2024 10:02 BST}
@@ -30,6 +34,7 @@ String value: \mydatum. Numeric value: \DTLdatumvalue{\mydatum}.
 
 String value: \mydatum. Numeric value: \DTLdatumvalue{\mydatum}.
 {\renewcommand\DTLtemporalvalue[2]{#2}ISO: \DTLdatumvalue{\mydatum}}.
+Data type: \DTLdatumtype{\mydatum}.
 
 \DTLread[format=dtltex]{test-data-3}
 
