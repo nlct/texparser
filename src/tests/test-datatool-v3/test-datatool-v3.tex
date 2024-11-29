@@ -15,6 +15,10 @@
 \begin{document}
 No value: \dtlnovalue. Data type: \DTLdatumtype{\dtlnovalue}.
 
+\DTLparse\mydatum{2000}%\show\mydatum
+String value: \mydatum. Numeric value: \DTLdatumvalue{\mydatum}.
+Data type: \DTLdatumtype{\mydatum}.
+
 % The Julian day number should be 2451545.25
 \DTLparse\mydatum{2000-01-01 18:00:00}%\show\mydatum
 String value: \mydatum. Numeric value: \DTLdatumvalue{\mydatum}.

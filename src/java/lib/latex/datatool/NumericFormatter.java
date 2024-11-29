@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2023 Nicola L.C. Talbot
+    Copyright (C) 2023-2024 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.util.Vector;
 import java.text.NumberFormat;
 import java.text.ParseException;
+import java.text.ParsePosition;
 
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.*;
@@ -66,7 +67,16 @@ public class NumericFormatter extends Command
          }
       }
 
-      return numFormat.parse(source);
+      ParsePosition pos = new ParsePosition(0);
+
+      Number num = numFormat.parse(source, pos);
+
+      if (num == null || pos.getIndex() < source.length())
+      {
+         throw new ParseException("Not a number: "+source, pos.getIndex());
+      }
+
+      return num;
    }
 
    protected String fmtArg(TeXObject arg, TeXParser parser, TeXObjectList stack)
