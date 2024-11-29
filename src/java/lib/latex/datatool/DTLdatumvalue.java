@@ -55,7 +55,10 @@ public class DTLdatumvalue extends Command
 
          TeXObject obj = datumCs.getTeXValue();
 
-         content.add((TeXObject)obj.clone(), true);
+         if (obj != null)
+         {
+            content.add((TeXObject)obj.clone(), true);
+         }
       }
       else if (sty.isNull(cs))
       {
