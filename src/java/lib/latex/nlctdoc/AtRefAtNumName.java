@@ -26,7 +26,7 @@ public class AtRefAtNumName extends Command
 {
    public AtRefAtNumName()
    {
-      this("@ref@numnam", false);
+      this("@ref@numname", false);
    }
 
    public AtRefAtNumName(String name, boolean isStar)
