@@ -113,6 +113,7 @@ public class UserGuideSty extends LaTeXSty
 
       registerControlSequence(new AtGobble("settabcolsep"));
       registerControlSequence(new AtGobble("tcbset"));
+      registerControlSequence(new AtGobble("tcbuselibrary"));
 
       registerControlSequence(new GobbleOpt("RedeclareSectionCommand", 1, 1));
 
@@ -180,6 +181,8 @@ public class UserGuideSty extends LaTeXSty
         null, FG_COMMENT, listener.createString("% "), null);
 
       registerControlSequence(new CodeComment());
+      registerControlSequence(new CodeComment("commentdbsp",
+        new TeXCsRef("dbspace")));
 
       addSemanticCommand("csfmt", TeXFontFamily.VERB, FG_CS, 
         listener.getOther('\\'), null);
@@ -267,6 +270,14 @@ public class UserGuideSty extends LaTeXSty
       def.add(listener.getParam(1));
       def.add(listener.getOther(']'));
       registerControlSequence(new LaTeXGenericCommand(true, "oarg",
+        "m", def));
+
+      // \oargnobr
+      def = listener.createStack();
+      def.add(listener.getOther('['));
+      def.add(listener.getParam(1));
+      def.add(listener.getOther(']'));
+      registerControlSequence(new LaTeXGenericCommand(true, "oargnobr",
         "m", def));
 
       // \margm
@@ -724,6 +735,18 @@ public class UserGuideSty extends LaTeXSty
       registerControlSequence(new MExampleRef());
       registerControlSequence(new MExampleRef("mexampleref", false));
       registerControlSequence(new ExampleMarginRef());
+
+      def = listener.createStack();
+      def.add(new TeXCsRef("exampleref"));
+      def.add(TeXParserUtils.createGroup(listener, listener.getParam(1)));
+      def.add(listener.getSpace());
+      def.add(listener.getOther('('));
+      def.add(new TeXCsRef("nameref"));
+      def.add(TeXParserUtils.createGroup(listener, listener.getParam(1)));
+      def.add(listener.getOther(')'));
+
+      registerControlSequence(new LaTeXGenericCommand(true, "examplenameref",
+       "m", def));
 
       // \tableref
       registerControlSequence(new TextualContentCommand("tablerefprefix", "Table "));
@@ -1230,7 +1253,9 @@ public class UserGuideSty extends LaTeXSty
         listener, "florettemarker", 0x273E, // six petalled B&W florette
         "florette marker"));
 
+      // don't bother with thin spaces for these commands
       registerControlSequence(new Symbol("dash", 0x2014));
+      registerControlSequence(new Symbol("Slash", '/'));
 
       registerControlSequence(new Symbol("nlctopensqbracket", '['));
       registerControlSequence(new Symbol("nlctclosesqbracket", ']'));
@@ -1603,6 +1628,7 @@ public class UserGuideSty extends LaTeXSty
       createIndexItemBox(0);
       createIndexItemBox(1);
       createIndexItemBox(2);
+      createIndexItemBox(3);
 
       addColourBox("nlctusernavbox", null, null, null, null);
       addSemanticCommand("texparser@abstractheader", "abstractheader", 
@@ -1754,6 +1780,13 @@ public class UserGuideSty extends LaTeXSty
       registerControlSequence(new AtRefAtNumName("s@ref@numname", true));
 
       getListener().addAuxCommand(new AuxCommand("nlctdoc@extag", 2));
+
+      registerControlSequence(new TextualContentCommand("exampletagreflistsep",
+        ";"));
+      registerControlSequence(new TextualContentCommand("exampletagreflistpretitle",
+        ". "));
+      registerControlSequence(new TextualContentCommand("exampletagrefprelist",
+        "the following examples:"));
    }
 
    @Override
@@ -1920,6 +1953,14 @@ public class UserGuideSty extends LaTeXSty
       registerControlSequence(new GenericCommand(true, "glsaddterm", null,
          new TeXCsRef("glsadd")));
 
+      // \\glscmd
+      def = listener.createStack();
+      def.add(new TeXCsRef("glsentrytext"));
+      def.add(TeXParserUtils.createGroup(listener, listener.getParam(1)));
+
+      registerControlSequence(new LaTeXGenericCommand(true, "glscmd", "m", def));
+
+
       // \\glscsname
       def = listener.createStack();
       def.add(new TeXCsRef("glslink"));
@@ -1996,7 +2037,7 @@ public class UserGuideSty extends LaTeXSty
       registerControlSequence(new TextualContentCommand(
          "glsxtrpostdescdualindexabbreviation", "."));
 
-      // \starredcs
+      // \starredcs (simplified definition)
       def = listener.createStack();
       def.add(new TeXCsRef("glslink"));
       def.add(TeXParserUtils.createGroup(listener, listener.getParam(1)));
@@ -2009,6 +2050,27 @@ public class UserGuideSty extends LaTeXSty
       registerControlSequence(new LaTeXGenericCommand(true, "starredcs",
        "m", def));
 
+      // \starredenv (simplified definition)
+
+      def = listener.createStack();
+      def.add(new TeXCsRef("glslink"));
+
+      grp = listener.createGroup("env.");
+      grp.add(listener.getParam(1));
+      def.add(grp);
+
+      grp = listener.createGroup();
+      def.add(grp);
+
+      grp.add(new TeXCsRef("envfmt"));
+      grp.add(TeXParserUtils.createGroup(listener,
+        listener.getParam(1), listener.getOther('*')));
+
+      registerControlSequence(new LaTeXGenericCommand(true, "starredenv",
+       "m", def));
+
+      registerControlSequence(new TheCtr());
+      registerControlSequence(new TheCtr("theHctr", "theH"));
    }
 
    protected void addGlsFmtTextCommand(String name, String prefix)
