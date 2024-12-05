@@ -358,6 +358,8 @@ documents.
 Command with starred version:
 
 \cmddef{cswithstarredversion}
+Reference \gls{cswithstarredversion} (unstarred) and
+\starredcs{cswithstarredversion} (starred).
 
 Command with starred and plus version:
 
@@ -419,9 +421,13 @@ Some common options.
 
 An environment:
 \envdef{foobarenv}
+The starred version \starredenv{foobarenv} doesn't need a separate
+definition.
 
 A counter:
 \ctrdef{foobarctr}
+The value is obtained with \thectr{foobarctr}. The associated
+hyperlink anchor is obtained with \theHctr{foobarctr}.
 
 \section{Section About \stytext{foobarsty}}
 
