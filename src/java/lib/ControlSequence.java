@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2024 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -46,12 +46,15 @@ public abstract class ControlSequence extends Macro
       this.name = name;
    }
 
+   @Override
    public String toString()
    {
-      return String.format("%s[name=%s,prefix=%d,syntax=%s]",
-       getClass().getSimpleName(), getName(), getPrefix(), getSyntax());
+      return String.format("%s[name=%s,prefix=%d,canExpand=%s,syntax=%s]",
+       getClass().getSimpleName(), getName(), getPrefix(),
+        canExpand(), getSyntax());
    }
 
+   @Override
    public String format()
    {
       String name = getName();
@@ -67,18 +70,21 @@ public abstract class ControlSequence extends Macro
       return "\\"+name;
    }
 
+   @Override
    public String toString(TeXParser parser)
    {
       return String.format("%s%s", 
         new String(Character.toChars(parser.getEscChar())), getName());
    }
 
+   @Override
    public TeXObjectList string(TeXParser parser)
      throws IOException
    {
       return parser.string(toString(parser));
    }
 
+   @Override
    public boolean equals(Object obj)
    {
       if (this == obj) return true;
