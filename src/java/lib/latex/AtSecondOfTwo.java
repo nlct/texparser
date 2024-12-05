@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2024 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -35,111 +35,78 @@ public class AtSecondOfTwo extends Command
       super(name);
    }
 
+   @Override
    public Object clone()
    {
       return new AtSecondOfTwo(getName());
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser)
      throws IOException
    {
-      TeXObject ignore = parser.popNextArg();
-      TeXObject arg = parser.popNextArg();
-
-      if (arg instanceof TeXObjectList) return (TeXObjectList)arg;
-
-      TeXObjectList list = new TeXObjectList();
-      list.add(arg);
-
-      return list;
+      return expandonce(parser, parser);
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      TeXObject ignore = stack.popArg(parser);
-      TeXObject arg = stack.popArg(parser);
+      popArg(parser, stack);// ignore
+      TeXObject arg = popArg(parser, stack);
 
-      if (arg instanceof TeXObjectList) return (TeXObjectList)arg;
+      if (parser.isStack(arg)) return (TeXObjectList)arg;
 
-      TeXObjectList list = new TeXObjectList();
+      TeXObjectList list = parser.getListener().createStack();
       list.add(arg);
 
       return list;
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser)
      throws IOException
    {
-      TeXObject ignore = parser.popNextArg();
-      TeXObject arg = parser.popNextArg();
-
-      TeXObjectList list;
-
-      if (arg instanceof Expandable)
-      {
-         list = ((Expandable)arg).expandfully(parser);
-
-         if (list != null)
-         {
-            return list;
-         }
-
-         if (arg instanceof TeXObjectList)
-         {
-            return (TeXObjectList)arg;
-         }
-      }
-
-      list = new TeXObjectList();
-      list.add(arg);
-
-      return list;
+      return expandfully(parser, parser);
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      TeXObject ignore = stack.popArg(parser);
-      TeXObject arg = stack.popArg(parser);
+      popArg(parser, stack);// ignore
+      TeXObject arg = popArg(parser, stack);
 
-      TeXObjectList list;
+      TeXObject expanded = TeXParserUtils.expandFully(arg, parser, stack);
 
-      if (arg instanceof Expandable)
+      if (parser.isStack(expanded))
       {
-         list = ((Expandable)arg).expandfully(parser, stack);
-
-         if (list != null)
-         {
-            return list;
-         }
-
-         if (arg instanceof TeXObjectList)
-         {
-            return (TeXObjectList)arg;
-         }
+         return (TeXObjectList)expanded;
       }
 
-      list = new TeXObjectList();
-      list.add(arg);
+      TeXObjectList list = parser.getListener().createStack();
+
+      list.add(expanded);
 
       return list;
    }
 
+   @Override
    public void process(TeXParser parser) throws IOException
    {
-      TeXObject ignore = parser.popNextArg();
+      parser.popNextArg();// ignore
       TeXObject arg = parser.popNextArg();
 
       arg.process(parser);
    }
 
-   public void process(TeXParser parser, TeXObjectList list) throws IOException
+   @Override
+   public void process(TeXParser parser, TeXObjectList stack) throws IOException
    {
-      TeXObject ignore = list.popArg(parser);
-      TeXObject arg = list.popArg(parser);
+      stack.popArg(parser);// ignore
+      TeXObject arg = stack.popArg(parser);
 
-      arg.process(parser, list);
+      arg.process(parser, stack);
    }
 
 }

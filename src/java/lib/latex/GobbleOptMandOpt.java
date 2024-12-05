@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2020 Nicola L.C. Talbot
+    Copyright (C) 2020-2024 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -38,6 +38,7 @@ public class GobbleOptMandOpt extends GobbleOpt
       this.numOptional2 = numOptional2;
    }
 
+   @Override
    public Object clone()
    {
       return new GobbleOptMandOpt(getName(), getNumOptional(), getNumMandatory(),
@@ -49,6 +50,7 @@ public class GobbleOptMandOpt extends GobbleOpt
       return numOptional2;
    }
 
+   @Override
    public void process(TeXParser parser) throws IOException
    {
       super.process(parser);
@@ -64,13 +66,14 @@ public class GobbleOptMandOpt extends GobbleOpt
       }
    }
 
-   public void process(TeXParser parser, TeXObjectList list) throws IOException
+   @Override
+   public void process(TeXParser parser, TeXObjectList stack) throws IOException
    {
-      super.process(parser, list);
+      super.process(parser, stack);
 
       for (int i = 0; i < numOptional2; i++)
       {
-         TeXObject obj = list.popArg(parser, '[', ']');
+         TeXObject obj = stack.popArg(parser, '[', ']');
 
          if (obj == null)
          {

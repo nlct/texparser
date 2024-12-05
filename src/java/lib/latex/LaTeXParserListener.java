@@ -1112,6 +1112,10 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       // limited support for switching off babel shorthand
       parser.putControlSequence(new ShortHandOff());
 
+      // Ignore but define to pick up \else and \fi
+      NewIf.createConditional(false, parser, "if@endpe");
+      parser.putControlSequence(new Relax("@doendpe"));
+
       // LaTeX3
       // minimal support, mainly to pick up cat code
       // changes to allow command names to be read properly

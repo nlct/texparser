@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2024 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -41,6 +41,7 @@ public class AtGobble extends Command
       this.numParams = numParams;
    }
 
+   @Override
    public Object clone()
    {
       return new AtGobble(getName(), getNumParams());
@@ -51,6 +52,7 @@ public class AtGobble extends Command
       return numParams;
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser)
      throws IOException
    {
@@ -59,9 +61,10 @@ public class AtGobble extends Command
          parser.popNextArg();
       }
 
-      return new TeXObjectList();
+      return parser.getListener().createStack();
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
@@ -70,21 +73,24 @@ public class AtGobble extends Command
          stack.popArg(parser);
       }
 
-      return new TeXObjectList();
+      return parser.getListener().createStack();
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser)
      throws IOException
    {
       return expandonce(parser);
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
       return expandonce(parser, stack);
    }
 
+   @Override
    public void process(TeXParser parser) throws IOException
    {
       for (int i = 0; i < numParams; i++)
@@ -93,11 +99,12 @@ public class AtGobble extends Command
       }
    }
 
-   public void process(TeXParser parser, TeXObjectList list) throws IOException
+   @Override
+   public void process(TeXParser parser, TeXObjectList stack) throws IOException
    {
       for (int i = 0; i < numParams; i++)
       {
-         list.popArg(parser);
+         stack.popArg(parser);
       }
    }
 

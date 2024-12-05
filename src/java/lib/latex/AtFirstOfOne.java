@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2024 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -38,53 +38,40 @@ public class AtFirstOfOne extends Command
    public AtFirstOfOne(String name, boolean canExpand)
    {
       super(name);
-      this.canExpand = canExpand;
+      this.expandable = canExpand;
    }
 
    @Override
    public Object clone()
    {
-      return new AtFirstOfOne(getName(), canExpand);
+      return new AtFirstOfOne(getName(), canExpand());
    }
 
    @Override
    public boolean canExpand()
    {
-      return canExpand;
+      return expandable;
    }
 
    @Override
    public TeXObjectList expandonce(TeXParser parser)
      throws IOException
    {
-      if (canExpand)
-      {
-         TeXObject arg1 = parser.popNextArg();
-
-         if (arg1 instanceof TeXObjectList) return (TeXObjectList)arg1;
-
-         TeXObjectList list = new TeXObjectList();
-         list.add(arg1);
-
-         return list;
-      }
-      else
-      {
-         return null;
-      }
+      return expandonce(parser, parser);
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      if (canExpand)
+      if (canExpand())
       {
-         TeXObject arg1 = stack.popArg(parser);
+         TeXObject arg = popArg(parser, stack);
 
-         if (arg1 instanceof TeXObjectList) return (TeXObjectList)arg1;
+         if (parser.isStack(arg)) return (TeXObjectList)arg;
 
-         TeXObjectList list = new TeXObjectList();
-         list.add(arg1);
+         TeXObjectList list = parser.getListener().createStack();
+         list.add(arg);
 
          return list;
       }
@@ -94,67 +81,30 @@ public class AtFirstOfOne extends Command
       }
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser)
      throws IOException
    {
-      if (canExpand)
-      {
-         TeXObject arg1 = parser.popNextArg();
-
-         TeXObjectList list;
-
-         if (arg1 instanceof Expandable)
-         {
-            list = ((Expandable)arg1).expandfully(parser);
-
-            if (list != null)
-            {
-               return list;
-            }
-
-            if (arg1 instanceof TeXObjectList)
-            {
-               return (TeXObjectList)arg1;
-            }
-         }
-
-         list = new TeXObjectList();
-         list.add(arg1);
-
-         return list;
-      }
-      else
-      {
-         return null;
-      }
+      return expandfully(parser, parser);
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      if (canExpand)
+      if (canExpand())
       {
-         TeXObject arg1 = stack.popArg(parser);
+         TeXObject arg = popArg(parser, stack);
 
-         TeXObjectList list;
+         TeXObject expanded = TeXParserUtils.expandFully(arg, parser, stack);
 
-         if (arg1 instanceof Expandable)
+         if (parser.isStack(expanded))
          {
-            list = ((Expandable)arg1).expandfully(parser, stack);
-
-            if (list != null)
-            {
-               return list;
-            }
-
-            if (arg1 instanceof TeXObjectList)
-            {
-               return (TeXObjectList)arg1;
-            }
+            return (TeXObjectList)expanded;
          }
 
-         list = new TeXObjectList();
-         list.add(arg1);
+         TeXObjectList list = parser.getListener().createStack();
+         list.add(arg);
 
          return list;
       }
@@ -164,6 +114,7 @@ public class AtFirstOfOne extends Command
       }
    }
 
+   @Override
    public void process(TeXParser parser) throws IOException
    {
       TeXObject arg1 = parser.popNextArg();
@@ -171,12 +122,13 @@ public class AtFirstOfOne extends Command
       arg1.process(parser);
    }
 
-   public void process(TeXParser parser, TeXObjectList list) throws IOException
+   @Override
+   public void process(TeXParser parser, TeXObjectList stack) throws IOException
    {
-      TeXObject arg1 = list.popArg(parser);
+      TeXObject arg1 = stack.popArg(parser);
 
-      arg1.process(parser, list);
+      arg1.process(parser, stack);
    }
 
-   boolean canExpand;
+   boolean expandable = true;
 }

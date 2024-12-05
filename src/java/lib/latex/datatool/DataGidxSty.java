@@ -27,6 +27,7 @@ import java.io.IOException;
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.generic.PadNumber;
 import com.dickimawbooks.texparserlib.latex.*;
+import com.dickimawbooks.texparserlib.primitives.Unexpanded;
 
 /**
  * Limited support for datagidx.sty. Mainly intended for datatooltk.
@@ -518,7 +519,7 @@ public class DataGidxSty extends LaTeXSty
 
          if (sortVal == null)
          {
-            parser.putControlSequence(new AtFirstOfOne("__datagidx_punc:n", false));
+            parser.putControlSequence(new Unexpanded("__datagidx_punc:n"));
 
             parser.putControlSequence(new LaTeXGenericCommand(true,
               "DTLgidxName", "mm", TeXParserUtils.createStack(

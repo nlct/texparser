@@ -1922,12 +1922,29 @@ public class TeXObjectList extends Vector<TeXObject>
       return true;
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser) throws IOException
    {
+      if (parser.isDebugMode(TeXParser.DEBUG_EXPANSION))
+      {
+         parser.logMessage("FULLY EXPANDING: "+toString(parser));
+      }
+
+      if (parser.isDebugMode(TeXParser.DEBUG_EXPANSION_LIST))
+      {
+         parser.logMessage("FULLY EXPANDING: "+toString());
+      }
+
       TeXObjectList list = new TeXObjectList(size());
 
       if (isExpanded())
       {
+         if (parser.isDebugMode(TeXParser.DEBUG_EXPANSION)
+           || parser.isDebugMode(TeXParser.DEBUG_EXPANSION_LIST))
+         {
+            parser.logMessage("ALREADY EXPANDED");
+         }
+
          list.add(this, true);
          clear();
          return list;
@@ -1954,6 +1971,12 @@ public class TeXObjectList extends Vector<TeXObject>
          if (object.isExpansionBlocker())
          {
             blocked = true;
+
+            if (parser.isDebugMode(TeXParser.DEBUG_EXPANSION)
+              || parser.isDebugMode(TeXParser.DEBUG_EXPANSION_LIST))
+            {
+               parser.logMessage("EXPANSION BLOCKED AT: "+object);
+            }
          }
 
          if (object instanceof StackMarker || blocked)
@@ -1971,7 +1994,7 @@ public class TeXObjectList extends Vector<TeXObject>
          {
             push(object, true);
          }
-         else if (object instanceof Expandable)
+         else if (object.canExpand() && object instanceof Expandable)
          {
             TeXObjectList expanded = ((Expandable)object).expandfully(parser, this);
 
@@ -1987,19 +2010,45 @@ public class TeXObjectList extends Vector<TeXObject>
          else
          {
             list.add(object);
+
+            if (object instanceof Macro
+              && (parser.isDebugMode(TeXParser.DEBUG_EXPANSION)
+                || parser.isDebugMode(TeXParser.DEBUG_EXPANSION_LIST)))
+            {
+               parser.logMessage("CAN'T EXPAND: "+object);
+            }
          }
       }
 
       return list;
    }
 
+   @Override
    public TeXObjectList expandfully(TeXParser parser,
         TeXObjectList stack) throws IOException
    {
       TeXObjectList list = new TeXObjectList(size());
 
+      if (parser.isDebugMode(TeXParser.DEBUG_EXPANSION))
+      {
+         parser.logMessage("FULLY EXPANDING: "+toString(parser)
+            + " SUBSTACK: "+stack.toString(parser));
+      }
+
+      if (parser.isDebugMode(TeXParser.DEBUG_EXPANSION_LIST))
+      {
+         parser.logMessage("FULLY EXPANDING: "+toString()
+            + " SUBSTACK: "+stack);
+      }
+
       if (isExpanded())
       {
+         if (parser.isDebugMode(TeXParser.DEBUG_EXPANSION)
+           || parser.isDebugMode(TeXParser.DEBUG_EXPANSION_LIST))
+         {
+            parser.logMessage("ALREADY EXPANDED");
+         }
+
          list.add(this, true);
          clear();
          return list;
@@ -2040,6 +2089,12 @@ public class TeXObjectList extends Vector<TeXObject>
          if (object.isExpansionBlocker())
          {
             blocked = true;
+
+            if (parser.isDebugMode(TeXParser.DEBUG_EXPANSION)
+              || parser.isDebugMode(TeXParser.DEBUG_EXPANSION_LIST))
+            {
+               parser.logMessage("EXPANSION BLOCKED AT: "+object);
+            }
          }
 
          TeXObjectList expanded = null;
@@ -2048,9 +2103,19 @@ public class TeXObjectList extends Vector<TeXObject>
          {
             object = remaining.popArg(parser);
          }
-         else if (!blocked && object.canExpand() && object instanceof Expandable)
+         else if (blocked)
+         {
+            // do nothing
+         }
+         else if (object.canExpand() && object instanceof Expandable)
          {
             expanded = ((Expandable)object).expandfully(parser, remaining);
+         }
+         else if (object instanceof Macro
+            && (parser.isDebugMode(TeXParser.DEBUG_EXPANSION)
+              || parser.isDebugMode(TeXParser.DEBUG_EXPANSION_LIST)))
+         {
+            parser.logMessage("CAN'T EXPAND: "+object);
          }
 
          if (expanded == null)
