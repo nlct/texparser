@@ -27,18 +27,19 @@ public class CodeComment extends ControlSequence
 {
    public CodeComment()
    {
-      this("comment");
+      this("comment", null);
    }
 
-   public CodeComment(String name)
+   public CodeComment(String name, TeXObject postEol)
    {
       super(name);
+      this.postEol = postEol;
    }
 
    @Override
    public Object clone()
    {
-      return new CodeComment(getName());
+      return new CodeComment(getName(), postEol);
    }
 
    @Override
@@ -49,16 +50,38 @@ public class CodeComment extends ControlSequence
 
       TeXObject arg = popArg(parser, stack);
 
-      TeXObject nextObj = stack.peekStack(TeXObjectList.POP_RETAIN_IGNOREABLES);
+      TeXObject nextObj = TeXParserUtils.peek(parser,
+        stack, TeXObjectList.POP_RETAIN_IGNOREABLES);
 
       TeXObjectList content = listener.createStack();
 
       content.add(listener.getControlSequence("code@comment"));
       content.add(TeXParserUtils.createGroup(listener, arg));
 
-      if (!(nextObj instanceof Eol || nextObj instanceof Par))
+      if (nextObj instanceof Eol || nextObj instanceof Par)
+      {
+         content.add(TeXParserUtils.pop(parser, stack,
+           TeXObjectList.POP_RETAIN_IGNOREABLES));
+      }
+      else
       {
          content.add(listener.getEol());
+      }
+
+      if (postEol != null)
+      {
+         TeXObject following;
+
+         if (postEol instanceof TeXCsRef)
+         {
+            following = listener.getControlSequence(((TeXCsRef)postEol).getName());
+         }
+         else
+         {
+            following = (TeXObject)postEol.clone();
+         }
+
+         content.add(following, true);
       }
 
       TeXParserUtils.process(content, parser, stack);
@@ -70,4 +93,6 @@ public class CodeComment extends ControlSequence
    {
       process(parser, parser);
    }
+
+   TeXObject postEol;
 }
