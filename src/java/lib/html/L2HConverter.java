@@ -249,7 +249,7 @@ public class L2HConverter extends LaTeXParserListener
       super.addPredefined();
 
       // Add 
-      // \providecommand{\IfTeXParserLib}[2]{#2}
+      // \providecommand{\IfTeXParserLib}[2]{#1}
       // to the document to provide a conditional that depends on
       // whether or not the TeX parser library is interpreting the
       // code.
