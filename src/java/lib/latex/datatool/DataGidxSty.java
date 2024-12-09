@@ -123,7 +123,7 @@ public class DataGidxSty extends LaTeXSty
       registerControlSequence(new GenericCommand(true, SORT_TL, null, list));
 
       registerControlSequence(new AtFirstOfOne("__datagidx_punc:n"));
-      registerControlSequence(new AtGobble("DTLgidxIgnore"));
+      registerControlSequence(new AtFirstOfOne("DTLgidxIgnore"));
       registerControlSequence(new AtGobble("DTLgidxGobble"));
       registerControlSequence(new AtFirstOfOne("DTLgidxNoFormat"));
 
@@ -496,6 +496,7 @@ public class DataGidxSty extends LaTeXSty
             parser.putControlSequence(new AtGobble("__datagidx_punc:n"));
             parser.putControlSequence(new AtSecondOfTwo("DTLgidxName"));
             parser.putControlSequence(new AtSecondOfTwo("DTLgidxOffice"));
+            parser.putControlSequence(new AtFirstOfOne("DTLgidxIgnore"));
 
             parser.putControlSequence(new DatagidxAtInvert("DTLgidxPlace"));
             parser.putControlSequence(new DatagidxAtInvert("DTLgidxSubject"));
