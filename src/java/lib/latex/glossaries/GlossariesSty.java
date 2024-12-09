@@ -1300,6 +1300,7 @@ public class GlossariesSty extends LaTeXSty
       registerControlSequence(new GlsXtrNoGlsWarningAutoMake());
 
       registerControlSequence(new AtGobble("BibGlsOptions"));
+      registerControlSequence(new AtFirstOfTwo("IfNotBibGls"));
    }
 
    protected void addFloatsHook()
