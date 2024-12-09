@@ -266,6 +266,22 @@ public class DataToolBaseSty extends LaTeXSty
          registerControlSequence(new IntegerContentCommand(
            type.getCsName(), type.getValue(), true));
       }
+
+      registerControlSequence(new TextualContentCommand("datatoolpersoncomma", ", "));
+      registerControlSequence(new TextualContentCommand("datatoolplacecomma", ", "));
+      registerControlSequence(new TextualContentCommand("datatoolsubjectcomma", ", "));
+      registerControlSequence(new TextualContentCommand("datatoolparenstart", " "));
+
+      registerControlSequence(new LaTeXGenericCommand(true,
+       "datatoolparen", "m", TeXParserUtils.createStack(listener,
+        listener.getSpace(), listener.getOther('('),
+        listener.getParam(1), listener.getOther(')'))));
+
+      registerControlSequence(new GenericCommand(true, "datatoolasciistart"));
+      registerControlSequence(new GenericCommand(true, "datatoolasciiend"));
+      registerControlSequence(new GenericCommand(true, "datatoolctrlboundary"));
+
+      registerControlSequence(new AtFirstOfTwo("dtltexorsort"));
    }
 
    @Override
