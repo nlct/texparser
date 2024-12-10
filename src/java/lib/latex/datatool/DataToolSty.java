@@ -624,12 +624,12 @@ public class DataToolSty extends LaTeXSty
       return entry;
    }
 
-   public void removeDataBase(String name)
+   public DataBase removeDataBase(String name)
    {
-      removeDataBase(name, true);
+      return removeDataBase(name, true);
    }
 
-   public void removeDataBase(String name, boolean global)
+   public DataBase removeDataBase(String name, boolean global)
    {
       DataBase db = null;
 
@@ -681,6 +681,8 @@ public class DataToolSty extends LaTeXSty
          settings.removeLocalControlSequence(
             getColumnCountRegisterName(name));
       }
+
+      return db;
    }
 
    public void updateInternals(boolean global, String name)
