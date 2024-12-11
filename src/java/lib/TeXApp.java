@@ -20,6 +20,7 @@ package com.dickimawbooks.texparserlib;
 
 import java.nio.charset.Charset;
 import java.nio.file.Path;
+import java.util.Locale;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -226,6 +227,14 @@ public interface TeXApp
     * @return the default encoding
     */
    public Charset getDefaultCharset();
+
+   /**
+    * Gets the default locale. This may simply return
+    * java.util.Locale.getDefault().
+    *
+    * @return the default locale
+    */
+   public Locale getDefaultLocale();
 
    /**
     * Creates a buffered reader for the given file and encoding.

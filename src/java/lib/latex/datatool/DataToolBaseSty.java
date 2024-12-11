@@ -19,12 +19,15 @@
 package com.dickimawbooks.texparserlib.latex.datatool;
 
 import java.util.Date;
+import java.util.Locale;
 import java.util.Vector;
 import java.util.regex.Pattern;
 
 import java.io.IOException;
 
 import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
@@ -86,20 +89,29 @@ public class DataToolBaseSty extends LaTeXSty
 
       // Numeric
 
+      Locale locale = getListener().getTeXApp().getDefaultLocale();
+
+      DecimalFormatSymbols symbols = DecimalFormatSymbols.getInstance(locale);
+
       registerControlSequence(new DTLsetnumberchars());
-      registerControlSequence(new TextualContentCommand("@dtl@numbergroupchar", ","));
-      registerControlSequence(new TextualContentCommand("@dtl@decimal", "."));
+      registerControlSequence(new TextualContentCommand("@dtl@numbergroupchar",
+        ""+symbols.getGroupingSeparator()));
+      registerControlSequence(new TextualContentCommand("@dtl@decimal",
+        ""+symbols.getDecimalSeparator()));
 
       registerControlSequence(new AtFirstOfTwo("DTLtemporalvalue"));
 
       registerControlSequence(
-        new NumericFormatter(FMT_INTEGER_VALUE, new DecimalFormat("#,##0"), "."));
+        new NumericFormatter(FMT_INTEGER_VALUE,
+          NumberFormat.getIntegerInstance(locale), symbols, true));
 
       registerControlSequence(
-        new NumericFormatter(FMT_DECIMAL_VALUE, new DecimalFormat("#,##0.0#####")));
+        new NumericFormatter(FMT_DECIMAL_VALUE, 
+          NumberFormat.getNumberInstance(locale), symbols, false));
 
       registerControlSequence(
-        new NumericFormatter(FMT_CURRENCY_VALUE, new DecimalFormat("#,##0.00")));
+        new NumericFormatter(FMT_CURRENCY_VALUE,
+           new DecimalFormat("#,##0.00", symbols)));
 
       registerControlSequence(
         new DateFormatter(FMT_DATETIME_VALUE, DATE_TIME_FORMAT));

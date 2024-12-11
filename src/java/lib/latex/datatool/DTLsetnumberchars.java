@@ -20,6 +20,8 @@ package com.dickimawbooks.texparserlib.latex.datatool;
 
 import java.io.IOException;
 import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.text.NumberFormat;
 
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.*;
@@ -49,26 +51,32 @@ public class DTLsetnumberchars extends ControlSequence
       String numGrpChar = popLabelString(parser, stack);
       String decimalChar = popLabelString(parser, stack);
 
+      DecimalFormatSymbols symbols = new DecimalFormatSymbols();
+      symbols.setDecimalSeparator(decimalChar.charAt(0));
+      symbols.setGroupingSeparator(numGrpChar.charAt(0));
+
       parser.putControlSequence(true, 
         new TextualContentCommand("@dtl@numbergroupchar", numGrpChar));
 
       parser.putControlSequence(true, 
         new TextualContentCommand("@dtl@decimal", decimalChar));
 
+      DecimalFormat fmt = new DecimalFormat("#,##0", symbols);
+      fmt.setParseIntegerOnly(true);
+
       parser.putControlSequence(true, 
         new NumericFormatter(
-          DataToolBaseSty.FMT_INTEGER_VALUE,
-          new DecimalFormat("#"+numGrpChar+"##0"), decimalChar));
+          DataToolBaseSty.FMT_INTEGER_VALUE, fmt));
 
       parser.putControlSequence(true, 
         new NumericFormatter(
           DataToolBaseSty.FMT_DECIMAL_VALUE,
-          new DecimalFormat("#"+numGrpChar+"##0"+decimalChar+"0######")));
+          new DecimalFormat("#,##0.0######", symbols)));
 
-      parser.putControlSequence(true, 
-        new NumericFormatter(
-          DataToolBaseSty.FMT_CURRENCY_VALUE,
-          new DecimalFormat("#"+numGrpChar+"##0"+decimalChar+"00")));
+      parser.putControlSequence(
+        new NumericFormatter(DataToolBaseSty.FMT_CURRENCY_VALUE,
+           new DecimalFormat("#,##0.00", symbols)));
+
    }
 
    @Override

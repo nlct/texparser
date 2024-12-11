@@ -20,6 +20,8 @@ package com.dickimawbooks.texparserlib.latex.datatool;
 
 import java.io.IOException;
 import java.util.Vector;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.ParsePosition;
@@ -29,14 +31,19 @@ import com.dickimawbooks.texparserlib.latex.*;
 
 public class NumericFormatter extends Command
 {
-   public NumericFormatter(String name, NumberFormat numFormat)
+   public NumericFormatter(String name, DecimalFormat numFormat)
    {
-      this(name, numFormat, null, false);
+      this(name, numFormat, numFormat.getDecimalFormatSymbols(),
+        numFormat.isParseIntegerOnly());
    }
 
-   public NumericFormatter(String name, NumberFormat numFormat, String decimalChar)
+   public NumericFormatter(String name, NumberFormat numFormat, 
+      DecimalFormatSymbols symbols,
+     boolean prohibitDecimal)
    {
-      this(name, numFormat, decimalChar, decimalChar != null);
+      this(name, numFormat, 
+       prohibitDecimal || symbols == null ? null : ""+symbols.getDecimalSeparator(),
+       prohibitDecimal);
    }
 
    public NumericFormatter(String name, NumberFormat numFormat, String decimalChar,

@@ -23,6 +23,8 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import java.util.Locale;
+
 import java.io.*;
 
 import com.dickimawbooks.texparserlib.latex.LaTeXSyntaxException;
@@ -64,6 +66,12 @@ public class TeXAppAdapter extends AbstractTeXApp
      String[] outOptions, File outFile)
      throws IOException,InterruptedException
    {
+   }
+
+   @Override
+   public Locale getDefaultLocale()
+   {
+      return Locale.getDefault();
    }
 
    @Override

@@ -22,6 +22,7 @@ package com.dickimawbooks.texparsertest;
 import java.util.Properties;
 import java.util.Vector;
 import java.util.Map;
+import java.util.Locale;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 import java.text.MessageFormat;
@@ -856,6 +857,12 @@ public class TeXParserApp implements TeXApp
    public Charset getDefaultCharset()
    {
       return Charset.defaultCharset();
+   }
+
+   @Override
+   public Locale getDefaultLocale()
+   {
+      return Locale.getDefault();
    }
 
    @Override
