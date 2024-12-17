@@ -866,6 +866,12 @@ public class TeXParserApp implements TeXApp
    }
 
    @Override
+   public Locale getDefaultLocale(Locale.Category category)
+   {
+      return Locale.getDefault(category);
+   }
+
+   @Override
    public BufferedReader createBufferedReader(Path path,
      Charset charset) throws IOException, SecurityException
    {

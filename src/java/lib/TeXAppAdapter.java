@@ -75,6 +75,12 @@ public class TeXAppAdapter extends AbstractTeXApp
    }
 
    @Override
+   public Locale getDefaultLocale(Locale.Category category)
+   {
+      return Locale.getDefault(category);
+   }
+
+   @Override
    public String getMessage(String label, Object... params)
    {
       if (params.length == 0)

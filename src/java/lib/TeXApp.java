@@ -237,6 +237,14 @@ public interface TeXApp
    public Locale getDefaultLocale();
 
    /**
+    * Gets the default locale for the specified Category. This may simply return
+    * java.util.Locale.getDefault(category).
+    *
+    * @return the default locale
+    */
+   public Locale getDefaultLocale(Locale.Category category);
+
+   /**
     * Creates a buffered reader for the given file and encoding.
     * This method may simply use
     * java.nio.Files.newBufferedReader(Path,Charset)
