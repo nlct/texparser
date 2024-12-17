@@ -843,27 +843,43 @@ public class DataToolBaseSty extends LaTeXSty
 
    public static double toJulianDate(Date date)
    {
-      return unixEpochToJulianDate(date.getTime());
+      return unixEpochMillisToJulianDate(date.getTime());
    }
 
-   public static double unixEpochToJulianDate(long time)
+   public static double unixEpochSecondsToJulianDate(long timeInSecs)
    {
-      return time / 86400.0 + 2440587.5;
+      return timeInSecs / 86400.0 + 2440587.5;
    }
 
-   public static long unixEpochFromJulianDate(long jd)
+   public static double unixEpochMillisToJulianDate(long timeInMillis)
    {
-      return unixEpochFromJulianDate((double)jd);
+      return unixEpochSecondsToJulianDate(timeInMillis/1000L);
    }
 
-   public static long unixEpochFromJulianDate(double jdt)
+   public static long unixEpochSecondsFromJulianDate(long jd)
+   {
+      return unixEpochSecondsFromJulianDate((double)jd);
+   }
+
+   public static long unixEpochSecondsFromJulianDate(double jdt)
    {
       return (long)Math.round((jdt - 2440587.5) * 86400.0);
    }
 
+   public static long unixEpochMillisFromJulianDate(long jd)
+   {
+      return unixEpochMillisFromJulianDate((double)jd);
+   }
+
+   public static long unixEpochMillisFromJulianDate(double jdt)
+   {
+      return (long)Math.round((jdt - 2440587.5) * 86400000.0);
+   }
+
    public static String formatDateTime(Number num)
    {
-      return DATE_TIME_FORMAT.format(unixEpochFromJulianDate(num.doubleValue()));
+      return DATE_TIME_FORMAT.format(
+       new Date(unixEpochMillisFromJulianDate(num.doubleValue())));
    }
 
    public boolean isNull(TeXObject object)

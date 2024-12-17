@@ -127,7 +127,7 @@ public class DataTimeElement extends AbstractTeXObject
    @Override
    public Date getDate()
    {
-      return new Date(julian.toUnixEpoch());
+      return new Date(julian.toUnixEpochMillis());
    }
 
    @Override

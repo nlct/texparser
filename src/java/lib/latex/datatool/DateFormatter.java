@@ -71,7 +71,8 @@ public class DateFormatter extends Command
          }
       }
 
-      fmt = dateFormat.format(new Date(DataToolBaseSty.unixEpochFromJulianDate(jdn)));
+      fmt = dateFormat.format(
+        new Date(DataToolBaseSty.unixEpochMillisFromJulianDate(jdn)));
 
       return fmt;
    }

@@ -127,6 +127,8 @@ public class Julian
     * Creates a new instance for the given UTC datetime with local
     * time set according to the given time zone offsets.
     * @param jdt the Julian date
+    * @param timeZoneHr hour offset
+    * @param timeZoneMin hour offset
     */
    public static Julian createDate(double jdt, int timeZoneHr, int timeZoneMin)
    {
@@ -138,6 +140,118 @@ public class Julian
         signedTwoDigits(julian.tzh), julian.tzm);
 
       julian.timestamp += julian.zoneId;
+
+      return julian;
+   }
+
+   /**
+    * Creates a new instance for the given Calendar.
+    * @param calendar
+    */
+   public static Julian createDate(Calendar calendar)
+   {
+      long date = calendar.getTimeInMillis();
+      TimeZone timezone = calendar.getTimeZone();
+      int offset = timezone.getOffset(date);
+
+      Julian julian = new Julian();
+
+      julian.hasDate = true;
+      julian.hasTime = true;
+      julian.hasTimeZone = true;
+
+      julian.julianDate = DataToolBaseSty.unixEpochMillisToJulianDate(date);
+      julian.julianDay = (int)Math.round(julian.julianDate);
+      julian.julianTime = julian.julianDate - julian.julianDay;
+
+      julian.localYear = calendar.get(Calendar.YEAR);
+      julian.localMonth = calendar.get(Calendar.MONTH)+1;
+      julian.localDay = calendar.get(Calendar.DAY_OF_MONTH);
+
+      switch (calendar.get(Calendar.DAY_OF_WEEK))
+      {
+         case Calendar.SUNDAY:
+           julian.localDow = 6;
+         break;
+         case Calendar.MONDAY:
+           julian.localDow = 0;
+         break;
+         case Calendar.TUESDAY:
+           julian.localDow = 1;
+         break;
+         case Calendar.WEDNESDAY:
+           julian.localDow = 2;
+         break;
+         case Calendar.THURSDAY:
+           julian.localDow = 3;
+         break;
+         case Calendar.FRIDAY:
+           julian.localDow = 4;
+         break;
+         case Calendar.SATURDAY:
+           julian.localDow = 5;
+         break;
+      }
+
+      julian.localHour = calendar.get(Calendar.HOUR_OF_DAY);
+      julian.localMinute = calendar.get(Calendar.MINUTE);
+      julian.localSecond = calendar.get(Calendar.SECOND);
+
+      julian.year = julian.localYear;
+      julian.month = julian.localMonth;
+      julian.day = julian.localDay;
+      julian.dow = julian.localDow;
+      julian.hour = julian.localDow;
+      julian.minute = julian.localMinute;
+      julian.second = julian.localSecond;
+
+      if (offset != 0)
+      {
+         julian.tzh = offset/3600000;
+         julian.tzm = Math.abs(offset/60000)%60;
+
+         if (julian.tzm != 0)
+         {
+            julian.minute -= julian.tzm;
+
+            if (julian.minute < 0)
+            {
+               julian.minute += 60;
+               julian.hour--;
+            }
+            else if (julian.minute >= 60)
+            {
+               julian.minute -= 60;
+               julian.hour++;
+            }
+         }
+
+         if (julian.tzh != 0)
+         {
+            julian.hour -= julian.tzh;
+         }
+
+         if (julian.hour < 0)
+         {
+            julian.hour += 23;
+         }
+         else if (julian.hour >= 24)
+         {
+            julian.hour -= 24;
+         }
+
+         julian.updateYMD(false, julian.julianDay);
+         julian.dow = julian.julianDay % 7;
+      }
+
+      julian.zoneId = String.format((Locale)null, "%s:%02d",
+        signedTwoDigits(julian.tzh), julian.tzm);
+
+      julian.timestamp = String.format((Locale)null,
+        "%d-%02d-%02dT%02d:%02d:%02d%s",
+        julian.localYear, julian.localMonth, julian.localDay,
+        julian.localHour, julian.localMinute, julian.localSecond,
+        julian.zoneId);
 
       return julian;
    }
@@ -684,9 +798,14 @@ public class Julian
       return DatumType.TIME;
    }
 
-   public long toUnixEpoch()
+   public long toUnixEpochMillis()
    {
-      return DataToolBaseSty.unixEpochFromJulianDate(julianDate);
+      return DataToolBaseSty.unixEpochMillisFromJulianDate(julianDate);
+   }
+
+   public long toUnixEpochSeconds()
+   {
+      return DataToolBaseSty.unixEpochSecondsFromJulianDate(julianDate);
    }
 
    public int getYear(boolean local)
@@ -794,7 +913,7 @@ public class Julian
 
    public void adjustTimeZone(TimeZone timeZone)
    {
-      int offset = timeZone.getOffset(toUnixEpoch());
+      int offset = timeZone.getOffset(toUnixEpochMillis());
 
       int offsetHr = offset / 3600000;
       int offsetMin = (((int)Math.abs(offset)) / 60000)
