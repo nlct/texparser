@@ -19,6 +19,7 @@
 package com.dickimawbooks.texparserlib.latex.datatool;
 
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
 
@@ -145,6 +146,17 @@ public class Julian
    }
 
    /**
+    * Creates a new datetime instance for the given Date.
+    * @param calendar
+    */
+   public static Julian createDate(Date date, Locale locale)
+   {
+     Calendar cal = Calendar.getInstance(locale);
+     cal.setTime(date);
+     return createDate(cal);
+   }
+
+   /**
     * Creates a new datetime instance for the given Calendar.
     * @param calendar
     */
@@ -257,6 +269,17 @@ public class Julian
    }
 
    /**
+    * Creates a new date instance for the given Date.
+    * @param calendar
+    */
+   public static Julian createDay(Date date, Locale locale)
+   {
+     Calendar cal = Calendar.getInstance(locale);
+     cal.setTime(date);
+     return createDay(cal);
+   }
+
+   /**
     * Creates a new date instance for the given Calendar.
     * @param calendar
     */
@@ -310,6 +333,17 @@ public class Julian
         julian.year, julian.month, julian.day);
 
       return julian;
+   }
+
+   /**
+    * Creates a new time instance for the given Date.
+    * @param calendar
+    */
+   public static Julian createTime(Date date, Locale locale)
+   {
+     Calendar cal = Calendar.getInstance(locale);
+     cal.setTime(date);
+     return createTime(cal);
    }
 
    /**
