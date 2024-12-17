@@ -312,6 +312,39 @@ public class Julian
       return julian;
    }
 
+   /**
+    * Creates a new time instance for the given Calendar.
+    * @param calendar
+    */
+   public static Julian createTime(Calendar calendar)
+   {
+      long date = calendar.getTimeInMillis();
+
+      Julian julian = new Julian();
+
+      julian.hasDate = false;
+      julian.hasTime = true;
+      julian.hasTimeZone = false;
+
+      julian.julianDate = DataToolBaseSty.unixEpochMillisToJulianDate(date);
+      julian.julianDay = (int)Math.round(julian.julianDate);
+      julian.julianTime = julian.julianDate - julian.julianDay;
+      julian.julianDay = 0;
+      julian.julianDate = julian.julianTime;
+
+      julian.hour = calendar.get(Calendar.HOUR_OF_DAY);
+      julian.minute = calendar.get(Calendar.MINUTE);
+      julian.second = calendar.get(Calendar.SECOND);
+
+      julian.setLocals();
+
+      julian.timestamp = String.format((Locale)null,
+        "%02d:%02d:%02d",
+        julian.localHour, julian.localMinute, julian.localSecond);
+
+      return julian;
+   }
+
    public static Julian create(String iso)
     throws IllegalArgumentException
    {
