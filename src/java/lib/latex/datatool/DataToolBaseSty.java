@@ -841,7 +841,7 @@ public class DataToolBaseSty extends LaTeXSty
       return TeXParserUtils.isTrue(REFORMAT_DATETIME_BOOL, getParser());
    }
 
-   public double toJulianDate(Date date)
+   public static double toJulianDate(Date date)
    {
       return unixEpochToJulianDate(date.getTime());
    }
