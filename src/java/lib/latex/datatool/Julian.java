@@ -21,6 +21,10 @@ package com.dickimawbooks.texparserlib.latex.datatool;
 import java.util.Calendar;
 import java.util.Locale;
 import java.util.TimeZone;
+
+import java.time.*;
+import java.time.temporal.Temporal;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -130,8 +134,10 @@ public class Julian
 
       julian.adjustTimeZone(timeZoneHr, timeZoneMin);
 
-      julian.timestamp += String.format((Locale)null, "%s:%02d",
+      julian.zoneId = String.format((Locale)null, "%s:%02d",
         signedTwoDigits(julian.tzh), julian.tzm);
+
+      julian.timestamp += julian.zoneId;
 
       return julian;
    }
@@ -250,11 +256,14 @@ public class Julian
 
             if (julian.hasTimeZone)
             {
+               julian.zoneId = String.format((Locale)null, "%s:%02d",
+                 signedTwoDigits(julian.tzh), julian.tzm);
+
                julian.timestamp = String.format((Locale)null,
-                 "%d-%02d-%02dT%02d:%02d:%02d%s:%02d",
+                 "%d-%02d-%02dT%02d:%02d:%02d%s",
                  julian.localYear, julian.localMonth, julian.localDay,
                  julian.localHour, julian.localMinute, julian.localSecond,
-                 signedTwoDigits(julian.tzh), julian.tzm);
+                 julian.zoneId);
             }
             else
             {
@@ -316,10 +325,251 @@ public class Julian
       return builder.build();
    }
 
+   public ZoneOffset getZoneOffset()
+   {
+      if (hasTimeZone)
+      {
+         try
+         {
+            return ZoneOffset.ofHoursMinutes(tzh, tzh < 0 ? -Math.abs(tzm) : Math.abs(tzm));
+         }
+         catch (DateTimeException e)
+         {
+         }
+      }
+
+      return null;
+   }
+
+   public ZoneId getZoneId()
+   {
+      if (zoneId != null)
+      {
+         try
+         {
+            return ZoneId.of(zoneId);
+         }
+         catch (DateTimeException e)
+         {
+         }
+      }
+
+      return null;
+   }
+
+   public LocalDateTime getLocalDateTime()
+   {
+      if (hasDate && hasTime)
+      {
+         try
+         {
+            return LocalDateTime.of(localYear, localMonth, localDay,
+              localHour, localMinute, localSecond);
+         }
+         catch (DateTimeException e)
+         {
+         }
+      }
+
+      return null;
+   }
+
+   public LocalDate getLocalDate()
+   {
+      if (hasDate)
+      {
+         try
+         {
+            return LocalDate.of(localYear, localMonth, localDay);
+         }
+         catch (DateTimeException e)
+         {
+         }
+      }
+
+      return null;
+   }
+
+   public LocalTime getLocalTime()
+   {
+      if (hasTime)
+      {
+         try
+         {
+            return LocalTime.of(localHour, localMinute, localSecond);
+         }
+         catch (DateTimeException e)
+         {
+         }
+      }
+
+      return null;
+   }
+
+   public Temporal getTemporal()
+   {
+      LocalDateTime dt = getLocalDateTime();
+      Temporal temporal = dt;
+
+      if (dt == null)
+      {
+         LocalDate d = getLocalDate();
+
+         if (d == null)
+         {
+            temporal = getLocalTime();
+         }
+         else
+         {
+            temporal = d;
+         }
+      }
+      else
+      {
+         ZoneId zone = getZoneId();
+
+         if (zone != null)
+         {
+            try
+            {
+               temporal = ZonedDateTime.of(dt, zone);
+            }
+            catch (DateTimeException e)
+            {
+            }
+         }
+      }
+
+      return temporal;
+   }
+
    public static String signedTwoDigits(int num)
    {
       return num < 0 ? String.format((Locale)null, "%02d", num) :
         String.format((Locale)null, "+%02d", num);
+   }
+
+   public TeXObjectList createTeXFormat(TeXParserListener listener)
+   {
+      TeXObjectList list = listener.createStack();
+
+      if (hasDate)
+      {
+         if (hasTime)
+         {
+            list.add(new TeXCsRef("DataToolTimeStampFmt"));
+
+            Group grp = listener.createGroup();
+            list.add(grp);
+
+            grp.add(TeXParserUtils.createGroup(listener,
+              new UserNumber(localYear)));
+            grp.add(listener.createGroup(String.format("%02d", localMonth)));
+            grp.add(listener.createGroup(String.format("%02d", localDay)));
+            grp.add(TeXParserUtils.createGroup(listener,
+              new UserNumber(localDow)));
+
+            grp = listener.createGroup();
+            list.add(grp);
+
+            grp.add(listener.createGroup(String.format("%02d", localHour)));
+            grp.add(listener.createGroup(String.format("%02d", localMinute)));
+            grp.add(listener.createGroup(String.format("%02d", localSecond)));
+
+            grp = listener.createGroup();
+            list.add(grp);
+
+            grp.add(listener.createGroup(signedTwoDigits(tzh)));
+            grp.add(listener.createGroup(String.format("%02d", tzm)));
+         }
+         else
+         {
+            list.add(new TeXCsRef("DataToolDateFmt"));
+
+            list.add(TeXParserUtils.createGroup(listener,
+              new UserNumber(localYear)));
+            list.add(listener.createGroup(String.format("%02d", localMonth)));
+            list.add(listener.createGroup(String.format("%02d", localDay)));
+            list.add(TeXParserUtils.createGroup(listener,
+              new UserNumber(localDow)));
+
+         }
+      }
+      else
+      {
+         list.add(new TeXCsRef("DataToolTimeFmt"));
+
+         list.add(listener.createGroup(String.format("%02d", localHour)));
+         list.add(listener.createGroup(String.format("%02d", localMinute)));
+         list.add(listener.createGroup(String.format("%02d", localSecond)));
+      }
+
+      return list;
+   }
+
+   public String getTeXFormatCode()
+   {
+      StringBuilder builder = new StringBuilder();
+
+      if (hasDate)
+      {
+         if (hasTime)
+         {
+            builder.append("\\DataToolTimeStampFmt{");
+
+            builder.append('{');
+            builder.append(localYear);
+            builder.append('}');
+
+            builder.append(String.format("{%02d}", localMonth));
+            builder.append(String.format("{%02d}", localDay));
+
+            builder.append('{');
+            builder.append(localDow);
+            builder.append('}');
+
+            builder.append("}{");
+
+            builder.append(String.format("{%02d}", localHour));
+            builder.append(String.format("{%02d}", localMinute));
+            builder.append(String.format("{%02d}", localSecond));
+
+            builder.append("}{");
+
+            builder.append('{');
+            builder.append(signedTwoDigits(tzh));
+            builder.append('}');
+
+            builder.append(String.format("{%02d}", tzm));
+
+            builder.append('}');
+         }
+         else
+         {
+            builder.append("\\DataToolDateFmt");
+
+            builder.append('{');
+            builder.append(localYear);
+            builder.append('}');
+
+            builder.append(String.format("{%02d}", localMonth));
+            builder.append(String.format("{%02d}", localDay));
+
+            builder.append('{');
+            builder.append(localDow);
+            builder.append('}');
+         }
+      }
+      else
+      {
+         builder.append("\\DataToolTimeFmt");
+
+         builder.append(String.format("{%02d}", localHour));
+         builder.append(String.format("{%02d}", localMinute));
+         builder.append(String.format("{%02d}", localSecond));
+      }
+
+      return builder.toString();
    }
 
    public DatumElement toDatumElement(TeXParserListener listener,
@@ -353,64 +603,11 @@ public class Julian
 
       if (reformatOriginal)
       {
-         TeXObjectList list = listener.createStack();
-
-         if (hasDate)
-         {
-            if (hasTime)
-            {
-               list.add(new TeXCsRef("DataToolTimeStampFmt"));
-
-               Group grp = listener.createGroup();
-               list.add(grp);
-
-               grp.add(TeXParserUtils.createGroup(listener,
-                 new UserNumber(localYear)));
-               grp.add(listener.createGroup(String.format("%02d", localMonth)));
-               grp.add(listener.createGroup(String.format("%02d", localDay)));
-               grp.add(TeXParserUtils.createGroup(listener,
-                 new UserNumber(localDow)));
-
-               grp = listener.createGroup();
-               list.add(grp);
-
-               grp.add(listener.createGroup(String.format("%02d", localHour)));
-               grp.add(listener.createGroup(String.format("%02d", localMinute)));
-               grp.add(listener.createGroup(String.format("%02d", localSecond)));
-
-               grp = listener.createGroup();
-               list.add(grp);
-
-               grp.add(listener.createGroup(signedTwoDigits(tzh)));
-               grp.add(listener.createGroup(String.format("%02d", tzm)));
-            }
-            else
-            {
-               list.add(new TeXCsRef("DataToolDateFmt"));
-
-               list.add(TeXParserUtils.createGroup(listener,
-                 new UserNumber(localYear)));
-               list.add(listener.createGroup(String.format("%02d", localMonth)));
-               list.add(listener.createGroup(String.format("%02d", localDay)));
-               list.add(TeXParserUtils.createGroup(listener,
-                 new UserNumber(localDow)));
-
-            }
-         }
-         else
-         {
-            list.add(new TeXCsRef("DataToolTimeFmt"));
-
-            list.add(listener.createGroup(String.format("%02d", localHour)));
-            list.add(listener.createGroup(String.format("%02d", localMinute)));
-            list.add(listener.createGroup(String.format("%02d", localSecond)));
-         }
-
-         strVal = list;
+         strVal = createTeXFormat(listener);
       }
 
       return new DatumElement(strVal, 
-        texNum, valueList, null, getDatumType());
+        texNum, valueList, null, this, getDatumType());
    }
 
    public DataElement toDataElement(TeXParserListener listener,
@@ -722,7 +919,7 @@ public class Julian
        );
    }
 
-   String timestamp;
+   String timestamp, zoneId;
    boolean hasDate=false, hasTime=false, hasTimeZone=false;
    int year=-4713, month=1, day=1, dow=1, hour=12, minute=0, second=0, 
     julianDay=0;
