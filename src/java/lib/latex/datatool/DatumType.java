@@ -30,24 +30,30 @@ import com.dickimawbooks.texparserlib.ControlSequence;
  */
 public enum DatumType
 {
-   UNKNOWN(-1, "c_datatool_unknown_int"),
-   STRING(0, "c_datatool_string_int"),
-   INTEGER(1, "c_datatool_integer_int"),
-   DECIMAL(2, "c_datatool_decimal_int"),
-   CURRENCY(3, "c_datatool_currency_int"),
-   DATETIME(4, "c_datatool_datetime_int"),
-   DATE(5, "c_datatool_date_int"),
-   TIME(6, "c_datatool_time_int");
+   UNKNOWN(-1, "c_datatool_unknown_int", "unset"),
+   STRING(0, "c_datatool_string_int", "string"),
+   INTEGER(1, "c_datatool_integer_int", "int"),
+   DECIMAL(2, "c_datatool_decimal_int", "real"),
+   CURRENCY(3, "c_datatool_currency_int", "currency"),
+   DATETIME(4, "c_datatool_datetime_int", "datetime"),
+   DATE(5, "c_datatool_date_int", "date"),
+   TIME(6, "c_datatool_time_int", "time");
 
-   DatumType(int id, String csname)
+   DatumType(int id, String csname, String tag)
    {
       this.id = id;
       this.csname = csname;
+      this.tag = tag;
    }
 
    public int getValue()
    {
       return id;
+   }
+
+   public String getTag()
+   {
+      return tag;
    }
 
    public String getCsName()
@@ -150,4 +156,5 @@ public enum DatumType
 
    private final int id;
    private final String csname;
+   private final String tag;
 }
