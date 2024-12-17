@@ -145,7 +145,7 @@ public class Julian
    }
 
    /**
-    * Creates a new instance for the given Calendar.
+    * Creates a new datetime instance for the given Calendar.
     * @param calendar
     */
    public static Julian createDate(Calendar calendar)
@@ -252,6 +252,62 @@ public class Julian
         julian.localYear, julian.localMonth, julian.localDay,
         julian.localHour, julian.localMinute, julian.localSecond,
         julian.zoneId);
+
+      return julian;
+   }
+
+   /**
+    * Creates a new date instance for the given Calendar.
+    * @param calendar
+    */
+   public static Julian createDay(Calendar calendar)
+   {
+      long date = calendar.getTimeInMillis();
+
+      Julian julian = new Julian();
+
+      julian.hasDate = true;
+      julian.hasTime = false;
+      julian.hasTimeZone = false;
+
+      julian.julianDay = (int)Math.round(
+        DataToolBaseSty.unixEpochMillisToJulianDate(date));
+      julian.julianDate = julian.julianDay;
+
+      julian.year = calendar.get(Calendar.YEAR);
+      julian.month = calendar.get(Calendar.MONTH)+1;
+      julian.day = calendar.get(Calendar.DAY_OF_MONTH);
+
+      switch (calendar.get(Calendar.DAY_OF_WEEK))
+      {
+         case Calendar.SUNDAY:
+           julian.dow = 6;
+         break;
+         case Calendar.MONDAY:
+           julian.dow = 0;
+         break;
+         case Calendar.TUESDAY:
+           julian.dow = 1;
+         break;
+         case Calendar.WEDNESDAY:
+           julian.dow = 2;
+         break;
+         case Calendar.THURSDAY:
+           julian.dow = 3;
+         break;
+         case Calendar.FRIDAY:
+           julian.dow = 4;
+         break;
+         case Calendar.SATURDAY:
+           julian.dow = 5;
+         break;
+      }
+
+      julian.setLocals();
+
+      julian.timestamp = String.format((Locale)null,
+        "%d-%02d-%02d",
+        julian.year, julian.month, julian.day);
 
       return julian;
    }
