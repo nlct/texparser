@@ -89,29 +89,14 @@ public class DataToolBaseSty extends LaTeXSty
 
       // Numeric
 
-      Locale locale = getListener().getTeXApp().getDefaultLocale();
-
-      DecimalFormatSymbols symbols = DecimalFormatSymbols.getInstance(locale);
-
       registerControlSequence(new DTLsetnumberchars());
-      registerControlSequence(new TextualContentCommand("@dtl@numbergroupchar",
-        ""+symbols.getGroupingSeparator()));
-      registerControlSequence(new TextualContentCommand("@dtl@decimal",
-        ""+symbols.getDecimalSeparator()));
+
+      if (numericLocale == null)
+      {
+         setNumericLocale(getListener().getTeXApp().getDefaultLocale());
+      }
 
       registerControlSequence(new AtFirstOfTwo("DTLtemporalvalue"));
-
-      registerControlSequence(
-        new NumericFormatter(FMT_INTEGER_VALUE,
-          NumberFormat.getIntegerInstance(locale), symbols, true));
-
-      registerControlSequence(
-        new NumericFormatter(FMT_DECIMAL_VALUE, 
-          NumberFormat.getNumberInstance(locale), symbols, false));
-
-      registerControlSequence(
-        new NumericFormatter(FMT_CURRENCY_VALUE,
-           new DecimalFormat("#,##0.00", symbols)));
 
       registerControlSequence(
         new DateFormatter(FMT_DATETIME_VALUE, DATE_TIME_FORMAT));
@@ -921,7 +906,38 @@ public class DataToolBaseSty extends LaTeXSty
       return false;
    }
 
+   public Locale getNumericLocale()
+   {
+      return numericLocale;
+   }
+
+   public void setNumericLocale(Locale locale)
+   {
+      numericLocale = locale;
+
+      DecimalFormatSymbols symbols = DecimalFormatSymbols.getInstance(locale);
+
+      registerControlSequence(new TextualContentCommand("@dtl@numbergroupchar",
+        ""+symbols.getGroupingSeparator()));
+      registerControlSequence(new TextualContentCommand("@dtl@decimal",
+        ""+symbols.getDecimalSeparator()));
+
+      registerControlSequence(
+        new NumericFormatter(FMT_INTEGER_VALUE,
+          NumberFormat.getIntegerInstance(locale), symbols, true));
+
+      registerControlSequence(
+        new NumericFormatter(FMT_DECIMAL_VALUE, 
+          NumberFormat.getNumberInstance(locale), symbols, false));
+
+      registerControlSequence(
+        new NumericFormatter(FMT_CURRENCY_VALUE,
+           new DecimalFormat("#,##0.00", symbols)));
+   }
+
    private IfThenSty ifThenSty;
+
+   private Locale numericLocale;
 
    private Vector<TeXObject> currencySymbolList;
 

@@ -50,6 +50,11 @@ public interface DataElement extends TeXObject
    public TeXObject getCurrencySymbol();
 
    /**
+    * Gets the Julian object or null if not temporal.
+    */
+   public Julian getJulian();
+
+   /**
     * Gets the value as a TeXObject or null if not numeric.
     */
    public TeXObject getTeXValue(TeXParser parser);

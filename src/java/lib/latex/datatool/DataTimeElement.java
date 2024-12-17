@@ -46,44 +46,54 @@ public class DataTimeElement extends AbstractTeXObject
 
    public DataTimeElement(double value)
    {
-      this.value = value;
+      this(value, null);
    }
 
    public DataTimeElement(double value, TeXObject original)
    {
-      this.value = value;
+      this(Julian.createTime(value), original);
+   }
+
+   public DataTimeElement(Julian julian)
+   {
+      this(julian, null);
+   }
+
+   public DataTimeElement(Julian julian, TeXObject original)
+   {
+      this.julian = julian;
       this.original = original;
    }
 
    @Override
    public Object clone()
    {
-      return new DataTimeElement(value,
+      return new DataTimeElement(julian,
         original == null ? null : (TeXObject)original.clone());
    }
 
    @Override
    public double doubleValue()
    {
-      return value;
+      return julian.getJulianTime();
    }
 
    @Override
    public float floatValue()
    {
-      return (float)value;
+      return (float)doubleValue();
    }
 
    @Override
    public int intValue()
    {
-      return (int)value;
+      return (int)doubleValue();
    }
 
    @Override
    public long longValue()
    {
-      return (long)value;
+      return (long)doubleValue();
    }
 
    @Override
@@ -97,7 +107,7 @@ public class DataTimeElement extends AbstractTeXObject
 
       Group grp = listener.createGroup();
       list.add(grp);
-      grp.add(new TeXFloatingPoint(value));
+      grp.add(new TeXFloatingPoint(doubleValue()));
 
       if (original == null)
       {
@@ -117,7 +127,13 @@ public class DataTimeElement extends AbstractTeXObject
    @Override
    public Date getDate()
    {
-      return new Date(DataToolBaseSty.unixEpochFromJulianDate(value));
+      return new Date(julian.toUnixEpoch());
+   }
+
+   @Override
+   public Julian getJulian()
+   {
+      return julian;
    }
 
    @Override
@@ -144,21 +160,30 @@ public class DataTimeElement extends AbstractTeXObject
    public void advance(TeXParser parser, Numerical increment)
     throws TeXSyntaxException
    {
+      double value = doubleValue();
       value += increment.number(parser);
+
+      julian = Julian.createTime(value);
       original = null;
    }
 
    @Override
    public void divide(int divisor)
    {
+      double value = doubleValue();
       value /= divisor;
+
+      julian = Julian.createTime(value);
       original = null;
    }
 
    @Override
    public void multiply(int factor)
    {
+      double value = doubleValue();
       value *= factor;
+
+      julian = Julian.createTime(value);
       original = null;
    }
 
@@ -295,16 +320,16 @@ public class DataTimeElement extends AbstractTeXObject
 
    public String toString()
    {
-      return String.format("%s[value=%f,original=%s]",
-        getClass().getSimpleName(), value, original);
+      return String.format("%s[julian=%s,original=%s]",
+        getClass().getSimpleName(), julian, original);
    }
 
    @Override
    public ControlSequence createControlSequence(String name)
    {
-      return new FloatingPointContentCommand(name, value);
+      return new FloatingPointContentCommand(name, doubleValue());
    }
 
-   protected double value;
+   protected Julian julian;
    protected TeXObject original;
 }

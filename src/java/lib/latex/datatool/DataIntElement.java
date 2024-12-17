@@ -128,6 +128,12 @@ public class DataIntElement extends UserNumber implements DataNumericElement
    }
 
    @Override
+   public Julian getJulian()
+   {
+      return null;
+   }
+
+   @Override
    public void process(TeXParser parser) throws IOException
    {
       process(parser, parser);

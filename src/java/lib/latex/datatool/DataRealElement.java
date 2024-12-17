@@ -110,6 +110,12 @@ public class DataRealElement extends AbstractTeXObject
    }
 
    @Override
+   public Julian getJulian()
+   {
+      return null;
+   }
+
+   @Override
    public void advance(TeXParser parser, Numerical increment)
     throws TeXSyntaxException
    {

@@ -23,4 +23,5 @@ import java.util.Date;
 public interface DataTemporalElement extends DataNumericElement
 {
    public Date getDate();
+   public Julian getJulian();
 }

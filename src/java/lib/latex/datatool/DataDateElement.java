@@ -31,65 +31,81 @@ public class DataDateElement extends AbstractTeXObject
 {
    public DataDateElement()
    {
-      this(0L);
+      this(0);
    }
 
    public DataDateElement(Number num)
    {
-      this(num.longValue());
+      this(num.intValue(), null);
    }
 
    public DataDateElement(TeXNumber num)
    {
-      this(num.longValue());
+      this(num.getValue(), null);
    }
 
-   public DataDateElement(long value)
+   public DataDateElement(int value)
    {
-      this.value = value;
+      this(value, null);
    }
 
-   public DataDateElement(long value, TeXObject original)
+   public DataDateElement(int value, TeXObject original)
    {
-      this.value = value;
+      this(Julian.createDay(value), original);
+   }
+
+   public DataDateElement(Julian julian)
+   {
+      this(julian, null);
+   }
+
+   public DataDateElement(Julian julian, TeXObject original)
+   {
+      this.julian = julian;
       this.original = original;
    }
 
    @Override
    public Object clone()
    {
-      return new DataDateElement(value,
+      return new DataDateElement(julian,
         original == null ? null : (TeXObject)original.clone());
    }
 
    @Override
    public double doubleValue()
    {
-      return (double)value;
+      return (double)intValue();
    }
 
    @Override
    public float floatValue()
    {
-      return (float)value;
+      return (float)intValue();
    }
 
    @Override
    public int intValue()
    {
-      return (int)value;
+      return julian.getJulianDay();
    }
 
    @Override
    public long longValue()
    {
-      return value;
+      return (long)intValue();
    }
 
    @Override
    public Date getDate()
    {
-      return new Date(DataToolBaseSty.unixEpochFromJulianDate(value));
+      return new Date(julian.toUnixEpoch());
+   }
+
+   @Override
+   public Julian getJulian()
+   {
+      return julian;
    }
 
    @Override
@@ -103,12 +119,11 @@ public class DataDateElement extends AbstractTeXObject
 
       Group grp = listener.createGroup();
       list.add(grp);
-      grp.add(new TeXLongNumber(value));
+      grp.add(new UserNumber(intValue()));
 
       if (original == null)
       {
-         String timestamp = DataToolBaseSty.DATE_FORMAT.format(getDate());
-         list.add(listener.createGroup(timestamp));
+         list.add(listener.createGroup(julian.getTimeStamp()));
       }
       else
       {
@@ -144,21 +159,30 @@ public class DataDateElement extends AbstractTeXObject
    public void advance(TeXParser parser, Numerical increment)
     throws TeXSyntaxException
    {
+      int value = intValue();
       value += increment.number(parser);
+
+      julian = Julian.createDay(value);
       original = null;
    }
 
    @Override
    public void divide(int divisor)
    {
+      int value = intValue();
       value /= divisor;
+
+      julian = Julian.createDay(value);
       original = null;
    }
 
    @Override
    public void multiply(int factor)
    {
+      int value = intValue();
       value *= factor;
+
+      julian = Julian.createDay(value);
       original = null;
    }
 
@@ -210,7 +234,7 @@ public class DataDateElement extends AbstractTeXObject
       {
          expanded.add(listener.getControlSequence(
            DataToolBaseSty.FMT_DATE_VALUE));
-         expanded.add(new TeXLongNumber(longValue()));
+         expanded.add(new UserNumber(intValue()));
       }
       else
       {
@@ -283,7 +307,7 @@ public class DataDateElement extends AbstractTeXObject
 
          expanded.add(listener.getControlSequence(
            DataToolBaseSty.FMT_DATE_VALUE));
-         expanded.add(new TeXLongNumber(longValue()));
+         expanded.add(new UserNumber(intValue()));
 
          TeXParserUtils.process(expanded, parser, stack);
       }
@@ -295,16 +319,16 @@ public class DataDateElement extends AbstractTeXObject
 
    public String toString()
    {
-      return String.format("%s[value=%f,original=%s]",
-        getClass().getSimpleName(), value, original);
+      return String.format("%s[julian=%s,original=%s]",
+        getClass().getSimpleName(), julian, original);
    }
 
    @Override
    public ControlSequence createControlSequence(String name)
    {
-      return new LongContentCommand(name, value);
+      return new IntegerContentCommand(name, intValue());
    }
 
-   protected long value;
+   protected Julian julian;
    protected TeXObject original;
 }

@@ -65,6 +65,11 @@ public enum DatumType
       return id > 0;
    }
 
+   public boolean isTemporal()
+   {
+      return this == DATETIME || this == DATE || this == TIME;
+   }
+
    public static DatumType toDatumType(int typeId)
    {
       for (DatumType type : values())

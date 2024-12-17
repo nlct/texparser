@@ -30,29 +30,64 @@ public class DatumElement extends AbstractTeXObject
 {
    public DatumElement()
    {
-      this(new TeXObjectList(), null, null, DatumType.UNKNOWN);
+      this(new TeXObjectList(), null, null, null, null, DatumType.UNKNOWN);
    }
 
    public DatumElement(TeXObject content)
    {
-      this(content, null, null, DatumType.STRING);
+      this(content, null, null, null, null, DatumType.STRING);
    }
 
    public DatumElement(TeXObject content, TeXNumber number,
       TeXObject currencySymbol, DatumType datumType)
    {
-      this(content, number, number, currencySymbol, datumType);
+      this(content, number, number, currencySymbol, null, datumType);
    }
 
    public DatumElement(TeXObject content, TeXNumber number,
       TeXObject objectValue,
-      TeXObject currencySymbol, DatumType datumType)
+      TeXObject currencySymbol,
+      Julian julian, DatumType datumType)
    {
       this.content = content;
       this.number = number;
       this.objectValue = objectValue;
       this.currencySymbol = currencySymbol;
+      this.julian = julian;
       this.datumType = datumType;
+   }
+
+   public DatumElement(TeXParserListener listener, TeXObject content, Julian julian)
+   {
+      this.content = content;
+      this.currencySymbol = null;
+
+      TeXObjectList list = listener.createStack();
+      objectValue = list;
+
+      list.add(new TeXCsRef("DTLtemporalvalue"));
+      Group grp = listener.createGroup();
+      list.add(grp);
+
+      if (julian.hasDate() && julian.hasTime())
+      {
+         this.datumType = DatumType.DATETIME;
+         number = new TeXFloatingPoint(julian.getJulianDate());
+      }
+      else if (julian.hasTime())
+      {
+         this.datumType = DatumType.TIME;
+         number = new TeXFloatingPoint(julian.getJulianTime());
+      }
+      else
+      {
+         this.datumType = DatumType.DATE;
+         number = new UserNumber(julian.getJulianDay());
+      }
+
+      grp.add(number);
+
+      list.add(listener.createGroup(julian.getTimeStamp()));
    }
 
    @Override
@@ -74,6 +109,8 @@ public class DatumElement extends AbstractTeXObject
       {
          element.currencySymbol = (TeXObject)currencySymbol.clone();
       }
+
+      element.julian = julian;
 
       element.datumType = datumType;
 
@@ -126,6 +163,11 @@ public class DatumElement extends AbstractTeXObject
    public TeXObject getTeXValue(TeXParser parser)
    {
       return objectValue;
+   }
+
+   public Julian getJulian()
+   {
+      return julian;
    }
 
    public Number getNumber()
@@ -349,8 +391,9 @@ public class DatumElement extends AbstractTeXObject
    @Override
    public String toString()
    {
-      return String.format("%s[content=%s,number=%s,objectValue=%s,symbol=%s,type=%s]",
-        getClass().getSimpleName(), content, number, objectValue, currencySymbol, datumType);
+      return String.format("%s[content=%s,number=%s,objectValue=%s,symbol=%s,julian=%s,type=%s]",
+        getClass().getSimpleName(), content, number, objectValue, currencySymbol,
+         julian, datumType);
    }
 
    @Override
@@ -364,4 +407,5 @@ public class DatumElement extends AbstractTeXObject
    private TeXNumber number;
    private TeXObject objectValue;
    private DatumType datumType;
+   private Julian julian;
 }
