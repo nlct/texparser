@@ -1218,5 +1218,37 @@ public class TeXParserUtils
 
       return true;
    }
+
+   public static boolean isBlank(CharSequence cbuff, int off, int len)
+   {
+      for (int i = off, n = off+len; i < n; i++)
+      {
+         if (!isBlank(cbuff.charAt(i)))
+         {
+            return false;
+         }
+      }
+
+      return true;
+   }
+
+   public static boolean isBlank(char[] cbuff, int off, int len)
+   {
+      for (int i = off, n = off+len; i < n; i++)
+      {
+         if (!isBlank(cbuff[i]))
+         {
+            return false;
+         }
+      }
+
+      return true;
+   }
+
+   public static boolean isBlank(char[] cbuff)
+   {
+      return isBlank(cbuff, 0, cbuff.length);
+   }
+
 }
 
