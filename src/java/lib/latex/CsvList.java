@@ -203,6 +203,34 @@ public class CsvList extends DataObjectList
       return false;
    }
 
+   /**
+    * Determines if this CSV has an element whose stringified value is the given value.
+    * Note that the trim option doesn't trim the search string, only the stringified
+    * element values.
+    * @param parser the current TeXParser
+    * @param str the search string
+    * @param trim trim the element before comparing
+    */
+   public boolean containsString(TeXParser parser, String str, boolean trim)
+   {
+      for (TeXObject obj : this)
+      {
+         String elem = obj.toString(parser);
+
+         if (trim)
+         {
+            elem = elem.trim();
+         }
+
+         if (elem.equals(str))
+         {
+            return true;
+         }
+      }
+
+      return false;
+   }
+
    public TeXObject getValue(int index)
    {
       return getValue(index, false);
