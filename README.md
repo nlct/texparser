@@ -78,6 +78,13 @@ I experimented with including a GUI to provide a way of testing the
 library with a graphical interface but I've now removed it as I don't have time
 to develop it, and it requires additional libraries.
 
+[TeX Java Help](https://github.com/nlct/texjavahelp) uses the TeX Parser Library.
+The command line `texjavahelpmk.jar` application is similar to `texparsertest --html` 
+but is customized to work with the `texjavahelplib.jar` library and has added support
+for `texjavahelp.sty`. This is used with `datatooltk` to provide the in-application
+manual created from the LaTeX source and will also be used with future versions of
+`flowframtk` and `makeglossariesgui`.
+
 ## TEST FILES
 
 
@@ -129,10 +136,9 @@ pdf.
 
 ### Example 3:
 
-Conversion to HTML just creates a single HTML file.
+Conversion to HTML just creates a single HTML file and copies over image files.
 It's very limited as I initially only needed to convert
-abstracts to HTML. Images aren't supported. MathJax is used to 
-render math mode.
+abstracts to HTML. MathJax is used to render math mode.
 ```bash
 cd src/tests
 texparsertest --in test-article/test-article.tex --output output/test-article --html
@@ -141,4 +147,5 @@ The `bib2gls` application uses the HTML conversion without MathJax
 when trying to interpret the sort value when the `sort` field is
 missing, so this test file now includes some packages that have been
 added to help `bib2gls`. These are mostly packages that provide
-symbols that might appear in a glossary.
+symbols that might appear in a glossary. Some support for `datatool` has also
+been added to assist `datatooltk`.
