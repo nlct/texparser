@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2024 Nicola L.C. Talbot
+    Copyright (C) 2024-2025 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -909,13 +909,16 @@ public class Julian
 
    public DatumType getDatumType()
    {
-      if (hasDate && hasTime)
+      if (hasDate)
       {
-         return DatumType.DATETIME;
-      }
-      else if (hasDate)
-      {
-         return DatumType.TIME;
+         if (hasTime)
+         {
+            return DatumType.DATETIME;
+         }
+         else
+         {
+            return DatumType.DATE;
+         }
       }
 
       return DatumType.TIME;
