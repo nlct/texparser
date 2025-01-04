@@ -535,7 +535,7 @@ public class Julian
 
       if (hasDate)
       {
-         builder.setDate(localYear, localMonth, localDay);
+         builder.setDate(localYear, localMonth-1, localDay);
       }
 
       if (hasTime)
