@@ -694,7 +694,7 @@ public class Julian
       {
          if (hasTime)
          {
-            list.add(new TeXCsRef("DataToolTimeStampFmt"));
+            list.add(new TeXCsRef("DataToolDateTimeFmt"));
 
             Group grp = listener.createGroup();
             list.add(grp);
@@ -752,7 +752,7 @@ public class Julian
       {
          if (hasTime)
          {
-            builder.append("\\DataToolTimeStampFmt{");
+            builder.append("\\DataToolDateTimeFmt{");
 
             builder.append('{');
             builder.append(localYear);

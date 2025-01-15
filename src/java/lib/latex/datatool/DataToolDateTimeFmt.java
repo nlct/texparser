@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2024 Nicola L.C. Talbot
+    Copyright (C) 2024-2025 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -22,21 +22,21 @@ import java.io.IOException;
 
 import com.dickimawbooks.texparserlib.*;
 
-public class DataToolTimeStampFmt extends Command
+public class DataToolDateTimeFmt extends Command
 {
-   public DataToolTimeStampFmt()
+   public DataToolDateTimeFmt()
    {
-      this("DataToolTimeStampFmt");
+      this("DataToolDateTimeFmt");
    }
 
-   public DataToolTimeStampFmt(String name)
+   public DataToolDateTimeFmt(String name)
    {
       super(name);
    }
 
    public Object clone()
    {
-      return new DataToolTimeStampFmt(getName());
+      return new DataToolDateTimeFmt(getName());
    }
 
    public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
@@ -64,7 +64,7 @@ public class DataToolTimeStampFmt extends Command
 
          if (!timeArgs.isEmpty())
          {
-            expanded.add(listener.getControlSequence("DTLformattimestampsep"));
+            expanded.add(listener.getControlSequence("DataToolTimeStampFmtSep"));
             expanded.add(listener.getControlSequence("DataToolTimeFmt"));
             expanded.add(timeArgs, true);
          }
@@ -72,7 +72,7 @@ public class DataToolTimeStampFmt extends Command
 
       if (!timezoneArgs.isEmpty())
       {
-         expanded.add(listener.getControlSequence("DTLformattimezone"));
+         expanded.add(listener.getControlSequence("DataToolTimeZoneFmt"));
          expanded.add(timezoneArgs, true);
       }
 

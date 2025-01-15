@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2024 Nicola L.C. Talbot
+    Copyright (C) 2024-2025 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -22,14 +22,14 @@ import java.io.IOException;
 
 import com.dickimawbooks.texparserlib.*;
 
-public class DTLformattimezone extends Command
+public class DataToolTimeZoneFmt extends Command
 {
-   public DTLformattimezone()
+   public DataToolTimeZoneFmt()
    {
-      this("DTLformattimezone");
+      this("DataToolTimeZoneFmt");
    }
 
-   public DTLformattimezone(String name)
+   public DataToolTimeZoneFmt(String name)
    {
       super(name);
    }
@@ -37,7 +37,7 @@ public class DTLformattimezone extends Command
    @Override
    public Object clone()
    {
-      return new DTLformattimezone(getName());
+      return new DataToolTimeZoneFmt(getName());
    }
 
    @Override
