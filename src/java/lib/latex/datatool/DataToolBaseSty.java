@@ -279,6 +279,81 @@ public class DataToolBaseSty extends LaTeXSty
       registerControlSequence(new GenericCommand(true, "datatoolctrlboundary"));
 
       registerControlSequence(new AtFirstOfTwo("dtltexorsort"));
+
+      registerControlSequence(
+       listener.createSymbol("datatool_cent_str", 0xA2));
+      registerControlSequence(
+       listener.createSymbol("datatool_pound_str", 0xA3));
+      registerControlSequence(
+       listener.createSymbol("datatool_currency_str", 0xA4));
+      registerControlSequence(
+       listener.createSymbol("datatool_yen_str", 0xA5));
+      registerControlSequence(
+       listener.createSymbol("datatool_middot_str", 0xB7));
+      registerControlSequence(
+       listener.createSymbol("datatool_colonsign_str", 0x20A1));
+      registerControlSequence(
+       listener.createSymbol("datatool_cruzerio_str", 0x20A2));
+      registerControlSequence(
+       listener.createSymbol("datatool_frenchfranc_str", 0x20A3));
+      registerControlSequence(
+       listener.createSymbol("datatool_lira_str", 0x20A4));
+      registerControlSequence(
+       listener.createSymbol("datatool_mill_str", 0x20A5));
+      registerControlSequence(
+       listener.createSymbol("datatool_naira_str", 0x20A6));
+      registerControlSequence(
+       listener.createSymbol("datatool_peseta_str", 0x20A7));
+      registerControlSequence(
+       listener.createSymbol("datatool_rupee_str", 0x20A8));
+      registerControlSequence(
+       listener.createSymbol("datatool_won_str", 0x20A9));
+      registerControlSequence(
+       listener.createSymbol("datatool_shekel_str", 0x20AA));
+      registerControlSequence(
+       listener.createSymbol("datatool_dong_str", 0x20AB));
+      registerControlSequence(
+       listener.createSymbol("datatool_euro_str", 0x20AC));
+      registerControlSequence(
+       listener.createSymbol("datatool_kip_str", 0x20AD));
+      registerControlSequence(
+       listener.createSymbol("datatool_tugrik_str", 0x20AE));
+      registerControlSequence(
+       listener.createSymbol("datatool_drachma_str", 0x20AF));
+      registerControlSequence(
+       listener.createSymbol("datatool_germanpenny_str", 0x20B0));
+      registerControlSequence(
+       listener.createSymbol("datatool_peso_str", 0x20B1));
+      registerControlSequence(
+       listener.createSymbol("datatool_guarani_str", 0x20B2));
+      registerControlSequence(
+       listener.createSymbol("datatool_austral_str", 0x20B3));
+      registerControlSequence(
+       listener.createSymbol("datatool_hryvnia_str", 0x20B4));
+      registerControlSequence(
+       listener.createSymbol("datatool_cedi_str", 0x20B5));
+      registerControlSequence(
+       listener.createSymbol("datatool_livretournois_str", 0x20B6));
+      registerControlSequence(
+       listener.createSymbol("datatool_spesmilo_str", 0x20B7));
+      registerControlSequence(
+       listener.createSymbol("datatool_tenge_str", 0x20B8));
+      registerControlSequence(
+       listener.createSymbol("datatool_indianrupee_str", 0x20B9));
+      registerControlSequence(
+       listener.createSymbol("datatool_turkishlira_str", 0x20BA));
+      registerControlSequence(
+       listener.createSymbol("datatool_nordicmark_str", 0x20BB));
+      registerControlSequence(
+       listener.createSymbol("datatool_manat_str", 0x20BC));
+      registerControlSequence(
+       listener.createSymbol("datatool_ruble_str", 0x20BD));
+      registerControlSequence(
+       listener.createSymbol("datatool_lari_str", 0x20BE));
+      registerControlSequence(
+       listener.createSymbol("datatool_bitcoin_str", 0x20BF));
+      registerControlSequence(
+       listener.createSymbol("datatool_som_str", 0x20C0));
    }
 
    @Override

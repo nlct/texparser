@@ -17,7 +17,7 @@
   \dtldbcolreconstruct{2}% Column 2
   {\dtldbdatumreconstruct{\DataToolTimeFmt {06}{00}{00}}{-0.25}{}{6}}%
   \dtldbcolreconstruct{3}% Column 3
-  {\dtldbdatumreconstruct{\DataToolTimeStampFmt
+  {\dtldbdatumreconstruct{\DataToolDateTimeFmt
 {{2024}{08}{31}{5}}{{06}{00}{00}}{{+00}{00}}}{2460553.75}{}{4}}%
 }%
 % Row 2
@@ -28,7 +28,7 @@
   \dtldbcolreconstruct{2}% Column 2
   {\dtldbdatumreconstruct{\DataToolTimeFmt {18}{00}{00}}{0.25}{}{6}}%
   \dtldbcolreconstruct{3}% Column 3
-  {\dtldbdatumreconstruct{\DataToolTimeStampFmt
+  {\dtldbdatumreconstruct{\DataToolDateTimeFmt
 {{2024}{09}{01}{6}}{{18}{00}{00}}{{+01}{00}}}{2460555.208333333}{}{4}}%
 }%
 }% End of Content

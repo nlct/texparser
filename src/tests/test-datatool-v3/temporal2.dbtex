@@ -19,7 +19,7 @@
   {\dtldbdatumreconstruct{\DataToolTimeFmt
 {06}{00}{00}}{\DTLtemporalvalue{-0.25}{06:00:00}}{}{6}}%
   \dtldbcolreconstruct{3}% Column 3
-  {\dtldbdatumreconstruct{\DataToolTimeStampFmt
+  {\dtldbdatumreconstruct{\DataToolDateTimeFmt
 {{2024}{08}{31}{5}}{{06}{00}{00}}{{+00}{00}}}{\DTLtemporalvalue{2460553.75}{2024-08-31T06:00:00+00:00}}{}{4}}%
 }%
 % Row 2
@@ -32,7 +32,7 @@
   {\dtldbdatumreconstruct{\DataToolTimeFmt
 {18}{00}{00}}{\DTLtemporalvalue{0.25}{18:00:00}}{}{6}}%
   \dtldbcolreconstruct{3}% Column 3
-  {\dtldbdatumreconstruct{\DataToolTimeStampFmt
+  {\dtldbdatumreconstruct{\DataToolDateTimeFmt
 {{2024}{09}{01}{6}}{{18}{00}{00}}{{+01}{00}}}{\DTLtemporalvalue{2460555.208333333}{2024-09-01T18:00:00+01:00}}{}{4}}%
 }%
 }% End of Content
