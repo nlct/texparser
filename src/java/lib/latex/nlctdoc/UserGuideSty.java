@@ -1960,22 +1960,7 @@ public class UserGuideSty extends LaTeXSty
 
       registerControlSequence(new LaTeXGenericCommand(true, "glscmd", "m", def));
 
-
-      // \\glscsname
-      def = listener.createStack();
-      def.add(new TeXCsRef("glslink"));
-      def.add(listener.getOther('['));
-      def.add(listener.getParam(1));
-      def.add(listener.getOther(']'));
-      def.add(TeXParserUtils.createGroup(listener, listener.getParam(2)));
-      grp = listener.createGroup();
-      def.add(grp);
-      grp.add(new TeXCsRef("csfmtfont"));
-      grp.add(TeXParserUtils.createGroup(listener, listener.getParam(2)));
-
-      registerControlSequence(new LaTeXGenericCommand(true, "glscsname",
-        "om", def, TeXParserUtils.createStack(listener, listener.createStack())));
-
+      registerControlSequence(new GlsCsName());
 
       addGlsFmtTextCommand("filetext", "file.");
       addGlsFmtTextCommand("stytext", "pkg.");

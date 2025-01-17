@@ -100,6 +100,10 @@
     \desc{sample command that is initialised to expand to backslash
 space}
   }
+  \gcmd{l\dsb foobar\dsb tl}
+  {
+    \desc{a token list variable}
+  }
   \gfn{foo\dsb test}{nn}{VV,vv}
   {
     \syntax{\ \margm{tl1} \margm{tl2}}
@@ -380,6 +384,12 @@ A language-sensitive command.
 \cmddef{foobartl}
 Some token list type of command that expands to \gls{cs.space}
 (backslash space).
+
+\cmddef{lfoobartl}
+A \styfmt{l3tl} token list variable.
+The control sequence name without a leading backslash:
+\glscsname{l\_foobar\_tl} (corresponds to
+\gls{lfoobartl}).
 
 \cmddef{footest}
 A \LaTeX3 function that has variants \expfunc{footest}{VV} and
