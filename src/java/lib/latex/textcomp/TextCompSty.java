@@ -93,7 +93,6 @@ public class TextCompSty extends LaTeXSty
       new Object[]{"textguarani", Integer.valueOf(0x0020B2)},
       new Object[]{"textcolonmonetary", Integer.valueOf(0x0020B5)},
       new Object[]{"textcelsius", Integer.valueOf(0x002103)},
-      new Object[]{"textdegree", Integer.valueOf(0x002109)},
       new Object[]{"textnumero", Integer.valueOf(0x002116)},
       new Object[]{"textcircledP", Integer.valueOf(0x002117)},
       new Object[]{"textrecipe", Integer.valueOf(0x00211E)},
