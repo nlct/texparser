@@ -109,6 +109,11 @@ space}
     \syntax{\ \margm{tl1} \margm{tl2}}
     \desc{a \LaTeX3 command that takes two arguments with variants}
   }
+  \gfnsuffix{foo\dsb test}{nnn}{VVV,vvv}
+  {
+    \syntax{\ \margm{tl1} \margm{tl2} \margm{tl3}}
+    \desc{a \LaTeX3 command that takes three arguments with variants}
+  }
   \gexplpred{foo\dsb if\dsb exist}{n}
    {
     \syntax{\ \margm{tl} \TFsyntax}
@@ -394,6 +399,10 @@ The control sequence name without a leading backslash:
 \cmddef{footest}
 A \LaTeX3 function that has variants \expfunc{footest}{VV} and
 \expfunc{footest}{vv}.
+
+\cmddef{footest:nnn}
+A \LaTeX3 function that has variants \expfunc{footest:nnn}{VVV} and
+\expfunc{footest:nnn}{vvv}.
 
 \cmddef{fooifexist:n}
 A conditional \gls{fooifexist:n}, which may also be
