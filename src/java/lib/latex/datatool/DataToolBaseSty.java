@@ -186,13 +186,13 @@ public class DataToolBaseSty extends LaTeXSty
 
       registerControlSequence(new GenericCommand(true,
         "dtlcurrfmtsep", null, TeXParserUtils.createStack(listener,
-        new TeXCsRef("DTLcurrCodeOrSymOrStr"),
+        new TeXCsRef("DTLcurrCodeOrSymOrChar"),
          TeXParserUtils.createGroup(listener, listener.getActiveChar('~')),
          listener.createGroup(), listener.createGroup())
       ));
 
       registerControlSequence(new TextualContentCommand("DTLCurrencyCode", "XXX"));
-      registerControlSequence(new AtNumberOfNumber("DTLcurrCodeOrSymOrStr", 2, 3));
+      registerControlSequence(new AtNumberOfNumber("DTLcurrCodeOrSymOrChar", 2, 3));
 
       registerControlSequence(new GenericCommand(true,
         "DTLdefaultEURcurrencyfmt", null, new TeXCsRef("dtlcurrdefaultfmt")));
@@ -501,7 +501,7 @@ public class DataToolBaseSty extends LaTeXSty
          TeXParserUtils.createStack(listener,
             new TeXCsRef("dtltexorsort"),
             TeXParserUtils.createGroup(listener,
-              new TeXCsRef("DTLcurrCodeOrSymOrStr"),
+              new TeXCsRef("DTLcurrCodeOrSymOrChar"),
                TeXParserUtils.createGroup(listener, listener.getParam(1)),
                new TeXCsRef("dtl@curr@"+label+"@sym"),
                new TeXCsRef("dtl@curr@"+label+"@str")
