@@ -1801,7 +1801,7 @@ public class UserGuideSty extends LaTeXSty
          if (d.getName().equals("nlctdoc@extag"))
          {
             TeXObject tagArg = d.getArg(0);
-            TeXObject labelArg = d.getArg(0);
+            TeXObject labelArg = d.getArg(1);
 
             String tag = getParser().expandToString(tagArg, stack);
             String label = getParser().expandToString(labelArg, stack);

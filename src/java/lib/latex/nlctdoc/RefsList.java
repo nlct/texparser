@@ -66,7 +66,7 @@ public class RefsList extends ControlSequence
          }
       }
 
-      String[] labels = labelList.split(",");
+      String[] labels = labelList.trim().split("\\s*,\\s*");
 
       for (int i = 0, j = labels.length-2; i < labels.length; i++)
       {
