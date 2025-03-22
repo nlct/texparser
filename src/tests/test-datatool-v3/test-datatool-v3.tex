@@ -1,8 +1,6 @@
 \documentclass{article}
 
-% datatool v3.0 currently under development
-% see https://www.dickimaw-books.com/expl/
-\usepackage{datatool}[=v3.0]
+\usepackage{datatool}
 
 \DTLsetup{store-datum,
  %datetime=parse-only
@@ -87,4 +85,15 @@ Pad leading zeros: \dtlpadleadingzeros{3}{4},
 \DTLread[format=dbtex,name=temporal2]{temporal2}
 
 \DTLdisplaydb{temporal2}
+
+\DTLsetup{numeric={auto-reformat}}
+
+\DTLread[format=csv,name=plain,csv-content=no-parse,
+  %data-types={decimal},
+  data-types={integer,decimal,currency,decimal},
+  only-reformat-columns={4}
+ ]
+{test-plain}
+
+\DTLdisplaydb{plain}
 \end{document}
