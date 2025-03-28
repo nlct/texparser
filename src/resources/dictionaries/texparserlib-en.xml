@@ -148,6 +148,7 @@
 <entry key="datatool.write.comment">Created by {0} version {1} on {2, date, yyyy-MM-dd HH:mm:ss Z}</entry>
 <entry key="datatool.warn.dbtex3exp">Detected DBTEX v3.0 experimental format. Resave database file as DBTEX v3.0</entry>
 <entry key="datatool.unsupported.action">Unsupported action: ''{0}''</entry>
+<entry key="datatool.unknown_data_type">Unknown data type ''{0}''.</entry>
 
 <entry key="datagidx.term_not_defined">Term ''{0}'' not defined</entry>
 <entry key="datagidx.database_not_defined">Index database ''{0}'' not defined</entry>

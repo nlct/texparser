@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2023 Nicola L.C. Talbot
+    Copyright (C) 2023-2025 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -43,6 +43,13 @@ import com.dickimawbooks.texparserlib.latex.latex3.PropertyCommand;
  * will be removed.  Any escape backslashes will be stripped according
  * to the csv-escape-chars option.
  *
+ * With csv-content=no-parse (added in datatool v3.2), the line and element splitting is as
+ * per csv-content=tex but there's no parsing to determine data
+ * type. If the data-types option is set, then that will set the
+ * data type for the column and any numeric columns should have
+ * plain numbers. (No localise decimal or number group characters
+ * and no currency symbol.)
+ *
  * With csv-content=literal, the content should be interpreted
  * literally. Each line in the file is read in as a detokenized 
  * string, which is then split according to the separator and
@@ -79,6 +86,14 @@ public class CsvReadHandler implements FileMapHandler
       parser = sty.getParser();
 
       headers = new Vector<DataToolHeader>();
+
+      useDatum = TeXParserUtils.isTrue(DataToolSty.DB_STORE_DATUM_BOOL, parser);
+
+      autoReformatNumeric = TeXParserUtils.isTrue(
+        DataToolBaseSty.REFORMAT_NUMERIC_BOOL, parser);
+
+      autoReformatDate = TeXParserUtils.isTrue(
+        DataToolBaseSty.REFORMAT_DATETIME_BOOL, parser);
    }
 
    @Override
@@ -244,6 +259,13 @@ public class CsvReadHandler implements FileMapHandler
             headerRow.add(header);
          }
 
+         DatumType type = settings.getColumnType(colIdx);
+
+         if (type != DatumType.UNKNOWN)
+         {
+            header.setType(type);
+         }
+
          headers.add(header);
       }
    }
@@ -281,17 +303,6 @@ public class CsvReadHandler implements FileMapHandler
             continue;
          }
 
-         TeXObject cell = processCell(obj);
-
-         DataElement element = settings.getSty().getElement(cell);
-         boolean update = true;
-
-         if (element == null)
-         {
-            update = false;
-            element = new DataStringElement();
-         }
-
          DataToolHeader header = null;
 
          if (headers.size() > i)
@@ -300,20 +311,74 @@ public class CsvReadHandler implements FileMapHandler
          }
          else
          {
-            Integer colIdx = Integer.valueOf(i+1);
-
-            String colKey = settings.getColumnKey(colIdx);
-
-            if (colKey == null)
+            for (int j = headers.size(); j <= i+1; j++)
             {
-               colKey = parser.expandToString(
-                 parser.getListener().getControlSequence("dtldefaultkey"),
-                    currentStack) + colIdx;
+               Integer colIdx = Integer.valueOf(j);
+
+               String colKey = settings.getColumnKey(colIdx);
+
+               if (colKey == null)
+               {
+                  colKey = parser.expandToString(
+                    parser.getListener().getControlSequence("dtldefaultkey"),
+                       currentStack) + colIdx;
+               }
+
+               header = new DataToolHeader(settings.getSty(), j, colKey);
+               headerRow.add(header);
+               headers.add(header);
+
+               DatumType type = settings.getColumnType(colIdx);
+
+               if (type != DatumType.UNKNOWN)
+               {
+                  header.setType(type);
+               }
+            }
+         }
+
+         TeXObject cell = processCell(obj);
+
+         DataElement element = null;
+         boolean update = true;
+
+         boolean reformatNum = autoReformatNumeric;
+         boolean reformatDate = autoReformatDate;
+
+         if (settings.isOnlyAutoReformatColsEnabled()
+              && !settings.isOnlyAutoReformatColumnSet(header.getColumnIndex()))
+         {
+            reformatNum = false;
+            reformatDate = false;
+         }
+
+         if (settings.isCsvPlain())
+         {
+            DatumType type = header.getDataType();
+
+            if (type == DatumType.UNKNOWN && !cell.isEmpty())
+            {
+               type = settings.getLastColumnType();
+
+               if (type == DatumType.UNKNOWN)
+               {
+                  type = DatumType.STRING;
+               }
             }
 
-            header = new DataToolHeader(settings.getSty(), headerRow.size()+1, colKey);
-            headerRow.add(header);
-            headers.add(header);
+            element = settings.getSty().getPlainElement(type, cell, useDatum,
+              reformatNum, reformatDate);
+         }
+         else
+         {
+            element = settings.getSty().getElement(cell, useDatum,
+              reformatNum, reformatDate);
+         }
+
+         if (element == null)
+         {
+            update = false;
+            element = new DataStringElement();
          }
 
          if (update)
@@ -766,4 +831,5 @@ public class CsvReadHandler implements FileMapHandler
    Vector<DataToolHeader> headers;
    TeXParser parser;
    DataToolSty sty;
+   boolean useDatum=true, autoReformatNumeric=false, autoReformatDate=false;
 }

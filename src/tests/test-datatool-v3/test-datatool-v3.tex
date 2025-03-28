@@ -91,9 +91,10 @@ Pad leading zeros: \dtlpadleadingzeros{3}{4},
 \DTLread[format=csv,name=plain,csv-content=no-parse,
   %data-types={decimal},
   data-types={integer,decimal,currency,decimal},
-  only-reformat-columns={4}
+  %only-reformat-columns={4}
  ]
 {test-plain}
 
 \DTLdisplaydb{plain}
+%\dtlshowdb{plain}
 \end{document}

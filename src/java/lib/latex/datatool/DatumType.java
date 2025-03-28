@@ -89,6 +89,29 @@ public enum DatumType
       throw new IllegalArgumentException("Invalid DatumType id "+typeId);
    }
 
+   public static DatumType toDatumType(String tag)
+   {
+      if (tag.equalsIgnoreCase("integer"))
+      {
+         return INTEGER;
+      }
+
+      if (tag.equalsIgnoreCase("decimal"))
+      {
+         return DECIMAL;
+      }
+
+      for (DatumType type : values())
+      {
+         if (type.tag.equalsIgnoreCase(tag))
+         {
+            return type;
+         }
+      }
+
+      throw new IllegalArgumentException("Invalid DatumType tag "+tag);
+   }
+
    /**
     * Returns true if this type overrides the other type.
     */

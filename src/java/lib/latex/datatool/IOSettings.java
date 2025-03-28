@@ -28,6 +28,7 @@ import com.dickimawbooks.texparserlib.latex.KeyValList;
 import com.dickimawbooks.texparserlib.latex.LaTeXSyntaxException;
 
 import com.dickimawbooks.texparserlib.latex.latex3.PropertyCommand;
+import com.dickimawbooks.texparserlib.latex.latex3.SequenceCommand;
 
 public class IOSettings
 {
@@ -183,6 +184,67 @@ public class IOSettings
                headers = null;
             }
 
+            cs = parser.getControlSequence(DataToolSty.CSV_TYPES_PROP);
+
+            if (cs != null && !cs.isEmpty() && cs instanceof PropertyCommand)
+            {
+               PropertyCommand propCs = (PropertyCommand)cs;
+               dataTypes = new DatumType[propCs.size()];
+
+               for (int i = 0; i < dataTypes.length; i++)
+               {
+                  @SuppressWarnings("unchecked")
+                  TeXObject kv = propCs.get(Integer.valueOf(i+1));
+
+                  if (kv != null)
+                  {
+                     int typeId = TeXParserUtils.toInt(kv, parser, stack);
+
+                     try
+                     {
+                        dataTypes[i] = DatumType.toDatumType(typeId);
+                     }
+                     catch (IllegalArgumentException e)
+                     {
+                       throw new LaTeXSyntaxException(e, parser,
+                         DataToolSty.ERROR_UNKNOWN_DATA_TYPE, typeId);
+                     }
+                  }
+               }
+            }
+            else
+            {
+               dataTypes = null;
+            }
+
+            cs = parser.getControlSequence(DataToolSty.CSV_ONLY_AUTO_REFORMAT_SEQ);
+
+            if (cs != null && !cs.isEmpty() && cs instanceof SequenceCommand)
+            {
+               SequenceCommand seqCs = (SequenceCommand)cs;
+               onlyAutoReformatCols = new int[seqCs.size()];
+
+               for (int i = 0; i < onlyAutoReformatCols.length; i++)
+               {
+                  TeXObject itemObj = seqCs.get(i);
+
+                  try
+                  {
+                     onlyAutoReformatCols[i] = TeXParserUtils.toInt(itemObj, parser, stack);
+                  }
+                  catch (IllegalArgumentException e)
+                  {
+                     throw new LaTeXSyntaxException(e, parser,
+                       LaTeXSyntaxException.ERROR_INVALID_OPTION_VALUE, 
+                        "only-reformat-columns", itemObj.toString(parser));
+                  }
+               }
+            }
+            else
+            {
+               onlyAutoReformatCols = null;
+            }
+
             skipLines = TeXParserUtils.toInt(
               parser.getListener().getControlSequence(DataToolSty.OMIT_LINES),
               parser, stack);
@@ -199,8 +261,20 @@ public class IOSettings
                   "csv-blank="+val, "datatool/io");
             }
 
-            csvLiteral = !TeXParserUtils.isFalse(
-              DataToolSty.CSV_LITERAL_CONTENT_BOOL, parser);
+            if (!TeXParserUtils.isFalse(
+              DataToolSty.CSV_PLAIN_CONTENT_BOOL, parser))
+            {
+               csvContentOpt = CsvContentOption.NO_PARSE;
+            }
+            else if (!TeXParserUtils.isFalse(
+              DataToolSty.CSV_LITERAL_CONTENT_BOOL, parser))
+            {
+               csvContentOpt = CsvContentOption.LITERAL;
+            }
+            else
+            {
+               csvContentOpt = CsvContentOption.TEX;
+            }
          }
 
          appendAllowed = !TeXParserUtils.isFalse(
@@ -346,6 +420,82 @@ public class IOSettings
                }
             }
          }
+         else if (key.equals("data-types"))
+         {
+            if (val == null)
+            {
+               dataTypes = null;
+            }
+            else
+            {
+               String strVal = parser.expandToString(val, stack).trim();
+
+               if (strVal.startsWith(","))
+               {
+                  strVal = strVal.substring(1).trim();
+               }
+
+               if (strVal.isEmpty())
+               {
+                  dataTypes = null;
+               }
+               else
+               {
+                  String[] split = strVal.split("( *, *)+");
+
+                  dataTypes = new DatumType[split.length];
+
+                  for (int i = 0; i < split.length; i++)
+                  {
+                     try
+                     {
+                        if (split[i].isEmpty())
+                        {
+                           dataTypes[i] = DatumType.UNKNOWN;
+                        }
+                        else
+                        {
+                           dataTypes[i] = DatumType.toDatumType(split[i]);
+                        }
+                     }
+                     catch (IllegalArgumentException e)
+                     {
+                       throw new LaTeXSyntaxException(e, parser,
+                         DataToolSty.ERROR_UNKNOWN_DATA_TYPE, split[i]);
+                     } 
+                  }
+               }
+            }
+         }
+         else if (key.equals("only-reformat-columns"))
+         {
+            if (val == null)
+            {
+               onlyAutoReformatCols = null;
+            }
+            else
+            {
+               CsvList csvList = CsvList.getList(parser, val);
+
+               for (int i = 0; i < csvList.size(); i++)
+               {
+                  TeXObject itemObj = csvList.getValue(i, true);
+
+                  if (itemObj.isEmpty()) continue;
+
+                  try
+                  {
+                     onlyAutoReformatCols[i] = TeXParserUtils.toInt(itemObj, parser, stack);
+                  }
+                  catch (IllegalArgumentException e)
+                  {
+                     throw new LaTeXSyntaxException(e, parser,
+                       LaTeXSyntaxException.ERROR_INVALID_OPTION_VALUE, 
+                        key, itemObj.toString(parser));
+                  }
+               }
+            }
+         }
          else if (key.equals("expand"))
          {
             String strVal = (val == null ?
@@ -475,19 +625,15 @@ public class IOSettings
 
             String strVal = parser.expandToString(val, stack).trim();
 
-            if (strVal.equals("literal"))
-            {
-               csvLiteral = true;
-            }
-            else if (strVal.equals("tex"))
-            {
-               csvLiteral = false;
-            }
-            else
+            CsvContentOption optVal = CsvContentOption.fromOptionName(strVal);
+
+            if (optVal == null)
             {
                throw new TeXSyntaxException(parser,
                  LaTeXSyntaxException.ERROR_INVALID_OPTION_VALUE, key, strVal);
             }
+
+            csvContentOpt = optVal;
          }
          else if (key.equals("csv-blank"))
          {
@@ -833,12 +979,35 @@ public class IOSettings
 
    public boolean isCsvLiteral()
    {
-      return csvLiteral;
+      return csvContentOpt == CsvContentOption.LITERAL;
    }
 
+   public boolean isCsvPlain()
+   {
+      return csvContentOpt == CsvContentOption.NO_PARSE;
+   }
+
+   public CsvContentOption getCsvContentOption()
+   {
+      return csvContentOpt;
+   }
+
+   public void setCsvContentOption(CsvContentOption opt)
+   {
+      csvContentOpt = opt;
+   }
+
+   @Deprecated
    public void setCsvLiteral(boolean isLiteral)
    {
-      csvLiteral = isLiteral;
+      if (isLiteral)
+      {
+         csvContentOpt = CsvContentOption.LITERAL;
+      }
+      else if (csvContentOpt == CsvContentOption.LITERAL)
+      {
+         csvContentOpt = CsvContentOption.TEX;
+      }
    }
 
    public IOExpandOption getExpandOption()
@@ -958,6 +1127,55 @@ public class IOSettings
       }
    }
 
+   public void setColumnTypes(DatumType[] types)
+   {
+      dataTypes = types;
+   }
+
+   public int getColumnTypeCount()
+   {
+      return dataTypes == null ? 0 : dataTypes.length;
+   }
+
+   public DatumType getColumnType(int colIdx)
+   {
+      if (dataTypes == null || dataTypes.length < colIdx)
+      {
+         return DatumType.UNKNOWN;
+      }
+      else
+      {
+         return dataTypes[colIdx-1];
+      }
+   }
+
+   public DatumType getLastColumnType()
+   {
+      return getColumnTypeCount() == 0 ?
+        DatumType.UNKNOWN : dataTypes[dataTypes.length-1];
+   }
+
+   public boolean isOnlyAutoReformatColsEnabled()
+   {
+      return onlyAutoReformatCols != null;
+   }
+
+   public boolean isOnlyAutoReformatColumnSet(int colIdx)
+   {
+      if (onlyAutoReformatCols != null)
+      {
+         for (int i = 0; i < onlyAutoReformatCols.length; i++)
+         {
+            if (onlyAutoReformatCols[i] == colIdx)
+            {
+               return true;
+            }
+         }
+      }
+
+      return false;
+   }
+
    public DataToolSty getSty()
    {
       return sty;
@@ -980,7 +1198,7 @@ public class IOSettings
    AddDelimiterOption addDelimOpt = AddDelimiterOption.DETECT;
    EscapeCharsOption escCharsOpt = EscapeCharsOption.DOUBLE_DELIM;
    CsvBlankOption csvBlankOpt = CsvBlankOption.IGNORE;
-   boolean csvLiteral = true;
+   CsvContentOption csvContentOpt = CsvContentOption.LITERAL;
    IOExpandOption expandOpt = IOExpandOption.NONE;
    boolean appendAllowed = false;
    boolean autoKeys = false;
@@ -989,6 +1207,9 @@ public class IOSettings
 
    String[] keys = null;
    TeXObject[] headers = null;
+   DatumType[] dataTypes = null;
+
+   int[] onlyAutoReformatCols = null;
 
    /*
     * This setting isn't supported with datatool.sty but is with

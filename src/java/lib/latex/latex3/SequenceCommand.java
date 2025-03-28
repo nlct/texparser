@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2023-2024 Nicola L.C. Talbot
+    Copyright (C) 2023-2025 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -333,6 +333,40 @@ public class SequenceCommand extends Command implements L3StorageCommand
       {
          return content.remove(content.size()-1);
       }
+   }
+
+   public boolean contains(TeXObject object)
+   {
+      return content.contains(object);
+   }
+
+   public boolean contains(String strItem)
+   {
+      int cp = -1;
+
+      if (!strItem.isEmpty())
+      {
+         cp = strItem.codePointAt(0);
+
+         if (Character.charCount(cp) != strItem.length())
+         {
+            cp = -1;
+         }
+      }
+
+      for (TeXObject obj : content)
+      {
+         if ((obj instanceof TeXObjectList
+              && ((TeXObjectList)obj).equals(strItem))
+            ||
+             (obj instanceof CharObject && cp != -1 
+                  && ((CharObject)obj).getCharCode() == cp))
+         {
+            return true;
+         }
+      }
+
+      return false;
    }
 
    protected TeXObjectList content;

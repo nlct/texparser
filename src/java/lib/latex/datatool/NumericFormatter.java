@@ -86,6 +86,18 @@ public class NumericFormatter extends Command
       return num;
    }
 
+   public TeXObject format(Number num, TeXParserListener listener)
+   {
+      if (prohibitDecimal)
+      {
+         return listener.createString(numFormat.format(num.intValue()));
+      }
+      else
+      {
+         return listener.createString(numFormat.format(num.doubleValue()));
+      }
+   }
+
    protected String fmtArg(TeXObject arg, TeXParser parser, TeXObjectList stack)
     throws IOException
    {

@@ -28,55 +28,28 @@ import com.dickimawbooks.texparserlib.latex.*;
 
 public class DTLsetnumberchars extends ControlSequence
 {
-   public DTLsetnumberchars()
+   public DTLsetnumberchars(DataToolBaseSty sty)
    {
-      this("DTLsetnumberchars");
+      this("DTLsetnumberchars", sty);
    }
 
-   public DTLsetnumberchars(String name)
+   public DTLsetnumberchars(String name, DataToolBaseSty sty)
    {
       super(name);
+      this.sty = sty;
    }
 
    @Override
    public Object clone()
    {
-      return new DTLsetnumberchars(getName());
+      return new DTLsetnumberchars(getName(), sty);
    }
 
    @Override
    public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      String numGrpChar = popLabelString(parser, stack);
-      String decimalChar = popLabelString(parser, stack);
-
-      DecimalFormatSymbols symbols = new DecimalFormatSymbols();
-      symbols.setDecimalSeparator(decimalChar.charAt(0));
-      symbols.setGroupingSeparator(numGrpChar.charAt(0));
-
-      parser.putControlSequence(true, 
-        new TextualContentCommand("@dtl@numbergroupchar", numGrpChar));
-
-      parser.putControlSequence(true, 
-        new TextualContentCommand("@dtl@decimal", decimalChar));
-
-      DecimalFormat fmt = new DecimalFormat("#,##0", symbols);
-      fmt.setParseIntegerOnly(true);
-
-      parser.putControlSequence(true, 
-        new NumericFormatter(
-          DataToolBaseSty.FMT_INTEGER_VALUE, fmt));
-
-      parser.putControlSequence(true, 
-        new NumericFormatter(
-          DataToolBaseSty.FMT_DECIMAL_VALUE,
-          new DecimalFormat("#,##0.0######", symbols)));
-
-      parser.putControlSequence(
-        new NumericFormatter(DataToolBaseSty.FMT_CURRENCY_VALUE,
-           new DecimalFormat("#,##0.00", symbols)));
-
+      sty.setNumberChars(popArg(parser, stack), popArg(parser, stack));
    }
 
    @Override
@@ -86,4 +59,5 @@ public class DTLsetnumberchars extends ControlSequence
       process(parser, parser);
    }
 
+   DataToolBaseSty sty;
 }

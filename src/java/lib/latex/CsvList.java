@@ -231,6 +231,25 @@ public class CsvList extends DataObjectList
       return false;
    }
 
+   public void stripEmpty(boolean trim)
+   {
+      for (int i = size()-1; i >= 0; i--)
+      {
+         TeXObject obj = get(i);
+
+         if (trim && obj instanceof TeXObjectList 
+             && !(obj instanceof Group))
+         {
+            ((TeXObjectList)obj).trim();
+         }
+
+         if (obj.isEmpty())
+         {
+            remove(i);
+         }
+      }
+   }
+
    public TeXObject getValue(int index)
    {
       return getValue(index, false);

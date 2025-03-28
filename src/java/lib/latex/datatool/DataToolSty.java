@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013-2022 Nicola L.C. Talbot
+    Copyright (C) 2013-2025 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -237,12 +237,16 @@ public class DataToolSty extends LaTeXSty
       registerControlSequence(
         new LaTeX3Boolean(CSV_LITERAL_CONTENT_BOOL, true));
       registerControlSequence(
+        new LaTeX3Boolean(CSV_PLAIN_CONTENT_BOOL, false));
+      registerControlSequence(
         new TextualContentCommand(DEFAULT_NAME, "untitled"));
 
       registerControlSequence(
         new PropertyCommand<Integer>(CSV_HEADERS_PROP));
       registerControlSequence(
         new PropertyCommand<Integer>(CSV_KEYS_PROP));
+      registerControlSequence(
+        new PropertyCommand<Integer>(CSV_TYPES_PROP));
 
       // display options
 
@@ -574,6 +578,40 @@ public class DataToolSty extends LaTeXSty
      throws IOException
    {
       return dataToolBaseSty.getElement(entry);
+   }
+
+   public DataElement getElement(TeXObject entry, boolean useDatum)
+     throws IOException
+   {
+      return dataToolBaseSty.getElement(entry, useDatum);
+   }
+
+   public DataElement getElement(TeXObject entry, boolean useDatum,
+     boolean autoReformatNumeric, boolean autoReformatDateTime)
+     throws IOException
+   {
+      return dataToolBaseSty.getElement(entry, useDatum,
+        autoReformatNumeric, autoReformatDateTime);
+   }
+
+   public DataElement getPlainElement(DatumType type, TeXObject entry)
+     throws IOException
+   {
+      return dataToolBaseSty.getPlainElement(type, entry);
+   }
+
+   public DataElement getPlainElement(DatumType type, TeXObject entry, boolean useDatum)
+     throws IOException
+   {
+      return dataToolBaseSty.getPlainElement(type, entry, useDatum);
+   }
+
+   public DataElement getPlainElement(DatumType type, TeXObject entry, boolean useDatum,
+      boolean autoReformatNumeric, boolean autoReformatDateTime)
+     throws IOException
+   {
+      return dataToolBaseSty.getPlainElement(type, entry, useDatum,
+        autoReformatNumeric, autoReformatDateTime);
    }
 
    public boolean isNull(TeXObject object)
@@ -1213,10 +1251,11 @@ public class DataToolSty extends LaTeXSty
             if (val != null)
             {
                CsvList csvList = TeXParserUtils.toCsvList(val, parser);
+               csvList.stripEmpty(true);
 
                for (int i = 0; i < csvList.size(); i++)
                {
-                  TeXObject obj = csvList.getValue(i);
+                  TeXObject obj = csvList.getValue(i, true);
 
                   prop.put(Integer.valueOf(i+1), obj);
                }
@@ -1232,16 +1271,73 @@ public class DataToolSty extends LaTeXSty
             if (val != null)
             {
                CsvList csvList = TeXParserUtils.toCsvList(val, parser);
+               csvList.stripEmpty(true);
 
                for (int i = 0; i < csvList.size(); i++)
                {
-                  TeXObject obj = csvList.getValue(i);
+                  TeXObject obj = csvList.getValue(i, true);
 
                   prop.put(Integer.valueOf(i+1), obj);
                }
             }
 
             parser.putControlSequence(true, prop);
+         }
+         else if (key.equals("data-types"))
+         {
+            PropertyCommand<Integer> prop 
+              = new PropertyCommand<Integer>(CSV_TYPES_PROP);
+
+            if (val != null)
+            {
+               String strVal = parser.expandToString(val, stack).trim();
+
+               String[] split = strVal.split(" *, *");
+               int i = 0;
+
+               for (String spVal : split)
+               {
+                  spVal = spVal.trim();
+
+                  if (spVal.isEmpty()) continue;
+
+                  try
+                  {
+                     DatumType datumType = DatumType.toDatumType(spVal);
+
+                     prop.put(Integer.valueOf(i+1), datumType.getCs(getListener()));
+                  }
+                  catch (IllegalArgumentException e)
+                  {
+                     throw new LaTeXSyntaxException(e, parser,
+                       ERROR_UNKNOWN_DATA_TYPE, val);
+                  }
+
+                  i++;
+               }
+            }
+
+            parser.putControlSequence(true, prop);
+         }
+         else if (key.equals("only-reformat-columns"))
+         {
+            SequenceCommand seqCs = new SequenceCommand(CSV_ONLY_AUTO_REFORMAT_SEQ);
+
+            if (val != null)
+            {
+               CsvList csvList = CsvList.getList(parser, val);
+
+               for (int i = 0; i < csvList.size(); i++)
+               {
+                  TeXObject itemObj = csvList.getValue(i, true);
+
+                  if (itemObj.isEmpty()) continue;
+
+                  seqCs.append(TeXParserUtils.toTeXNumber(true, itemObj, parser, stack));
+               }
+            }
+
+            parser.putControlSequence(true, seqCs);
          }
          else if (key.equals("expand"))
          {
@@ -1349,13 +1445,17 @@ public class DataToolSty extends LaTeXSty
 
             String str = parser.expandToString(val, stack).trim();
 
-            if (str.equals("tex"))
+            CsvContentOption csvContentOpt = CsvContentOption.fromOptionName(str);
+
+            if (csvContentOpt != null)
             {
-               boolVal = false;
-            }
-            else if (str.equals("literal"))
-            {
-               boolVal = true;
+               getParser().putControlSequence(true,
+                 new LaTeX3Boolean(CSV_LITERAL_CONTENT_BOOL,
+                    csvContentOpt == CsvContentOption.LITERAL));
+
+               getParser().putControlSequence(true,
+                 new LaTeX3Boolean(CSV_PLAIN_CONTENT_BOOL,
+                    csvContentOpt == CsvContentOption.NO_PARSE));
             }
             else
             {
@@ -1364,8 +1464,6 @@ public class DataToolSty extends LaTeXSty
                   key+"="+str, "datatool/io");
             }
 
-            getParser().putControlSequence(true,
-              new LaTeX3Boolean(CSV_LITERAL_CONTENT_BOOL, boolVal));
          }
          else if (key.equals("csv-blank"))
          {
@@ -1634,6 +1732,9 @@ public class DataToolSty extends LaTeXSty
         new LaTeX3Boolean(CSV_LITERAL_CONTENT_BOOL, ioSettings.isCsvLiteral()));
 
       parser.putControlSequence(true,
+        new LaTeX3Boolean(CSV_PLAIN_CONTENT_BOOL, ioSettings.isCsvPlain()));
+
+      parser.putControlSequence(true,
         new LaTeX3Boolean(APPEND_ALLOWED_BOOL, ioSettings.isAppendAllowed()));
 
       parser.putControlSequence(true,
@@ -1702,6 +1803,33 @@ public class DataToolSty extends LaTeXSty
       for (int i = 0; i < headers.length; i++)
       {
          prop.put(Integer.valueOf(i+1), headers[i]);
+      }
+
+      getParser().putControlSequence(true, prop);
+   }
+
+   public void setCsvTypes(DatumType... types)
+   {
+      PropertyCommand<Integer> prop 
+         = new PropertyCommand<Integer>(CSV_TYPES_PROP);
+
+      for (int i = 0; i < types.length; i++)
+      {
+         prop.put(Integer.valueOf(i+1),
+           types[i].getCs(getListener()));
+      }
+
+      getParser().putControlSequence(true, prop);
+   }
+
+   public void setCsvTypes(TeXObject... types)
+   {
+      PropertyCommand<Integer> prop 
+         = new PropertyCommand<Integer>(CSV_TYPES_PROP);
+
+      for (int i = 0; i < types.length; i++)
+      {
+         prop.put(Integer.valueOf(i+1), types[i]);
       }
 
       getParser().putControlSequence(true, prop);
@@ -3479,6 +3607,8 @@ public class DataToolSty extends LaTeXSty
      ="datatool.row.not.found";
    public static final String ERROR_NO_COLUMNS
      ="datatool.no.columns";
+   public static final String ERROR_UNKNOWN_DATA_TYPE
+     ="datatool.unknown_data_type";
 
    public static final String MESSAGE_LOADDB
      ="datatool.loaddb.message";
@@ -3494,6 +3624,8 @@ public class DataToolSty extends LaTeXSty
      = "l__datatool_new_element_trim_bool";
    public static final String CSV_LITERAL_CONTENT_BOOL
      = "l__datatool_csv_literal_content_bool";
+   public static final String CSV_PLAIN_CONTENT_BOOL
+     = "l__datatool_csv_plain_content_bool";
    public static final String APPEND_ALLOWED_BOOL
      = "l__datatool_append_allowed_bool";
    public static final String DB_GLOBAL_BOOL
@@ -3510,6 +3642,7 @@ public class DataToolSty extends LaTeXSty
 
    public static final String CSV_HEADERS_PROP = "l__datatool_csv_headers_prop";
    public static final String CSV_KEYS_PROP = "l__datatool_csv_keys_prop";
+   public static final String CSV_TYPES_PROP = "l__datatool_csv_types_prop";
 
    public static final String OMIT_COLUMNS_SEQ = "l__datatool_omit_columns_seq";
    public static final String OMIT_KEYS_SEQ = "l__datatool_omit_keys_seq";
@@ -3517,6 +3650,8 @@ public class DataToolSty extends LaTeXSty
    public static final String ONLY_KEYS_SEQ = "l__datatool_only_keys_seq";
 
    public static final String COLUMN_INDEXES_SEQ = "l__datatool_column_indexes_seq";
+   public static final String CSV_ONLY_AUTO_REFORMAT_SEQ
+      = "l__datatool_csv_only_auto_reformat_seq";
 
    public static final String DELIMITER = "@dtl@delimiter";
    public static final String SEPARATOR = "@dtl@separator";

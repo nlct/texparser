@@ -315,26 +315,6 @@ public class TeXParserUtils
       return parser.expandToString(cs, stack);
    }
 
-   public static Numerical toNumerical(TeXObject obj, 
-    TeXParser parser, TeXObjectList stack)
-   throws IOException
-   {
-      if (obj instanceof Numerical)
-      {
-         return (Numerical)obj;
-      }
-
-      if (parser.isStack(obj) && ((TeXObjectList)obj).size() == 1
-           && ((TeXObjectList)obj).firstElement() instanceof Numerical)
-      {
-         return (Numerical)((TeXObjectList)obj).firstElement();
-      }
-
-      String str = parser.expandToString(obj, stack).trim();
-
-      return new UserNumber(parser, str);
-   }
-
    /**
     * Pops an integer.
     * @param parser the TeX parser
@@ -904,9 +884,109 @@ public class TeXParserUtils
       return null;
    }
 
+   public static Numerical toNumerical(TeXObject obj, 
+    TeXParser parser, TeXObjectList stack)
+   throws IOException
+   {
+      if (parser.isStack(obj))
+      {
+         ((TeXObjectList)obj).trim();
+
+         if (((TeXObjectList)obj).size() == 1)
+         {
+            obj = ((TeXObjectList)obj).firstElement();
+         }
+      }
+
+      if (obj instanceof Numerical)
+      {
+         return (Numerical)obj;
+      }
+
+      String str = parser.expandToString(obj, stack).trim();
+
+      return new UserNumber(parser, str);
+   }
+
+   public static TeXNumber toTeXNumber(boolean intOnly,
+       TeXObject object, TeXParser parser, TeXObjectList stack)
+     throws IOException
+   {
+      TeXNumber num = null;
+
+      if (parser.isStack(object))
+      {
+         ((TeXObjectList)object).trim();
+
+         if (((TeXObjectList)object).size() == 1)
+         {
+            object = ((TeXObjectList)object).firstElement();
+         }
+      }
+
+      if (object instanceof TeXNumber)
+      {
+         num = (TeXNumber)object;
+      }
+      else if (object instanceof AssignedControlSequence)
+      {
+         TeXObject underlying = ((AssignedControlSequence)object).getBaseUnderlying();
+
+         if (underlying instanceof TeXNumber)
+         {
+            num = (TeXNumber)underlying;
+         }
+      }
+      else
+      {
+         String str = parser.expandToString(object, stack);
+
+         try
+         {
+            if (intOnly)
+            {
+               num = new UserNumber(Integer.parseInt(str));
+            }
+            else
+            {
+               try
+               {
+                  num = new UserNumber(Integer.parseInt(str));
+               }
+               catch (NumberFormatException e)
+               {
+                  num = new TeXFloatingPoint(Double.parseDouble(str));
+               }
+            }
+         }
+         catch (NumberFormatException e)
+         {
+            throw new TeXSyntaxException(e, parser,
+              TeXSyntaxException.ERROR_NUMBER_EXPECTED, str);
+         }
+      }
+
+      if (intOnly && num instanceof TeXFloatingPoint)
+      {
+         num = new UserNumber(num.getValue());
+      }
+
+      return num;
+   }
+
    public static int toInt(TeXObject object, TeXParser parser, TeXObjectList stack)
      throws IOException
    {
+      if (parser.isStack(object))
+      {
+         ((TeXObjectList)object).trim();
+
+         if (((TeXObjectList)object).size() == 1)
+         {
+            object = ((TeXObjectList)object).firstElement();
+         }
+      }
+
       if (object instanceof TeXNumber)
       {
          return ((TeXNumber)object).getValue();
@@ -938,6 +1018,16 @@ public class TeXParserUtils
    public static float toFloat(TeXObject object, TeXParser parser, TeXObjectList stack)
      throws IOException
    {
+      if (parser.isStack(object))
+      {
+         ((TeXObjectList)object).trim();
+
+         if (((TeXObjectList)object).size() == 1)
+         {
+            object = ((TeXObjectList)object).firstElement();
+         }
+      }
+
       if (object instanceof TeXNumber)
       {
          return (float)((TeXNumber)object).doubleValue();
@@ -969,6 +1059,16 @@ public class TeXParserUtils
    public static double toDouble(TeXObject object, TeXParser parser, TeXObjectList stack)
      throws IOException
    {
+      if (parser.isStack(object))
+      {
+         ((TeXObjectList)object).trim();
+
+         if (((TeXObjectList)object).size() == 1)
+         {
+            object = ((TeXObjectList)object).firstElement();
+         }
+      }
+
       if (object instanceof TeXNumber)
       {
          return ((TeXNumber)object).doubleValue();

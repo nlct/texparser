@@ -19,6 +19,7 @@
 package com.dickimawbooks.texparserlib.latex.datatool;
 
 import java.util.Date;
+import java.util.Iterator;
 import java.util.Locale;
 import java.util.Vector;
 import java.util.regex.Pattern;
@@ -37,6 +38,7 @@ import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.*;
 import com.dickimawbooks.texparserlib.latex.ifthen.IfThenSty;
 import com.dickimawbooks.texparserlib.latex.latex3.LaTeX3Boolean;
+import com.dickimawbooks.texparserlib.latex.latex3.SequenceCommand;
 import com.dickimawbooks.texparserlib.primitives.EndGraf;
 import com.dickimawbooks.texparserlib.primitives.NewIf;
 
@@ -59,6 +61,17 @@ public class DataToolBaseSty extends LaTeXSty
 
       registerControlSequence(new LaTeX3Boolean(PARSE_DATETIME_BOOL, false));
       registerControlSequence(new LaTeX3Boolean(REFORMAT_DATETIME_BOOL, false));
+      registerControlSequence(new LaTeX3Boolean(REFORMAT_NUMERIC_BOOL, false));
+
+      SequenceCommand seq = new SequenceCommand(AUTO_REFORMAT_TYPES_SEQ);
+      seq.append(getListener().createString("integer"));
+      seq.append(getListener().createString("decimal"));
+      seq.append(getListener().createString("si"));
+      seq.append(getListener().createString("currency"));
+      seq.append(getListener().createString("datetime"));
+      seq.append(getListener().createString("date"));
+      seq.append(getListener().createString("time"));
+      registerControlSequence(seq);
 
       CountRegister reg;
 
@@ -89,7 +102,7 @@ public class DataToolBaseSty extends LaTeXSty
 
       // Numeric
 
-      registerControlSequence(new DTLsetnumberchars());
+      registerControlSequence(new DTLsetnumberchars(this));
 
       if (numericLocale == null)
       {
@@ -358,6 +371,53 @@ public class DataToolBaseSty extends LaTeXSty
       else if (key.equals("lists"))
       {// TODO
       }
+      else if (key.equals("auto-reformat-types"))
+      {
+         SequenceCommand seq = new SequenceCommand(AUTO_REFORMAT_TYPES_SEQ);
+
+         if (value != null)
+         {
+            String[] split = value.toString(getParser()).split(",");
+
+            for (String spVal : split)
+            {
+               spVal = spVal.trim();
+
+               if (spVal.isEmpty())
+               {// ignore
+               }
+               else if ( spVal.equals("integer")
+                      || spVal.equals("decimal")
+                      || spVal.equals("si")
+                      || spVal.equals("datetime")
+                      || spVal.equals("date")
+                      || spVal.equals("time")
+                       )
+               {
+                  seq.append(getListener().createString(spVal));
+               }
+               else
+               {
+                  throw new LaTeXSyntaxException(getParser(),
+                    LaTeXSyntaxException.ERROR_INVALID_OPTION_VALUE,
+                    key, spVal);
+               }
+            }
+         }
+
+         getParser().putControlSequence(true, seq);
+      }
+      else if (key.equals("numeric"))
+      {
+         if (value == null)
+         {
+            throw new LaTeXSyntaxException(getParser(),
+              LaTeXSyntaxException.ERROR_MISSING_KEY_VALUE,
+              key);
+         }
+
+         setupNumeric(TeXParserUtils.toKeyValList(value, getParser()), stack);
+      }
       else if (key.equals("datetime"))
       {
          if (value == null)
@@ -367,33 +427,7 @@ public class DataToolBaseSty extends LaTeXSty
               key);
          }
 
-         String strVal = getParser().expandToString(value, stack).trim();
-
-         if (strVal.equals("false"))
-         {
-            getParser().putControlSequence(true,
-              new LaTeX3Boolean(PARSE_DATETIME_BOOL, false));
-         }
-         else if (strVal.equals("parse-only"))
-         {
-            getParser().putControlSequence(true,
-              new LaTeX3Boolean(PARSE_DATETIME_BOOL, true));
-            getParser().putControlSequence(true,
-              new LaTeX3Boolean(REFORMAT_DATETIME_BOOL, false));
-         }
-         else if (strVal.equals("reformat"))
-         {
-            getParser().putControlSequence(true,
-              new LaTeX3Boolean(PARSE_DATETIME_BOOL, true));
-            getParser().putControlSequence(true,
-              new LaTeX3Boolean(REFORMAT_DATETIME_BOOL, true));
-         }
-         else
-         {
-            throw new LaTeXSyntaxException(getParser(),
-              LaTeXSyntaxException.ERROR_INVALID_OPTION_VALUE,
-              key, strVal);
-         }
+         setupDateTime(TeXParserUtils.toKeyValList(value, getParser()), stack);
       }
       else if (key.equals("utf8") || key.equals("math") 
          || key.equals("locales") || key.equals("nolocale"))
@@ -409,6 +443,208 @@ public class DataToolBaseSty extends LaTeXSty
           LaTeXSyntaxException.ERROR_UNKNOWN_OPTION,
           key, "datatool-base");
       }
+   }
+
+   public void setupNumeric(KeyValList options, TeXObjectList stack)
+   throws IOException
+   {
+      for (Iterator<String> it = options.keySet().iterator();
+           it.hasNext(); )
+      {
+         String key = it.next();
+
+         TeXObject value = options.get(key);
+
+         if (key.equals("auto-reformat"))
+         {
+            boolean on = true;
+
+            if (value != null && !value.isEmpty()
+                 && getParser().expandToString(value, stack).trim().equals("false"))
+            {
+               on = false;
+            }
+
+            getParser().putControlSequence(true,
+              new LaTeX3Boolean(REFORMAT_NUMERIC_BOOL, on));
+         }
+         else if (key.equals("set-number-chars"))
+         {
+            TeXObjectList substack = TeXParserUtils.toList(value, getParser());
+
+            TeXObject numGrp = substack.popArg(getParser());
+            TeXObject decChar = substack.popArg(getParser());
+
+            setNumberChars(numGrp, decChar);
+         }
+         else if (key.equals("region-number-chars"))
+         {// TODO
+         }
+         else if (key.equals("set-currency"))
+         {
+            if (value == null)
+            {
+               throw new LaTeXSyntaxException(getParser(),
+                 LaTeXSyntaxException.ERROR_MISSING_KEY_VALUE,
+                 key);
+            }
+
+            setDefaultCurrency(value);
+         }
+         else if (key.equals("region-currency"))
+         {// TODO
+         }
+         else if (key.equals("region-currency-prefix"))
+         {// TODO
+         }
+         else if (key.equals("currency-symbol-style"))
+         {// TODO
+         }
+         else
+         {
+            throw new LaTeXSyntaxException(getParser(),
+             LaTeXSyntaxException.ERROR_UNKNOWN_OPTION,
+             key, "numeric");
+         }
+      }
+   }
+
+   public void setupDateTime(KeyValList options, TeXObjectList stack)
+   throws IOException
+   {
+      for (Iterator<String> it = options.keySet().iterator();
+           it.hasNext(); )
+      {
+         String key = it.next();
+
+         TeXObject value = options.get(key);
+
+         if (key.equals("auto-reformat"))
+         {
+            String strVal = "true";
+
+            if (value != null && !value.isEmpty())
+            {
+               strVal = getParser().expandToString(value, stack).trim();
+
+               if (strVal.isEmpty())
+               {
+                  strVal = "true";
+               }
+            }
+
+            getParser().putControlSequence(true,
+              new LaTeX3Boolean(PARSE_DATETIME_BOOL, !strVal.equals("false")));
+
+            // TODO : options "region", "iso", "datetime2"
+         }
+         else if (key.equals("parse"))
+         {
+            String strVal = "true";
+
+            if (value != null && !value.isEmpty())
+            {
+               strVal = getParser().expandToString(value, stack).trim();
+
+               if (strVal.isEmpty())
+               {
+                  strVal = "true";
+               }
+            }
+
+            if (strVal.equals("false"))
+            {
+               getParser().putControlSequence(true,
+                 new LaTeX3Boolean(PARSE_DATETIME_BOOL, false));
+            }
+            else if (strVal.equals("true"))
+            {
+               getParser().putControlSequence(true,
+                 new LaTeX3Boolean(PARSE_DATETIME_BOOL, true));
+            }
+            else if (strVal.equals("parse-only"))
+            {
+               getParser().putControlSequence(true,
+                 new LaTeX3Boolean(PARSE_DATETIME_BOOL, true));
+               getParser().putControlSequence(true,
+                 new LaTeX3Boolean(REFORMAT_DATETIME_BOOL, false));
+            }
+            else if (strVal.equals("auto-reformat"))
+            {
+               getParser().putControlSequence(true,
+                 new LaTeX3Boolean(PARSE_DATETIME_BOOL, true));
+               getParser().putControlSequence(true,
+                 new LaTeX3Boolean(REFORMAT_DATETIME_BOOL, true));
+            }
+            else if (strVal.equals("iso-only"))
+            {
+               getParser().putControlSequence(true,
+                 new LaTeX3Boolean(PARSE_DATETIME_BOOL, true));
+// TODO
+            }
+            else if (strVal.equals("region-only"))
+            {
+               getParser().putControlSequence(true,
+                 new LaTeX3Boolean(PARSE_DATETIME_BOOL, true));
+// TODO
+            }
+            else if (strVal.equals("iso+region"))
+            {
+               getParser().putControlSequence(true,
+                 new LaTeX3Boolean(PARSE_DATETIME_BOOL, true));
+// TODO
+            }
+            else
+            {
+               throw new LaTeXSyntaxException(getParser(),
+                 LaTeXSyntaxException.ERROR_INVALID_OPTION_VALUE,
+                 key, strVal);
+            }
+         }
+         else
+         {
+            throw new LaTeXSyntaxException(getParser(),
+             LaTeXSyntaxException.ERROR_UNKNOWN_OPTION,
+             key, "numeric");
+         }
+      }
+   }
+
+   public void setNumberChars(TeXObject numGrp, TeXObject decChar)
+   {
+      setNumberChars(numGrp.toString(getParser()), decChar.toString(getParser()));
+   }
+
+   // TODO: allow regex
+   public void setNumberChars(String numGrpChar, String decimalChar)
+   {
+      TeXParser parser = getParser();
+
+      DecimalFormatSymbols symbols = new DecimalFormatSymbols();
+      symbols.setDecimalSeparator(decimalChar.charAt(0));
+      symbols.setGroupingSeparator(numGrpChar.charAt(0));
+
+      parser.putControlSequence(true,
+        new TextualContentCommand("@dtl@numbergroupchar", numGrpChar));
+
+      parser.putControlSequence(true,
+        new TextualContentCommand("@dtl@decimal", decimalChar));
+
+      DecimalFormat fmt = new DecimalFormat("#,##0", symbols);
+      fmt.setParseIntegerOnly(true);
+   
+      parser.putControlSequence(true,
+        new NumericFormatter(
+          FMT_INTEGER_VALUE, fmt));
+
+      parser.putControlSequence(true,
+        new NumericFormatter(
+          FMT_DECIMAL_VALUE,
+          new DecimalFormat("#,##0.0######", symbols)));
+
+      parser.putControlSequence(
+        new NumericFormatter(DataToolBaseSty.FMT_CURRENCY_VALUE,
+           new DecimalFormat("#,##0.00", symbols)));
    }
 
    public void addCurrencySymbol(TeXObject symbol)
@@ -529,6 +765,46 @@ public class DataToolBaseSty extends LaTeXSty
       return sortCountReg;
    }
 
+   protected boolean isAutoReformatOn(String setting)
+   {
+      ControlSequence cs = getParser().getControlSequence(AUTO_REFORMAT_TYPES_SEQ);
+      boolean found = false;
+
+      if (cs instanceof SequenceCommand)
+      {
+         return ((SequenceCommand)cs).contains(setting);
+      }
+
+      return false;
+   }
+
+   public boolean isSIAutoReformatOn(boolean isReformatNumOn)
+   {
+      return isReformatNumOn && isAutoReformatOn("si");
+   }
+
+   public boolean isAutoReformatOn(DatumType type,
+      boolean isReformatNumOn, boolean isReformatDateTimeOn)
+   {
+      switch (type)
+      {
+         case INTEGER:
+           return isReformatNumOn && isAutoReformatOn("integer");
+         case DECIMAL:
+           return isReformatNumOn && isAutoReformatOn("decimal");
+         case CURRENCY:
+           return isReformatNumOn && isAutoReformatOn("currency");
+         case DATETIME:
+           return isReformatDateTimeOn && isAutoReformatOn("datetime");
+         case DATE:
+           return isReformatDateTimeOn && isAutoReformatOn("date");
+         case TIME:
+           return isReformatDateTimeOn && isAutoReformatOn("time");
+      }
+
+      return false;
+   }
+
    public static int parseInt(String str, TeXParser parser)
     throws TeXSyntaxException
    {
@@ -605,6 +881,170 @@ public class DataToolBaseSty extends LaTeXSty
       }
    }
 
+   public DataElement getPlainElement(DatumType type, TeXObject entry)
+     throws IOException
+   {
+      boolean useDatum
+        = TeXParserUtils.isTrue(DataToolSty.DB_STORE_DATUM_BOOL, getParser());
+
+      return getPlainElement(type, entry, useDatum);
+   }
+
+   public DataElement getPlainElement(DatumType type, TeXObject entry, boolean useDatum)
+     throws IOException
+   {
+       boolean reformatNum = false;
+       boolean reformatDateTime = false;
+
+       if (type.isTemporal())
+       {
+          reformatDateTime =
+            TeXParserUtils.isTrue(REFORMAT_DATETIME_BOOL, getParser());
+       }
+       else if (type.isNumeric())
+       {
+          reformatNum =
+            TeXParserUtils.isTrue(REFORMAT_NUMERIC_BOOL, getParser());
+       }
+
+       return getPlainElement(type, entry, useDatum, reformatNum, reformatDateTime);
+   }
+
+   public DataElement getPlainElement(DatumType type, TeXObject entry, boolean useDatum,
+      boolean autoReformatNumeric, boolean autoReformatDateTime)
+     throws IOException
+   {
+      DataElement element;
+      TeXObject content = entry;
+      Number num = null;
+      TeXNumber texNum = null;
+      TeXObject currency = null;
+      Julian julian = null;
+
+      if (type.isNumeric())
+      {
+         try
+         {
+            String val = entry.toString(getParser());
+
+            try
+            {
+               num = Integer.valueOf(val);
+            }
+            catch (NumberFormatException e)
+            {
+               num = Double.valueOf(val);
+            }
+         }
+         catch (NumberFormatException e)
+         {
+            getListener().getTeXApp().error(e);
+            type = DatumType.STRING;
+            num = null;
+         }
+      }
+
+      if (type == DatumType.INTEGER || type == DatumType.DECIMAL)
+      {
+         if (isAutoReformatOn(type, autoReformatNumeric, autoReformatDateTime))
+         {
+            content = formatNumber(type, num);
+         }
+      }
+      else if (type == DatumType.CURRENCY)
+      {
+         TeXObjectList currencyList = getListener().createStack();
+         currencyList.add(new TeXCsRef("DTLcurr"));
+         currencyList.add(TeXParserUtils.createGroup(getListener(),
+           new TeXCsRef("DTLCurrencyCode")));
+         currency = currencyList;
+
+         if (isAutoReformatOn(type, autoReformatNumeric, autoReformatDateTime))
+         {
+            TeXObjectList contentList = getListener().createStack();
+            contentList.add(new TeXCsRef("DTLcurrency"));
+            contentList.add(TeXParserUtils.createGroup(getListener(), entry));
+            content = contentList;
+         }
+      }
+      else if (type.isTemporal())
+      {
+         if (type == DatumType.TIME)
+         {
+            julian = Julian.createTime(num.doubleValue());
+         }
+         else if (type == DatumType.DATETIME)
+         {
+            julian = Julian.createDate(num.doubleValue());
+         }
+         else if (type == DatumType.DATE)
+         {
+            julian = Julian.createDay(num.intValue());
+         }
+
+         if (isAutoReformatOn(type, autoReformatNumeric, autoReformatDateTime))
+         {
+            content = julian.createTeXFormat(getListener());
+         }
+
+         if (useDatum)
+         {
+            TeXObjectList objVal = getListener().createStack();
+
+            objVal.add(new TeXCsRef("DTLtemporalvalue"));
+            objVal.add(TeXParserUtils.createGroup(getListener(), texNum));
+            objVal.add(getListener().createGroup(julian.getTimeStamp()));
+
+            return new DatumElement(content, texNum, objVal, null, julian, type);
+         }
+      }
+
+      if (useDatum)
+      {
+         switch (type)
+         {
+            case INTEGER:
+              texNum = new UserNumber(num.intValue());
+            break;
+            case CURRENCY:
+            case DECIMAL:
+              texNum = new TeXFloatingPoint(num.doubleValue());
+            break;
+         }
+
+         element = new DatumElement(content, texNum, currency, type);
+      }
+      else
+      {
+         switch (type)
+         {
+            case INTEGER:
+              element = new DataIntElement(num.intValue(), content);
+            break;
+            case DECIMAL:
+              element = new DataRealElement(num.doubleValue(), content);
+            break;
+            case CURRENCY:
+              element = new DataCurrencyElement(currency,
+                num.doubleValue(), content);
+            break;
+            case DATE:
+              element = new DataDateElement(julian, content);
+            break;
+            case TIME:
+              element = new DataTimeElement(julian, content);
+            break;
+            case DATETIME:
+              element = new DataDateTimeElement(julian, content);
+            break;
+            default:
+              element = new DataStringElement(TeXParserUtils.toList(content, getParser()));
+         }
+      }
+
+      return element;
+   }
+
    public DataElement getElement(TeXObject entry)
      throws IOException
    {
@@ -615,6 +1055,16 @@ public class DataToolBaseSty extends LaTeXSty
    }
 
    public DataElement getElement(TeXObject entry, boolean useDatum)
+     throws IOException
+   {
+       boolean reformatNum = TeXParserUtils.isTrue(REFORMAT_NUMERIC_BOOL, getParser());
+       boolean reformatDateTime = TeXParserUtils.isTrue(REFORMAT_DATETIME_BOOL, getParser());
+
+       return getElement(entry, useDatum, reformatNum, reformatDateTime);
+   }
+
+   public DataElement getElement(TeXObject entry, boolean useDatum,
+     boolean autoReformatNumeric, boolean autoReformatDateTime)
      throws IOException
    {
       TeXParser parser = getListener().getParser();
@@ -732,6 +1182,60 @@ public class DataToolBaseSty extends LaTeXSty
             {// not numeric
 
                list.add(0, first);
+               return new DataStringElement(list);
+            }
+         }
+
+         // does it end with a currency marker?
+         TeXObject lastObj = list.lastElement();
+         int idx = list.size()-1;
+
+         while (lastObj instanceof Ignoreable && idx > 1)
+         {
+            idx--;
+            lastObj = list.get(idx);
+         }
+
+         if (isCurrencySymbol(lastObj))
+         {
+            for (int i = list.size()-1; i >= idx; i--)
+            {
+               list.remove(i);
+            }
+
+            // is the remainder numerical?
+
+            try
+            {
+               ControlSequence cs = parser.getControlSequence(
+                 FMT_CURRENCY_VALUE);
+
+               String str = list.toString(parser).trim();
+               double value;
+
+               if (cs instanceof NumericFormatter)
+               {
+                  value = ((NumericFormatter)cs).parse(str).doubleValue();
+               }
+               else
+               {
+                  value = Double.parseDouble(str);
+               }
+
+               if (useDatum)
+               {
+                  return new DatumElement(original,
+                     new TeXFloatingPoint(value), lastObj, DatumType.CURRENCY);
+               }
+               else
+               {
+                  return new DataCurrencyElement(lastObj, value, original);
+               }
+            }
+            catch (NumberFormatException | ParseException e)
+            {// not numeric
+
+               list.add(lastObj);
                return new DataStringElement(list);
             }
          }
@@ -976,6 +1480,9 @@ public class DataToolBaseSty extends LaTeXSty
       return numericLocale;
    }
 
+   // TODO add support for regex?
+   // \datatool_set_thinspace_group_decimal_char:n etc
+
    public void setNumericLocale(Locale locale)
    {
       numericLocale = locale;
@@ -998,6 +1505,43 @@ public class DataToolBaseSty extends LaTeXSty
       registerControlSequence(
         new NumericFormatter(FMT_CURRENCY_VALUE,
            new DecimalFormat("#,##0.00", symbols)));
+   }
+
+   public TeXObject formatNumber(DatumType type, Number num)
+   {
+      ControlSequence cs;
+
+      if (type == DatumType.INTEGER)
+      {
+         cs = getParser().getControlSequence(FMT_INTEGER_VALUE);
+      }
+      else
+      {
+         cs = getParser().getControlSequence(FMT_DECIMAL_VALUE);
+      }
+
+      if (cs instanceof NumericFormatter)
+      {
+         return ((NumericFormatter)cs).format(num, getListener());
+      }
+      else
+      {
+         return getListener().createString(num.toString());
+      }
+   }
+
+   public TeXObject formatCurrency(DatumType type, Number num, String currencyCode)
+   {
+      ControlSequence cs = getParser().getControlSequence(FMT_CURRENCY_VALUE);
+
+      if (cs instanceof NumericFormatter)
+      {
+         return ((NumericFormatter)cs).format(num, getListener());
+      }
+      else
+      {
+         return getListener().createString(num.toString());
+      }
    }
 
    private IfThenSty ifThenSty;
@@ -1070,6 +1614,9 @@ public class DataToolBaseSty extends LaTeXSty
 
    public static final String PARSE_DATETIME_BOOL = "l__datatool_parse_datetime_bool";
    public static final String REFORMAT_DATETIME_BOOL = "l__datatool_reformat_datetime_bool";
+
+   public static final String REFORMAT_NUMERIC_BOOL = "l__datatool_reformat_numeric_bool";
+   public static final String AUTO_REFORMAT_TYPES_SEQ = "l__datatool_auto_reformat_types_seq";
 
    public static final String TMPA_VAR = "l__datatool_tmpa_tl";
    public static final String TMPB_VAR = "l__datatool_tmpb_tl";
