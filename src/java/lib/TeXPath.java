@@ -121,6 +121,12 @@ public class TeXPath
    public static TeXPath newOutputPath(File outputDir, String texPathStr,
      String defExt)
    {
+      return newOutputPath(outputDir, texPathStr, defExt, true);
+   }
+
+   public static TeXPath newOutputPath(File outputDir, String texPathStr,
+     String defExt, boolean enforceDefExt)
+   {
       File parent = outputDir;
 
       if (texPathStr.startsWith("\"") && texPathStr.endsWith("\""))
@@ -173,9 +179,8 @@ public class TeXPath
 
       if (defExt != null && !defExt.isEmpty())
       {
-         boolean hasExtension = baseName.contains(".");
-
-         if (!hasExtension)
+         if ((enforceDefExt && !baseName.endsWith("."+defExt)) 
+              || !baseName.contains("."))
          {
             baseName += "."+defExt;
          }
