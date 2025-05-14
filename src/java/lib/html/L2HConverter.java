@@ -319,6 +319,9 @@ public class L2HConverter extends LaTeXParserListener
       putControlSequence(new L2HSection("part"));
       putControlSequence(new L2HNumberline());
 
+      // No floats to worry about
+      putControlSequence(new Relax("FloatBarrier"));
+
       putControlSequence(new L2HCaption());
       putControlSequence(new L2HAtMakeCaption());
 
