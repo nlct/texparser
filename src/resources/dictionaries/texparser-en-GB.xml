@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
 <properties>
-<comment>GB English language file for texparserapp</comment>
+<comment>GB English language file for texparserapp
+https://github.com/nlct/texparser
+GPL-3.0
+Nicola Talbot
+</comment>
 
 <!--  About dialog -->
 <entry key="about.title">About {0}</entry>
