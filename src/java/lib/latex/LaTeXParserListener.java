@@ -2993,6 +2993,13 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       {
          Path basePath = path.getBaseDir();
 
+         if (basePath == null)
+         {
+            basePath = getParser().getBaseDir().toPath();
+         }
+
+         basePath = basePath.toAbsolutePath();
+
          for (int i = 0; i < grpaths.length; i++)
          {
             Path subPath = 
@@ -3036,23 +3043,8 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
 
          for (int i = 0; i < n; i++)
          {
-            TeXObject object = graphicsPath.get(i);
-
-            TeXObjectList expanded = null;
-
-            if (object instanceof Expandable)
-            {
-               expanded = ((Expandable)object).expandfully(parser);
-            }
-
-            if (expanded != null)
-            {
-               grpaths[i] = expanded.toString(parser);
-            }
-            else
-            {
-               grpaths[i] = object.toString(parser);
-            }
+            TeXObject object = (TeXObject)graphicsPath.get(i).clone();
+            grpaths[i] = parser.expandToString(object, parser);
          }
       }
 
