@@ -161,7 +161,7 @@ public class L2HToImage extends ControlSequence
       content.append(arg.toString(parser));
 
       L2HImage image = listener.toImage(preamble, 
-       content.toString(), type, alt, name, crop);
+       content.toString(), type, alt, name, crop, null);
 
       if (image != null)
       {

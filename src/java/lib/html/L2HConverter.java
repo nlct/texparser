@@ -193,6 +193,16 @@ public class L2HConverter extends LaTeXParserListener
       return outPath == null ? null : outPath.toFile();
    }
 
+   public Path getOutputPath()
+   {
+      return outPath;
+   }
+
+   public Path getBasePath()
+   {
+      return basePath;
+   }
+
    /**
     * Sets the split level. This must be set before the file is parsed. 
     * Has no effect if the division data isn't available. This method
@@ -461,8 +471,32 @@ public class L2HConverter extends LaTeXParserListener
       return super.createUnknownReference(label);
    }
 
+   @Deprecated
    public L2HImage toImage(String preamble, 
     String content, String mimeType, TeXObject alt, String name, boolean crop)
+   throws IOException
+   {
+      return toImage(preamble, content, mimeType, alt, name, crop, null);
+   }
+
+   /**
+    * Converts content to an image by creating a temporary
+    * LaTeX file and building it. Returns null if not supported.
+    * @param preamble the document preamble for the temporary LaTeX file
+    * @param content the document body
+    * @param mimetype the image (output) format
+    * @param alt image alternative text
+    * @param name the basename of the (output) image
+    * @param crop if true, crop the resulting image
+    * @param relPath the relative directory the original image
+    * was in (which may be preserved relative to the output
+    * directory) or null if the new image should be in the output
+    * directory
+    * @return the L2HImage or null if no conversion available
+    */
+   public L2HImage toImage(String preamble, 
+    String content, String mimeType, TeXObject alt, String name, boolean crop,
+    Path relPath)
    throws IOException
    {
       return null;
@@ -3696,8 +3730,37 @@ public class L2HConverter extends LaTeXParserListener
             getParser().logMessage("Creating image "+content.toString());
          }
 
+         Path relPath = null;
+
+         Path parent = imagePath.getParent();
+
+         if (parent != null)
+         {
+            if (parent.isAbsolute())
+            {
+               try
+               {
+                  if (basePath.isAbsolute())
+                  {
+                     relPath = basePath.relativize(parent);
+                  }
+                  else
+                  {
+                     relPath = basePath.toAbsolutePath().relativize(parent);
+                  }
+               }
+               catch (IllegalArgumentException e)
+               {// ignore
+               }
+            }
+            else
+            {
+               relPath = parent;
+            }
+         }
+
          image = toImage(getImagePreamble(),
-          content.toString(), type, alt, null, true);
+          content.toString(), type, alt, null, true, relPath);
       }
 
       return image;

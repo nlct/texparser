@@ -199,9 +199,10 @@ public class TeXParserApp implements TeXApp
       L2HConverter listener = new L2HConverter(this, mathJax, outDir, 
         outCharset, true, splitLevel)
       {
+         @Override
          public L2HImage toImage(String preamble, 
           String content, String mimeType, TeXObject alt, String name, 
-          boolean crop)
+          boolean crop, Path relPath)
          throws IOException
          {
             if (convertImages)
