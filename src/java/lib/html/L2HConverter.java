@@ -3484,7 +3484,16 @@ public class L2HConverter extends LaTeXParserListener
       }
       else if (imagePath.isAbsolute())
       {
-         relPath = imagePath.getName(imagePath.getNameCount()-1);
+         Path absBasePath = basePath.toAbsolutePath();
+
+         if (imagePath.startsWith(absBasePath))
+         {
+            relPath = absBasePath.relativize(imagePath);
+         }
+         else
+         {
+            relPath = imagePath.getName(imagePath.getNameCount()-1);
+         }
       }
       else
       {
