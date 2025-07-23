@@ -2446,6 +2446,14 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
    {
       usepackage(sty);
 
+      KeyValList passedOptions
+         = getPassedOptions(sty.getName()+"."+sty.getExtension());
+
+      if (passedOptions != null)
+      {
+         sty.addOptions(passedOptions);
+      }
+
       if (options != null)
       {
          sty.addOptions(options);
@@ -2552,10 +2560,26 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       return colorSty;
    }
 
-   protected LaTeXSty getLaTeXSty(KeyValList options, String styName, 
+   protected LaTeXSty getLaTeXSty(KeyValList suppliedOptions, String styName, 
       boolean loadParentOptions, TeXObjectList stack)
    throws IOException
    {
+      KeyValList options = getPassedOptions(styName+".sty");
+
+      if (options == null)
+      {
+         options = suppliedOptions;
+      }
+      else
+      {
+         passOptions.remove(styName+".sty");
+
+         if (suppliedOptions != null)
+         {
+            options.putAll(suppliedOptions);
+         }
+      }
+
       if (styName.equals("graphics")
         || styName.equals("graphicx")
         || styName.equals("epsfig"))
