@@ -69,6 +69,10 @@ public class GlossariesSty extends LaTeXSty
       {
          extra = true;
       }
+      else if (name.equals("glossaries-prefix"))
+      {
+         prefixSupport = true;
+      }
 
       entries = new HashMap<String,GlossaryEntry>();
       glossaries = new HashMap<String,Glossary>();
@@ -539,6 +543,11 @@ public class GlossariesSty extends LaTeXSty
       fbox.setTextFont(new TeXFontText(TeXFontFamily.TT, TeXFontSize.FOOTNOTE));
 
       getListener().declareFrameBox(fbox, false);
+
+      if (prefixSupport)
+      {
+        addPrefixDefinitions();
+      }
 
       if (extra)
       {
@@ -1301,6 +1310,69 @@ public class GlossariesSty extends LaTeXSty
 
       registerControlSequence(new AtGobble("BibGlsOptions"));
       registerControlSequence(new AtFirstOfTwo("IfNotBibGls"));
+   }
+
+   protected void addPrefixDefinitions()
+   {
+      addField("prefixfirst");
+      addField("prefixfirstplural");
+      addField("prefix");
+      addField("prefixplural");
+
+      registerControlSequence(
+         new GlsEntryField("glsentryprefixfirst", "prefixfirst", this));
+      registerControlSequence(
+         new GlsEntryField("glsentryprefixfirstplural", "prefixfirstplural", this));
+
+      registerControlSequence(
+         new GlsEntryField("glsentryprefix", "prefix", this));
+      registerControlSequence(
+         new GlsEntryField("glsentryprefixplural", "prefixplural", this));
+
+      registerControlSequence(new GlsEntryField("Glsentryprefixfirst",
+        "prefixfirst", CaseChange.SENTENCE, this));
+
+      registerControlSequence(new GlsEntryField("Glsentryprefixfirstplural",
+        "prefixfirstplural", CaseChange.SENTENCE, this));
+
+      registerControlSequence(new GlsEntryField("Glsentryprefix",
+        "prefix", CaseChange.SENTENCE, this));
+
+      registerControlSequence(new GlsEntryField("Glsentryprefixplural",
+        "prefixplural", CaseChange.SENTENCE, this));
+
+      registerControlSequence(new IfHasField("ifglshasprefix", "prefix", this));
+      registerControlSequence(
+         new IfHasField("ifglshasprefixplural", "prefixplural", this));
+
+      registerControlSequence(
+         new IfHasField("ifglshasprefixfirst", "prefixfirst", this));
+      registerControlSequence(
+         new IfHasField("ifglshasprefixfirstplural", "prefixfirstplural", this));
+
+      registerControlSequence(new GenericCommand("glsprefixsep"));
+
+      registerControlSequence(new PGls(this));
+
+      registerControlSequence(new PGls("pglspl",
+       false, CaseChange.NO_CHANGE, true, this));
+
+      registerControlSequence(new PGls("Pgls",
+       false, CaseChange.SENTENCE, false, this));
+
+      registerControlSequence(new PGls("Pglspl",
+       false, CaseChange.SENTENCE, true, this));
+
+      registerControlSequence(new PGls("PGLS",
+       false, CaseChange.TO_UPPER, false, this));
+
+      registerControlSequence(new PGls("PGLSpl",
+       false, CaseChange.SENTENCE, true, this));
+
+      addCaseMapping("pgls", "Pgls");
+      addCaseBlocker("PGLS");
+      addCaseMapping("pglspl", "Pglspl");
+      addCaseBlocker("PGLSpl");
    }
 
    protected void addFloatsHook()
@@ -2459,7 +2531,11 @@ public class GlossariesSty extends LaTeXSty
    {
       TeXParser parser = getParser();
 
-      if (option.equals("nomain"))
+      if (option.equals("prefix"))
+      {
+         prefixSupport = true;
+      }
+      else if (option.equals("nomain"))
       {
          createMain = false;
       }
@@ -4062,6 +4138,7 @@ public class GlossariesSty extends LaTeXSty
    private boolean undefWarn = false;
 
    private boolean extra = false;
+   private boolean prefixSupport = false;
 
    private HashMap<String,Boolean> expandField;
 

@@ -98,6 +98,12 @@ public class GlsLabel extends TextualContentCommand
       return entry == null ? null : entry.get(fieldLabel);
    }
 
+   public boolean isUnset()
+   {
+      GlossaryEntry entry = getEntry();
+      return entry == null ? false : entry.isUnset();
+   }
+
    public int getLevel()
    {
       GlossaryEntry entry = getEntry();
