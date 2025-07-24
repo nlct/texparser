@@ -1796,30 +1796,37 @@ public class UserGuideSty extends LaTeXSty
       Vector<AuxData> auxData = evt.getListener().getAuxData();
       TeXObjectList stack = evt.getStack();
 
-      for (AuxData d : auxData)
+      if (auxData == null)
       {
-         if (d.getName().equals("nlctdoc@extag"))
+         getParser().warningMessage("warning.no_aux");
+      }
+      else
+      {
+         for (AuxData d : auxData)
          {
-            TeXObject tagArg = d.getArg(0);
-            TeXObject labelArg = d.getArg(1);
-
-            String tag = getParser().expandToString(tagArg, stack);
-            String label = getParser().expandToString(labelArg, stack);
-
-            if (tagGroups == null)
+            if (d.getName().equals("nlctdoc@extag"))
             {
-               tagGroups = new HashMap<String,Vector<String>>();
+               TeXObject tagArg = d.getArg(0);
+               TeXObject labelArg = d.getArg(1);
+
+               String tag = getParser().expandToString(tagArg, stack);
+               String label = getParser().expandToString(labelArg, stack);
+
+               if (tagGroups == null)
+               {
+                  tagGroups = new HashMap<String,Vector<String>>();
+               }
+
+               Vector<String> list = tagGroups.get(tag);
+
+               if (list == null)
+               {
+                  list = new Vector<String>();
+                  tagGroups.put(tag, list);
+               }
+
+               list.add(label);
             }
-
-            Vector<String> list = tagGroups.get(tag);
-
-            if (list == null)
-            {
-               list = new Vector<String>();
-               tagGroups.put(tag, list);
-            }
-
-            list.add(label);
          }
       }
    }

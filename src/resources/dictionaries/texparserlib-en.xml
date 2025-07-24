@@ -25,6 +25,7 @@ Nicola Talbot
 <entry key="warning.unsupported.image.type">Unsupported image type {0}</entry>
 <entry key="warning.unsupported.generic">Not supported: {0}</entry>
 <entry key="warning.overwriting">Overwriting file {0}</entry>
+<entry key="warning.no_aux">No aux data found</entry>
 
 <!--  TeX Error Messages -->
 

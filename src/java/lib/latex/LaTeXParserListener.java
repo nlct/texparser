@@ -2032,6 +2032,7 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
          }
          else
          {
+            parseAux = false;
             parser.debugMessage(TeXParser.DEBUG_IO, "No AUX file: "+auxFile);
          }
       }
