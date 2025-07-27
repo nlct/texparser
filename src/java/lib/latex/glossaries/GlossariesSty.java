@@ -360,6 +360,9 @@ public class GlossariesSty extends LaTeXSty
       registerControlSequence(new GenericCommand("glslowercase", null,
          new TeXCsRef("lowercase")));
 
+      registerControlSequence(new GenericCommand("glsuppercase", null,
+         new TeXCsRef("uppercase")));
+
       registerControlSequence(new GenericCommand("glssentencecase", null,
          new TeXCsRef("makefirstuc")));
 
