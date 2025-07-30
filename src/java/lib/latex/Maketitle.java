@@ -76,6 +76,18 @@ public class Maketitle extends ControlSequence
 
       list.add(grp);
 
+      ControlSequence subTitle = listener.getControlSequence("@subtitle");
+
+      if (!subTitle.isEmpty())
+      {
+         grp = listener.createGroup();
+         grp.add(listener.getControlSequence("Large"));
+         grp.add(subTitle);
+         grp.add(listener.getControlSequence("par"));
+
+         list.add(grp);
+      }
+
       grp = listener.createGroup();
       grp.add(listener.getControlSequence("large"));
       grp.add(listener.getControlSequence("begin"));

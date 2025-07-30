@@ -1995,6 +1995,7 @@ public class L2HConverter extends LaTeXParserListener
       writeliteralln("div.marginpar { float: right; }");
       writeliteralln("div.abstract { display: block; margin-right: 4em; margin-left: 4em;}");
       writeliteralln("div.title { display: block; text-align: center; font-size: x-large;}");
+      writeliteralln("div.subtitle { display: block; text-align: center; font-size: large;}");
       writeliteralln("div.author { display: block; text-align: center; font-size: large;}");
       writeliteralln("div.date { display: block; text-align: center; font-size: medium;}");
       writeliteralln("div.bibliography { display: block; margin-left: 4em; }");

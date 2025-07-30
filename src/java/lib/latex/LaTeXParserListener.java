@@ -879,6 +879,9 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       parser.putControlSequence(new StoreDataCs("date"));
       parser.putControlSequence(new GenericCommand("@date", null, new TeXCsRef("today")));
 
+      parser.putControlSequence(new TextualContentCommand("@subtitle", ""));
+      parser.putControlSequence(new StoreDataCs("subtitle"));
+
       parser.putControlSequence(
         new GenericCommand("figurename", null, createString("Figure")));
       parser.putControlSequence(

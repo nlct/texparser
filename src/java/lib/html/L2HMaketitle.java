@@ -82,6 +82,19 @@ public class L2HMaketitle extends Maketitle
       list.add(new EndElement("div"));
       list.add(new HtmlTag("<!-- end of title -->"));
 
+      ControlSequence subTitle = listener.getControlSequence("@subtitle");
+
+      if (!subTitle.isEmpty())
+      {
+         elem = new StartElement("div");
+         elem.putAttribute("class", "subtitle");
+
+         list.add(elem);
+         list.add(subTitle);
+         list.add(new EndElement("div"));
+         list.add(new HtmlTag("<!-- end of subtitle -->"));
+      }
+
       elem = new StartElement("div");
       elem.putAttribute("class", "author");
 
