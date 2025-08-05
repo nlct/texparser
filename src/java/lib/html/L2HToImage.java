@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2025 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -73,13 +73,14 @@ public class L2HToImage extends ControlSequence
       String type = null;
       String name = null;
       boolean crop = true;
+      String div = null;
 
       if (options != null)
       {
          keyValList = KeyValList.getList(parser, options);
          alt = keyValList.getValue("alt");
-         preAlt =keyValList.getValue("pre-alt"); 
-         postAlt =keyValList.getValue("post-alt"); 
+         preAlt = keyValList.getValue("pre-alt"); 
+         postAlt = keyValList.getValue("post-alt"); 
 
          TeXObject nameObj = keyValList.getExpandedValue("name", parser, stack);
 
@@ -97,7 +98,30 @@ public class L2HToImage extends ControlSequence
 
          Boolean boolVal = keyValList.getBoolean("crop", parser, stack);
 
-         crop = (boolVal == null ? false : boolVal.booleanValue());
+         if (boolVal != null)
+         {
+            crop = boolVal.booleanValue();
+         }
+
+         TeXObject divObj = keyValList.getValue("div");
+
+         if (divObj instanceof MissingValue)
+         {
+            div = "";
+         }
+         else
+         {
+            div = parser.expandToString(divObj, stack).trim();
+
+            if (div.equals("false"))
+            {
+               div = null;
+            }
+            else if (div.equals("true"))
+            {
+               div = "";
+            }
+         }
       }
 
       if (alt == null)
@@ -163,6 +187,18 @@ public class L2HToImage extends ControlSequence
       L2HImage image = listener.toImage(preamble, 
        content.toString(), type, alt, name, crop, null);
 
+      if (div != null)
+      {
+         StartElement startElem = new StartElement("div");
+
+         if (!div.isEmpty())
+         {
+            startElem.putAttribute("class", div);
+         }
+
+         TeXParserUtils.process(startElem, parser, stack);
+      }
+
       if (image != null)
       {
          image.process(parser);
@@ -189,5 +225,11 @@ public class L2HToImage extends ControlSequence
                String.format("<!-- End of Image %s Alt Block -->", name));
          }
       }
+
+      if (div != null)
+      {
+         TeXParserUtils.process(new EndElement("div"), parser, stack);
+      }
+
    }
 }
