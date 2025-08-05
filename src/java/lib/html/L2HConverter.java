@@ -425,6 +425,26 @@ public class L2HConverter extends LaTeXParserListener
    }
 
    @Override
+   protected LaTeXSty getLaTeXSty(KeyValList suppliedOptions, String styName, 
+      boolean loadParentOptions, TeXObjectList stack)
+   throws IOException
+   {
+      LaTeXSty sty = super.getLaTeXSty(suppliedOptions, styName,
+       loadParentOptions, stack);
+
+      if (styName.equals("pgf") || styName.equals("tikz"))
+      {
+         putControlSequence(new AtGobble("usepgflibrary"));
+         putControlSequence(new AtGobble("usetikzlibrary"));
+
+         // NB any image code will need to be 
+         // encapsulated with \TeXParserLibToImage[...]{...}
+      }
+
+      return sty;
+   }
+
+   @Override
    protected TeXParserSection createTeXParserSection(String sectionCsname)
    {
       return new L2HTeXParserSection("texparser@"+sectionCsname, sectionCsname);
