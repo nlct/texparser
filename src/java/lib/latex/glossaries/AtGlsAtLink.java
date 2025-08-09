@@ -122,6 +122,8 @@ public class AtGlsAtLink extends AbstractGlsCommand
       list.add(listener.getControlSequence("do@glsdisablehyperinlist"));
       //list.add(listener.getControlSequence("do@gls@link@checkfirsthyper"));
 
+      ControlSequence orgIsHyper = parser.getControlSequence("ifKV@glslink@hyper");
+
       if (options != null && !options.isEmpty())
       {
          list.add(listener.getControlSequence("setkeys"));
@@ -216,7 +218,6 @@ public class AtGlsAtLink extends AbstractGlsCommand
          }
       }
 
-
       if (doHyper)
       {
          list.add(listener.getControlSequence("@glslink"));
@@ -270,6 +271,11 @@ public class AtGlsAtLink extends AbstractGlsCommand
       if (orgPrefixCs != null)
       {
          parser.putControlSequence(true, orgPrefixCs);
+      }
+
+      if (orgIsHyper != null)
+      {
+         parser.putControlSequence(true, orgIsHyper);
       }
    }
 
