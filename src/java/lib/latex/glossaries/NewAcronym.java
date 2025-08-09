@@ -91,6 +91,8 @@ public class NewAcronym extends NewGlossaryEntry
          keyValList.put("category", cs);
       }
 
+      TeXObject descValue = keyValList.get("description");
+
       keyValList.put("short", shortArg);
       keyValList.put("long", longArg);
 
@@ -289,6 +291,12 @@ public class NewAcronym extends NewGlossaryEntry
          }
 
          keyValList.putAll(extraFields);
+      }
+
+      if (descValue != null)
+      {
+         // ensure description isn't overridden if provided
+         keyValList.put("description", descValue);
       }
 
       defineEntry(label, keyValList, parser, stack);
