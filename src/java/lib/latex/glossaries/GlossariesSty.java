@@ -480,6 +480,7 @@ public class GlossariesSty extends LaTeXSty
       registerControlSequence(new GlsEntryField("Glsentrylongpl", "longplural",
         CaseChange.SENTENCE, this));
 
+      registerControlSequence(new IfHasField("ifglshasparent", "parent", this));
       registerControlSequence(new IfHasField("ifglshassymbol", "symbol", this));
       registerControlSequence(new IfHasField("ifglshasdesc", "description", this));
       registerControlSequence(new IfHasField("ifglshasshort", "short", this));
