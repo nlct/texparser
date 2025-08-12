@@ -166,7 +166,9 @@ public class AtGlsAtAtLink extends AbstractGlsCommand
 
          if (keyValList != null)
          {
+            substack.add(listener.getOther('['));
             substack.add(keyValList);
+            substack.add(listener.getOther(']'));
          }
 
          substack.add(glslabel);
