@@ -260,7 +260,7 @@ public class AtGlsAtLink extends AbstractGlsCommand
 
       grp = listener.createGroup();
       list.add(grp);
-      grp.add(new TeXCsRef(csname));
+      grp.add(listener.getControlSequence(csname));
 
       Group subgrp = listener.createGroup();
       grp.add(subgrp);
