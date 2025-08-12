@@ -128,14 +128,7 @@ public abstract class AbstractGlsCommand extends Command
    protected KeyValList popKeyValList(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      TeXObject arg = popArg(parser, stack);
-
-      if (arg instanceof KeyValList)
-      {
-         return (KeyValList)arg;
-      }
-
-      return KeyValList.getList(parser, arg);
+      return TeXParserUtils.popKeyValList(parser, stack);
    }
 
    public void setEntryLabelPrefix(String prefix)
