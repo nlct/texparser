@@ -109,7 +109,7 @@ public class L2HToImage extends ControlSequence
          {
             div = "";
          }
-         else
+         else if (divObj != null)
          {
             div = parser.expandToString(divObj, stack).trim();
 
