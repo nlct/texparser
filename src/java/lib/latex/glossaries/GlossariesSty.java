@@ -2941,7 +2941,19 @@ public class GlossariesSty extends LaTeXSty
          modOptions = popModifier(stack);
       }
 
-      KeyValList options = TeXParserUtils.popOptKeyValList(parser, stack);
+      KeyValList options = null;
+
+      TeXObject obj = TeXParserUtils.peek(parser, stack, TeXObjectList.POP_SHORT);
+
+      if (obj instanceof KeyValList)
+      {
+         TeXParserUtils.pop(parser, stack, TeXObjectList.POP_SHORT);
+         options = (KeyValList)obj;
+      }
+      else
+      {
+         options = TeXParserUtils.popOptKeyValList(parser, stack);
+      }
 
       if (options == null)
       {
