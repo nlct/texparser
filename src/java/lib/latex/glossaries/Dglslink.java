@@ -64,4 +64,23 @@ public class Dglslink extends AtGlsAtAtLink
          return new GlsLabel("@@glslabel@"+label, entry.getLabel(), entry);
       }
    }
+
+   @Override
+   protected void preGlsHook(GlsLabel glslabel,
+     TeXParser parser, TeXObjectList stack)
+   throws IOException
+   {
+      ControlSequence cs = parser.getControlSequence("predglslinkhook");
+
+      if (cs != null)
+      {
+         TeXObjectList substack = parser.getListener().createStack();
+
+         substack.add(cs);
+         substack.add(glslabel);
+
+         TeXParserUtils.process(substack, parser, stack);
+      }
+   }
+
 }

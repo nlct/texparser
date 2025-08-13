@@ -1165,6 +1165,10 @@ public class GlossariesSty extends LaTeXSty
       registerControlSequence(new Dglslink(this));
       registerControlSequence(new Dglslink("dglsdisp", true, this));
 
+      registerControlSequence(new AtGobble("predglshook"));
+      registerControlSequence(new AtGobble("predglslinkhook"));
+      registerControlSequence(new AtGobble("predglsfieldhook"));
+
       registerControlSequence(
          new TextualContentCommand("dglsfieldcurrentfieldlabel", ""));
 

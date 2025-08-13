@@ -149,6 +149,8 @@ public class AtGlsAtAtLink extends AbstractGlsCommand
       }
       else
       {
+         preGlsHook(glslabel, parser, stack);
+
          // \let\do@gls@link@checkfirsthyper\relax
          parser.putControlSequence(true, 
             new AssignedControlSequence("do@gls@link@checkfirsthyper", new Relax()));
@@ -194,6 +196,12 @@ public class AtGlsAtAtLink extends AbstractGlsCommand
      throws IOException
    {
       process(parser, parser);
+   }
+
+   protected void preGlsHook(GlsLabel glslabel,
+     TeXParser parser, TeXObjectList stack)
+   throws IOException
+   {
    }
 
    protected boolean checkModifier, doUnset;

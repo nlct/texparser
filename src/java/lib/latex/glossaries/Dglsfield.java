@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2022 Nicola L.C. Talbot
+    Copyright (C) 2022-2025 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -105,6 +105,24 @@ public class Dglsfield extends AtGlsAtAtLink
       else
       {
          return fieldVal;
+      }
+   }
+
+   @Override
+   protected void preGlsHook(GlsLabel glslabel,
+     TeXParser parser, TeXObjectList stack)
+   throws IOException
+   {
+      ControlSequence cs = parser.getControlSequence("predglsfieldhook");
+
+      if (cs != null)
+      {
+         TeXObjectList substack = parser.getListener().createStack();
+
+         substack.add(cs);
+         substack.add(glslabel);
+
+         TeXParserUtils.process(substack, parser, stack);
       }
    }
 

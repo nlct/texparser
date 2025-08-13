@@ -123,6 +123,8 @@ public class Gls extends AbstractGlsCommand
       }
       else
       {
+         preGlsHook(glslabel, parser, stack);
+
          boolean isUnset = entry.isUnset();
 
          Glossary glossary = entry.getGlossary(stack);
@@ -186,6 +188,12 @@ public class Gls extends AbstractGlsCommand
       substack.add(listener.getControlSequence("glspostlinkhook"));
 
       TeXParserUtils.process(substack, parser, stack);
+   }
+
+   protected void preGlsHook(GlsLabel glslabel,
+     TeXParser parser, TeXObjectList stack)
+   throws IOException
+   {
    }
 
    protected void addLinkText(TeXObjectList substack,

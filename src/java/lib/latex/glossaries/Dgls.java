@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2022 Nicola L.C. Talbot
+    Copyright (C) 2022-2025 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -67,4 +67,23 @@ public class Dgls extends Gls
          return new GlsLabel("@@glslabel@"+label, entry.getLabel(), entry);
       }
    }
+
+   @Override
+   protected void preGlsHook(GlsLabel glslabel,
+     TeXParser parser, TeXObjectList stack)
+   throws IOException
+   {
+      ControlSequence cs = parser.getControlSequence("predglshook");
+
+      if (cs != null)
+      {
+         TeXObjectList substack = parser.getListener().createStack();
+
+         substack.add(cs);
+         substack.add(glslabel);
+
+         TeXParserUtils.process(substack, parser, stack);
+      }
+   }
+
 }
