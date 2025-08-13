@@ -2542,7 +2542,7 @@ public class UserGuideSty extends LaTeXSty
       return addTaggedColourBox(name, false, font, fg, bg, frameCol, tag);
    }
 
-   protected TaggedColourBox addTaggedColourBox(String name, boolean isInLine, TeXFontText font, 
+   public TaggedColourBox addTaggedColourBox(String name, boolean isInLine, TeXFontText font, 
       Color fg, Color bg, Color borderCol, TeXObject tag)
    {
       FrameBox boxFrame = new ColourBox("frame@"+name, BorderStyle.SOLID,
