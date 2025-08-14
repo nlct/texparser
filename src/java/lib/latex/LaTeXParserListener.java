@@ -790,6 +790,13 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       parser.putControlSequence(new GenericCommand("@empty"));
       parser.putControlSequence(new SymbolCs());
 
+      NewIf.createConditional(false, parser, "if@ignore", false);
+
+      parser.putControlSequence(new GenericCommand(true,
+       "ignorespacesafterend", null,
+       TeXParserUtils.createStack(this, new TeXCsRef("global"),
+        new TeXCsRef("let"), new TeXCsRef("if@ignore"), new TeXCsRef("iftrue"))));
+
       parser.putControlSequence(new TextualContentCommand("p@", "pt"));
       parser.putControlSequence(new TextualContentCommand("@minus", "minus"));
       parser.putControlSequence(new TextualContentCommand("@plus", "plus"));
@@ -1312,6 +1319,17 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       "ProvideDocumentCommand", Overwrite.SKIP));
       parser.putControlSequence(new NewDocumentCommand(
       "DeclareDocumentCommand", Overwrite.ALLOW));
+
+      parser.putControlSequence(new NewDocumentEnvironment());
+      parser.putControlSequence(new NewDocumentEnvironment(
+      "RenewDocumentEnvironment", Overwrite.FORCE));
+      parser.putControlSequence(new NewDocumentEnvironment(
+      "ProvideDocumentEnvironment", Overwrite.SKIP));
+      parser.putControlSequence(new NewDocumentEnvironment(
+      "DeclareDocumentEnvironment", Overwrite.ALLOW));
+
+      parser.putControlSequence(new GenericCommand(true,
+       "obeyedline", null, createString(String.format("%n"))));
    }
 
    protected TeXParserSection createTeXParserSection(String sectionCsname)

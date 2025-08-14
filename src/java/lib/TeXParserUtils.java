@@ -201,6 +201,52 @@ public class TeXParserUtils
    }
 
    /**
+    * Pops an optional argument with the given delimiters and
+    * default pop style.
+    * @param parser the TeX parser
+    * @param stack the stack or the parser or null
+    * @param delim1 the start delimiter
+    * @param delim2 the end delimiter
+    * @return the argument or null if not present
+    */ 
+   public static TeXObject popOptArg(
+      TeXParser parser, TeXObjectList stack, int delim1, int delim2)
+     throws IOException
+   {
+      if (parser == stack || stack == null)
+      {
+         return parser.popNextArg(delim1, delim2);
+      }
+      else
+      {
+         return stack.popArg(parser, delim1, delim2);
+      }
+   }
+
+   /**
+    * Pops an optional argument with the given delimiters.
+    * @param popStyle the pop style
+    * @param parser the TeX parser
+    * @param stack the stack or the parser or null
+    * @param delim1 the start delimiter
+    * @param delim2 the end delimiter
+    * @return the argument or null if not present
+    */ 
+   public static TeXObject popOptArg(byte popStyle,
+      TeXParser parser, TeXObjectList stack, int delim1, int delim2)
+     throws IOException
+   {
+      if (parser == stack || stack == null)
+      {
+         return parser.popNextArg(popStyle, delim1, delim2);
+      }
+      else
+      {
+         return stack.popArg(parser, popStyle, delim1, delim2);
+      }
+   }
+
+   /**
     * Pops an optional argument (delimited with <code>[</code> and <code>]</code>).
     * @param parser the TeX parser
     * @param stack the stack or the parser or null
@@ -1280,6 +1326,16 @@ public class TeXParserUtils
       }
 
       return list;
+   }
+
+   public static TeXObject trim(TeXObject object)
+   {
+      if (object instanceof TeXObjectList)
+      {
+         return ((TeXObjectList)object).trim();
+      }
+
+      return object;
    }
 
    public static boolean isBlank(int cp)

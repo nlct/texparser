@@ -44,16 +44,34 @@ public class L3Arg
 
    public L3Arg(int id, int token1, int token2, TeXObject defValue, boolean isShort)
    {
+      this(id, token1, token2, defValue, isShort, true);
+   }
+
+   public L3Arg(int id, int token1, int token2, TeXObject defValue, boolean isShort,
+     boolean ignoreSpace)
+   {
       this.id = id;
       this.token1 = token1;
       this.token2 = token2;
       this.defaultValue = defValue;
       this.isShort = isShort;
+      this.ignoreSpace = ignoreSpace;
    }
 
    public byte getPopStyle()
    {
-      return TeXObjectList.getArgPopStyle(isShort);
+      if (ignoreSpace)
+      {
+         return TeXObjectList.getArgPopStyle(isShort);
+      }
+      else if (isShort)
+      {
+         return TeXObjectList.POP_SHORT;
+      }
+      else
+      {
+         return (byte)0;
+      }
    }
 
    public int getId()
@@ -76,9 +94,19 @@ public class L3Arg
       return defaultValue;
    }
 
+   public boolean isIgnoreSpace()
+   {
+      return ignoreSpace;
+   }
+
    public String toString()
    {
       StringBuilder builder = new StringBuilder();
+
+      if (!ignoreSpace)
+      {
+         builder.append('!');
+      }
 
       if (!isShort)
       {
@@ -139,4 +167,5 @@ public class L3Arg
    int token1=-1, token2=-1;
    TeXObject defaultValue;
    boolean isShort = true;
+   boolean ignoreSpace = true;
 }

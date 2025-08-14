@@ -3810,6 +3810,96 @@ public class TeXParser extends TeXObjectList
       return charList;
    }
 
+
+   public TeXObjectList popVerbToEndEnv(String envname)
+     throws IOException
+   {
+      TeXObjectList charList = new TeXObjectList();
+
+      while (size() > 0)
+      {
+         TeXObject obj = pop();
+
+         if (obj instanceof ControlSequence
+             || ((ControlSequence)obj).getName().equals("end"))
+         {
+            if (size() > 0)
+            {
+               TeXObject nextObj = firstElement();
+
+               if (nextObj instanceof BgChar || nextObj instanceof Group)
+               {
+                  nextObj = popNextArg(POP_RETAIN_IGNOREABLES);
+                  String name = nextObj.toString(this);
+
+                  if (name.equals(envname))
+                  {
+                     return charList;
+                  }
+                  else
+                  {
+                     charList.addTokens(obj.toString(this), listener);
+                     charList.add(listener.getOther(getBgChar()));
+                     charList.addTokens(name, listener);
+                     charList.add(listener.getOther(getEgChar()));
+                  }
+               }
+               else
+               {
+                  charList.addTokens(obj.toString(this), listener);
+               }
+            }
+         }
+      }
+
+      int cp = read();
+
+      StringBuilder endTag = new StringBuilder("end");
+      endTag.appendCodePoint(getBgChar());
+      endTag.append(envname);
+      endTag.appendCodePoint(getEgChar());
+
+      while (cp != -1)
+      {
+         if (isCatCode(TYPE_ESC, cp))
+         {
+            StringBuilder builder = new StringBuilder(endTag.length());
+
+            mark();
+            cp = read();
+
+            while (cp != -1 && builder.length() < endTag.length())
+            {
+               if (isCatCode(TYPE_ESC, cp))
+               {
+                  reset();
+                  break;
+               }
+
+               builder.appendCodePoint(cp);
+
+               if (endTag.equals(builder))
+               {
+                  return charList;
+               }
+
+               mark();
+               cp = read();
+            }
+
+            charList.addTokens(builder, listener);
+         }
+         else
+         {
+            charList.addToken(cp, listener);
+         }
+
+         cp = read();
+      }
+
+      return charList;
+   }
+
    public TeXNumber popNumber()
      throws IOException
    {
@@ -4663,6 +4753,6 @@ public class TeXParser extends TeXObjectList
    public static final int DEBUG_READ = 32768;
    public static final int DEBUG_SETTINGS = 65536;
 
-   public static final String VERSION = "1.5.20250813";
-   public static final String VERSION_DATE = "2025-08-13";
+   public static final String VERSION = "1.5.20250814";
+   public static final String VERSION_DATE = "2025-08-14";
 }

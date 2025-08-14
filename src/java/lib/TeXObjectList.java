@@ -1203,6 +1203,43 @@ public class TeXObjectList extends Vector<TeXObject>
       }
    }
 
+   public void addTokens(String str, TeXParserListener listener)
+   {
+      for (int i = 0; i < str.length(); )
+      {
+         int cp = str.codePointAt(i);
+
+         i += Character.charCount(cp);
+
+         addToken(cp, listener);
+      }
+   }
+
+   public void addTokens(StringBuilder str, TeXParserListener listener)
+   {
+      for (int i = 0; i < str.length(); )
+      {
+         int cp = str.codePointAt(i);
+
+         i += Character.charCount(cp);
+
+         addToken(cp, listener);
+      }
+   }
+
+   public void addToken(int cp, TeXParserListener listener)
+   {
+      if (Character.isAlphabetic(cp))
+      {
+         add(listener.getLetter(cp));
+      }
+      else
+      {
+         add(listener.getOther(cp));
+      }
+   }
+
+
    public TeXObject peek()
    {
       return size() == 0 ? null : firstElement();

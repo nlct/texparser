@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2023 Nicola L.C. Talbot
+    Copyright (C) 2025 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -25,14 +25,14 @@ import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.Overwrite;
 import com.dickimawbooks.texparserlib.latex.LaTeXSyntaxException;
 
-public class NewDocumentCommand extends ControlSequence
+public class NewDocumentEnvironment extends ControlSequence
 {
-   public NewDocumentCommand()
+   public NewDocumentEnvironment()
    {
-      this("NewDocumentCommand", Overwrite.FORBID);
+      this("NewDocumentEnvironment", Overwrite.FORBID);
    }
 
-   public NewDocumentCommand(String name, Overwrite overwrite)
+   public NewDocumentEnvironment(String name, Overwrite overwrite)
    {
       super(name, false);
       this.overwrite = overwrite;
@@ -40,20 +40,20 @@ public class NewDocumentCommand extends ControlSequence
 
    public Object clone()
    {
-      return new NewDocumentCommand(getName(), getOverwrite());
+      return new NewDocumentEnvironment(getName(), getOverwrite());
    }
 
    @Override
    public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      ControlSequence cs = popControlSequence(parser, stack);
-      String csName = cs.getName();
+      String envName = popLabelString(parser, stack).trim();
 
       TeXObject argSpecs = popArg(parser, stack);
-      TeXObject defArg = popArg(parser, stack);
+      TeXObject beginArg = popArg(parser, stack);
+      TeXObject endArg = popArg(parser, stack);
 
-      cs = parser.getControlSequence(csName);
+      ControlSequence cs = parser.getControlSequence(envName);
 
       if (cs == null)
       {
@@ -62,7 +62,7 @@ public class NewDocumentCommand extends ControlSequence
             throw new TeXSyntaxException(parser,
              TeXSyntaxException.ERROR_UNDEFINED,
              String.format("%s%s", 
-              new String(Character.toChars(parser.getEscChar())), csName));
+              new String(Character.toChars(parser.getEscChar())), envName));
          }
       }
       else
@@ -151,6 +151,8 @@ public class NewDocumentCommand extends ControlSequence
 
                   switch (cp)
                   {
+                     case 'b':
+                     case 'c':
                      case 'm':
                      case 'v':
                      case 'o':
@@ -243,21 +245,13 @@ public class NewDocumentCommand extends ControlSequence
          }
       }
 
-      TeXObjectList definition;
+      TeXObjectList beginCode = TeXParserUtils.toList(beginArg, parser);
+      TeXObjectList endCode = TeXParserUtils.toList(endArg, parser);
 
-      if (parser.isStack(defArg))
-      {
-         definition = (TeXObjectList)defArg;
-      }
-      else
-      {
-         definition = TeXParserUtils.createStack(parser, defArg);
-      }
+      LaTeX3GenericEnvironment newEnv = new LaTeX3GenericEnvironment(envName,
+       argList, beginCode, endCode);
 
-      LaTeX3GenericCommand newCs = new LaTeX3GenericCommand(csName,
-       argList, definition);
-
-      parser.putControlSequence(true, newCs);
+      parser.putControlSequence(true, newEnv);
    }
 
    public void process(TeXParser parser)
