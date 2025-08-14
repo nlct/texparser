@@ -84,6 +84,19 @@ public class End extends ControlSequence
       }
 
       endHook(name, parser, stack);
+
+      if (TeXParserUtils.isTrue("if@ignore", parser))
+      {
+         TeXObjectList substack = listener.createStack();
+
+         substack.add(listener.getControlSequence("global"));
+         substack.add(listener.getControlSequence("let"));
+         substack.add(listener.getControlSequence("if@ignore"));
+         substack.add(listener.getControlSequence("iffalse"));
+         substack.add(listener.getControlSequence("ignorespaces"));
+
+         TeXParserUtils.process(substack, parser, stack);
+      }
    }
 
    @Override
