@@ -802,6 +802,9 @@ public class UserGuideSty extends LaTeXSty
       registerControlSequence(new OptionsTo());
 
       registerControlSequence(new AtGobble("GetTitleStringSetup"));
+
+      registerControlSequence(new AssignedControlSequence(
+        "glsseeitemformat", listener.getControlSequence("glsxtrseeitemformat")));
    }
 
    protected void addFootnoteCommands()

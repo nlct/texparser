@@ -555,6 +555,8 @@ public class GlossariesSty extends LaTeXSty
 
       if (extra)
       {
+         registerControlSequence(new GlsXtrSeeItemFormat(this));
+
          registerControlSequence(new GenericCommand("@gls@preglossaryhook",
            null, new TeXCsRef("glossxtrsetpopts")));
 
@@ -614,7 +616,7 @@ public class GlossariesSty extends LaTeXSty
       registerControlSequence(new Symbol("glsxtrshowtargetsymbolleft", 0x25C1));
 
       registerControlSequence(new TextualContentCommand("glsxtrhiernamesep", 
-        "\u2006\u25C1\u2006"));
+        "\u2006\u25B7\u2006"));
 
       registerControlSequence(new GlsXtrHierName(this));
       registerControlSequence(new GlsXtrHierName("Glsxtrhiername",
