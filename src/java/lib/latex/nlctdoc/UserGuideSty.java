@@ -1908,7 +1908,7 @@ public class UserGuideSty extends LaTeXSty
       registerControlSequence(new PrintCommandOptions(glossariesSty));
       registerControlSequence(new PrintCommonOptions(glossariesSty));
       registerControlSequence(new PrintIndex(glossariesSty));
-      registerControlSequence(new IndexInitPostNameHooks());
+      registerControlSequence(new IndexInitPostNameHooks(this));
       registerControlSequence(new AbbrPostNameHook(glossariesSty));
 
 
@@ -2601,6 +2601,48 @@ public class UserGuideSty extends LaTeXSty
    public boolean isDraft()
    {
       return draft;
+   }
+
+   public void initIndexPostNameHooks()
+   {
+      TeXParser parser = getParser();
+      TeXParserListener listener = getListener();
+
+      parser.putControlSequence(true, 
+        new GenericCommand(true, "glsxtrpostnameenvironment", null,
+         TeXParserUtils.createStack(listener,
+          listener.getSpace(), new TeXCsRef("idxenvname"))));
+
+      parser.putControlSequence(true, 
+        new GenericCommand(true, "glsxtrpostnamepackage", null,
+         TeXParserUtils.createStack(listener,
+          listener.getSpace(), new TeXCsRef("idxpackagename"))));
+
+      parser.putControlSequence(true, 
+        new GenericCommand(true, "glsxtrpostnameclass", null,
+         TeXParserUtils.createStack(listener,
+          listener.getSpace(), new TeXCsRef("idxclassname"))));
+
+      parser.putControlSequence(true, 
+        new GenericCommand(true, "glsxtrpostnamecounter", null,
+         TeXParserUtils.createStack(listener,
+          listener.getSpace(), new TeXCsRef("idxcountername"))));
+
+      parser.putControlSequence(true,
+        new GenericCommand(true, "glsxtrpostnameacronym", null, 
+          new TeXCsRef("abbrpostnamehook")));
+
+      parser.putControlSequence(true,
+        new GenericCommand(true, "glsxtrpostnameabbreviation", null, 
+          new TeXCsRef("abbrpostnamehook")));
+
+      parser.putControlSequence(true,
+        new GenericCommand(true, "glsxtrpostnametermabbreviation", null, 
+          new TeXCsRef("abbrpostnamehook")));
+
+      parser.putControlSequence(true,
+        new GenericCommand(true, "glsxtrpostnamedualindexabbreviation", null, 
+          new TeXCsRef("abbrpostnamehook")));
    }
 
    protected GlossariesSty glossariesSty;

@@ -28,63 +28,28 @@ import com.dickimawbooks.texparserlib.latex.glossaries.*;
 
 public class IndexInitPostNameHooks extends ControlSequence
 {
-   public IndexInitPostNameHooks()
+   public IndexInitPostNameHooks(UserGuideSty sty)
    {
-      this("nlctguideindexinitpostnamehooks");
+      this("nlctguideindexinitpostnamehooks", sty);
    }
 
-   public IndexInitPostNameHooks(String name)
+   public IndexInitPostNameHooks(String name, UserGuideSty sty)
    {
       super(name);
+      this.sty = sty;
    }
 
    @Override
    public Object clone()
    {
-      return new IndexInitPostNameHooks(getName());
+      return new IndexInitPostNameHooks(getName(), sty);
    }
 
    @Override
    public void process(TeXParser parser, TeXObjectList stack)
    throws IOException
    {
-      TeXParserListener listener = parser.getListener();
-
-      parser.putControlSequence(true, 
-        new GenericCommand(true, "glsxtrpostnameenvironment", null,
-         TeXParserUtils.createStack(listener,
-          listener.getSpace(), new TeXCsRef("idxenvname"))));
-
-      parser.putControlSequence(true, 
-        new GenericCommand(true, "glsxtrpostnamepackage", null,
-         TeXParserUtils.createStack(listener,
-          listener.getSpace(), new TeXCsRef("idxpackagename"))));
-
-      parser.putControlSequence(true, 
-        new GenericCommand(true, "glsxtrpostnameclass", null,
-         TeXParserUtils.createStack(listener,
-          listener.getSpace(), new TeXCsRef("idxclassname"))));
-
-      parser.putControlSequence(true, 
-        new GenericCommand(true, "glsxtrpostnamecounter", null,
-         TeXParserUtils.createStack(listener,
-          listener.getSpace(), new TeXCsRef("idxcountername"))));
-
-      parser.putControlSequence(true,
-        new GenericCommand(true, "glsxtrpostnameacronym", null, 
-          new TeXCsRef("abbrpostnamehook")));
-
-      parser.putControlSequence(true,
-        new GenericCommand(true, "glsxtrpostnameabbreviation", null, 
-          new TeXCsRef("abbrpostnamehook")));
-
-      parser.putControlSequence(true,
-        new GenericCommand(true, "glsxtrpostnametermabbreviation", null, 
-          new TeXCsRef("abbrpostnamehook")));
-
-      parser.putControlSequence(true,
-        new GenericCommand(true, "glsxtrpostnamedualindexabbreviation", null, 
-          new TeXCsRef("abbrpostnamehook")));
+      sty.initIndexPostNameHooks();
    }
 
    @Override
@@ -93,4 +58,6 @@ public class IndexInitPostNameHooks extends ControlSequence
    {
       process(parser, parser);
    }
+
+   UserGuideSty sty;
 }
