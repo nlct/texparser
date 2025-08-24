@@ -3799,6 +3799,16 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       return null;
    }
 
+   public void setCurrentContentsList(String toc)
+   {
+      currentTOC = toc;
+   }
+
+   public String getCurrentContentsList()
+   {
+      return currentTOC;
+   }
+
    private Vector<String> verbEnv;
 
    protected Vector<LaTeXFile> loadedPackages;
@@ -3866,6 +3876,8 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
    private Stack<TrivListDec> trivListStack = new Stack<TrivListDec>();
 
    protected HashMap<String,FrameBox> frameBoxes;
+
+   protected String currentTOC = null;
 
    public static final UserNumber ZERO = UserNumber.ZERO;
    public static final UserNumber ONE = UserNumber.ONE;

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2022 Nicola L.C. Talbot
+    Copyright (C) 2013-2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -22,43 +22,44 @@ import java.io.IOException;
 
 import com.dickimawbooks.texparserlib.*;
 
-public class ListOfFloats extends ListOf
+public class ListOf extends ControlSequence
 {
-   public ListOfFloats(String csname, String titlecsname, String ext)
+   public ListOf(String name, String ext)
    {
-      super(csname, ext);
-      this.titlecsname = titlecsname;
+      super(name);
+      this.ext = ext;
    }
 
    @Override
    public Object clone()
    {
-      return new ListOfFloats(getName(), titlecsname, ext);
+      return new ListOf(getName(), ext);
    }
 
-   @Override
    public void processContentsList(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      TeXObjectList content = parser.getListener().createStack();
-
-      ControlSequence secCs = parser.getControlSequence("chapter");
-
-      if (secCs == null)
-      {
-         secCs = parser.getListener().getControlSequence("section");
-      }
-
-      content.add(secCs);
-      content.add(parser.getListener().getOther('*'));
-
-      content.add(parser.getListener().getControlSequence(titlecsname));
-
-      content.add(parser.getListener().getControlSequence("@starttoc"));
-      content.add(parser.getListener().createGroup(ext));
-
-      TeXParserUtils.process(content, parser, stack);
    }
 
-   protected String titlecsname;
+   @Override
+   public void process(TeXParser parser, TeXObjectList stack)
+     throws IOException
+   {
+      LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
+
+      listener.setCurrentContentsList(ext);
+
+      processContentsList(parser, stack);
+
+      listener.setCurrentContentsList(null);
+   }
+
+   @Override
+   public void process(TeXParser parser)
+     throws IOException
+   {
+      process(parser, parser);
+   }
+
+   protected String ext;
 }

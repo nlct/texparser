@@ -26,7 +26,7 @@ import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.primitives.*;
 import com.dickimawbooks.texparserlib.latex.*;
 
-public class L2HTableOfContents extends ControlSequence
+public class L2HTableOfContents extends ListOf
 {
    public L2HTableOfContents()
    {
@@ -35,7 +35,7 @@ public class L2HTableOfContents extends ControlSequence
 
    public L2HTableOfContents(String name)
    {
-      super(name);
+      super(name, "toc");
    }
 
    @Override
@@ -45,7 +45,7 @@ public class L2HTableOfContents extends ControlSequence
    }
 
    @Override
-   public void process(TeXParser parser, TeXObjectList stack)
+   public void processContentsList(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
       L2HConverter listener = (L2HConverter)parser.getListener();
@@ -118,12 +118,5 @@ public class L2HTableOfContents extends ControlSequence
       reg.setValue(-1);
 
       listener.setCurrentBlockType(DocumentBlockType.BODY);
-   }
-
-   @Override
-   public void process(TeXParser parser)
-     throws IOException
-   {
-      process(parser, parser);
    }
 }
