@@ -1229,10 +1229,6 @@ public class GlossariesSty extends LaTeXSty
 
       registerControlSequence(new GlsXtrAtTitleAtField(this));
 
-      registerControlSequence(new GenericCommand(true, 
-       "glsxtrtitletext", null, TeXParserUtils.createStack(getListener(),
-       new TeXCsRef("glsxtr@title@field"), new TeXCsRef("glsentrytext"))));
-
       registerControlSequence(new TextualContentCommand("glshex", "\\u"));
       registerControlSequence(new TextualContentCommand("glscapturedgroup", "\\$"));
       registerControlSequence(new TextualContentCommand("glshashchar", "#"));
