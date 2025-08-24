@@ -1020,6 +1020,45 @@ public class TeXParserUtils
       return num;
    }
 
+   public static TeXDimension toTeXDimension(TeXObject object,
+      TeXParser parser, TeXObjectList stack)
+     throws IOException
+   {
+      TeXDimension dim = null;
+
+      if (parser.isStack(object))
+      {
+         ((TeXObjectList)object).trim();
+
+         if (((TeXObjectList)object).size() == 1)
+         {
+            object = ((TeXObjectList)object).firstElement();
+         }
+      }
+
+      if (object instanceof TeXDimension)
+      {
+         dim = (TeXDimension)object;
+      }
+      else if (object instanceof AssignedControlSequence)
+      {
+         TeXObject underlying = ((AssignedControlSequence)object).getBaseUnderlying();
+
+         if (underlying instanceof TeXDimension)
+         {
+            dim = (TeXDimension)underlying;
+         }
+      }
+      else
+      {
+         TeXObjectList list = toList(object, parser);
+
+         dim = list.popDimension(parser);
+      }
+
+      return dim;
+   }
+
    public static int toInt(TeXObject object, TeXParser parser, TeXObjectList stack)
      throws IOException
    {

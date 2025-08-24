@@ -44,6 +44,7 @@ import com.dickimawbooks.texparserlib.latex.bpchem.*;
 import com.dickimawbooks.texparserlib.latex.color.*;
 import com.dickimawbooks.texparserlib.latex.datatool.*;
 import com.dickimawbooks.texparserlib.latex.etoolbox.*;
+import com.dickimawbooks.texparserlib.latex.flowfram.*;
 import com.dickimawbooks.texparserlib.latex.fontawesome.*;
 import com.dickimawbooks.texparserlib.latex.fontenc.*;
 import com.dickimawbooks.texparserlib.latex.fourier.*;
@@ -2700,6 +2701,16 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       if (styName.equals("fourier"))
       {
          return new FourierSty(options, this, loadParentOptions);
+      }
+
+      if (styName.equals("flowfram"))
+      {
+         if (colorSty == null)
+         {
+            colorSty = new ColorSty(options, styName, this, loadParentOptions);
+         }
+
+         return new FlowFramSty(options, this, loadParentOptions, colorSty);
       }
 
       if (styName.equals("glossaries"))

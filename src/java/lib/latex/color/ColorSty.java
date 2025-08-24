@@ -76,6 +76,11 @@ public class ColorSty extends LaTeXSty
       definedColors.put(name, color);
    }
 
+   public Color getDefinedColor(String name)
+   {
+      return definedColors.get(name);
+   }
+
    @Override
    public void addDefinitions()
    {

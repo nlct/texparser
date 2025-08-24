@@ -203,6 +203,25 @@ Nicola Talbot
 
 <entry key="nlctdoc.unknown_tag_group">Unknown tag group ''{0}''.</entry>
 
+<!--  flowfram messages -->
+
+<entry key="flowfram.flow_already_defined">Flow frame ''{0}'' already defined.</entry>
+<entry key="flowfram.flow_id_not_defined">Flow frame ID ''{0}'' not defined.</entry>
+<entry key="flowfram.flow_label_not_defined">Flow frame label ''{0}'' not defined.</entry>
+
+<entry key="flowfram.static_already_defined">Static frame ''{0}'' already defined.</entry>
+<entry key="flowfram.static_id_not_defined">Static frame ID ''{0}'' not defined.</entry>
+<entry key="flowfram.static_label_not_defined">Static frame label ''{0}'' not defined.</entry>
+
+<entry key="flowfram.dynamic_already_defined">Dynamic frame ''{0}'' already defined.</entry>
+<entry key="flowfram.dynamic_id_not_defined">Dynamic frame ID ''{0}'' not defined.</entry>
+<entry key="flowfram.dynamic_label_not_defined">Dynamic frame label ''{0}'' not defined.</entry>
+
+<entry key="flowfram.label_not_defined">Label ''{0}'' not defined for frame type ''{1}''.</entry>
+<entry key="flowfram.id_not_defined">ID ''{0}'' not defined for frame type ''{1}''.</entry>
+<entry key="flowfram.invalid_frame_setting">Setting {0} = {1} not valid for frame type ''{2}''.</entry>
+<entry key="flowfram.invalid_frame_noval_setting">Setting {0} not valid for frame type ''{1}''.</entry>
+
 <!--  Image drawing messages -->
 
 <entry key="teximage.error.no_path">No path defined on which to operate</entry>
