@@ -18,11 +18,12 @@
 */
 package com.dickimawbooks.texparserlib.latex.flowfram;
 
+import java.io.IOException;
 import java.awt.Color;
 
 import com.dickimawbooks.texparserlib.*;
 
-public class FlowFrameData
+public class FlowFrameData extends AbstractTeXObject
 {
    public FlowFrameData(FlowFrameType type, String label, int id,
       boolean bordered, TeXDimension width, TeXDimension height,
@@ -42,6 +43,47 @@ public class FlowFrameData
       setHeight(height);
       setX(posX);
       setY(posY);
+   }
+
+   @Override
+   public boolean isDataObject()
+   {
+      return true;
+   }
+
+   @Override
+   public Object clone()
+   {
+      return this;
+   }
+
+   @Override
+   public String format()
+   {
+      return "";
+   }
+
+   @Override
+   public TeXObjectList string(TeXParser parser)
+    throws IOException
+   {
+      return parser.getListener().createStack();
+   }
+
+   @Override
+   public String toString(TeXParser parser)
+   {
+      return "";
+   }
+
+   @Override
+   public boolean equals(Object obj)
+   {
+      if (obj == null || !(obj instanceof FlowFrameData)) return false;
+
+      FlowFrameData data = (FlowFrameData)obj;
+
+      return type == data.type && label.equals(data.label);
    }
 
    public FlowFrameType getType()
@@ -86,7 +128,7 @@ public class FlowFrameData
          bordered = true;
          frameCsName = "fbox";
       }
-      else if (csname.equals("none"))
+      else if (csname.equals("none") || csname.equals("relax") || csname.isEmpty())
       {
          bordered = false;
          frameCsName = "";
@@ -460,6 +502,39 @@ public class FlowFrameData
    public enum MarginSide
    {
       LEFT, RIGHT, INNER, OUTER;
+   }
+
+   @Override
+   public void process(TeXParser parser, TeXObjectList stack)
+     throws IOException
+   {
+      if (content != null)
+      {
+         TeXParserListener listener = parser.getListener();
+         TeXObjectList list;
+
+         if (bordered && frameCsName != null
+              && !frameCsName.startsWith("@flf@border@"))
+         {
+            list = listener.createStack();
+            list.add(listener.getControlSequence(frameCsName));
+            list.add(TeXParserUtils.createGroup(listener,
+               (TeXObject)content.clone()));
+         }
+         else
+         {
+            list = TeXParserUtils.toList((TeXObject)content.clone(), parser);
+         }
+
+         TeXParserUtils.process(list, parser, stack);
+      }
+   }
+
+   @Override
+   public void process(TeXParser parser)
+     throws IOException
+   {
+      process(parser, parser);
    }
 
    FlowFrameType type;
