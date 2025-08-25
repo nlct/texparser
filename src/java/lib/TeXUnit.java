@@ -77,6 +77,8 @@ public abstract class TeXUnit extends AbstractTeXObject
    public static final FixedUnit SP = new FixedUnit(FixedUnit.UNIT_SP);
    public static final FixedUnit BP = new FixedUnit(FixedUnit.UNIT_BP);
    public static final FixedUnit CM = new FixedUnit(FixedUnit.UNIT_CM);
+   public static final FixedUnit MM = new FixedUnit(FixedUnit.UNIT_MM);
+   public static final FixedUnit IN = new FixedUnit(FixedUnit.UNIT_IN);
    public static final EmUnit EM = new EmUnit();
    public static final ExUnit EX = new ExUnit();
    public static final MuUnit MU = new MuUnit();

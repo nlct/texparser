@@ -49,6 +49,7 @@ import com.dickimawbooks.texparserlib.latex.fontawesome.*;
 import com.dickimawbooks.texparserlib.latex.fontenc.*;
 import com.dickimawbooks.texparserlib.latex.fourier.*;
 import com.dickimawbooks.texparserlib.latex.glossaries.*;
+import com.dickimawbooks.texparserlib.latex.geometry.*;
 import com.dickimawbooks.texparserlib.latex.graphics.*;
 import com.dickimawbooks.texparserlib.latex.hyperref.*;
 import com.dickimawbooks.texparserlib.latex.ifthen.*;
@@ -2590,6 +2591,11 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       return flowframSty;
    }
 
+   public GeometrySty getGeometrySty()
+   {
+      return geometrySty;
+   }
+
    protected LaTeXSty getLaTeXSty(KeyValList suppliedOptions, String styName, 
       boolean loadParentOptions, TeXObjectList stack)
    throws IOException
@@ -2722,6 +2728,12 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       if (styName.equals("flowframtkutils"))
       {
          return new FlowFramTkUtilsSty(options, this, loadParentOptions);
+      }
+
+      if (styName.equals("geometry"))
+      {
+         geometrySty = new GeometrySty(options, this, loadParentOptions);
+         return geometrySty;
       }
 
       if (styName.equals("glossaries"))
@@ -3884,6 +3896,8 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
    protected GlossariesSty glossariesSty = null;
 
    protected FlowFramSty flowframSty = null;
+
+   protected GeometrySty geometrySty = null;
 
    private TeXObjectList bibliographySection;
 

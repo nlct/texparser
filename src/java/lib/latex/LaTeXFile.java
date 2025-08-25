@@ -237,7 +237,7 @@ public class LaTeXFile extends TeXPath
 
       if (declaredOptions == null)
       {
-         for (Iterator<String> it = options.keySet().iterator(); it.hasNext();)
+         for (Iterator<String> it = options.getOrderedKeyIterator(); it.hasNext();)
          {
             String option = it.next();
             TeXObject value = options.get(option);
@@ -257,7 +257,7 @@ public class LaTeXFile extends TeXPath
             }
          }
 
-         for (Iterator<String> it = options.keySet().iterator(); it.hasNext();)
+         for (Iterator<String> it = options.getOrderedKeyIterator(); it.hasNext();)
          {
             String option = it.next();
 
@@ -386,7 +386,7 @@ public class LaTeXFile extends TeXPath
 
    protected LaTeXParserListener listener;
 
-   private Vector<String> declaredOptions = null;
+   protected Vector<String> declaredOptions = null;
    private HashMap<String,TeXObject> declaredOptionCode=null;
    private TeXObject defaultOptionCode = null;
    protected boolean loadParentOptions=false;

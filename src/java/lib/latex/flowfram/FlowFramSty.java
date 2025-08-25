@@ -80,27 +80,27 @@ public class FlowFramSty extends LaTeXSty implements BeginDocumentListener
       listener.newcounter("displayedframe");
       listener.newcounter("minitoc");
 
-      listener.newlength("fflabelsep", 1, TeXUnit.PT);
-      listener.newlength("fftolerance", 2, TeXUnit.PT);
-      listener.newlength("sdfparindent", 0, TeXUnit.PT);
-      listener.newlength("flowframesep", 3, TeXUnit.PT);
-      listener.newlength("flowframerule", 0.4f, TeXUnit.PT);
+      registerNewLength("fflabelsep", 1, TeXUnit.PT);
+      registerNewLength("fftolerance", 2, TeXUnit.PT);
+      registerNewLength("sdfparindent", 0, TeXUnit.PT);
+      registerNewLength("flowframesep", 3, TeXUnit.PT);
+      registerNewLength("flowframerule", 0.4f, TeXUnit.PT);
 
-      listener.newlength("ffareawidth", 0, TeXUnit.PT);
-      listener.newlength("ffareaheight", 0, TeXUnit.PT);
-      listener.newlength("ffareax", 0, TeXUnit.PT);
-      listener.newlength("ffareay", 0, TeXUnit.PT);
-      listener.newlength("ffareaevenx", 0, TeXUnit.PT);
-      listener.newlength("ffareaeveny", 0, TeXUnit.PT);
+      registerNewLength("ffareawidth", 0, TeXUnit.PT);
+      registerNewLength("ffareaheight", 0, TeXUnit.PT);
+      registerNewLength("ffareax", 0, TeXUnit.PT);
+      registerNewLength("ffareay", 0, TeXUnit.PT);
+      registerNewLength("ffareaevenx", 0, TeXUnit.PT);
+      registerNewLength("ffareaeveny", 0, TeXUnit.PT);
 
-      listener.newlength("ffevenoffset", 0, TeXUnit.PT);
-      listener.newlength("columnheight", 0, TeXUnit.PT);
-      listener.newlength("vcolumnsep", 10, TeXUnit.PT);
-      listener.newlength("ffcolumnseprule", 2, TeXUnit.PT);
+      registerNewLength("ffevenoffset", 0, TeXUnit.PT);
+      registerNewLength("columnheight", 0, TeXUnit.PT);
+      registerNewLength("vcolumnsep", 10, TeXUnit.PT);
+      registerNewLength("ffcolumnseprule", 2, TeXUnit.PT);
 
-      listener.newlength("thumbtabwidth", 1, TeXUnit.CM);
-      listener.newlength("beforeminitocskip", 0, TeXUnit.PT);
-      listener.newlength("afterminitocskip", 0, TeXUnit.PT);
+      registerNewLength("thumbtabwidth", 1, TeXUnit.CM);
+      registerNewLength("beforeminitocskip", 0, TeXUnit.PT);
+      registerNewLength("afterminitocskip", 0, TeXUnit.PT);
 
       registerControlSequence(new StaticFloat("staticfigure", "figure"));
       registerControlSequence(new StaticFloat("statictable", "table"));
