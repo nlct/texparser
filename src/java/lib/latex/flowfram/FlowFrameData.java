@@ -19,11 +19,13 @@
 package com.dickimawbooks.texparserlib.latex.flowfram;
 
 import java.io.IOException;
+import java.util.Locale;
 import java.awt.Color;
 
 import com.dickimawbooks.texparserlib.*;
+import com.dickimawbooks.texparserlib.html.*;
 
-public class FlowFrameData extends AbstractTeXObject
+public class FlowFrameData
 {
    public FlowFrameData(FlowFrameType type, String label, int id,
       boolean bordered, TeXDimension width, TeXDimension height,
@@ -46,44 +48,13 @@ public class FlowFrameData extends AbstractTeXObject
    }
 
    @Override
-   public boolean isDataObject()
-   {
-      return true;
-   }
-
-   @Override
-   public Object clone()
-   {
-      return this;
-   }
-
-   @Override
-   public String format()
-   {
-      return "";
-   }
-
-   @Override
-   public TeXObjectList string(TeXParser parser)
-    throws IOException
-   {
-      return parser.getListener().createStack();
-   }
-
-   @Override
-   public String toString(TeXParser parser)
-   {
-      return "";
-   }
-
-   @Override
    public boolean equals(Object obj)
    {
       if (obj == null || !(obj instanceof FlowFrameData)) return false;
 
       FlowFrameData data = (FlowFrameData)obj;
 
-      return type == data.type && label.equals(data.label);
+      return type == data.type && id == data.id && label.equals(data.label);
    }
 
    public FlowFrameType getType()
@@ -475,6 +446,16 @@ public class FlowFrameData extends AbstractTeXObject
       }
    }
 
+   public void setCss()
+   {
+      this.css = css;
+   }
+
+   public String getCss()
+   {
+      return css;
+   }
+
    public TeXObject getContent()
    {
       return content;
@@ -504,8 +485,59 @@ public class FlowFrameData extends AbstractTeXObject
       LEFT, RIGHT, INNER, OUTER;
    }
 
-   @Override
-   public void process(TeXParser parser, TeXObjectList stack)
+   public void writeCss(L2HConverter l2h)
+     throws IOException
+   {
+      l2h.write("div."+type+label);
+      l2h.write(", div."+type+id);
+      l2h.writeln("{");
+
+      l2h.writeliteral(String.format(" width: %s;", l2h.getHtmlDimension(width)));
+      l2h.writeliteral(String.format(" height: %s;", l2h.getHtmlDimension(height)));
+
+      if (bordered)
+      {
+         l2h.writeliteral(" border-style: solid;");
+         l2h.writeln();
+
+         if (textCol != null)
+         {
+            l2h.writeliteral(String.format(" color: %s%n",
+              l2h.getHtmlColor(textCol)));
+         }
+
+         if (backCol != null)
+         {
+            l2h.writeliteral(String.format(" background-color: %s%n",
+              l2h.getHtmlColor(backCol)));
+         }
+
+         if (borderCol != null)
+         {
+            l2h.writeliteral(String.format(" border-color: %s%n",
+              l2h.getHtmlColor(borderCol)));
+         }
+
+         if (hasAngle())
+         {
+            String transform = String.format("rotate(%fdeg)", -angle.doubleValue());
+            l2h.writeliteral(String.format(
+             "transform: %s; -ms-transform: %s; -webkit-transform: %s;",
+             transform, transform, transform));
+         }
+
+         if (css != null)
+         {
+            l2h.writeliteral(css);
+            l2h.writeln();
+         }
+      }
+
+      l2h.writeln("}");
+   }
+
+   public void process(TeXParser parser, TeXObjectList stack,
+       boolean l2hImg, TeXObject alt, String imgType, String cssStyle)
      throws IOException
    {
       if (content != null)
@@ -513,28 +545,153 @@ public class FlowFrameData extends AbstractTeXObject
          TeXParserListener listener = parser.getListener();
          TeXObjectList list;
 
-         if (bordered && frameCsName != null
-              && !frameCsName.startsWith("@flf@border@"))
+         if (listener instanceof L2HConverter)
          {
+            parser.startGroup();
+
+            String prefix = type.toString().toLowerCase();
+
+            L2HConverter l2h = (L2HConverter)listener;
+
             list = listener.createStack();
-            list.add(listener.getControlSequence(frameCsName));
-            list.add(TeXParserUtils.createGroup(listener,
-               (TeXObject)content.clone()));
+            StartElement startElem = new StartElement("div", true, true);
+            EndElement endElem = new EndElement("div", true, true);
+
+            if (cssStyle != null)
+            {
+               startElem.putAttribute("style", cssStyle);
+            }
+
+            if (l2hImg)
+            {
+               TeXParserUtils.process(startElem, parser, stack);
+
+               StringBuilder builder = new StringBuilder();
+
+               if (shape != null)
+               {
+                  builder.append(shape.toString(parser));
+               }
+
+               builder.append("\\null");
+
+               StringBuilder preamble = new StringBuilder(l2h.getImagePreamble());
+
+               preamble.append("\\setallflowframes{pages=none}");
+               preamble.append("\\setallstaticframes{pages=none}");
+               preamble.append("\\setalldynamicframes{pages=none}");
+               preamble.append("\\onecolumn");
+               preamble.append("\\pagestyle{empty}");
+
+               preamble.append(String.format((Locale)null,
+                "\\set%sframe{%d}{pages=all}%n", prefix, id));
+
+               preamble.append(String.format((Locale)null,
+                "\\set%scontents{%d}{%s}", prefix, id,
+                 content.toString(parser)));
+
+               String name = prefix;
+
+               if (imgNum > 0)
+               {
+                  name += imgNum;
+               }
+
+               imgNum++;
+
+               L2HImage image = l2h.toImage(preamble.toString(), builder.toString(),
+                 imgType, alt, name, true, null);
+
+               if (image != null)
+               {
+                  image.process(parser);
+               }
+               else
+               {
+                  listener.getWriteable().writeliteral(
+                    String.format("<!-- Image %s Creation Failed -->", name));
+                  alt.process(parser, stack);
+                  listener.getWriteable().writeliteral(
+                     String.format("<!-- End of Image %s Alt Block -->", name));
+               }
+
+               TeXParserUtils.process(endElem, parser, stack);
+            }
+            else
+            {
+               list.add(startElem);
+
+               startElem.putAttribute("class", type+label+" "+type+id);
+
+               list.add((TeXObject)content.clone(), true);
+
+               list.add(endElem);
+               TeXParserUtils.process(list, parser, stack);
+            }
+
+            parser.endGroup();
          }
          else
          {
-            list = TeXParserUtils.toList((TeXObject)content.clone(), parser);
-         }
+            TeXObjectList contentList = TeXParserUtils.toList(
+              (TeXObject)content.clone(), parser);
 
-         TeXParserUtils.process(list, parser, stack);
+            if (hasShape())
+            {
+               contentList.push((TeXObject)shape.clone(), true);
+            }
+
+            // TODO check for colours
+
+            contentList.push(TeXParserUtils.createGroup(listener,
+             width));
+
+            contentList.push(listener.getOther(']'));
+            contentList.push(height);
+            contentList.push(listener.getOther('['));
+
+            contentList.push(listener.getOther(']'));
+            contentList.push(listener.getLetter(vAlign));
+            contentList.push(listener.getOther('['));
+
+            contentList.push(listener.createGroup("minipage"));
+            contentList.push(listener.getControlSequence("begin"));
+
+            contentList.add(listener.getControlSequence("begin"));
+            contentList.add(listener.createGroup("minipage"));
+
+            if (bordered && frameCsName != null)
+            {
+               list = listener.createStack();
+               list.add(listener.getControlSequence(frameCsName));
+               list.add(TeXParserUtils.createGroup(listener,
+                  contentList));
+            }
+            else
+            {
+               list = contentList;
+            }
+
+            if (angle != null)
+            {
+               contentList = list;
+
+               list = TeXParserUtils.createStack(listener,
+                listener.getControlSequence("rotatebox"),
+                TeXParserUtils.createGroup(listener, angle),
+                TeXParserUtils.createGroup(listener, contentList)
+              );
+            }
+
+            TeXParserUtils.process(list, parser, stack);
+         }
       }
    }
 
-   @Override
-   public void process(TeXParser parser)
-     throws IOException
+   public String toString()
    {
-      process(parser, parser);
+      return String.format("%s[type=%s,id=%d,label=%s]",
+       getClass().getSimpleName(), type, id, label);
    }
 
    FlowFrameType type;
@@ -555,4 +712,7 @@ public class FlowFrameData extends AbstractTeXObject
    TeXNumber angle;
    TeXObject shape;
    TeXObject content;
+
+   String css;
+   int imgNum=0;
 }

@@ -30,8 +30,14 @@ import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.primitives.*;
 import com.dickimawbooks.texparserlib.latex.*;
 import com.dickimawbooks.texparserlib.latex.color.ColorSty;
+import com.dickimawbooks.texparserlib.html.*;
 
-public class FlowFramSty extends LaTeXSty
+/**
+ * Since the TeX parser library has no output routine this is mainly
+ * for obtaining flowfram.sty data and for providing a basic
+ * implementation for L2HConverter.
+ */
+public class FlowFramSty extends LaTeXSty implements BeginDocumentListener
 {
    public FlowFramSty(KeyValList options, LaTeXParserListener listener, 
      boolean loadParentOptions, ColorSty colorSty)
@@ -48,6 +54,11 @@ public class FlowFramSty extends LaTeXSty
       flowIdMap = new HashMap<String,Integer>();
       staticIdMap = new HashMap<String,Integer>();
       dynamicIdMap = new HashMap<String,Integer>();
+
+      if (listener instanceof L2HConverter)
+      {
+         listener.addBeginDocumentListener(this);
+      }
    }
 
    @Override
@@ -132,6 +143,11 @@ public class FlowFramSty extends LaTeXSty
         FlowFrameType.DYNAMIC, this));
       registerControlSequence(new SetFrameContentsEnv("dynamiccontents*",
         FlowFrameType.DYNAMIC, this));
+
+      registerControlSequence(new NoTeXShowContent(
+       "noTeXshowstaticcontents", FlowFrameType.STATIC, this));
+      registerControlSequence(new NoTeXShowContent(
+       "noTeXshowdynamiccontents", FlowFrameType.DYNAMIC, this));
 
       // ignore:
       registerControlSequence(new Relax("flowframeshowlayout"));
@@ -224,6 +240,11 @@ public class FlowFramSty extends LaTeXSty
       flowIdMap.put(label, Integer.valueOf(id));
 
       listener.stepcounter("maxflow");
+
+      if (currentFrame == null)
+      {
+         currentFrame = data;
+      }
 
       return data;
    }
@@ -576,7 +597,33 @@ public class FlowFramSty extends LaTeXSty
       return dynamicFrames.elements();
    }
 
+   @Override
+   public void documentBegun(BeginDocumentEvent evt)
+    throws IOException
+   {
+      L2HConverter l2h = (L2HConverter)listener;
+
+      if (!staticFrames.isEmpty() || !dynamicFrames.isEmpty())
+      {
+         l2h.write("<style>");
+
+         for (FlowFrameData data : staticFrames)
+         {
+            data.writeCss(l2h);
+         }
+
+         for (FlowFrameData data : dynamicFrames)
+         {
+            data.writeCss(l2h);
+         }
+
+         l2h.write("</style>");
+      }
+   }
+
    boolean pagesRelative = true;
+
+   FlowFrameData currentFrame;
 
    Vector<FlowFrameData> flowFrames;
    Vector<FlowFrameData> staticFrames;
