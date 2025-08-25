@@ -495,42 +495,65 @@ public class FlowFrameData
       l2h.writeliteral(String.format(" width: %s;", l2h.getHtmlDimension(width)));
       l2h.writeliteral(String.format(" height: %s;", l2h.getHtmlDimension(height)));
 
+      if (textCol != null)
+      {
+         l2h.writeliteral(String.format(" color: %s;%n",
+           l2h.getHtmlColor(textCol)));
+      }
+
+      if (backCol != null)
+      {
+         l2h.writeliteral(String.format(" background-color: %s;%n",
+           l2h.getHtmlColor(backCol)));
+      }
+
       if (bordered)
       {
-         l2h.writeliteral(" border-style: solid;");
-         l2h.writeln();
-
-         if (textCol != null)
+         if ("shadowbox".equals(frameCsName))
          {
-            l2h.writeliteral(String.format(" color: %s%n",
-              l2h.getHtmlColor(textCol)));
+            l2h.writeliteral(" box-shadow: ");
+
+            if (borderCol == null)
+            {
+               l2h.writeliteral("black");
+            }
+            else
+            {
+               l2h.writeliteral(l2h.getHtmlColor(borderCol));
+            }
+
+            l2h.writeln(";");
          }
-
-         if (backCol != null)
+         else
          {
-            l2h.writeliteral(String.format(" background-color: %s%n",
-              l2h.getHtmlColor(backCol)));
-         }
-
-         if (borderCol != null)
-         {
-            l2h.writeliteral(String.format(" border-color: %s%n",
-              l2h.getHtmlColor(borderCol)));
-         }
-
-         if (hasAngle())
-         {
-            String transform = String.format("rotate(%fdeg)", -angle.doubleValue());
-            l2h.writeliteral(String.format(
-             "transform: %s; -ms-transform: %s; -webkit-transform: %s;",
-             transform, transform, transform));
-         }
-
-         if (css != null)
-         {
-            l2h.writeliteral(css);
+            l2h.writeliteral(" border-style: solid;");
             l2h.writeln();
+
+            if (borderCol != null)
+            {
+               l2h.writeliteral(String.format(" border-color: %s;%n",
+                 l2h.getHtmlColor(borderCol)));
+            }
+
+            if ("ovalbox".equals(frameCsName))
+            {
+               l2h.writeliteral(" border-radius: 10%;");
+            }
          }
+      }
+
+      if (hasAngle())
+      {
+         String transform = String.format("rotate(%fdeg)", -angle.doubleValue());
+         l2h.writeliteral(String.format(
+          "transform: %s; -ms-transform: %s; -webkit-transform: %s;",
+          transform, transform, transform));
+      }
+
+      if (css != null)
+      {
+         l2h.writeliteral(css);
+         l2h.writeln();
       }
 
       l2h.writeln("}");

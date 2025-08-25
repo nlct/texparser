@@ -2585,6 +2585,11 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       return colorSty;
    }
 
+   public FlowFramSty getFlowFramSty()
+   {
+      return flowframSty;
+   }
+
    protected LaTeXSty getLaTeXSty(KeyValList suppliedOptions, String styName, 
       boolean loadParentOptions, TeXObjectList stack)
    throws IOException
@@ -2710,7 +2715,13 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
             colorSty = new ColorSty(options, styName, this, loadParentOptions);
          }
 
-         return new FlowFramSty(options, this, loadParentOptions, colorSty);
+         flowframSty = new FlowFramSty(options, this, loadParentOptions, colorSty);
+         return flowframSty;
+      }
+
+      if (styName.equals("flowframtkutils"))
+      {
+         return new FlowFramTkUtilsSty(options, this, loadParentOptions);
       }
 
       if (styName.equals("glossaries"))
@@ -3871,6 +3882,8 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
    protected ColorSty colorSty = null;
 
    protected GlossariesSty glossariesSty = null;
+
+   protected FlowFramSty flowframSty = null;
 
    private TeXObjectList bibliographySection;
 
