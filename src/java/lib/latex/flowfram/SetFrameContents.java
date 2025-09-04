@@ -21,6 +21,7 @@ package com.dickimawbooks.texparserlib.latex.flowfram;
 import java.io.IOException;
 
 import com.dickimawbooks.texparserlib.*;
+import com.dickimawbooks.texparserlib.latex.KeyValList;
 
 public class SetFrameContents extends ControlSequence
 {
@@ -79,6 +80,35 @@ public class SetFrameContents extends ControlSequence
          data = sty.getFrame(type, id);
       }
 
+      KeyValList options = TeXParserUtils.popOptKeyValList(parser, stack);
+      KeyValList htmlOptions = null;
+
+      if (options != null)
+      {
+         TeXObject html = options.getValue("html");
+
+         if (html != null)
+         {
+            options.remove("html");
+            htmlOptions = TeXParserUtils.toKeyValList(html, parser);
+         }
+
+         if (!options.isEmpty())
+         {
+            TeXObjectList substack = parser.getListener().createStack();
+
+            substack.add(parser.getListener().getControlSequence(
+              "set" + type.toString().toLowerCase()+"frame"));
+
+            substack.add(TeXParserUtils.createGroup(parser, 
+              new UserNumber(data.getID())));
+
+            substack.add(TeXParserUtils.createGroup(parser, options));
+
+            TeXParserUtils.process(substack, parser, stack);
+         }
+      }
+
       TeXObject content = popArg(parser, stack);
 
       if (append && data.hasContent())
@@ -91,6 +121,11 @@ public class SetFrameContents extends ControlSequence
       }
 
       data.setContent(content);
+
+      if (htmlOptions != null)
+      {
+         data.showContent(parser, stack, htmlOptions);
+      }
    }
 
    FlowFramSty sty;

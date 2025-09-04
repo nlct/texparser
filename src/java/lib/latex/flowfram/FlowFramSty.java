@@ -144,10 +144,14 @@ public class FlowFramSty extends LaTeXSty implements BeginDocumentListener
       registerControlSequence(new SetFrameContentsEnv("dynamiccontents*",
         FlowFrameType.DYNAMIC, this));
 
-      registerControlSequence(new NoTeXShowContent(
-       "noTeXshowstaticcontents", FlowFrameType.STATIC, this));
-      registerControlSequence(new NoTeXShowContent(
-       "noTeXshowdynamiccontents", FlowFrameType.DYNAMIC, this));
+      registerControlSequence(new SetFrameAttrs("setstaticframe",
+         FlowFrameType.STATIC, this));
+
+      registerControlSequence(new SetFrameAttrs("setdynamicframe",
+         FlowFrameType.DYNAMIC, this));
+
+      registerControlSequence(new SetFrameAttrs("setflowframe",
+         FlowFrameType.FLOW, this));
 
       // ignore:
       registerControlSequence(new Relax("flowframeshowlayout"));

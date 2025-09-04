@@ -55,6 +55,7 @@ public class SetFrameAttrs extends ControlSequence
       String strVal;
       TeXDimension dim;
       TeXNumber num;
+      TeXObject html = null;
 
       for (Iterator<String> it = settings.keySet().iterator();
            it.hasNext(); )
@@ -397,6 +398,10 @@ public class SetFrameAttrs extends ControlSequence
 
                data.setAngle(num);
             }
+            else if (key.equals("html"))
+            {
+               html = (TeXObject)value.clone();
+            }
 
          }
          catch (NullPointerException e)
@@ -417,6 +422,18 @@ public class SetFrameAttrs extends ControlSequence
                  FlowFramSty.INVALID_FRAME_SETTING, key, 
                    value.toString(parser), type);
             }
+         }
+      }
+
+      if (html != null)
+      {
+         KeyValList htmlOpts = TeXParserUtils.toKeyValList(html, parser);
+
+         Boolean show = htmlOpts.getBoolean("show", parser, stack);
+
+         if (show != null && show.booleanValue())
+         {
+            data.showContent(parser, stack, htmlOpts);
          }
       }
    }
@@ -456,7 +473,6 @@ public class SetFrameAttrs extends ControlSequence
             }
          }
       }
-
    }
 
    FlowFramSty sty;

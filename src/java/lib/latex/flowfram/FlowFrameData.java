@@ -23,6 +23,7 @@ import java.util.Locale;
 import java.awt.Color;
 
 import com.dickimawbooks.texparserlib.*;
+import com.dickimawbooks.texparserlib.latex.KeyValList;
 import com.dickimawbooks.texparserlib.html.*;
 
 public class FlowFrameData
@@ -559,8 +560,49 @@ public class FlowFrameData
       l2h.writeln("}");
    }
 
+   public void showContent(TeXParser parser, TeXObjectList stack,
+    KeyValList opts)
+     throws IOException
+   {
+      boolean l2hImg = false;
+      String imgType = "image/png";
+      TeXObject alt = null;
+      String cssStyle = null;
+      String cssClass = null;
+
+      if (content == null || content.isEmpty()) return;
+
+      if (hasShape())
+      {
+         l2hImg = true;
+      }
+
+      alt = opts.getValue("alt");
+
+      String val = opts.getString("mime-type", parser, stack);
+
+      if (val != null)
+      {
+         imgType = val;
+      }
+
+      Boolean bool = opts.getBoolean("image", parser, stack);
+
+      if (bool != null)
+      {
+         l2hImg = bool.booleanValue();
+      }
+
+      cssStyle = opts.getString("style", parser, stack);
+
+      cssClass = opts.getString("class", parser, stack);
+
+      process(parser, stack, l2hImg, alt, imgType, cssStyle, cssClass);
+   }
+
    public void process(TeXParser parser, TeXObjectList stack,
-       boolean l2hImg, TeXObject alt, String imgType, String cssStyle)
+       boolean l2hImg, TeXObject alt, String imgType,
+       String cssStyle, String cssClass)
      throws IOException
    {
       if (content != null)
@@ -583,6 +625,11 @@ public class FlowFrameData
             if (cssStyle != null)
             {
                startElem.putAttribute("style", cssStyle);
+            }
+
+            if (cssClass != null)
+            {
+               startElem.putAttribute("class", cssClass);
             }
 
             if (l2hImg)
