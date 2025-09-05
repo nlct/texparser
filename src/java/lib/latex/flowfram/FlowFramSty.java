@@ -153,6 +153,8 @@ public class FlowFramSty extends LaTeXSty implements BeginDocumentListener
       registerControlSequence(new SetFrameAttrs("setflowframe",
          FlowFrameType.FLOW, this));
 
+      registerControlSequence(new FlowFramSectionUnit());
+
       // ignore:
       registerControlSequence(new Relax("flowframeshowlayout"));
       registerControlSequence(new Relax("framebreak"));

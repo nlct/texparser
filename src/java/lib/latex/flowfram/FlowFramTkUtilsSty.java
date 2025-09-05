@@ -38,6 +38,9 @@ public class FlowFramTkUtilsSty extends LaTeXSty
       registerControlSequence(new AtNumberOfNumber("jdroutline", 3, 3));
       registerControlSequence(new AtFirstOfOne("jdrimagebox"));
 
+      registerControlSequence(new AtGobble("flowframtkstartobject", 3));
+      registerControlSequence(new AtGobble("flowframtkendobject", 3));
+
       registerControlSequence(new AtNumberOfNumber("flowframtkimgtitlechar", 1, 2));
 
       registerControlSequence(new StoreDataCs("flowframtkSetTitle",
