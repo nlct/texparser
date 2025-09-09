@@ -59,6 +59,25 @@ public class FlowFramSty extends LaTeXSty implements BeginDocumentListener
       {
          listener.addBeginDocumentListener(this);
       }
+
+      float textWidthPt = TeXParserUtils.toPt(getParser(), "textwidth");
+
+      if (textWidthPt == 0.0f)
+      {
+         textWidthPt = 430.00462f;
+      }
+
+      registerNewLength("typeblockwidth", textWidthPt, TeXUnit.PT);
+
+      float textHeightPt = TeXParserUtils.toPt(getParser(), "textheight");
+
+      if (textHeightPt == 0.0f)
+      {
+         textHeightPt = 556.47656f;
+      }
+
+      registerNewLength("typeblockheight", textHeightPt, TeXUnit.PT);
+
    }
 
    @Override
@@ -154,6 +173,13 @@ public class FlowFramSty extends LaTeXSty implements BeginDocumentListener
          FlowFrameType.FLOW, this));
 
       registerControlSequence(new FlowFramSectionUnit());
+
+      registerControlSequence(new ComputeLeftEdgeOdd());
+      registerControlSequence(new ComputeLeftEdgeEven());
+      registerControlSequence(new ComputeTopEdge());
+      registerControlSequence(new ComputeBottomEdge());
+      registerControlSequence(new ComputeRightEdgeOdd());
+      registerControlSequence(new ComputeRightEdgeEven());
 
       // ignore:
       registerControlSequence(new Relax("flowframeshowlayout"));
