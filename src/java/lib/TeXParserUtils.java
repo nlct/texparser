@@ -1059,6 +1059,21 @@ public class TeXParserUtils
       return dim;
    }
 
+   public static float toPt(TeXParser parser, String dimRegName)
+   throws TeXSyntaxException
+   {
+      DimenRegister dim = parser.getDimenRegister(dimRegName);
+
+      if (dim == null)
+      {
+         return 0.0f;
+      }
+      else
+      {
+         return dim.getUnit().toPt(parser, dim.getValue());
+      }
+   }
+
    public static int toInt(TeXObject object, TeXParser parser, TeXObjectList stack)
      throws IOException
    {

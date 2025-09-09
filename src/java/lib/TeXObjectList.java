@@ -692,9 +692,44 @@ public class TeXObjectList extends Vector<TeXObject>
       TeXObject object = expandedPopStack(parser, 
         (byte)(POP_SHORT | POP_IGNORE_LEADING_SPACE));
 
+      if (parser.isStack(object) && ((TeXObjectList)object).size() == 1)
+      {
+         object = ((TeXObjectList)object).firstElement();
+      }
+
       if (object instanceof TeXDimension)
       {
          return (TeXDimension)object;
+      }
+
+      int sign = 1;
+
+      if (object instanceof CharObject)
+      {
+         int cp = ((CharObject)object).getCharCode();
+
+         if (cp == '-' || cp == '+')
+         {
+            if (cp == '-')
+            {
+               sign = -1;
+            }
+
+            object = popStack(parser, (byte)(POP_SHORT | POP_IGNORE_LEADING_SPACE));
+
+            if (object instanceof TeXDimension)
+            {
+               if (sign == 1)
+               {
+                  return (TeXDimension)object;
+               }
+               else
+               {
+                  TeXDimension dim = (TeXDimension)object;
+                  return new UserDimension(-dim.getValue(), dim.getUnit());
+               }
+            }
+         }
       }
 
       push(object);
@@ -706,7 +741,7 @@ public class TeXObjectList extends Vector<TeXObject>
       if (object instanceof DimenRegister)
       {
          TeXDimension dimen = new TeXGlue(parser, (DimenRegister)object);
-         dimen.multiply(value.floatValue());
+         dimen.multiply(sign * value.floatValue());
          return dimen;
       }
 
@@ -714,7 +749,7 @@ public class TeXObjectList extends Vector<TeXObject>
 
       TeXUnit unit = popUnit(parser);
 
-      TeXDimension dimen = new UserDimension(value, unit);
+      TeXDimension dimen = new UserDimension(sign * value.floatValue(), unit);
 
       if (!glue)
       {

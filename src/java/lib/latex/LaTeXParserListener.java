@@ -841,6 +841,7 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
 
       parser.putControlSequence(new NewLength());
       parser.putControlSequence(new SetLength());
+      parser.putControlSequence(new AddToLength());
 
       parser.putControlSequence(new Verbatim());
       parser.putControlSequence(new Verbatim("verbatim*"));
