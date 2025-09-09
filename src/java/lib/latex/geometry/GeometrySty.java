@@ -510,6 +510,26 @@ public class GeometrySty extends LaTeXSty
          }
       }
 
+      if (paperWidth == null)
+      {
+         paperWidth = getPaperWidth();
+
+         if (paperWidth == null)
+         {
+            paperWidth = new UserDimension(210, TeXUnit.MM);
+         }
+      }
+
+      if (paperHeight == null)
+      {
+         paperHeight = getPaperHeight();
+
+         if (paperHeight == null)
+         {
+            paperHeight = new UserDimension(297, TeXUnit.MM);
+         }
+      }
+
       if (portrait != null)
       {
          if (portrait.booleanValue())
