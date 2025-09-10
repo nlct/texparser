@@ -1116,13 +1116,16 @@ public class TeXObjectList extends Vector<TeXObject>
    public TeXDimension popDimension(TeXParser parser, boolean glue)
     throws IOException
    {
-      TeXObject object = expandedPopStack(parser, 
-        (byte)(POP_SHORT | POP_IGNORE_LEADING_SPACE));
+      byte popStyle = (byte)(POP_SHORT | POP_IGNORE_LEADING_SPACE);
+
+      TeXObject object = popStack(parser, popStyle);
 
       if (parser.isStack(object) && ((TeXObjectList)object).size() == 1)
       {
          object = ((TeXObjectList)object).firstElement();
       }
+
+      object = TeXParserUtils.resolve(object, parser);
 
       if (object instanceof TeXDimension)
       {
@@ -1142,7 +1145,14 @@ public class TeXObjectList extends Vector<TeXObject>
                sign = -1;
             }
 
-            object = popStack(parser, (byte)(POP_SHORT | POP_IGNORE_LEADING_SPACE));
+            object = popStack(parser, popStyle);
+
+            if (parser.isStack(object) && ((TeXObjectList)object).size() == 1)
+            {
+               object = ((TeXObjectList)object).firstElement();
+            }
+
+            object = TeXParserUtils.resolve(object, parser);
 
             if (object instanceof TeXDimension)
             {
@@ -1163,7 +1173,7 @@ public class TeXObjectList extends Vector<TeXObject>
 
       Float value = popFloat(parser);
 
-      object = expandedPopStack(parser);
+      object = expandedPopStack(parser, popStyle);
 
       if (object instanceof DimenRegister)
       {

@@ -499,12 +499,16 @@ public class TeXParserUtils
       boolean calc)
      throws IOException
    {
-      TeXObject obj = popArgExpandFully(parser, stack);
+      TeXObject obj = popArg(parser, stack);
+
+      obj = trim(obj);
 
       if (parser.isStack(obj) && ((TeXObjectList)obj).size() == 1)
       {
          obj = ((TeXObjectList)obj).firstElement();
       }
+
+      obj = resolve(obj, parser);
 
       if (obj instanceof InternalQuantity)
       {
@@ -514,6 +518,11 @@ public class TeXParserUtils
       if (obj instanceof TeXDimension)
       {
          return (TeXDimension)obj;
+      }
+
+      if (!parser.isStack(obj) && obj.canExpand())
+      {
+         obj = expandFully(obj, parser, stack);
       }
 
       if (obj instanceof TeXObjectList)
@@ -531,7 +540,7 @@ public class TeXParserUtils
       }
 
       throw new TeXSyntaxException(parser, 
-           TeXSyntaxException.ERROR_DIMEN_EXPECTED);
+           TeXSyntaxException.ERROR_DIMEN_EXPECTED_FOUND, obj.toString(parser));
    }
 
    /**
@@ -551,17 +560,21 @@ public class TeXParserUtils
       boolean calculate)
      throws IOException
    {
-      TeXObject obj = popOptArgExpandFully(parser, stack);
+      TeXObject obj = popOptArg(parser, stack);
 
       if (obj == null)
       {
          return null;
       }
 
+      obj = trim(obj);
+
       if (parser.isStack(obj) && ((TeXObjectList)obj).size() == 1)
       {
          obj = ((TeXObjectList)obj).firstElement();
       }
+
+      obj = resolve(obj, parser);
 
       if (obj instanceof InternalQuantity)
       {
@@ -571,6 +584,11 @@ public class TeXParserUtils
       if (obj instanceof TeXDimension)
       {
          return (TeXDimension)obj;
+      }
+
+      if (!parser.isStack(obj) && obj.canExpand())
+      {
+         obj = expandFully(obj, parser, stack);
       }
 
       if (obj instanceof TeXObjectList)
@@ -588,7 +606,7 @@ public class TeXParserUtils
       }
 
       throw new TeXSyntaxException(parser, 
-           TeXSyntaxException.ERROR_DIMEN_EXPECTED);
+           TeXSyntaxException.ERROR_DIMEN_EXPECTED_FOUND, obj.toString(parser));
    }
 
    public static boolean onlyContainsControlSequence(
