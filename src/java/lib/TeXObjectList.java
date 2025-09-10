@@ -680,6 +680,231 @@ public class TeXObjectList extends Vector<TeXObject>
       return popNumber(parser);
    }
 
+   public TeXDimension popDimExpr(TeXParser parser)
+    throws IOException
+   {
+      byte popStyle = (byte)(POP_SHORT | POP_IGNORE_LEADING_SPACE);
+
+      TeXObject object = popArg(parser, popStyle, '(', ')', true);
+      TeXDimension dim = null;
+
+      if (object != null)
+      {
+         if (parser.isStack(object))
+         {
+            object = ((TeXObjectList)object).popDimExpr(parser);
+         }
+
+         if (object instanceof TeXDimension)
+         {
+            dim = (TeXDimension)object;
+         }
+         else
+         {
+            throw new TeXSyntaxException(parser,
+               TeXSyntaxException.ERROR_DIMEN_EXPECTED, object.toString(parser));
+         }
+      }
+
+      if (dim == null)
+      {
+         dim = popDimension(parser);
+      }
+
+      object = popStack(parser, popStyle);
+
+      if (object == null || !(object instanceof CharObject))
+      {
+         if (dim == null)
+         {
+            throw new TeXSyntaxException(parser,
+               TeXSyntaxException.ERROR_DIMEN_EXPECTED,
+                object == null ? "" : object.toString(parser));
+         }
+         else
+         {
+            if (!TeXParserUtils.isControlSequence(object, "relax"))
+            {
+               push(object);
+            }
+
+            return dim;
+         }
+      }
+
+      int cp = ((CharObject)object).getCharCode();
+      TeXDimension nextDim = null;
+      UserDimension result = new UserDimension(dim);
+
+      if (cp == '+' || cp == '-')
+      {
+         object = peekStack(popStyle);
+
+         if ((object instanceof CharObject)
+             && ((CharObject)object).getCharCode() == '(')
+         {
+            nextDim = popDimExpr(parser);
+         }
+         else
+         {
+            nextDim = popDimension(parser);
+         }
+
+         object = peekStack(popStyle);
+
+         if (object instanceof CharObject)
+         {
+            int nextCp = ((CharObject)object).getCharCode();
+
+            if (nextCp == '*' || nextCp == '/')
+            {
+               popStack(parser, popStyle);
+               TeXDimension factor = popDimenFactor(parser);
+
+               if (nextCp == '*')
+               {
+                  nextDim = new UserDimension(
+                    nextDim.getValue()
+                     * factor.getUnit().toUnit(parser,
+                         factor.getValue(), nextDim.getUnit()),
+                    nextDim.getUnit());
+               }
+               else
+               {
+                  nextDim = new UserDimension(
+                    nextDim.getValue()
+                     / factor.getUnit().toUnit(parser,
+                         factor.getValue(), nextDim.getUnit()),
+                    nextDim.getUnit());
+               }
+            }
+         }
+
+         if (cp == '+')
+         {
+            result.advance(parser, nextDim);
+         }
+         else
+         {
+            TeXUnit unit = nextDim.getUnit();
+
+            result.setValue(
+              result.getValue()
+                - unit.toUnit(parser, nextDim.getValue(), result.getUnit()),
+              result.getUnit());
+         }
+      }
+      else if (cp == '*')
+      {
+         TeXDimension factor = popDimenFactor(parser);
+
+         result.setValue(
+           result.getValue()
+            * factor.getUnit().toUnit(parser,
+                factor.getValue(), result.getUnit()),
+           result.getUnit());
+      }
+      else if (cp == '/')
+      {
+         TeXDimension factor = popDimenFactor(parser);
+
+         result.setValue(
+           result.getValue()
+            / factor.getUnit().toUnit(parser,
+                factor.getValue(), result.getUnit()),
+           result.getUnit());
+      }
+      else
+      {
+         throw new TeXSyntaxException(parser,
+            TeXSyntaxException.ERROR_DIMEN_EXPECTED,
+             object == null ? "" : object.toString(parser));
+      }
+
+      return result;
+   }
+
+   protected TeXDimension popDimenFactor(TeXParser parser)
+    throws IOException
+   {
+      byte popStyle = (byte)(POP_SHORT | POP_IGNORE_LEADING_SPACE);
+
+      TeXObject object = popArg(parser, popStyle, '(', ')', true);
+      TeXDimension dim = null;
+
+      if (object != null)
+      {
+         if (parser.isStack(object))
+         {
+            object = ((TeXObjectList)object).popDimExpr(parser);
+         }
+
+         if (object instanceof TeXDimension)
+         {
+            dim = (TeXDimension)object;
+         }
+         else
+         {
+            throw new TeXSyntaxException(parser,
+               TeXSyntaxException.ERROR_DIMEN_EXPECTED, object.toString(parser));
+         }
+      }
+
+      if (dim == null)
+      {
+         dim = popDimension(parser);
+      }
+
+      object = peekStack(popStyle);
+
+      if (object == null || !(object instanceof CharObject))
+      {
+         if (dim == null)
+         {
+            throw new TeXSyntaxException(parser,
+               TeXSyntaxException.ERROR_DIMEN_EXPECTED,
+                object == null ? "" : object.toString(parser));
+         }
+         else
+         {
+            return dim;
+         }
+      }
+
+      int cp = ((CharObject)object).getCharCode();
+
+      if (cp == '*' || cp == '/')
+      {
+         popStack(parser, popStyle);
+
+         UserDimension result = new UserDimension(dim);
+         TeXDimension factor = popDimenFactor(parser);
+
+         if (cp == '*')
+         {
+            result.setValue(
+              result.getValue()
+               * factor.getUnit().toUnit(parser,
+                   factor.getValue(), result.getUnit()),
+              result.getUnit());
+         }
+         else
+         {
+            result.setValue(
+              result.getValue()
+               / factor.getUnit().toUnit(parser,
+                   factor.getValue(), result.getUnit()),
+              result.getUnit());
+         }
+
+         return result;
+      }
+      else
+      {
+         return dim;
+      }
+   }
+
    public TeXDimension popDimension(TeXParser parser)
     throws IOException
    {
@@ -1394,6 +1619,13 @@ public class TeXObjectList extends Vector<TeXObject>
      int openDelim, int closeDelim)
    throws IOException
    {
+      return popArg(parser, popStyle, openDelim, closeDelim, false);
+   }
+
+   public TeXObject popArg(TeXParser parser, byte popStyle, 
+     int openDelim, int closeDelim, boolean balanced)
+   throws IOException
+   {
       boolean skipIgnoreables = !isRetainIgnoreables(popStyle);
       boolean skipLeadingWhiteSpace = isIgnoreLeadingSpace(popStyle);
 
@@ -1488,6 +1720,8 @@ public class TeXObjectList extends Vector<TeXObject>
          return null;
       }
 
+      int nested = 1;
+
       if (isIgnoreLeadingSpace(popStyle))
       {
          popStyle = (byte)(popStyle^POP_IGNORE_LEADING_SPACE);
@@ -1512,7 +1746,16 @@ public class TeXObjectList extends Vector<TeXObject>
          {
             if (((CharObject)object).getCharCode() == closeDelim)
             {
-               return list;
+               nested--;
+
+               if (!balanced || nested < 1)
+               {
+                  return list;
+               }
+            }
+            else if (((CharObject)object).getCharCode() == openDelim)
+            {
+               nested++;
             }
          }
          else if (bgChar != null)

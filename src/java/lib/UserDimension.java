@@ -60,6 +60,12 @@ public class UserDimension extends AbstractTeXObject implements TeXDimension, Ex
       unit = texUnit;
    }
 
+   public UserDimension(TeXDimension dim)
+   {
+      value = dim.getValue();
+      unit = dim.getUnit();
+   }
+
    public UserDimension(TeXParser parser, String string)
     throws TeXSyntaxException
    {
