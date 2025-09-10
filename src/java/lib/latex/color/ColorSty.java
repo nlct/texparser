@@ -222,6 +222,34 @@ public class ColorSty extends LaTeXSty
               ColorSty.INVALID_SPECS, specs, model);
          }
       }
+      else if (model.equals("cmyk"))
+      {
+         String[] split = specs.split(",", 4);
+
+         if (split.length != 3)
+         {
+            throw new LaTeXSyntaxException(parser, 
+              ColorSty.INVALID_SPECS, specs, model);
+         }
+
+         try
+         {
+            float components[] = 
+             {
+               Float.parseFloat(split[0]),
+               Float.parseFloat(split[1]),
+               Float.parseFloat(split[2]),
+               Float.parseFloat(split[2])
+             };
+
+            return new Color(ColorSpace.getInstance(ColorSpace.TYPE_CMYK), components, 1.0f);
+         }
+         catch (NumberFormatException e)
+         {
+            throw new LaTeXSyntaxException(e, parser, 
+              ColorSty.INVALID_SPECS, specs, model);
+         }
+      }
       else if (model.equals("gray"))
       {
          try
