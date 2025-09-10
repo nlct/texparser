@@ -680,6 +680,208 @@ public class TeXObjectList extends Vector<TeXObject>
       return popNumber(parser);
    }
 
+   public Numerical popNumExpr(TeXParser parser)
+    throws IOException
+   {
+      byte popStyle = (byte)(POP_SHORT | POP_IGNORE_LEADING_SPACE);
+
+      TeXObject object = popArg(parser, popStyle, '(', ')', true);
+      Numerical num = null;
+
+      if (object != null)
+      {
+         if (parser.isStack(object))
+         {
+            object = ((TeXObjectList)object).popNumExpr(parser);
+         }
+
+         if (object instanceof Numerical)
+         {
+            num = (Numerical)object;
+         }
+         else
+         {
+            throw new TeXSyntaxException(parser,
+               TeXSyntaxException.ERROR_NUMBER_EXPECTED, object.toString(parser));
+         }
+      }
+
+      if (num == null)
+      {
+         num = popNumerical(parser);
+      }
+
+      object = popStack(parser, popStyle);
+
+      if (object == null || !(object instanceof CharObject))
+      {
+         if (num == null)
+         {
+            throw new TeXSyntaxException(parser,
+               TeXSyntaxException.ERROR_NUMBER_EXPECTED,
+                object == null ? "" : object.toString(parser));
+         }
+         else
+         {
+            if (!TeXParserUtils.isControlSequence(object, "relax"))
+            {
+               push(object);
+            }
+
+            return num;
+         }
+      }
+
+      int cp = ((CharObject)object).getCharCode();
+      Numerical nextNum = null;
+      UserNumber result = new UserNumber(num.number(parser));
+
+      if (cp == '+' || cp == '-')
+      {
+         object = peekStack(popStyle);
+
+         if ((object instanceof CharObject)
+             && ((CharObject)object).getCharCode() == '(')
+         {
+            nextNum = popNumExpr(parser);
+         }
+         else
+         {
+            nextNum = popNumerical(parser);
+         }
+
+         object = peekStack(popStyle);
+
+         if (object instanceof CharObject)
+         {
+            int nextCp = ((CharObject)object).getCharCode();
+
+            if (nextCp == '*' || nextCp == '/')
+            {
+               popStack(parser, popStyle);
+               Numerical factor = popNumericFactor(parser);
+
+               if (nextCp == '*')
+               {
+                  nextNum = new UserNumber(
+                    nextNum.number(parser)
+                  * factor.number(parser));
+               }
+               else
+               {
+                  nextNum = new UserNumber(
+                    nextNum.number(parser)
+                  / factor.number(parser));
+               }
+            }
+         }
+
+         if (cp == '+')
+         {
+            result.advance(parser, nextNum);
+         }
+         else
+         {
+            result.setValue(
+              result.number(parser)
+            - nextNum.number(parser));
+         }
+      }
+      else if (cp == '*')
+      {
+         Numerical factor = popNumericFactor(parser);
+
+         result.multiply(factor.number(parser));
+      }
+      else if (cp == '/')
+      {
+         Numerical factor = popNumericFactor(parser);
+
+         result.divide(factor.number(parser));
+      }
+      else
+      {
+         throw new TeXSyntaxException(parser,
+            TeXSyntaxException.ERROR_NUMBER_EXPECTED,
+             object == null ? "" : object.toString(parser));
+      }
+
+      return result;
+   }
+
+   protected Numerical popNumericFactor(TeXParser parser)
+    throws IOException
+   {
+      byte popStyle = (byte)(POP_SHORT | POP_IGNORE_LEADING_SPACE);
+
+      TeXObject object = popArg(parser, popStyle, '(', ')', true);
+      Numerical num = null;
+
+      if (object != null)
+      {
+         if (parser.isStack(object))
+         {
+            object = ((TeXObjectList)object).popNumExpr(parser);
+         }
+
+         if (object instanceof Numerical)
+         {
+            num = (Numerical)object;
+         }
+         else
+         {
+            throw new TeXSyntaxException(parser,
+               TeXSyntaxException.ERROR_NUMBER_EXPECTED, object.toString(parser));
+         }
+      }
+
+      if (num == null)
+      {
+         num = popNumerical(parser);
+      }
+
+      object = peekStack(popStyle);
+
+      if (object == null || !(object instanceof CharObject))
+      {
+         if (num == null)
+         {
+            throw new TeXSyntaxException(parser,
+               TeXSyntaxException.ERROR_NUMBER_EXPECTED,
+                object == null ? "" : object.toString(parser));
+         }
+         else
+         {
+            return num;
+         }
+      }
+
+      int cp = ((CharObject)object).getCharCode();
+
+      if (cp == '*' || cp == '/')
+      {
+         popStack(parser, popStyle);
+
+         UserNumber result = new UserNumber(num.number(parser));
+         Numerical factor = popNumericFactor(parser);
+
+         if (cp == '*')
+         {
+            result.multiply(factor.number(parser));
+         }
+         else
+         {
+            result.divide(factor.number(parser));
+         }
+
+         return result;
+      }
+      else
+      {
+         return num;
+      }
+   }
+
    public TeXDimension popDimExpr(TeXParser parser)
     throws IOException
    {
