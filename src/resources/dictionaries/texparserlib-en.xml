@@ -45,6 +45,7 @@ Nicola Talbot
 <entry key="tex.error.missing_closing">Missing closing {0}</entry>
 <entry key="tex.error.missing_closing.from_open">Missing closing {0} (from opening {1} on line {2})</entry>
 <entry key="tex.error.dimen_expected">Dimension expected</entry>
+<entry key="tex.error.dimen_expected_found">Dimension expected but found ''{0}''</entry>
 <entry key="tex.error.missing_unit">Missing unit</entry>
 <entry key="tex.error.expected">Expected {0}</entry>
 <entry key="tex.error.expected_but_found">Expected {0} but found ''{1}''</entry>

@@ -163,6 +163,7 @@ public class TeXSyntaxException extends IOException
    public static final String ERROR_MISSING_CLOSING_FROM_OPEN = 
       "tex.error.missing_closing.from_open";
    public static final String ERROR_DIMEN_EXPECTED = "tex.error.dimen_expected";
+   public static final String ERROR_DIMEN_EXPECTED_FOUND = "tex.error.dimen_expected_found";
    public static final String ERROR_MISSING_UNIT = "tex.error.missing_unit";
    public static final String ERROR_EXPECTED = "tex.error.expected";
    public static final String ERROR_EXPECTED_BUT_FOUND = "tex.error.expected_but_found";
