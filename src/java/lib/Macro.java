@@ -263,6 +263,13 @@ public abstract class Macro extends AbstractTeXObject
       return TeXParserUtils.popNumericalArg(parser, stack);
    }
 
+   protected Numerical popNumericalArg(TeXParser parser, TeXObjectList stack,
+      boolean calculate)
+     throws IOException
+   {
+      return TeXParserUtils.popNumericalArg(parser, stack, calculate);
+   }
+
    protected NumericRegister popNumericRegister(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
@@ -275,10 +282,24 @@ public abstract class Macro extends AbstractTeXObject
       return TeXParserUtils.popDimensionArg(parser, stack);
    }
 
+   protected TeXDimension popDimensionArg(TeXParser parser, TeXObjectList stack,
+       boolean calculate)
+     throws IOException
+   {
+      return TeXParserUtils.popDimensionArg(parser, stack, calculate);
+   }
+
    protected TeXDimension popOptDimensionArg(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
       return TeXParserUtils.popOptDimensionArg(parser, stack);
+   }
+
+   protected TeXDimension popOptDimensionArg(TeXParser parser, TeXObjectList stack,
+      boolean calculate)
+     throws IOException
+   {
+      return TeXParserUtils.popOptDimensionArg(parser, stack, calculate);
    }
 
    protected ControlSequence popControlSequence(TeXParser parser, TeXObjectList stack)
