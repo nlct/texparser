@@ -1316,6 +1316,9 @@ public class GlossariesSty extends LaTeXSty
 
       registerControlSequence(new AtGobble("BibGlsOptions"));
       registerControlSequence(new AtFirstOfTwo("IfNotBibGls"));
+
+      registerControlSequence(new GenericCommand(true, "glsxtrbookindexcols",
+        null, TeXParserUtils.createStack(getListener(), new UserNumber(2))));
    }
 
    protected void addPrefixDefinitions()
