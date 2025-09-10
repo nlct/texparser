@@ -234,15 +234,16 @@ public class ColorSty extends LaTeXSty
 
          try
          {
-            float components[] = 
-             {
-               Float.parseFloat(split[0]),
-               Float.parseFloat(split[1]),
-               Float.parseFloat(split[2]),
-               Float.parseFloat(split[3])
-             };
+            float cyan = Float.parseFloat(split[0]);
+            float magenta = Float.parseFloat(split[1]);
+            float yellow = Float.parseFloat(split[2]);
+            float key = Float.parseFloat(split[3]);
 
-            return new Color(ColorSpace.getInstance(ColorSpace.TYPE_CMYK), components, 1.0f);
+            float red = 1.0f - Math.min(1.0f, cyan*(1-key)+key);
+            float green = 1.0f - Math.min(1.0f, magenta*(1-key)+key);
+            float blue = 1.0f - Math.min(1.0f, yellow*(1-key)+key);
+
+            return new Color(red, green, blue);
          }
          catch (NumberFormatException e)
          {
