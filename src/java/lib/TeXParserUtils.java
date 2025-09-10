@@ -472,7 +472,19 @@ public class TeXParserUtils
    public static TeXDimension popDimensionArg(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
+      return popDimensionArg(parser, stack, false);
+   }
+
+   public static TeXDimension popDimensionArg(TeXParser parser, TeXObjectList stack,
+      boolean calc)
+     throws IOException
+   {
       TeXObject obj = popArgExpandFully(parser, stack);
+
+      if (parser.isStack(obj) && ((TeXObjectList)obj).size() == 1)
+      {
+         obj = ((TeXObjectList)obj).firstElement();
+      }
 
       if (obj instanceof InternalQuantity)
       {
@@ -488,7 +500,14 @@ public class TeXParserUtils
       {
          TeXObjectList list = (TeXObjectList)obj;
 
-         return list.popDimension(parser);
+         if (calc)
+         {
+            return list.popDimExpr(parser);
+         }
+         else
+         {
+            return list.popDimension(parser);
+         }
       }
 
       throw new TeXSyntaxException(parser, 
