@@ -45,14 +45,17 @@ public class SetLength extends ControlSequence
    {
       TeXObject obj = popArg(parser, stack);
 
-      if (parser.isStack(obj))
-      {
-         stack.push(obj, true);
+      obj = TeXParserUtils.trim(obj);
 
-         obj = popArg(parser, stack);
+      if (parser.isStack(obj) && ((TeXObjectList)obj).size() == 1)
+      {
+         obj = ((TeXObjectList)obj).firstElement();
       }
 
-      obj = TeXParserUtils.resolve(obj, parser);
+      if (obj instanceof TeXCsRef)
+      {
+         obj = TeXParserUtils.resolve(obj, parser);
+      }
 
       TeXDimension value = popDimensionArg(parser, stack);
 
