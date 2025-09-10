@@ -321,6 +321,7 @@ public class FlowFrameData
          case STATIC:
          case DYNAMIC:
            this.hidden = hidden;
+         break;
          default:
            throw new IllegalArgumentException(
             "hide not permitted for frame type "+type);
@@ -340,6 +341,7 @@ public class FlowFrameData
          case STATIC:
          case DYNAMIC:
            this.clear = on;
+         break;
          default:
            throw new IllegalArgumentException(
             "clear not permitted for frame type "+type);
