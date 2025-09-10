@@ -47,6 +47,24 @@ public class DimenRegister extends NumericRegister implements TeXDimension
       this.dimension = dimension;
    }
 
+   public void setValue(TeXParser parser, float value, TeXUnit unit)
+   throws TeXSyntaxException
+   {
+      TeXDimension fixed = dimension.getFixed();
+
+      if (fixed instanceof UserDimension)
+      {
+         ((UserDimension)fixed).setValue(value, unit);
+      }
+      else
+      {
+         dimension.setFixed(parser, new UserDimension(value, unit));
+      }
+
+      dimension.setShrink(parser, null);
+      dimension.setStretch(parser, null);
+   }
+
    public void setValue(TeXParser parser, Numerical numerical)
     throws TeXSyntaxException
    {
