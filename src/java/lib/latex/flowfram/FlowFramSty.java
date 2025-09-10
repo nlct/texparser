@@ -160,6 +160,9 @@ public class FlowFramSty extends LaTeXSty implements BeginDocumentListener
       registerControlSequence(new SetFrameContents("setdynamiccontents",
         FlowFrameType.DYNAMIC, this));
 
+      registerControlSequence(new SetFrameContents("appenddynamiccontents",
+        FlowFrameType.DYNAMIC, true, this));
+
       registerControlSequence(new SetFrameContentsEnv("staticcontents",
         FlowFrameType.STATIC, this));
       registerControlSequence(new SetFrameContentsEnv("staticcontents*",
@@ -195,19 +198,57 @@ public class FlowFramSty extends LaTeXSty implements BeginDocumentListener
       registerControlSequence(new TwoToneTop(this));
       registerControlSequence(new TwoToneTop("htwotoneright", false, this));
 
+      registerControlSequence(new MakeDFHeaderFooter(this));
+
       // ignore:
       registerControlSequence(new Relax("flowframeshowlayout"));
       registerControlSequence(new Relax("framebreak"));
-      registerControlSequence(new Relax("makedfheaderfooter"));
+      registerControlSequence(new Relax("enablethumbtabs"));
+      registerControlSequence(new Relax("disablethumbtabs"));
 
       registerControlSequence(new GenericCommand(true, "ffprechapterhook"));
       registerControlSequence(new GenericCommand(true, "ffruledeclarations"));
-      registerControlSequence(new AtGobble("continueonframe", 2));
+      registerControlSequence(new GobbleOpt("continueonframe", 1, 1));
       registerControlSequence(new AtGobble("ffcontinuedtextlayout"));
       registerControlSequence(new AtGobble("ffcontinuedtextfont"));
-      registerControlSequence(new AtGobble("dfchaphead"));
+      registerControlSequence(new GobbleOpt("dfchaphead", 0, 1, '*'));
       registerControlSequence(new AtGobble("DFchapterstyle"));
       registerControlSequence(new AtGobble("DFschapterstyle"));
+      registerControlSequence(new GobbleOpt("enableminitoc", 1, 0));
+      registerControlSequence(new AtGobble("setthumbtab", 2));
+      registerControlSequence(new GobbleOpt("ffswapoddeven", 0, 1, '*'));
+      registerControlSequence(new GobbleOpt("sfswapoddeven", 0, 1, '*'));
+      registerControlSequence(new GobbleOpt("dfswapoddeven", 0, 1, '*'));
+
+      registerControlSequence(new GobbleOpt("flowswitchoffnext", 0, 1, '*'));
+      registerControlSequence(new GobbleOpt("flowswitchoffnextodd", 0, 1, '*'));
+      registerControlSequence(new GobbleOpt("flowswitchoffnextonly", 0, 1, '*'));
+      registerControlSequence(new GobbleOpt("flowswitchoffnextoddonly", 0, 1, '*'));
+
+      registerControlSequence(new GobbleOpt("flowswitchonnext", 0, 1, '*'));
+      registerControlSequence(new GobbleOpt("flowswitchonnextodd", 0, 1, '*'));
+      registerControlSequence(new GobbleOpt("flowswitchonnextonly", 0, 1, '*'));
+      registerControlSequence(new GobbleOpt("flowswitchonnextoddonly", 0, 1, '*'));
+
+      registerControlSequence(new GobbleOpt("dynamicswitchonnext", 0, 1, '*'));
+      registerControlSequence(new GobbleOpt("dynamicswitchonnextodd", 0, 1, '*'));
+      registerControlSequence(new GobbleOpt("dynamicswitchonnextonly", 0, 1, '*'));
+      registerControlSequence(new GobbleOpt("dynamicswitchonnextoddonly", 0, 1, '*'));
+
+      registerControlSequence(new GobbleOpt("dynamicswitchoffnext", 0, 1, '*'));
+      registerControlSequence(new GobbleOpt("dynamicswitchoffnextodd", 0, 1, '*'));
+      registerControlSequence(new GobbleOpt("dynamicswitchoffnextonly", 0, 1, '*'));
+      registerControlSequence(new GobbleOpt("dynamicswitchoffnextoddonly", 0, 1, '*'));
+
+      registerControlSequence(new GobbleOpt("staticswitchonnext", 0, 1, '*'));
+      registerControlSequence(new GobbleOpt("staticswitchonnextodd", 0, 1, '*'));
+      registerControlSequence(new GobbleOpt("staticswitchonnextonly", 0, 1, '*'));
+      registerControlSequence(new GobbleOpt("staticswitchonnextoddonly", 0, 1, '*'));
+
+      registerControlSequence(new GobbleOpt("staticswitchoffnext", 0, 1, '*'));
+      registerControlSequence(new GobbleOpt("staticswitchoffnextodd", 0, 1, '*'));
+      registerControlSequence(new GobbleOpt("staticswitchoffnextonly", 0, 1, '*'));
+      registerControlSequence(new GobbleOpt("staticswitchoffnextoddonly", 0, 1, '*'));
    }
 
    @Override
