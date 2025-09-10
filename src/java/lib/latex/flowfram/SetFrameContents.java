@@ -69,6 +69,8 @@ public class SetFrameContents extends ControlSequence
       boolean isStar = (popModifier(parser, stack, '*') == '*');
       FlowFrameData data;
 
+      KeyValList options = TeXParserUtils.popOptKeyValList(parser, stack);
+
       if (isStar)
       {
          String label = popLabelString(parser, stack);
@@ -80,7 +82,6 @@ public class SetFrameContents extends ControlSequence
          data = sty.getFrame(type, id);
       }
 
-      KeyValList options = TeXParserUtils.popOptKeyValList(parser, stack);
       KeyValList htmlOptions = null;
 
       if (options != null)

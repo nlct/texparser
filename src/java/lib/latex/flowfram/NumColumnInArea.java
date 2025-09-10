@@ -58,7 +58,14 @@ public class NumColumnInArea extends ControlSequence
       FlowFrameData[] frames = new FlowFrameData[n];
       TeXDimension width=null, height=null, posX=null, posY=null;
 
-      if (!hasAreaArgs)
+      if (hasAreaArgs)
+      {
+         width = popDimensionArg(parser, stack, true);
+         height = popDimensionArg(parser, stack, true);
+         posX = popDimensionArg(parser, stack, true);
+         posY = popDimensionArg(parser, stack, true);
+      }
+      else
       {
          width = parser.getDimenRegister("typeblockwidth");
          height = parser.getDimenRegister("typeblockheight");
@@ -68,14 +75,6 @@ public class NumColumnInArea extends ControlSequence
 
       for (int i = 0; i < n; i++)
       {
-         if (hasAreaArgs)
-         {
-            width = popDimensionArg(parser, stack, true);
-            height = popDimensionArg(parser, stack, true);
-            posX = popDimensionArg(parser, stack, true);
-            posY = popDimensionArg(parser, stack, true);
-         }
-
          frames[i] = sty.newFlowFrame(null, false, width, height, posX, posY);
 
          if (pages != null)
