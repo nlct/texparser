@@ -1993,9 +1993,20 @@ public class TeXObjectList extends Vector<TeXObject>
    public Numerical popNumericalArg(TeXParser parser)
      throws IOException
    {
+      return popNumericalArg(parser, false);
+   }
+
+   public Numerical popNumericalArg(TeXParser parser, boolean calculate)
+     throws IOException
+   {
       TeXObject obj = popArg(parser, POP_SHORT);
 
       if (obj == null) return null;
+
+      if (parser.isStack(obj) && ((TeXObjectList)obj).size() == 1)
+      {
+         obj = ((TeXObjectList)obj).firstElement();
+      }
 
       if (obj instanceof Numerical)
       {
@@ -2014,7 +2025,14 @@ public class TeXObjectList extends Vector<TeXObject>
 
       if (obj instanceof TeXObjectList)
       {
-         return ((TeXObjectList)obj).popNumerical(parser);
+         if (calculate)
+         {
+            return ((TeXObjectList)obj).popNumExpr(parser);
+         }
+         else
+         {
+            return ((TeXObjectList)obj).popNumerical(parser);
+         }
       }
 
       return new UserNumber(parser, obj.toString(parser));
@@ -2023,9 +2041,21 @@ public class TeXObjectList extends Vector<TeXObject>
    public Numerical popNumericalArg(TeXParser parser, int openDelim, int closeDelim)
      throws IOException
    {
+      return popNumericalArg(parser, openDelim, closeDelim, false);
+   }
+
+   public Numerical popNumericalArg(TeXParser parser, int openDelim, int closeDelim,
+     boolean calculate)
+     throws IOException
+   {
       TeXObject obj = popArg(parser, POP_SHORT, openDelim, closeDelim);
 
       if (obj == null) return null;
+
+      if (parser.isStack(obj) && ((TeXObjectList)obj).size() == 1)
+      {
+         obj = ((TeXObjectList)obj).firstElement();
+      }
 
       if (obj instanceof Numerical)
       {
@@ -2044,7 +2074,14 @@ public class TeXObjectList extends Vector<TeXObject>
 
       if (obj instanceof TeXObjectList)
       {
-         return ((TeXObjectList)obj).popNumerical(parser);
+         if (calculate)
+         {
+            return ((TeXObjectList)obj).popNumExpr(parser);
+         }
+         else
+         {
+            return ((TeXObjectList)obj).popNumerical(parser);
+         }
       }
 
       return new UserNumber(parser, obj.toString(parser));

@@ -3201,9 +3201,20 @@ public class TeXParser extends TeXObjectList
    public Numerical popNumericalArg(int openDelim, int closeDelim)
      throws IOException
    {
+      return popNumericalArg(openDelim, closeDelim, false);
+   }
+
+   public Numerical popNumericalArg(int openDelim, int closeDelim, boolean calculate)
+     throws IOException
+   {
       TeXObject obj = popNextArg(POP_SHORT, openDelim, closeDelim);
 
       if (obj == null) return null;
+
+      if (isStack(obj) && ((TeXObjectList)obj).size() == 1)
+      {
+         obj = ((TeXObjectList)obj).firstElement();
+      }
 
       if (obj instanceof Numerical)
       {
@@ -3222,7 +3233,14 @@ public class TeXParser extends TeXObjectList
 
       if (obj instanceof TeXObjectList)
       {
-         return ((TeXObjectList)obj).popNumerical(this);
+         if (calculate)
+         {
+            return ((TeXObjectList)obj).popNumExpr(this);
+         }
+         else
+         {
+            return ((TeXObjectList)obj).popNumerical(this);
+         }
       }
 
       return new UserNumber(this, obj.toString(this));
@@ -3231,9 +3249,20 @@ public class TeXParser extends TeXObjectList
    public Numerical popNumericalArg()
      throws IOException
    {
+      return popNumericalArg(false);
+   }
+
+   public Numerical popNumericalArg(boolean calculate)
+     throws IOException
+   {
       TeXObject obj = popNextArg(POP_SHORT);
 
       if (obj == null) return null;
+
+      if (isStack(obj) && ((TeXObjectList)obj).size() == 1)
+      {
+         obj = ((TeXObjectList)obj).firstElement();
+      }
 
       if (obj instanceof Numerical)
       {
@@ -3252,7 +3281,14 @@ public class TeXParser extends TeXObjectList
 
       if (obj instanceof TeXObjectList)
       {
-         return ((TeXObjectList)obj).popNumerical(this);
+         if (calculate)
+         {
+            return ((TeXObjectList)obj).popNumExpr(this);
+         }
+         else
+         {
+            return ((TeXObjectList)obj).popNumerical(this);
+         }
       }
 
       return new UserNumber(this, obj.toString(this));

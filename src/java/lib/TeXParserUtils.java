@@ -404,13 +404,20 @@ public class TeXParserUtils
    public static Numerical popNumericalArg(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
+      return popNumericalArg(parser, stack, false);
+   }
+
+   public static Numerical popNumericalArg(TeXParser parser, TeXObjectList stack,
+      boolean calculate)
+     throws IOException
+   {
       if (parser == stack || stack == null)
       {
-         return parser.popNumericalArg();
+         return parser.popNumericalArg(calculate);
       }
       else
       {
-         return stack.popNumericalArg(parser);
+         return stack.popNumericalArg(parser, calculate);
       }
    }
 
@@ -424,13 +431,20 @@ public class TeXParserUtils
    public static Numerical popOptNumericalArg(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
+      return popOptNumericalArg(parser, stack, false);
+   }
+
+   public static Numerical popOptNumericalArg(TeXParser parser, TeXObjectList stack,
+      boolean calculate)
+     throws IOException
+   {
       if (parser == stack || stack == null)
       {
-         return parser.popNumericalArg('[', ']');
+         return parser.popNumericalArg('[', ']', calculate);
       }
       else
       {
-         return stack.popNumericalArg(parser, '[', ']');
+         return stack.popNumericalArg(parser, '[', ']', calculate);
       }
    }
 
