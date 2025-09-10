@@ -566,6 +566,7 @@ public class FlowFrameData
     KeyValList opts)
      throws IOException
    {
+      boolean useDiv = true;
       boolean l2hImg = false;
       String imgType = "image/png";
       TeXObject alt = null;
@@ -595,16 +596,23 @@ public class FlowFrameData
          l2hImg = bool.booleanValue();
       }
 
+      bool = opts.getBoolean("div", parser, stack);
+
+      if (bool != null)
+      {
+         useDiv = bool.booleanValue();
+      }
+
       cssStyle = opts.getString("style", parser, stack);
 
       cssClass = opts.getString("class", parser, stack);
 
-      process(parser, stack, l2hImg, alt, imgType, cssStyle, cssClass);
+      process(parser, stack, l2hImg, alt, imgType, useDiv, cssStyle, cssClass);
    }
 
    public void process(TeXParser parser, TeXObjectList stack,
        boolean l2hImg, TeXObject alt, String imgType,
-       String cssStyle, String cssClass)
+       boolean useDiv, String cssStyle, String cssClass)
      throws IOException
    {
       if (content != null)
@@ -621,22 +629,31 @@ public class FlowFrameData
             L2HConverter l2h = (L2HConverter)listener;
 
             list = listener.createStack();
-            StartElement startElem = new StartElement("div", true, true);
-            EndElement endElem = new EndElement("div", true, true);
+            StartElement startElem = null;
+            EndElement endElem = null;
 
-            if (cssStyle != null)
+            if (useDiv)
             {
-               startElem.putAttribute("style", cssStyle);
-            }
+               startElem = new StartElement("div", true, true);
+               endElem = new EndElement("div", true, true);
 
-            if (cssClass != null)
-            {
-               startElem.putAttribute("class", cssClass);
+               if (cssStyle != null)
+               {
+                  startElem.putAttribute("style", cssStyle);
+               }
+
+               if (cssClass != null)
+               {
+                  startElem.putAttribute("class", cssClass);
+               }
             }
 
             if (l2hImg)
             {
-               TeXParserUtils.process(startElem, parser, stack);
+               if (startElem != null)
+               {
+                  TeXParserUtils.process(startElem, parser, stack);
+               }
 
                StringBuilder builder = new StringBuilder();
 
@@ -687,17 +704,30 @@ public class FlowFrameData
                      String.format("<!-- End of Image %s Alt Block -->", name));
                }
 
-               TeXParserUtils.process(endElem, parser, stack);
+               if (endElem != null)
+               {
+                  TeXParserUtils.process(endElem, parser, stack);
+               }
             }
             else
             {
-               list.add(startElem);
+               if (startElem != null)
+               {
+                  list.add(startElem);
 
-               startElem.putAttribute("class", type+label+" "+type+id);
+                  if (cssClass == null)
+                  {
+                     startElem.putAttribute("class", type+label+" "+type+id);
+                  }
+               }
 
                list.add((TeXObject)content.clone(), true);
 
-               list.add(endElem);
+               if (endElem != null)
+               {
+                  list.add(endElem);
+               }
+
                TeXParserUtils.process(list, parser, stack);
             }
 
