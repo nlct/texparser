@@ -39,70 +39,60 @@ public class GeometrySty extends LaTeXSty
    {
       TeXParser parser = getParser();
 
-      if (parser.getDimenRegister("paperwidth") == null)
-      {
-         registerNewLength("paperwidth", 614.295f, TeXUnit.PT);
-      }
-
-      if (parser.getDimenRegister("paperheight") == null)
-      {
-         registerNewLength("paperheight", 794.96999f, TeXUnit.PT);
-      }
-
-      if (parser.getDimenRegister("textwidth") == null)
-      {
-         registerNewLength("textwidth", 430.00462f, TeXUnit.PT);
-      }
-
-      if (parser.getDimenRegister("textheight") == null)
-      {
-         registerNewLength("textheight", 556.47656f, TeXUnit.PT);
-      }
-
-      if (parser.getDimenRegister("marginparwidth") == null)
-      {
-         registerNewLength("marginparwidth", 65, TeXUnit.PT);
-      }
-
-      if (parser.getDimenRegister("marginparsep") == null)
-      {
-         registerNewLength("marginparsep", 11, TeXUnit.PT);
-      }
-
-      if (parser.getDimenRegister("oddsidemargin") == null)
-      {
-         registerNewLength("oddsidemargin", 19.8752f, TeXUnit.PT);
-      }
-
-      if (parser.getDimenRegister("evensidemargin") == null)
-      {
-         registerNewLength("evensidemargin", 19.8752f, TeXUnit.PT);
-      }
-
-      if (parser.getDimenRegister("topmargin") == null)
-      {
-         registerNewLength("topmargin", -13.87262f, TeXUnit.PT);
-      }
-
-      if (parser.getDimenRegister("headheight") == null)
-      {
-         registerNewLength("headheight", 12, TeXUnit.PT);
-      }
-
-      if (parser.getDimenRegister("headsep") == null)
-      {
-         registerNewLength("headsep", 25, TeXUnit.PT);
-      }
-
-      if (parser.getDimenRegister("footskip") == null)
-      {
-         registerNewLength("footskip", 30, TeXUnit.PT);
-      }
+      defOrSetDimenReg(PercentUnit.PAPER_WIDTH, "paperwidth", 614.295f, TeXUnit.PT);
+      defOrSetDimenReg(PercentUnit.PAPER_HEIGHT, "paperheight", 794.96999f, TeXUnit.PT);
+      defOrSetDimenReg(PercentUnit.TEXT_WIDTH, "textwidth", 430.00462f, TeXUnit.PT);
+      defOrSetDimenReg(PercentUnit.TEXT_HEIGHT, "textheight", 556.47656f, TeXUnit.PT);
+      defOrSetDimenReg(PercentUnit.MARGIN_WIDTH, "marginparwidth", 65, TeXUnit.PT);
+      defOrSetDimenReg("marginparsep", 11, TeXUnit.PT);
+      defOrSetDimenReg("oddsidemargin", 19.8752f, TeXUnit.PT);
+      defOrSetDimenReg("evensidemargin", 19.8752f, TeXUnit.PT);
+      defOrSetDimenReg("topmargin", -13.87262f, TeXUnit.PT);
+      defOrSetDimenReg("headheight", 12, TeXUnit.PT);
+      defOrSetDimenReg("headsep", 25, TeXUnit.PT);
+      defOrSetDimenReg("footskip", 30, TeXUnit.PT);
 
       registerControlSequence(new Geometry(this));
 
       // TODO \newgeometry \restoregeometry
       // \savegeometry \loadgeometry
+   }
+
+   protected void defOrSetDimenReg(String csname, float value, TeXUnit unit)
+   {
+      TeXParser parser = getParser();
+
+      DimenRegister reg = parser.getDimenRegister(csname);
+
+      if (reg == null)
+      {
+         registerNewLength(csname, value, unit);
+      }
+      else
+      {
+         try
+         {
+            reg.setValue(getParser(), value, unit);
+         }
+         catch (TeXSyntaxException e)
+         {
+            getParser().warning(e);
+         }
+      }
+   }
+
+   protected void defOrSetDimenReg(int type, String csname, float value, TeXUnit unit)
+   {
+      defOrSetDimenReg(csname, value, unit);
+
+      try
+      {
+         listener.setPageDimension(type, unit.toUnit(getParser(), value, FixedUnit.BP));
+      }
+      catch (TeXSyntaxException e)
+      {
+         getParser().warning(e);
+      }
    }
 
    @Override
@@ -1049,6 +1039,8 @@ public class GeometrySty extends LaTeXSty
    throws IOException
    {
       setDimension(name, new UserDimension(value, unit));
+
+      updatePageDimension(name, unit.toUnit(getParser(), (float)value, FixedUnit.BP));
    }
 
    public void setDimension(String name, TeXDimension newDim)
@@ -1062,6 +1054,50 @@ public class GeometrySty extends LaTeXSty
       }
 
       dim.setDimension(getParser(), newDim);
+
+      TeXUnit unit = newDim.getUnit();
+      float value = newDim.getValue();
+      updatePageDimension(name, unit.toUnit(getParser(), value, FixedUnit.BP));
+   }
+
+   protected void updatePageDimension(String name, float bpValue)
+   {
+      if (name.equals("paperwidth"))
+      {
+         listener.setPageDimension(PercentUnit.PAPER_WIDTH, bpValue);
+      }
+      else if (name.equals("paperheight"))
+      {
+         listener.setPageDimension(PercentUnit.PAPER_HEIGHT, bpValue);
+      }
+      else if (name.equals("hsize"))
+      {
+         listener.setPageDimension(PercentUnit.HSIZE, bpValue);
+      }
+      else if (name.equals("vsize"))
+      {
+         listener.setPageDimension(PercentUnit.VSIZE, bpValue);
+      }
+      else if (name.equals("textwidth"))
+      {
+         listener.setPageDimension(PercentUnit.TEXT_WIDTH, bpValue);
+      }
+      else if (name.equals("textheight"))
+      {
+         listener.setPageDimension(PercentUnit.TEXT_HEIGHT, bpValue);
+      }
+      else if (name.equals("marginparwidth"))
+      {
+         listener.setPageDimension(PercentUnit.MARGIN_WIDTH, bpValue);
+      }
+      else if (name.equals("columnwidth"))
+      {
+         listener.setPageDimension(PercentUnit.COLUMN_WIDTH, bpValue);
+      }
+      else if (name.equals("columnheight"))
+      {
+         listener.setPageDimension(PercentUnit.COLUMN_HEIGHT, bpValue);
+      }
    }
 
    public TeXDimension getDimension(String name)
