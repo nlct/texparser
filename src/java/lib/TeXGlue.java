@@ -351,7 +351,11 @@ public class TeXGlue extends AbstractTeXObject implements TeXDimension, Expandab
    public void setShrink(TeXParser parser, TeXDimension shrink)
     throws TeXSyntaxException
    {
-      if (shrink instanceof DimenRegister)
+      if (shrink == null)
+      {
+         this.shrink = null;
+      }
+      else if (shrink instanceof DimenRegister)
       {
          setShrink(parser, ((DimenRegister)shrink).getDimension());
       }
@@ -365,10 +369,7 @@ public class TeXGlue extends AbstractTeXObject implements TeXDimension, Expandab
       {
          if (this.shrink == null)
          {
-            if (shrink != null)
-            {
-               this.shrink = (TeXDimension)shrink.clone();
-            }
+            this.shrink = (TeXDimension)shrink.clone();
          }
          else
          {
@@ -380,7 +381,11 @@ public class TeXGlue extends AbstractTeXObject implements TeXDimension, Expandab
    public void setStretch(TeXParser parser, TeXDimension stretch)
     throws TeXSyntaxException
    {
-      if (stretch instanceof DimenRegister)
+      if (stretch == null)
+      {
+         this.stretch = null;
+      }
+      else if (stretch instanceof DimenRegister)
       {
          setStretch(parser, ((DimenRegister)stretch).getDimension());
       }
@@ -394,10 +399,7 @@ public class TeXGlue extends AbstractTeXObject implements TeXDimension, Expandab
       {
          if (this.stretch == null)
          {
-            if (stretch != null)
-            {
-               this.stretch = (TeXDimension)stretch.clone();
-            }
+            this.stretch = (TeXDimension)stretch.clone();
          }
          else
          {
