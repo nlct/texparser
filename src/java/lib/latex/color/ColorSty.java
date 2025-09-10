@@ -226,7 +226,7 @@ public class ColorSty extends LaTeXSty
       {
          String[] split = specs.split(",", 4);
 
-         if (split.length != 3)
+         if (split.length != 4)
          {
             throw new LaTeXSyntaxException(parser, 
               ColorSty.INVALID_SPECS, specs, model);
@@ -239,7 +239,7 @@ public class ColorSty extends LaTeXSty
                Float.parseFloat(split[0]),
                Float.parseFloat(split[1]),
                Float.parseFloat(split[2]),
-               Float.parseFloat(split[2])
+               Float.parseFloat(split[3])
              };
 
             return new Color(ColorSpace.getInstance(ColorSpace.TYPE_CMYK), components, 1.0f);
