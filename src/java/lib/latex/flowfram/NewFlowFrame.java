@@ -54,10 +54,10 @@ public class NewFlowFrame extends ControlSequence
       boolean bordered = (popModifier(parser, stack, '*') == '*');
       String pages = popOptLabelString(parser, stack);
 
-      TeXDimension width = popDimensionArg(parser, stack);
-      TeXDimension height = popDimensionArg(parser, stack);
-      TeXDimension posX = popDimensionArg(parser, stack);
-      TeXDimension posY = popDimensionArg(parser, stack);
+      TeXDimension width = popDimensionArg(parser, stack, true);
+      TeXDimension height = popDimensionArg(parser, stack, true);
+      TeXDimension posX = popDimensionArg(parser, stack, true);
+      TeXDimension posY = popDimensionArg(parser, stack, true);
 
       String label = popOptLabelString(parser, stack);
 

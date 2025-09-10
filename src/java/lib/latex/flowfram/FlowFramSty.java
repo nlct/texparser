@@ -132,6 +132,13 @@ public class FlowFramSty extends LaTeXSty implements BeginDocumentListener
       registerControlSequence(new NewFlowFrame("newdynamicframe",
         FlowFrameType.DYNAMIC, this));
 
+      registerControlSequence(new NumColumnInArea("onecolumn", 1, false, this));
+      registerControlSequence(new NumColumnInArea("onecolumninarea", 1, true, this));
+      registerControlSequence(new NumColumnInArea("twocolumn", 2, false, this));
+      registerControlSequence(new NumColumnInArea("twocolumninarea", 2, true, this));
+      registerControlSequence(new NumColumnInArea("Ncolumn", 0, false, this));
+      registerControlSequence(new NumColumnInArea("Ncolumninarea", 0, true, this));
+
       registerControlSequence(new GetFlowLabel(this));
 
       registerControlSequence(new GetFlowLabel("getstaticlabel",
@@ -180,6 +187,13 @@ public class FlowFramSty extends LaTeXSty implements BeginDocumentListener
       registerControlSequence(new ComputeBottomEdge());
       registerControlSequence(new ComputeRightEdgeOdd());
       registerControlSequence(new ComputeRightEdgeEven());
+
+      registerControlSequence(new TwoTone(this));
+      registerControlSequence(new TwoTone("htwotone", false, this));
+      registerControlSequence(new TwoToneBottom(this));
+      registerControlSequence(new TwoToneBottom("htwotoneleft", false, this));
+      registerControlSequence(new TwoToneTop(this));
+      registerControlSequence(new TwoToneTop("htwotoneright", false, this));
 
       // ignore:
       registerControlSequence(new Relax("flowframeshowlayout"));

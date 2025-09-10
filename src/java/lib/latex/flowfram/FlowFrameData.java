@@ -70,7 +70,7 @@ public class FlowFrameData
 
    public void setLabel(String newLabel)
    {
-      if (label == null)
+      if (newLabel == null)
       {
          throw new NullPointerException();
       }
