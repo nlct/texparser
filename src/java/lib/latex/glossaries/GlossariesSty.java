@@ -183,6 +183,7 @@ public class GlossariesSty extends LaTeXSty
          "description", CaseChange.SENTENCE, this));
 
       registerControlSequence(new GenericCommand(true, "@@glossaryseclabel"));
+      registerControlSequence(new SetGlossarySection());
 
       registerControlSequence(new PrintGlossary(this));
       registerControlSequence(new PrintGlossaries(this));
@@ -2254,8 +2255,17 @@ public class GlossariesSty extends LaTeXSty
 
       if (getParser().getControlSequence("chapter") != null)
       {
-         section = "chapter";
+         registerControlSequence(
+            new TextualContentCommand("@@glossarysec", "chapter"));
       }
+      else
+      {
+         registerControlSequence(
+            new TextualContentCommand("@@glossarysec", "section"));
+      }
+
+      registerControlSequence(
+       new TextualContentCommand("@@glossarysecstar", "*"));
    }
 
    @Override
@@ -2356,8 +2366,7 @@ public class GlossariesSty extends LaTeXSty
            null, def));
       }
 
-      getListener().putControlSequence(true, 
-        new GlossarySection(section, isNumberedSection));
+      registerControlSequence(new GlossarySection());
 
       if (loadList && listener.isStyLoaded("glossary-list"))
       {
@@ -2663,6 +2672,8 @@ public class GlossariesSty extends LaTeXSty
       }
       else if (option.equals("section"))
       {
+         String section;
+
          if (value == null || value.isEmpty())
          {
             section = "section";
@@ -2671,12 +2682,17 @@ public class GlossariesSty extends LaTeXSty
          {
             section = getParser().expandToString(value, null);
          }
+
+         getParser().putControlSequence(true,
+          new TextualContentCommand("@@glossarysec", section));
       }
       else if (option.equals("numberedsection"))
       {
          if (value == null || value.isEmpty())
          {
-            isNumberedSection = true;
+            getParser().putControlSequence(true,
+              new TextualContentCommand("@@glossarysecstar", ""));
+
             isAutoLabel = false;
          }
          else
@@ -2685,22 +2701,30 @@ public class GlossariesSty extends LaTeXSty
 
             if (valStr.equals("nolabel"))
             {
-               isNumberedSection = true;
+               getParser().putControlSequence(true,
+                 new TextualContentCommand("@@glossarysecstar", ""));
+
                isAutoLabel = false;
             }
             else if (valStr.equals("false"))
             {
-               isNumberedSection = false;
+               getParser().putControlSequence(true,
+                 new TextualContentCommand("@@glossarysecstar", "*"));
+
                isAutoLabel = false;
             }
             else if (valStr.equals("autolabel"))
             {
-               isNumberedSection = true;
+               getParser().putControlSequence(true,
+                 new TextualContentCommand("@@glossarysecstar", ""));
+
                isAutoLabel = true;
             }
             else
             {
-               isNumberedSection = false;
+               getParser().putControlSequence(true,
+                 new TextualContentCommand("@@glossarysecstar", "*"));
+
                isAutoLabel = true;
             }
          }
@@ -4148,10 +4172,6 @@ public class GlossariesSty extends LaTeXSty
    private HashMap<String,Vector<String>> innerFmtExclusions;
 
    private Vector<String> nohyperlist;
-
-   private String section = "section";
-
-   private boolean isNumberedSection = false;
 
    private boolean isAutoLabel = false;
 

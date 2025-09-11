@@ -25,57 +25,62 @@ import com.dickimawbooks.texparserlib.latex.*;
 
 public class GlossarySection extends ControlSequence
 {
-   public GlossarySection(String section, 
-       boolean isNumbered)
+   public GlossarySection()
    {
-      this("glossarysection", section, isNumbered);
+      this("glossarysection");
    }
 
-   public GlossarySection(String name, String section, 
-       boolean isNumbered)
+   public GlossarySection(String name)
    {
       super(name);
-      this.section = section;
-      this.isNumbered = isNumbered;
    }
 
    public Object clone()
    {
-      return new GlossarySection(getName(), section, isNumbered);
+      return new GlossarySection(getName());
    }
 
    public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      TeXObject tocTitle = popOptArg(parser, stack);
-      TeXObject title = popArg(parser, stack);
+      String section = TeXParserUtils.getControlSequenceValue("@@glossarysec",
+        "section", parser, stack); 
 
-      TeXParserListener listener = parser.getListener();
+      boolean isNumbered = TeXParserUtils.getControlSequenceValue(
+       "@@glossarysecstar", "*", parser, stack).isEmpty();
 
-      TeXObjectList substack = listener.createStack();
-
-      substack.add(listener.getControlSequence(section));
-
-      if (!isNumbered)
+      if (!section.equals("none"))
       {
-         substack.add(listener.getOther('*'));
+         TeXObject tocTitle = popOptArg(parser, stack);
+         TeXObject title = popArg(parser, stack);
+
+         TeXParserListener listener = parser.getListener();
+
+         TeXObjectList substack = listener.createStack();
+
+         substack.add(listener.getControlSequence(section));
+
+         if (!isNumbered)
+         {
+            substack.add(listener.getOther('*'));
+         }
+         else if (tocTitle != null)
+         {
+            substack.add(listener.getOther('['));
+            substack.add(tocTitle);
+            substack.add(listener.getOther(']'));
+         }
+
+         Group grp = listener.createGroup();
+         grp.add(title);
+         substack.add(grp);
+
+         ControlSequence labelCs = listener.getControlSequence("@@glossaryseclabel");
+
+         substack.add(TeXParserUtils.expandOnce(labelCs, parser, stack), true);
+
+         TeXParserUtils.process(substack, parser, stack);
       }
-      else if (tocTitle != null)
-      {
-         substack.add(listener.getOther('['));
-         substack.add(tocTitle);
-         substack.add(listener.getOther(']'));
-      }
-
-      Group grp = listener.createGroup();
-      grp.add(title);
-      substack.add(grp);
-
-      ControlSequence labelCs = listener.getControlSequence("@@glossaryseclabel");
-
-      substack.add(TeXParserUtils.expandOnce(labelCs, parser, stack), true);
-
-      TeXParserUtils.process(substack, parser, stack);
    }
 
    public void process(TeXParser parser)
@@ -83,7 +88,4 @@ public class GlossarySection extends ControlSequence
    {
       process(parser, parser);
    }
-
-   private String section;
-   private boolean isNumbered;
 }
