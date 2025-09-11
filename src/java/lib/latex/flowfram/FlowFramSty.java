@@ -214,6 +214,7 @@ public class FlowFramSty extends LaTeXSty implements BeginDocumentListener
       registerControlSequence(new GobbleOpt("dfchaphead", 0, 1, '*'));
       registerControlSequence(new AtGobble("DFchapterstyle"));
       registerControlSequence(new AtGobble("DFschapterstyle"));
+      registerControlSequence(new GobbleOptMandOpt("makethumbtabs", 1, 1, 1));
       registerControlSequence(new GobbleOpt("enableminitoc", 1, 0));
       registerControlSequence(new AtGobble("setthumbtab", 2));
       registerControlSequence(new GobbleOpt("ffswapoddeven", 0, 1, '*'));
