@@ -1896,6 +1896,10 @@ public class UserGuideSty extends LaTeXSty
       registerControlSequence(new TextualContentCommand("bibglslocationgroupsep",
        "; "));
 
+      // not implemented but define to prevent errors if these
+      // commands are redefined
+      registerControlSequence(new AtFirstOfOne("summarymarginpar"));
+      registerControlSequence(new AtFirstOfOne("summaryloc"));
    }
 
    protected void addPrintCommands()
@@ -1908,6 +1912,10 @@ public class UserGuideSty extends LaTeXSty
       registerControlSequence(new PrintIcons(glossariesSty));
       registerControlSequence(new PrintMain(glossariesSty));
       registerControlSequence(new PrintSummary(glossariesSty));
+      registerControlSequence(new PrintSummary("printcmdenvsummary",
+         true, false, glossariesSty));
+      registerControlSequence(new PrintSummary("printclsstysummary",
+         false, true, glossariesSty));
       registerControlSequence(new PrintCommandOptions(glossariesSty));
       registerControlSequence(new PrintCommonOptions(glossariesSty));
       registerControlSequence(new PrintIndex(glossariesSty));

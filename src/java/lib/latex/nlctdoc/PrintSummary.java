@@ -35,13 +35,21 @@ public class PrintSummary extends AbstractGlsCommand
 
    public PrintSummary(String name, GlossariesSty sty)
    {
+      this(name, true, true, sty);
+   }
+
+   public PrintSummary(String name,
+    boolean doCmdsEnvs, boolean doClsSty, GlossariesSty sty)
+   {
       super(name, sty);
+      this.doCmdsEnvs = doCmdsEnvs;
+      this.doClsSty = doClsSty;
    }
 
    @Override
    public Object clone()
    {
-      return new PrintSummary(getName(), getSty());
+      return new PrintSummary(getName(), doCmdsEnvs, doClsSty, getSty());
    }
 
    @Override
@@ -219,8 +227,23 @@ public class PrintSummary extends AbstractGlsCommand
 
          TeXObjectList substack = listener.createStack();
 
-         ControlSequence sectionCs = parser.getControlSequence("chapter");
-         ControlSequence subsectionCs = parser.getControlSequence("section");
+         String sectionCsname = "chapter";
+
+         ControlSequence cs = parser.getControlSequence("@@glossarysec");
+
+         if (cs != null)
+         {
+            sectionCsname = parser.expandToString(cs, stack);
+         }
+
+         ControlSequence sectionCs = null;
+         ControlSequence subsectionCs = null;
+
+         if (sectionCsname.equals("chapter"))
+         {
+            sectionCs = parser.getControlSequence("chapter");
+            subsectionCs = parser.getControlSequence("section");
+         }
 
          if (sectionCs == null)
          {
@@ -387,66 +410,74 @@ public class PrintSummary extends AbstractGlsCommand
 
          }
 
-         if (!cmds.isEmpty())
+         if (doCmdsEnvs)
          {
-            processSummary(substack, cmds, "Command Summary", "cmdsummary", sectionCs, subsectionCs, showGroupHeaders,
-              parser, stack);
-         }
-
-         showGroupHeaders = false;
-
-         if (!envs.isEmpty())
-         {
-            processSummary(substack, envs, "Environment Summary", "envsummary", sectionCs, subsectionCs, showGroupHeaders, 
-              parser, stack);
-         }
-
-         if (!clsopts.isEmpty())
-         {
-            processSummary(substack, clsopts, "Class Option Summary",
-              "clsoptsummary", sectionCs, subsectionCs, showGroupHeaders, parser, stack);
-         }
-         else if (!clsList.isEmpty())
-         {
-            substack.add(sectionCs);
-            substack.add(listener.getOther('*'));
-            substack.add(listener.createGroup("Class Summary"));
-            substack.add(new TeXCsRef("label"));
-            substack.add(listener.createGroup("clsoptsummary"));
-         }
-
-         if (!clsList.isEmpty())
-         {
-            for (GlsLabel gl : clsList)
+            if (!cmds.isEmpty())
             {
-               processSummary(substack, pkgMap.get(gl.getLabel()),
-                 subsectionCs, showGroupHeaders, parser, stack);
+               processSummary(substack, cmds, "Command Summary", "cmdsummary",
+                 sectionCs, subsectionCs, showGroupHeaders,
+                 parser, stack);
+            }
+
+            showGroupHeaders = false;
+
+            if (!envs.isEmpty())
+            {
+               processSummary(substack, envs, "Environment Summary", "envsummary",
+                 sectionCs, subsectionCs, showGroupHeaders, 
+                 parser, stack);
             }
          }
 
-         if (!pkgopts.isEmpty())
+         if (doClsSty)
          {
-            processSummary(substack, pkgopts, "Package Option Summary",
-              "styoptsummary", sectionCs, subsectionCs, showGroupHeaders, parser, stack);
-         }
-         else if (!pkgList.isEmpty())
-         {
-            substack.add(sectionCs);
-            substack.add(listener.getOther('*'));
-            substack.add(listener.createGroup("Package Option Summary"));
-            substack.add(new TeXCsRef("label"));
-            substack.add(listener.createGroup("styoptsummary"));
+           if (!clsopts.isEmpty())
+           {
+              processSummary(substack, clsopts, "Class Option Summary",
+                "clsoptsummary", sectionCs, subsectionCs, showGroupHeaders, parser, stack);
+           }
+           else if (!clsList.isEmpty())
+           {
+              substack.add(sectionCs);
+              substack.add(listener.getOther('*'));
+              substack.add(listener.createGroup("Class Summary"));
+              substack.add(new TeXCsRef("label"));
+              substack.add(listener.createGroup("clsoptsummary"));
+           }
 
-            for (GlsLabel gl : pkgList)
-            {
-               Vector<GlsLabel> pl = pkgMap.get(gl.getLabel());
+           if (!clsList.isEmpty())
+           {
+              for (GlsLabel gl : clsList)
+              {
+                 processSummary(substack, pkgMap.get(gl.getLabel()),
+                   subsectionCs, showGroupHeaders, parser, stack);
+              }
+           }
 
-               if (pl.size() > 1)
-               {
-                  processSummary(substack, pl,
-                    subsectionCs, showGroupHeaders, parser, stack);
-               }
-            }
+           if (!pkgopts.isEmpty())
+           {
+              processSummary(substack, pkgopts, "Package Option Summary",
+                "styoptsummary", sectionCs, subsectionCs, showGroupHeaders, parser, stack);
+           }
+           else if (!pkgList.isEmpty())
+           {
+              substack.add(sectionCs);
+              substack.add(listener.getOther('*'));
+              substack.add(listener.createGroup("Package Option Summary"));
+              substack.add(new TeXCsRef("label"));
+              substack.add(listener.createGroup("styoptsummary"));
+
+              for (GlsLabel gl : pkgList)
+              {
+                 Vector<GlsLabel> pl = pkgMap.get(gl.getLabel());
+
+                 if (pl.size() > 1)
+                 {
+                    processSummary(substack, pl,
+                      subsectionCs, showGroupHeaders, parser, stack);
+                 }
+              }
+           }
          }
 
          // substack should be empty, but if not process anything
@@ -464,4 +495,7 @@ public class PrintSummary extends AbstractGlsCommand
    {
       process(parser, parser);
    }
+
+   boolean doCmdsEnvs = true;
+   boolean doClsSty = true;
 }
