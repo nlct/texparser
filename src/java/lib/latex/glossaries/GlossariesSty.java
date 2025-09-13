@@ -139,6 +139,7 @@ public class GlossariesSty extends LaTeXSty
 
       registerControlSequence(new ParCs("glspar"));
 
+      registerControlSequence(new SetupGlossaries(this));
       registerControlSequence(new AtNumberOfNumber("glstexorpdfstring", 1, 2));
 
       registerControlSequence(new TextualContentCommand("glssymbolsgroupname",
