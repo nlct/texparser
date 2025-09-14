@@ -200,6 +200,8 @@ public class FlowFramSty extends LaTeXSty implements BeginDocumentListener
 
       registerControlSequence(new MakeDFHeaderFooter(this));
 
+      registerControlSequence(new FlowFramSetup(this));
+
       // ignore:
       registerControlSequence(new Relax("flowframeshowlayout"));
       registerControlSequence(new Relax("framebreak"));
