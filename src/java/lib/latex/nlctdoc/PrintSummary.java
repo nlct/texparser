@@ -71,12 +71,36 @@ public class PrintSummary extends AbstractGlsCommand
      TeXParser parser, TeXObjectList stack)
    throws IOException
    {
+      processSummary(substack, (GlsLabel) null, glslabels, 
+        title, label, sectionCs, subsectionCs, showGroupHeaders,
+        parser, stack);
+   }
+
+   protected void processSummary(TeXObjectList substack,
+     GlsLabel headerLabel, Vector<GlsLabel> glslabels, 
+     TeXObject title, String label, ControlSequence sectionCs, 
+     ControlSequence subsectionCs, boolean showGroupHeaders,
+     TeXParser parser, TeXObjectList stack)
+   throws IOException
+   {
       processSummary(substack, glslabels, title, label, sectionCs,
         subsectionCs, showGroupHeaders, null,
         parser, stack);
    }
 
    protected void processSummary(TeXObjectList substack, Vector<GlsLabel> glslabels, 
+     TeXObject title, String label, ControlSequence sectionCs, 
+     ControlSequence subsectionCs, boolean showGroupHeaders,
+     TeXObject preamble, TeXParser parser, TeXObjectList stack)
+   throws IOException
+   {
+      processSummary(substack, (GlsLabel) null, glslabels, 
+        title, label, sectionCs, subsectionCs, showGroupHeaders,
+        preamble, parser, stack);
+   }
+
+   protected void processSummary(TeXObjectList substack,
+     GlsLabel headerLabel, Vector<GlsLabel> glslabels, 
      TeXObject title, String label, ControlSequence sectionCs, 
      ControlSequence subsectionCs, boolean showGroupHeaders,
      TeXObject preamble, TeXParser parser, TeXObjectList stack)
@@ -99,11 +123,23 @@ public class PrintSummary extends AbstractGlsCommand
          substack.add(preamble, true);
       }
 
-      processSummary(substack, glslabels, subsectionCs, showGroupHeaders,
+      processSummary(substack, headerLabel, glslabels, subsectionCs, showGroupHeaders,
         parser, stack);
    }
 
    protected void processSummary(TeXObjectList substack, Vector<GlsLabel> glslabels, 
+     String title, String label, ControlSequence sectionCs, 
+     ControlSequence subsectionCs, boolean showGroupHeaders,
+     TeXParser parser, TeXObjectList stack)
+   throws IOException
+   {
+      processSummary(substack, (GlsLabel) null, glslabels, 
+        title, label, sectionCs, subsectionCs, showGroupHeaders,
+        parser, stack);
+   }
+
+   protected void processSummary(TeXObjectList substack,
+     GlsLabel headerLabel, Vector<GlsLabel> glslabels, 
      String title, String label, ControlSequence sectionCs, 
      ControlSequence subsectionCs, boolean showGroupHeaders,
      TeXParser parser, TeXObjectList stack)
@@ -117,7 +153,8 @@ public class PrintSummary extends AbstractGlsCommand
       substack.add(new TeXCsRef("label"));
       substack.add(listener.createGroup(label));
 
-      processSummary(substack, glslabels, subsectionCs, showGroupHeaders, parser, stack);
+      processSummary(substack, headerLabel, glslabels,
+         subsectionCs, showGroupHeaders, parser, stack);
    }
 
    protected void processSummary(TeXObjectList substack, Vector<GlsLabel> glslabels, 
@@ -125,11 +162,32 @@ public class PrintSummary extends AbstractGlsCommand
      TeXParser parser, TeXObjectList stack)
    throws IOException
    {
-      processSummary(substack, glslabels, subsectionCs, showGroupHeaders, 0, 
+      processSummary(substack, (GlsLabel) null, glslabels, 
+        subsectionCs, showGroupHeaders, parser, stack);
+   }
+
+   protected void processSummary(TeXObjectList substack,
+     GlsLabel headerLabel, Vector<GlsLabel> glslabels, 
+     ControlSequence subsectionCs, boolean showGroupHeaders,
+     TeXParser parser, TeXObjectList stack)
+   throws IOException
+   {
+      processSummary(substack, headerLabel, glslabels, subsectionCs, showGroupHeaders, 0, 
         parser, stack);
    }
 
-   protected void processSummary(TeXObjectList substack, Vector<GlsLabel> glslabels, 
+   protected void processSummary(TeXObjectList substack,
+     Vector<GlsLabel> glslabels, 
+     ControlSequence subsectionCs, boolean showGroupHeaders, int maxGroupDepth,
+     TeXParser parser, TeXObjectList stack)
+   throws IOException
+   {
+     processSummary(substack, (GlsLabel)null, glslabels, 
+        subsectionCs, showGroupHeaders, maxGroupDepth, parser, stack);
+   }
+
+   protected void processSummary(TeXObjectList substack,
+     GlsLabel headerLabel, Vector<GlsLabel> glslabels, 
      ControlSequence subsectionCs, boolean showGroupHeaders, int maxGroupDepth,
      TeXParser parser, TeXObjectList stack)
    throws IOException
@@ -145,6 +203,41 @@ public class PrintSummary extends AbstractGlsCommand
       ControlSequence postDescCs = listener.getControlSequence("glspostdescription");
 
       ControlSequence labelCs = listener.getControlSequence("label");
+
+      if (headerLabel != null)
+      {
+         String category = headerLabel.getCategory();
+
+         parser.putControlSequence(true, headerLabel.duplicate("glscurrententrylabel"));
+
+         ControlSequence nameCs = parser.getControlSequence(
+           "summaryglossentry"+category);
+
+         if (nameCs == null)
+         {
+            nameCs = listener.getControlSequence("summaryglossentry");
+         }
+
+         substack.add(nameCs);
+         substack.add(headerLabel);
+
+         substack.add(listener.getPar());
+         substack.add(descCs);
+         substack.add(headerLabel);
+         substack.add(postDescCs);
+
+         TeXObject loc = headerLabel.getField("primarylocations");
+
+         if (loc != null)
+         {
+            substack.add(listener.getSpace());
+            substack.add(loc);
+         }
+
+         substack.add(listener.getPar());
+
+         TeXParserUtils.process(substack, parser, stack);
+      }
 
       for (GlsLabel glslabel : glslabels)
       {
@@ -262,6 +355,8 @@ public class PrintSummary extends AbstractGlsCommand
          Vector<GlsLabel> pkgopts = new Vector<GlsLabel>();
          Vector<GlsLabel> clsopts = new Vector<GlsLabel>();
 
+         GlsLabel pkgLabel = null;
+
          for (String label : glossary)
          {
             GlossaryEntry entry = sty.getEntry(label);
@@ -286,17 +381,15 @@ public class PrintSummary extends AbstractGlsCommand
             }
             else if (cat.equals("package"))
             {
+               pkgLabel = glslabel;
+
                if (!entry.isFieldEmpty("childlist"))
                {
-                  pkgopts.add(glslabel);
-               }
-/*
-               pkgList.add(glslabel);
+                  pkgList.add(glslabel);
 
-               Vector<GlsLabel> pl = new Vector<GlsLabel>();
-               pl.add(glslabel);
-               pkgMap.put(glslabel.getLabel(), pl);
-*/
+                  Vector<GlsLabel> pl = new Vector<GlsLabel>();
+                  pkgMap.put(glslabel.getLabel(), pl);
+               }
             }
             else if (cat.equals("class"))
             {
@@ -308,7 +401,6 @@ public class PrintSummary extends AbstractGlsCommand
             }
             else if (cat.equals("packageoption"))
             {
-/*
                if (entry.hasParent())
                {
                   GlossaryEntry parentEntry = entry.getParent(stack);
@@ -334,8 +426,6 @@ public class PrintSummary extends AbstractGlsCommand
                {
                   pkgopts.add(glslabel);
                }
-*/
-               pkgopts.add(glslabel);
             }
             else if (cat.equals("classoption"))
             {
@@ -454,12 +544,7 @@ public class PrintSummary extends AbstractGlsCommand
               }
            }
 
-           if (!pkgopts.isEmpty())
-           {
-              processSummary(substack, pkgopts, "Package Option Summary",
-                "styoptsummary", sectionCs, subsectionCs, showGroupHeaders, parser, stack);
-           }
-           else if (!pkgList.isEmpty())
+           if (!pkgList.isEmpty())
            {
               substack.add(sectionCs);
               substack.add(listener.getOther('*'));
@@ -471,12 +556,14 @@ public class PrintSummary extends AbstractGlsCommand
               {
                  Vector<GlsLabel> pl = pkgMap.get(gl.getLabel());
 
-                 if (pl.size() > 1)
-                 {
-                    processSummary(substack, pl,
-                      subsectionCs, showGroupHeaders, parser, stack);
-                 }
+                 processSummary(substack, gl, pl,
+                   subsectionCs, showGroupHeaders, parser, stack);
               }
+           }
+           else if (!pkgopts.isEmpty())
+           {
+              processSummary(substack, pkgopts, "Package Option Summary",
+                "styoptsummary", sectionCs, subsectionCs, showGroupHeaders, parser, stack);
            }
          }
 
