@@ -28,6 +28,7 @@ import java.awt.Color;
 
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.primitives.*;
+import com.dickimawbooks.texparserlib.generic.ParCs;
 import com.dickimawbooks.texparserlib.latex.*;
 import com.dickimawbooks.texparserlib.latex.color.ColorSty;
 import com.dickimawbooks.texparserlib.html.*;
@@ -207,6 +208,11 @@ public class FlowFramSty extends LaTeXSty implements BeginDocumentListener
       registerControlSequence(new Relax("framebreak"));
       registerControlSequence(new Relax("enablethumbtabs"));
       registerControlSequence(new Relax("disablethumbtabs"));
+
+      if (getListener() instanceof L2HConverter)
+      {
+         registerControlSequence(new ParCs("cleartoevenpage"));
+      }
 
       registerControlSequence(new GenericCommand(true, "ffprechapterhook"));
       registerControlSequence(new GenericCommand(true, "ffruledeclarations"));
