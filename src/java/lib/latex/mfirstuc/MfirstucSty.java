@@ -24,6 +24,7 @@ import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.primitives.NewIf;
 import com.dickimawbooks.texparserlib.primitives.Uppercase;
 import com.dickimawbooks.texparserlib.latex.*;
+import com.dickimawbooks.texparserlib.latex.textcase.MakeTextUppercase;
 
 public class MfirstucSty extends LaTeXSty
 {
@@ -42,6 +43,7 @@ public class MfirstucSty extends LaTeXSty
       NewIf.createConditional(true, getParser(), "ifMFUhyphen", false);
 
       registerControlSequence(new MFUsentencecase(this));
+      registerControlSequence(new MakeTextUppercase("mfirstucMakeUppercase"));
       registerControlSequence(new GlsMakeFirstUc());
       registerControlSequence(new GlsMakeFirstUc(
        "mfugrabfirstuc", GlsMakeFirstUc.GRABFIRST));
