@@ -94,6 +94,12 @@ public class HtmlTag extends AbstractTeXObject
     */ 
    public static String encodeAttributeValue(String value, boolean url)
    {
+      return encodeAttributeValue(value, url, false);
+   }
+
+   public static String encodeAttributeValue(String value, boolean url,
+     boolean useEntities)
+   {
       StringBuilder builder = new StringBuilder();
 
       for (int i = 0; i < value.length(); )
@@ -113,6 +119,10 @@ public class HtmlTag extends AbstractTeXObject
             }
 
             builder.append(String.format("%X", cp));
+         }
+         else if (useEntities && cp > 127)
+         {
+            builder.append(String.format("&#x%x;", cp));
          }
          else
          {

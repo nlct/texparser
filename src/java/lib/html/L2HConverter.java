@@ -1137,8 +1137,13 @@ public class L2HConverter extends LaTeXParserListener
    @Override
    public void writeliteralln(String string) throws IOException
    {
-      writeliteral(string);
-      writeln();
+      if (!(string.isEmpty() &&
+           (currentDocumentBlockType == DocumentBlockType.OUTSIDE
+         || currentDocumentBlockType == DocumentBlockType.HEAD)))
+      {
+         writeliteral(string);
+         writeln();
+      }
    }
 
    @Override
@@ -1163,6 +1168,11 @@ public class L2HConverter extends LaTeXParserListener
    public void setUseEntities(boolean useEntities)
    {
       this.useHtmlEntities = useEntities;
+   }
+
+   public boolean isUseEntitiesEnabled()
+   {
+      return useHtmlEntities;
    }
 
    public void separateCss(File file)
@@ -1577,7 +1587,7 @@ public class L2HConverter extends LaTeXParserListener
                   if (text != null)
                   {
                      elem.putAttribute(attr,
-                       HtmlTag.encodeAttributeValue(text, false));
+                       HtmlTag.encodeAttributeValue(text, false, useHtmlEntities));
                   }
 
                   return object;
@@ -1610,12 +1620,12 @@ public class L2HConverter extends LaTeXParserListener
          if (attr == null)
          {
             startElem.putAttribute("title",
-              HtmlTag.encodeAttributeValue(text, false));
+              HtmlTag.encodeAttributeValue(text, false, useHtmlEntities));
          }
          else
          {
             startElem.putAttribute(attr, 
-              HtmlTag.encodeAttributeValue(text, false));
+              HtmlTag.encodeAttributeValue(text, false, useHtmlEntities));
          }
       }
 
@@ -2198,9 +2208,13 @@ public class L2HConverter extends LaTeXParserListener
 
       writeliteralln("<head>");
 
+      String charsetName = htmlCharSet.name();
+
+      writeMeta(String.format("charset=\"%s\"", charsetName));
+
       writeMeta(String.format(
        "http-equiv=\"Content-Type\" content=\"text/html; charset=%s\"", 
-       htmlCharSet.name()));
+       charsetName));
 
       ControlSequence cs = parser.getControlSequence("TeXParserLibGeneratorName");
 
@@ -2212,7 +2226,7 @@ public class L2HConverter extends LaTeXParserListener
       if (!generator.isEmpty())
       {
          writeMeta(String.format("name=\"generator\" content=\"%s\"",
-           HtmlTag.encodeAttributeValue(generator, false)));
+           HtmlTag.encodeAttributeValue(generator, false, useHtmlEntities)));
       }
 
       if (useMathJax())
@@ -2503,7 +2517,7 @@ public class L2HConverter extends LaTeXParserListener
       if (!generator.isEmpty())
       {
          writeMeta(String.format("name=\"generator\" content=\"%s\"",
-           HtmlTag.encodeAttributeValue(generator, false)));
+           HtmlTag.encodeAttributeValue(generator, false, useHtmlEntities)));
       }
 
       if (useMathJax())
@@ -3024,7 +3038,7 @@ public class L2HConverter extends LaTeXParserListener
          if (!generator.isEmpty())
          {
             writeMeta(String.format("name=\"generator\" content=\"%s\"",
-              HtmlTag.encodeAttributeValue(generator, false)));
+              HtmlTag.encodeAttributeValue(generator, false, useHtmlEntities)));
          }
 
          if (useMathJax())
@@ -3686,7 +3700,7 @@ public class L2HConverter extends LaTeXParserListener
                try
                {
                   altVal = processToString(alt, stack);
-                  altVal = HtmlTag.encodeAttributeValue(altVal, false);
+                  altVal = HtmlTag.encodeAttributeValue(altVal, false, useHtmlEntities);
                }
                catch (IOException e)
                {
