@@ -1137,9 +1137,7 @@ public class L2HConverter extends LaTeXParserListener
    @Override
    public void writeliteralln(String string) throws IOException
    {
-      if (!(string.isEmpty() &&
-           (currentDocumentBlockType == DocumentBlockType.OUTSIDE
-         || currentDocumentBlockType == DocumentBlockType.HEAD)))
+      if (currentDocumentBlockType != DocumentBlockType.OUTSIDE)
       {
          writeliteral(string);
          writeln();
@@ -1159,7 +1157,7 @@ public class L2HConverter extends LaTeXParserListener
          parser.debugMessage(TeXParser.DEBUG_IO, 
            "No writer available. writeliteral: "+string);
       }
-      else
+      else if (currentDocumentBlockType != DocumentBlockType.OUTSIDE)
       {
          currentWriter.write(string);
       }
@@ -1243,6 +1241,10 @@ public class L2HConverter extends LaTeXParserListener
       {
          insertParIfRequired();
       }
+      else if (currentDocumentBlockType == DocumentBlockType.OUTSIDE)
+      {
+         return;
+      }
 
       if (codePoint == '<')
       {
@@ -1316,6 +1318,10 @@ public class L2HConverter extends LaTeXParserListener
       if (!isBlank)
       {
          insertParIfRequired();
+      }
+      else if (currentDocumentBlockType == DocumentBlockType.OUTSIDE)
+      {
+         return;
       }
 
       if (useHtmlEntities)
@@ -1394,6 +1400,10 @@ public class L2HConverter extends LaTeXParserListener
       {
          insertParIfRequired();
       }
+      else if (currentDocumentBlockType == DocumentBlockType.OUTSIDE)
+      {
+         return;
+      }
 
       if (useHtmlEntities)
       {
@@ -1465,6 +1475,10 @@ public class L2HConverter extends LaTeXParserListener
       {
          insertParIfRequired();
       }
+      else if (currentDocumentBlockType == DocumentBlockType.OUTSIDE)
+      {
+         return;
+      }
 
       write(str);
       writeln();
@@ -1472,7 +1486,8 @@ public class L2HConverter extends LaTeXParserListener
 
    public void writeln() throws IOException
    {
-      if (currentWriter != null)
+      if (currentWriter != null
+           && currentDocumentBlockType != DocumentBlockType.OUTSIDE)
       {
          currentWriter.write(String.format("%n"));
       }
