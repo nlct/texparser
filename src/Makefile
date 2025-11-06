@@ -79,7 +79,7 @@ tests/test-userguide/test-userguide.pdf	: tests/test-userguide/test-userguide.te
 
 test-jmlrutils : app tests/output
 	rm -f -r tests/output/test-jmlrutils
-	bin/texparsertest --no-rm-tmp-dir --debug --in tests/test-jmlrutils/test-jmlrutils.tex --output tests/output/test-jmlrutils --html
+	bin/texparsertest --debug --in tests/test-jmlrutils/test-jmlrutils.tex --output tests/output/test-jmlrutils --html
 
 test-doc : app tests/output
 	rm -f -r tests/output/test-doc
