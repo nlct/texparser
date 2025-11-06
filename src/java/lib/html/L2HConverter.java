@@ -3591,6 +3591,11 @@ public class L2HConverter extends LaTeXParserListener
       String cssClass = null;
       String cssStyle = null;
 
+      // Although border is deprecated, it's needed for the default
+      // HTML document with JEditorPane.
+
+      String border = null;
+
       String type=getMimeType(file.getName());
 
       double scale = 1;
@@ -3604,7 +3609,7 @@ public class L2HConverter extends LaTeXParserListener
               it.hasNext();)
          {
             String key = it.next();
-            TeXObject value = options.get(key);
+            TeXObject value = options.getValue(key);
 
             if (key.equals("alt") || key.equals("actualtext"))
             {
@@ -3612,7 +3617,8 @@ public class L2HConverter extends LaTeXParserListener
             }
             else if (key.equals("artifact"))
             {
-               if (value == null || value.toString(parser).trim().equals("true"))
+               if (value instanceof MissingValue || value.isEmpty()
+                   || value.toString(parser).trim().equals("true"))
                {
                   alt = createStack();
                }
@@ -3627,19 +3633,18 @@ public class L2HConverter extends LaTeXParserListener
                cssStyle = HtmlTag.encodeAttributeValue(
                   processToString(value, stack), false);
             }
+            else if (key.equals("border"))
+            {
+               border = HtmlTag.encodeAttributeValue(
+                  processToString(value, stack), false);
+            }
             else if (key.equals("scale"))
             {
-               if (value != null)
-               {
-                  scale = TeXParserUtils.toDouble(value, parser, stack);
-               }
+               scale = TeXParserUtils.toDouble(value, parser, stack);
             }
             else if (key.equals("zoom"))
             {
-               if (value != null)
-               {
-                  zoom = TeXParserUtils.toInt(value, parser, stack);
-               }
+               zoom = TeXParserUtils.toInt(value, parser, stack);
             }
             else
             {
@@ -3705,6 +3710,11 @@ public class L2HConverter extends LaTeXParserListener
          if (cssStyle != null)
          {
             writeliteral(String.format(" style=\"%s\"", cssStyle));
+         }
+
+         if (border != null)
+         {
+            writeliteral(String.format(" border=\"%s\"", border));
          }
 
          if (dim != null)
