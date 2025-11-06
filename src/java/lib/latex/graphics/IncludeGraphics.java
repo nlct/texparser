@@ -50,6 +50,11 @@ public class IncludeGraphics extends ControlSequence
       TeXObject opt = popOptArg(parser, stack);
       KeyValList keyValList = null;
 
+      if (opt instanceof KeyValList)
+      {
+         keyValList = (KeyValList)opt;
+      }
+
       if (opt != null && parser.isStack(opt))
       {
          TeXObjectList list = (TeXObjectList)opt;
