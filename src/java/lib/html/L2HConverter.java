@@ -3606,9 +3606,16 @@ public class L2HConverter extends LaTeXParserListener
             String key = it.next();
             TeXObject value = options.get(key);
 
-            if (key.equals("alt"))
+            if (key.equals("alt") || key.equals("actualtext"))
             {
                alt = value;
+            }
+            else if (key.equals("artifact"))
+            {
+               if (value == null || value.toString(parser).trim().equals("true"))
+               {
+                  alt = createStack();
+               }
             }
             else if (key.equals("class"))
             {
