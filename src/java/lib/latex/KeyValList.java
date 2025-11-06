@@ -534,5 +534,12 @@ public class KeyValList extends HashMap<String,TeXObject>
       return keyList.iterator();
    }
 
+   @Override
+   public TeXObject remove(Object key)
+   {
+      keyList.remove(key);
+      return super.remove(key);
+   }
+
    private Vector<String> keyList;
 }
