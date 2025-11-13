@@ -49,6 +49,8 @@ public class L2HStringConverter extends L2HConverter
       super(app, true, null, data, false, null, parsePackages);
 
       setWriteable(this);
+      currentDocumentBlockType = DocumentBlockType.BODY;
+      setIsInDocEnv(true);
    }
 
    public L2HStringConverter(TeXApp app, AuxParser auxParser, boolean parsePackages)
@@ -56,6 +58,8 @@ public class L2HStringConverter extends L2HConverter
       super(app, true, null, auxParser, false, null, parsePackages);
 
       setWriteable(this);
+      currentDocumentBlockType = DocumentBlockType.BODY;
+      setIsInDocEnv(true);
    }
 
    public L2HStringConverter()
@@ -79,8 +83,6 @@ public class L2HStringConverter extends L2HConverter
    public String convert(String str, boolean atIsLetter)
     throws IOException
    {
-      setIsInDocEnv(true);
-
       StringWriter writer = new StringWriter();
       setWriter(writer);
 
@@ -102,7 +104,6 @@ public class L2HStringConverter extends L2HConverter
    public String convert(String str, boolean atIsLetter, boolean useMathJax)
     throws IOException
    {
-      setIsInDocEnv(true);
       setUseMathJax(useMathJax);
 
       StringWriter writer = new StringWriter();

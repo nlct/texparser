@@ -1243,6 +1243,8 @@ public class L2HConverter extends LaTeXParserListener
       }
       else if (currentDocumentBlockType == DocumentBlockType.OUTSIDE)
       {
+         parser.debugMessage(TeXParser.DEBUG_IO, 
+           "Ignoring blank (outside document). Can't write codepoint "+codePoint);
          return;
       }
 
@@ -1321,6 +1323,8 @@ public class L2HConverter extends LaTeXParserListener
       }
       else if (currentDocumentBlockType == DocumentBlockType.OUTSIDE)
       {
+         parser.debugMessage(TeXParser.DEBUG_IO, 
+           "Ignoring blank (outside document). Can't write string '"+str+"'");
          return;
       }
 
@@ -1402,6 +1406,8 @@ public class L2HConverter extends LaTeXParserListener
       }
       else if (currentDocumentBlockType == DocumentBlockType.OUTSIDE)
       {
+         parser.debugMessage(TeXParser.DEBUG_IO, 
+           "Ignoring blank (outside document). Can't write char "+c);
          return;
       }
 
@@ -1477,6 +1483,8 @@ public class L2HConverter extends LaTeXParserListener
       }
       else if (currentDocumentBlockType == DocumentBlockType.OUTSIDE)
       {
+         parser.debugMessage(TeXParser.DEBUG_IO, 
+           "Ignoring blank (outside document). Can't write string '"+str+"'");
          return;
       }
 
@@ -5229,7 +5237,7 @@ public class L2HConverter extends LaTeXParserListener
    private boolean autoInsertPar = false;
    private boolean isXml = false;
 
-   private DocumentBlockType currentDocumentBlockType = DocumentBlockType.OUTSIDE;
+   protected DocumentBlockType currentDocumentBlockType = DocumentBlockType.OUTSIDE;
 
    private Vector<DocumentBlockTypeListener> documentBlockListeners;
 
