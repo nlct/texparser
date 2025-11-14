@@ -129,7 +129,7 @@ public class GeometrySty extends LaTeXSty
       {
          String option = it.next();
 
-         TeXObject value = options.get(option);
+         TeXObject value = (TeXObject)options.getValue(option).clone();
 
          if (option.equals("paper") || option.equals("papername"))
          {
