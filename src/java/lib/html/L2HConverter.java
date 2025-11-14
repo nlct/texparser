@@ -4692,7 +4692,8 @@ public class L2HConverter extends LaTeXParserListener
 
          if (style == null)
          {
-            writeliteral(String.format("style=\"%s\"", specs));
+            writeliteral(String.format("style=\"%s\"",
+             HtmlTag.encodeAttributeValue(specs, false, false)));
          }
          else if (!fbox.isInLine() && fbox.isMultiLine())
          {
