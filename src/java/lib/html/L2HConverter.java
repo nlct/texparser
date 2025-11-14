@@ -3452,6 +3452,20 @@ public class L2HConverter extends LaTeXParserListener
       setCurrentBlockType(DocumentBlockType.BODY);
    }
 
+   public void addToImagePreamble(String content)
+   {
+      if (extraImagePreamble == null)
+      {
+         extraImagePreamble = new StringBuilder();
+      }
+      else
+      {
+         extraImagePreamble.append(String.format("%n"));
+      }
+
+      extraImagePreamble.append(content);
+   }
+
    public String getImagePreamble() throws IOException
    {
       String preamble = null;
@@ -3495,21 +3509,34 @@ public class L2HConverter extends LaTeXParserListener
             builder.append(String.format("{%s}%n", cls.getName()));
          }
 
-         for (LaTeXFile lf : getLoadedPackages())
+         for (LaTeXFile lf : getLoadedPackages(true))
          {
             builder.append("\\usepackage");
+            String name = lf.getName();
 
-            KeyValList styOpts = lf.getOptions();
-
-            if (styOpts != null)
+            if (name.equals("hyperref"))
             {
-               builder.append(String.format("[%s]", styOpts.format()));
+               builder.append("[draft]");
+            }
+            else
+            {
+               KeyValList styOpts = lf.getOptions();
+
+               if (styOpts != null)
+               {
+                  builder.append(String.format("[%s]", styOpts.format()));
+               }
             }
 
-            builder.append(String.format("{%s}%n", lf.getName()));
+            builder.append(String.format("{%s}%n", name));
          }
 
          builder.append(String.format("\\pagestyle{empty}%n"));
+
+         if (extraImagePreamble != null)
+         {
+            builder.append(extraImagePreamble);
+         }
 
          preamble = builder.toString();
       }
@@ -5255,6 +5282,8 @@ public class L2HConverter extends LaTeXParserListener
    protected String generator = "TeX Parser Library";
 
    protected String htmlMetaTitle = null;
+
+   protected StringBuilder extraImagePreamble = null;
 
    protected boolean separateCss = false;
    protected File cssFile;

@@ -123,6 +123,7 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       footnotes = new TeXObjectList();
 
       loadedPackages = new Vector<LaTeXFile>();
+      userRequestedPackages = new Vector<LaTeXFile>();
       verbEnv = new Vector<String>();
    }
 
@@ -144,6 +145,7 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       footnotes = new TeXObjectList();
 
       loadedPackages = new Vector<LaTeXFile>();
+      userRequestedPackages = new Vector<LaTeXFile>();
       verbEnv = new Vector<String>();
    }
 
@@ -2352,6 +2354,7 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
    {
       removeFileReference(sty);
       loadedPackages.remove(sty);
+      userRequestedPackages.remove(sty);
    }
 
    public LaTeXSty requirepackage(String name, TeXObjectList stack)
@@ -2536,6 +2539,11 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
 
          addFileReference(sty);
          loadedPackages.add(sty);
+
+         if (!userRequestedPackages.contains(sty))
+         {
+            userRequestedPackages.add(sty);
+         }
 
          if (sty instanceof UnknownSty)
          {
@@ -2942,7 +2950,12 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
 
    public Vector<LaTeXFile> getLoadedPackages()
    {
-      return loadedPackages;
+      return getLoadedPackages(false);
+   }
+
+   public Vector<LaTeXFile> getLoadedPackages(boolean usepackage)
+   {
+      return usepackage ? userRequestedPackages : loadedPackages;
    }
 
    @Override
@@ -3846,7 +3859,7 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
 
    private Vector<String> verbEnv;
 
-   protected Vector<LaTeXFile> loadedPackages;
+   protected Vector<LaTeXFile> loadedPackages, userRequestedPackages;
    protected Vector<LaTeXCls> loadedClasses;
 
    private boolean parseAux = false;
