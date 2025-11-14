@@ -28,7 +28,7 @@ import com.dickimawbooks.texparserlib.html.*;
 
 public class FlowFrameData
 {
-   public FlowFrameData(FlowFrameType type, String label, int id,
+   public FlowFrameData(FlowFramSty sty, FlowFrameType type, String label, int id,
       boolean bordered, TeXDimension width, TeXDimension height,
       TeXDimension posX, TeXDimension posY)
    {
@@ -37,6 +37,7 @@ public class FlowFrameData
          throw new NullPointerException();
       }
 
+      this.sty = sty;
       this.type = type;
       this.id = id;
       this.bordered = bordered;
@@ -607,11 +608,14 @@ public class FlowFrameData
 
       cssClass = opts.getString("class", parser, stack);
 
-      process(parser, stack, l2hImg, alt, imgType, useDiv, cssStyle, cssClass);
+      String imgName = opts.getString("name", parser, stack);
+
+      process(parser, stack, l2hImg, imgName, alt, imgType, 
+      useDiv, cssStyle, cssClass);
    }
 
    public void process(TeXParser parser, TeXObjectList stack,
-       boolean l2hImg, TeXObject alt, String imgType,
+       boolean l2hImg, String imgName, TeXObject alt, String imgType,
        boolean useDiv, String cssStyle, String cssClass)
      throws IOException
    {
@@ -657,36 +661,103 @@ public class FlowFrameData
 
                StringBuilder builder = new StringBuilder();
 
+               if (style != null)
+               {
+                  builder.append("\\csname ");
+                  builder.append(style);
+                  builder.append("\\endcsname");
+                  builder.append('{');
+               }
+
+               builder.append("\\begin{minipage}[");
+               builder.append(vAlign);
+               builder.append(']');
+               builder.append('[');
+
+               String widthStr = null;
+               String heightStr = null;
+
+               FrameHtmlOptions fho = sty.getCurrentFrameHtmlOptions();
+
+               if (fho != null)
+               {
+                  widthStr = fho.width;
+                  heightStr = fho.height;
+               }
+
+               if (heightStr == null || heightStr.isEmpty())
+               {
+                  builder.append(height.toString(parser));
+               }
+               else
+               {
+                  builder.append(heightStr);
+               }
+
+               builder.append(']');
+               builder.append('{');
+
+               if (widthStr == null || widthStr.isEmpty())
+               {
+                  builder.append(width.toString(parser));
+               }
+               else
+               {
+                  builder.append(widthStr);
+               }
+
+               builder.append('}');
+
                if (shape != null)
                {
                   builder.append(shape.toString(parser));
+
+                  if (parser.isStack(content))
+                  {
+                     TeXObjectList contentList = (TeXObjectList)content;
+
+                     for (int i = 0; i < contentList.size(); i++)
+                     {
+                        TeXObject obj = contentList.get(i);
+
+                        if (obj.isPar())
+                        {
+                           contentList.set(i, new TeXCsRef("FLFsimpar"));
+                        }
+                     }
+                  }
                }
 
-               builder.append("\\null");
+               builder.append(content.toString(parser));
+
+               builder.append("\\end{minipage}");
+
+               if (style != null)
+               {
+                  builder.append('}');
+               }
 
                StringBuilder preamble = new StringBuilder(l2h.getImagePreamble());
-
-               preamble.append("\\setallflowframes{pages=none}");
-               preamble.append("\\setallstaticframes{pages=none}");
-               preamble.append("\\setalldynamicframes{pages=none}");
                preamble.append("\\onecolumn");
                preamble.append("\\pagestyle{empty}");
 
-               preamble.append(String.format((Locale)null,
-                "\\set%sframe{%d}{pages=all}%n", prefix, id));
+               String name;
 
-               preamble.append(String.format((Locale)null,
-                "\\set%scontents{%d}{%s}", prefix, id,
-                 content.toString(parser)));
-
-               String name = prefix;
-
-               if (imgNum > 0)
+               if (imgName == null)
                {
-                  name += imgNum;
-               }
+                  name = prefix;
 
-               imgNum++;
+                  if (imgNum > 0)
+                  {
+                     name += imgNum;
+                  }
+
+                  imgNum++;
+               }
+               else
+               {
+                  name = imgName;
+               }
 
                L2HImage image = l2h.toImage(preamble.toString(), builder.toString(),
                  imgType, alt, name, true, null);
@@ -814,6 +885,7 @@ public class FlowFrameData
    TeXNumber angle;
    TeXObject shape;
    TeXObject content;
+   FlowFramSty sty;
 
    String css;
    int imgNum=0;

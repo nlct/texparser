@@ -32,6 +32,7 @@ import com.dickimawbooks.texparserlib.generic.ParCs;
 import com.dickimawbooks.texparserlib.latex.*;
 import com.dickimawbooks.texparserlib.latex.color.ColorSty;
 import com.dickimawbooks.texparserlib.html.*;
+import com.dickimawbooks.texparserlib.auxfile.*;
 
 /**
  * Since the TeX parser library has no output routine this is mainly
@@ -56,10 +57,7 @@ public class FlowFramSty extends LaTeXSty implements BeginDocumentListener
       staticIdMap = new HashMap<String,Integer>();
       dynamicIdMap = new HashMap<String,Integer>();
 
-      if (listener instanceof L2HConverter)
-      {
-         listener.addBeginDocumentListener(this);
-      }
+      listener.addBeginDocumentListener(this);
 
       float textWidthPt = TeXParserUtils.toPt(getParser(), "textwidth");
 
@@ -79,6 +77,8 @@ public class FlowFramSty extends LaTeXSty implements BeginDocumentListener
 
       registerNewLength("typeblockheight", textHeightPt, TeXUnit.PT);
 
+      listener.addAuxCommand(new AuxCommand("flowfram@preamble@htmlopts", 6));
+      listener.addAuxCommand(new AuxCommand("flowfram@doc@htmlopts", 6));
    }
 
    @Override
@@ -328,7 +328,7 @@ public class FlowFramSty extends LaTeXSty implements BeginDocumentListener
       getParser().putControlSequence(new TextualContentCommand(
         "@col@id@" + RomanNumeral.romannumeral(id), label));
 
-      FlowFrameData data = new FlowFrameData(FlowFrameType.FLOW,
+      FlowFrameData data = new FlowFrameData(this, FlowFrameType.FLOW,
         label, id, bordered, width, height,
          posX, posY);
 
@@ -411,7 +411,7 @@ public class FlowFramSty extends LaTeXSty implements BeginDocumentListener
       getParser().putControlSequence(new TextualContentCommand(
         "@sf@id@" + RomanNumeral.romannumeral(id), label));
 
-      FlowFrameData data = new FlowFrameData(FlowFrameType.STATIC,
+      FlowFrameData data = new FlowFrameData(this, FlowFrameType.STATIC,
         label, id, bordered, width, height,
          posX, posY);
 
@@ -489,7 +489,7 @@ public class FlowFramSty extends LaTeXSty implements BeginDocumentListener
       getParser().putControlSequence(new TextualContentCommand(
         "@df@id@" + RomanNumeral.romannumeral(id), label));
 
-      FlowFrameData data = new FlowFrameData(FlowFrameType.DYNAMIC,
+      FlowFrameData data = new FlowFrameData(this, FlowFrameType.DYNAMIC,
         label, id, bordered, width, height,
          posX, posY);
 
@@ -697,24 +697,85 @@ public class FlowFramSty extends LaTeXSty implements BeginDocumentListener
    public void documentBegun(BeginDocumentEvent evt)
     throws IOException
    {
-      L2HConverter l2h = (L2HConverter)listener;
-
-      if (!staticFrames.isEmpty() || !dynamicFrames.isEmpty())
+      if (listener instanceof L2HConverter)
       {
-         l2h.write("<style>");
+         L2HConverter l2h = (L2HConverter)listener;
 
-         for (FlowFrameData data : staticFrames)
+         if (!staticFrames.isEmpty() || !dynamicFrames.isEmpty())
          {
-            data.writeCss(l2h);
-         }
+            l2h.write("<style>");
 
-         for (FlowFrameData data : dynamicFrames)
-         {
-            data.writeCss(l2h);
-         }
+            for (FlowFrameData data : staticFrames)
+            {
+               data.writeCss(l2h);
+            }
 
-         l2h.write("</style>");
+            for (FlowFrameData data : dynamicFrames)
+            {
+               data.writeCss(l2h);
+            }
+
+            l2h.write("</style>");
+         }
       }
+
+      Vector<AuxData> auxData = listener.getAuxData();
+
+      if (auxData != null)
+      {
+         for (AuxData ad : auxData)
+         {
+            if (ad.getName().equals("flowfram@doc@htmlopts")
+            || ad.getName().equals("flowfram@preamble@htmlopts"))
+            {
+               TeXParser parser = getParser();
+
+               try
+               {
+                  int idx = Integer.parseInt(ad.getArg(0).toString(parser));
+                  FrameHtmlOptions fho = new FrameHtmlOptions(idx);
+
+                  fho.type = ad.getArg(1).toString(parser);
+                  fho.frameId = Integer.parseInt(ad.getArg(2).toString(parser));
+
+                  KeyValList options = KeyValList.getList(parser, ad.getArg(3));
+
+                  fho.width = options.getString("width", parser, null);
+                  fho.height = options.getString("height", parser, null);
+
+                  fho.thepage = ad.getArg(4).toString(parser);
+                  fho.theabsolutepage = ad.getArg(5).toString(parser);
+
+                  if (frameHtmlOptionsMap == null)
+                  {
+                     frameHtmlOptionsMap = new HashMap<Integer,FrameHtmlOptions>();
+                  }
+
+                  frameHtmlOptionsMap.put(Integer.valueOf(idx), fho);
+               }
+               catch (NumberFormatException e)
+               {
+                  parser.getTeXApp().error(e);
+               }
+            }
+         }
+      }
+   }
+
+   public void incrFrameHtmlOptionsIndex()
+   {
+      frameHtmlOptionsIndex++;
+   }
+
+   public FrameHtmlOptions getFrameHtmlOptions(int index)
+   {
+      return frameHtmlOptionsMap == null ? null : 
+              frameHtmlOptionsMap.get(Integer.valueOf(index));
+   }
+
+   public FrameHtmlOptions getCurrentFrameHtmlOptions()
+   {
+      return getFrameHtmlOptions(frameHtmlOptionsIndex);
    }
 
    boolean pagesRelative = true;
@@ -728,6 +789,9 @@ public class FlowFramSty extends LaTeXSty implements BeginDocumentListener
    HashMap<String,Integer> flowIdMap;
    HashMap<String,Integer> staticIdMap;
    HashMap<String,Integer> dynamicIdMap;
+
+   HashMap<Integer,FrameHtmlOptions> frameHtmlOptionsMap;
+   private int frameHtmlOptionsIndex = 0;
 
    protected ColorSty colorSty;
 

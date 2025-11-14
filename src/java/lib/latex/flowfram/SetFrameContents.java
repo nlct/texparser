@@ -90,6 +90,7 @@ public class SetFrameContents extends ControlSequence
 
          if (html != null)
          {
+            sty.incrFrameHtmlOptionsIndex();
             options.remove("html");
             htmlOptions = TeXParserUtils.toKeyValList(html, parser);
          }

@@ -427,6 +427,8 @@ public class SetFrameAttrs extends ControlSequence
 
       if (html != null)
       {
+         sty.incrFrameHtmlOptionsIndex();
+
          KeyValList htmlOpts = TeXParserUtils.toKeyValList(html, parser);
 
          Boolean show = htmlOpts.getBoolean("show", parser, stack);

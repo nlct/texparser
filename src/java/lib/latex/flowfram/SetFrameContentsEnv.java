@@ -90,6 +90,8 @@ public class SetFrameContentsEnv extends GatherEnvContents
       boolean isStar = getName().endsWith("*");
       FlowFrameData data;
 
+      KeyValList options = TeXParserUtils.popOptKeyValList(parser, stack);
+
       if (isStar)
       {
          String label = popLabelString(parser, stack);
@@ -101,9 +103,43 @@ public class SetFrameContentsEnv extends GatherEnvContents
          data = sty.getFrame(type, id);
       }
 
+      KeyValList htmlOptions = null;
+
+      if (options != null)
+      {
+         TeXObject html = options.getValue("html");
+
+         if (html != null)
+         {
+            sty.incrFrameHtmlOptionsIndex();
+            options.remove("html");
+            htmlOptions = TeXParserUtils.toKeyValList(html, parser);
+         }
+
+         if (!options.isEmpty())
+         {
+            TeXObjectList substack = parser.getListener().createStack();
+
+            substack.add(parser.getListener().getControlSequence(
+              "set" + type.toString().toLowerCase()+"frame"));
+
+            substack.add(TeXParserUtils.createGroup(parser, 
+              new UserNumber(data.getID())));
+
+            substack.add(TeXParserUtils.createGroup(parser, options));
+
+            TeXParserUtils.process(substack, parser, stack);
+         }
+      }
+
       TeXObject content = popContents(parser, stack);
 
       data.setContent(content);
+
+      if (htmlOptions != null)
+      {
+         data.showContent(parser, stack, htmlOptions);
+      }
    }
 
    @Override
