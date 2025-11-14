@@ -23,6 +23,7 @@ import java.awt.Color;
 
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.*;
+import com.dickimawbooks.texparserlib.html.L2HConverter;
 
 public class DefSemanticCmd extends ControlSequence
 {
@@ -76,6 +77,29 @@ public class DefSemanticCmd extends ControlSequence
       }
 
       TeXObject prefix = popArg(parser, stack);
+
+      if (parser.getListener() instanceof L2HConverter)
+      {
+         L2HConverter l2h = (L2HConverter)parser.getListener();
+
+         String code = "\\defsemanticcmd";
+
+         if (colSpec != null)
+         {
+            code += "[" + colSpec + "]";
+         }
+
+         code += "{" + cs.toString(parser) + "}{";
+
+         if (fontCs != null)
+         {
+            code += fontCs.toString(parser);
+         }
+
+         code += "}{" + prefix.toString(parser) + "}";
+
+         l2h.addToImagePreamble(code);
+      }
 
       TeXFontText font = null;
 
