@@ -240,7 +240,7 @@ public class LaTeXFile extends TeXPath
          for (Iterator<String> it = options.getOrderedKeyIterator(); it.hasNext();)
          {
             String option = it.next();
-            TeXObject value = options.get(option);
+            TeXObject value = options.getValue(option);
 
             processOption(option, value);
          }
@@ -251,7 +251,7 @@ public class LaTeXFile extends TeXPath
          {
             if (options.containsKey(option))
             {
-               TeXObject value = options.get(option);
+               TeXObject value = options.getValue(option);
 
                processOption(option, value);
             }
@@ -263,7 +263,7 @@ public class LaTeXFile extends TeXPath
 
             if (!declaredOptions.contains(option))
             {
-               TeXObject value = options.get(option);
+               TeXObject value = options.getValue(option);
 
                processUnknownOption(option, value);
             }
