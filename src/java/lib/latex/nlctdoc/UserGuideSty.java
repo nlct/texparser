@@ -126,6 +126,57 @@ public class UserGuideSty extends LaTeXSty
 
       registerControlSequence(new AtGobble("nlctdocatnum"));
 
+      appendToImagePreamble();
+   }
+
+   protected void appendToImagePreamble()
+   {
+      LaTeXParserListener listener = getListener();
+
+      if (listener instanceof L2HConverter)
+      {
+         L2HConverter l2h = (L2HConverter)listener;
+
+         TeXApp texapp = getParser().getTeXApp();
+         String jobname = getParser().getJobname();
+
+         try
+         {
+            TeXPath path = new TeXPath(getParser(), jobname, "glstex", true);
+
+            if (path != null)
+            {
+               String file = path.getPath().toAbsolutePath().toString();
+               int idx = file.lastIndexOf(".glstex");
+
+               if (idx > 0)
+               {
+                  file = file.substring(0, idx);
+               }
+
+               l2h.addToImagePreamble("\\glsxtrresourcefile{"+file+"}");
+            }
+
+            path = new TeXPath(getParser(), jobname+"-1", "glstex", true);
+
+            if (path != null)
+            {
+               String file = path.getPath().toAbsolutePath().toString();
+               int idx = file.lastIndexOf(".glstex");
+
+               if (idx > 0)
+               {
+                  file = file.substring(0, idx);
+               }
+
+               l2h.addToImagePreamble("\\glsxtrresourcefile{"+file+"}");
+            }
+         }
+         catch (Exception e)
+         {
+            texapp.error(e);
+         }
+      }
    }
 
    protected void addCssStyles()
@@ -183,6 +234,8 @@ public class UserGuideSty extends LaTeXSty
       registerControlSequence(new CodeComment());
       registerControlSequence(new CodeComment("commentdbsp",
         new TeXCsRef("dbspace")));
+
+      registerControlSequence(new GlsEntryField("syntax", "syntax", glossariesSty));
 
       addSemanticCommand("csfmt", TeXFontFamily.VERB, FG_CS, 
         listener.getOther('\\'), null);
