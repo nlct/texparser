@@ -1746,6 +1746,8 @@ public class UserGuideSty extends LaTeXSty
       registerControlSequence(new ExampleFileBaseName());
       registerControlSequence(new ExampleEnv());
 
+      registerControlSequence(new CreateResultExampleInDynamicFrame());
+
       registerControlSequence(new GenericCommand(true,
         "exampleattachtexicon", null, new AccSuppObject(
           AccSupp.createSymbol("TeX File Attachment", true),
