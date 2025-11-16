@@ -79,6 +79,7 @@ public class FlowFramSty extends LaTeXSty implements BeginDocumentListener
 
       listener.addAuxCommand(new AuxCommand("flowfram@preamble@htmlopts", 6));
       listener.addAuxCommand(new AuxCommand("flowfram@doc@htmlopts", 6));
+      listener.addAuxCommand(new AuxCommand("@flowfram@saverelativeloc", 4));
    }
 
    @Override
@@ -192,6 +193,17 @@ public class FlowFramSty extends LaTeXSty implements BeginDocumentListener
       registerControlSequence(new ComputeRightEdgeOdd());
       registerControlSequence(new ComputeRightEdgeEven());
 
+      registerControlSequence(new RefSavedRelativeLocation(this));
+      registerControlSequence(new TextualContentCommand("FFabove", "above"));
+      registerControlSequence(new TextualContentCommand("FFaboveleft", "above left"));
+      registerControlSequence(new TextualContentCommand("FFaboveright", "above right"));
+      registerControlSequence(new TextualContentCommand("FFbelow", "below"));
+      registerControlSequence(new TextualContentCommand("FFbelowleft", "below left"));
+      registerControlSequence(new TextualContentCommand("FFbelowright", "below right"));
+      registerControlSequence(new TextualContentCommand("FFleft", "on the left"));
+      registerControlSequence(new TextualContentCommand("FFright", "on the right"));
+      registerControlSequence(new TextualContentCommand("FFoverlap", "overlap"));
+
       registerControlSequence(new TwoTone(this));
       registerControlSequence(new TwoTone("htwotone", false, this));
       registerControlSequence(new TwoToneBottom(this));
@@ -258,6 +270,8 @@ public class FlowFramSty extends LaTeXSty implements BeginDocumentListener
       registerControlSequence(new GobbleOpt("staticswitchoffnextodd", 0, 1, '*'));
       registerControlSequence(new GobbleOpt("staticswitchoffnextonly", 0, 1, '*'));
       registerControlSequence(new GobbleOpt("staticswitchoffnextoddonly", 0, 1, '*'));
+
+      registerControlSequence(new GobbleOpt("SaveRelativeFrameLocation", 0, 5, '*'));
    }
 
    @Override
@@ -725,41 +739,148 @@ public class FlowFramSty extends LaTeXSty implements BeginDocumentListener
       {
          for (AuxData ad : auxData)
          {
-            if (ad.getName().equals("flowfram@doc@htmlopts")
-            || ad.getName().equals("flowfram@preamble@htmlopts"))
-            {
-               TeXParser parser = getParser();
-
-               try
-               {
-                  int idx = Integer.parseInt(ad.getArg(0).toString(parser));
-                  FrameHtmlOptions fho = new FrameHtmlOptions(idx);
-
-                  fho.type = ad.getArg(1).toString(parser);
-                  fho.frameId = Integer.parseInt(ad.getArg(2).toString(parser));
-
-                  KeyValList options = KeyValList.getList(parser, ad.getArg(3));
-
-                  fho.width = options.getString("width", parser, null);
-                  fho.height = options.getString("height", parser, null);
-
-                  fho.thepage = ad.getArg(4).toString(parser);
-                  fho.theabsolutepage = ad.getArg(5).toString(parser);
-
-                  if (frameHtmlOptionsMap == null)
-                  {
-                     frameHtmlOptionsMap = new HashMap<Integer,FrameHtmlOptions>();
-                  }
-
-                  frameHtmlOptionsMap.put(Integer.valueOf(idx), fho);
-               }
-               catch (NumberFormatException e)
-               {
-                  parser.getTeXApp().error(e);
-               }
-            }
+            processAuxData(ad);
          }
       }
+   }
+
+   public void processAuxData(AuxData data)
+    throws IOException
+   {
+      TeXParser parser = getParser();
+      String strValue;
+
+      if (data.getName().equals("flowfram@doc@htmlopts")
+      || data.getName().equals("flowfram@preamble@htmlopts"))
+      {
+         int idx;
+
+         strValue = data.getArg(0).toString(parser);
+
+         try
+         {
+            idx = Integer.parseInt(strValue);
+         }
+         catch (NumberFormatException e)
+         {
+            throw new TeXSyntaxException(e, parser, 
+              TeXSyntaxException.ERROR_NUMBER_EXPECTED, strValue);
+         }
+
+         FrameHtmlOptions fho = new FrameHtmlOptions(idx);
+
+         fho.type = data.getArg(1).toString(parser);
+
+         strValue = data.getArg(2).toString(parser);
+
+         try
+         {
+            fho.frameId = Integer.parseInt(strValue);
+         }
+         catch (NumberFormatException e)
+         {
+            throw new TeXSyntaxException(e, parser, 
+              TeXSyntaxException.ERROR_NUMBER_EXPECTED, strValue);
+         }
+
+         KeyValList options = KeyValList.getList(parser, data.getArg(3));
+
+         fho.width = options.getString("width", parser, null);
+         fho.height = options.getString("height", parser, null);
+
+         fho.thepage = data.getArg(4).toString(parser);
+         fho.theabsolutepage = data.getArg(5).toString(parser);
+
+         if (frameHtmlOptionsMap == null)
+         {
+            frameHtmlOptionsMap = new HashMap<Integer,FrameHtmlOptions>();
+         }
+
+         frameHtmlOptionsMap.put(Integer.valueOf(idx), fho);
+      }
+      else if (data.getName().equals("@flowfram@saverelativeloc"))
+      {
+         RelativeLocationData relData = new RelativeLocationData(
+           data.getArg(0).toString(parser));
+
+         strValue = data.getArg(1).toString(parser);
+
+         try
+         {
+            relData.pageNum = Integer.parseInt(strValue);
+         }
+         catch (NumberFormatException e)
+         {
+            throw new TeXSyntaxException(e, parser, 
+              TeXSyntaxException.ERROR_NUMBER_EXPECTED, strValue);
+         }
+
+         TeXObject obj = data.getArg(2);
+
+         if (parser.isStack(obj))
+         {
+            TeXObjectList list = (TeXObjectList)obj;
+
+            if (list.size() == 6)
+            {
+               relData.x1 = TeXParserUtils.popDimensionArg(parser, list);
+               relData.y1 = TeXParserUtils.popDimensionArg(parser, list);
+               relData.evenX1 = TeXParserUtils.popDimensionArg(parser, list);
+               relData.evenY1 = TeXParserUtils.popDimensionArg(parser, list);
+               relData.width1 = TeXParserUtils.popDimensionArg(parser, list);
+               relData.height1 = TeXParserUtils.popDimensionArg(parser, list);
+            }
+            else
+            {
+               throw new LaTeXSyntaxException(parser, INVALID_CMD_ARG, obj.toString(parser));
+            }
+         }
+         else
+         {
+            throw new LaTeXSyntaxException(parser, 
+              INVALID_CMD_ARG, data.getName(), obj.toString(parser));
+         }
+
+         obj = data.getArg(3);
+
+         if (parser.isStack(obj))
+         {
+            TeXObjectList list = (TeXObjectList)obj;
+
+            if (list.size() == 6)
+            {
+               relData.x2 = TeXParserUtils.popDimensionArg(parser, list);
+               relData.y2 = TeXParserUtils.popDimensionArg(parser, list);
+               relData.evenX2 = TeXParserUtils.popDimensionArg(parser, list);
+               relData.evenY2 = TeXParserUtils.popDimensionArg(parser, list);
+               relData.width2 = TeXParserUtils.popDimensionArg(parser, list);
+               relData.height2 = TeXParserUtils.popDimensionArg(parser, list);
+            }
+            else
+            {
+               throw new LaTeXSyntaxException(parser, INVALID_CMD_ARG, obj.toString(parser));
+            }
+         }
+         else
+         {
+            throw new LaTeXSyntaxException(parser, 
+              INVALID_CMD_ARG, data.getName(), obj.toString(parser));
+         }
+
+         relData.calculate();
+
+         if (relLocDataMap == null)
+         {
+            relLocDataMap = new HashMap<String,RelativeLocationData>();
+         }
+
+         relLocDataMap.put(relData.getLabel(), relData);
+      }
+   }
+
+   public RelativeLocationData getRelativeLocationData(String label)
+   {
+      return relLocDataMap == null ? null : relLocDataMap.get(label);
    }
 
    public void incrFrameHtmlOptionsIndex()
@@ -792,6 +913,8 @@ public class FlowFramSty extends LaTeXSty implements BeginDocumentListener
 
    HashMap<Integer,FrameHtmlOptions> frameHtmlOptionsMap;
    private int frameHtmlOptionsIndex = 0;
+
+   HashMap<String,RelativeLocationData> relLocDataMap;
 
    protected ColorSty colorSty;
 
@@ -826,4 +949,9 @@ public class FlowFramSty extends LaTeXSty implements BeginDocumentListener
    public static final String INVALID_FRAME_NOVAL_SETTING
      = "flowfram.invalid_frame_noval_setting";
 
+   public static final String INVALID_CMD_ARG
+     = "flowfram.invalid_cmd_arg";
+
+   public static final String LOCDATA_LABEL_NOT_DEFINED
+     = "flowfram.locdata_label_not_defined";
 }
