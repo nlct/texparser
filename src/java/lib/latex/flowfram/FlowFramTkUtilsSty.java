@@ -33,6 +33,12 @@ public class FlowFramTkUtilsSty extends LaTeXSty
    }
 
    @Override
+   protected void preOptions(TeXObjectList stack) throws IOException
+   {
+      getListener().requirepackage("graphicx", stack);
+   }
+
+   @Override
    public void addDefinitions()
    {
       registerControlSequence(new AtNumberOfNumber("jdroutline", 3, 3));
@@ -40,6 +46,8 @@ public class FlowFramTkUtilsSty extends LaTeXSty
 
       registerControlSequence(new AtGobble("flowframtkstartobject", 3));
       registerControlSequence(new AtGobble("flowframtkendobject", 3));
+
+      registerControlSequence(new IncludeTeXImage());
 
       registerControlSequence(new AtNumberOfNumber("flowframtkimgtitlechar", 1, 2));
 

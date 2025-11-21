@@ -50,20 +50,8 @@ public class L2HToImage extends ControlSequence
 
    public void process(TeXParser parser, TeXObjectList stack) throws IOException
    {
-      TeXObject options;
-      TeXObject arg;
-
-      if (stack == parser)
-      {
-         options = parser.popNextArg('[', ']');
-         arg = parser.popNextArg();
-      }
-      else
-      {
-         options = stack.popArg(parser, '[', ']');
-         arg = stack.popArg(parser);
-      }
-
+      TeXObject options = popOptArg(parser, stack);
+      TeXObject arg = popArg(parser, stack);
 
       KeyValList keyValList = null;
 
