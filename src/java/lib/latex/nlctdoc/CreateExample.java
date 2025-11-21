@@ -63,6 +63,8 @@ public class CreateExample extends ControlSequence
       String label = null;
       int[] pageList = null;
       String backLink = null;
+      Boolean solofirst = null;
+      Boolean border = null;
 
       if (options != null)
       {
@@ -114,6 +116,9 @@ public class CreateExample extends ControlSequence
                }
             }
          }
+
+         solofirst = options.getBoolean("solofirst", parser, stack);
+         border = options.getBoolean("border", parser, stack);
       }
 
       TeXObjectList substack = listener.createStack();
@@ -244,6 +249,11 @@ public class CreateExample extends ControlSequence
                parser.logMessage(e);
             }
 
+            if (border != null && border.booleanValue())
+            {
+               imgOptions.put("class", listener.createString("bordered"));
+            }
+
             listener.includegraphics(stack, imgOptions, imgPath);
          }
          else
@@ -285,10 +295,23 @@ public class CreateExample extends ControlSequence
                   }
 
                   imgOptions.put("alt", altList);
-                  imgOptions.put("class", listener.createString("pageimage"));
+
+                  if (border != null && border.booleanValue())
+                  {
+                     imgOptions.put("class", listener.createString("pageimage bordered"));
+                  }
+                  else
+                  {
+                     imgOptions.put("class", listener.createString("pageimage"));
+                  }
 
                   listener.includegraphics(stack, imgOptions, imgPath);
                   listener.getWriteable().writeln("");
+               }
+
+               if (i == 0 && solofirst != null && solofirst.booleanValue())
+               {
+                  TeXParserUtils.process(listener.getPar(), parser, stack);
                }
             }
          }
