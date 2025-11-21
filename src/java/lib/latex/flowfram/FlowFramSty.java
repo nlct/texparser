@@ -368,12 +368,12 @@ public class FlowFramSty extends LaTeXSty implements BeginDocumentListener
          return null;
       }
 
-      return flowFrames.get(id.intValue());
+      return flowFrames.get(id.intValue()-1);
    }
 
    public FlowFrameData getFlowFrame(int id)
    {
-      return flowFrames.get(id);
+      return flowFrames.get(id-1);
    }
 
    public void setFlowFrameLabel(int id, String newLabel)
@@ -446,12 +446,12 @@ public class FlowFramSty extends LaTeXSty implements BeginDocumentListener
          return null;
       }
 
-      return staticFrames.get(id.intValue());
+      return staticFrames.get(id.intValue()-1);
    }
 
    public FlowFrameData getStaticFrame(int id)
    {
-      return staticFrames.get(id);
+      return staticFrames.get(id-1);
    }
 
    public void setStaticFrameLabel(int id, String newLabel)
@@ -524,12 +524,12 @@ public class FlowFramSty extends LaTeXSty implements BeginDocumentListener
          return null;
       }
 
-      return dynamicFrames.get(id.intValue());
+      return dynamicFrames.get(id.intValue()-1);
    }
 
    public FlowFrameData getDynamicFrame(int id)
    {
-      return dynamicFrames.get(id);
+      return dynamicFrames.get(id-1);
    }
 
    public void setDynamicFrameLabel(int id, String newLabel)
