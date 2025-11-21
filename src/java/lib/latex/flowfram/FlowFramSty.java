@@ -326,7 +326,7 @@ public class FlowFramSty extends LaTeXSty implements BeginDocumentListener
       TeXDimension posX, TeXDimension posY)
     throws TeXSyntaxException
    {
-      int id = flowFrames.size();
+      int id = flowFrames.size() + 1;
 
       if (label == null)
       {
@@ -409,7 +409,7 @@ public class FlowFramSty extends LaTeXSty implements BeginDocumentListener
       TeXDimension posX, TeXDimension posY)
     throws TeXSyntaxException
    {
-      int id = staticFrames.size();
+      int id = staticFrames.size() + 1;
 
       if (label == null)
       {
@@ -487,7 +487,7 @@ public class FlowFramSty extends LaTeXSty implements BeginDocumentListener
       TeXDimension posX, TeXDimension posY)
     throws TeXSyntaxException
    {
-      int id = dynamicFrames.size();
+      int id = dynamicFrames.size() + 1;
 
       if (label == null)
       {
@@ -625,13 +625,26 @@ public class FlowFramSty extends LaTeXSty implements BeginDocumentListener
       {
          case STATIC:
             id = staticIdMap.remove(data.getLabel());
+
+            if (id == null || id.intValue() != data.getID())
+            {
+               id = Integer.valueOf(data.getID());
+            }
+
             data.setLabel(newLabel);
             staticIdMap.put(data.getLabel(), id);
+
             getParser().putControlSequence(new TextualContentCommand(
               "@sf@id@" + RomanNumeral.romannumeral(id), newLabel));
          break;
          case DYNAMIC:
             id = dynamicIdMap.remove(data.getLabel());
+
+            if (id == null || id.intValue() != data.getID())
+            {
+               id = Integer.valueOf(data.getID());
+            }
+
             data.setLabel(newLabel);
             dynamicIdMap.put(data.getLabel(), id);
             getParser().putControlSequence(new TextualContentCommand(
@@ -639,6 +652,12 @@ public class FlowFramSty extends LaTeXSty implements BeginDocumentListener
          break;
          case FLOW:
             id = flowIdMap.remove(data.getLabel());
+
+            if (id == null || id.intValue() != data.getID())
+            {
+               id = Integer.valueOf(data.getID());
+            }
+
             data.setLabel(newLabel);
             flowIdMap.put(data.getLabel(), id);
             getParser().putControlSequence(new TextualContentCommand(

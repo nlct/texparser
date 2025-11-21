@@ -56,7 +56,7 @@ public class GetFlowId extends ControlSequence
       String csname = cs.getName();
       String label = popLabelString(parser, stack);
 
-      int id;
+      int id = -1;
 
       switch (type)
       {
@@ -66,7 +66,7 @@ public class GetFlowId extends ControlSequence
          case DYNAMIC:
             id = sty.getDynamicFrameId(label);
          break;
-         default:
+         case FLOW:
             id = sty.getFlowFrameId(label);
       }
 
