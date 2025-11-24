@@ -1591,7 +1591,7 @@ public class UserGuideSty extends LaTeXSty
       FrameBoxEnv compactcodeBox = new FrameBoxEnv(
         addSemanticCommand("@compactcodebox", "compactcodebox",
         new TeXFontText(TeXFontFamily.VERB),
-        (Color)null, BG_CODE, Color.BLACK, null, null, false, true));
+        (Color)null, BG_CODE, Color.BLACK, null, null, false, true), true, true);
 
       registerControlSequence(compactcodeBox);
       registerControlSequence(new DuplicateEnv("compactcodebox*", compactcodeBox));

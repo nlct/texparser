@@ -30,6 +30,12 @@ public class FrameBoxEnv extends Declaration
       this(fbox.getId(), fbox);
    }
 
+   public FrameBoxEnv(FrameBox fbox, boolean popLeadingSpace,
+     boolean popOptional)
+   {
+      this(fbox.getId(), fbox, popLeadingSpace, popOptional);
+   }
+
    public FrameBoxEnv(String name, FrameBox fbox)
    {
       this(name, fbox, true);
@@ -37,21 +43,33 @@ public class FrameBoxEnv extends Declaration
 
    public FrameBoxEnv(String name, FrameBox fbox, boolean popLeadingSpace)
    {
+      this(name, fbox, popLeadingSpace, false);
+   }
+
+   public FrameBoxEnv(String name, FrameBox fbox, boolean popLeadingSpace,
+     boolean popOptional)
+   {
       super(name);
       this.fbox = fbox;
       this.popLeadingSpace = popLeadingSpace;
+      this.popOptional = popOptional;
       setEndDeclaration(new EndDeclaration(name));
    }
 
    @Override
    public Object clone()
    {
-      return new FrameBoxEnv(getName(), fbox, popLeadingSpace);
+      return new FrameBoxEnv(getName(), fbox, popLeadingSpace, popOptional);
    }
 
    protected void preprocess(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
+      if (popOptional)
+      {
+         optionalArg = popOptArg(parser, stack);
+      }
+
       if (popLeadingSpace)
       {
          TeXObject token = stack.peekStack();
@@ -147,5 +165,6 @@ public class FrameBoxEnv extends Declaration
    }
 
    protected FrameBox fbox;
-   protected boolean popLeadingSpace;
+   protected boolean popLeadingSpace, popOptional;
+   protected TeXObject optionalArg;
 }
