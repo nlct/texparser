@@ -108,7 +108,7 @@ public class L2HTextSubscript extends ControlSequence
       }
    }
 
-   private TeXObject convert(TeXParser parser, TeXObject arg)
+   public static TeXObject convert(TeXParser parser, TeXObject arg)
    {
       if (arg instanceof CharObject)
       {
@@ -132,7 +132,7 @@ public class L2HTextSubscript extends ControlSequence
       }
    }
 
-   private CharObject getUnicode(TeXParser parser, CharObject obj)
+   public static CharObject getUnicode(TeXParser parser, CharObject obj)
    {
       int code = obj.getCharCode();
 
@@ -149,7 +149,7 @@ public class L2HTextSubscript extends ControlSequence
         +obj);
    }
 
-   private boolean hasUnicodeSupport(TeXObject arg)
+   public static boolean hasUnicodeSupport(TeXObject arg)
    {
       if (arg instanceof TeXObjectList && !(arg instanceof MathGroup))
       {
@@ -211,7 +211,17 @@ public class L2HTextSubscript extends ControlSequence
       new int[] {'p', 0x209A},
       new int[] {'s', 0x209B},
       new int[] {'t', 0x209C},
-      new int[] {'j', 0x2C7C}
+      new int[] {'j', 0x2C7C},
+// Phonetic Extensions block:
+      new int[] {'i', 0x1D62},
+      new int[] {'r', 0x1D63},
+      new int[] {'u', 0x1D64},
+      new int[] {'v', 0x1D65},
+      new int[] {0x03B2, 0x1D66},// small letter beta
+      new int[] {0x03B3, 0x1D67},// small letter gamma
+      new int[] {0x03C1, 0x1D68},// small letter rho
+      new int[] {0x03C6, 0x1D69},// small letter phi
+      new int[] {0x03C7, 0x1D6A}// small letter chi
    };
 
 }

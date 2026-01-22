@@ -1914,6 +1914,12 @@ public class L2HConverter extends LaTeXParserListener
       unicodeScriptSupport = support;
    }
 
+   // if not MathJax
+   public void setMathModeSupportUnicodeScript(boolean support)
+   {
+      mathModeSupportUnicodeScript = support;
+   }
+
    public boolean useMathJax()
    {
       return useMathJax;
@@ -3397,6 +3403,11 @@ public class L2HConverter extends LaTeXParserListener
          arg.process(parser);
          writeliteral("}");
       }
+      else if (mathModeSupportUnicodeScript && unicodeScriptSupport
+                && L2HTextSubscript.hasUnicodeSupport(arg))
+      {
+         L2HTextSubscript.convert(parser, arg).process(parser);
+      }
       else
       {
          writeliteral("<sub>");
@@ -3414,6 +3425,11 @@ public class L2HConverter extends LaTeXParserListener
          writeliteral("^{");
          arg.process(parser);
          writeliteral("}");
+      }
+      else if (mathModeSupportUnicodeScript && unicodeScriptSupport
+                && L2HTextSuperscript.hasUnicodeSupport(arg))
+      {
+         L2HTextSuperscript.convert(parser, arg).process(parser);
       }
       else
       {
@@ -5242,6 +5258,7 @@ public class L2HConverter extends LaTeXParserListener
    private boolean useMathJax=true;
 
    private boolean unicodeScriptSupport=true;
+   private boolean mathModeSupportUnicodeScript=false;
 
    private boolean useHtmlEntities = false;
 

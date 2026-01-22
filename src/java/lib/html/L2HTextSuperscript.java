@@ -108,7 +108,7 @@ public class L2HTextSuperscript extends ControlSequence
       }
    }
 
-   private TeXObject convert(TeXParser parser, TeXObject arg)
+   public static TeXObject convert(TeXParser parser, TeXObject arg)
    {
       if (arg instanceof CharObject)
       {
@@ -132,7 +132,7 @@ public class L2HTextSuperscript extends ControlSequence
       }
    }
 
-   private CharObject getUnicode(TeXParser parser, CharObject obj)
+   public static CharObject getUnicode(TeXParser parser, CharObject obj)
    {
       int code = obj.getCharCode();
 
@@ -149,7 +149,7 @@ public class L2HTextSuperscript extends ControlSequence
         +obj);
    }
 
-   private boolean hasUnicodeSupport(TeXObject arg)
+   public static boolean hasUnicodeSupport(TeXObject arg)
    {
       if (arg instanceof TeXObjectList && !(arg instanceof MathGroup))
       {
