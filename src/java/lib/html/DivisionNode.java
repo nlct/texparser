@@ -238,6 +238,11 @@ public class DivisionNode implements Comparable<DivisionNode>
       return prefix;
    }
 
+   public String getPrefixedTitle()
+   {
+      return prefix == null ? title : prefix + " " + title;
+   }
+
    public String getId()
    {
       String label = data.getLabel();

@@ -204,6 +204,20 @@ public class L2HConverter extends LaTeXParserListener
    }
 
    /**
+    * Sets the destination directory for images. If null, retain
+    * input relative structure. 
+    */
+   public void setImageDest(Path dest)
+   {
+      imageDest = dest;
+   }
+
+   public Path getImageDest()
+   {
+      return imageDest;
+   }
+
+   /**
     * Sets the split level. This must be set before the file is parsed. 
     * Has no effect if the division data isn't available. This method
     * will automatically switch on save divisions, but it won't have an effect
@@ -2028,6 +2042,12 @@ public class L2HConverter extends LaTeXParserListener
       writeliteralln(".linkicon { display: inline-block; }");
       writeliteralln(".linkiconleft { display: inline-block; padding-right: .25em; }");
       writeliteralln(".linkiconright { display: inline-block; padding-left: .25em; }");
+
+      writeliteralln(".navigatesym { display: inline-block; font-size: xx-large; }");
+      writeliteralln(".navigateprev { display: inline-block; padding-right: .25em; }");
+      writeliteralln(".navigateup { display: inline-block; padding-left: .25em; padding-right: .25em;}");
+      writeliteralln(".navigatenext { display: inline-block; padding-left: .25em; }");
+
       writeliteralln("a.icon { white-space: nowrap; }");
       writeliteralln("a.icon span { white-space: normal; }");
 
@@ -2397,7 +2417,7 @@ public class L2HConverter extends LaTeXParserListener
       }
 
       writeliteralln("</head>");
-      startBody();
+      startBody(stack);
 
       setCurrentBlockType(DocumentBlockType.BODY);
 
@@ -2420,21 +2440,7 @@ public class L2HConverter extends LaTeXParserListener
 
          createDivisionTree(stack);
 
-         if (navFile == null)
-         {
-            writeNavigationList();
-         }
-         else
-         {
-            try
-            {
-               writeNavigationFile(stack);
-            }
-            catch (IOException e)
-            {
-               getTeXApp().error(e);
-            }
-         }
+         createDivisionNav(stack);
 
          if (splitLevel > 0 && citeList != null && citeList.size() > 1)
          {
@@ -2451,15 +2457,221 @@ public class L2HConverter extends LaTeXParserListener
       writeliteralln("<div id=\"main\">");
    }
 
-   // Used for node HTML files not for the navigation HTML file
+   protected void createDivisionNav(TeXObjectList stack) throws IOException
+   {
+      if (navFile == null)
+      {
+         writeNavigationList();
+      }
+      else
+      {
+         try
+         {
+            writeNavigationFile(stack);
+         }
+         catch (IOException e)
+         {
+            getTeXApp().error(e);
+         }
+      }
+   }
+
+   @Deprecated
    protected void startBody() throws IOException
+   {
+      startBody(null);
+   }
+
+   // Used for node HTML files not for the navigation HTML file
+   protected void startBody(TeXObjectList stack) throws IOException
    {
       writeliteralln("<body>");
    }
 
+   @Deprecated
    protected void endBody() throws IOException
    {
+      endBody(null);
+   }
+
+   protected void endBody(TeXObjectList stack) throws IOException
+   {
       writeliteralln("</body>");
+   }
+
+   protected TeXObjectList createBreadcrumbTrail()
+   {
+      TeXObjectList stack = null;
+
+      if (currentNode != null)
+      {
+         stack = createStack();
+
+         pushBreadcrumb(stack, currentNode);
+
+         StartElement startElem = new StartElement("div", true);
+         startElem.putAttribute("class", "breadcrumb-trail");
+
+         stack.push(startElem);
+         stack.add(new EndElement("div", true));
+      }
+
+      return stack;
+   }
+
+   protected void pushBreadcrumb(TeXObjectList stack, DivisionNode node)
+   {
+      StartElement startElem;
+
+      if (node == currentNode)
+      {
+         stack.push(new EndElement("span"));
+
+         stack.push(new HtmlTag(node.getPrefixedTitle()));
+
+         startElem = new StartElement("span");
+         startElem.putAttribute("class", "breadcrumb-current");
+         stack.push(startElem);
+      }
+      else
+      {
+         stack.push(new EndElement("a"));
+
+         stack.push(new HtmlTag(node.getPrefixedTitle()));
+
+         startElem = new StartElement("a");
+         startElem.putAttribute("class", "breadcrumb-item");
+         startElem.putAttribute("href", node.getRef());
+         stack.push(startElem);
+      }
+
+      DivisionNode parent = node.getParent();
+
+      if (parent != null)
+      {
+         stack.push(new EndElement("span"));
+
+         ControlSequence cs = parser.getControlSequence("TeXParserLibBreadCrumbSep");
+
+         if (cs == null)
+         {
+            stack.push(getOther('\u23F5'));
+         }
+         else
+         {
+            stack.push(cs);
+         }
+
+         startElem = new StartElement("span");
+         startElem.putAttribute("class", "breadcrumb-sep");
+         stack.push(startElem);
+
+         pushBreadcrumb(stack, parent);
+      }
+   }
+
+   protected TeXObjectList createMiniToc()
+   {
+      TeXObjectList stack = null;
+
+      if (currentNode != null)
+      {
+         stack = createStack();
+
+         StartElement startElem = new StartElement("li", true);
+         startElem.putAttribute("class", "current");
+
+         stack.add(startElem);
+         stack.add(new HtmlTag(currentNode.getPrefixedTitle()));
+
+         if (currentNode.getChildCount() > 0)
+         {
+            stack.add(new StartElement("ul", true));
+
+            for (Iterator<DivisionNode> it = currentNode.getChildIterator(); it.hasNext(); )
+            {
+               DivisionNode child = it.next();
+
+               stack.add(new StartElement("li", true));
+               startElem = new StartElement("a");
+               startElem.putAttribute("href", child.getRef());
+               stack.add(startElem);
+               stack.add(new HtmlTag(child.getPrefixedTitle()));
+               stack.add(new EndElement("a"));
+               stack.add(new EndElement("li"));
+            }
+
+            stack.add(new EndElement("ul", true));
+         }
+
+         stack.add(new EndElement("li"));
+
+         DivisionNode sibling = currentNode.getPreviousSibling();
+
+         while (sibling != null)
+         {
+            stack.push(new EndElement("li"));
+            stack.push(new EndElement("a"));
+
+            stack.push(new HtmlTag(sibling.getPrefixedTitle()));
+
+            startElem = new StartElement("a");
+            startElem.putAttribute("href", sibling.getRef());
+            stack.push(startElem);
+
+            stack.push(new StartElement("li", true));
+
+            sibling = sibling.getPreviousSibling();
+         }
+
+         sibling = currentNode.getNextSibling();
+
+         while (sibling != null)
+         {
+            stack.add(new StartElement("li", true));
+            startElem = new StartElement("a");
+            startElem.putAttribute("href", sibling.getRef());
+            stack.add(startElem);
+            stack.add(new HtmlTag(sibling.getPrefixedTitle()));
+            stack.add(new EndElement("a"));
+            stack.add(new EndElement("li"));
+
+            sibling = sibling.getNextSibling();
+         }
+
+         stack.add(new EndElement("ul", true));
+
+         startElem = new StartElement("ul", true);
+         stack.push(startElem);
+
+         DivisionNode parent = currentNode.getParent();
+
+         if (parent == null)
+         {
+            startElem.putAttribute("class", "listnav");
+         }
+         else
+         {
+            stack.push(new EndElement("a"));
+
+            stack.push(new HtmlTag(parent.getPrefixedTitle()));
+
+            startElem = new StartElement("a");
+            startElem.putAttribute("href", parent.getRef());
+            stack.push(startElem);
+
+            stack.push(new StartElement("li", true));
+
+            startElem = new StartElement("ul", true);
+            startElem.putAttribute("class", "listnav");
+            stack.push(startElem);
+
+            stack.add(new EndElement("li"));
+            stack.add(new EndElement("ul", true));
+         }
+      }
+
+      return stack;
    }
 
    @Override
@@ -2507,7 +2719,7 @@ public class L2HConverter extends LaTeXParserListener
          }
       }
 
-      endBody();
+      endBody(stack);
       writeliteralln("</html>");
 
       setCurrentBlockType(DocumentBlockType.OUTSIDE);
@@ -2582,7 +2794,7 @@ public class L2HConverter extends LaTeXParserListener
       }
 
       writeliteralln("</head>");
-      startBody();
+      startBody(stack);
 
       setCurrentBlockType(DocumentBlockType.BODY);
 
@@ -2615,7 +2827,7 @@ public class L2HConverter extends LaTeXParserListener
 
       writeliteralln("</div><!-- end of main -->");// ends <div id="main">
 
-      endBody();
+      endBody(stack);
       writeliteralln("</html>");
 
       setCurrentBlockType(DocumentBlockType.OUTSIDE);
@@ -2735,6 +2947,154 @@ public class L2HConverter extends LaTeXParserListener
       writeEndHtml5OrDiv("footer", true);
 
       setCurrentBlockType(DocumentBlockType.BODY);
+   }
+
+   protected TeXObjectList createDivNav(boolean compact)
+   {
+      TeXObjectList stack = null;
+
+      if (currentNode != null)
+      {
+         stack = createStack();
+
+         StartElement startElem = new StartElement("div", true);
+         startElem.putAttribute("class", "navigate");
+
+         stack.add(startElem);
+
+         int idx = currentNode.getIndex();
+
+         DivisionNode prevNode = null;
+
+         for (int i = idx-1; i >= 0; i--)
+         {
+            DivisionInfo info = divisionData.get(i);
+            DivisionNode node = (DivisionNode)info.getSpecial();
+
+            if (!node.getRef().startsWith("#"))
+            {
+               prevNode = node;
+               break;
+            }
+         }
+
+         DivisionNode nextNode = null;
+
+         for (int i = idx+1; i < divisionData.size(); i++)
+         {
+            DivisionInfo info = divisionData.get(i);
+            DivisionNode node = (DivisionNode)info.getSpecial();
+
+            if (!node.getRef().startsWith("#"))
+            {
+               nextNode = node;
+               break;
+            }
+         }
+
+         if (prevNode != null)
+         {
+            startElem = new StartElement("div", true);
+
+            startElem.putAttribute("title", prevNode.getPrefixedTitle());
+            startElem.putAttribute("class", "navigateprev");
+
+            stack.add(startElem);
+
+            startElem = new StartElement("a");
+            startElem.putAttribute("href", prevNode.getRef());
+
+            stack.add(startElem);
+
+            startElem = new StartElement("div");
+
+            startElem.putAttribute("class", compact ? "navigatesym" : "linkiconleft");
+            stack.add(startElem);
+
+            stack.add(getOther('\u23F4'));
+            stack.add(new EndElement("div"));
+
+            if (!compact)
+            {
+               stack.add(new HtmlTag(prevNode.getPrefixedTitle()));
+            }
+
+            stack.add(new EndElement("a"));
+            stack.add(new EndElement("div", true));
+         }
+
+         startElem = new StartElement("div");
+         startElem.putAttribute("class", "navigateup");
+         stack.add(startElem);
+
+         DivisionNode upNode = currentNode.getParent();
+
+         while (upNode != null && upNode.getRef().startsWith("#"))
+         {
+            upNode = upNode.getParent();
+         }
+
+         if (upNode != null)
+         {
+            startElem.putAttribute("title", upNode.getPrefixedTitle());
+
+            startElem = new StartElement("a");
+            startElem.putAttribute("href", upNode.getRef());
+            stack.add(startElem);
+
+            startElem = new StartElement("div");
+
+            startElem.putAttribute("class", compact ? "navigatesym" : "linkiconleft");
+            stack.add(startElem);
+
+            stack.add(getOther('\u23F6'));
+            stack.add(new EndElement("div"));
+
+            if (!compact)
+            {
+               stack.add(new HtmlTag(upNode.getPrefixedTitle()));
+            }
+
+            stack.add(new EndElement("a"));
+         }
+
+         stack.add(new EndElement("div", true));
+
+         if (nextNode != null)
+         {
+            startElem = new StartElement("div", true);
+
+            startElem.putAttribute("title", nextNode.getPrefixedTitle());
+            startElem.putAttribute("class", "navigatenext");
+
+            stack.add(startElem);
+
+            startElem = new StartElement("a");
+            startElem.putAttribute("href", nextNode.getRef());
+
+            stack.add(startElem);
+
+            startElem = new StartElement("div");
+
+            startElem.putAttribute("class", compact ? "navigatesym" : "linkiconright");
+            stack.add(startElem);
+
+            stack.add(getOther('\u23F5'));
+            stack.add(new EndElement("div"));
+
+            if (!compact)
+            {
+               stack.add(new HtmlTag(nextNode.getPrefixedTitle()));
+            }
+
+            stack.add(new EndElement("a"));
+            stack.add(new EndElement("div", true));
+         }
+
+         stack.add(new EndElement("div", true));
+      }
+
+      return stack;
    }
 
    @Override
@@ -3119,7 +3479,7 @@ public class L2HConverter extends LaTeXParserListener
 
          setCurrentBlockType(DocumentBlockType.BODY);
 
-         writeNavigationList(null, null);
+         writeNavigationList("nav", null);
 
          writeliteralln("</body>");
          writeliteralln("</html>");
@@ -3148,7 +3508,7 @@ public class L2HConverter extends LaTeXParserListener
       writeliteralln("<div class=\"nav-content\">");
 
       writeStartHtml5OrDiv("nav",
-        "id=\"doc-nav\" aria-label=\"Document Navigation\">", true);
+        "id=\"doc-nav\" aria-label=\"Document Navigation\"", true);
 
       writeNavigationList(null, null);
 
@@ -3724,7 +4084,16 @@ public class L2HConverter extends LaTeXParserListener
       }
       else
       {
-         Path dest = (outPath == null ? relPath : outPath.resolve(relPath));
+         Path dest;
+
+         if (imageDest == null)
+         {
+            dest = (outPath == null ? relPath : outPath.resolve(relPath));
+         }
+         else
+         {
+            dest = outPath.resolve(imageDest.resolve(file.getName()));
+         }
 
          Dimension dim = getImageSize(file, type);
 
@@ -5253,7 +5622,7 @@ public class L2HConverter extends LaTeXParserListener
 
    private TeXApp texApp;
 
-   private Path outPath, basePath;
+   private Path outPath, basePath, imageDest;
 
    private boolean useMathJax=true;
 
