@@ -2047,6 +2047,7 @@ public class L2HConverter extends LaTeXParserListener
       writeliteralln(".navigateprev { display: inline-block; padding-right: .25em; }");
       writeliteralln(".navigateup { display: inline-block; padding-left: .25em; padding-right: .25em;}");
       writeliteralln(".navigatenext { display: inline-block; padding-left: .25em; }");
+      writeliteralln(".notset { color: silver; }");
 
       writeliteralln("a.icon { white-space: nowrap; }");
       writeliteralln("a.icon span { white-space: normal; }");
@@ -2234,6 +2235,16 @@ public class L2HConverter extends LaTeXParserListener
       }
    }
 
+   protected void writeMetaData(String title) throws IOException
+   {
+      if (title != null)
+      {
+         writeliteral("<title>");
+         writeliteral(title);
+         writeliteralln("</title>");
+      }
+   }
+
    public void writeMeta(String attributes)
      throws IOException
    {
@@ -2259,11 +2270,16 @@ public class L2HConverter extends LaTeXParserListener
 
       String charsetName = htmlCharSet.name();
 
-      writeMeta(String.format("charset=\"%s\"", charsetName));
-
-      writeMeta(String.format(
-       "http-equiv=\"Content-Type\" content=\"text/html; charset=%s\"", 
-       charsetName));
+      if (isHtml5())
+      {
+         writeMeta(String.format("charset=\"%s\"", charsetName));
+      }
+      else
+      {
+         writeMeta(String.format(
+          "http-equiv=\"Content-Type\" content=\"text/html; charset=%s\"", 
+          charsetName));
+      }
 
       ControlSequence cs = parser.getControlSequence("TeXParserLibGeneratorName");
 
@@ -2383,9 +2399,7 @@ public class L2HConverter extends LaTeXParserListener
             parser.endGroup();
          }
 
-         writeliteral("<title>");
-         write(htmlMetaTitle);
-         writeliteralln("</title>");
+         writeMetaData(htmlMetaTitle);
       }
       else
       {
@@ -2454,7 +2468,13 @@ public class L2HConverter extends LaTeXParserListener
          }
       }
 
+      rootPagePreMain(stack);
+
       writeliteralln("<div id=\"main\">");
+   }
+
+   protected void rootPagePreMain(TeXObjectList stack) throws IOException
+   {
    }
 
    protected void createDivisionNav(TeXObjectList stack) throws IOException
@@ -2465,6 +2485,8 @@ public class L2HConverter extends LaTeXParserListener
       }
       else
       {
+         DocumentBlockType orgType = getCurrentBlockType();
+
          try
          {
             writeNavigationFile(stack);
@@ -2473,6 +2495,8 @@ public class L2HConverter extends LaTeXParserListener
          {
             getTeXApp().error(e);
          }
+
+         setCurrentBlockType(orgType);
       }
    }
 
@@ -2751,9 +2775,16 @@ public class L2HConverter extends LaTeXParserListener
 
       writeliteralln("<head>");
 
-      writeMeta(String.format(
-       "http-equiv=\"Content-Type\" content=\"text/html; charset=%s\"", 
-       htmlCharSet.name()));
+      if (isHtml5())
+      {
+         writeMeta(String.format("charset=\"%s\"", htmlCharSet.name()));
+      }
+      else
+      {
+         writeMeta(String.format(
+          "http-equiv=\"Content-Type\" content=\"text/html; charset=%s\"", 
+          htmlCharSet.name()));
+      }
 
       if (!generator.isEmpty())
       {
@@ -2774,9 +2805,7 @@ public class L2HConverter extends LaTeXParserListener
          }
       }
 
-      writeliteral("<title>");
-      writeliteral(currentNode.getTitle());
-      writeliteralln("</title>");
+      writeMetaData(currentNode.getTitle());
 
       if (separateCss && cssFile != null)
       {
@@ -3022,9 +3051,16 @@ public class L2HConverter extends LaTeXParserListener
             stack.add(new EndElement("a"));
             stack.add(new EndElement("div", true));
          }
+         else
+         {
+            startElem = new StartElement("div");
+            startElem.putAttribute("class", "navigateprev notset");
+            stack.add(startElem);
+            stack.add(getOther('\u23F4'));
+            stack.add(new EndElement("div"));
+         }
 
          startElem = new StartElement("div");
-         startElem.putAttribute("class", "navigateup");
          stack.add(startElem);
 
          DivisionNode upNode = currentNode.getParent();
@@ -3036,6 +3072,7 @@ public class L2HConverter extends LaTeXParserListener
 
          if (upNode != null)
          {
+            startElem.putAttribute("class", "navigateup");
             startElem.putAttribute("title", upNode.getPrefixedTitle());
 
             startElem = new StartElement("a");
@@ -3056,6 +3093,11 @@ public class L2HConverter extends LaTeXParserListener
             }
 
             stack.add(new EndElement("a"));
+         }
+         else
+         {
+            startElem.putAttribute("class", "navigateup notset");
+            stack.add(getOther('\u23F6'));
          }
 
          stack.add(new EndElement("div", true));
@@ -3089,6 +3131,14 @@ public class L2HConverter extends LaTeXParserListener
 
             stack.add(new EndElement("a"));
             stack.add(new EndElement("div", true));
+         }
+         else
+         {
+            startElem = new StartElement("div");
+            startElem.putAttribute("class", "navigatenext notset");
+            stack.add(startElem);
+            stack.add(getOther('\u23F5'));
+            stack.add(new EndElement("div"));
          }
 
          stack.add(new EndElement("div", true));
@@ -3205,6 +3255,11 @@ public class L2HConverter extends LaTeXParserListener
       }
    }
 
+   public File getRootFile()
+   {
+      return new File(outPath.toFile(), baseName+"."+getSuffix());
+   }
+
    protected void createDivisionTree(TeXObjectList stack)
     throws IOException
    {
@@ -3307,7 +3362,7 @@ public class L2HConverter extends LaTeXParserListener
 
          if (node.getLevel() == 0)
          {
-            File f = new File(outPath.toFile(), baseName+"."+getSuffix());
+            File f = getRootFile();
 
             node.setFile(f);
             node.setRef(f.getName());
@@ -3420,9 +3475,16 @@ public class L2HConverter extends LaTeXParserListener
 
          writeliteralln("<head>");
 
-         writeMeta(String.format(
-          "http-equiv=\"Content-Type\" content=\"text/html; charset=%s\"", 
-          htmlCharSet.name()));
+         if (isHtml5())
+         {
+            writeMeta(String.format("charset=\"%s\"", htmlCharSet.name()));
+         }
+         else
+         {
+            writeMeta(String.format(
+             "http-equiv=\"Content-Type\" content=\"text/html; charset=%s\"", 
+             htmlCharSet.name()));
+         }
 
          if (!generator.isEmpty())
          {
@@ -3443,12 +3505,7 @@ public class L2HConverter extends LaTeXParserListener
             }
          }
 
-         if (title != null)
-         {
-            writeliteral("<title>");
-            writeliteral(title);
-            writeliteralln("</title>");
-         }
+         writeMetaData(title);
 
          if (separateCss)
          {
