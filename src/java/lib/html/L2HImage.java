@@ -88,15 +88,15 @@ public class L2HImage extends AbstractTeXObject implements Expandable
 
       if (ext.equals("jpg") || ext.equals("jpeg"))
       {
-         mimetype = "image/jpeg";
+         mimetype = L2HConverter.MIME_TYPE_JPEG;
       }
       else if (ext.equals("png"))
       {
-         mimetype = "image/png";
+         mimetype = L2HConverter.MIME_TYPE_PNG;
       }
       else if (ext.equals("pdf"))
       {
-         mimetype = "application/pdf";
+         mimetype = L2HConverter.MIME_TYPE_PDF;
       }
    }
 
