@@ -2904,7 +2904,9 @@ public class L2HConverter extends LaTeXParserListener
 
          writeliteral(String.format("<a href=\"%s\">", prevNode.getRef()));
 
-         writeliteral("<div class=\"linkiconleft\">&#x23F4;</div>");
+         writeliteral("<div class=\"linkiconleft\">");
+         writeCodePoint(getNavLeftCodePoint());
+         writeliteral("</div>");
 
          String prefix = prevNode.getPrefix();
 
@@ -2934,7 +2936,9 @@ public class L2HConverter extends LaTeXParserListener
       {
          writeliteral(String.format("<a href=\"%s\">", upNode.getRef()));
 
-         writeliteral("<div class=\"linkiconleft\">&#x23F6;</div>");
+         writeliteral("<div class=\"linkiconleft\">");
+         writeCodePoint(getNavUpCodePoint());
+         writeliteral("</div>");
 
          String prefix = upNode.getPrefix();
 
@@ -2966,7 +2970,9 @@ public class L2HConverter extends LaTeXParserListener
 
          writeliteral(nextNode.getTitle());
 
-         writeliteral("<div class=\"linkiconright\">&#x23F5;</div>");
+         writeliteral("<div class=\"linkiconright\">");
+         writeCodePoint(getNavRightCodePoint());
+         writeliteral("</div>");
 
          writeliteralln("</a>");
 
@@ -2976,6 +2982,21 @@ public class L2HConverter extends LaTeXParserListener
       writeEndHtml5OrDiv("footer", true);
 
       setCurrentBlockType(DocumentBlockType.BODY);
+   }
+
+   public int getNavLeftCodePoint()
+   {
+      return 0x23F4;
+   }
+
+   public int getNavUpCodePoint()
+   {
+      return 0x23F6;
+   }
+
+   public int getNavRightCodePoint()
+   {
+      return 0x23F5;
    }
 
    protected TeXObjectList createDivNav(boolean compact)
@@ -3040,7 +3061,7 @@ public class L2HConverter extends LaTeXParserListener
             startElem.putAttribute("class", compact ? "navigatesym" : "linkiconleft");
             stack.add(startElem);
 
-            stack.add(getOther('\u23F4'));
+            stack.add(getOther(getNavLeftCodePoint()));
             stack.add(new EndElement("div"));
 
             if (!compact)
@@ -3054,9 +3075,9 @@ public class L2HConverter extends LaTeXParserListener
          else
          {
             startElem = new StartElement("div");
-            startElem.putAttribute("class", "navigateprev notset");
+            startElem.putAttribute("class", "navigateprev navigatesym notset");
             stack.add(startElem);
-            stack.add(getOther('\u23F4'));
+            stack.add(getOther(getNavLeftCodePoint()));
             stack.add(new EndElement("div"));
          }
 
@@ -3084,7 +3105,7 @@ public class L2HConverter extends LaTeXParserListener
             startElem.putAttribute("class", compact ? "navigatesym" : "linkiconleft");
             stack.add(startElem);
 
-            stack.add(getOther('\u23F6'));
+            stack.add(getOther(getNavUpCodePoint()));
             stack.add(new EndElement("div"));
 
             if (!compact)
@@ -3096,8 +3117,8 @@ public class L2HConverter extends LaTeXParserListener
          }
          else
          {
-            startElem.putAttribute("class", "navigateup notset");
-            stack.add(getOther('\u23F6'));
+            startElem.putAttribute("class", "navigateup navigatesym notset");
+            stack.add(getOther(getNavUpCodePoint()));
          }
 
          stack.add(new EndElement("div", true));
@@ -3121,7 +3142,7 @@ public class L2HConverter extends LaTeXParserListener
             startElem.putAttribute("class", compact ? "navigatesym" : "linkiconright");
             stack.add(startElem);
 
-            stack.add(getOther('\u23F5'));
+            stack.add(getOther(getNavRightCodePoint()));
             stack.add(new EndElement("div"));
 
             if (!compact)
@@ -3135,9 +3156,9 @@ public class L2HConverter extends LaTeXParserListener
          else
          {
             startElem = new StartElement("div");
-            startElem.putAttribute("class", "navigatenext notset");
+            startElem.putAttribute("class", "navigatenext navigatesym notset");
             stack.add(startElem);
-            stack.add(getOther('\u23F5'));
+            stack.add(getOther(getNavRightCodePoint()));
             stack.add(new EndElement("div"));
          }
 
