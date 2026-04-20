@@ -3276,9 +3276,20 @@ public class L2HConverter extends LaTeXParserListener
       }
    }
 
+   public void setRootName(String name)
+   {
+      rootName = name;
+   }
+
+   public String getRootName()
+   {
+      return rootName;
+   }
+
    public File getRootFile()
    {
-      return new File(outPath.toFile(), baseName+"."+getSuffix());
+      return new File(outPath.toFile(),
+       (rootName == null ? baseName : rootName) + "." + getSuffix());
    }
 
    protected void createDivisionTree(TeXObjectList stack)
@@ -4535,7 +4546,7 @@ public class L2HConverter extends LaTeXParserListener
             baseName = baseName.substring(0,idx);
          }
 
-         File outFile = new File(outPath.toFile(), baseName+"."+getSuffix());
+         File outFile = getRootFile();
 
          getParser().message(TeXApp.MESSAGE_WRITING, outFile);
 
@@ -5710,6 +5721,7 @@ public class L2HConverter extends LaTeXParserListener
    private boolean useHtmlEntities = false;
 
    protected String baseName;
+   protected String rootName = null;
    protected String suffix = "html";
 
    protected boolean splitUseBaseNamePrefix = false;
