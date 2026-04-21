@@ -633,6 +633,16 @@ public class L2HConverter extends LaTeXParserListener
       return currentDocumentBlockType;
    }
 
+   public boolean isAfterHeading()
+   {
+      return afterHeading;
+   }
+
+   public void setAfterHeading(boolean afterHeading)
+   {
+      this.afterHeading = afterHeading;
+   }
+
    public void startParagraph()
    throws IOException
    {
@@ -647,7 +657,15 @@ public class L2HConverter extends LaTeXParserListener
 
          setCurrentBlockType(DocumentBlockType.PARAGRAPH);
 
-         writeliteralln("<p>");
+         if (afterHeading)
+         {
+            writeliteralln("<p class=\"afterheading\">");
+            afterHeading = false;
+         }
+         else
+         {
+            writeliteralln("<p>");
+         }
       }
    }
 
@@ -913,7 +931,15 @@ public class L2HConverter extends LaTeXParserListener
       {
          setCurrentBlockType(DocumentBlockType.PARAGRAPH);
 
-         writeliteralln("<p>");
+         if (afterHeading)
+         {
+            writeliteralln("<p class=\"afterheading\">");
+            afterHeading = false;
+         }
+         else
+         {
+            writeliteralln("<p>");
+         }
       }
    }
 
@@ -3599,6 +3625,8 @@ public class L2HConverter extends LaTeXParserListener
             writeliteral("<h1>");
             writeliteral(title);
             writeliteralln("</h1>");
+
+            afterHeading = true;
          }
 
          setCurrentBlockType(DocumentBlockType.BODY);
@@ -5370,7 +5398,6 @@ public class L2HConverter extends LaTeXParserListener
          writeliteral(String.format("<!-- end of section %s -->%n", currentSection));
       }
 
-
       if (id == null)
       {
          currentSection = tag+"-"+name;
@@ -5390,6 +5417,8 @@ public class L2HConverter extends LaTeXParserListener
       }
 
       writeToTopLink(stack);
+
+      afterHeading = true;
    }
 
    public void endSection()
@@ -5781,6 +5810,7 @@ public class L2HConverter extends LaTeXParserListener
    private Vector<DocumentBlockTypeListener> documentBlockListeners;
 
    private String currentSection = null;
+   private boolean afterHeading = false;
 
    protected DivisionNode currentNode = null;
 
