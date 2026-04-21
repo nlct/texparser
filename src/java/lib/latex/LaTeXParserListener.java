@@ -21,13 +21,16 @@ package com.dickimawbooks.texparserlib.latex;
 import java.io.IOException;
 import java.io.EOFException;
 import java.io.File;
+import java.util.Calendar;
 import java.util.Hashtable;
 import java.util.HashMap;
 import java.util.Vector;
 import java.util.Stack;
 import java.util.Iterator;
+import java.util.Properties;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
+import java.text.DateFormat;
 import java.nio.charset.Charset;
 import java.nio.charset.IllegalCharsetNameException;
 import java.nio.file.Path;
@@ -3857,6 +3860,91 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       return currentTOC;
    }
 
+   public void setModifiedDate(Calendar calendar)
+   {
+      modifiedDate = calendar;
+
+      if (calendar == null)
+      {
+         removeDocumentProperty("ModDate");
+      }
+      else
+      {
+         setDocumentProperty("ModDate",
+           DateFormat.getDateTimeInstance().format(calendar.getTime()));
+      }
+   }
+
+   public Calendar getModifiedDate()
+   {
+      return modifiedDate;
+   }
+
+   public void setCreationDate(Calendar calendar)
+   {
+      creationDate = calendar;
+
+      if (calendar == null)
+      {
+         removeDocumentProperty("CreationDate");
+      }
+      else
+      {
+         setDocumentProperty("CreationDate",
+           DateFormat.getDateTimeInstance().format(calendar.getTime()));
+      }
+   }
+
+   public Calendar getCreationDate()
+   {
+      return creationDate;
+   }
+
+   public void setDocumentProperty(String key, String value)
+   {
+      if (docProperties == null)
+      {
+         docProperties = new Properties();
+      }
+
+      docProperties.setProperty(key, value);
+   }
+
+   public String getDocumentProperty(String key)
+   {
+      return docProperties == null ? null : docProperties.getProperty(key);
+   }
+
+   public String getDocumentProperty(String key, String defaultValue)
+   {
+      return docProperties == null ? defaultValue
+        : docProperties.getProperty(key, defaultValue);
+   }
+
+   public String removeDocumentProperty(String key)
+   {
+      if (docProperties == null)
+      {
+         return null;
+      }
+      else
+      {
+         return (String)docProperties.remove(key);
+      }
+   }
+
+   public boolean hasDocumentProperty(String key)
+   {
+      if (docProperties == null)
+      {
+         return false;
+      }
+      else
+      {
+         return docProperties.containsKey(key);
+      }
+   }
+
    private Vector<String> verbEnv;
 
    protected Vector<LaTeXFile> loadedPackages, userRequestedPackages;
@@ -3930,6 +4018,9 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
    protected HashMap<String,FrameBox> frameBoxes;
 
    protected String currentTOC = null;
+
+   protected Calendar modifiedDate, creationDate;
+   protected Properties docProperties;
 
    public static final UserNumber ZERO = UserNumber.ZERO;
    public static final UserNumber ONE = UserNumber.ONE;

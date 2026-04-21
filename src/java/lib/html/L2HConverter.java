@@ -2237,11 +2237,38 @@ public class L2HConverter extends LaTeXParserListener
 
    protected void writeMetaData(String title) throws IOException
    {
+      if (title == null)
+      {
+         title = getDocumentProperty("Title");
+      }
+
       if (title != null)
       {
          writeliteral("<title>");
          writeliteral(title);
          writeliteralln("</title>");
+
+         writeMeta(String.format("property=\"og:title\" content=\"%s\"",
+           HtmlTag.encodeAttributeValue(title, false)));
+      }
+
+      String keywords = getDocumentProperty("Keywords");
+
+      if (keywords != null)
+      {
+         writeMeta(String.format("property=\"keywords\" content=\"%s\"",
+           HtmlTag.encodeAttributeValue(keywords, false)));
+      }
+
+      String description = getDocumentProperty("Description");
+
+      if (description != null)
+      {
+         writeMeta(String.format("property=\"description\" content=\"%s\"",
+           HtmlTag.encodeAttributeValue(keywords, false)));
+
+         writeMeta(String.format("property=\"og:description\" content=\"%s\"",
+           HtmlTag.encodeAttributeValue(keywords, false)));
       }
    }
 
@@ -2375,7 +2402,7 @@ public class L2HConverter extends LaTeXParserListener
 
    public void setMetaDataTitle(String title)
    {
-      htmlMetaTitle = title;
+      setDocumentProperty("Title", title);
    }
 
    @Override
@@ -2390,22 +2417,28 @@ public class L2HConverter extends LaTeXParserListener
       if (!(cs instanceof Undefined) && !cs.isEmpty())
       {
          title = TeXParserUtils.expandOnce(cs, getParser(), stack);
-
-         if (htmlMetaTitle == null)
-         {
-            parser.startGroup();
-            parser.putControlSequence(true, new AtSecondOfTwo("texorpdfstring"));
-            htmlMetaTitle = stripTags(processToString(cs, stack));
-            parser.endGroup();
-         }
-
-         writeMetaData(htmlMetaTitle);
       }
-      else
+
+      String htmlMetaTitle = getDocumentProperty("Title");
+
+      if (htmlMetaTitle == null)
+      {
+          parser.startGroup();
+          parser.putControlSequence(true, new AtSecondOfTwo("texorpdfstring"));
+          htmlMetaTitle = stripTags(processToString(cs, stack));
+          parser.endGroup();
+
+          setMetaDataTitle(htmlMetaTitle);
+      }
+
+      if (htmlMetaTitle == null)
       {
          writeliteralln("<!-- no title found -->");
       }
-
+      else
+      {
+         writeMetaData(htmlMetaTitle);
+      }
 
       addDefaultArrayStyles();
 
@@ -3421,6 +3454,8 @@ public class L2HConverter extends LaTeXParserListener
          }
 
          TeXObject obj = info.getTitle();
+
+         String htmlMetaTitle = getDocumentProperty("Title");
          String title = htmlMetaTitle == null ? "Untitled" : htmlMetaTitle;
 
          if (obj != null)
@@ -5757,8 +5792,6 @@ public class L2HConverter extends LaTeXParserListener
    private boolean toTopLinkEnabled = true;
 
    protected String generator = "TeX Parser Library";
-
-   protected String htmlMetaTitle = null;
 
    protected StringBuilder extraImagePreamble = null;
 
