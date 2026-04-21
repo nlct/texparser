@@ -77,6 +77,7 @@ Nicola Talbot
 <entry key="tex.error.file.mapper">An error occurred while parsing {0}:
    {1}</entry>
 <entry key="tex.error.invalid.debug_mode">Invalid debug mode ''{0}''. Recognised mode names: {1}</entry>
+<entry key="tex.error.invalid.pdf_date">Can''t parse PDF date: {0}</entry>
 
 <!--  LaTeX Error Messages -->
 

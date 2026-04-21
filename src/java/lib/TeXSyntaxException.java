@@ -215,4 +215,6 @@ public class TeXSyntaxException extends IOException
       "tex.error.file.mapper";
    public static final String ERROR_INVALID_DEBUG_MODE =
       "tex.error.invalid.debug_mode";
+   public static final String ERROR_INVALID_PDF_DATE =
+      "tex.error.invalid.pdf_date";
 }

@@ -19,6 +19,9 @@
 package com.dickimawbooks.texparserlib;
 
 import java.io.IOException;
+import java.util.Calendar;
+import java.util.SimpleTimeZone;
+import java.util.Locale;
 
 import com.dickimawbooks.texparserlib.primitives.Relax;
 import com.dickimawbooks.texparserlib.latex.KeyValList;
@@ -1534,6 +1537,141 @@ public class TeXParserUtils
    public static boolean isBlank(char[] cbuff)
    {
       return isBlank(cbuff, 0, cbuff.length);
+   }
+
+   public static Calendar parsePDFDate(TeXObject obj, TeXParser parser, TeXObjectList stack)
+    throws IOException
+   {
+      String pdfdate = parser.expandToString(obj, stack).trim();
+
+      return parsePDFDate(pdfdate, parser);
+   }
+
+   public static Calendar parsePDFDate(String pdfdate, TeXParser parser)
+    throws TeXSyntaxException
+   {
+      String text = pdfdate;
+
+      if (!text.startsWith("D:") || text.length() < 16)
+      {
+         throw new TeXSyntaxException(parser,
+            TeXSyntaxException.ERROR_INVALID_PDF_DATE, pdfdate);
+      }
+
+      text = text.substring(2);
+
+      int year = 0;
+      int month = 0;
+      int dayOfMonth = 0;
+
+      int hour = 0;
+      int minute = 0;
+      int second = 0;
+
+      int tzhr = 0;
+      int tzmin = 0;
+
+      Calendar.Builder builder = new Calendar.Builder();
+
+      try
+      {
+         year = Integer.parseInt(text.substring(0, 4));
+         text = text.substring(4);
+
+         month = Integer.parseInt(text.substring(0, 2));
+         text = text.substring(2);
+
+         dayOfMonth = Integer.parseInt(text.substring(0, 2));
+         text = text.substring(2);
+
+         builder.setDate(year, month-1, dayOfMonth);
+
+         hour = Integer.parseInt(text.substring(0, 2));
+         text = text.substring(2);
+
+         minute = Integer.parseInt(text.substring(0, 2));
+         text = text.substring(2);
+
+         second = Integer.parseInt(text.substring(0, 2));
+         text = text.substring(2);
+
+         builder.setTimeOfDay(hour, minute, second);
+
+         SimpleTimeZone timezone;
+
+         if (text.equals("Z"))
+         {
+            timezone = new SimpleTimeZone(0, "UTC+0");
+         }
+         else
+         {
+            int relation = text.codePointAt(0);
+
+            text = text.substring(1);
+
+            tzhr = Integer.parseInt(text.substring(0, 2));
+            text = text.substring(2);
+
+            if (!text.isEmpty())
+            {
+               if (!text.startsWith("'"))
+               {
+                  throw new TeXSyntaxException(parser,
+                     TeXSyntaxException.ERROR_INVALID_PDF_DATE, pdfdate);
+               }
+
+               text = text.substring(1);
+
+               tzmin = Integer.parseInt(text.substring(0, 2));
+               text = text.substring(2);
+
+               if (!text.equals("'"))
+               {
+                  throw new TeXSyntaxException(parser,
+                     TeXSyntaxException.ERROR_INVALID_PDF_DATE, pdfdate);
+               }
+            }
+
+            int millisecs = 60000 * tzmin + (3600000 * tzhr);
+
+            String id = String.format((Locale)null, "%02", tzhr);
+
+            if (tzmin != 0)
+            {
+               id += String.format((Locale)null, "%02", tzmin);
+            }
+
+            if (relation == '+')
+            {
+               timezone = new SimpleTimeZone(millisecs, "UTC+"+id);
+            }
+            else if (relation == '-')
+            {
+               timezone = new SimpleTimeZone(-millisecs, "UTC-"+id);
+            }
+            else
+            {
+               throw new TeXSyntaxException(parser,
+                  TeXSyntaxException.ERROR_INVALID_PDF_DATE, pdfdate);
+            }
+         }
+
+         builder.setTimeZone(timezone);
+      }
+      catch (NumberFormatException e)
+      {
+         throw new TeXSyntaxException(e, parser,
+            TeXSyntaxException.ERROR_INVALID_PDF_DATE, pdfdate);
+      }
+      catch (IllegalStateException
+           | IllegalArgumentException
+           | IndexOutOfBoundsException e)
+      {
+         throw new TeXSyntaxException(e, parser,
+            TeXSyntaxException.ERROR_INVALID_PDF_DATE, pdfdate);
+      }
+
+      return builder.build();
    }
 
 }
