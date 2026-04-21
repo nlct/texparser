@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2022 Nicola L.C. Talbot
+    Copyright (C) 2026 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -19,18 +19,19 @@
 package com.dickimawbooks.texparserlib.latex.hyperref;
 
 import java.io.IOException;
-import java.util.Vector;
+import java.util.Iterator;
 
 import com.dickimawbooks.texparserlib.*;
+import com.dickimawbooks.texparserlib.latex.*;
 
-public class HyperBaseUrl extends ControlSequence
+public class HyperSetup extends ControlSequence
 {
-   public HyperBaseUrl(HyperrefSty sty)
+   public HyperSetup(HyperrefSty sty)
    {
-      this("hyperbaseurl", sty);
+      this("hypersetup", sty);
    }
 
-   public HyperBaseUrl(String name, HyperrefSty sty)
+   public HyperSetup(String name, HyperrefSty sty)
    {
       super(name);
       this.sty = sty;
@@ -39,22 +40,24 @@ public class HyperBaseUrl extends ControlSequence
    @Override
    public Object clone()
    {
-      return new HyperBaseUrl(getName(), sty);
+      return new HyperSetup(getName(), sty);
    }
 
    @Override
-   public void process(TeXParser parser) throws IOException
+   public void process(TeXParser parser, TeXObjectList stack)
+     throws IOException
+   {
+      KeyValList options = TeXParserUtils.popKeyValList(parser, stack);
+
+      sty.setup(options, stack);
+   }
+
+   @Override
+   public void process(TeXParser parser)
+     throws IOException
    {
       process(parser, parser);
    }
 
-   @Override
-   public void process(TeXParser parser, TeXObjectList stack) throws IOException
-   {
-      TeXObject urlArg = popArgExpandFully(parser, stack);
-
-      sty.setBaseUrl(urlArg);
-   }
-
-   private HyperrefSty sty;
+   HyperrefSty sty;
 }
