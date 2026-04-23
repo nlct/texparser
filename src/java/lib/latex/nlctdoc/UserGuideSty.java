@@ -1309,6 +1309,18 @@ public class UserGuideSty extends LaTeXSty
         listener, "florettemarker", 0x273E, // six petalled B&W florette
         "florette marker"));
 
+      registerControlSequence(AccSuppObject.createSymbol(
+        listener, "floralheartmarker", 0x2766, // Aldus leaf
+        "floral heart marker"));
+
+      registerControlSequence(AccSuppObject.createSymbol(
+        listener, "triangleupmarker", 0x25B2,
+        "triangle up marker"));
+
+      registerControlSequence(AccSuppObject.createSymbol(
+        listener, "triangledownmarker", 0x25BC,
+        "triangle down marker"));
+
       // don't bother with thin spaces for these commands
       registerControlSequence(new Symbol("dash", 0x2014));
       registerControlSequence(new Symbol("Slash", '/'));

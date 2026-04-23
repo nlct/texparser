@@ -64,6 +64,9 @@ public class FnSymMarker extends ControlSequence
          case 9: marker = listener.getControlSequence("vdoubleasteriskmarker"); break;
          case 10: marker = listener.getControlSequence("starmarker"); break;
          case 11: marker = listener.getControlSequence("florettemarker"); break;
+         case 12: marker = listener.getControlSequence("floralheartmarker"); break;
+         case 13: marker = listener.getControlSequence("triangleupmarker"); break;
+         case 14: marker = listener.getControlSequence("triangledownmarker"); break;
          default: marker = listener.createString(""+num);
       }
 
