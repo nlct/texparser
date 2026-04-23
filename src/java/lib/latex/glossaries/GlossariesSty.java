@@ -25,6 +25,8 @@ import java.util.Iterator;
 import java.util.Set;
 
 import com.dickimawbooks.texparserlib.*;
+import com.dickimawbooks.texparserlib.auxfile.AuxCommand;
+import com.dickimawbooks.texparserlib.auxfile.AuxData;
 import com.dickimawbooks.texparserlib.primitives.NewIf;
 import com.dickimawbooks.texparserlib.primitives.IfFalse;
 import com.dickimawbooks.texparserlib.primitives.IfTrue;
@@ -51,6 +53,7 @@ import com.dickimawbooks.texparserlib.html.EndElement;
  */
 
 public class GlossariesSty extends LaTeXSty
+  implements BeginDocumentListener
 {
    public GlossariesSty(KeyValList options, 
       LaTeXParserListener listener, boolean loadParentOptions)
@@ -64,6 +67,8 @@ public class GlossariesSty extends LaTeXSty
    throws IOException
    {
       super(options, name, listener, loadParentOptions);
+
+      listener.addBeginDocumentListener(this);
 
       if (name.equals("glossaries-extra"))
       {
@@ -549,6 +554,9 @@ public class GlossariesSty extends LaTeXSty
       fbox.setTextFont(new TeXFontText(TeXFontFamily.TT, TeXFontSize.FOOTNOTE));
 
       getListener().declareFrameBox(fbox, false);
+
+      getListener().addAuxCommand(new AuxCommand("@glossarylabeltype", 2));
+      getListener().addAuxCommand(new AuxCommand("glsSavedGlossaryGroup", 6));
 
       if (prefixSupport)
       {
@@ -1547,6 +1555,122 @@ public class GlossariesSty extends LaTeXSty
 
       listener.addPackage(new GlossaryStyleSty(this, "hypernav",
                   GlossaryStyleSty.STATUS_IMPLEMENTED));
+   }
+
+   @Override
+   public void documentBegun(BeginDocumentEvent evt)
+    throws IOException
+   {
+      Vector<AuxData> auxData = evt.getListener().getAuxData();
+
+      if (auxData != null)
+      {
+         TeXObjectList stack = evt.getStack();
+         TeXParser parser = getParser();
+
+         if (refLabelToTypeMap == null)
+         {
+            refLabelToTypeMap = new HashMap<String,String>();
+         }
+
+         for (AuxData d : auxData)
+         {
+            if (d.getName().equals("@glossarylabeltype"))
+            {
+               // \@glossarylabeltype{ref-label}{glossary-type}
+               TeXObject labelArg = d.getArg(0);
+               TeXObject typeArg = d.getArg(1);
+
+               String label = parser.expandToString(labelArg, stack);
+               String type = parser.expandToString(typeArg, stack);
+
+               refLabelToTypeMap.put(label, type);
+            }
+            else if (d.getName().equals("glsSavedGlossaryGroup"))
+            {
+// \glsSavedGlossaryGroup{ref-label}{glossary-type}{level}{parent}{group-label}{group title}
+               TeXObject labelArg = d.getArg(0);
+               TeXObject typeArg = d.getArg(1);
+               TeXObject levelArg = d.getArg(2);
+               TeXObject parentArg = d.getArg(3);
+               TeXObject grpLabelArg = d.getArg(4);
+               TeXObject grpTitle = d.getArg(5);
+
+               String label = parser.expandToString(labelArg, stack);
+               String type = parser.expandToString(typeArg, stack);
+               int level = TeXParserUtils.toInt(levelArg, parser, stack);
+               String parent = parser.expandToString(parentArg, stack);
+               String grpLabel = parser.expandToString(grpLabelArg, stack);
+
+               GlossaryGroup grp = new GlossaryGroup(label, type, level, parent,
+                 grpLabel, grpTitle);
+
+               Vector<GlossaryGroup> list = null;
+
+               if (label.isEmpty())
+               {
+                  if (typeGroupsMap == null)
+                  {
+                     typeGroupsMap = new HashMap<String,Vector<GlossaryGroup>>();
+                  }
+                  else
+                  {
+                     list = typeGroupsMap.get(type);
+                  }
+
+                  if (list == null)
+                  {
+                     list = new Vector<GlossaryGroup>();
+                     typeGroupsMap.put(type, list);
+                  }
+               }
+               else
+               {
+                  if (refLabelGroupsMap == null)
+                  {
+                     refLabelGroupsMap = new HashMap<String,Vector<GlossaryGroup>>();
+                  }
+                  else
+                  {
+                     list = refLabelGroupsMap.get(label);
+                  }
+
+                  if (list == null)
+                  {
+                     list = new Vector<GlossaryGroup>();
+                     refLabelGroupsMap.put(label, list);
+                  }
+               }
+
+               list.add(grp);
+            }
+         }
+      }
+   }
+
+   public Set<String> getRefLabelGroupsKeySet()
+   {
+      return refLabelGroupsMap == null ? null : refLabelGroupsMap.keySet();
+   }
+
+   public Vector<GlossaryGroup> getGroupsForRefLabel(String refLabel)
+   {
+      return refLabelGroupsMap == null ? null : refLabelGroupsMap.get(refLabel);
+   }
+
+   public Set<String> getTypeGroupsKeySet()
+   {
+      return typeGroupsMap == null ? null : typeGroupsMap.keySet();
+   }
+
+   public Vector<GlossaryGroup> getGroupsForType(String type)
+   {
+      return typeGroupsMap == null ? null : typeGroupsMap.get(type);
+   }
+
+   public String getTypeForRefLabel(String refLabel)
+   {
+      return refLabelToTypeMap == null ? null : refLabelToTypeMap.get(refLabel);
    }
 
    protected GlossaryStyleSty addListStyles() throws IOException
@@ -4195,6 +4319,11 @@ public class GlossariesSty extends LaTeXSty
    private String record = "off";
 
    private HashMap<String,Vector<String>> targetMap;
+
+   private HashMap<String,String> refLabelToTypeMap;
+
+   private HashMap<String,Vector<GlossaryGroup>> refLabelGroupsMap;
+   private HashMap<String,Vector<GlossaryGroup>> typeGroupsMap;
 
    public static final String GLOSSARY_NOT_DEFINED 
     = "glossaries.glossary.not.defined";
