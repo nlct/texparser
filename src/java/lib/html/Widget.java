@@ -49,7 +49,7 @@ public class Widget extends Command
 
       TeXObjectList list = listener.createStack();
 
-      if (listener.isHtml5())
+      if (listener.isHtml5() || listener.isXml())
       {
          StartElement startElem = new StartElement("kbd");
 

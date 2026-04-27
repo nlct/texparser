@@ -77,15 +77,14 @@ public class TrivListDec extends Declaration
    @Override
    public void process(TeXParser parser) throws IOException
    {
-      setup(parser, parser);
-      ((LaTeXParserListener)parser.getListener()).startList(this);
+      process(parser, parser);
    }
 
    @Override
    public void process(TeXParser parser, TeXObjectList stack) throws IOException
    {
       setup(parser, stack);
-      ((LaTeXParserListener)parser.getListener()).startList(this);
+      ((LaTeXParserListener)parser.getListener()).startList(this, stack);
    }
 
    public void setup(TeXParser parser, TeXObjectList stack) throws IOException
@@ -94,21 +93,14 @@ public class TrivListDec extends Declaration
 
       ControlSequence cs = parser.getListener().getControlSequence("@nmbrlistfalse");
 
-      if (parser == stack || stack == null)
-      {
-         cs.process(parser);
-      }
-      else
-      {
-         cs.process(parser, stack);
-      }
+      TeXParserUtils.process(cs, parser, stack);
    }
 
    @Override
    public void end(TeXParser parser, TeXObjectList stack)
     throws IOException
    {
-      ((LaTeXParserListener)parser.getListener()).endList(this);
+      ((LaTeXParserListener)parser.getListener()).endList(this, stack);
    }
 
    @Override

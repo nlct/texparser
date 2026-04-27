@@ -444,6 +444,11 @@ public class L2HImage extends AbstractTeXObject implements Expandable
       }
    }
 
+   public FileData getFileData()
+   {
+      return new FileData(path.toFile(), name, mimetype);
+   }
+
    private Path path;
    private String mimetype, name;
    private int width=0, height=0;

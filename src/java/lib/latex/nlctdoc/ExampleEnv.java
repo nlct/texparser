@@ -71,6 +71,8 @@ public class ExampleEnv extends Declaration
          listener.stepcounter("example");
          L2HConverter l2h = (L2HConverter)listener;
 
+         label = l2h.processAnchorName(label);
+
          l2h.writeliteral(
            String.format("<div class=\"example\" id=\"%s\">", label));
 

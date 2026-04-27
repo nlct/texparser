@@ -111,7 +111,16 @@ public class L2HTableOfContents extends ListOf
 
       StartElement elem = new StartElement(navTag);
       elem.putAttribute("class", "toc");
-      elem.putAttribute("aria-label", "Table of Contents");
+
+      if (listener.isXml())
+      {
+         elem.putAttribute("title", "Table of Contents");
+      }
+      else
+      {
+         elem.putAttribute("aria-label", "Table of Contents");
+      }
+
       stack.push(elem);
 
       reg = parser.getSettings().newcount(true, "@curr@toclevel");

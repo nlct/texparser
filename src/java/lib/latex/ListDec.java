@@ -85,7 +85,7 @@ public class ListDec extends TrivListDec
          listsettings.process(parser, stack);
       }
 
-      ((LaTeXParserListener)parser.getListener()).startList(this);
+      ((LaTeXParserListener)parser.getListener()).startList(this, stack);
    }
 
    @Override

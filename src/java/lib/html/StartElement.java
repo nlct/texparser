@@ -217,6 +217,18 @@ public class StartElement extends HtmlTag
       attributes.put(attrName, attrValue);
    }
 
+   public void putAllAttributes(HashMap<String,String> attrs)
+   {
+      if (attributes == null)
+      {
+         attributes = new HashMap<String,String>(attrs);
+      }
+      else
+      {
+         attributes.putAll(attrs);
+      }
+   }
+
    public void putStyle(L2HConverter listener, HashMap<String,String> css)
    {
       String name = listener.getCssClass(css);

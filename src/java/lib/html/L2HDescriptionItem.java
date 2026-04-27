@@ -41,21 +41,25 @@ public class L2HDescriptionItem extends DescriptionItem
       return new L2HDescriptionItem(getName());
    }
 
-   public void makelabel(TeXParser parser, TrivListDec trivList, 
+   @Override
+   public void makelabel(TeXParser parser, TeXObjectList stack, TrivListDec trivList, 
      TeXObject label)
     throws IOException
    {
       L2HConverter listener = (L2HConverter)parser.getListener();
 
+      listener.startListItem(new StartElement("dt"), stack);
+
       Group grp = listener.createGroup();
 
-      grp.add(new StartElement("dt"));
       grp.add(listener.getControlSequence("descriptionlabel"));
       grp.add(label);
-      grp.add(new EndElement("dt"));
-      grp.add(new StartElement("<dd>"));
 
-      grp.process(parser);
+      TeXParserUtils.process(grp, parser, stack);
+
+      listener.endListItem(new EndElement("dt"), stack);
+
+      listener.startListItem(new StartElement("dd"), stack);
    }
 
 }

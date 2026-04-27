@@ -66,19 +66,22 @@ public class L2HContentsLine extends ContentsLine
          reg = (CountRegister)settings.getNumericRegister("@curr@toclevel@chapter");
       }
 
-      StartElement startElem;
+      L2HItem startItem;
+      TeXObject endElem = null;
+
       int currLevel = -1;
       int prevLevel = -1;
 
-      String tag;
-
       if (reg == null)
       {
-         tag = "div";
+         StartElement startElem = new StartElement("div");
+         startElem.putAttribute("class", "toc-"+typeStr);
+         list.add(startElem);
+
+         endElem = new EndElement("div");
       }
       else
       {
-         tag = "li";
          currLevel = reg.number(parser);
          reg = (CountRegister)settings.getNumericRegister("@curr@toclevel");
          prevLevel = reg.number(parser);
@@ -97,11 +100,12 @@ public class L2HContentsLine extends ContentsLine
          {
             for (int i = prevLevel; i < currLevel; i++)
             {
-               list.add(new StartElement("ul", true));
+               L2HList listDec = new L2HList();
+               list.add(listDec);
 
                if (def != null)
                {
-                  def.add(new EndElement("ul"));
+                  def.add(new EndDeclaration(listDec));
                }
             }
          }
@@ -120,12 +124,12 @@ public class L2HContentsLine extends ContentsLine
                }
             }
          }
+
+         startItem = new L2HItem();
+         startItem.putAttribute("class", "toc-"+typeStr);
+
+         list.add(startItem);
       }
-
-      startElem = new StartElement(tag, true);
-      startElem.putAttribute("class", "toc-"+typeStr);
-
-      list.add(startElem);
 
       LabelInfo info = listener.getLabelInfo(link);
 
@@ -141,7 +145,7 @@ public class L2HContentsLine extends ContentsLine
 
       if (info == null)
       {
-         startElem = new StartElement("a");
+         StartElement startElem = new StartElement("a");
          startElem.putAttribute("href", "#"+HtmlTag.getUriFragment(link));
          list.add(startElem);
 
@@ -153,8 +157,11 @@ public class L2HContentsLine extends ContentsLine
          list.add(listener.createLink(info, title), true);
       }
 
-      list.add(new EndElement(tag));
-      list.add(new HtmlTag(String.format("<!-- end of toc-%s -->%n", typeStr)));
+      if (endElem != null)
+      {
+         list.add(endElem);
+         list.add(new HtmlTag(String.format("<!-- end of toc-%s -->%n", typeStr)));
+      }
 
       return list;
    }

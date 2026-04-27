@@ -3522,7 +3522,14 @@ public class GlossariesSty extends LaTeXSty
       }
       else if (cs instanceof GenericCommand)
       {
-         prefix = ((GenericCommand)cs).getDefinition().toString(getParser());
+         try
+         {
+            prefix = getParser().expandToString(cs, null);
+         }
+         catch (IOException e)
+         {
+            getParser().warning(e);
+         }
       }
 
       return prefix + glslabel.getLabel();

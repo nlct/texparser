@@ -19,7 +19,7 @@
 package com.dickimawbooks.texparserlib.html;
 
 import java.io.IOException;
-import java.io.EOFException;
+import java.util.HashMap;
 
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.*;
@@ -54,26 +54,83 @@ public class L2HItem extends ListItem
       }
       else
       {
+         StartElement elem = new StartElement("li", true);
+
+         if (attributes != null)
+         {
+            elem.putAllAttributes(attributes);
+         }
+
+         listener.startListItem(elem, stack);
+
          if (listener.isIfTrue(listener.getControlSequence("if@nmbrlist")))
          {
-            listener.writeliteral("<li><span class=\"numitem\">");
+            listener.writeliteral("<span class=\"numitem\">");
          }
          else
          {
-            listener.writeliteral("<li><span class=\"bulletitem\">");
+            listener.writeliteral("<span class=\"bulletitem\">");
          }
       }
 
-      if (parser == stack || stack == null)
-      {
-         label.process(parser);
-      }
-      else
-      {
-         label.process(parser, stack);
-      }
+      TeXParserUtils.process(label, parser, stack);
 
       listener.writeliteral("</span>");
    }
 
+   public String removeAttribute(String attrName)
+   {
+      if (attributes == null)
+      {
+         return null;
+      }
+
+      return attributes.remove(attrName);
+   }
+
+   public String getAttribute(String attrName)
+   {
+      if (attributes == null)
+      {
+         return null;
+      }
+
+      return attributes.get(attrName);
+   }
+
+   public boolean hasAttribute(String attrName)
+   {
+      if (attributes == null)
+      {
+         return false;
+      }
+
+      return attributes.containsKey(attrName);
+   }
+
+   public void putAttribute(String attrName, String attrValue)
+   {
+      if (attributes == null)
+      {
+         attributes = new HashMap<String,String>();
+      }
+
+      attributes.put(attrName, attrValue);
+   }
+
+   public void putStyle(L2HConverter listener, HashMap<String,String> css)
+   {
+      String name = listener.getCssClass(css);
+
+      if (name == null)
+      {
+         putAttribute("style", listener.cssAttributesToString(css));
+      }
+      else
+      {
+         putAttribute("class", name);
+      }
+   }
+
+   private HashMap<String,String> attributes;
 }

@@ -45,9 +45,9 @@ public class WidgetKeyStroke extends Command
 
       /*
         Swing's HTMLDocument only has limited support so this assumes the HTML
-        output is for Swing if not HTML5.
+        output is for Swing if not HTML5 or XHTML.
        */
-      String kbdTag = listener.isHtml5() ? "kbd" : "font";
+      String kbdTag = listener.isHtml5() || listener.isXml() ? "kbd" : "font";
 
       StartElement startElem = new StartElement(kbdTag);
       startElem.putAttribute("class", "keystroke");

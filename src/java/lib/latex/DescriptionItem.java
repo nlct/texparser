@@ -40,7 +40,9 @@ public class DescriptionItem extends ListItem
       return new DescriptionItem(getName());
    }
 
-   public void makelabel(TeXParser parser, TrivListDec trivList, TeXObject label)
+   @Override
+   public void makelabel(TeXParser parser, TeXObjectList stack,
+      TrivListDec trivList, TeXObject label)
     throws IOException
    {
       LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
@@ -50,6 +52,6 @@ public class DescriptionItem extends ListItem
       grp.add(listener.getControlSequence("descriptionlabel"));
       grp.add(label);
 
-      grp.process(parser);
+      TeXParserUtils.process(grp, parser, stack);
    }
 }

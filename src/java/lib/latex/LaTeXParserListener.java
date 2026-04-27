@@ -28,6 +28,7 @@ import java.util.Vector;
 import java.util.Stack;
 import java.util.Iterator;
 import java.util.Properties;
+import java.util.Locale;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 import java.text.DateFormat;
@@ -3619,12 +3620,14 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       mainIndex = label;
    }
 
-   public void startList(TrivListDec trivlist) throws IOException
+   public void startList(TrivListDec trivlist, TeXObjectList stack)
+     throws IOException
    {
       trivListStack.push(trivlist);
    }
 
-   public void endList(TrivListDec trivlist) throws IOException
+   public void endList(TrivListDec trivlist, TeXObjectList stack)
+      throws IOException
    {
       trivListStack.pop();
    }
@@ -3900,6 +3903,16 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       return creationDate;
    }
 
+   public void setMainLanguage(Locale locale)
+   {
+      mainLocale = locale;
+   }
+
+   public Locale getMainLanguage()
+   {
+      return mainLocale == null ? Locale.getDefault() : mainLocale;
+   }
+
    public void setDocumentProperty(String key, String value)
    {
       if (docProperties == null)
@@ -4021,6 +4034,7 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
 
    protected Calendar modifiedDate, creationDate;
    protected Properties docProperties;
+   protected Locale mainLocale; // primary language
 
    public static final UserNumber ZERO = UserNumber.ZERO;
    public static final UserNumber ONE = UserNumber.ONE;

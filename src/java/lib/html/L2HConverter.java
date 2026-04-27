@@ -203,6 +203,24 @@ public class L2HConverter extends LaTeXParserListener
       return basePath;
    }
 
+   public void addToManifest(FileData fileData)
+   {
+      if (manifest == null)
+      {
+         manifest = new Vector<FileData>();
+      }
+
+      if (!manifest.contains(fileData))
+      {
+         manifest.add(fileData);
+      }
+   }
+
+   public Vector<FileData> getManifest()
+   {
+      return manifest;
+   }
+
    /**
     * Sets the destination directory for images. If null, retain
     * input relative structure. 
@@ -358,6 +376,8 @@ public class L2HConverter extends LaTeXParserListener
       putControlSequence(new L2HAbstract());
       putControlSequence(new L2HMultiCols());
       putControlSequence(new L2HMultiCols("multicols*"));
+
+      putControlSequence(new L2HList());
 
       putControlSequence(new L2HItem());
 
@@ -892,7 +912,7 @@ public class L2HConverter extends LaTeXParserListener
 
    public boolean isHtml5()
    {
-      return !isXml();
+      return isHtml5;
    }
 
    /**
@@ -1704,10 +1724,17 @@ public class L2HConverter extends LaTeXParserListener
       return list;
    }
 
+   public String processAnchorName(String anchorName)
+   {
+      return anchorName;
+   }
+
    @Override
    public TeXObject createAnchor(String anchorName, TeXObject text)
     throws IOException
    {
+      anchorName = processAnchorName(anchorName);
+
       if (text instanceof TeXObjectList && !text.isEmpty() 
            && ((TeXObjectList)text).firstElement() instanceof StartElement)
       {
@@ -1838,6 +1865,8 @@ public class L2HConverter extends LaTeXParserListener
             node = divisionMap.get(id);
          }
 
+         id = processAnchorName(id);
+
          if (node == null || node == currentNode
               || node.getFile().equals(currentNode.getFile()))
          {
@@ -1861,6 +1890,8 @@ public class L2HConverter extends LaTeXParserListener
       }
       else
       {
+         id = processAnchorName(id);
+
          ref = "#"+HtmlTag.getUriFragment(id);
       }
 
@@ -1891,6 +1922,8 @@ public class L2HConverter extends LaTeXParserListener
             anchorName = label.toString(parser);
          }
       }
+
+      anchorName = processAnchorName(anchorName);
 
       String ref = "#"+HtmlTag.getUriFragment(anchorName);
 
@@ -2261,8 +2294,15 @@ public class L2HConverter extends LaTeXParserListener
       }
    }
 
+   public boolean isWriteOGMarkupOn()
+   {
+      return true;
+   }
+
    protected void writeMetaData(String title) throws IOException
    {
+      boolean addOG = isWriteOGMarkupOn();
+
       if (title == null)
       {
          title = getDocumentProperty("Title");
@@ -2274,8 +2314,11 @@ public class L2HConverter extends LaTeXParserListener
          writeliteral(title);
          writeliteralln("</title>");
 
-         writeMeta(String.format("property=\"og:title\" content=\"%s\"",
-           HtmlTag.encodeAttributeValue(title, false)));
+         if (addOG)
+         {
+            writeMeta(String.format("property=\"og:title\" content=\"%s\"",
+              HtmlTag.encodeAttributeValue(title, false)));
+         }
       }
 
       String keywords = getDocumentProperty("Keywords");
@@ -2293,8 +2336,11 @@ public class L2HConverter extends LaTeXParserListener
          writeMeta(String.format("property=\"description\" content=\"%s\"",
            HtmlTag.encodeAttributeValue(keywords, false)));
 
-         writeMeta(String.format("property=\"og:description\" content=\"%s\"",
-           HtmlTag.encodeAttributeValue(keywords, false)));
+         if (addOG)
+         {
+            writeMeta(String.format("property=\"og:description\" content=\"%s\"",
+              HtmlTag.encodeAttributeValue(keywords, false)));
+         }
       }
    }
 
@@ -2476,11 +2522,14 @@ public class L2HConverter extends LaTeXParserListener
          {
             cssFile = new File(outPath.toFile(), parser.getJobname()+".css");
             writeCssFile();
+
+            addToManifest(new FileData(cssFile, "stylesheet", MIME_TYPE_CSS));
          }
 
-         writeliteral("<link rel=\"stylesheet\" type=\"text/css\" href=\"");
-         writeliteral(HtmlTag.encodeAttributeValue(cssFile.getName(), true));
-         writeliteralln("\">");
+         writeVoidElement("link",
+            String.format("rel=\"stylesheet\" type=\"text/css\" href=\"%s\"",
+              HtmlTag.encodeAttributeValue(cssFile.getName(), true)),
+          true);
       }
       else
       {
@@ -2525,6 +2574,11 @@ public class L2HConverter extends LaTeXParserListener
 
             citeInfo.setDivisionInfo(citeList.get(1).getDivisionInfo());
          }
+      }
+      else
+      {
+         addToManifest(new FileData(getRootFile(),
+           isXml() ? MIME_TYPE_XHTML : MIME_TYPE_HTML));
       }
 
       rootPagePreMain(stack);
@@ -3356,6 +3410,8 @@ public class L2HConverter extends LaTeXParserListener
    {
       if (divisionData == null || divisionData.isEmpty()) return;
 
+      String mimeType = isXml() ? MIME_TYPE_XHTML : MIME_TYPE_HTML;
+
       divisionMap = new HashMap<String,DivisionNode>();
 
       DivisionNode prevNode = null;
@@ -3411,6 +3467,8 @@ public class L2HConverter extends LaTeXParserListener
                label = "node"+i;
             }
          }
+
+         label = processAnchorName(label);
 
          // Is there a label corresponding to the target?
 
@@ -3510,6 +3568,8 @@ public class L2HConverter extends LaTeXParserListener
 
          divisionMap.put(label, node);
 
+         addToManifest(new FileData(node, mimeType));
+
          prevNode = node;
       }
 
@@ -3530,6 +3590,9 @@ public class L2HConverter extends LaTeXParserListener
       try
       {
          navWriter = newNavWriter(navFile.toPath());
+
+         addToManifest(new FileData(navFile,
+           isXml() ? MIME_TYPE_XHTML : MIME_TYPE_HTML));
 
          getParser().message(TeXApp.MESSAGE_WRITING, navFile);
 
@@ -3659,8 +3722,16 @@ public class L2HConverter extends LaTeXParserListener
 
       writeliteralln("<div class=\"nav-content\">");
 
-      writeStartHtml5OrDiv("nav",
-        "id=\"doc-nav\" aria-label=\"Document Navigation\"", true);
+      if (isXml())
+      {
+         writeStartHtml5OrDiv("nav",
+           "id=\"doc-nav\" title=\"Document Navigation\"", true);
+      }
+      else
+      {
+         writeStartHtml5OrDiv("nav",
+           "id=\"doc-nav\" aria-label=\"Document Navigation\"", true);
+      }
 
       writeNavigationList(null, null);
 
@@ -3705,6 +3776,17 @@ public class L2HConverter extends LaTeXParserListener
 
       DivisionNode prevNode = null;
 
+      Stack<ListBlockData> stack = null;
+
+      ListBlockData listData = null;
+
+      if (isXml())
+      {
+         stack = new Stack<ListBlockData>();
+         listData = new ListBlockData("ul", 0);
+         stack.push(listData);
+      }
+
       for (DivisionInfo divInfo : divisionData)
       {
          DivisionNode node = (DivisionNode)divInfo.getSpecial();
@@ -3719,17 +3801,57 @@ public class L2HConverter extends LaTeXParserListener
 
          if (prevNode == null || prevNode.getLevel() == node.getLevel())
          {
+            if (stack != null && !stack.empty())
+            {
+               listData = stack.peek();
+
+               if (listData.getCurrentItem() != null)
+               {
+                  writeliteralln("</li>");
+               }
+            }
          }
          else if (prevNode.getLevel() < node.getLevel())
          {
             writeliteralln("<ul>");
+
+            if (stack != null)
+            {
+               listData = new ListBlockData("ul", node.getLevel());
+               stack.push(listData);
+            }
          }
          else
          {
+            if (stack != null && !stack.empty())
+            {
+               listData = stack.pop();
+
+               if (listData.getCurrentItem() != null)
+               {
+                  writeliteralln("</li>");
+               }
+            }
+
             writeliteralln("</ul>");
+
+            if (stack != null && !stack.empty())
+            {
+               listData = stack.peek();
+
+               if (listData.getCurrentItem() != null)
+               {
+                  writeliteralln("</li>");
+               }
+            }
          }
 
          writeliteral("<li>");
+
+         if (listData != null)
+         {
+            listData.setCurrentItem("li");
+         }
 
          String prefix = node.getPrefix();
          String ref = node.getRef();
@@ -3769,6 +3891,35 @@ public class L2HConverter extends LaTeXParserListener
          writeliteralln("</a>");
 
          prevNode = node;
+         listData = null;
+      }
+
+      if (prevNode != null)
+      {
+         for (int i = prevNode.getLevel(); i > 0; i--)
+         {
+            if (stack != null && !stack.empty())
+            {
+               listData = stack.pop();
+
+               if (listData.getCurrentItem() != null)
+               {
+                  writeliteralln("</li>");
+               }
+            }
+
+            writeliteralln("</ul>");
+         }
+      }
+
+      if (stack != null && !stack.empty())
+      {
+         listData = stack.pop();
+
+         if (listData.getCurrentItem() != null)
+         {
+            writeliteralln("</li>");
+         }
       }
 
       writeliteralln("</ul>");
@@ -4233,6 +4384,8 @@ public class L2HConverter extends LaTeXParserListener
       if (image != null)
       {
          TeXParserUtils.process(image, parser, stack);
+
+         addToManifest(image.getFileData());
       }
       else
       {
@@ -4246,6 +4399,8 @@ public class L2HConverter extends LaTeXParserListener
          {
             dest = outPath.resolve(imageDest.resolve(file.getName()));
          }
+
+         addToManifest(new FileData(dest.toFile(), type));
 
          Dimension dim = getImageSize(file, type);
 
@@ -4689,6 +4844,8 @@ public class L2HConverter extends LaTeXParserListener
       String anchor = String.format("idx-%s-%d", 
         HtmlTag.getUriFragment(indexLabel), indexLoc);
 
+      anchor = processAnchorName(anchor);
+
       writeliteral(String.format("<a id=\"%s\"></a>", anchor));
 
       return new IndexLocation(new HtmlTag(
@@ -4707,70 +4864,207 @@ public class L2HConverter extends LaTeXParserListener
       return styCs.contains(cs.getName());
    }
 
-   public void startList(TrivListDec trivlist) throws IOException
+   public void startListItem(StartElement elem, TeXObjectList stack)
+    throws IOException
    {
       endParagraph();
 
-      super.startList(trivlist);
-
-      setCurrentBlockType(DocumentBlockType.BLOCK);
-
-      if (trivlist instanceof DescriptionDec)
+      if (isXml())
       {
-         switch (((DescriptionDec)trivlist).getStyle())
+         ListBlockData listData = null;
+
+         if (listStack != null && !listStack.empty())
          {
-            case INLINE_TITLE:
-               writeliteral(String.format("%n<dl class=\"inlinetitle\">%n"));
-            break;
-            case INLINE_BLOCK_TITLE:
-               writeliteral(String.format("%n<dl class=\"inlineblock\">%n"));
-            break;
-            default:
-               writeliteral(String.format("%n<dl>%n"));
+            listData = listStack.peek();
+            String tag = listData.getCurrentItem();
+
+            if (tag != null)
+            {
+               writeliteralln("</"+tag+">");
+            }
          }
-      }
-      else if (trivlist.isInLine())
-      {
-         writeliteral("<div class=\"inlinelist\">");
+
+         TeXParserUtils.process(elem, getParser(), stack);
+
+         if (listData != null)
+         {
+            listData.setCurrentItem(elem.getName());
+         }
       }
       else
       {
-         if (isIfTrue(getControlSequence("if@nmbrlist")))
-         {
-            writeliteral(String.format("%n<ol class=\"displaylist\">%n"));
-         }
-         else
-         {
-            writeliteral(String.format("%n<ul class=\"displaylist\">%n"));
-         }
+         TeXParserUtils.process(elem, getParser(), stack);
       }
    }
 
-   public void endList(TrivListDec trivlist) throws IOException
+   public void endListItem(EndElement elem, TeXObjectList stack)
+    throws IOException
    {
-      setCurrentBlockType(DocumentBlockType.BODY);
+      endParagraph();
+
+      if (listStack != null && !listStack.empty())
+      {
+         ListBlockData listData = listStack.peek();
+
+         String tag = listData.getCurrentItem();
+
+         if (tag != null)
+         {
+            writeliteralln("</"+tag+">");
+         }
+
+         listData.setCurrentItem(null);
+      }
+
+      TeXParserUtils.process(elem, getParser(), stack);
+   }
+
+   @Override
+   public void startList(TrivListDec trivlist, TeXObjectList stack) throws IOException
+   {
+      endParagraph();
+
+      super.startList(trivlist, stack);
+
+      setCurrentBlockType(DocumentBlockType.BLOCK);
+
+      StartElement elem;
+
+      String cssClass = null;
 
       if (trivlist instanceof DescriptionDec)
       {
-         writeliteral(String.format("%n</dl>%n"));
+         elem = new StartElement("dl", true);
+
+         switch (((DescriptionDec)trivlist).getStyle())
+         {
+            case INLINE_TITLE:
+               cssClass = "inlinetitle";
+            break;
+            case INLINE_BLOCK_TITLE:
+               cssClass = "inlineblock";
+            break;
+         }
       }
       else if (trivlist.isInLine())
       {
-         writeliteral("</div>");
+         elem = new StartElement("div", false, false);
+         cssClass = "inlinelist";
       }
       else
       {
          if (isIfTrue(getControlSequence("if@nmbrlist")))
          {
-            writeliteral(String.format("%n</ol>%n"));
+            elem = new StartElement("ol", true);
          }
          else
          {
-            writeliteral(String.format("%n</ul>%n"));
+            elem = new StartElement("ul", true);
+         }
+
+         cssClass = "displaylist";
+      }
+
+      if (trivlist instanceof L2HList)
+      {
+         ((L2HList)trivlist).applyAttributesTo(elem);
+
+         String listClass = elem.getAttribute("class");
+
+         if (listClass != null)
+         {
+            if (cssClass == null)
+            {
+               cssClass = listClass;
+            }
+            else
+            {
+               cssClass += " " + listClass;
+            }
          }
       }
 
-      super.endList(trivlist);
+      if (cssClass != null)
+      {
+         elem.putAttribute("class", cssClass);
+      }
+
+      TeXParserUtils.process(elem, getParser(), stack);
+
+      if (isXml())
+      {
+         int level = 0;
+
+         if (listStack == null)
+         {
+            listStack = new Stack<ListBlockData>();
+         }
+         else if (!listStack.empty())
+         {
+            ListBlockData listData = listStack.peek();
+            level = listData.getLevel();
+         }
+
+         listStack.push(new ListBlockData(elem.getName(), level+1));
+      }
+   }
+
+   @Override
+   public void endList(TrivListDec trivlist, TeXObjectList stack) throws IOException
+   {
+      setCurrentBlockType(DocumentBlockType.BODY);
+
+      EndElement elem;
+
+      if (trivlist instanceof DescriptionDec)
+      {
+         elem = new EndElement("dl", true);
+      }
+      else if (trivlist.isInLine())
+      {
+         elem = new EndElement("div", false, false);
+      }
+      else
+      {
+         if (isIfTrue(getControlSequence("if@nmbrlist")))
+         {
+            elem = new EndElement("ol", true);
+         }
+         else
+         {
+            elem = new EndElement("ul", true);
+         }
+      }
+
+      if (listStack != null && !listStack.empty())
+      {
+         ListBlockData listData = listStack.pop();
+
+         String tag = listData.getCurrentItem();
+
+         if (tag != null)
+         {
+            writeliteralln("</"+tag+">");
+         }
+      }
+
+      TeXParserUtils.process(elem, getParser(), stack);
+
+      if (listStack != null && !listStack.empty())
+      {
+         ListBlockData listData = listStack.peek();
+
+         String tag = listData.getCurrentItem();
+
+         if (tag != null)
+         {
+            writeliteralln("</"+tag+">");
+
+            listData.setCurrentItem(null);
+         }
+      }
+
+      super.endList(trivlist, stack);
    }
 
    public String getHtmlColor(Color col)
@@ -5351,6 +5645,8 @@ public class L2HConverter extends LaTeXParserListener
 
       boolean doEndSec = (currentSection != null);
 
+      id = processAnchorName(id);
+
       if (currentNode != null && id != null)
       {
          DivisionNode nextNode = divisionMap.get(id);
@@ -5448,11 +5744,11 @@ public class L2HConverter extends LaTeXParserListener
 
          if (id == null)
          {
-            writeliteral(String.format("<a id=\"%s\"></a>", name));
+            writeliteral(String.format("<a id=\"%s\"></a>", processAnchorName(name)));
          }
          else
          {
-            writeliteral(String.format("<a id=\"%s\"></a>", id));
+            writeliteral(String.format("<a id=\"%s\"></a>", processAnchorName(id)));
          }
       }
       else
@@ -5476,7 +5772,8 @@ public class L2HConverter extends LaTeXParserListener
             currentSection = id;
 
             writeln();
-            writeStartHtml5OrDiv("section", String.format("id=\"%s\"", id), false);
+            writeStartHtml5OrDiv("section",
+             String.format("id=\"%s\"", processAnchorName(id)), false);
          }
 
          writeliteral(String.format("<!-- start of section %s -->",
@@ -5518,7 +5815,7 @@ public class L2HConverter extends LaTeXParserListener
    {
       TeXObjectList stack = createStack();
       StartElement startElem = new StartElement("a");
-      startElem.putAttribute("id", anchorName);
+      startElem.putAttribute("id", processAnchorName(anchorName));
 
       stack.add(startElem);
       stack.add(new EndElement("a"));
@@ -5803,7 +6100,8 @@ public class L2HConverter extends LaTeXParserListener
    private HashMap<HashMap<String,String>,String> defaultStyleMaps;
 
    private boolean autoInsertPar = false;
-   private boolean isXml = false;
+   protected boolean isXml = false;
+   protected boolean isHtml5 = true;
 
    protected DocumentBlockType currentDocumentBlockType = DocumentBlockType.OUTSIDE;
 
@@ -5811,6 +6109,8 @@ public class L2HConverter extends LaTeXParserListener
 
    private String currentSection = null;
    private boolean afterHeading = false;
+
+   protected Stack<ListBlockData> listStack;
 
    protected DivisionNode currentNode = null;
 
@@ -5828,6 +6128,8 @@ public class L2HConverter extends LaTeXParserListener
    protected boolean separateCss = false;
    protected File cssFile;
 
+   protected Vector<FileData> manifest;
+
    // CSS font names
    protected String cssSerifFontNames = "";
    protected String cssSansSerifFontNames = "";
@@ -5840,4 +6142,9 @@ public class L2HConverter extends LaTeXParserListener
    public static final String MIME_TYPE_PNG = "image/png";
    public static final String MIME_TYPE_JPEG = "image/jpeg";
    public static final String MIME_TYPE_TEX = "text/x-tex";
+
+   public static final String MIME_TYPE_HTML = "text/html";
+   public static final String MIME_TYPE_XHTML = "application/xhtml+xml";
+   public static final String MIME_TYPE_XML = "application/xml";
+   public static final String MIME_TYPE_CSS = "text/css";
 }

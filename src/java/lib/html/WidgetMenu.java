@@ -56,7 +56,7 @@ public class WidgetMenu extends Command
 
       TeXObjectList list = listener.createStack();
 
-      if (listener.isHtml5())
+      if (listener.isHtml5() || listener.isXml())
       {
          // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/kbd
 
