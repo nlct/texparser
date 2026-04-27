@@ -738,8 +738,9 @@ public class UserGuideSty extends LaTeXSty
       registerControlSequence(new TextualContentCommand(
         "refslistsep", ", "));
 
-      registerControlSequence(new TextualContentCommand(
-        "refslistlastsep", " & "));
+      registerControlSequence(new GenericCommand(true,
+        "refslistlastsep", null, TeXParserUtils.createStack(listener,
+          listener.getSpace(), new TeXCsRef("&"), listener.getSpace())));
 
       // \sectionref
       registerControlSequence(new Ref("sectionref", new TeXCsRef("sectionrefprefix")));
