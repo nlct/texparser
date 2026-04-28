@@ -31,4 +31,11 @@ public abstract class LaTeXCls extends LaTeXSty
    {
       super(options, name, "cls", listener, loadParentOptions);
    }
+
+   public boolean supportsChapter()
+   {
+      return supportsChapter;
+   }
+
+   protected boolean supportsChapter = false;
 }

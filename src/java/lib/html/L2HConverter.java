@@ -2357,7 +2357,7 @@ public class L2HConverter extends LaTeXParserListener
    {
       super.documentclass(options, clsName, loadParentOptions, stack);
 
-      if (parser.getControlSequence("c@chapter") != null)
+      if (docCls.supportsChapter())
       {
          putControlSequence(new L2HSection("chapter"));
       }

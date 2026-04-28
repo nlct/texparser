@@ -2304,6 +2304,8 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
             parser.putControlSequence(new FrontMatter());
             parser.putControlSequence(new MainMatter());
             parser.putControlSequence(new BackMatter());
+
+            ((UnknownCls)docCls).setSupportsChapter(true);
          }
 
          parsePackageFile(docCls, stack);

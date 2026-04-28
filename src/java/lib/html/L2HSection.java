@@ -282,4 +282,6 @@ public class L2HSection extends Section
       new String[] {"subsubsection", "h4"},
       new String[] {"paragraph", "h5"}
    };
+
+   private HashMap<String,String> attributes;
 }

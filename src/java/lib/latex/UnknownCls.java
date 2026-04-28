@@ -44,6 +44,11 @@ public class UnknownCls extends LaTeXCls
    {
    }
 
+   public void setSupportsChapter(boolean hasChapter)
+   {
+      this.supportsChapter = hasChapter;
+   }
+
    @Override
    public void processOption(String option, TeXObject value)
     throws IOException

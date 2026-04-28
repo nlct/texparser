@@ -31,6 +31,8 @@ public class JmlrBookCls extends JmlrCls
    throws IOException
    {
       super(options, "jmlrbook", listener, loadParentOptions);
+
+      supportsChapter = true;
    }
 
    @Override
