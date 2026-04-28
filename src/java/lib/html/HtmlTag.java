@@ -19,67 +19,33 @@
 package com.dickimawbooks.texparserlib.html;
 
 import java.io.IOException;
-import java.util.Vector;
+import java.util.HashMap;
 import java.net.URI;
 import java.net.URISyntaxException;
 
 import com.dickimawbooks.texparserlib.*;
 
-public class HtmlTag extends AbstractTeXObject
+public class HtmlTag extends HtmlLiteral
 {
    public HtmlTag(String tag)
    {
+      this(tag, tag);
+   }
+
+   public HtmlTag(String htmlCode, String tag)
+   {
+      super(htmlCode);
       this.tag = tag;
    }
 
    @Override
    public Object clone()
    {
-      return new HtmlTag(getTag());
-   }
+      HtmlTag elem = new HtmlTag(getHtmlCode(), getTag());
 
-   @Override
-   public boolean isDataObject()
-   {
-      return true;
-   }
+      applyAttributesTo(elem);
 
-   @Override
-   public TeXObjectList string(TeXParser parser)
-   {
-      return parser.getListener().createString(getTag());
-   }
-
-   @Override
-   public String toString()
-   {
-      return String.format("%s[tag=%s]", 
-        getClass().getSimpleName(), getTag());
-   }
-
-   @Override
-   public String format()
-   {
-      return getTag();
-   }
-
-   @Override
-   public String toString(TeXParser parser)
-   {
-      return getTag();
-   }
-
-   @Override
-   public void process(TeXParser parser)
-      throws IOException
-   {
-      parser.getListener().getWriteable().writeliteral(tag);
-   }
-
-   @Override
-   public void process(TeXParser parser, TeXObjectList list) throws IOException
-   {
-      process(parser);
+      return elem;
    }
 
    public String getTag()
@@ -161,5 +127,80 @@ public class HtmlTag extends AbstractTeXObject
       }
    }
 
+   public void applyAttributesTo(HtmlTag elem)
+   {
+      if (attributes != null)
+      {
+         elem.putAllAttributes(attributes);
+      }
+   }
+
+   public String removeAttribute(String attrName)
+   {
+      if (attributes == null)
+      {
+         return null;
+      }
+
+      return attributes.remove(attrName);
+   }
+
+   public String getAttribute(String attrName)
+   {
+      if (attributes == null)
+      {
+         return null;
+      }
+
+      return attributes.get(attrName);
+   }
+
+   public boolean hasAttribute(String attrName)
+   {
+      if (attributes == null)
+      {
+         return false;
+      }
+
+      return attributes.containsKey(attrName);
+   }
+
+   public void putAttribute(String attrName, String attrValue)
+   {
+      if (attributes == null)
+      {
+         attributes = new HashMap<String,String>();
+      }
+
+      attributes.put(attrName, attrValue);
+   }
+
+   public void putAllAttributes(HashMap<String,String> attrs)
+   {
+      if (attributes == null)
+      {
+         attributes = new HashMap<String,String>(attrs);
+      }
+      else
+      {
+         attributes.putAll(attrs);
+      }
+   }
+
+   public void putStyle(L2HConverter listener, HashMap<String,String> css)
+   {
+      String name = listener.getCssClass(css);
+
+      if (name == null)
+      {
+         putAttribute("style", listener.cssAttributesToString(css));
+      }
+      else
+      {
+         putAttribute("class", name);
+      }
+   }
+
    private String tag;
+   protected HashMap<String,String> attributes;
 }

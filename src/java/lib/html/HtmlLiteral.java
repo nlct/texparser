@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2026 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -20,61 +20,72 @@ package com.dickimawbooks.texparserlib.html;
 
 import java.io.IOException;
 import java.util.Vector;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 import com.dickimawbooks.texparserlib.*;
 
-public class L2HNoBreakSpace extends Command
+public class HtmlLiteral extends AbstractTeXObject
 {
-   public L2HNoBreakSpace()
+   public HtmlLiteral(String htmlCode)
    {
-      this("nobreakspace");
+      this.htmlCode = htmlCode;
    }
 
-   public L2HNoBreakSpace(String name)
-   {
-      super(name);
-   }
-
+   @Override
    public Object clone()
    {
-      return new L2HNoBreakSpace(getName());
+      return new HtmlLiteral(getHtmlCode());
    }
 
-   public TeXObjectList expandonce(TeXParser parser) throws IOException
+   @Override
+   public boolean isDataObject()
    {
-      TeXObjectList list = new TeXObjectList(1);
-      list.add(new HtmlLiteral("&nbsp;"));
-      return list;
+      return true;
    }
 
-   public TeXObjectList expandonce(TeXParser parser, TeXObjectList List)
+   @Override
+   public TeXObjectList string(TeXParser parser)
+   {
+      return parser.getListener().createString(getHtmlCode());
+   }
+
+   @Override
+   public String toString()
+   {
+      return String.format("%s[htmlCode=%s]", 
+        getClass().getSimpleName(), getHtmlCode());
+   }
+
+   @Override
+   public String format()
+   {
+      return getHtmlCode();
+   }
+
+   @Override
+   public String toString(TeXParser parser)
+   {
+      return getHtmlCode();
+   }
+
+   @Override
+   public void process(TeXParser parser)
       throws IOException
    {
-      return expandonce(parser);
+      parser.getListener().getWriteable().writeliteral(htmlCode);
    }
 
-   public TeXObjectList expandfully(TeXParser parser)
-      throws IOException
-   {
-      return expandonce(parser);
-   }
-
-   public TeXObjectList expandfully(TeXParser parser, TeXObjectList List)
-      throws IOException
-   {
-      return expandfully(parser);
-   }
-
-   public void process(TeXParser parser) throws IOException
-   {
-      if (((L2HConverter)parser.getListener()).isInDocEnv())
-      {
-         parser.getListener().getWriteable().writeliteral("&nbsp;");
-      }
-   }
-
+   @Override
    public void process(TeXParser parser, TeXObjectList list) throws IOException
    {
       process(parser);
    }
+
+   public String getHtmlCode()
+   {
+      return htmlCode;
+   }
+
+   private String htmlCode;
 }

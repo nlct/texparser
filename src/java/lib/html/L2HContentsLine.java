@@ -160,7 +160,7 @@ public class L2HContentsLine extends ContentsLine
       if (endElem != null)
       {
          list.add(endElem);
-         list.add(new HtmlTag(String.format("<!-- end of toc-%s -->%n", typeStr)));
+         list.add(new HtmlLiteral(String.format("<!-- end of toc-%s -->%n", typeStr)));
       }
 
       return list;
@@ -175,10 +175,14 @@ public class L2HContentsLine extends ContentsLine
 
       String typeStr = type.toString(parser);
 
-      list.add(new HtmlTag(String.format("<div class=\"toc-%s\">",
-        typeStr)));
+      StartElement startElem = new StartElement("div");
+
+      startElem.putAttribute("class", "toc-"+typeStr);
+
+      list.add(startElem);
       list.add(title);
-      list.add(new HtmlTag(String.format("</div><!-- end of toc-%s -->%n", typeStr)));
+      list.add(new EndElement("div"));
+      list.add(new HtmlLiteral(String.format("<!-- end of toc-%s -->%n", typeStr)));
 
       return list;
    }

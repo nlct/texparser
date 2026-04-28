@@ -49,13 +49,13 @@ public class L2HBibItem extends BibItem
       if (parser == stack || stack == null)
       {
          parser.push(new EndElement("div"));
-         parser.push(new HtmlTag("<!-- end of bibitem -->"));
+         parser.push(new HtmlLiteral("<!-- end of bibitem -->"));
          parser.push(new StartElement("div"));
       }
       else
       {
          stack.push(new EndElement("div"));
-         stack.push(new HtmlTag("<!-- end of bibitem -->"));
+         stack.push(new HtmlLiteral("<!-- end of bibitem -->"));
          stack.push(new StartElement("div"));
       }
 
@@ -103,13 +103,13 @@ public class L2HBibItem extends BibItem
       if (parser == stack || stack == null)
       {
          parser.push(new EndElement("div"));
-         parser.push(new HtmlTag("<!-- end of bibitem -->"));
+         parser.push(new HtmlLiteral("<!-- end of bibitem -->"));
          parser.push(elem);
       }
       else
       {
          stack.push(new EndElement("div"));
-         stack.push(new HtmlTag("<!-- end of bibitem -->"));
+         stack.push(new HtmlLiteral("<!-- end of bibitem -->"));
          stack.push(elem);
       }
 

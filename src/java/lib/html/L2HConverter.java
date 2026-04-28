@@ -331,7 +331,7 @@ public class L2HConverter extends LaTeXParserListener
       parser.putControlSequence(new TextualContentCommand("BibTeX", "BibTeX"));
 
       parser.putControlSequence(new GenericCommand("indexspace", null,
-        new HtmlTag("<div class=\"indexspace\"></div>")));
+        new HtmlLiteral("<div class=\"indexspace\"></div>")));
 
       putControlSequence(new Relax("nonumberline"));
 
@@ -414,19 +414,19 @@ public class L2HConverter extends LaTeXParserListener
       parser.putControlSequence(new Relax("strut"));
 
       putControlSequence(new GenericCommand(true, "bigskip", null, 
-       new TeXObject[] {new HtmlTag("<div class=\"bigskip\"></div>")}));
+       new TeXObject[] {new HtmlLiteral("<div class=\"bigskip\"></div>")}));
       putControlSequence(new GenericCommand(true, "medskip", null, 
-       new TeXObject[] {new HtmlTag("<div class=\"medskip\"></div>")}));
+       new TeXObject[] {new HtmlLiteral("<div class=\"medskip\"></div>")}));
       putControlSequence(new GenericCommand(true, "smallskip", null, 
-       new TeXObject[] {new HtmlTag("<div class=\"smallskip\"></div>")}));
+       new TeXObject[] {new HtmlLiteral("<div class=\"smallskip\"></div>")}));
 
       putControlSequence(new L2Hhfill("hfill"));
       putControlSequence(new L2Hhfill("hfil"));
 
       putControlSequence(new GenericCommand(true, "quad", null, 
-       new TeXObject[] {new HtmlTag("<span class=\"quad\">  </span>")}));
+       new TeXObject[] {new HtmlLiteral("<span class=\"quad\">  </span>")}));
       putControlSequence(new GenericCommand(true, "qquad", null, 
-       new TeXObject[] {new HtmlTag("<span class=\"qquad\">    </span>")}));
+       new TeXObject[] {new HtmlLiteral("<span class=\"qquad\">    </span>")}));
 
       // ignore \\addvspace
       putControlSequence(new AtGobble("addvspace"));
@@ -434,7 +434,7 @@ public class L2HConverter extends LaTeXParserListener
       putControlSequence(new L2HNormalFont());
 
       putControlSequence(new GenericCommand(true, "labelitemii", null,
-       new HtmlTag("&#x2013;")));
+       new HtmlLiteral("&#x2013;")));
 
       /* indent/noindent not implemented */
       putControlSequence(new Relax("indent"));
@@ -718,7 +718,7 @@ public class L2HConverter extends LaTeXParserListener
    @Override
    public TeXObject getDivider(String name)
    {
-      return new HtmlTag(String.format("<div class=\"%s\">%s</div>", name,
+      return new HtmlLiteral(String.format("<div class=\"%s\">%s</div>", name,
         isXml() ? "<hr/>" : "<hr>"));
    }
 
@@ -2178,6 +2178,7 @@ public class L2HConverter extends LaTeXParserListener
 
       writeliteralln(".part { font-size: x-large; font-weight: bold; }");
 
+      writeliteralln("span.hfill { float: right; }");
       writeliteralln("div.bigskip { padding-left: 0pt; padding-right: 0pt; padding-top: 0pt; padding-bottom: 2ex;}");
       writeliteralln("div.medskip { padding-left: 0pt; padding-right: 0pt; padding-top: 0pt; padding-bottom: 1ex;}");
       writeliteralln("div.smallskip { padding-left: 0pt; padding-right: 0pt; padding-top: 0pt; padding-bottom: .5ex;}");
@@ -2664,7 +2665,7 @@ public class L2HConverter extends LaTeXParserListener
       {
          stack.push(new EndElement("span"));
 
-         stack.push(new HtmlTag(node.getPrefixedTitle()));
+         stack.push(new HtmlLiteral(node.getPrefixedTitle()));
 
          startElem = new StartElement("span");
          startElem.putAttribute("class", "breadcrumb-current");
@@ -2674,7 +2675,7 @@ public class L2HConverter extends LaTeXParserListener
       {
          stack.push(new EndElement("a"));
 
-         stack.push(new HtmlTag(node.getPrefixedTitle()));
+         stack.push(new HtmlLiteral(node.getPrefixedTitle()));
 
          startElem = new StartElement("a");
          startElem.putAttribute("class", "breadcrumb-item");
@@ -2719,7 +2720,7 @@ public class L2HConverter extends LaTeXParserListener
          startElem.putAttribute("class", "current");
 
          stack.add(startElem);
-         stack.add(new HtmlTag(currentNode.getPrefixedTitle()));
+         stack.add(new HtmlLiteral(currentNode.getPrefixedTitle()));
 
          if (currentNode.getChildCount() > 0)
          {
@@ -2733,7 +2734,7 @@ public class L2HConverter extends LaTeXParserListener
                startElem = new StartElement("a");
                startElem.putAttribute("href", child.getRef());
                stack.add(startElem);
-               stack.add(new HtmlTag(child.getPrefixedTitle()));
+               stack.add(new HtmlLiteral(child.getPrefixedTitle()));
                stack.add(new EndElement("a"));
                stack.add(new EndElement("li"));
             }
@@ -2750,7 +2751,7 @@ public class L2HConverter extends LaTeXParserListener
             stack.push(new EndElement("li"));
             stack.push(new EndElement("a"));
 
-            stack.push(new HtmlTag(sibling.getPrefixedTitle()));
+            stack.push(new HtmlLiteral(sibling.getPrefixedTitle()));
 
             startElem = new StartElement("a");
             startElem.putAttribute("href", sibling.getRef());
@@ -2769,7 +2770,7 @@ public class L2HConverter extends LaTeXParserListener
             startElem = new StartElement("a");
             startElem.putAttribute("href", sibling.getRef());
             stack.add(startElem);
-            stack.add(new HtmlTag(sibling.getPrefixedTitle()));
+            stack.add(new HtmlLiteral(sibling.getPrefixedTitle()));
             stack.add(new EndElement("a"));
             stack.add(new EndElement("li"));
 
@@ -2791,7 +2792,7 @@ public class L2HConverter extends LaTeXParserListener
          {
             stack.push(new EndElement("a"));
 
-            stack.push(new HtmlTag(parent.getPrefixedTitle()));
+            stack.push(new HtmlLiteral(parent.getPrefixedTitle()));
 
             startElem = new StartElement("a");
             startElem.putAttribute("href", parent.getRef());
@@ -3179,7 +3180,7 @@ public class L2HConverter extends LaTeXParserListener
 
             if (!compact)
             {
-               stack.add(new HtmlTag(prevNode.getPrefixedTitle()));
+               stack.add(new HtmlLiteral(prevNode.getPrefixedTitle()));
             }
 
             stack.add(new EndElement("a"));
@@ -3223,7 +3224,7 @@ public class L2HConverter extends LaTeXParserListener
 
             if (!compact)
             {
-               stack.add(new HtmlTag(upNode.getPrefixedTitle()));
+               stack.add(new HtmlLiteral(upNode.getPrefixedTitle()));
             }
 
             stack.add(new EndElement("a"));
@@ -3260,7 +3261,7 @@ public class L2HConverter extends LaTeXParserListener
 
             if (!compact)
             {
-               stack.add(new HtmlTag(nextNode.getPrefixedTitle()));
+               stack.add(new HtmlLiteral(nextNode.getPrefixedTitle()));
             }
 
             stack.add(new EndElement("a"));
@@ -4848,7 +4849,7 @@ public class L2HConverter extends LaTeXParserListener
 
       writeliteral(String.format("<a id=\"%s\"></a>", anchor));
 
-      return new IndexLocation(new HtmlTag(
+      return new IndexLocation(new HtmlLiteral(
         String.format("<a ref=\"#%s\">%d</a>", anchor, indexLoc)));
    }
 
@@ -4951,6 +4952,10 @@ public class L2HConverter extends LaTeXParserListener
          elem = new StartElement("div", false, false);
          cssClass = "inlinelist";
       }
+      else if (trivlist instanceof L2HList)
+      {
+         elem = ((L2HList)trivlist).getStartElement();
+      }
       else
       {
          if (isIfTrue(getControlSequence("if@nmbrlist")))
@@ -4963,25 +4968,6 @@ public class L2HConverter extends LaTeXParserListener
          }
 
          cssClass = "displaylist";
-      }
-
-      if (trivlist instanceof L2HList)
-      {
-         ((L2HList)trivlist).applyAttributesTo(elem);
-
-         String listClass = elem.getAttribute("class");
-
-         if (listClass != null)
-         {
-            if (cssClass == null)
-            {
-               cssClass = listClass;
-            }
-            else
-            {
-               cssClass += " " + listClass;
-            }
-         }
       }
 
       if (cssClass != null)
@@ -5023,6 +5009,10 @@ public class L2HConverter extends LaTeXParserListener
       else if (trivlist.isInLine())
       {
          elem = new EndElement("div", false, false);
+      }
+      else if (trivlist instanceof L2HList)
+      {
+         elem = ((L2HList)trivlist).getEndElement();
       }
       else
       {
@@ -5603,7 +5593,7 @@ public class L2HConverter extends LaTeXParserListener
       return linkBoxEnabled;
    }
 
-   public HtmlTag createLinkBox(String label)
+   public HtmlLiteral createLinkBox(String label)
    {
       if (isLinkBoxEnabled())
       {
@@ -5622,13 +5612,13 @@ public class L2HConverter extends LaTeXParserListener
             }
          }
 
-         return new HtmlTag(String.format(
+         return new HtmlLiteral(String.format(
           "<span class=\"labellink\"><a href=\"#%s\">%s</a></span>",
             HtmlTag.encodeAttributeValue(label, true), text));
       }
       else
       {
-         return new HtmlTag("<!-- Link setting off -->");
+         return new HtmlLiteral("<!-- Link setting off -->");
       }
    }
 

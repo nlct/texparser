@@ -64,14 +64,14 @@ public class L2HMathAlignRow extends L2HAlignRow
                cellContents.remove(i+1);
                String label = parser.expandToString(((Group)arg).toList(), stack);
 
-               object = new HtmlTag(String.format("<a id=\"%s\"></a>", label));
+               object = new HtmlLiteral(String.format("<a id=\"%s\"></a>", label));
             }
          }
 
-         if (object instanceof HtmlTag)
+         if (object instanceof HtmlLiteral)
          {
             cellContents.remove(i);
-            tags.push((HtmlTag)object);
+            tags.push((HtmlLiteral)object);
          }
       }
 
@@ -176,5 +176,5 @@ public class L2HMathAlignRow extends L2HAlignRow
 
    private boolean isNumbered;
 
-   private ArrayDeque<HtmlTag> tags = new ArrayDeque<HtmlTag>();
+   private ArrayDeque<HtmlLiteral> tags = new ArrayDeque<HtmlLiteral>();
 }

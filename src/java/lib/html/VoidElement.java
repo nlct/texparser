@@ -51,11 +51,7 @@ public class VoidElement extends HtmlTag
    {
       VoidElement elem = new VoidElement(getName(), insertCR, isXml);
 
-      if (attributes != null)
-      {
-         elem.attributes = new HashMap<String,String>();
-         elem.attributes.putAll(attributes);
-      }
+      applyAttributesTo(elem);
 
       return elem;
    }
@@ -112,7 +108,7 @@ public class VoidElement extends HtmlTag
 
       if (attributes == null || attributes.isEmpty())
       {
-         writeable.writeliteral(getTag());
+         writeable.writeliteral(getHtmlCode());
       }
       else
       {
@@ -140,61 +136,6 @@ public class VoidElement extends HtmlTag
       return name;
    }
 
-   public String removeAttribute(String attrName)
-   {
-      if (attributes == null)
-      {
-         return null;
-      }
-
-      return attributes.remove(attrName);
-   }
-
-   public String getAttribute(String attrName)
-   {
-      if (attributes == null)
-      {
-         return null;
-      }
-
-      return attributes.get(attrName);
-   }
-
-   public boolean hasAttribute(String attrName)
-   {
-      if (attributes == null)
-      {
-         return false;
-      }
-
-      return attributes.containsKey(attrName);
-   }
-
-   public void putAttribute(String attrName, String attrValue)
-   {
-      if (attributes == null)
-      {
-         attributes = new HashMap<String,String>();
-      }
-
-      attributes.put(attrName, attrValue);
-   }
-
-   public void putStyle(L2HConverter listener, HashMap<String,String> css)
-   {
-      String name = listener.getCssClass(css);
-
-      if (name == null)
-      {
-         putAttribute("style", listener.cssAttributesToString(css));
-      }
-      else
-      {
-         putAttribute("class", name);
-      }
-   }
-
    private String name;
    private boolean insertCR=false, isXml=false;
-   private HashMap<String,String> attributes;
 }

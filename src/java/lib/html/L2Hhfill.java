@@ -47,7 +47,11 @@ public class L2Hhfill extends ControlSequence
    {
       TeXObjectList list = new TeXObjectList();
 
-      list.add(new HtmlTag("<span style=\"float: right; \">"));
+      StartElement elem = new StartElement("span");
+
+      elem.putAttribute("class", "hfill");
+
+      list.add(elem);
 
       TeXObject object = parser.pop();
 
@@ -66,7 +70,7 @@ public class L2Hhfill extends ControlSequence
 
       parser.push(object);
 
-      list.add(new HtmlTag("</span>"));
+      list.add(new EndElement("span"));
 
       parser.addAll(0, list);
    }
@@ -76,7 +80,9 @@ public class L2Hhfill extends ControlSequence
    {
       TeXObjectList list = new TeXObjectList();
 
-      list.add(new HtmlTag("<span style=\"float: right; \">"));
+      StartElement elem = new StartElement("span");
+
+      elem.putAttribute("class", "hfill");
 
       TeXObject object = stack.pop();
 
@@ -95,7 +101,7 @@ public class L2Hhfill extends ControlSequence
 
       stack.push(object);
 
-      list.add(new HtmlTag("</span>"));
+      list.add(new EndElement("span"));
 
       stack.addAll(0, list);
    }

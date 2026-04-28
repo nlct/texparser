@@ -46,7 +46,7 @@ public class HCode extends Command
 
       TeXObjectList list = new TeXObjectList();
 
-      list.add(new HtmlTag(arg.toString(parser)));
+      list.add(new HtmlLiteral(arg.toString(parser)));
 
       return list;
    }
@@ -58,7 +58,7 @@ public class HCode extends Command
 
       TeXObjectList list = new TeXObjectList();
 
-      list.add(new HtmlTag(arg.toString(parser)));
+      list.add(new HtmlLiteral(arg.toString(parser)));
 
       return list;
    }

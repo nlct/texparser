@@ -43,7 +43,7 @@ public class L2HAmp extends Command
    public TeXObjectList expandonce(TeXParser parser) throws IOException
    {
       TeXObjectList list = new TeXObjectList(1);
-      list.add(new HtmlTag("&amp;"));
+      list.add(new HtmlLiteral("&amp;"));
       return list;
    }
 

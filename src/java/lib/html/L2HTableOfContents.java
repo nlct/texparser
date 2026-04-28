@@ -86,7 +86,7 @@ public class L2HTableOfContents extends ListOf
 
       String navTag = listener.isHtml5() ? "nav" : "div";
 
-      stack.push(new HtmlTag("<!-- end of toc -->"));
+      stack.push(new HtmlLiteral("<!-- end of toc -->"));
       stack.push(new EndElement(navTag));
       stack.push(listener.getControlSequence("endgroup"));
 

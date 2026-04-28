@@ -34,11 +34,22 @@ public class L2HItem extends ListItem
    public L2HItem(String name)
    {
       super(name);
+
+      startElement = new StartElement("li", true);
+      endElement = new EndElement("li");
+   }
+
+   public L2HItem(String name, StartElement startElem, EndElement endElem)
+   {
+      super(name);
+      this.startElement = startElem;
+      this.endElement = endElem;
    }
 
    public Object clone()
    {
-      return new L2HItem(getName());
+      return new L2HItem(getName(), (StartElement)startElement.clone(),
+       (EndElement)endElement.clone());
    }
 
    @Override
@@ -54,14 +65,7 @@ public class L2HItem extends ListItem
       }
       else
       {
-         StartElement elem = new StartElement("li", true);
-
-         if (attributes != null)
-         {
-            elem.putAllAttributes(attributes);
-         }
-
-         listener.startListItem(elem, stack);
+         listener.startListItem(startElement, stack);
 
          if (listener.isIfTrue(listener.getControlSequence("if@nmbrlist")))
          {
@@ -80,57 +84,39 @@ public class L2HItem extends ListItem
 
    public String removeAttribute(String attrName)
    {
-      if (attributes == null)
-      {
-         return null;
-      }
-
-      return attributes.remove(attrName);
+      return startElement.removeAttribute(attrName);
    }
 
    public String getAttribute(String attrName)
    {
-      if (attributes == null)
-      {
-         return null;
-      }
-
-      return attributes.get(attrName);
+      return startElement.getAttribute(attrName);
    }
 
    public boolean hasAttribute(String attrName)
    {
-      if (attributes == null)
-      {
-         return false;
-      }
-
-      return attributes.containsKey(attrName);
+      return startElement.hasAttribute(attrName);
    }
 
    public void putAttribute(String attrName, String attrValue)
    {
-      if (attributes == null)
-      {
-         attributes = new HashMap<String,String>();
-      }
-
-      attributes.put(attrName, attrValue);
+      startElement.putAttribute(attrName, attrValue);
    }
 
    public void putStyle(L2HConverter listener, HashMap<String,String> css)
    {
-      String name = listener.getCssClass(css);
-
-      if (name == null)
-      {
-         putAttribute("style", listener.cssAttributesToString(css));
-      }
-      else
-      {
-         putAttribute("class", name);
-      }
+      startElement.putStyle(listener, css);
    }
 
-   private HashMap<String,String> attributes;
+   public StartElement getStartElement()
+   {
+      return startElement;
+   }
+
+   public EndElement getEndElement()
+   {
+      return endElement;
+   }
+
+   protected StartElement startElement;
+   protected EndElement endElement;
 }

@@ -65,7 +65,7 @@ public class L2HTeXParserSection extends TeXParserSection
 
       substack.add(elem);
 
-      substack.add(new HtmlTag(String.format("<!-- start of %s header -->",
+      substack.add(new HtmlLiteral(String.format("<!-- start of %s header -->",
             sectionCsname)));
 
       substack.add(title);
@@ -77,7 +77,7 @@ public class L2HTeXParserSection extends TeXParserSection
 
       substack.add(new EndElement(tag == null ? "div" : tag));
 
-      substack.add(new HtmlTag(String.format("<!-- end of %s header -->%n",
+      substack.add(new HtmlLiteral(String.format("<!-- end of %s header -->%n",
             sectionCsname)));
 
       TeXParserUtils.process(substack, parser, stack);

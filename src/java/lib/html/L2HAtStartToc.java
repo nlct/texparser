@@ -52,7 +52,7 @@ public class L2HAtStartToc extends ControlSequence
 
       String ext = popLabelString(parser, stack);
 
-      stack.push(new HtmlTag(String.format("<!-- end of %s -->", ext)));
+      stack.push(new HtmlLiteral(String.format("<!-- end of %s -->", ext)));
       stack.push(new EndElement("div"));
       stack.push(listener.getControlSequence("endgroup"));
 

@@ -135,7 +135,7 @@ public class L2HSection extends Section
 
       substack.add(startElem);
 
-      substack.add(new HtmlTag(
+      substack.add(new HtmlLiteral(
         String.format("<!-- start of %s header -->", getName())));
 
       substack.add(arg);
@@ -147,7 +147,7 @@ public class L2HSection extends Section
 
       substack.add(new EndElement(tag == null ? "div" : tag));
 
-      substack.add(new HtmlTag(
+      substack.add(new HtmlLiteral(
             String.format("<!-- end of %s header -->%n", getName())));
 
       listener.setCurrentBlockType(DocumentBlockType.HEADING);
@@ -207,7 +207,7 @@ public class L2HSection extends Section
 
       list.add(elem);
 
-      list.add(new HtmlTag(String.format("<!-- start of %s header -->",
+      list.add(new HtmlLiteral(String.format("<!-- start of %s header -->",
             getName())));
 
       list.add(listener.getControlSequence("the"+getName()));
@@ -223,7 +223,7 @@ public class L2HSection extends Section
 
       list.add(new EndElement(tag == null ? "div" : tag));
 
-      list.add(new HtmlTag(String.format("<!-- end of %s header -->%n",
+      list.add(new HtmlLiteral(String.format("<!-- end of %s header -->%n",
             getName())));
 
       if (!parser.isPar(stack.peekStack(TeXObjectList.POP_IGNORE_LEADING_SPACE)))
@@ -283,5 +283,4 @@ public class L2HSection extends Section
       new String[] {"paragraph", "h5"}
    };
 
-   private HashMap<String,String> attributes;
 }

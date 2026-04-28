@@ -154,22 +154,20 @@ public class L2HMathDeclaration extends MathDeclaration
       {
          if (getMode() == TeXMode.DISPLAY_MATH)
          {
-            stack.push(new HtmlTag(listener.mathJaxStartDisplay()));
+            stack.push(new HtmlLiteral(listener.mathJaxStartDisplay()));
          }
          else
          {
-            stack.push(new HtmlTag(listener.mathJaxStartInline()));
+            stack.push(new HtmlLiteral(listener.mathJaxStartInline()));
          }
       }
 
       if (isNumbered())
       {
-         //stack.push(new HtmlTag("</span>"));
          stack.push(new EndElement("span"));
          stack.push(listener.getOther(')'));
          stack.push(listener.getControlSequence("theequation"));
          stack.push(listener.getOther('('));
-         //stack.push(new HtmlTag("<span class=\"eqno\">"));
 
          StartElement elem = new StartElement("span");
          elem.putAttribute("class", "eqno");
@@ -281,21 +279,24 @@ public class L2HMathDeclaration extends MathDeclaration
       {
          if (getMode() == TeXMode.DISPLAY_MATH)
          {
-            parser.push(new HtmlTag(listener.mathJaxStartDisplay()));
+            parser.push(new HtmlLiteral(listener.mathJaxStartDisplay()));
          }
          else
          {
-            parser.push(new HtmlTag(listener.mathJaxStartInline()));
+            parser.push(new HtmlLiteral(listener.mathJaxStartInline()));
          }
       }
 
       if (isNumbered())
       {
-         parser.push(new HtmlTag("</span>"));
+         parser.push(new EndElement("span"));
          parser.push(listener.getOther(')'));
          parser.push(listener.getControlSequence("theequation"));
          parser.push(listener.getOther('('));
-         parser.push(new HtmlTag("<span class=\"eqno\">"));
+
+         StartElement elem = new StartElement("span");
+         elem.putAttribute("class", "eqno");
+         parser.push(elem);
       }
 
       if (getMode() == TeXMode.DISPLAY_MATH)

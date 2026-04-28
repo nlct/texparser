@@ -80,7 +80,7 @@ public class L2HMaketitle extends Maketitle
       list.add(elem);
       list.add(listener.getControlSequence("@title"));
       list.add(new EndElement("div"));
-      list.add(new HtmlTag("<!-- end of title -->"));
+      list.add(new HtmlLiteral("<!-- end of title -->"));
 
       ControlSequence subTitle = listener.getControlSequence("@subtitle");
 
@@ -92,7 +92,7 @@ public class L2HMaketitle extends Maketitle
          list.add(elem);
          list.add(subTitle);
          list.add(new EndElement("div"));
-         list.add(new HtmlTag("<!-- end of subtitle -->"));
+         list.add(new HtmlLiteral("<!-- end of subtitle -->"));
       }
 
       elem = new StartElement("div");
@@ -101,7 +101,7 @@ public class L2HMaketitle extends Maketitle
       list.add(elem);
       list.add(listener.getControlSequence("@author"));
       list.add(new EndElement("div"));
-      list.add(new HtmlTag("<!-- end of author -->"));
+      list.add(new HtmlLiteral("<!-- end of author -->"));
 
       elem = new StartElement("div");
       elem.putAttribute("class", "date");
@@ -109,7 +109,7 @@ public class L2HMaketitle extends Maketitle
       list.add(elem);
       list.add(listener.getControlSequence("@date"));
       list.add(new EndElement("div"));
-      list.add(new HtmlTag("<!-- end of date -->"));
+      list.add(new HtmlLiteral("<!-- end of date -->"));
 
       list.add(listener.newHtml5EndElement("header"));
 
