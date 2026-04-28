@@ -84,10 +84,31 @@ public class L2HTableOfContents extends ListOf
 
       listener.stepcounter(counter);
 
-      String navTag = listener.isHtml5() ? "nav" : "div";
+      if (cs instanceof L2HSection)
+      {
+         String navTag = listener.isHtml5() ? "nav" : "div";
+
+         L2HSection secCs = (L2HSection)cs.clone();
+
+         StartElement blockStartElem = new StartElement(navTag); 
+         blockStartElem.putAttribute("class", "toc");
+
+         if (listener.isXml())
+         {
+            blockStartElem.putAttribute("title", "Table of Contents");
+         }
+         else
+         {
+            blockStartElem.putAttribute("aria-label", "Table of Contents");
+         }
+
+         secCs.setBlockStartElement(blockStartElem);
+         secCs.setBlockEndElement(new EndElement(navTag));
+
+         cs = secCs;
+      }
 
       stack.push(new HtmlLiteral("<!-- end of toc -->"));
-      stack.push(new EndElement(navTag));
       stack.push(listener.getControlSequence("endgroup"));
 
       ControlSequence tagCs = new GenericCommand(true, "@toc@endtags");
@@ -108,20 +129,6 @@ public class L2HTableOfContents extends ListOf
       stack.push(new TeXCsRef("contentsname"));
       stack.push(listener.getOther('*'));
       stack.push(cs);
-
-      StartElement elem = new StartElement(navTag);
-      elem.putAttribute("class", "toc");
-
-      if (listener.isXml())
-      {
-         elem.putAttribute("title", "Table of Contents");
-      }
-      else
-      {
-         elem.putAttribute("aria-label", "Table of Contents");
-      }
-
-      stack.push(elem);
 
       reg = parser.getSettings().newcount(true, "@curr@toclevel");
       reg.setValue(-1);

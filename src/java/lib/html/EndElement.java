@@ -39,7 +39,7 @@ public class EndElement extends HtmlTag
 
    public EndElement(String name, boolean appendCR, boolean isBlock)
    {
-      super(String.format("</%s>", name));
+      super(String.format("</%s>", name), name);
 
       if (name.contains("[^a-zA-Z]"))
       {

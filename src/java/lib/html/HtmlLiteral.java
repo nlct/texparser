@@ -66,18 +66,18 @@ public class HtmlLiteral extends AbstractTeXObject
    @Override
    public String toString(TeXParser parser)
    {
-      return getHtmlCode();
+      return format();
    }
 
    @Override
    public void process(TeXParser parser)
       throws IOException
    {
-      parser.getListener().getWriteable().writeliteral(htmlCode);
+      parser.getListener().getWriteable().writeliteral(toString(parser));
    }
 
    @Override
-   public void process(TeXParser parser, TeXObjectList list) throws IOException
+   public void process(TeXParser parser, TeXObjectList stack) throws IOException
    {
       process(parser);
    }
@@ -87,5 +87,5 @@ public class HtmlLiteral extends AbstractTeXObject
       return htmlCode;
    }
 
-   private String htmlCode;
+   protected String htmlCode;
 }

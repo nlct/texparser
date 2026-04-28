@@ -126,7 +126,8 @@ public class L2HStringConverter extends L2HConverter
 
    @Override
    public void startSection(boolean isNumbered, String tag, String name,
-     String id, TeXObjectList stack)
+     String id, TeXObjectList stack, StartElement blockStartElement,
+     EndElement blockEndElement)
     throws IOException
    {
    }

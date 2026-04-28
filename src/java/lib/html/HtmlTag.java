@@ -20,6 +20,7 @@ package com.dickimawbooks.texparserlib.html;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.net.URI;
 import java.net.URISyntaxException;
 
@@ -29,7 +30,7 @@ public class HtmlTag extends HtmlLiteral
 {
    public HtmlTag(String tag)
    {
-      this(tag, tag);
+      this("<"+tag+">", tag);
    }
 
    public HtmlTag(String htmlCode, String tag)
@@ -51,6 +52,42 @@ public class HtmlTag extends HtmlLiteral
    public String getTag()
    {
       return tag;
+   }
+
+   @Override
+   public String format()
+   {
+      if (htmlCode.startsWith("</") || attributes == null)
+      {
+         return htmlCode;
+      }
+      else
+      {
+         StringBuilder builder = new StringBuilder();
+
+         builder.append('<');
+         builder.append(tag);
+
+         for (Iterator<String> it = attributes.keySet().iterator(); it.hasNext(); )
+         {
+            String key = it.next();
+
+            String val = attributes.get(key);
+
+            builder.append(String.format(" %s=\"%s\"", key, val));
+         }
+
+         if (htmlCode.endsWith("/>"))
+         {
+            builder.append("/>");
+         }
+         else
+         {
+            builder.append(">");
+         }
+
+         return builder.toString();
+      }
    }
 
    /**

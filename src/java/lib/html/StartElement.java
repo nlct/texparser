@@ -38,7 +38,7 @@ public class StartElement extends HtmlTag
 
    public StartElement(String name, boolean insertCR, boolean isBlock)
    {
-      super(String.format("<%s>", name));
+      super(String.format("<%s>", name), name);
 
       if (name.contains("[^a-zA-Z]"))
       {
@@ -62,13 +62,7 @@ public class StartElement extends HtmlTag
    }
 
    @Override
-   public String toString(TeXParser parser)
-   {
-      return toString();
-   }
-
-   @Override
-   public String toString()
+   public String format()
    {
       StringBuilder builder = new StringBuilder();
 
@@ -144,7 +138,7 @@ public class StartElement extends HtmlTag
 
       if (attributes == null || attributes.isEmpty())
       {
-         listener.writeliteral(getTag());
+         listener.writeliteral(getHtmlCode());
       }
       else
       {

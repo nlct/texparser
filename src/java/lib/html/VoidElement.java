@@ -33,7 +33,7 @@ public class VoidElement extends HtmlTag
 
    public VoidElement(String name, boolean insertCR, boolean isXml)
    {
-      super(isXml ? String.format("<%s/>", name) : String.format("<%s>", name));
+      super(isXml ? String.format("<%s/>", name) : String.format("<%s>", name), name);
 
       if (name.contains("[^a-zA-Z]"))
       {
@@ -57,13 +57,7 @@ public class VoidElement extends HtmlTag
    }
 
    @Override
-   public String toString(TeXParser parser)
-   {
-      return toString();
-   }
-
-   @Override
-   public String toString()
+   public String format()
    {
       StringBuilder builder = new StringBuilder();
 

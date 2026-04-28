@@ -33,13 +33,53 @@ public class L2HTeXParserSection extends TeXParserSection
 
    public L2HTeXParserSection(String name, String sectionCsname)
    {
+      this(name, sectionCsname, null, null);
+   }
+
+   public L2HTeXParserSection(String name, String sectionCsname,
+      StartElement startElem, EndElement endElem)
+   {
       super(name, sectionCsname);
+      this.blockStartElement = startElem;
+      this.blockEndElement = endElem;
    }
 
    @Override
    public Object clone()
    {
-      return new L2HTeXParserSection(getName(), sectionCsname);
+      L2HTeXParserSection cs = new L2HTeXParserSection(getName(), sectionCsname);
+
+      if (blockStartElement != null)
+      {
+         cs.blockStartElement = (StartElement)blockStartElement.clone();
+      }
+
+      if (blockEndElement != null)
+      {
+         cs.blockEndElement = (EndElement)blockEndElement.clone();
+      }
+
+      return cs;
+   }
+
+   public StartElement getBlockStartElement()
+   {
+      return blockStartElement;
+   }
+
+   public void setBlockStartElement(StartElement startElem)
+   {
+      blockStartElement = startElem;
+   }
+
+   public EndElement getBlockEndElement()
+   {
+      return blockEndElement;
+   }
+
+   public void setBlockEndElement(EndElement endElem)
+   {
+      blockEndElement = endElem;
    }
 
    public void process(TeXParser parser, TeXObjectList stack)
@@ -52,7 +92,8 @@ public class L2HTeXParserSection extends TeXParserSection
 
       String tag = L2HSection.getTag(sectionCsname);
 
-      listener.startSection(false, tag, sectionCsname, label, stack);
+      listener.startSection(false, tag, sectionCsname, label, stack,
+       blockStartElement, blockEndElement);
 
       TeXObjectList substack = listener.createStack();
 
@@ -89,4 +130,7 @@ public class L2HTeXParserSection extends TeXParserSection
       process(parser, parser);
    }
 
+
+   protected StartElement blockStartElement;
+   protected EndElement blockEndElement;
 }

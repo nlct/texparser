@@ -33,13 +33,52 @@ public class L2HSection extends Section
 
    public L2HSection(String name)
    {
+      this(name, null, null);
+   }
+
+   public L2HSection(String name, StartElement startElem, EndElement endElem)
+   {
       super(name);
+      this.blockStartElement = startElem;
+      this.blockEndElement = endElem;
    }
 
    @Override
    public Object clone()
    {
-      return new L2HSection(getName());
+      L2HSection cs = new L2HSection(getName());
+
+      if (blockStartElement != null)
+      {
+         cs.blockStartElement = (StartElement)blockStartElement.clone();
+      }
+
+      if (blockEndElement != null)
+      {
+         cs.blockEndElement = (EndElement)blockEndElement.clone();
+      }
+
+      return cs;
+   }
+
+   public StartElement getBlockStartElement()
+   {
+      return blockStartElement;
+   }
+
+   public void setBlockStartElement(StartElement startElem)
+   {
+      blockStartElement = startElem;
+   }
+
+   public EndElement getBlockEndElement()
+   {
+      return blockEndElement;
+   }
+
+   public void setBlockEndElement(EndElement endElem)
+   {
+      blockEndElement = endElem;
    }
 
    protected String popLabel(TeXParser parser, TeXObjectList stack)
@@ -124,8 +163,10 @@ public class L2HSection extends Section
          listener.stepcounter(counter);
       }
 
-      listener.startSection(false, tag, getName(), labelName, stack);
+      listener.startSection(false, tag, getName(), labelName, stack,
+       blockStartElement, blockEndElement);
 
+      // Section title tag
       StartElement startElem = new StartElement(tag == null ? "div" : tag, true);
 
       if (tag == null)
@@ -196,8 +237,10 @@ public class L2HSection extends Section
          }
       }
 
-      listener.startSection(true, tag, getName(), labelName, stack);
+      listener.startSection(true, tag, getName(), labelName, stack,
+         blockStartElement, blockEndElement);
 
+      // Section title tag
       StartElement elem = new StartElement(tag == null ? "div" : tag, true);
 
       if (tag == null)
@@ -283,4 +326,6 @@ public class L2HSection extends Section
       new String[] {"paragraph", "h5"}
    };
 
+   protected StartElement blockStartElement;
+   protected EndElement blockEndElement;
 }

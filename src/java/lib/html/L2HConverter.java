@@ -2827,10 +2827,20 @@ public class L2HConverter extends LaTeXParserListener
       if (currentSection != null)
       {
          writeln();
-         writeEndHtml5OrDiv("section", false);
+ 
+         if (currentSectionEndElement == null)
+         {
+            writeEndHtml5OrDiv("section", false);
+         }
+         else
+         {
+            writeliteralln(currentSectionEndElement.format());
+         }
+
          writeliteral(String.format("<!-- end of section %s -->%n", currentSection));
 
          currentSection = null;
+         currentSectionEndElement = null;
       }
 
       processFootnotes(stack);
@@ -2958,10 +2968,20 @@ public class L2HConverter extends LaTeXParserListener
       if (currentSection != null)
       {
          writeln();
-         writeEndHtml5OrDiv("section", false);
+
+         if (currentSectionEndElement == null)
+         {
+            writeEndHtml5OrDiv("section", false);
+         }
+         else
+         {
+            writeliteralln(currentSectionEndElement.format());
+         }
+
          writeliteral(String.format("<!-- end of section %s -->%n", currentSection));
 
          currentSection = null;
+         currentSectionEndElement = null;
       }
 
       processFootnotes(stack);
@@ -5631,6 +5651,14 @@ public class L2HConverter extends LaTeXParserListener
      String id, TeXObjectList stack)
     throws IOException
    {
+      startSection(isNumbered, tag, name, id, stack, null, null);
+   }
+
+   public void startSection(boolean isNumbered, String tag, String name,
+     String id, TeXObjectList stack, StartElement blockStartElement,
+     EndElement blockEndElement)
+    throws IOException
+   {
       endParagraph();
 
       boolean doEndSec = (currentSection != null);
@@ -5680,30 +5708,53 @@ public class L2HConverter extends LaTeXParserListener
       if (doEndSec)
       {
          writeln();
-         writeEndHtml5OrDiv("section", false);
+
+         if (currentSectionEndElement == null)
+         {
+            writeEndHtml5OrDiv("section", false);
+         }
+         else
+         {
+            writeliteralln(currentSectionEndElement.format());
+         }
+
          writeliteral(String.format("<!-- end of section %s -->%n", currentSection));
+      }
+
+      StartElement startElem = blockStartElement;
+
+      if (startElem == null) 
+      {
+         if (isHtml5())
+         {
+            startElem = new StartElement("section");
+            blockEndElement = new EndElement("section");
+         }
+         else
+         {
+            startElem = new StartElement("div");
+            blockEndElement = new EndElement("div");
+         }
       }
 
       if (id == null)
       {
-         currentSection = tag+"-"+name;
-
-         writeln();
-         writeStartHtml5OrDiv("section", null, false);
-         writeliteral(String.format("<!-- start of section %s -->", currentSection));
+         id = tag+"-"+name;
       }
-      else
-      {
-         currentSection = id;
 
-         writeln();
-         writeStartHtml5OrDiv("section", String.format("id=\"%s\"", id), false);
-         writeliteral(String.format("<!-- start of section %s -->",
-           currentSection));
-      }
+      startElem.putAttribute("id", id);
+
+      currentSection = id;
+
+      writeln();
+
+      writeliteralln(startElem.format());
+
+      writeliteral(String.format("<!-- start of section %s -->", currentSection));
 
       writeToTopLink(stack);
 
+      currentSectionEndElement = blockEndElement;
       afterHeading = true;
    }
 
@@ -6098,6 +6149,7 @@ public class L2HConverter extends LaTeXParserListener
    private Vector<DocumentBlockTypeListener> documentBlockListeners;
 
    private String currentSection = null;
+   private EndElement currentSectionEndElement = null;
    private boolean afterHeading = false;
 
    protected Stack<ListBlockData> listStack;
