@@ -127,6 +127,7 @@ public class AuxParser extends DefaultTeXParserListener
       putControlSequence(new AuxProvideCommand());
 
       addAuxCommand("@writefile", 2);
+      addAuxCommand("texparser@divisioninfo", 5);
 
       putControlSequence(new AuxIgnoreable("selectlanguage", true, new boolean[]{true}));
    }
@@ -388,6 +389,24 @@ public class AuxParser extends DefaultTeXParserListener
                   divisionData.add(divData);
                }
             }
+         }
+      }
+      else if (data.getName().equals("texparser@divisioninfo"))
+      {
+         if (saveDivisions)
+         {
+            String unit = data.getArg(0).toString(getParser());
+            TeXObject prefix = data.getArg(1);
+            TeXObject title = data.getArg(2);
+            String target = data.getArg(3).toString(getParser());
+            TeXObject location = data.getArg(4);
+
+            if (divisionData == null)
+            {
+               initDivisionInfo();
+            }
+
+            divisionData.add(new DivisionInfo(unit, prefix, title, target, location));
          }
       }
       else
