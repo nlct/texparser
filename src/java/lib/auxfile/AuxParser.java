@@ -128,6 +128,7 @@ public class AuxParser extends DefaultTeXParserListener
 
       addAuxCommand("@writefile", 2);
       addAuxCommand("texparser@divisioninfo", 5);
+      addAuxCommand("texparser@newlabel", 1, labelPrefix);
 
       putControlSequence(new AuxIgnoreable("selectlanguage", true, new boolean[]{true}));
    }
@@ -411,9 +412,13 @@ public class AuxParser extends DefaultTeXParserListener
       }
       else
       {
+         // NB this can be incorrect if the label is in a float that
+         // has been moved to another section
+
          if (data.getName().equals("newlabel"))
          {
-            DivisionInfo divData = null;
+            String label = data.getArg(0).toString(getParser());
+            DivisionInfo divData = (tpLabels == null ? null : tpLabels.get(label));
 
             if (saveDivisions)
             {
@@ -424,8 +429,12 @@ public class AuxParser extends DefaultTeXParserListener
 
                if (!divisionData.isEmpty())
                {
-                  divData = divisionData.lastElement();
-                  divData.addLabel(data.getArg(0).toString(getParser()));
+                  if (divData == null)
+                  {
+                     divData = divisionData.lastElement();
+                  }
+
+                  divData.addLabel(label);
                }
             }
 
@@ -438,12 +447,54 @@ public class AuxParser extends DefaultTeXParserListener
 
                LabelInfo info = LabelInfo.createLabel(data, getParser());
 
-               if (divData != null)
+               labelData.put(info.getLabel(), info);
+            }
+         }
+         else if (data.getName().equals("texparser@newlabel"))
+         {
+            // Provided for labels that might float. The class or
+            // package should ensure that \texparser@newlabel{label}
+            // is added at point in the document where
+            // the code for the floated material is placed.
+
+            DivisionInfo divData = null;
+            String label = data.getArg(0).toString(getParser());
+
+            if (saveDivisions)
+            {
+               if (divisionData == null)
                {
-                  info.setDivisionInfo(divData);
+                  initDivisionInfo();
                }
 
-               labelData.put(info.getLabel(), info);
+               if (!divisionData.isEmpty())
+               {
+                  divData = divisionData.lastElement();
+
+                  if (tpLabels == null)
+                  {
+                     tpLabels = new HashMap<String,DivisionInfo>();
+                  }
+
+                  tpLabels.put(label, divData);
+               }
+            }
+
+            if (labelData != null)
+            {
+               LabelInfo other = labelData.get(label);
+
+               if (other != null)
+               {
+                  DivisionInfo d = other.getDivisionInfo();
+
+                  if (d != null)
+                  {
+                     d.removeLabel(label);
+                  }
+
+                  other.setDivisionInfo(divData);
+               }
             }
          }
          else if (saveCites && data.getName().equals("bibcite"))
@@ -705,6 +756,8 @@ public class AuxParser extends DefaultTeXParserListener
    }
 
    private Vector<AuxData> auxData;
+
+   private HashMap<String,DivisionInfo> tpLabels;
 
    private boolean saveDivisions = false;
    protected Vector<DivisionInfo> divisionData;
