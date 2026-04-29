@@ -73,6 +73,13 @@ public class DivisionInfo
       return labels == null ? false : labels.contains(label);
    }
 
+   public boolean removeLabel(String label)
+   {
+      if (labels == null) return false;
+
+      return labels.remove(label);
+   }
+
    public void setTarget(String target)
    {
       this.target = target;
@@ -194,6 +201,51 @@ public class DivisionInfo
       }
 
       return (labels == null || labels.equals(data.labels));
+   }
+
+   @Override
+   public String toString()
+   {
+      StringBuilder builder = new StringBuilder();
+
+      builder.append(String.format("%s[target=%s,unit=%s",
+           getClass().getSimpleName(),
+           target, unit
+        ));
+
+      if (prefix != null)
+      {
+         builder.append(",prefix=");
+         builder.append(prefix.format());
+      }
+
+      if (title != null)
+      {
+         builder.append(",title=");
+         builder.append(title.format());
+      }
+
+      if (location != null)
+      {
+         builder.append(",location=");
+         builder.append(location.format());
+      }
+
+      if (labels != null)
+      {
+         builder.append(",labels=");
+         builder.append(labels);
+      }
+
+      builder.append(']');
+
+      if (special != null)
+      {
+         builder.append(",special=");
+         builder.append(special);
+      }
+
+      return builder.toString();
    }
 
    protected String target, unit;
