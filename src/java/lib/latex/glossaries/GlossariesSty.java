@@ -1596,11 +1596,11 @@ public class GlossariesSty extends LaTeXSty
                TeXObject grpLabelArg = d.getArg(4);
                TeXObject grpTitle = d.getArg(5);
 
-               String label = parser.expandToString(labelArg, stack);
-               String type = parser.expandToString(typeArg, stack);
+               String label = labelArg.toString(parser);
+               String type = typeArg.toString(parser);
                int level = TeXParserUtils.toInt(levelArg, parser, stack);
-               String parent = parser.expandToString(parentArg, stack);
-               String grpLabel = parser.expandToString(grpLabelArg, stack);
+               String parent = parentArg.toString(parser);
+               String grpLabel = grpLabelArg.toString(parser);
 
                GlossaryGroup grp = new GlossaryGroup(label, type, level, parent,
                  grpLabel, grpTitle);
@@ -2482,6 +2482,15 @@ public class GlossariesSty extends LaTeXSty
          def.add(listener.getControlSequence("label"));
 
          Group grp = getParser().getListener().createGroup();
+         grp.add(getParser().getListener().getControlSequence("glsautoprefix"));
+         grp.add(getParser().getListener().getControlSequence("@glo@type"));
+
+         def.add(grp);
+
+         def.add(listener.getControlSequence("edef"));
+         def.add(new TeXCsRef("@gls@currentglossaryxrlabel"));
+
+         grp = getParser().getListener().createGroup();
          grp.add(getParser().getListener().getControlSequence("glsautoprefix"));
          grp.add(getParser().getListener().getControlSequence("@glo@type"));
 
@@ -3879,10 +3888,17 @@ public class GlossariesSty extends LaTeXSty
             }
             else
             {
-               parser.putControlSequence(true, new GenericCommand(true,
-                "@@glossaryseclabel", null, TeXParserUtils.createStack(parser,
-                new TeXCsRef("label"), TeXParserUtils.createGroup(parser,
-                 labelVal))));
+               parser.putControlSequence(true,
+                 new GenericCommand(true,
+                   "@@glossaryseclabel", null,
+                   TeXParserUtils.createStack
+                   (
+                     parser,
+                     new TeXCsRef("label"), TeXParserUtils.createGroup(parser, labelVal),
+                     new TeXCsRef("edef"), new TeXCsRef("@gls@currentglossaryxrlabel"),
+                       TeXParserUtils.createGroup(parser, labelVal)
+                   )
+                ));
             }
          }
 
