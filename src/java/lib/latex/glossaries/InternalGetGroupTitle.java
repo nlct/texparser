@@ -45,7 +45,8 @@ public class InternalGetGroupTitle extends ControlSequence
       String groupLabel = popLabelString(parser, stack);
       ControlSequence csArg = popControlSequence(parser, stack);
 
-       ControlSequence cs = parser.getControlSequence("glsxtr@grouptitle@"+groupLabel);
+      ControlSequence cs = parser.getControlSequence("glsxtr@grouptitle@"+groupLabel);
+
       if (useGroup)
       {
          if (cs == null)
