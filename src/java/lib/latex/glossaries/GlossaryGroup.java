@@ -78,6 +78,16 @@ public class GlossaryGroup
       return !groupTitle.isEmpty();
    }
 
+   @Override
+   public String toString()
+   {
+      return String.format(
+        "%s[ref=%s,type=%s,level=%d,parent=%s,groupLabel=%s,groupTitle=%s]",
+         getClass().getSimpleName(),
+         refLabel, glossaryType, level, parentLabel,
+         groupLabel, groupTitle);
+   }
+
    String refLabel, glossaryType, parentLabel, groupLabel;
    TeXObject groupTitle;
    int level=0;
