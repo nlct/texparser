@@ -3793,7 +3793,7 @@ public class L2HConverter extends LaTeXParserListener
          writeliteral("\"");
       }
 
-      writeliteralln(">");
+      writeliteral(">");
 
       DivisionNode prevNode = null;
 
@@ -3828,13 +3828,17 @@ public class L2HConverter extends LaTeXParserListener
 
                if (listData.getCurrentItem() != null)
                {
-                  writeliteralln("</li>");
+                  writeliteral("</li>");
                }
             }
          }
          else if (prevNode.getLevel() < node.getLevel())
          {
-            writeliteralln("<ul>");
+            writeln();
+
+            for (int i = 0; i < node.getLevel(); i++) write(' ');
+
+            writeliteral("<ul>");
 
             if (stack != null)
             {
@@ -3844,17 +3848,24 @@ public class L2HConverter extends LaTeXParserListener
          }
          else
          {
-            if (stack != null && !stack.empty())
+            for (int level = prevNode.getLevel(); level > node.getLevel(); level--)
             {
-               listData = stack.pop();
-
-               if (listData.getCurrentItem() != null)
+               if (stack != null && !stack.empty())
                {
-                  writeliteralln("</li>");
-               }
-            }
+                  listData = stack.pop();
 
-            writeliteralln("</ul>");
+                  if (listData.getCurrentItem() != null)
+                  {
+                     writeliteral("</li>");
+                  }
+               }
+
+               writeln();
+
+               for (int i = 0; i < level; i++) write(' ');
+
+               writeliteral("</ul>");
+            }
 
             if (stack != null && !stack.empty())
             {
@@ -3862,10 +3873,16 @@ public class L2HConverter extends LaTeXParserListener
 
                if (listData.getCurrentItem() != null)
                {
-                  writeliteralln("</li>");
+                  writeln();
+                  for (int i = 0; i < node.getLevel(); i++) write(' ');
+                  writeliteral("</li>");
                }
             }
          }
+
+         writeln();
+
+         for (int i = 0; i < node.getLevel(); i++) write(' ');
 
          writeliteral("<li>");
 
@@ -3909,7 +3926,7 @@ public class L2HConverter extends LaTeXParserListener
 
          writeliteral(node.getTitle());
 
-         writeliteralln("</a>");
+         writeliteral("</a>");
 
          prevNode = node;
          listData = null;
@@ -3917,7 +3934,7 @@ public class L2HConverter extends LaTeXParserListener
 
       if (prevNode != null)
       {
-         for (int i = prevNode.getLevel(); i > 0; i--)
+         for (int level = prevNode.getLevel(); level > 0; level--)
          {
             if (stack != null && !stack.empty())
             {
@@ -3925,9 +3942,13 @@ public class L2HConverter extends LaTeXParserListener
 
                if (listData.getCurrentItem() != null)
                {
-                  writeliteralln("</li>");
+                  writeliteral("</li>");
                }
             }
+
+            writeln();
+
+            for (int i = 0; i < level; i++) write(' ');
 
             writeliteralln("</ul>");
          }
