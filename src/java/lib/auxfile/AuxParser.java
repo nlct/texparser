@@ -447,6 +447,11 @@ public class AuxParser extends DefaultTeXParserListener
 
                LabelInfo info = LabelInfo.createLabel(data, getParser());
 
+               if (divData != null)
+               {
+                  info.setDivisionInfo(divData);
+               }
+
                labelData.put(info.getLabel(), info);
             }
          }
