@@ -20,6 +20,7 @@ package com.dickimawbooks.texparserlib.latex.nlctdoc;
 
 import java.io.IOException;
 import java.util.Vector;
+import java.util.HashMap;
 
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.*;
@@ -164,6 +165,24 @@ public class PrintIndex extends AbstractGlsCommand
          list.add(new TeXCsRef("label"));
          list.add(listener.createGroup(sectionLabel));
 
+         Vector<GlossaryGroup> groups = sty.getGroupsForRefLabel(sectionLabel);
+         HashMap<String,GlossaryGroup> groupMap = null;
+
+         if (groups == null)
+         {
+            groups = sty.getGroupsForType(glosType);
+         }
+
+         if (groups != null && !groups.isEmpty())
+         {
+            groupMap = new HashMap<String,GlossaryGroup>(groups.size());
+
+            for (GlossaryGroup g : groups)
+            {
+               groupMap.put(g.getGroupLabel(), g);
+            }
+         }
+
          list.add(listener.getControlSequence("nlctguideindexinitpostnamehooks"));
 
          ControlSequence initExtraCs =
@@ -203,17 +222,32 @@ public class PrintIndex extends AbstractGlsCommand
                   grp.add(listener.getSpace());
                }
 
-               ControlSequence cs = parser.getControlSequence(
-                  "glsxtr@grouptitle@"+grpLabels[i]);
+               GlossaryGroup g = null;
+
+               if (groupMap != null)
+               {
+                  g = groupMap.get(grpLabels[i]);
+               }
+
                TeXObject grpTitle;
 
-               if (cs == null)
+               if (g == null)
                {
-                  grpTitle = listener.createGroup(grpLabels[i]);
+                  ControlSequence cs = parser.getControlSequence(
+                     "glsxtr@grouptitle@"+grpLabels[i]);
+
+                  if (cs == null)
+                  {
+                     grpTitle = listener.createGroup(grpLabels[i]);
+                  }
+                  else
+                  {
+                     grpTitle = cs;
+                  }
                }
                else
                {
-                  grpTitle = cs;
+                  grpTitle = g.getGroupTitle();
                }
 
                grp.add(listener.getControlSequence("hyperlink"));
@@ -234,10 +268,27 @@ public class PrintIndex extends AbstractGlsCommand
 
                if (!grpLabel.equals(currentGrpLabel))
                {
-                  ControlSequence cs = parser.getControlSequence(
-                     "glsxtr@grouptitle@"+grpLabel);
+                  TeXObject grpTitle = null;
 
-                  addGroupHeading(subSectionCs, grpLabel, cs, list,
+                  if (groupMap != null)
+                  {
+                     GlossaryGroup g = groupMap.get(grpLabel);
+
+                     if (g != null)
+                     {
+                        grpTitle = g.getGroupTitle();
+                     }
+                  }
+
+                  if (grpTitle == null)
+                  {
+                     ControlSequence cs = parser.getControlSequence(
+                        "glsxtr@grouptitle@"+grpLabel);
+
+                     grpTitle = cs;
+                  }
+
+                  addGroupHeading(subSectionCs, grpLabel, grpTitle, list,
                    parser, stack);
 
                   currentGrpLabel = grpLabel;
@@ -284,19 +335,19 @@ public class PrintIndex extends AbstractGlsCommand
    }
 
    protected void addGroupHeading(ControlSequence subSectionCs,
-     String grpLabel, ControlSequence groupTitleCs,
+     String grpLabel, TeXObject groupTitle,
      TeXObjectList content, TeXParser parser, TeXObjectList stack)
    throws IOException
    {
       content.add(subSectionCs);
 
-      if (groupTitleCs == null)
+      if (groupTitle == null)
       {
          content.add(parser.getListener().createGroup(grpLabel));
       }
       else
       {
-         content.add(groupTitleCs);
+         content.add(TeXParserUtils.createGroup(parser, groupTitle));
       }
 
       content.add(parser.getListener().createGroup(grpLabel));
