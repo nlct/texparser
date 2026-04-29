@@ -54,7 +54,7 @@ public class AuxCommand extends ControlSequence
       return numArgs;
    }
 
-   public AuxCommand clone()
+   public Object clone()
    {
       return new AuxCommand(getName(), getNumArgs(), labelPrefix);
    }
@@ -92,7 +92,12 @@ public class AuxCommand extends ControlSequence
          }
       }
 
-      auxParser.addAuxData(new AuxData(getName(), args));
+      addAuxData(auxParser, new AuxData(getName(), args));
+   }
+
+   protected void addAuxData(AuxParser auxParser, AuxData auxData)
+   {
+      auxParser.addAuxData(auxData);
    }
 
    public void process(TeXParser parser)
@@ -101,6 +106,6 @@ public class AuxCommand extends ControlSequence
       process(parser, parser);
    }
 
-   private int numArgs;
-   private String labelPrefix;
+   protected int numArgs;
+   protected String labelPrefix;
 }
