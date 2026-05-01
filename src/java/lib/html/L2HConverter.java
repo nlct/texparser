@@ -5697,6 +5697,22 @@ public class L2HConverter extends LaTeXParserListener
       if (currentNode != null && id != null)
       {
          DivisionNode nextNode = divisionMap.get(id);
+
+         if (nextNode == null)
+         {
+            String labelForLink = getStringLabelForLink(id);
+
+            if (labelForLink != null)
+            {
+               nextNode = divisionMap.get(labelForLink);
+
+               if (nextNode != null)
+               {
+                  id = processAnchorName(labelForLink);
+               }
+            }
+         }
+
          DivisionInfo nextData = null;
 
          if (nextNode != null)
