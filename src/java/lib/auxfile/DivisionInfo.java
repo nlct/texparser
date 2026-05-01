@@ -80,6 +80,11 @@ public class DivisionInfo
       return labels.remove(label);
    }
 
+   public int getLabelCount()
+   {
+      return (labels == null ? 0 : labels.size());
+   }
+
    public void setTarget(String target)
    {
       this.target = target;
