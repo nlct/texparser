@@ -333,6 +333,14 @@ public class L2HConverter extends LaTeXParserListener
       parser.putControlSequence(new GenericCommand("indexspace", null,
         new HtmlLiteral("<div class=\"indexspace\"></div>")));
 
+      addLaTeXCommand(true, "emph", true, 1, null,
+       TeXParserUtils.createStack(this, 
+         new StartElement("em"), getParam(1), new EndElement("em")));
+
+      addLaTeXCommand(true, "strong", true, 1, null,
+       TeXParserUtils.createStack(this, 
+         new StartElement("strong"), getParam(1), new EndElement("strong")));
+
       putControlSequence(new Relax("nonumberline"));
 
       putControlSequence(new L2HAmp());
