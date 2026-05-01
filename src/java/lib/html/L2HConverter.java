@@ -1627,6 +1627,11 @@ public class L2HConverter extends LaTeXParserListener
       String id = accsupp.getId();
       String cssClass = null;
 
+      if (id != null)
+      {
+         id = processAnchorName(id);
+      }
+
       if (tag != null && !isHtml5())
       {
          tag = getNonHtml5AccSuppTag(tag);
