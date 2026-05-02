@@ -199,6 +199,7 @@ public class UserGuideSty extends LaTeXSty
       colorSty.putColor("styopt", FG_STYOPT);
       colorSty.putColor("csopt", FG_CSOPT);
       colorSty.putColor("comment", FG_COMMENT);
+      colorSty.putColor("faded", FADED);
 
       colorSty.putColor("style1", new Color(0.32f,0.545f,0.545f));// DarkSlateGray4
       colorSty.putColor("style2", new Color(0.21f,0.392f,0.545f));// SteelBlue4
@@ -207,7 +208,6 @@ public class UserGuideSty extends LaTeXSty
       colorSty.putColor("style5", new Color(0.28f,0.235f,0.545f));// SlateBlue4
       colorSty.putColor("style6", new Color(0.545f,0.352f,0.17f));// Tan4
 
-      addSemanticCommand("strong", TeXFontWeight.STRONG);
       addSemanticCommand("booktitle", TeXFontShape.EM);
 
       addSemanticCommand("sidenote", 
@@ -252,6 +252,8 @@ public class UserGuideSty extends LaTeXSty
       addSemanticCommand("ctrfmt", TeXFontFamily.TT);
       addSemanticCommand("filefmt", TeXFontFamily.TT);
       addSemanticCommand("extfmt", TeXFontFamily.TT);
+      addSemanticCommand("dottedextfmt", TeXFontFamily.TT, null,
+        listener.getOther('.'), null);
       addSemanticCommand("deprecatedorbannedfmt", FG_DEPRECATED_OR_BANNED);
       addSemanticCommand("summarylocfmt", TeXFontShape.IT);
 
@@ -273,6 +275,7 @@ public class UserGuideSty extends LaTeXSty
       registerControlSequence(new TextualContentCommand("codebackslash", "\\"));
       registerControlSequence(new TextualContentCommand("longswitch", "--"));
       registerControlSequence(new TextualContentCommand("shortswitch", "-"));
+      registerControlSequence(new TextualContentCommand("envdefcontentname", "content"));
 
       addSemanticCommand("cbeg", TeXFontFamily.VERB, null, 
         listener.createString("\\begin{"), listener.getOther('}'));
@@ -553,7 +556,7 @@ public class UserGuideSty extends LaTeXSty
       registerControlSequence(new LaTeXGenericCommand(true,
        "csmetametafmt", "mmmmm", def));
 
-      // \metafilefmt
+      // \filemetafmt
       def = listener.createStack();
       def.add(new TeXCsRef("filefmt"));
       grp = listener.createGroup();
@@ -571,9 +574,9 @@ public class UserGuideSty extends LaTeXSty
       grp.add(listener.getParam(3));
 
       registerControlSequence(new LaTeXGenericCommand(true,
-       "metafilefmt", "mmm", def));
+       "filemetafmt", "mmm", def));
 
-      // \metametafilefmt
+      // \filemetametafmt
       def = listener.createStack();
       def.add(new TeXCsRef("filefmt"));
       grp = listener.createGroup();
@@ -601,18 +604,41 @@ public class UserGuideSty extends LaTeXSty
       grp.add(listener.getParam(5));
 
       registerControlSequence(new LaTeXGenericCommand(true,
+       "filemetametafmt", "mmmmm", def));
+
+      // \metafilefmt (deprecated)
+      def = listener.createStack();
+      def.add(new TeXCsRef("filemetafmt"));
+      def.add(TeXParserUtils.createGroup(listener, listener.getParam(1)));
+      def.add(TeXParserUtils.createGroup(listener, listener.getParam(2)));
+      def.add(TeXParserUtils.createGroup(listener, listener.getParam(3)));
+
+      registerControlSequence(new LaTeXGenericCommand(true,
+       "metafilefmt", "mmm", def));
+
+      // \metametafilefmt (deprecated)
+      def = listener.createStack();
+      def.add(new TeXCsRef("filemetametafmt"));
+      def.add(TeXParserUtils.createGroup(listener, listener.getParam(1)));
+      def.add(TeXParserUtils.createGroup(listener, listener.getParam(2)));
+      def.add(TeXParserUtils.createGroup(listener, listener.getParam(3)));
+      def.add(TeXParserUtils.createGroup(listener, listener.getParam(4)));
+      def.add(TeXParserUtils.createGroup(listener, listener.getParam(5)));
+
+      registerControlSequence(new LaTeXGenericCommand(true,
        "metametafilefmt", "mmmmm", def));
 
       // homefilefmt
       def = listener.createStack();
       def.add(new TeXCsRef("filefmt"));
       def.add(TeXParserUtils.createGroup(listener, new TeXCsRef("homedir"),
-       listener.getOther('/'), listener.getParam(1)));
+       new TeXCsRef("filedirsep"), listener.getParam(1)));
 
       registerControlSequence(new LaTeXGenericCommand(true,
        "homefilefmt", "m", def));
 
       registerControlSequence(new Symbol("homedir", '~'));
+      registerControlSequence(new Symbol("filedirsep", '/'));
 
       // urlfootref
       def = listener.createStack();
