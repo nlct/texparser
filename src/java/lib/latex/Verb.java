@@ -72,6 +72,8 @@ public class Verb extends Command
    public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
+      TeXParserListener listener = parser.getListener();
+
       TeXObject object = stack.pop();
 
       boolean isStar = false;
@@ -83,13 +85,94 @@ public class Verb extends Command
          object = stack.pop();
       }
 
-      String text = object.toString(parser);
+      StringBuilder builder = new StringBuilder();
 
-      char delim = text.charAt(0);
+      int delim;
+      boolean foundEnd = false;
 
-      text = text.substring(1, text.length()-1);
+      if (object instanceof SingleToken)
+      {
+         delim = ((SingleToken)object).getCharCode();
+      }
+      else
+      {
+         // This shouldn't happen as the stack ought to just contain
+         // tokens at this point (up to the end delimiter).
 
-      parser.getListener().verb(getName(), isStar, delim, text);
+         String text = object.toString(parser);
+
+         delim = text.codePointAt(0);
+
+         for (int i = Character.charCount(delim); i < text.length(); )
+         {
+            int cp = text.codePointAt(i);
+            i += Character.charCount(cp);
+
+            if (cp == delim)
+            {
+               if (i < text.length())
+               {// this may go wrong
+                  stack.push(listener.createString(text));
+               }
+
+               foundEnd = true;
+               break;
+            }
+            else
+            {
+               builder.appendCodePoint(cp);
+            }
+         }
+      }
+
+      while (!foundEnd && !stack.isEmpty())
+      {
+         object = stack.pop();
+
+         if (object instanceof SingleToken)
+         {
+            int cp = ((SingleToken)object).getCharCode();
+
+            if (cp == delim)
+            {
+               foundEnd = true;
+            }
+            else
+            {
+               builder.appendCodePoint(cp);
+            }
+         }
+         else
+         {
+            // This shouldn't happen as the stack ought to just contain
+            // tokens at this point (up to the end delimiter).
+
+            String text = object.toString(parser);
+
+            for (int i = 0; i < text.length(); )
+            {
+               int cp = text.codePointAt(i);
+               i += Character.charCount(cp);
+
+               if (cp == delim)
+               {
+                  if (i < text.length())
+                  {// this may go wrong
+                     stack.push(listener.createString(text));
+                  }
+
+                  foundEnd = true;
+                  break;
+               }
+               else
+               {
+                  builder.appendCodePoint(cp);
+               }
+            }
+         }
+      }
+
+      parser.getListener().verb(getName(), isStar, delim, builder.toString());
    }
 
    public void process(TeXParser parser)
