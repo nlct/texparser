@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2022-2024 Nicola L.C. Talbot
+    Copyright (C) 2022-2026 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -94,7 +94,8 @@ public class EnvDef extends StandaloneDef
       }
 
       list.add(listener.getControlSequence("meta"));
-      list.add(listener.createGroup("content"));
+      list.add(TeXParserUtils.createGroup(listener,
+        listener.getControlSequence("envdefcontentname")));
 
       list.add(listener.getControlSequence("cend"));
       list.add(TeXParserUtils.createGroup(listener, glslabel.getField("name")));
