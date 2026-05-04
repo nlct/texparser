@@ -169,7 +169,7 @@ public class LaTeX2LaTeX extends LaTeXParserListener
    {
       ControlSequence cs = super.getControlSequence(name);
 
-      if (!(isReplaceCmd(name) || cs instanceof L2LControlSequence))
+      if (!(cs instanceof L2LControlSequence || isReplaceCmd(name)))
       {
          if (isSkipCmd(name))
          {
@@ -534,13 +534,24 @@ public class LaTeX2LaTeX extends LaTeXParserListener
    {
       if (outPath == null) return null;
 
+      File baseDir = parser.getBaseDir();
+
+      if (baseDir == null)
+      {
+         baseDir = new File(System.getProperty("user.dir"));
+      }
+
+      Path basePath = baseDir.toPath();
+
+      Path relPath = path.getRelativePath();
+
       if (grpaths == null)
       {
          File file = path.getFile();
 
          if (file.exists())
          {
-            File destFile = outPath.resolve(path.getRelativePath()).toFile();
+            File destFile = outPath.resolve(relPath).toFile();
 
             copyImageFile(file, destFile);
 
@@ -549,24 +560,29 @@ public class LaTeX2LaTeX extends LaTeXParserListener
       }
       else
       {
-         Path basePath = path.getBaseDir();
-
          for (int i = 0; i < grpaths.length; i++)
          {
-            Path subPath = 
-            (new File(File.separatorChar == '/' ?
-              grpaths[i] : 
-              grpaths[i].replaceAll("/", File.separator)
-            ).toPath()).resolve(path.getRelativePath());
+            String grPath = grpaths[i];
 
-            File file = (basePath == null ?  subPath :
-              basePath.resolve(subPath)).toFile();
+            if (File.separatorChar != '/')
+            {
+               grPath = grPath.replaceAll("/", File.separator);
+            }
+
+            File dir = new File(grPath);
+
+            Path subPath = dir.toPath().resolve(relPath);
+            Path inPath = basePath.resolve(subPath);
+
+            File file = inPath.toFile();
 
             if (file.exists())
             {
                File destFile = outPath.resolve(subPath).toFile();
 
                copyImageFile(file, destFile);
+
+               path.setRelativePath(subPath);
 
                return subPath;
             }
@@ -576,14 +592,25 @@ public class LaTeX2LaTeX extends LaTeXParserListener
       return null;
    }
 
-   public Path copyImageFile(String[] grpaths, TeXPath orgPath, Path destPath)
+   public Path copyImageFile(String[] grpaths, TeXPath srcPath, Path destPath)
     throws IOException,InterruptedException
    {
       if (outPath == null) return null;
 
+      File baseDir = parser.getBaseDir();
+
+      if (baseDir == null)
+      {
+         baseDir = new File(System.getProperty("user.dir"));
+      }
+
+      Path basePath = baseDir.toPath();
+
+      Path relPath = srcPath.getRelativePath();
+
       if (grpaths == null)
       {
-         File file = orgPath.getFile();
+         File file = srcPath.getFile();
 
          if (file.exists())
          {
@@ -596,24 +623,29 @@ public class LaTeX2LaTeX extends LaTeXParserListener
       }
       else
       {
-         Path basePath = orgPath.getBaseDir();
-
          for (int i = 0; i < grpaths.length; i++)
          {
-            Path subPath = 
-            (new File(File.separatorChar == '/' ?
-              grpaths[i] : 
-              grpaths[i].replaceAll("/", File.separator)
-            ).toPath()).resolve(orgPath.getRelativePath());
+            String grPath = grpaths[i];
 
-            File file = (basePath == null ?  subPath :
-              basePath.resolve(subPath)).toFile();
+            if (File.separatorChar != '/')
+            {
+               grPath = grPath.replaceAll("/", File.separator);
+            }
+
+            File dir = new File(grPath);
+
+            Path subPath = dir.toPath().resolve(relPath);
+            Path inPath = basePath.resolve(subPath);
+
+            File file = inPath.toFile();
 
             if (file.exists())
             {
                File destFile = outPath.resolve(destPath).toFile();
 
                copyImageFile(file, destFile);
+
+               srcPath.setRelativePath(subPath);
 
                return destPath;
             }
@@ -680,7 +712,7 @@ public class LaTeX2LaTeX extends LaTeXParserListener
       }
 
       if (imagePath != null
-           && (isReplaceGraphicsPathEnabled() || imageDestPath != null))
+           && (isReplaceGraphicsPathEnabled() && imageDestPath == null))
       {
          StringBuilder builder = new StringBuilder();
 
@@ -733,7 +765,29 @@ public class LaTeX2LaTeX extends LaTeXParserListener
    {
       super.setGraphicsPath(paths);
 
-      if (!isReplaceGraphicsPathEnabled())
+      if (isReplaceGraphicsPathEnabled())
+      {
+         if (imageDestPath != null)
+         {
+            writeCodePoint(parser.getEscChar());
+            write("graphicspath");
+
+            int bg = parser.getBgChar();
+            int eg = parser.getEgChar();
+
+            writeCodePoint(bg);
+
+            for (TeXObject path : paths)
+            {
+               writeCodePoint(bg);
+               write(imageDestPath.toString());
+               writeCodePoint(eg);
+            }
+
+            writeCodePoint(eg);
+         }
+      }
+      else
       {
          writeCodePoint(parser.getEscChar());
          write("graphicspath");
@@ -794,24 +848,7 @@ public class LaTeX2LaTeX extends LaTeXParserListener
    @Override
    public void writeCodePoint(int charCode) throws IOException
    {
-      if (writer != null)
-      {
-         if (charCode <= Character.MAX_VALUE)
-         {
-            writer.print((char)charCode);
-         }
-         else
-         {
-            for (char c : Character.toChars(charCode))
-            {
-               writer.print(c);
-            }
-         }
-      }
-      else
-      {
-         getParser().warning("null writer");
-      }
+      write(new String(Character.toChars(charCode)));
    }
 
    @Override
@@ -823,7 +860,15 @@ public class LaTeX2LaTeX extends LaTeXParserListener
       }
       else
       {
-         getParser().warning("null writer");
+         try
+         {
+            throw new TeXSyntaxException(getParser(),
+              TeXSyntaxException.WARNING_NO_WRITER, c);
+         }
+         catch (Exception e)
+         {
+            getParser().warning(e);
+         }
       }
    }
 
@@ -836,7 +881,15 @@ public class LaTeX2LaTeX extends LaTeXParserListener
       }
       else
       {
-         getParser().warning("null writer");
+         try
+         {
+            throw new TeXSyntaxException(getParser(),
+              TeXSyntaxException.WARNING_NO_WRITER, string);
+         }
+         catch (Exception e)
+         {
+            getParser().warning(e);
+         }
       }
    }
 
@@ -849,7 +902,15 @@ public class LaTeX2LaTeX extends LaTeXParserListener
       }
       else
       {
-         getParser().warning("null writer");
+         try
+         {
+            throw new TeXSyntaxException(getParser(),
+              TeXSyntaxException.WARNING_NO_WRITER, string);
+         }
+         catch (Exception e)
+         {
+            getParser().warning(e);
+         }
       }
    }
 
@@ -873,7 +934,15 @@ public class LaTeX2LaTeX extends LaTeXParserListener
       }
       else
       {
-         getParser().warning("null writer");
+         try
+         {
+            throw new TeXSyntaxException(getParser(),
+              TeXSyntaxException.WARNING_NO_WRITER, String.format("%c%n", c));
+         }
+         catch (Exception e)
+         {
+            getParser().warning(e);
+         }
       }
    }
 
@@ -885,7 +954,15 @@ public class LaTeX2LaTeX extends LaTeXParserListener
       }
       else
       {
-         getParser().warning("null writer");
+         try
+         {
+            throw new TeXSyntaxException(getParser(),
+              TeXSyntaxException.WARNING_NO_WRITER, String.format("%n"));
+         }
+         catch (Exception e)
+         {
+            getParser().warning(e);
+         }
       }
    }
 
@@ -1248,15 +1325,15 @@ public class LaTeX2LaTeX extends LaTeXParserListener
       this.replaceJobname = enable;
    }
 
-   private Path outPath, basePath, imageDestPath;
-   private PrintWriter writer;
+   protected Path outPath, basePath, imageDestPath;
+   protected PrintWriter writer;
 
-   private Charset outCharset=null;
+   protected Charset outCharset=null;
 
-   private boolean replaceGraphicsPath = false;
-   private boolean replaceJobname = false; 
+   protected boolean replaceGraphicsPath = false;
+   protected boolean replaceJobname = false; 
 
-   private TeXApp texApp;
+   protected TeXApp texApp;
 
    public static final String[] CHECK_CMDS = new String[]
    {

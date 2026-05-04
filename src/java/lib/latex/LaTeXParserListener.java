@@ -3992,7 +3992,7 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
 
    private boolean parsePackages = false;
 
-   private TeXObjectList graphicsPath = null;
+   protected TeXObjectList graphicsPath = null;
 
    protected String[] imageExtensions = new String[]
    {

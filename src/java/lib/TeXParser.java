@@ -3977,9 +3977,11 @@ public class TeXParser extends TeXObjectList
 
       TeXObject obj = firstElement();
 
+      boolean retainIgnoreables = isRetainIgnoreables(popStyle);
+
       if (isIgnoreLeadingSpace(popStyle))
       {
-         while (obj instanceof Ignoreable 
+         while ((!retainIgnoreables && obj instanceof Ignoreable)
              || obj instanceof WhiteSpace)
          {
             idx++;
@@ -3997,7 +3999,7 @@ public class TeXParser extends TeXObjectList
             obj = get(idx);
          }
       }
-      else
+      else if (!retainIgnoreables)
       {
          while (obj instanceof Ignoreable)
          {

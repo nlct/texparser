@@ -205,7 +205,7 @@ public class TeXObjectList extends Vector<TeXObject>
          return null;
       }
 
-      if (isIgnoreLeadingSpace(popStyle))
+      if (skipLeadingWhiteSpace)
       {
          popStyle = (byte)(popStyle^POP_IGNORE_LEADING_SPACE);
       }
@@ -1736,13 +1736,20 @@ public class TeXObjectList extends Vector<TeXObject>
          return null;
       }
 
+      boolean retainIgnoreables = isRetainIgnoreables(popStyle);
+
       if (isIgnoreLeadingSpace(popStyle))
       {
          for (int i = 0, n = size(); i < n; i++)
          {
             TeXObject obj = get(i);
 
-            if (!((obj instanceof Ignoreable) || (obj instanceof WhiteSpace)))
+            if (
+                 !(
+                    (!retainIgnoreables && (obj instanceof Ignoreable))
+                    || (obj instanceof WhiteSpace)
+                  )
+               )
             {
                return obj;
             }
@@ -1754,7 +1761,7 @@ public class TeXObjectList extends Vector<TeXObject>
          {
             TeXObject obj = get(i);
 
-            if (!(obj instanceof Ignoreable))
+            if (retainIgnoreables || !(obj instanceof Ignoreable))
             {
                return obj;
             }

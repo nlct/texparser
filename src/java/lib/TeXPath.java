@@ -725,6 +725,12 @@ public class TeXPath
       this.charset = charset;
    }
 
+   public void setRelativePath(Path path)
+   {
+      relative = path;
+      foundByKpsewhich = false;
+   }
+
    private Path base, relative;
 
    private boolean foundByKpsewhich = false;
