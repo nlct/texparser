@@ -201,12 +201,12 @@ public class UserGuideSty extends LaTeXSty
       colorSty.putColor("comment", FG_COMMENT);
       colorSty.putColor("faded", FADED);
 
-      colorSty.putColor("style1", new Color(0.32f,0.545f,0.545f));// DarkSlateGray4
-      colorSty.putColor("style2", new Color(0.21f,0.392f,0.545f));// SteelBlue4
-      colorSty.putColor("style3", new Color(0f,0f,0.545f));// Blue4
-      colorSty.putColor("style4", new Color(0.332f,0.1f,0.545f));// Purple4
-      colorSty.putColor("style5", new Color(0.28f,0.235f,0.545f));// SlateBlue4
-      colorSty.putColor("style6", new Color(0.545f,0.352f,0.17f));// Tan4
+      colorSty.putColor("style1", STYLE1);
+      colorSty.putColor("style2", STYLE2);
+      colorSty.putColor("style3", STYLE3);
+      colorSty.putColor("style4", STYLE4);
+      colorSty.putColor("style5", STYLE5);
+      colorSty.putColor("style6", STYLE6);
 
       addSemanticCommand("booktitle", TeXFontShape.EM);
 
@@ -247,7 +247,7 @@ public class UserGuideSty extends LaTeXSty
       addSemanticCommand("envfmt", TeXFontFamily.TT);
       addSemanticCommand("optfmt", TeXFontFamily.TT);
       addSemanticCommand("csoptfmt", TeXFontFamily.TT, FG_CSOPT);
-      addSemanticCommand("styoptfmt", TeXFontFamily.TT,FG_STYOPT);
+      addSemanticCommand("styoptfmt", TeXFontFamily.TT, FG_STYOPT);
       addSemanticCommand("clsoptfmt", TeXFontFamily.TT);
       addSemanticCommand("ctrfmt", TeXFontFamily.TT);
       addSemanticCommand("filefmt", TeXFontFamily.TT);
@@ -2798,6 +2798,13 @@ public class UserGuideSty extends LaTeXSty
    public static final Color BG_INFO = new Color(0.94f,1.0f,1.0f);
 
    public static final Color FADED = Color.GRAY;
+
+   public static final Color STYLE1 =  new Color(0.32f,0.545f,0.545f);// DarkSlateGray4
+   public static final Color STYLE2 = new Color(0.21f,0.392f,0.545f);// SteelBlue4
+   public static final Color STYLE3 = new Color(0f,0f,0.545f);// Blue4;
+   public static final Color STYLE4 = new Color(0.332f,0.1f,0.545f);// Purple4
+   public static final Color STYLE5 = new Color(0.28f,0.235f,0.545f);// SlateBlue4
+   public static final Color STYLE6 = new Color(0.545f,0.352f,0.17f);// Tan4
 
    public static final String ERROR_UNKNOWN_TAG_GROUP = "nlctdoc.unknown_tag_group";
 }
