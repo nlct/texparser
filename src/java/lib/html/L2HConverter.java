@@ -3997,12 +3997,17 @@ public class L2HConverter extends LaTeXParserListener
          }
          else
          {
+            // Possibly an unnumbered chapter or section
+            // e.g. "chapter*.1"
+
             label = label.replaceAll("\\*", "star");
             label = label.replaceAll("\\.", "");
          }
       }
       else
       {
+         // Remove colon prefixes such as "sec:" or "ch:"
+
          int idx = label.indexOf(":");
 
          if (idx >= 0)
@@ -4010,7 +4015,9 @@ public class L2HConverter extends LaTeXParserListener
             label = label.substring(idx+1);
          }
 
-         label = label.replaceAll("\\.", "_");
+         // Replace potentially problematic characters with an underscore.
+
+         label = label.replaceAll("[^\\p{IsAlphabetic}\\d\\-]", "_");
       }
 
       if (splitUseBaseNamePrefix)
