@@ -1615,7 +1615,7 @@ public class L2HConverter extends LaTeXParserListener
 
    protected String getNonHtml5AccSuppTag(String tag)
    {
-      return tag.equals(AccSupp.TAG_IMG) ? tag : "span";
+      return tag.equals(AccSupp.TAG_IMG) || tag.equals(AccSupp.TAG_DFN) ? tag : "span";
    }
 
    @Override
