@@ -875,12 +875,13 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       parser.putControlSequence(createTeXParserSection("part"));
 
       bibliographySection = new TeXObjectList();
-      bibliographySection.add(new TeXCsRef("section"));
-      bibliographySection.add(getOther('*'));
-      bibliographySection.add(new TeXCsRef("refname"));
+      bibliographySection.add(new TeXParserBibliographySection());
 
       parser.putControlSequence(
         new GenericCommand("refname", null, createString("References")));
+
+      parser.putControlSequence(
+        new GenericCommand("bibname", null, createString("Bibliography")));
 
       parser.putControlSequence(
         new GenericCommand("contentsname", null, createString("Contents")));

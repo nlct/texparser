@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2022 Nicola L.C. Talbot
+    Copyright (C) 2026 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -23,38 +23,45 @@ import java.io.EOFException;
 
 import com.dickimawbooks.texparserlib.*;
 
-public class TeXParserSection extends ControlSequence
+public class TeXParserBibliographySection extends ControlSequence
 {
-   public TeXParserSection()
+   public TeXParserBibliographySection()
    {
-      this("texparser@section", "section");
+      this("texparser@bibsection");
    }
 
-   public TeXParserSection(String name, String sectionCsname)
+   public TeXParserBibliographySection(String name)
    {
       super(name);
-      this.sectionCsname = sectionCsname;
    }
 
    @Override
    public Object clone()
    {
-      return new TeXParserSection(getName(), sectionCsname);
+      return new TeXParserBibliographySection(getName());
    }
 
    public void process(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
-      TeXObject title = popArg(parser, stack);
-      String label = popLabelString(parser, stack);
-
-      TeXParserListener listener = parser.getListener();
+      LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
       TeXObjectList substack = listener.createStack();
+
+      String sectionCsname = "section";
+      String titleCsname = "refname";
+
+      LaTeXCls docCls = listener.getDocumentClass();
+
+      if (docCls != null && docCls.supportsChapter())
+      {
+         sectionCsname = "chapter";
+         titleCsname = "bibname";
+      }
 
       substack.add(listener.getControlSequence(sectionCsname));
       substack.add(listener.getOther('*'));
-      substack.add(listener.getControlSequence("label"));
-      substack.add(listener.createGroup(label));
+      substack.add(TeXParserUtils.createGroup(listener,
+        listener.getControlSequence(titleCsname)));
 
       TeXParserUtils.process(substack, parser, stack);
    }
@@ -65,5 +72,4 @@ public class TeXParserSection extends ControlSequence
       process(parser, parser);
    }
 
-   protected String sectionCsname;
 }

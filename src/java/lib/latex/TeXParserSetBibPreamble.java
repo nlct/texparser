@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2022 Nicola L.C. Talbot
+    Copyright (C) 2026 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -23,40 +23,39 @@ import java.io.EOFException;
 
 import com.dickimawbooks.texparserlib.*;
 
-public class TeXParserSection extends ControlSequence
+public class TeXParserSetBibPreamble extends ControlSequence
 {
-   public TeXParserSection()
+   public TeXParserSetBibPreamble(String name)
    {
-      this("texparser@section", "section");
+      this(name, true);
    }
 
-   public TeXParserSection(String name, String sectionCsname)
+   public TeXParserSetBibPreamble(String name, boolean insertSection)
    {
       super(name);
-      this.sectionCsname = sectionCsname;
+      this.insertSection = insertSection;
    }
 
    @Override
    public Object clone()
    {
-      return new TeXParserSection(getName(), sectionCsname);
+      return new TeXParserSetBibPreamble(getName(), insertSection);
    }
 
    public void process(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
-      TeXObject title = popArg(parser, stack);
-      String label = popLabelString(parser, stack);
+      LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
+      TeXObject arg = popArg(parser, stack);
 
-      TeXParserListener listener = parser.getListener();
-      TeXObjectList substack = listener.createStack();
+      TeXObjectList list = TeXParserUtils.toList(arg, parser);
 
-      substack.add(listener.getControlSequence(sectionCsname));
-      substack.add(listener.getOther('*'));
-      substack.add(listener.getControlSequence("label"));
-      substack.add(listener.createGroup(label));
+      if (insertSection)
+      {
+         list.push(new TeXParserBibliographySection());
+      }
 
-      TeXParserUtils.process(substack, parser, stack);
+      listener.setBibliographySection(list);
    }
 
    public void process(TeXParser parser)
@@ -65,5 +64,5 @@ public class TeXParserSection extends ControlSequence
       process(parser, parser);
    }
 
-   protected String sectionCsname;
+   boolean insertSection;
 }
