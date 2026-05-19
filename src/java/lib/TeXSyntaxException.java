@@ -111,6 +111,19 @@ public class TeXSyntaxException extends IOException
       this.file = file;
    }
 
+   @Override
+   public String getLocalizedMessage()
+   {
+      if (parser == null)
+      {
+         return super.getLocalizedMessage();
+      }
+      else
+      {
+         return getMessage(parser.getTeXApp());
+      }
+   }
+
    public String getMessage(TeXApp app)
    {
       if (app == null)
