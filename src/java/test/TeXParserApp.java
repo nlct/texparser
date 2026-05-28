@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013-2024 Nicola L.C. Talbot
+    Copyright (C) 2013-2026 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -646,6 +646,9 @@ public class TeXParserApp implements TeXApp
    {
       if (name.indexOf("\\") != -1)
       {
+         // If a backslash occurs in name it's an indication that
+         // a command hasn't expanded and needs to be investigated.
+
          throw new IOException(getMessage("error.bksl_in_kpsewhich", name));
       }
 
@@ -1006,6 +1009,7 @@ public class TeXParserApp implements TeXApp
 
    // adapted from http://kylecartmell.com/?p=9 only it's no longer there
    // TODO replace with ProcessBuilder
+   // see TeXJavaHelpLib.execCommandAndWaitFor
    public int execCommandAndWaitFor(String[] cmd, String[] envp, File dir, 
       ProcessListener listener, boolean writeInfo)
      throws IOException,InterruptedException
@@ -1348,8 +1352,10 @@ public class TeXParserApp implements TeXApp
    {
       Properties dictionary = new Properties();
 
-      addDictionary("texparserlib", "en", dictionary);
-      addDictionary(TeXParserAppSettings.RESOURCE, "en-GB", dictionary);
+      // TeX Java Help has better localisation management
+
+      addDictionary("texjavaparserlib", "en", dictionary);
+      addDictionary(TeXParserAppSettings.RESOURCE, "en", dictionary);
 
       messages = new TeXParserAppMessages(dictionary);
    }
@@ -1825,9 +1831,9 @@ public class TeXParserApp implements TeXApp
 
    // TeXParser class now has its own version and date.
    // As from 0.9.2.2b these now refer to the test application only.
-   public static final String APP_VERSION = "0.9.2.9b";
-   public static final String APP_NAME = "texparsertest";
-   public static final String APP_DATE = "2024-08-20";
+   public static final String APP_VERSION = "1.0";
+   public static final String APP_NAME = "texjavaparsertest";
+   public static final String APP_DATE = "2026-05-28";
 
    public static long MAX_PROCESS_TIME=0L;
 

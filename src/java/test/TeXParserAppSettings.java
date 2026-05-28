@@ -30,7 +30,10 @@ import java.util.Locale;
 import java.net.URL;
 
 /**
- * Application settings for texparsertest.
+ * Application settings for texjavaparsertest.
+ *
+ * This is a test application. See TeX Java Help for 
+ * abstract adapter application classes.
  */
 public class TeXParserAppSettings extends Properties
 {
@@ -430,7 +433,7 @@ public class TeXParserAppSettings extends Properties
 
    public String getDictionary()
    {
-      return getDictionary(RESOURCE, "en-GB");
+      return getDictionary(RESOURCE, "en");
    }
 
    public String getDictionary(String prefix, String defLangTag)
@@ -504,58 +507,6 @@ public class TeXParserAppSettings extends Properties
       setProperty("dictionary", dictionary);
    }
 
-   public String getHelpSet()
-   {
-      String prop = getProperty("helpset");
-
-      if (prop == null)
-      {
-         Locale locale = Locale.getDefault();
-
-         String language = locale.getLanguage();
-         String country = locale.getCountry();
-
-         String helpsetLocation = HELPSET_DIR+RESOURCE;
-
-         URL hsURL = getClass().getResource(helpsetLocation
-          + "-" + language + "-" + country + "/" + RESOURCE + ".hs");
-         if (hsURL == null)
-         {
-            hsURL = getClass().getResource(helpsetLocation
-              + "-"+language + "/" + RESOURCE + ".hs");
-
-            if (hsURL == null)
-            {
-               app.debug("Can't find language file for "
-                   +language+"-"+country);
-               prop = "en-US";
-            }
-            else
-            {
-               prop = language;
-            }
-         }
-         else
-         {
-            prop = language+"-"+country;
-         }
-
-         setHelpSet(prop);
-      }
- 
-      return prop;
-   }
-
-   public void setHelpSet(String helpset)
-   {
-      setProperty("helpset", helpset);
-   }
-
-   public static String getHelpSetLocation()
-   {
-      return HELPSET_DIR + RESOURCE;
-   }
-
    public static String getDictionaryLocation()
    {
       return DICT_DIR + RESOURCE;
@@ -572,7 +523,7 @@ public class TeXParserAppSettings extends Properties
 
    private File propertiesPath = null;
 
-   public static final String RESOURCE = "texparser";
+   public static final String RESOURCE = "texjavaparsertest";
 
    private final String propertiesName= RESOURCE+".prop";
 
@@ -585,11 +536,7 @@ public class TeXParserAppSettings extends Properties
    public static final int STARTUP_LAST   = 2;
    public static final int STARTUP_CUSTOM = 3;
 
-   public static final String HELPSET_DIR = "/resources/helpsets/";
-   public static final String DICT_DIR = "/resources/dictionaries/";
-
-   public static final Pattern PATTERN_HELPSET 
-     = Pattern.compile(RESOURCE+"-([a-z]{2})(-[A-Z]{2})?");
+   public static final String DICT_DIR = "/";
 
    public static final Pattern PATTERN_DICT 
      = Pattern.compile(RESOURCE+"-([a-z]{2})(-[A-Z]{2})?\\.xml");
