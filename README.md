@@ -1,46 +1,80 @@
-# TeX Parser Library
+# TeX Java Parser Library
 
-This code is *highly experimental* and still under construction. It
-comes with no guarantees, no warranties and is not future-proof.
-Note that version 0.8b has some file name changes. The most
-important one being the renaming of the former `aux` directory
-(see issue #1).
+I am in the process of working on a way to get more of my
+(La)TeX-related Java applications into TeX Live. This will make it
+easier for people to install the applications (in the usual way via
+the TL package manager), but it means making changes in order to
+comply with TL requirements.
 
-## PURPOSE
+The library is being renamed the TeX Java Parser Library (instead of
+just the TeX Parser Library). This was suggested by Karl Berry to
+fit in with the [TeX Java Help Library](https://github.com/nlct/texjavahelp)
+naming scheme, and it also highlights that it's a Java library. 
 
-My Java application
+The jar file will be renamed `texjavaparserlib.jar`
+(from `texparserlib.jar`). The package name
+`com.dickimawbooks.texparserlib` is unchanged. Renaming the jar file
+will help prevent any conflict with the `texparserlib.jar` file currently
+bundled with [`bib2gls`](https://github.com/nlct/bib2gls).
+
+The aim is to have the libraries distributed separately and create a
+script that locates the required libraries in `texmfscripts` and
+adds them to the class path when running the application that
+depends on them.  This will avoid having multiple copies of
+`texparserlib.jar` (and `texjavahelplib.jar`) in the TeX
+distribution (which TL doesn't allow).  It will also allow
+`texjavahelp.sty` into TL, which makes it easier to build the
+application documentation from the source code. 
+
+## BACKGROUND
+
+In the past, I created a Java application
 [MakeJmlrBookGUI](http://www.dickimaw-books.com/software/makejmlrbookgui/)
-needs to parse LaTeX files so that it can fix common problems. This
-mainly involves replacing obsolete/problematic code and removing
-`.eps` from included graphics, so that the book correctly compiles
+that needed to parse LaTeX files so that it could fix common problems. This
+mainly involved replacing obsolete/problematic code and removing
+`.eps` from included graphics, so that the book correctly compiled
 with `pdflatex` and my [`jmlrbook` class](http://ctan.org/pkg/jmlr).
+(This no longer works as the underlying required class has stopped
+working following changes to the LaTeX kernel. The `jmlrbook` class is
+too fragile to continue to support, and the group who asked me to
+create it no longer need it.)
+
 Unfortunately TeX syntax can be too complex for a regular
-expression. The `texparserlib.jar` library is not intended as a TeX
+expression. The TeX Parser library is not intended as a TeX
 engine, but as a way of parsing TeX code that's somewhat better than
 a simple pattern match.
 
-Since TeX4HT no longer works with the `jmlrbook` class, I started to
+When TeX4HT stopped worked with the `jmlrbook` class (before the
+class itself stopped working with new LaTeX kernels), I started to
 extend the TeX parsing code so that it could convert the article
-abstracts to HTML without requiring TeX4HT. This aspect is no
-longer required as JMLR W&amp;CP now generate the HTML files from the
-`.bib` file associated with the proceedings, but the `html` part of the
-TeX parser library allows the translation of code fragments, such as 
-author name or article title, so it can be rendered in Java's
-`HTMLDocument`, which makes the GUI look a bit tidier.
+abstracts to HTML without requiring TeX4HT or other LaTeX to HTML
+systems that may have similar problems. This aspect is no longer
+required as PLMR (formerly JMLR W&amp;CP) now generate the HTML files from the
+`.bib` file associated with the proceedings, but the `html` part of
+the TeX parser library allows the translation of code fragments,
+such as author name or article title, so it can be rendered in
+Java's `HTMLDocument`, which makes the GUI look a bit tidier.
+
+In addition to parsing the LaTeX source code,
+the `.aux` files also needed parsing to pick out various bits of
+information, and the `.bib` files supplied by contributing authors
+needed to have just the actual referenced entries extracted.
+So the library includes code to gather information from `.aux` and
+`.bib` files.
 
 Since I have other Java applications (for example,
 [`datatooltk`](https://github.com/nlct/datatooltk) and
 [`bib2gls`](https://github.com/nlct/bib2gls)) that also need to
 parse LaTeX files or their associated `.aux` or `.bib` files, I
 decided to split away the TeX parsing code from MakeJmlBookGui into
-a separate library, namely `texparserlib.jar`. This also makes it
-easier to test the library without the additional overhead of the
-main program.
+a separate library, namely `texparserlib.jar` (now renamed
+`texjavaparserlib.jar`). This also makes it easier to test the
+library without the additional overhead of the main program.
 
 There are only a few LaTeX packages implemented and some of them
 aren't a full implementation. These are provided as some aspects of
-them are required for the applications using the `texparserlib.jar`
-library. For example, MakeJmlrBookGUI needs to convert articles that
+them are required for the applications using the TeX Parser
+library. For example, MakeJmlrBookGUI needed to convert articles that
 use the old `jmlr2e` package so that they instead use the new `jmlr`
 class, the `datatooltk` application can import `probsoln` data sets, and
 `bib2gls` needs to know symbols that commonly occur in glossary
@@ -53,11 +87,12 @@ important to `bib2gls` since entries aren't usually sorted by their
 description).
 
 The accompanying `texparsertest.jar` is a command line application
-provided to test the `texparserlib.jar` library. It's not intended for
-general use. (For this reason, I've renamed it from
-`texparserapp.jar` to `texparsertest.jar`. There is still a script
-called `texparserapp` in the `bin` directory which does the same
-thing as `texparsertest`.)
+provided to test the TeX Parser library. It's not intended for
+general use, although I do use it to create the HTML version of my
+package documentation. (It's very slow but it's a useful way of
+testing the system.) For example, `glossaries-user.html` is an HTML
+alternative to `glossaries-user.pdf` that's created with
+`texparsertest.jar`.
 
 Syntax:
 
@@ -68,22 +103,24 @@ copies over any included images. It will run `epstopdf` on any eps
 files and `wmf2eps` on any wps files. Both `epstopdf` and `wmf2eps` must
 be on your system path. The `--html` switch indicates conversion to
 HTML. If this switch is omitted, LaTeX to LaTeX conversion is
-assumed.
-
-The output directory &lt;*out dir*&gt; must not exist. This is a
-precautionary measure to ensure you don't accidentally overwrite the
-original files.
+assumed, which will produce a single flattened file (that is, instances of
+`\input` will be replaced with the referenced file's content).
 
 I experimented with including a GUI to provide a way of testing the
-library with a graphical interface but I've now removed it as I don't have time
-to develop it, and it requires additional libraries.
+library with a graphical interface, but I've now removed it as I don't have time
+to develop it, and it requires additional libraries. There's still
+some legacy content from that which needs removing.
 
-[TeX Java Help](https://github.com/nlct/texjavahelp) uses the TeX Parser Library.
-The command line `texjavahelpmk.jar` application is similar to `texparsertest --html` 
-but is customized to work with the `texjavahelplib.jar` library and has added support
-for `texjavahelp.sty`. This is used with `datatooltk` to provide the in-application
-manual created from the LaTeX source and will also be used with future versions of
-`flowframtk` and `makeglossariesgui`.
+The [TeX Java Help System](https://github.com/nlct/texjavahelp) uses
+the TeX Parser Library.  The command line `texjavahelpmk.jar`
+application is similar to `texparsertest --html` but is customized
+to work with the `texjavahelplib.jar` library and has added support
+for `texjavahelp.sty`. This is used with `flowframtk` and
+`datatooltk` to provide the in-application manual created from the
+LaTeX source and will also be used with future versions of other
+applications, such as `makeglossariesgui`.
+The command line `tjhflattendocsrc.jar` application is similar to
+using `texparsertest` in LaTeX-to-LaTeX mode.
 
 ## TEST FILES
 
@@ -149,3 +186,15 @@ missing, so this test file now includes some packages that have been
 added to help `bib2gls`. These are mostly packages that provide
 symbols that might appear in a glossary. Some support for `datatool` has also
 been added to assist `datatooltk`.
+
+Support for the `glossaries` and `glossaries-extra` packages is
+provided for `texjavahelpmk` (not for `bib2gls`, which has its own
+implementation of glossary commands that may occur in entry fields).
+
+I would like at some point to develop the
+`com.dickimawbooks.texparserlib.image` package for the benefit of
+the `jdr.jar` library (used by `flowframtk`) but this would be a
+major undertaking as there are many commands that would need
+implementing.
+
+And, of course, all the libraries will need documenting.
