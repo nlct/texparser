@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2026 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -18,11 +18,11 @@
 */
 package com.dickimawbooks.texparsertest.io;
 
-import com.dickimawbooks.texparsertest.TeXParserApp;
+import com.dickimawbooks.texparsertest.TeXParserTest;
 
 public class CancelledException extends InterruptedException
 {
-   public CancelledException(TeXParserApp app)
+   public CancelledException(TeXParserTest app)
    {
       this(app.getMessage("error.interrupted"));
    }

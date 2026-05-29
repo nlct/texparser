@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2017 Nicola L.C. Talbot
+    Copyright (C) 2017-2026 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -26,9 +26,9 @@ import java.text.ChoiceFormat;
 
 import com.dickimawbooks.texparsertest.io.InvalidSyntaxException;
 
-public class TeXParserAppMessages extends Hashtable<String,MessageFormat>
+public class TeXParserTestMessages extends Hashtable<String,MessageFormat>
 {
-    public TeXParserAppMessages(Properties props) throws InvalidSyntaxException
+    public TeXParserTestMessages(Properties props) throws InvalidSyntaxException
     {
        super(props.isEmpty() ? 10 : props.size());
 

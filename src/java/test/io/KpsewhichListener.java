@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2026 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -20,11 +20,11 @@ package com.dickimawbooks.texparsertest.io;
 
 import java.io.File;
 
-import com.dickimawbooks.texparsertest.TeXParserApp;
+import com.dickimawbooks.texparsertest.TeXParserTest;
 
 public class KpsewhichListener implements ProcessListener
 {
-   public KpsewhichListener(TeXParserApp application)
+   public KpsewhichListener(TeXParserTest application)
    {
       app = application;
    }
@@ -91,7 +91,7 @@ public class KpsewhichListener implements ProcessListener
    }
 
    private InterruptTimerTask interruptor;
-   private TeXParserApp app;
+   private TeXParserTest app;
    private String result = null;
    private Process process;
    private Thread thread;

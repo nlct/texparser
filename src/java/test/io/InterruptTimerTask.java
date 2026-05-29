@@ -1,12 +1,12 @@
 package com.dickimawbooks.texparsertest.io;
 
-import com.dickimawbooks.texparsertest.TeXParserApp;
+import com.dickimawbooks.texparsertest.TeXParserTest;
 
 // adapted from http://kylecartmell.com/?p=9
 
 public class InterruptTimerTask extends java.util.TimerTask
 {
-   public InterruptTimerTask(TeXParserApp app, Thread t)
+   public InterruptTimerTask(TeXParserTest app, Thread t)
    {
       this.app = app;
       thread = t;
@@ -39,7 +39,7 @@ public class InterruptTimerTask extends java.util.TimerTask
 
    private Thread thread;
 
-   private TeXParserApp app;
+   private TeXParserTest app;
 
    public static final int STATUS_NONE=0;
    public static final int STATUS_TIMEDOUT=1;

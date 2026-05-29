@@ -121,13 +121,13 @@ lib/texjavaparserlib.jar      : classes/com/dickimawbooks/texparserlib/TeXParser
 	com/dickimawbooks/texparserlib/*/*/*.class 
 
 lib/texjavaparsertest.jar      : java/test/Manifest.txt \
-			classes/com/dickimawbooks/texparsertest/TeXParserApp.class 
+			classes/com/dickimawbooks/texparsertest/TeXParserTest.class 
 	cd classes; \
 	jar cmf ../java/test/Manifest.txt ../lib/texjavaparsertest.jar \
 	com/dickimawbooks/texparsertest/*.class \
 	com/dickimawbooks/texparsertest/*/*.class 
 
-classes/com/dickimawbooks/texparsertest/TeXParserApp.class   : classes/com/dickimawbooks/texjavaparsertest \
+classes/com/dickimawbooks/texparsertest/TeXParserTest.class   : classes/com/dickimawbooks/texjavaparsertest \
 	java/test/*.java java/test/*/*.java \
 	lib/texjavaparserlib.jar
 	cd java/test; \

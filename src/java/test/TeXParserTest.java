@@ -55,13 +55,21 @@ import com.dickimawbooks.texparsertest.io.*;
  *
  * This application may spawn processes: kpsewhich is used to find files, and
  * latex or conversion tools are used to create or process images.
+ *
+ * Note that the TeX Java Help Library has newer classes that can be
+ * used to create applications that use the TeX Java Parser Library.
+ * These are used by TJH applications:
+ * texjavahelpmk provides similar functionality to this test application
+ * running in html mode; 
+ * tjhflattendocsrc provides similar functionality to this test
+ * application running in latex2latex mode.
  */
-public class TeXParserApp implements TeXApp
+public class TeXParserTest implements TeXApp
 {
-   public TeXParserApp() 
+   public TeXParserTest() 
    {
 
-      settings = new TeXParserAppSettings(this);
+      settings = new TeXParserTestSettings(this);
 
       initDefaultErrorListener(this);
 
@@ -70,7 +78,7 @@ public class TeXParserApp implements TeXApp
       currentProcessListeners = new Vector<ProcessListener>();
    }
 
-   private void initDefaultErrorListener(final TeXParserApp app)
+   private void initDefaultErrorListener(final TeXParserTest app)
    {
       errorListener = new ErrorListener()
       {
@@ -636,7 +644,7 @@ public class TeXParserApp implements TeXApp
       }
    }
 
-   public TeXParserAppSettings getSettings()
+   public TeXParserTestSettings getSettings()
    {
       return settings;
    }
@@ -1355,9 +1363,9 @@ public class TeXParserApp implements TeXApp
       // TeX Java Help has better localisation management
 
       addDictionary("texjavaparserlib", "en", dictionary);
-      addDictionary(TeXParserAppSettings.RESOURCE, "en", dictionary);
+      addDictionary(TeXParserTestSettings.RESOURCE, "en", dictionary);
 
-      messages = new TeXParserAppMessages(dictionary);
+      messages = new TeXParserTestMessages(dictionary);
    }
 
    public String getMessage(String label, Object... params)
@@ -1807,7 +1815,7 @@ public class TeXParserApp implements TeXApp
 
    public static void main(String[] args)
    {
-      final TeXParserApp app = new TeXParserApp();
+      final TeXParserTest app = new TeXParserTest();
 
       try
       {
@@ -1829,17 +1837,17 @@ public class TeXParserApp implements TeXApp
       app.runApplication();
    }
 
-   // TeXParser class now has its own version and date.
-   // As from 0.9.2.2b these now refer to the test application only.
-   public static final String APP_VERSION = "1.0";
    public static final String APP_NAME = "texjavaparsertest";
-   public static final String APP_DATE = "2026-05-28";
+
+   // reverted back to using same version details as TeXParser
+   public static final String APP_VERSION = TeXParser.VERSION;
+   public static final String APP_DATE = TeXParser.VERSION_DATE;
 
    public static long MAX_PROCESS_TIME=0L;
 
    private int debugMode = 0;
 
-   private TeXParserAppSettings settings;
+   private TeXParserTestSettings settings;
 
    private File inFileName;
 
@@ -1851,7 +1859,7 @@ public class TeXParserApp implements TeXApp
 
    private ErrorListener errorListener;
 
-   private TeXParserAppMessages messages;
+   private TeXParserTestMessages messages;
 
    private File texmf;
 

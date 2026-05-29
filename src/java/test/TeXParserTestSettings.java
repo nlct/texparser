@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2013-2026 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -35,9 +35,9 @@ import java.net.URL;
  * This is a test application. See TeX Java Help for 
  * abstract adapter application classes.
  */
-public class TeXParserAppSettings extends Properties
+public class TeXParserTestSettings extends Properties
 {
-   public TeXParserAppSettings(TeXParserApp app)
+   public TeXParserTestSettings(TeXParserTest app)
    {
       super();
       recentFiles = new Vector<String>();
@@ -529,7 +529,7 @@ public class TeXParserAppSettings extends Properties
 
    private final String recentName = "recentfiles";
 
-   private TeXParserApp app;
+   private TeXParserTest app;
 
    public static final int STARTUP_HOME   = 0;
    public static final int STARTUP_CWD    = 1;
