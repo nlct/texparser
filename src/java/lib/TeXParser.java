@@ -34,28 +34,33 @@ import com.dickimawbooks.texparserlib.latex.LaTeXSyntaxException;
 import com.dickimawbooks.texparserlib.primitives.Undefined;
 
 /**
- * The principle class in this library that deals with reading input
- * from a reader (file or string). It doesn't parse in quite the
- * same way as TeX but does recognise catcodes. The characters read
- * from the reader are converted into objects of type TeXObject.
- * These are either processed directly or are pushed onto the stack
- * to be processed after some action. Sometimes sub-stacks are
- * formed that need to be processed before returning to the main
- * parser stack.
+ * A class to parse TeX code.
+ * The <code>TeXParser</code> class is the principle class in the
+ * TeX Java Parser Library. It deals with reading input from a
+ * file or string (see {@link TeXReader}). This is not a TeX engine. It doesn't
+ * parse in quite the same way as TeX but does recognise category codes.
+ * The characters read from the reader are converted into objects of
+ * type {@link TeXObject}.  These are either processed directly or are
+ * pushed onto the stack to be processed after some action.
+ * Sometimes sub-stacks are formed that need to be processed before
+ * returning to the main parser stack.
  * 
- * Each stack is a TeXObjectList with the TeXParser as the main
- * stack. When the TeXParser stack runs out, more characters are
+ * Each stack is a {@link TeXObjectList} with the <code>TeXParser</code> as the main
+ * stack. When the <code>TeXParser</code> stack runs out, more characters are
  * read from the reader until EOF. When sub-stacks run out they are
- * discarded and the main processing returns to the TeXParser stack.
+ * discarded and the main processing returns to the <code>TeXParser</code> stack.
+ * The {@link TeXParserUtils} class provides convenient static methods to pop
+ * various types of argument from either the <code>TeXParser</code>
+ * or a sub-stack.
  *
- * Be careful about pushing content to a stack or the parser as it
+ * Be careful about pushing content to a sub-stack or the parser as it
  * can delay processing the content.
  *
- * The principle TeXObject sub-classes are:
+ * The principle <code>TeXObject</code> sub-classes are:
  *
- * Macro: corresponds to a macro, which may be ActiveChar (an active
- * character) or a ControlSequence (a control sequence). Some macros
- * may implement Expandable, which means they may be able to expand.
+ * {@link Macro}: corresponds to a macro, which may be {@link ActiveChar} (an active
+ * character) or a {@link ControlSequence} (a control sequence). Some macros
+ * may implement {@link Expandable}, which means they may be able to expand.
  * If they can expand, their expansion will be returned as a stack
  * otherwise null is returned. They may well expand differently to
  * the corresponding TeX macros. For example, they may not expand
@@ -63,35 +68,51 @@ import com.dickimawbooks.texparserlib.primitives.Undefined;
  * they may expand, even though their TeX definition may be robust
  * (such as case-changing commands).
  *
- * CharObject: corresponds to a character, which may be a Letter or
- * Other.
+ * {@link CharObject}: corresponds to a character, which may be a {@link Letter} or
+ * {@link Other}.
  *
- * WhiteSpace: corresponds to a space character, which may be Space
- * or Eol.
+ * {@link WhiteSpace}: corresponds to a space character, which may be {@link Space}
+ * or {@link Eol}.
  *
- * Par: corresponds to a paragraph break (multiple blank lines)
+ * {@link Par}: corresponds to a paragraph break (multiple blank lines)
  *
- * ParameterToken: corresponds to a parameter marker, which may be
- * Param (e.g #1) or DoubleParam (e.g. ##1, ###1, ####1).
+ * {@link ParameterToken}: corresponds to a parameter marker, which may be
+ * {@link Param} (e.g. <code>#1</code>) or {@link DoubleParam}
+ * (e.g. <code>##1</code>, <code>###1</code>, <code>####1</code>).
  *
- * Group: a form of stack that is treated as a single unit and
- * causes a new TeXSettings object to be created that represents the
- * local scope. The TeXSettings object is discarded when the group
+ * {@link Group}: a form of stack that is treated as a single unit and
+ * causes a new {@link TeXSettings} object to be created that represents the
+ * local scope. The <code>TeXSettings</code> object is discarded when the group
  * ends.
  *
- * MathGroup: a sub-class of Group that switches to math-mode
+ * {@link MathGroup}: a sub-class of <code>Group</code> that switches to math-mode.
  *
- * Special characters (SbChar, SpChar and Tab)
+ * Special characters {@link SbChar} (<code>_</code>), {@link SpChar} (<code>^</code>)
+ * and {@link Tab} (<code>&amp;</code>).
  *
- * Ignoreable: comments, spaces following control words. These
- * aren't automatically discarded to allow the latex2latex library
+ * {@link Ignoreable}: comments or spaces following control words. These
+ * aren't automatically discarded to allow the <code>latex2latex</code> library
  * to retain comments in the output files. They are discarded when
- * popping arguments off the stack.
+ * popping arguments off the stack unless a pop style is used that
+ * retains them.
+ *
+ * The associated listener (which should implement {@link TeXParserListener})
+ * is responsible for creating these objects for the parser.
+ *
+ * The parser needs to be informed of any verbatim commands using the
+ * {@link #addVerbCommand(String)} method (<code>\verb</code> is
+ * automatically added). This is a simplistic approach to
+ * support <code>\verb</code>-like commands. For more complex
+ * verbatim requirements, you would need to define a <code>Macro</code>
+ * (implementing {@link CatCodeChanger}) that
+ * changes the category codes.
  *
  * Some information isn't available, such as where TeX breaks lines
- * and pages or font information.
+ * and pages or font information. There's no output routine or any
+ * concept of floating objects.
  * 
  */
+
 public class TeXParser extends TeXObjectList
 {
    public TeXParser(TeXParserListener listener)
