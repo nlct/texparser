@@ -238,7 +238,7 @@ public interface TeXApp
 
    /**
     * Gets the default locale for the specified Category. This may simply return
-    * java.util.Locale.getDefault(category).
+    * <code>java.util.Locale.getDefault(category)</code>.
     *
     * @return the default locale
     */

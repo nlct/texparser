@@ -39,6 +39,11 @@ public interface TeXObject extends Cloneable
 
    public String toString(TeXParser parser);
 
+   /**
+    * Returns <code>\string</code> representation of this.
+    * @param parser the TeX Parser
+    * @return the string representing this object as a stack
+    */
    public TeXObjectList string(TeXParser parser)
     throws IOException;
 

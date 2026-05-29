@@ -20,12 +20,28 @@ package com.dickimawbooks.texparserlib;
 
 import java.io.IOException;
 
+/**
+ * An interface to implement if a macro changes the category code
+ * of one or more characters.
+ */
 public interface CatCodeChanger
 {
-   // anything popped off parser must be pushed back on
+   /**
+    * Applies the necessary category code changes.
+    * Note that if this method pops anything off the parser in order
+    * to determine what changes need to be made, the popped objects must
+    * be pushed back on again.
+    * @param parser the parser that needs to be notified of the
+    * category code change(s)
+    * @throws IOException if an I/O or syntax error occurs
+   */
    public void applyCatCodeChange(TeXParser parser) throws IOException;
 
-   // returns a command with the same syntax that does nothing
+   /** 
+    * Returns a command with the same syntax as this that does nothing.
+    * @return a control sequence with the same syntax as this that
+    * does nothing (except pop the arguments as per the syntax).
+    */
    public ControlSequence getNoOpCommand();
 }
 

@@ -77,8 +77,8 @@ import com.dickimawbooks.texparserlib.primitives.Undefined;
  * {@link Par}: corresponds to a paragraph break (multiple blank lines)
  *
  * {@link ParameterToken}: corresponds to a parameter marker, which may be
- * {@link Param} (e.g. <code>#1</code>) or {@link DoubleParam}
- * (e.g. <code>##1</code>, <code>###1</code>, <code>####1</code>).
+ * {@link Param} (for example, <code>#1</code>) or {@link DoubleParam}
+ * (for example, <code>##1</code>, <code>###1</code>, <code>####1</code>).
  *
  * {@link Group}: a form of stack that is treated as a single unit and
  * causes a new {@link TeXSettings} object to be created that represents the
@@ -115,6 +115,11 @@ import com.dickimawbooks.texparserlib.primitives.Undefined;
 
 public class TeXParser extends TeXObjectList
 {
+   /**
+    * Class constructor registering a listener.
+    * @param listener the listener that creates the required
+    * <code>TeXObject</code>s for this parser
+    */
    public TeXParser(TeXParserListener listener)
    {
       this.listener = listener;
@@ -263,26 +268,63 @@ public class TeXParser extends TeXObjectList
 
    }
 
+   /**
+    * Returns true if this parser's debugging mode is on.
+    */
    public boolean isDebugModeOn()
    {
       return debugMode > 0;
    }
 
+   /**
+    * Determines if the given debugging mode is currently on.
+    * For example, if this parser's debugging mode has been set to
+    * <code>DEBUG_DECL | DEBUG_CS</code> then
+    * <code>isDebugMode(DEBUG_DECL)</code>,
+    * <code>isDebugMode(DEBUG_CS)</code> and
+    * <code>isDebugMode(DEBUG_DECL | DEBUG_CS)</code>
+    * will all return true but any other value will return false.
+    * @param mode a debugging flag
+    * @return true if the bitwise <em>current mode</em> <code>&amp; mode</code> equals <code>mode</code>, where <em>current mode</em> is this parser's current debugging mode.
+    */
    public boolean isDebugMode(int mode)
    {
       return (debugMode & mode) == mode;
    }
 
+   /**
+    * Sets the debugging mode where the bits indicate what
+    * information should be produced.
+    * For example, <code>DEBUG_DECL | DEBUG_CS</code>.
+    * @param mode the debugging flag
+    */
    public void setDebugMode(int mode)
    {
       debugMode = mode;
    }
 
+   /**
+    * Sets the debugging mode and the log file writer.
+    * @param mode the debugging flag
+    * @param writer the log file writer (may be null)
+    */
    public void setDebugMode(int mode, PrintWriter writer)
    {
       setDebugMode(mode, writer, writer != null);
    }
 
+   /**
+    * Sets the debugging mode and the log file writer and indicates
+    * whether or not to log debugging messages. If <code>doLogging</code>
+    * is true and the <code>writer</code> is null, the messages will
+    * be written to standard output stream instead.
+    * @param mode the debugging flag
+    * @param writer the log file writer
+    * @param doLogging true if debugging messages should be written
+    * to the log file
+    * @see #setLogWriter(PrintWriter)
+    * @see #setLogging(boolean)
+    */
    public void setDebugMode(int mode, PrintWriter writer, boolean doLogging)
    {
       setDebugMode(mode);
@@ -291,7 +333,11 @@ public class TeXParser extends TeXObjectList
    }
 
    /**
-    * Calculates the level from the list of mode names.
+    * Calculates the debugging level from the list of mode names.
+    * Valid mode names: all, io, read, popped, cs, decl, sty-data, expansion, expansion-list, expansion-once, expansion-once-list, process, process-generic-cs, process-stack, process-stack-list, catcode, settings.
+    * The return value may be passed to any of the <code>setDebugMode</code> methods.
+    * @param modes list of mode names
+    * @return corresponding numeric debugging mode
     */
    public static int getDebugLevelFromModeList(String... modes)
     throws TeXSyntaxException
@@ -399,6 +445,19 @@ public class TeXParser extends TeXObjectList
       setDebugMode(level, writer);
    }
 
+   /**
+    * Log message if given debugging flag is on.
+    * If there is no log writer, the message will be written to
+    * standard output stream. Does nothing if the given debugging flag is not set.
+    * This method is simply a shortcut that does:
+    * <pre>
+    * if (isDebugMode(mode)) { logMessage(msg); }
+    * </pre>
+    * @param mode debugging flag
+    * @param msg the message
+    * @see isDebugMode(int)
+    * @see logMessage(String)
+    */
    public void debugMessage(int mode, String msg)
    {
       if (isDebugMode(mode))
@@ -407,6 +466,13 @@ public class TeXParser extends TeXObjectList
       }
    }
 
+   /**
+    * Logs message if logging is enabled.
+    * Does nothing if logging is not enabled.
+    * If there is no log writer, the message will be written to
+    * standard output stream.
+    * @param msg the message to log
+    */
    public void logMessage(String msg)
    {
       if (!logging) return;
@@ -439,6 +505,13 @@ public class TeXParser extends TeXObjectList
       }
    }
 
+   /**
+    * Logs throwable if logging is enabled.
+    * Does nothing if logging is not enabled.
+    * If there is no log writer, the stack trace will simply be
+    * printed to the standard error stream.
+    * @param e the throwable to log
+    */
    public void logMessage(Throwable e)
    {
       if (logging)
@@ -459,22 +532,45 @@ public class TeXParser extends TeXObjectList
       }
    }
 
+   /** Sets the writer for the log file.
+     * If the writer is null, ordinary log messages will be written to
+     * the standard output stream and errors or exceptions will have
+     * the stack trace written to the standard error stream.
+     * @param writer the log file writer or null
+    */
    public void setLogWriter(PrintWriter writer)
    {
       logWriter = writer;
    }
 
+   /** Sets whether or not to log messages.
+    * @param doLogging true if messages should be logged
+    */
    public void setLogging(boolean doLogging)
    {
       logging = doLogging;
    }
 
+   /**
+    * Issues a warning via the listener's <code>TeXApp</code> and,
+    * if enabled, logs the message.
+    * @param msg the warning message
+    * @see TeXApp#warning(String)
+    * @see #logMessage(String)
+    */
    public void warning(String msg)
    {
       getTeXApp().warning(this, msg);
       logMessage(msg);
    }
 
+   /**
+    * Issues a warning via the listener's <code>TeXApp</code> and,
+    * if enabled, logs the error or exception.
+    * @param e the error or exception to report
+    * @see TeXApp#warning(TeXParser,String)
+    * @see #logMessage(String)
+    */
    public void warning(Throwable e)
    {
       if (e instanceof TeXSyntaxException)
@@ -490,17 +586,46 @@ public class TeXParser extends TeXObjectList
       logMessage(e);
    }
 
+   /**
+    * Issues a warning for a localised message.
+    * This is just a shortcut that uses <code>warning(String)</code>
+    * where the message is obtained from the listener's <code>TeXApp</code>
+    * localisation support.
+    * @param msgTag the tag identifying the message
+    * @param params the arguments to pass to the localised message
+    * @see TeXApp#getMessage(String,Object...)
+    * @see #warning(String)
+    */
    public void warningMessage(String msgTag, Object... params)
    {
       warning(getTeXApp().getMessage(msgTag, params));
    }
 
+   /**
+    * Reports an error via the listener's <code>TeXApp</code> and,
+    * if enabled, logs the exception.
+    * @param e the error or exception to report
+    * @see TeXApp#error(Exception)
+    * @see #logMessage(Throwable)
+    */
    public void error(Exception e)
    {
       getTeXApp().error(e);
       logMessage(e);
    }
 
+   /**
+    * Reports an error via the listener's <code>TeXApp</code> and,
+    * if applicable, logs the debugging message and exception.
+    * Similar to <code>error(Exception)</code> but
+    * if the current debugging mode has the given debugging flag
+    * set, the provided message will also be logged.
+    * @param e the error or exception to report
+    * @param mode the debugging flag
+    * @param message the debugging message
+    * @see TeXApp#error(Exception)
+    * @see #logMessage(Throwable)
+    */
    public void error(Exception e, int mode, String msg)
    {
       getTeXApp().error(e);
@@ -513,6 +638,17 @@ public class TeXParser extends TeXObjectList
       logMessage(e);
    }
 
+   /**
+    * Issues a localised message via the listener's <code>TeXApp</code>
+    * and, if enabled, logs the message.
+    * The message is obtained from the listener's <code>TeXApp</code>
+    * localisation support.
+    * @param msgTag the tag identifying the message
+    * @param params the arguments to pass to the localised message
+    * @see TeXApp#getMessage(String,Object...)
+    * @see TeXApp#message(String)
+    * @see #logMessage(String)
+    */
    public void message(String msgTag, Object... params)
    {
       TeXApp texapp = getTeXApp();
@@ -521,6 +657,18 @@ public class TeXParser extends TeXObjectList
       logMessage(msg);
    }
 
+   /**
+    * Issues a message obtained from a <code>TeXSyntaxException</code> via the listener's <code>TeXApp</code>
+    * and, if enabled, logs the message.
+    * Warning or error methods should normally be used with
+    * exceptions, but this method is for occasions where a parsing exception occurs
+    * that simply needs to be treated as information.
+    * @param msgTag the tag identifying the message
+    * @param params the arguments to pass to the localised message
+    * @see TeXSyntaxException#getMessage(TeXApp)
+    * @see TeXApp#message(String)
+    * @see #logMessage(String)
+    */
    public void message(TeXSyntaxException e)
    {
       TeXApp texapp = getTeXApp();
@@ -529,6 +677,15 @@ public class TeXParser extends TeXObjectList
       logMessage(msg);
    }
 
+   /**
+    * Writes an object as a string to the listener's <code>TeXApp</code> messaging system.
+    * The message text is obtained from
+    * {@link TeXObject#toString(TeXParser)} and will also be logged, if
+    * logging enabled.
+    * @param obj the object
+    * @see TeXApp#message(String)
+    * @see #logMessage(String)
+    */ 
    public void message(TeXObject obj)
    {
       String msg = obj.toString(this);
@@ -536,55 +693,77 @@ public class TeXParser extends TeXObjectList
       logMessage(msg);
    }
 
-   public boolean isActive(int c)
+   /**
+    * Checks if in a character is an active character.
+    * @param codePoint the code point identifying the character
+    * @return true if the character is in this parser's active
+    * character table
+    */
+   public boolean isActive(int codePoint)
    {
-      // check if in the active map
-
-      ActiveChar ac = getActiveChar(Integer.valueOf(c));
+      ActiveChar ac = getActiveChar(Integer.valueOf(codePoint));
 
       return ac != null;
    }
 
-   // checks if c has cat code of given type
-   public boolean isCatCode(int type, int codePoint)
+   /**
+    * Checks if a character has the given category code.  
+    * @param catType the category code
+    * @param codePoint the code point identifying the character
+    * @return true if the character is identified as having the
+    * given category
+    */
+   public boolean isCatCode(int catType, int codePoint)
    {
-      if (type == TYPE_ACTIVE)
+      if (catType == TYPE_ACTIVE)
       {
          if (isActive(codePoint)) return true;
       }
 
       int catCode = getCatCode(codePoint);
 
-      return type == catCode;
+      return catType == catCode;
    }
 
-   public void setCatCode(boolean isLocal, int c, int catCode)
+   /**
+    * Sets the category code for a given character.
+    * @param isLocal true if this change should only apply to the
+    * current scope
+    * @param codePoint the code point identifying the character
+    * @param catCode the category code
+    */
+   public void setCatCode(boolean isLocal, int codePoint, int catCode)
    {
       if (isLocal)
       {
          if (isDebugMode(DEBUG_CATCODE))
          {
             logMessage(String.format("CatCode (local) %s -> %d", 
-             new String(Character.toChars(c)), catCode));
+             new String(Character.toChars(codePoint)), catCode));
          }
 
-         settings.setCatCode(c, catCode);
+         settings.setCatCode(codePoint, catCode);
       }
       else
       {
-         setCatCode(c, catCode);
+         setCatCode(codePoint, catCode);
       }
    }
 
-   public void setCatCode(int c, int catCode)
+   /**
+    * Globally sets the category code for a given character.
+    * @param codePoint the code point identifying the character
+    * @param catCode the category code
+    */
+   public void setCatCode(int codePoint, int catCode)
    {
       if (isDebugMode(DEBUG_CATCODE))
       {
          logMessage(String.format("CatCode (global) %s -> %d", 
-          new String(Character.toChars(c)), catCode));
+          new String(Character.toChars(codePoint)), catCode));
       }
 
-      Integer character = Integer.valueOf(c);
+      Integer character = Integer.valueOf(codePoint);
 
       // remove it from its current catcode list
 
@@ -606,10 +785,16 @@ public class TeXParser extends TeXObjectList
       }
    }
 
-   // gets the cat code of c
-   public int getRootCatCode(int c)
+   /**
+    * Gets the root category code for a given character.
+    * Disregards any local changes to the character's category code.
+    * @param codePoint the code point identifying the character
+    * @return the corresponding category code or <code>TYPE_OTHER</code> if not
+    * assigned.
+    */
+   public int getRootCatCode(int codePoint)
    {
-      Integer character = Integer.valueOf(c);
+      Integer character = Integer.valueOf(codePoint);
 
       for (int i = 0; i < catcodes.length; i++)
       {
@@ -622,37 +807,99 @@ public class TeXParser extends TeXObjectList
       return TYPE_OTHER;
    }
 
-   public int getCatCode(int c)
+   /**
+    * Gets the current category code for a given character.
+    * @param codePoint the code point identifying the character
+    */
+   public int getCatCode(int codePoint)
    {
-      return settings.getCatCode(c);
+      return settings.getCatCode(codePoint);
    }
 
+   /**
+    * Gets the current input line number.
+    * @return the current line number or -1 if not applicable
+    */
    public int getLineNumber()
    {
       return reader == null ? -1 : reader.getLineNumber()+1;
    }
 
+   /**
+    * Tests if an object is a stack.
+    * A null object returns false. A <code>Group</code> or 
+    * <code>DataObjectList</code> are not considered a stack.
+    * This method is preferred to simply testing if the object is an
+    * instance of <code>TeXObjectList</code> as not all lists are a
+    * considered a stack, even though it's possible to add or
+    * remove items.
+    * @param obj the object under consideration
+    * @return true of the object is considered a stack
+    * @see TeXObjectList#isStack()
+    */
    public boolean isStack(Object obj)
    {
       return (obj != null && obj instanceof TeXObjectList
         && ((TeXObjectList)obj).isStack());
    }
 
+   /**
+    * Tests if an object is a non-math group.
+    * A null object returns false.
+    * @param obj the object under consideration
+    * @return true of the object is a <code>Group</code> but not a <code>MathGroup</code>.
+    * @see Group#isMathGroup()
+    */
    public boolean isGroup(Object obj)
    {
       return (obj != null && obj instanceof Group
                && !((Group)obj).isMathGroup());
    }
 
+   /**
+    * Tests if the object is an undefined command.
+    * A null object returns true.
+    * @param obj the object under consideration
+    * @return true of the object is null or an instance of
+    * <code>Undefined</code>
+    */
    public boolean isUndefined(Object obj)
    {
       return (obj == null || obj instanceof Undefined);
    }
 
-   public boolean isLetter(int c)
+   /**
+    * Tests if a character is considered a letter.
+    * To avoid maintaining a map of every single Unicode character, 
+    * most characters are not actually assigned a category code by
+    * default. For example, the letter <code>A</code> would not usually have a
+    * category code set. Whereas <code>MakeAtLetter</code> and <code>MakeAtOther</code>
+    * will set the category code of <code>@</code> to <code>TYPE_LETTER</code> or
+    * <code>TYPE_OTHER</code>. Since <code>getRootCatCode(int)</code> returns
+    * <code>TYPE_OTHER</code> for characters that don't have a
+    * category code assigned, simply testing with
+    * <code>isCatCode(TYPE_LETTER, codePoint)</code>
+    * is not a reliable method for testing if
+    * the character with the given code point should be consider a letter.
+    *
+    * This method first tests if the character has actually been
+    * assigned the <code>TYPE_LETTER</code> category (which will be
+    * the case for <code>@</code> if <code>MakeAtLetter</code> is processed)
+    * but then tests with <code>Character.isAlphabetic(int)</code> if
+    * <code>isCatCode(TYPE_OTHER, codePoint)</code> is true.
+    *
+    * As such, this doesn't allow for instances where an
+    * alphabetical character is intentionally set to other.
+    * Such oddities are usually hidden out of the parser's sight
+    * inside packages.
+    *
+    * @param codePoint the code point identifying the character
+    * @return true if the character is considered a letter
+    */
+   public boolean isLetter(int codePoint)
    {
-      if (isCatCode(TYPE_LETTER, c)
-           || (Character.isAlphabetic(c) && isCatCode(TYPE_OTHER, c)))
+      if (isCatCode(TYPE_LETTER, codePoint)
+           || (Character.isAlphabetic(codePoint) && isCatCode(TYPE_OTHER, codePoint)))
       {
          return true;
       }
@@ -697,6 +944,10 @@ public class TeXParser extends TeXObjectList
       reader.reset();
    }
 
+   /**
+    * Terminates parsing. This method closes all readers.
+    * @see TeXReader#closeAll()
+    */
    public void terminate()
    {
       debugMessage(DEBUG_IO, "TERMINATE closing all open readers");
@@ -704,6 +955,16 @@ public class TeXParser extends TeXObjectList
       reader.closeAll();
    }
 
+   /**
+    * Scans a string.
+    * This method temporarily switches to a string <code>TeXReader</code> and
+    * adds all tokens to the supplied list. The reader reverts back
+    * at the end of the method.
+    * @param text the string to parse
+    * @param list the list in which to put the result
+    * @see #fetchNext(TeXObjectList)
+    * @throws IOException if a parsing error occurs
+    */
    public void scan(String text, TeXObjectList list)
      throws IOException
    {
@@ -722,6 +983,18 @@ public class TeXParser extends TeXObjectList
       reader = orgReader;
    }
 
+   /**
+    * Reads a line from some other reader.
+    * This method is provided to read a line in from another source.
+    * For example, <code>latex.datatool.DTLloaddb</code> uses <code>readLine</code>
+    * to read content from external files.
+    * @param otherReader the other reader
+    * @param retainEol include the end of line character in the
+    * returned list
+    * @return a list containing the content of the line read from
+    * the other reader
+    * @throws IOException if I/O or parsing error occurs
+    */
    public TeXObjectList readLine(TeXReader otherReader, boolean retainEol)
      throws IOException
    {
@@ -800,12 +1073,25 @@ public class TeXParser extends TeXObjectList
       return list;
    }
 
+   /**
+    * Formats the content of this stack.
+    * The argument is ignored since this actually is the parser.
+    * This method just does <code>string()</code>.
+    * @param TeXParser parser
+    * @return the string representing this <code>TeXObject</code> as a stack
+    * @see #string()
+    */
+   @Override
    public TeXObjectList string(TeXParser parser)
     throws IOException
    {
       return string();
    }
 
+   /**
+    * Formats the content of this stack.
+    * @return the string representing this <code>TeXObject</code> as a stack
+    */
    public TeXObjectList string()
     throws IOException
    {
@@ -843,6 +1129,13 @@ public class TeXParser extends TeXObjectList
       return string(text);
    }
 
+   /**
+    * Creates a stack consisting of letter or other characters
+    * obtained from a literal string.
+    * @param text the literal string
+    * @return a stack containing the characters of the literal
+    * string as either letter or other
+    */
    public TeXObjectList string(String text)
    {
       TeXObjectList list = new TeXObjectList();
@@ -862,7 +1155,8 @@ public class TeXParser extends TeXObjectList
    /**
     * Identifies the given control sequence name as a verbatim
     * command.
-    * @param csname the control sequence name (such as "verb")
+    * @param csname the control sequence name (such as
+    * <code>verb</code>)
     */ 
    public void addVerbCommand(String csname)
    {
@@ -872,7 +1166,8 @@ public class TeXParser extends TeXObjectList
    /**
     * Tests whether or not the given control sequence name has been
     * identified as a verbatim command.
-    * @param csname the control sequence name (such as "verb")
+    * @param csname the control sequence name (such as
+    * <code>verb</code>)
     * @return true if the control sequence name has been identified
     * as a verbatim command
     */ 
@@ -1184,6 +1479,13 @@ public class TeXParser extends TeXObjectList
       list.add(listener.getPar());
    }
 
+   /**
+    * Tests if an object represents a paragraph break.
+    * Returns false if the object is null.
+    * @param obj the object under consideration
+    * @return true if the object represents a paragraph break
+    * @see TeXObject#isPar()
+    */
    public static boolean isPar(TeXObject obj)
    {
       return obj != null && obj.isPar();
@@ -1439,6 +1741,16 @@ public class TeXParser extends TeXObjectList
       return true;
    }
 
+   /**
+    * Tests if an object resolves to an instance of
+    * <code>CatCodeChanger</code>.
+    * The object will be resolved using
+    * {@link TeXParserUtils.resolve(TeXObject,TeXParser)}
+    * before testing.
+    * @param the object under consideration
+    * @return the {@link CatCodeChanger} if the object resolves to
+    * an object that implements <code>CatCodeChanger</code> or null otherwise.
+    */
    public CatCodeChanger isCatCodeChanger(TeXObject obj)
    {
       obj = TeXParserUtils.resolve(obj, this);
@@ -1451,6 +1763,16 @@ public class TeXParser extends TeXObjectList
       return null;
    }
 
+   /**
+    * Tests if an object resolves to an instance of
+    * <code>EgChar</code> (end group).
+    * The object will be resolved using
+    * {@link TeXParserUtils.resolve(TeXObject,TeXParser)}
+    * before testing.
+    * @param the object under consideration
+    * @return the {@link EgChar} if the object resolves to
+    * an instance of <code>EgChar</code> or null otherwise.
+    */
    public EgChar isEndGroup(TeXObject obj)
    {
       obj = TeXParserUtils.resolve(obj, this);
@@ -1463,6 +1785,16 @@ public class TeXParser extends TeXObjectList
       return null;
    }
 
+   /**
+    * Tests if an object resolves to an instance of
+    * <code>BgChar</code> (begin group).
+    * The object will be resolved using
+    * {@link TeXParserUtils.resolve(TeXObject,TeXParser)}
+    * before testing.
+    * @param the object under consideration
+    * @return the {@link BgChar} if the object resolves to
+    * an instance of <code>BgChar</code> or null otherwise.
+    */
    public BgChar isBeginGroup(TeXObject obj)
    {
       obj = TeXParserUtils.resolve(obj, this);
@@ -2037,15 +2369,27 @@ public class TeXParser extends TeXObjectList
       return fetchNext(this, isShort);
    }
 
+   /**
+    * Reads the next object from the current reader and adds it to
+    * the given list.
+    * @param list the list in which to put the fetched object
+    */
    public boolean fetchNext(TeXObjectList list)
      throws IOException
    {
       return fetchNext(list, false);
    }
 
+   /**
+    * Reads the next object from the current reader and adds it to
+    * the given list.
+    * @param list the list in which to put the fetched object
+    * @param isShort currently ignored
+    */
    public boolean fetchNext(TeXObjectList list, boolean isShort)
      throws IOException
    {
+// TODO what happened to isShort?
       if (reader == null)
       {
          logMessage("NULL reader");
@@ -4774,10 +5118,53 @@ public class TeXParser extends TeXObjectList
 
    private TeXParserListener listener;
 
-   public static final int TYPE_ESC = 0, TYPE_BG=1, TYPE_EG=2,
-     TYPE_MATH=3, TYPE_TAB=4, TYPE_EOL=5, TYPE_PARAM=6, TYPE_SP=7,
-     TYPE_SB=8, TYPE_IGNORE=9, TYPE_SPACE=10, TYPE_LETTER=11,
-     TYPE_OTHER=12, TYPE_ACTIVE=13, TYPE_COMMENT=14, TYPE_INVALID=15;
+   /** Escape category code. */
+   public static final int TYPE_ESC = 0;
+
+   /** Begin group category code. */
+   public static final int TYPE_BG=1;
+
+   /** End group category code. */
+   public static final int TYPE_EG=2;
+
+   /** Math shift category code. */
+   public static final int TYPE_MATH=3;
+
+   /** Tab category code. */
+   public static final int TYPE_TAB=4;
+
+   /** Newline category code. */
+   public static final int TYPE_EOL=5;
+
+   /** Parameter category code. */
+   public static final int TYPE_PARAM=6;
+
+   /** Superscript category code. */
+   public static final int TYPE_SP=7;
+
+   /** Subscript category code. */
+   public static final int TYPE_SB=8;
+
+   /** Ignored category code. */
+   public static final int TYPE_IGNORE=9;
+
+   /** Space category code. */
+   public static final int TYPE_SPACE=10;
+
+   /** Letter category code. */
+   public static final int TYPE_LETTER=11;
+
+   /** Other category code. */
+   public static final int TYPE_OTHER=12;
+
+   /** Active category code. */
+   public static final int TYPE_ACTIVE=13;
+
+   /** Comment category code. */
+   public static final int TYPE_COMMENT=14;
+
+   /** Invalid category code. */
+   public static final int TYPE_INVALID=15;
 
    private CatCodeList[] catcodes;
 
@@ -4793,23 +5180,55 @@ public class TeXParser extends TeXObjectList
 
    private Charset currentInputCharset = null;
 
+   /** TeX's maximum integer value. */
    public static final int MAX_TEX_INT = 0x7FFFFFFF;
 
+   /** Input or output debugging flag. */
    public static final int DEBUG_IO = 1;
+
+   /** Popped from stack debugging flag. */
    public static final int DEBUG_POPPED = 2;
+
+   /** Pushing or processing declaration debugging flag. */
    public static final int DEBUG_DECL = 4;
+
+   /** Package data debugging flag. */
    public static final int DEBUG_STY_DATA = 8;
+
+   /** Object expansion debugging flag. */
    public static final int DEBUG_EXPANSION = 16;
+
+   /** Stack expansion debugging flag. */
    public static final int DEBUG_EXPANSION_LIST = 32;
+
+   /** Object processing debugging flag. */
    public static final int DEBUG_PROCESSING = 64;
+
+   /** Stack processing debugging flag. */
    public static final int DEBUG_PROCESSING_STACK = 128;
+
+   /** Stack processing with object details debugging flag. */
    public static final int DEBUG_PROCESSING_STACK_LIST = 256;
+
+   /** Registering or processing control sequence debugging flag. */
    public static final int DEBUG_CS = 1024;
+
+   /** Registering or processing <code>GenericCommand</code> debugging flag. */
    public static final int DEBUG_PROCESSING_GENERIC_CS = 2048;
+
+   /** Object single-expansion debugging flag. */
    public static final int DEBUG_EXPANSION_ONCE = 4096;
+
+   /** Stack single-expansion debugging flag. */
    public static final int DEBUG_EXPANSION_ONCE_LIST = 8192;
+
+   /** Category code changes debugging flag. */
    public static final int DEBUG_CATCODE = 16384;
+
+   /** Codepoint reading debugging flag. */
    public static final int DEBUG_READ = 32768;
+
+   /** Scoping debugging flag. */
    public static final int DEBUG_SETTINGS = 65536;
 
    public static final String VERSION = "1.9.20260529";
