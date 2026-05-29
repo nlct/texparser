@@ -7,6 +7,28 @@ GPL-3.0
 Nicola Talbot
 </comment>
 
+<!-- Syntax Message for CLI applications -->
+
+<entry key="syntax.debug-mode">{0} &lt;value&gt;	Debug verbosity. The value may be an integer or a comma-separated list of keywords:
+	all	Extremely verbose!
+	catcode	Whenever a category code changes
+	cs	Whenever a control sequence is registered or processed
+	decl	Declarations push onto stack or environment begin/end
+	expansion	Whenever an object is expanded
+	expansion-list	Whenever a list is expanded
+	expansion-once	Whenever an object is expanded once
+	expansion-once-list Whenever a list is expanded once
+	io	I/O operations
+	popped	Object popped from a stack
+	process		Whenever an object is processed
+	process-generic-cs	Whenever a GenericCommand is processed
+	process-stack	Whenever a stack is processed
+	process-stack-list	Whenever a stack is processed (list details)
+	read	Whenever a codepoint is read from a file (verbose!)
+	settings	Scoping changes
+	sty-data	Package data
+</entry>
+
 <!--  Messages -->
 <entry key="message.reading">Reading {0}...</entry>
 <entry key="message.writing">Writing {0}...</entry>
