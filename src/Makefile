@@ -122,9 +122,11 @@ lib/texjavaparserlib.jar      : classes/com/dickimawbooks/texparserlib/TeXParser
 	com/dickimawbooks/texparserlib/*/*/*.class 
 
 lib/texjavaparsertest.jar      : java/test/Manifest.txt \
+			classes/com/dickimawbooks/texparsertest/texjavaparsertest-en.xml \
 			classes/com/dickimawbooks/texparsertest/TeXParserTest.class 
 	cd classes; \
 	jar cmf ../java/test/Manifest.txt ../lib/texjavaparsertest.jar \
+	com/dickimawbooks/texparsertest/texjavaparsertest*.xml \
 	com/dickimawbooks/texparsertest/*.class \
 	com/dickimawbooks/texparsertest/*/*.class 
 
@@ -142,8 +144,11 @@ classes/com/dickimawbooks/texparserlib/TeXParser.class   : classes/com/dickimawb
 	cd java/lib; \
 	javac $(target_version) -d ../../classes -Xlint:unchecked -Xlint:deprecation *.java */*.java */*/*.java
 
-classes/com/dickimawbooks/texparserlib/texjavaparserlib-en.xml	: classes/com/dickimawbooks/texparserlib lib/texjavaparserlib-en.xml
-	cp lib/texjavaparserlib-*.xml classes/com/dickimawbooks/texparserlib/
+classes/com/dickimawbooks/texparserlib/texjavaparserlib-en.xml	: classes/com/dickimawbooks/texparserlib dictionaries/texjavaparserlib-en.xml
+	cp dictionaries/texjavaparserlib-*.xml classes/com/dickimawbooks/texparserlib/
+
+classes/com/dickimawbooks/texparsertest/texjavaparsertest-en.xml	: classes/com/dickimawbooks/texparsertest dictionaries/texjavaparsertest-en.xml
+	cp dictionaries/texjavaparsertest-*.xml classes/com/dickimawbooks/texparsertest/
 
 classes/com/dickimawbooks/texjavaparsertest    :
 	mkdir -p classes/com/dickimawbooks/texjavaparsertest

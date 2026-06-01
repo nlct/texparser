@@ -11,7 +11,7 @@ Nicola Talbot
 
 <!-- Syntax Message for CLI applications -->
 
-<entry key="syntax.debug-mode">{0} &lt;value&gt;	Debug verbosity. The value may be an integer or a comma-separated list of keywords:
+<entry key="texparser.syntax.debug-mode">{0} &lt;value&gt;	TeX Parser debug verbosity. The value may be an integer or a comma-separated list of keywords:
 	all	Extremely verbose!
 	catcode	Whenever a category code changes
 	cs	Whenever a control sequence is registered or processed
@@ -32,15 +32,15 @@ Nicola Talbot
 </entry>
 
 <!--  Messages -->
-<entry key="message.reading">Reading {0}...</entry>
-<entry key="message.writing">Writing {0}...</entry>
+<entry key="message.reading">Reading {0}</entry>
+<entry key="message.writing">Writing {0}</entry>
 <entry key="message.running">Running {0}</entry>
 <entry key="message.process.result">Process returned: {0}</entry>
 <entry key="message.processing">Processing {0}</entry>
-<entry key="message.copying">Copying {0} -> {1}</entry>
-<entry key="message.moving">Moving {0} -> {1}</entry>
-<entry key="message.no.read">No read access for {0}...</entry>
-<entry key="message.no.write">No write access for {0}...</entry>
+<entry key="message.copying">Copying {0} -&gt; {1}</entry>
+<entry key="message.moving">Moving {0} -&gt; {1}</entry>
+<entry key="message.no.read">No read access for {0}</entry>
+<entry key="message.no.write">No write access for {0}</entry>
 <entry key="message.charset">Encoding: {0}</entry>
 
 <!--  Warnings -->
