@@ -113,9 +113,10 @@ test-graphics	: lib/texjavaparsertest.jar tests/output
 	rm -f -r tests/output/test-graphics
 	bin/texjavaparsertest --debug --image-dest images --in tests/test-graphics/test-graphics.tex --output tests/output/test-graphics
 
-lib/texjavaparserlib.jar      : classes/com/dickimawbooks/texparserlib/TeXParser.class 
+lib/texjavaparserlib.jar      : classes/com/dickimawbooks/texparserlib/TeXParser.class classes/com/dickimawbooks/texparserlib/texjavaparserlib-en.xml
 	cd classes; \
 	jar cf ../lib/texjavaparserlib.jar \
+	com/dickimawbooks/texparserlib/texjavaparserlib-*.xml \
 	com/dickimawbooks/texparserlib/*.class \
 	com/dickimawbooks/texparserlib/*/*.class \
 	com/dickimawbooks/texparserlib/*/*/*.class 
@@ -140,6 +141,9 @@ classes/com/dickimawbooks/texparserlib/TeXParser.class   : classes/com/dickimawb
 	java/lib/*.java java/lib/*/*.java java/lib/*/*/*.java
 	cd java/lib; \
 	javac $(target_version) -d ../../classes -Xlint:unchecked -Xlint:deprecation *.java */*.java */*/*.java
+
+classes/com/dickimawbooks/texparserlib/texjavaparserlib-en.xml	: classes/com/dickimawbooks/texparserlib lib/texjavaparserlib-en.xml
+	cp lib/texjavaparserlib-*.xml classes/com/dickimawbooks/texparserlib/
 
 classes/com/dickimawbooks/texjavaparsertest    :
 	mkdir -p classes/com/dickimawbooks/texjavaparsertest

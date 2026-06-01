@@ -19,6 +19,7 @@
 package com.dickimawbooks.texparserlib;
 
 import java.util.Iterator;
+import java.util.Locale;
 import java.util.Vector;
 import java.util.Hashtable;
 import java.util.regex.Pattern;
@@ -29,6 +30,7 @@ import java.nio.file.Path;
 import java.nio.charset.Charset;
 import java.nio.charset.IllegalCharsetNameException;
 import java.nio.file.Files;
+import java.net.URL;
 
 import com.dickimawbooks.texparserlib.latex.LaTeXSyntaxException;
 import com.dickimawbooks.texparserlib.primitives.Undefined;
@@ -148,6 +150,49 @@ public class TeXParser extends TeXObjectList
    public TeXObjectList createList()
    {
       return new TeXParser(listener);
+   }
+
+   public static URL getLanguageResourceUrl(Locale locale)
+   {
+      String lang = locale.toLanguageTag();
+
+      String prefix = "texjavaparserlib";
+
+      String name = String.format("%s-%s.xml", prefix, lang);
+
+      URL url = TeXParser.class.getResource(name);
+
+      String jar = TeXParser.class.getProtectionDomain().getCodeSource().getLocation()
+               .toString();
+
+      if (url == null)
+      {
+         lang = locale.getLanguage();
+         String script = locale.getScript();
+
+         if (script != null && !script.isEmpty())
+         { 
+            name = String.format("%s-%s-%s", prefix, lang, script);
+
+            url = TeXParser.class.getResource(name);
+         }
+
+         if (url == null)
+         {
+            name = String.format("%s-%s.xml", prefix, lang);
+
+            url = TeXParser.class.getResource(name);
+         }
+
+         if (url == null)
+         {
+            name = prefix+"-en.xml";
+
+            url = TeXParser.class.getResource(name);
+         }
+      }
+
+      return url;
    }
 
    private void initRegisters()
@@ -5231,6 +5276,6 @@ public class TeXParser extends TeXObjectList
    /** Scoping debugging flag. */
    public static final int DEBUG_SETTINGS = 65536;
 
-   public static final String VERSION = "1.9.20260529";
-   public static final String VERSION_DATE = "2026-05-29";
+   public static final String VERSION = "1.9.20260601";
+   public static final String VERSION_DATE = "2026-06-01";
 }

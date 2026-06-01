@@ -7,6 +7,8 @@ GPL-3.0
 Nicola Talbot
 </comment>
 
+<entry key="texjavaparserlib.name">TeX Java Parser Library</entry>
+
 <!-- Syntax Message for CLI applications -->
 
 <entry key="syntax.debug-mode">{0} &lt;value&gt;	Debug verbosity. The value may be an integer or a comma-separated list of keywords:
