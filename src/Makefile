@@ -118,6 +118,7 @@ lib/texjavaparserlib.jar      : classes/com/dickimawbooks/texparserlib/TeXParser
 	cp dictionaries/texjavaparserlib-*.xml classes/com/dickimawbooks/texparserlib/dictionaries/
 	cd classes; \
 	jar cf ../lib/texjavaparserlib.jar \
+	com/dickimawbooks/texparserlib/dictionaries \
 	com/dickimawbooks/texparserlib/dictionaries/texjavaparserlib-*.xml \
 	com/dickimawbooks/texparserlib/*.class \
 	com/dickimawbooks/texparserlib/*/*.class \
@@ -129,6 +130,7 @@ lib/texjavaparsertest.jar      : java/test/Manifest.txt \
 	cp dictionaries/texjavaparsertest-*.xml classes/com/dickimawbooks/texparsertest/dictionaries/
 	cd classes; \
 	jar cmf ../java/test/Manifest.txt ../lib/texjavaparsertest.jar \
+	com/dickimawbooks/texparsertest/dictionaries \
 	com/dickimawbooks/texparsertest/dictionaries/texjavaparsertest*.xml \
 	com/dickimawbooks/texparsertest/*.class \
 	com/dickimawbooks/texparsertest/*/*.class 
