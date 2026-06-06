@@ -156,14 +156,11 @@ public class TeXParser extends TeXObjectList
    {
       String lang = locale.toLanguageTag();
 
-      String prefix = "texjavaparserlib";
+      String prefix = "dictionaries/texjavaparserlib";
 
       String name = String.format("%s-%s.xml", prefix, lang);
 
       URL url = TeXParser.class.getResource(name);
-
-      String jar = TeXParser.class.getProtectionDomain().getCodeSource().getLocation()
-               .toString();
 
       if (url == null)
       {
@@ -5276,6 +5273,6 @@ public class TeXParser extends TeXObjectList
    /** Scoping debugging flag. */
    public static final int DEBUG_SETTINGS = 65536;
 
-   public static final String VERSION = "1.9.20260601";
-   public static final String VERSION_DATE = "2026-06-01";
+   public static final String VERSION = "1.9.20260606";
+   public static final String VERSION_DATE = "2026-06-06";
 }

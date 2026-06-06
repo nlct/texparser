@@ -113,20 +113,23 @@ test-graphics	: lib/texjavaparsertest.jar tests/output
 	rm -f -r tests/output/test-graphics
 	bin/texjavaparsertest --debug --image-dest images --in tests/test-graphics/test-graphics.tex --output tests/output/test-graphics
 
-lib/texjavaparserlib.jar      : classes/com/dickimawbooks/texparserlib/TeXParser.class classes/com/dickimawbooks/texparserlib/texjavaparserlib-en.xml
+lib/texjavaparserlib.jar      : classes/com/dickimawbooks/texparserlib/TeXParser.class \
+	 classes/com/dickimawbooks/texparserlib/dictionaries
+	cp dictionaries/texjavaparserlib-*.xml classes/com/dickimawbooks/texparserlib/dictionaries/
 	cd classes; \
 	jar cf ../lib/texjavaparserlib.jar \
-	com/dickimawbooks/texparserlib/texjavaparserlib-*.xml \
+	com/dickimawbooks/texparserlib/dictionaries/texjavaparserlib-*.xml \
 	com/dickimawbooks/texparserlib/*.class \
 	com/dickimawbooks/texparserlib/*/*.class \
 	com/dickimawbooks/texparserlib/*/*/*.class 
 
 lib/texjavaparsertest.jar      : java/test/Manifest.txt \
-			classes/com/dickimawbooks/texparsertest/texjavaparsertest-en.xml \
+			classes/com/dickimawbooks/texparsertest/dictionaries \
 			classes/com/dickimawbooks/texparsertest/TeXParserTest.class 
+	cp dictionaries/texjavaparsertest-*.xml classes/com/dickimawbooks/texparsertest/dictionaries/
 	cd classes; \
 	jar cmf ../java/test/Manifest.txt ../lib/texjavaparsertest.jar \
-	com/dickimawbooks/texparsertest/texjavaparsertest*.xml \
+	com/dickimawbooks/texparsertest/dictionaries/texjavaparsertest*.xml \
 	com/dickimawbooks/texparsertest/*.class \
 	com/dickimawbooks/texparsertest/*/*.class 
 
@@ -144,11 +147,11 @@ classes/com/dickimawbooks/texparserlib/TeXParser.class   : classes/com/dickimawb
 	cd java/lib; \
 	javac $(target_version) -d ../../classes -Xlint:unchecked -Xlint:deprecation *.java */*.java */*/*.java
 
-classes/com/dickimawbooks/texparserlib/texjavaparserlib-en.xml	: classes/com/dickimawbooks/texparserlib dictionaries/texjavaparserlib-en.xml
-	cp dictionaries/texjavaparserlib-*.xml classes/com/dickimawbooks/texparserlib/
+classes/com/dickimawbooks/texparserlib/dictionaries	: 
+	mkdir -p classes/com/dickimawbooks/texparserlib/dictionaries
 
-classes/com/dickimawbooks/texparsertest/texjavaparsertest-en.xml	: classes/com/dickimawbooks/texparsertest dictionaries/texjavaparsertest-en.xml
-	cp dictionaries/texjavaparsertest-*.xml classes/com/dickimawbooks/texparsertest/
+classes/com/dickimawbooks/texparsertest/dictionaries	:
+	mkdir -p classes/com/dickimawbooks/texparsertest/dictionaries
 
 classes/com/dickimawbooks/texjavaparsertest    :
 	mkdir -p classes/com/dickimawbooks/texjavaparsertest

@@ -543,7 +543,7 @@ public class TeXParserTestSettings extends Properties
    public static final int STARTUP_LAST   = 2;
    public static final int STARTUP_CUSTOM = 3;
 
-   public static final String DICT_DIR = "";
+   public static final String DICT_DIR = "dictionaries/";
 
    public static final Pattern PATTERN_DICT 
      = Pattern.compile(RESOURCE+"-([a-z]{2})(-[A-Z]{2})?\\.xml");
