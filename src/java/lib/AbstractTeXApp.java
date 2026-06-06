@@ -19,6 +19,7 @@
 package com.dickimawbooks.texparserlib;
 
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -125,7 +126,12 @@ public abstract class AbstractTeXApp implements TeXApp
    @Override
    public Charset getDefaultCharset()
    {
-      return Charset.defaultCharset();
+      return defaultCharset;
+   }
+
+   public void setDefaultCharset(Charset charset)
+   {
+      defaultCharset = charset;
    }
 
    @Override
@@ -166,4 +172,12 @@ public abstract class AbstractTeXApp implements TeXApp
       }
    }
 
+   /**
+    * The default character encoding.
+    * texlua's os.execute seems to be running Java with US_ASCII
+    * as the default charset, so the default is set to UTF-8 as that's now
+    * LaTeX's default encoding.
+    */
+
+   protected Charset defaultCharset = StandardCharsets.UTF_8;
 }

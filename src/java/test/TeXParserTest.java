@@ -33,6 +33,7 @@ import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.awt.Dimension;
 
 import com.dickimawbooks.texparserlib.*;
@@ -868,7 +869,10 @@ public class TeXParserTest implements TeXApp
    @Override
    public Charset getDefaultCharset()
    {
-      return Charset.defaultCharset();
+      // texlua's os.execute seems to be running Java with US_ASCII
+      // as the default charset, so return UTF-8 as that's now
+      // LaTeX's default encoding.
+      return StandardCharsets.UTF_8;
    }
 
    @Override

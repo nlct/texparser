@@ -42,17 +42,11 @@ public class LaTeXPreambleListener extends LaTeX2LaTeX
       this.writer = writer;
    }
 
-   public static String readPreamble(File file, final Charset charset)
+   public static String readPreamble(File file, Charset charset)
     throws IOException
    {
-      TeXApp texApp = new TeXAppAdapter()
-       {
-          @Override
-          public Charset getDefaultCharset()
-          {
-             return charset == null ? Charset.defaultCharset() : charset;
-          }
-       };
+      TeXAppAdapter texApp = new TeXAppAdapter();
+      texApp.setDefaultCharset(charset);
 
       return readPreamble(file, texApp);
    }
