@@ -599,20 +599,25 @@ public class TeXPath
       StringBuilder builder = new StringBuilder();
 
       Iterator<Path> it = relative.iterator();
+      boolean isFirst = true;
 
       while (it.hasNext())
       {
          Path path = it.next();
+         String name = path.toString();
+
+         if (isFirst && isAbsolute() && !name.contains(":"))
+         {
+            builder.append('/');
+         }
 
          if (it.hasNext())
          {
-            builder.append(path.toString());
+            builder.append(name);
             builder.append('/');
          }
          else if (stripExtension)
          {
-            String name = path.toString();
-
             int idx = name.lastIndexOf(".");
 
             if (idx != -1)
@@ -624,8 +629,10 @@ public class TeXPath
          }
          else
          {
-            builder.append(path.toString());
+            builder.append(name);
          }
+
+         isFirst = false;
       }
 
       return builder.toString();
