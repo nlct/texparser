@@ -4332,6 +4332,13 @@ public class L2HConverter extends LaTeXParserListener
    {
       File file = getImageFile(filename);
 
+      includegraphics(stack, options, file, filename);
+   }
+
+   public void includegraphics(TeXObjectList stack, 
+       KeyValList options, File file, String filename)
+    throws IOException
+   {
       if (file == null || !file.exists())
       {
          throw new TeXSyntaxException(parser, 
