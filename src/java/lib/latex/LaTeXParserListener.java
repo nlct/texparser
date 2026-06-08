@@ -1347,6 +1347,19 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       return new TeXParserSection("texparser@"+sectionCsname, sectionCsname);
    }
 
+   public int getSectionLevel(String name)
+   {
+      if (name.equals("chapter")) return 0;
+      else if (name.equals("section")) return 1;
+      else if (name.equals("subsection")) return 2;
+      else if (name.equals("subsubsection")) return 3;
+      else if (name.equals("subsubsubsection")) return 4;
+      else if (name.equals("paragraph")) return 5;
+      else if (name.equals("subparagraph")) return 6;
+
+      return -1;
+   }
+
    protected void addSupplementaryBoxes()
    {
       // These are designed for adding frames or overlays to symbols

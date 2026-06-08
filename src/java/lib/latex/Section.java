@@ -35,6 +35,14 @@ public abstract class Section extends ControlSequence
       super(name);
    }
 
+   public boolean isNumbered(LaTeXParserListener listener, boolean isStar)
+      throws IOException
+   {
+      if (isStar) return false;
+
+      return listener.getSectionLevel(getName()) <= listener.getcountervalue("secnumdepth");
+   }
+
    public void process(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
@@ -61,7 +69,7 @@ public abstract class Section extends ControlSequence
          }
       }
 
-      if (isStar)
+      if (!isNumbered((LaTeXParserListener)parser.getListener(), isStar))
       {
          unnumbered(parser, stack, arg);
 
