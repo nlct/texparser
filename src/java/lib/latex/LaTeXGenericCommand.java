@@ -104,7 +104,18 @@ public class LaTeXGenericCommand extends GenericCommand
       latexSyntax = syntaxArray;
       this.isRobust = isRobust;
 
-      int numDefArgs = (defaultArgList == null ? 0 : defaultArgList.size());
+      int numDefArgs = 0;
+
+      if (latexSyntax != null)
+      {
+         for (int i = 0; i < latexSyntax.length; i++)
+         {
+            if (latexSyntax[i] == SYNTAX_OPTIONAL)
+            {
+               numDefArgs++;
+            }
+         }
+      }
 
       defaultArgs = (numDefArgs == 0 ? null : new TeXObject[numDefArgs]);
 
@@ -124,8 +135,23 @@ public class LaTeXGenericCommand extends GenericCommand
             {
                numArgs++;
 
-               defaultArgs[defArgIdx] = 
-                  (TeXObject)defaultArgList.get(defArgIdx).clone();
+               TeXObject defArg = null;
+
+               if (defaultArgList != null && defArgIdx < defaultArgList.size())
+               {
+                  defArg = defaultArgList.get(defArgIdx);
+               }
+
+               if (defArg == null)
+               {
+                  defArg = new MissingValue();
+               }
+               else
+               {
+                  defArg = (TeXObject)defArg.clone();
+               }
+
+               defaultArgs[defArgIdx] = defArg;
 
                defArgIdx++;
             }
@@ -151,7 +177,18 @@ public class LaTeXGenericCommand extends GenericCommand
       latexSyntax = syntaxArray;
       this.isRobust = isRobust;
 
-      int numDefArgs = (defaultArgArray == null ? 0 : defaultArgArray.length);
+      int numDefArgs = 0;
+
+      if (latexSyntax != null)
+      {
+         for (int i = 0; i < latexSyntax.length; i++)
+         {
+            if (latexSyntax[i] == SYNTAX_OPTIONAL)
+            {
+               numDefArgs++;
+            }
+         }
+      }
 
       defaultArgs = (numDefArgs == 0 ? null : new TeXObject[numDefArgs]);
 
@@ -171,8 +208,23 @@ public class LaTeXGenericCommand extends GenericCommand
             {
                numArgs++;
 
-               defaultArgs[defArgIdx] = 
-                  (TeXObject)defaultArgArray[defArgIdx].clone();
+               TeXObject defArg = null;
+
+               if (defaultArgArray != null && defArgIdx < defaultArgArray.length)
+               {
+                  defArg = defaultArgArray[defArgIdx];
+               }
+
+               if (defArg == null)
+               {
+                  defArg = new MissingValue();
+               }
+               else
+               {
+                  defArg = (TeXObject)defArg.clone();
+               }
+
+               defaultArgs[defArgIdx] = defArg;
 
                defArgIdx++;
             }
