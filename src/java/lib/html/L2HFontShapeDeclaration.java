@@ -29,11 +29,13 @@ public class L2HFontShapeDeclaration extends FontShapeDeclaration
    public L2HFontShapeDeclaration(String name, int shape)
    {
       super(name, shape);
+      font = new TeXFontText(getShape());
    }
 
    public L2HFontShapeDeclaration(String name, TeXFontShape shape)
    {
       super(name, shape);
+      font = new TeXFontText(getShape());
    }
 
    @Override
@@ -42,70 +44,31 @@ public class L2HFontShapeDeclaration extends FontShapeDeclaration
       return new L2HFontShapeDeclaration(getName(), getShape());
    }
 
-   @Override
-   public void process(TeXParser parser) throws IOException
+   public TeXFontText getFont()
    {
-      super.process(parser);
+      return font;
+   }
 
-      String style = "";
+   @Override
+   public void process(TeXParser parser, TeXObjectList stack) throws IOException
+   {
+      super.process(parser, stack);
 
-      switch (getShape())
+      L2HConverter listener = (L2HConverter)parser.getListener();
+
+      listener.writeliteral("<span");
+
+      try
       {
-         case UP:
-            style = "font-style: normal; font-variant: normal; ";
-         break;
-         case IT:
-            style = "font-style: italic; font-variant: normal; ";
-         break;
-         case SL:
-            style = "font-style: oblique; font-variant: normal; ";
-         break;
-         case EM:
-            TeXSettings settings = parser.getSettings();
-            TeXSettings parent = settings.getParent();
-
-            if (parent != null)
-            {
-               TeXFontShape parentStyle = parent.getFontShape();
-
-               if (parentStyle == TeXFontShape.UP
-                 ||parentStyle == TeXFontShape.INHERIT)
-               {
-                  if (settings.getFontFamily() == TeXFontFamily.SF)
-                  {
-                     style += "font-style: oblique; ";
-                  }
-                  else
-                  {
-                     style += "font-style: italic; ";
-                  }
-               }
-               else
-               {
-                  style += "font-style: normal; ";
-               }
-            }
-            else
-            {
-               if (settings.getFontFamily() == TeXFontFamily.SF)
-               {
-                  style += "font-style: oblique; ";
-               }
-               else
-               {
-                  style += "font-style: italic; ";
-               }
-            }
-
-            style += "font-variant: normal; ";
-
-         break;
-         case SC:
-            style += "font-style: normal; font-variant: small-caps; ";
-         break;
+         listener.writeliteral(
+           listener.getStyleOrClass(font.getCssAttributes(parser)));
+      }
+      catch (TeXSyntaxException e)
+      {
+         listener.getTeXApp().error(e);
       }
 
-      parser.getListener().getWriteable().writeliteral("<span style=\""+style+"\">");
+      listener.writeliteral(">");
    }
 
    @Override
@@ -115,4 +78,5 @@ public class L2HFontShapeDeclaration extends FontShapeDeclaration
       super.end(parser, stack);
    }
 
+   TeXFontText font;
 }

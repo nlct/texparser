@@ -29,11 +29,18 @@ public class L2HFontFamilyDeclaration extends FontFamilyDeclaration
    public L2HFontFamilyDeclaration(String name, int family)
    {
       super(name, family);
+      font = new TeXFontText(getFamily());
    }
 
    public L2HFontFamilyDeclaration(String name, TeXFontFamily family)
    {
       super(name, family);
+      font = new TeXFontText(getFamily());
+   }
+
+   public TeXFontText getFont()
+   {
+      return font;
    }
 
    @Override
@@ -43,39 +50,31 @@ public class L2HFontFamilyDeclaration extends FontFamilyDeclaration
    }
 
    @Override
-   public void process(TeXParser parser) throws IOException
+   public void process(TeXParser parser, TeXObjectList stack) throws IOException
    {
-      super.process(parser);
+      super.process(parser, stack);
 
       L2HConverter listener = (L2HConverter)parser.getListener();
 
-      String spec = "";
-      String tag = "span";
-
-      switch (getFamily())
+      if (getFamily() == TeXFontFamily.VERB)
       {
-         case RM:
-            spec = "font-family: "+listener.getSerifCssFontNames()+"; ";
-         break;
-         case SF:
-            spec = "font-family: "+listener.getSansSerifCssFontNames()+"; ";
-         break;
-         case TT:
-            spec = "font-family: "+listener.getMonospaceCssFontNames()+"; ";
-         break;
-         case VERB:
-            tag = "code";
-         return;
-      }
-
-      if (spec.isEmpty())
-      {
-         listener.writeliteral(String.format("<%s>", tag));
+         listener.writeliteral("<code>");
       }
       else
       {
-         parser.getListener().getWriteable().writeliteral(
-           String.format("<%s style=\"%s\">", tag, spec));
+         listener.writeliteral("<span");
+
+         try
+         {
+            listener.writeliteral(
+              listener.getStyleOrClass(font.getCssAttributes(parser)));
+         }
+         catch (TeXSyntaxException e)
+         {
+            listener.getTeXApp().error(e);
+         }
+
+         listener.writeliteral(">");
       }
    }
 
@@ -94,4 +93,5 @@ public class L2HFontFamilyDeclaration extends FontFamilyDeclaration
       super.end(parser, stack);
    }
 
+   TeXFontText font;
 }

@@ -28,11 +28,18 @@ public class L2HFontWeightDeclaration extends FontWeightDeclaration
    public L2HFontWeightDeclaration(String name, int weight)
    {
       super(name, weight);
+      font = new TeXFontText(getWeight());
    }
 
    public L2HFontWeightDeclaration(String name, TeXFontWeight weight)
    {
       super(name, weight);
+      font = new TeXFontText(getWeight());
+   }
+
+   public TeXFontText getFont()
+   {
+      return font;
    }
 
    @Override
@@ -42,23 +49,25 @@ public class L2HFontWeightDeclaration extends FontWeightDeclaration
    }
 
    @Override
-   public void process(TeXParser parser) throws IOException
+   public void process(TeXParser parser, TeXObjectList stack) throws IOException
    {
-      super.process(parser);
+      super.process(parser, stack);
 
-      String style = "";
+      L2HConverter listener = (L2HConverter)parser.getListener();
 
-      switch (getWeight())
+      listener.writeliteral("<span");
+
+      try
       {
-         case MD:
-            style += "font-weight: normal; ";
-         break;
-         case BF:
-            style += "font-weight: bold; ";
-         break;
+         listener.writeliteral(
+           listener.getStyleOrClass(font.getCssAttributes(parser)));
+      }
+      catch (TeXSyntaxException e)
+      {
+         listener.getTeXApp().error(e);
       }
 
-      parser.getListener().getWriteable().writeliteral("<span style=\""+style+"\">");
+      listener.writeliteral(">");
    }
 
    @Override
@@ -67,4 +76,6 @@ public class L2HFontWeightDeclaration extends FontWeightDeclaration
       parser.getListener().getWriteable().writeliteral("</span>");
       super.end(parser, stack);
    }
+
+   TeXFontText font;
 }

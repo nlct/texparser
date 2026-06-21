@@ -102,17 +102,17 @@ public class FontShapeDeclaration extends Declaration
    @Override
    public void process(TeXParser parser) throws IOException
    {
-      TeXSettings settings = parser.getSettings();
-
-      orgShape = settings.getCurrentFontShape();
-
-      settings.setFontShape(shape);
+      process(parser, parser);
    }
 
    @Override
    public void process(TeXParser parser, TeXObjectList stack) throws IOException
    {
-      process(parser);
+      TeXSettings settings = parser.getSettings();
+
+      orgShape = settings.getCurrentFontShape();
+
+      settings.setFontShape(shape);
    }
 
    @Override

@@ -29,11 +29,18 @@ public class L2HFontSizeDeclaration extends FontSizeDeclaration
    public L2HFontSizeDeclaration(String name, TeXFontSize size)
    {
       super(name, size);
+      font = new TeXFontText(getSize());
    }
 
    public L2HFontSizeDeclaration(String name, int size)
    {
       super(name, size);
+      font = new TeXFontText(getSize());
+   }
+
+   public TeXFontText getFont()
+   {
+      return font;
    }
 
    @Override
@@ -43,57 +50,25 @@ public class L2HFontSizeDeclaration extends FontSizeDeclaration
    }
 
    @Override
-   public void process(TeXParser parser) throws IOException
+   public void process(TeXParser parser, TeXObjectList stack) throws IOException
    {
-      super.process(parser);
+      super.process(parser, stack);
 
-      String style = "";
+      L2HConverter listener = (L2HConverter)parser.getListener();
 
-      switch (getSize())
+      listener.writeliteral("<span");
+
+      try
       {
-         case NORMAL:
-            style = "font-size: medium; ";
-         break;
-         case LARGE:
-            style = "font-size: large; ";
-         break;
-         case XLARGE:
-            style = "font-size: x-large; ";
-         break;
-         case XXLARGE:
-            style = "font-size: xx-large; ";
-         break;
-         case HUGE:
-            style = "font-size: xx-large; ";
-         break;
-         case XHUGE:
-            style = "font-size: xx-large; ";
-         break;
-         case XXHUGE:
-            style = "font-size: xx-large; ";
-         break;
-         case SMALL:
-            style = "font-size: small; ";
-         break;
-         case FOOTNOTE:
-            style = "font-size: x-small; ";
-         break;
-         case SCRIPT:
-            style = "font-size: xx-small; ";
-         break;
-         case TINY:
-            style = "font-size: xx-small; ";
-         break;
+         listener.writeliteral(
+           listener.getStyleOrClass(font.getCssAttributes(parser)));
+      }
+      catch (TeXSyntaxException e)
+      {
+         listener.getTeXApp().error(e);
       }
 
-      if (!style.isEmpty())
-      {
-         parser.getListener().getWriteable().writeliteral("<span style=\""+style+"\">");
-      }
-      else
-      {
-         parser.getListener().getWriteable().writeliteral("<span>");
-      }
+      listener.writeliteral(">");
    }
 
    @Override
@@ -102,4 +77,6 @@ public class L2HFontSizeDeclaration extends FontSizeDeclaration
       parser.getListener().getWriteable().writeliteral("</span>");
       super.end(parser, stack);
    }
+
+   TeXFontText font;
 }

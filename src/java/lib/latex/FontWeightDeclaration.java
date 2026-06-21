@@ -96,17 +96,17 @@ public class FontWeightDeclaration extends Declaration
    @Override
    public void process(TeXParser parser) throws IOException
    {
+      process(parser, parser);
+   }
+
+   @Override
+   public void process(TeXParser parser, TeXObjectList stack) throws IOException
+   {
       TeXSettings settings = parser.getSettings();
 
       orgWeight = settings.getCurrentFontWeight();
 
       settings.setFontWeight(weight);
-   }
-
-   @Override
-   public void process(TeXParser parser, TeXObjectList list) throws IOException
-   {
-      process(parser);
    }
 
    @Override

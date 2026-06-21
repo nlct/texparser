@@ -20,6 +20,9 @@ package com.dickimawbooks.texparserlib;
 
 import java.awt.Font;
 
+import java.util.Locale;
+import java.util.HashMap;
+
 import com.dickimawbooks.texparserlib.html.L2HConverter;
 
 public class TeXFontText
@@ -469,11 +472,172 @@ public class TeXFontText
             builder.append("font-size: larger; ");
          break;
          default:
-            builder.append(String.format("font-size: %fpt; ", deriveSize(parser)));
+            builder.append(String.format("font-size: %dpt; ", deriveSize(parser)));
       }
 
       return builder.toString();
    }
+
+   public HashMap<String,String> getCssAttributes(TeXParser parser)
+    throws TeXSyntaxException
+   {
+      HashMap<String,String> attrs = new HashMap<String,String>();
+
+      TeXSettings settings = parser.getSettings();
+
+      if (family != TeXFontFamily.INHERIT)
+      {
+         StringBuilder builder = new StringBuilder();
+
+         boolean addSep = false;
+
+         if (name != null)
+         {
+            if (name.matches("[^\\p{IsAlphabetic}]"))
+            {
+               builder.append(" '"+name+"'");
+            }
+            else
+            {
+               builder.append(name);
+            }
+
+            addSep = true;
+         }
+
+         switch (family)
+         {
+            case RM:
+               if (addSep) builder.append(',');
+
+               builder.append(' ');
+               builder.append(getSerifCssFontNames(parser.getListener()));
+            break;
+            case SF:
+               if (addSep) builder.append(',');
+
+               builder.append(' ');
+               builder.append(getSansSerifCssFontNames(parser.getListener()));
+            break;
+            case TT:
+            case VERB:
+               if (addSep) builder.append(',');
+
+               builder.append(' ');
+               builder.append(getMonospaceCssFontNames(parser.getListener()));
+            break;
+            case CAL:
+               if (addSep) builder.append(',');
+
+               builder.append(' ');
+               builder.append(getCursiveCssFontNames(parser.getListener()));
+            break;
+         }
+
+         attrs.put("font-family", builder.toString());
+      }
+
+      switch (shape)
+      {
+         case UP:
+            attrs.put("font-style", "normal");
+            attrs.put("font-variant", "normal");
+         break;
+         case IT:
+            attrs.put("font-style", "italic");
+            attrs.put("font-variant", "normal");
+         break;
+         case SL:
+            attrs.put("font-style", "oblique");
+            attrs.put("font-variant", "normal");
+         break;
+         case EM:
+            TeXFontFamily parentFamily = settings.getFontFamily();
+            TeXFontShape parentShape = settings.getFontShape();
+
+            if (parentShape == TeXFontShape.IT || parentShape == TeXFontShape.SL)
+            {
+               attrs.put("font-style", "normal");
+               attrs.put("font-variant", "normal");
+            }
+            else if (parentFamily == TeXFontFamily.SF)
+            {
+               attrs.put("font-style", "oblique");
+               attrs.put("font-variant", "normal");
+            }
+            else
+            {
+               attrs.put("font-style", "italic");
+               attrs.put("font-variant", "normal");
+            }
+         break;
+         case SC:
+            attrs.put("font-style", "normal");
+            attrs.put("font-variant", "small-caps");
+         break;
+      }
+
+      if (weight != TeXFontWeight.INHERIT)
+      {
+         if (weight.isBold())
+         {
+            attrs.put("font-weight", "bold");
+         }
+         else
+         {
+            attrs.put("font-weight", "normal");
+         }
+      }
+
+      switch (size)
+      {
+         case INHERIT:
+         break;
+         case USER:
+            if (userSize != null)
+            {
+               TeXUnit unit = userSize.getUnit();
+
+               attrs.put("font-size",
+                 String.format((Locale)null, "%fpt; ",
+                  unit.toUnit(parser, userSize.getValue(), TeXUnit.BP)));
+            }
+         break;
+         case NORMAL:
+            attrs.put("font-size", "medium");
+         break;
+         case SMALL:
+            attrs.put("font-size", "small");
+         break;
+         case FOOTNOTE:
+            attrs.put("font-size", "x-small");
+         break;
+         case SCRIPT:
+            attrs.put("font-size", "xx-small");
+         break;
+         case LARGE:
+            attrs.put("font-size", "large");
+         break;
+         case XLARGE:
+            attrs.put("font-size", "x-large");
+         break;
+         case XXLARGE:
+            attrs.put("font-size", "xx-large");
+         break;
+         case SMALLER:
+            attrs.put("font-size", "smaller");
+         break;
+         case LARGER:
+            attrs.put("font-size", "larger");
+         break;
+         default:
+            attrs.put("font-size",
+              String.format((Locale)null, "%dpt; ", deriveSize(parser)));
+      }
+
+      return attrs;
+   }
+
 
    private String name;
    private TeXFontFamily family = TeXFontFamily.INHERIT;

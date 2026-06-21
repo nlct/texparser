@@ -1181,25 +1181,88 @@ public class L2HConverter extends LaTeXParserListener
    @Override
    public FontWeightDeclaration getFontWeightDeclaration(String name, TeXFontWeight weight)
    {
-      return new L2HFontWeightDeclaration(name, weight);
+      L2HFontWeightDeclaration decl = new L2HFontWeightDeclaration(name, weight);
+
+      try
+      {
+         addDefaultStyle(name, decl.getFont().getCssAttributes(getParser()));
+      }
+      catch (IOException e)
+      {
+         getTeXApp().error(e);
+      }
+
+      return decl;
    }
 
    @Override
    public FontSizeDeclaration getFontSizeDeclaration(String name, TeXFontSize size)
    {
-      return new L2HFontSizeDeclaration(name, size);
+      L2HFontSizeDeclaration decl = new L2HFontSizeDeclaration(name, size);
+
+      try
+      {
+         switch (size)
+         {
+            case USER:
+            case INHERIT:
+            break;
+            case XLARGE:
+               addDefaultStyle("xlarge", decl.getFont().getCssAttributes(getParser()));
+            break;
+            case XXLARGE:
+               addDefaultStyle("xxlarge", decl.getFont().getCssAttributes(getParser()));
+            break;
+            case XHUGE:
+               addDefaultStyle("xhuge", decl.getFont().getCssAttributes(getParser()));
+            break;
+            case XXHUGE:
+               addDefaultStyle("xxhuge", decl.getFont().getCssAttributes(getParser()));
+            break;
+            default:
+               addDefaultStyle(name, decl.getFont().getCssAttributes(getParser()));
+         }
+      }
+      catch (IOException e)
+      {
+         getTeXApp().error(e);
+      }
+
+      return decl;
    }
 
    @Override
    public FontShapeDeclaration getFontShapeDeclaration(String name, TeXFontShape shape)
    {
-      return new L2HFontShapeDeclaration(name, shape);
+      L2HFontShapeDeclaration decl = new L2HFontShapeDeclaration(name, shape);
+
+      try
+      {
+         addDefaultStyle(name, decl.getFont().getCssAttributes(getParser()));
+      }
+      catch (IOException e)
+      {
+         getTeXApp().error(e);
+      }
+
+      return decl;
    }
 
    @Override
    public FontFamilyDeclaration getFontFamilyDeclaration(String name, TeXFontFamily family)
    {
-      return new L2HFontFamilyDeclaration(name, family);
+      L2HFontFamilyDeclaration decl = new L2HFontFamilyDeclaration(name, family);
+
+      try
+      {
+         addDefaultStyle(name, decl.getFont().getCssAttributes(getParser()));
+      }
+      catch (IOException e)
+      {
+         getTeXApp().error(e);
+      }
+
+      return decl;
    }
 
    @Override
@@ -6099,20 +6162,23 @@ public class L2HConverter extends LaTeXParserListener
    public void addDefaultStyle(String name, HashMap<String,String> styleAttrs)
     throws IOException
    {
-      if (defaultStyleMaps==null)
+      if (!styleAttrs.isEmpty())
       {
-         defaultStyleMaps = new HashMap<HashMap<String,String>,String>();
-      }
+         if (defaultStyleMaps==null)
+         {
+            defaultStyleMaps = new HashMap<HashMap<String,String>,String>();
+         }
 
-      defaultStyleMaps.put(styleAttrs, name);
+         defaultStyleMaps.put(styleAttrs, name);
 
-      String specs = cssAttributesToString(styleAttrs);
+         String specs = cssAttributesToString(styleAttrs);
 
-      defaultStyles.put(specs, name);
+         defaultStyles.put(specs, name);
 
-      if (isInDocEnv())
-      {
-         writeliteral(String.format("<style>%s: {%s}</style>", name, specs));
+         if (isInDocEnv())
+         {
+            writeliteral(String.format("<style>%s: {%s}</style>", name, specs));
+         }
       }
    }
 

@@ -46,56 +46,14 @@ public class TextBlockCommand extends ControlSequence
    @Override
    public void process(TeXParser parser) throws IOException
    {
-      Group grp = parser.getListener().createGroup();
-
-      if (mode != TeXMode.INHERIT)
-      {
-         grp.add(TeXParserActionObject.createModeChangeAction(mode));
-      }
-
-      grp.add(declaration);
-      String argTypes = declaration.getArgTypes();
-
-      if (argTypes != null)
-      {
-         for (int i = 0; i < argTypes.length(); i++)
-         {
-            char c = argTypes.charAt(i);
-
-            switch (c)
-            {
-               case 'm':
-                  grp.add(parser.popStack());
-               break;
-               case 'o':
-                  TeXObject obj = parser.popNextArg('[', ']');
-
-                  if (obj != null)
-                  {
-                     grp.add(parser.getListener().getOther('['));
-                     grp.add(obj);
-                     grp.add(parser.getListener().getOther(']'));
-                  }
-
-               break;
-               default:
-                 throw new LaTeXSyntaxException(parser, 
-                   LaTeXSyntaxException.ILLEGAL_ARG_TYPE, c);
-            }
-         }
-      }
-
-      TeXObject arg = parser.popNextArg();
-
-      grp.add(arg);
-
-      grp.process(parser);
+      process(parser, parser);
    }
 
    @Override
    public void process(TeXParser parser, TeXObjectList stack) throws IOException
    {
-      Group grp = parser.getListener().createGroup();
+      TeXParserListener listener = parser.getListener();
+      Group grp = listener.createGroup();
 
       grp.add(declaration);
       String argTypes = declaration.getArgTypes();
@@ -109,16 +67,16 @@ public class TextBlockCommand extends ControlSequence
             switch (c)
             {
                case 'm':
-                  grp.add(stack.popStack(parser));
+                  grp.add(TeXParserUtils.createGroup(parser, popArg(parser, stack)));
                break;
                case 'o':
-                  TeXObject obj = stack.popArg(parser, '[', ']');
+                  TeXObject obj = popOptArg(parser, stack);
 
                   if (obj != null)
                   {
-                     grp.add(parser.getListener().getOther('['));
-                     grp.add(obj);
-                     grp.add(parser.getListener().getOther(']'));
+                     grp.add(listener.getOther('['));
+                     grp.add(obj, true);
+                     grp.add(listener.getOther(']'));
                   }
 
                break;
@@ -129,12 +87,11 @@ public class TextBlockCommand extends ControlSequence
          }
       }
 
+      TeXObject arg = popArg(parser, stack);
 
-      TeXObject arg = stack.popArg(parser);
+      grp.add(arg, true);
 
-      grp.add(arg);
-
-      grp.process(parser, stack);
+      TeXParserUtils.process(grp, parser, stack);
    }
 
    private Declaration declaration;
