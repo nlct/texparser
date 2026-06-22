@@ -18,7 +18,7 @@
 */
 package com.dickimawbooks.texparserlib;
 
-public interface TeXDimension extends Numerical,TeXObject
+public interface TeXDimension extends Numerical
 {
    public float getValue();
 

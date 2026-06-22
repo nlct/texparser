@@ -69,6 +69,7 @@ import com.dickimawbooks.texparserlib.latex.natbib.*;
 import com.dickimawbooks.texparserlib.latex.nlctdoc.*;
 import com.dickimawbooks.texparserlib.latex.pifont.*;
 import com.dickimawbooks.texparserlib.latex.probsoln.*;
+import com.dickimawbooks.texparserlib.latex.relsize.*;
 import com.dickimawbooks.texparserlib.latex.shortvrb.*;
 import com.dickimawbooks.texparserlib.latex.siunitx.*;
 import com.dickimawbooks.texparserlib.latex.stix.*;
@@ -1833,13 +1834,13 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
         new LaTeXGenericEnvironment(name, cs, endDefinition));
    }
 
-   protected TextBlockCommand createTextBlockCommand(String textblockName,
+   public TextBlockCommand createTextBlockCommand(String textblockName,
     Declaration decl)
    {
       return new TextBlockCommand(textblockName, decl, TeXMode.TEXT);
    }
 
-   private void addFontWeightDeclaration(
+   public void addFontWeightDeclaration(
        String declName, String textblockName, TeXFontWeight weight)
    {
       Declaration decl = getFontWeightDeclaration(declName, weight);
@@ -1847,7 +1848,7 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       parser.putControlSequence(createTextBlockCommand(textblockName, decl));
    }
 
-   private void addFontShapeDeclaration(
+   public void addFontShapeDeclaration(
        String declName, String textblockName, TeXFontShape shape)
    {
       Declaration decl = getFontShapeDeclaration(declName, shape);
@@ -1855,12 +1856,12 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       parser.putControlSequence(createTextBlockCommand(textblockName, decl));
    }
 
-   private void addFontSizeDeclaration(String name, TeXFontSize size)
+   public void addFontSizeDeclaration(String name, TeXFontSize size)
    {
       parser.putControlSequence(getFontSizeDeclaration(name, size));
    }
 
-   private void addFontFamilyDeclaration(
+   public void addFontFamilyDeclaration(
        String declName, String textblockName, TeXFontFamily family)
    {
       Declaration decl =  getFontFamilyDeclaration(declName, family);
@@ -2298,6 +2299,18 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
 
       docCls = getLaTeXCls(options, clsName, loadParentOptions);
 
+      if (clsName.equals("a0poster"))
+      {
+         setNormalFontSize(25);
+         addFontSizeDeclaration("veryHuge", TeXFontSize.XXHUGE);
+         addFontSizeDeclaration("VeryHuge", TeXFontSize.XXXHUGE);
+         addFontSizeDeclaration("VERYHuge", TeXFontSize.XXXXHUGE);
+      }
+      else if (options != null)
+      {
+         setNormalFontSize(options);
+      }
+
       addFileReference(docCls);
 
       if (docCls instanceof UnknownCls)
@@ -2327,6 +2340,38 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       else
       {
          docCls.processOptions(stack);
+      }
+   }
+
+   public void setNormalFontSize(KeyValList options)
+    throws TeXSyntaxException
+   {
+      for (Iterator<String> it = options.keySet().iterator(); it.hasNext(); )
+      {
+         String key = it.next();
+
+         if (key.equals("fontsize"))
+         {
+            TeXObject obj = options.getValue("fontsize");
+            setNormalFontSize(obj);
+            break;
+         }
+         else
+         {
+            Matcher m = UserDimension.DIMENSION_PT_UNIT_PATTERN.matcher(key);
+
+            if (m.matches())
+            {
+               try
+               {
+                  setNormalFontSize(Float.parseFloat(m.group(1)), TeXUnit.PT);
+                  break;
+               }
+               catch (NumberFormatException e)
+               {// shouldn't happen
+               }
+            }
+         }
       }
    }
 
@@ -2882,6 +2927,11 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
          return new ProbSolnSty(options, this, loadParentOptions);
       }
 
+      if (styName.equals("relsize"))
+      {
+         return new RelSizeSty(options, this, loadParentOptions);
+      }
+
       if (styName.equals("shortvrb"))
       {
          return new ShortVrbSty(options, this, loadParentOptions);
@@ -2935,6 +2985,11 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       if (styName.equals("xspace"))
       {
          return new XspaceSty(options, this, loadParentOptions);
+      }
+
+      if (styName.equals("extsizes") && options != null)
+      {
+         setNormalFontSize(options);
       }
 
       return new UnknownSty(options, styName, this, loadParentOptions);
@@ -3543,13 +3598,13 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
          {
             for (Iterator<String> it = opts.keySet().iterator(); it.hasNext();)
             {
-               Matcher m = PTSIZE_PATTERN.matcher(it.next());
+               Matcher m = UserDimension.DIMENSION_PT_UNIT_PATTERN.matcher(it.next());
 
                if (m.matches())
                {
                   try
                   {
-                     base = (float)Integer.parseInt(m.group(1));
+                     base = Float.parseFloat(m.group(1));
                      break;
                   }
                   catch (NumberFormatException e)
@@ -3582,13 +3637,13 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
          {
             for (Iterator<String> it = opts.keySet().iterator(); it.hasNext();)
             {
-               Matcher m = PTSIZE_PATTERN.matcher(it.next());
+               Matcher m = UserDimension.DIMENSION_PT_UNIT_PATTERN.matcher(it.next());
 
                if (m.matches())
                {
                   try
                   {
-                     base = (float)Integer.parseInt(m.group(1));
+                     base = Float.parseFloat(m.group(1));
                      break;
                   }
                   catch (NumberFormatException e)
@@ -4063,6 +4118,4 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
    public static final UserNumber SUBSUBSECTION_LEVEL = UserNumber.THREE;
    public static final UserNumber PARAGRAPH_LEVEL = UserNumber.FOUR;
    public static final UserNumber SUBPARAGRAPH_LEVEL = UserNumber.FIVE;
-
-   public static final Pattern PTSIZE_PATTERN = Pattern.compile("(\\d+)pt");
 }

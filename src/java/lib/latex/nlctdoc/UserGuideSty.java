@@ -117,9 +117,6 @@ public class UserGuideSty extends LaTeXSty
 
       registerControlSequence(new GobbleOpt("RedeclareSectionCommand", 1, 1));
 
-      registerControlSequence(new AtFirstOfOne("textsmaller"));
-      registerControlSequence(new AtFirstOfOne("textlarger"));
-
       registerControlSequence(new Relax("nlctnovref"));
       registerControlSequence(new Relax("nlctusevref"));
       registerControlSequence(new Relax("htmlavailable"));

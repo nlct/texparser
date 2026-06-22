@@ -6197,6 +6197,17 @@ public class L2HConverter extends LaTeXParserListener
       return null;
    }
 
+   public String getStyleOrClass(String name, HashMap<String,String> css)
+   {
+      if (defaultStyleMaps != null && defaultStyleMaps.containsValue(name))
+      {
+         return String.format(" class=\"%s\"",
+           HtmlTag.encodeAttributeValue(name, false));
+      }
+
+      return getStyleOrClass(css);
+   }
+
    public String getStyleOrClass(HashMap<String,String> css)
    {
       if (css == null || css.isEmpty())

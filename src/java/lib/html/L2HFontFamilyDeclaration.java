@@ -67,7 +67,7 @@ public class L2HFontFamilyDeclaration extends FontFamilyDeclaration
          try
          {
             listener.writeliteral(
-              listener.getStyleOrClass(font.getCssAttributes(parser)));
+              listener.getStyleOrClass(getName(), font.getCssAttributes(parser)));
          }
          catch (TeXSyntaxException e)
          {

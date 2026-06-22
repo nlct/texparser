@@ -61,7 +61,7 @@ public class L2HFontShapeDeclaration extends FontShapeDeclaration
       try
       {
          listener.writeliteral(
-           listener.getStyleOrClass(font.getCssAttributes(parser)));
+           listener.getStyleOrClass(getName(), font.getCssAttributes(parser)));
       }
       catch (TeXSyntaxException e)
       {

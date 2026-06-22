@@ -154,5 +154,5 @@ public class FontSizeDeclaration extends Declaration
       return size;
    }
 
-   private TeXFontSize size, orgSize;
+   protected TeXFontSize size, orgSize;
 }

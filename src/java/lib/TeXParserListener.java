@@ -144,14 +144,133 @@ public abstract class TeXParserListener
    // returns page layout length in bp
    public abstract float getPageDimension(int type);
 
+   /**
+    * Gets the normal font size in pt rounded to an integer.
+    * @return the normal font size in pt
+    */
    public int getNormalFontSize()
    {
       return normalFontSize;
    }
 
+   /**
+    * Sets the normal font size in pt.
+    * @param size the size in pt
+    * @throws TeXSyntaxException if the size is &lt;=0
+    */
    public void setNormalFontSize(int size)
+   throws TeXSyntaxException
    {
+      if (size <= 0)
+      {
+         throw new TeXSyntaxException(getParser(),
+          TeXSyntaxException.ERROR_POSITIVE_DIMEN_EXPECTED_FOUND, size);
+      }
+
       normalFontSize = size;
+      normalFontDimension.setValue(size, TeXUnit.PT);
+   }
+
+   public void setNormalFontSize(double size)
+   throws TeXSyntaxException
+   {
+      setNormalFontSize((float)size);
+   }
+
+   public void setNormalFontSize(float size)
+   throws TeXSyntaxException
+   {
+      if (size <= 0)
+      {
+         throw new TeXSyntaxException(getParser(),
+          TeXSyntaxException.ERROR_POSITIVE_DIMEN_EXPECTED_FOUND, size);
+      }
+
+      normalFontDimension.setValue(size, FixedUnit.PT);
+      normalFontSize = (int)Math.round(size);
+   }
+
+   public void setNormalFontSize(double size, TeXUnit unit)
+   throws TeXSyntaxException
+   {
+      setNormalFontSize((float)size, unit);
+   }
+
+   public void setNormalFontSize(float size, TeXUnit unit)
+   throws TeXSyntaxException
+   {
+      if (size <= 0)
+      {
+         throw new TeXSyntaxException(getParser(),
+          TeXSyntaxException.ERROR_POSITIVE_DIMEN_EXPECTED_FOUND, size);
+      }
+
+      normalFontDimension.setValue(size, unit);
+
+      normalFontSize = (int)Math.round(normalFontDimension.getUnit().toPt(getParser(),
+         normalFontDimension.getValue()));
+   }
+
+   /**
+    * Sets the normal font size from a dimension.
+    * The provided value must be expanded first unless it's a
+    * <code>TeXDimension</code> or <code>Numerical</code>. If no unit is provided, pt is
+    * assumed.
+    * @param value the dimension or number
+    * @throws TeXSyntaxException if the size is &lt;=0
+    */
+   public void setNormalFontSize(TeXObject value)
+    throws TeXSyntaxException
+   {
+      if (value == null || value.isEmpty())
+      {
+         throw new TeXSyntaxException(getParser(),
+          TeXSyntaxException.ERROR_DIMEN_EXPECTED);
+      }
+
+      if (value instanceof TeXDimension)
+      {
+         TeXDimension dim = (TeXDimension)value;
+
+         if (dim.getValue() <= 0)
+         {
+            throw new TeXSyntaxException(getParser(),
+             TeXSyntaxException.ERROR_POSITIVE_DIMEN_EXPECTED_FOUND,
+               dim.getValue()+dim.getUnit().format());
+         }
+
+         normalFontDimension.setDimension(getParser(), dim);
+      }
+      else if (value instanceof TeXNumber)
+      {
+         setNormalFontSize(((TeXNumber)value).doubleValue());
+      }
+      else if (value instanceof Numerical)
+      {
+         setNormalFontSize(((Numerical)value).number(getParser()));
+      }
+      else
+      {
+         String valStr = value.toString(getParser());
+
+         normalFontDimension.setFrom(getParser(), valStr, true);
+
+         if (normalFontDimension.getValue() <= 0)
+         {
+            normalFontDimension.setValue(normalFontSize, TeXUnit.PT);
+
+            throw new TeXSyntaxException(getParser(),
+             TeXSyntaxException.ERROR_POSITIVE_DIMEN_EXPECTED_FOUND, valStr);
+         }
+      }
+
+      normalFontSize = (int)Math.round(normalFontDimension.getUnit().toPt(getParser(),
+         normalFontDimension.getValue()));
+   }
+
+   public UserDimension getNormalFontDimension()
+   {
+      return normalFontDimension;
    }
 
    public TeXUnit createUnit(String unitName)
@@ -304,5 +423,7 @@ public abstract class TeXParserListener
    }
 
    protected TeXParser parser;
-   private int normalFontSize = 10;
+
+   private int normalFontSize = 10;// in pt
+   private UserDimension normalFontDimension = new UserDimension(10, TeXUnit.PT);
 }

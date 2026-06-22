@@ -69,16 +69,30 @@ public class UserDimension extends AbstractTeXObject implements TeXDimension, Ex
    public UserDimension(TeXParser parser, String string)
     throws TeXSyntaxException
    {
-      Matcher m = DIMENSION_PATTERN.matcher(string);
+      setFrom(parser, string, false);
+   }
+
+   public void setFrom(TeXParser parser, String dimString, boolean ptOptional)
+   throws TeXSyntaxException
+   {
+      Matcher m;
+
+      if (ptOptional)
+      {
+         m = DIMENSION_OPT_UNIT_PATTERN.matcher(dimString);
+      }
+      else
+      {
+         m = DIMENSION_PATTERN.matcher(dimString);
+      }
 
       if (!m.matches())
       {
          throw new TeXSyntaxException(parser,
-           TeXSyntaxException.ERROR_DIMEN_EXPECTED, string);
+           TeXSyntaxException.ERROR_DIMEN_EXPECTED, dimString);
       }
 
       String valueString = m.group(1);
-      String unitString = m.group(2);
 
       try
       {
@@ -88,10 +102,20 @@ public class UserDimension extends AbstractTeXObject implements TeXDimension, Ex
       {
          // this shouldn't happen
          throw new TeXSyntaxException(parser,
-           TeXSyntaxException.ERROR_DIMEN_EXPECTED, string);
+           TeXSyntaxException.ERROR_DIMEN_EXPECTED, dimString);
       }
 
-      unit = parser.getListener().createUnit(unitString);
+      unit = FixedUnit.PT;
+
+      if (m.groupCount() == 2)
+      {
+         String unitString = m.group(2);
+
+         if (!unitString.isEmpty())
+         {
+            unit = parser.getListener().createUnit(unitString);
+         }
+      }
    }
 
    @Override
@@ -292,4 +316,10 @@ public class UserDimension extends AbstractTeXObject implements TeXDimension, Ex
 
    public static final Pattern DIMENSION_PATTERN 
      = Pattern.compile("\\s*(\\d*(?:\\.\\d+)?\\d)\\s*([a-z]{2})\\s*");
+
+   public static final Pattern DIMENSION_OPT_UNIT_PATTERN 
+     = Pattern.compile("\\s*(\\d*(?:\\.\\d+)?\\d)\\s*([a-z]{2})?\\s*");
+
+   public static final Pattern DIMENSION_PT_UNIT_PATTERN 
+     = Pattern.compile("\\s*(\\d*(?:\\.\\d+)?\\d)\\s*pt\\s*");
 }

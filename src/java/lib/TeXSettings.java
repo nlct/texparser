@@ -277,6 +277,31 @@ public class TeXSettings
       return currentFontSize;
    }
 
+   /**
+    * Gets the current font dimension if a custom size has been set.
+    * The dimension should be set for TeXFontSize.USER.
+    * @return the current font dimension or null if not set
+    */
+   public TeXDimension getCurrentFontDimension()
+   {
+      return currentFontDimension;
+   }
+
+   public TeXDimension getFontDimension()
+   {
+      if (currentFontDimension == null)
+      {
+         if (parent == null)
+         {
+            return null;
+         }
+
+         return parent.getFontDimension();
+      }
+
+      return currentFontDimension;
+   }
+
    public TeXFontMath getCurrentMathFont()
    {
       return currentMathFont;
@@ -721,6 +746,12 @@ public class TeXSettings
             "Invalid setting '%d' for TeXSettings.setFontWeight(int)",
              setting));
       }
+   }
+
+   public void setUserFontSize(TeXDimension dim)
+   {
+      currentFontSize = TeXFontSize.USER;
+      currentFontDimension = dim;
    }
 
    public void setFontSize(TeXFontSize setting)
@@ -3198,6 +3229,7 @@ public class TeXSettings
    private TeXFontShape currentFontShape   = TeXFontShape.INHERIT;
    private TeXFontWeight currentFontWeight = TeXFontWeight.INHERIT;
    private TeXFontSize currentFontSize     = TeXFontSize.INHERIT;
+   private TeXDimension currentFontDimension = null;
    private TeXFontMath currentMathFont = TeXFontMath.INHERIT;
 
    private int currentParAlign = INHERIT;
