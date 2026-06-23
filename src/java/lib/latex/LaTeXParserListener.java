@@ -3394,14 +3394,25 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
 
       String jobname = parser.getJobname();
 
+      String name = jobname+"."+ext;
+
+      File file;
+
       if (dir == null)
       {
-         return new File(jobname+"."+ext);
+         file = new File(name);
       }
       else
       {
-         return new File(dir, jobname+"."+ext);
+         file = new File(dir, name);
       }
+
+      if (!file.exists())
+      {
+         file = new File(getParser().getBaseDir(), name);
+      }
+
+      return file;
    }
 
    public void newcounter(String name)
