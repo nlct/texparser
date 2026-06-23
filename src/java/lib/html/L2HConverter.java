@@ -2554,24 +2554,15 @@ public class L2HConverter extends LaTeXParserListener
       setDocumentProperty("Title", title);
    }
 
-   @Override
-   public void beginDocument(TeXObjectList stack)
+   protected void assignMetaData(TeXObjectList stack)
      throws IOException
    {
-      inPreamble = false;
-
-      TeXObject cs = getControlSequence("@title");
-      TeXObject title = null;
-
-      if (!(cs instanceof Undefined) && !cs.isEmpty())
-      {
-         title = TeXParserUtils.expandOnce(cs, getParser(), stack);
-      }
-
       String htmlMetaTitle = getDocumentProperty("Title");
 
       if (htmlMetaTitle == null)
       {
+          TeXObject cs = getControlSequence("@title");
+
           parser.startGroup();
           parser.putControlSequence(true, new AtSecondOfTwo("texorpdfstring"));
           htmlMetaTitle = stripTags(processToString(cs, stack));
@@ -2588,6 +2579,23 @@ public class L2HConverter extends LaTeXParserListener
       {
          writeMetaData(htmlMetaTitle);
       }
+   }
+
+   @Override
+   public void beginDocument(TeXObjectList stack)
+     throws IOException
+   {
+      inPreamble = false;
+
+      TeXObject cs = getControlSequence("@title");
+      TeXObject title = null;
+
+      if (!(cs instanceof Undefined) && !cs.isEmpty())
+      {
+         title = TeXParserUtils.expandOnce(cs, getParser(), stack);
+      }
+
+      assignMetaData(stack);
 
       addDefaultArrayStyles();
 
