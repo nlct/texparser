@@ -892,10 +892,18 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       parser.putControlSequence(new AbstractDec());
 
       parser.putControlSequence(new Today());
+
+      // allow for classes or packages that redefine \title or
+      // \author to include an optional argument
+
       parser.putControlSequence(new TextualContentCommand("@title", ""));
+      parser.putControlSequence(new TextualContentCommand("TeXParser@opttitle", ""));
       parser.putControlSequence(new TextualContentCommand("@author", ""));
-      parser.putControlSequence(new StoreDataCs("title"));
-      parser.putControlSequence(new StoreDataCs("author"));
+      parser.putControlSequence(new TextualContentCommand("TeXParser@optauthor", ""));
+
+      parser.putControlSequence(new StoreDataCs("title", "TeXParser@opttitle", "@title"));
+      parser.putControlSequence(new StoreDataCs("author", "TeXParser@optauthor", "@author"));
+
       parser.putControlSequence(new StoreDataCs("date"));
       parser.putControlSequence(new GenericCommand("@date", null, new TeXCsRef("today")));
 
