@@ -473,7 +473,7 @@ public class TeXFontText
             if (userSize != null)
             {
                TeXUnit unit = userSize.getUnit();
-               builder.append(String.format("font-size: %fpt; ",
+               builder.append(String.format((Locale)null, "font-size: %fpt; ",
                  unit.toUnit(parser, userSize.getValue(), TeXUnit.BP)));
             }
          break;
@@ -643,7 +643,7 @@ public class TeXFontText
                TeXUnit unit = userSize.getUnit();
 
                attrs.put("font-size",
-                 String.format((Locale)null, "%fpt; ",
+                 String.format((Locale)null, "%fpt",
                   unit.toUnit(parser, userSize.getValue(), TeXUnit.BP)));
             }
          break;
@@ -676,7 +676,7 @@ public class TeXFontText
             else
             {
                attrs.put("font-size",
-                 String.format((Locale)null, "%dpt; ", deriveSize(parser)));
+                 String.format((Locale)null, "%dpt", deriveSize(parser)));
             }
          break;
          case LARGER:
@@ -688,7 +688,7 @@ public class TeXFontText
          // fall through
          default:
             attrs.put("font-size",
-              String.format((Locale)null, "%dpt; ", deriveSize(parser)));
+              String.format((Locale)null, "%dpt", deriveSize(parser)));
       }
 
       return attrs;
