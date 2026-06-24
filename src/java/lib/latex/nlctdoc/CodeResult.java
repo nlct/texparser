@@ -119,7 +119,7 @@ public class CodeResult extends GatherEnvContents
        listener.createGroup("result")
       ));
 
-      contents.add(listener.getPar());
+      //contents.add(listener.getPar());
 
       contents.add(codeBoxCs);
 
