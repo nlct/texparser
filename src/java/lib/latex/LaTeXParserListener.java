@@ -3100,13 +3100,13 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       return charset == null ? super.getCharSet() : charset;
    }
 
-   public void setGraphicsPath(TeXObjectList paths)
+   public void setGraphicsPath(DataObjectList paths)
      throws IOException
    {
       graphicsPath = paths;
    }
 
-   public TeXObjectList getGraphicsPath()
+   public DataObjectList getGraphicsPath()
    {
       return graphicsPath;
    }
@@ -3210,19 +3210,19 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
    public String[] getGraphicsPaths()
      throws IOException
    {
-      TeXObjectList graphicsPath = getGraphicsPath();
+      DataObjectList paths = getGraphicsPath();
 
       String[] grpaths = null;
 
-      if (graphicsPath != null && graphicsPath.size() > 0)
+      if (paths != null && paths.size() > 0)
       {
-         int n = graphicsPath.size();
+         int n = paths.size();
 
          grpaths = new String[n];
 
          for (int i = 0; i < n; i++)
          {
-            TeXObject object = (TeXObject)graphicsPath.get(i).clone();
+            TeXObject object = (TeXObject)paths.get(i).clone();
             grpaths[i] = parser.expandToString(object, parser);
          }
       }
@@ -4080,7 +4080,7 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
 
    private boolean parsePackages = false;
 
-   protected TeXObjectList graphicsPath = null;
+   protected DataObjectList graphicsPath = null;
 
    protected String[] imageExtensions = new String[]
    {

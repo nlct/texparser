@@ -40,30 +40,10 @@ public class GraphicsPath extends ControlSequence
       return new GraphicsPath(getName());
    }
 
-   private void processPath(TeXParser parser, TeXObject arg)
+   private void processPath(TeXParser parser, TeXObjectList list)
      throws IOException
    {
-      TeXObjectList paths = new TeXObjectList();
-
-      if (arg instanceof Group)
-      {
-         paths.add(((Group)arg).toList());
-      }
-      else if (arg instanceof TeXObjectList)
-      {
-         TeXObjectList list = (TeXObjectList)arg; 
-
-         while (list.size() > 0)
-         {
-            TeXObject thisPath = list.popArg(parser);
-
-            paths.add(thisPath);
-         }
-      }
-      else
-      {
-         paths.add(arg);
-      }
+      DataObjectList paths = DataObjectList.createUniqueFrom(parser, list);
 
       ((LaTeXParserListener)parser.getListener()).setGraphicsPath(paths);
    }
@@ -71,13 +51,13 @@ public class GraphicsPath extends ControlSequence
    public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      processPath(parser, stack.popArg(parser));
+      processPath(parser, TeXParserUtils.toList(popArg(parser, stack), parser));
 
    }
 
    public void process(TeXParser parser)
      throws IOException
    {
-      processPath(parser, parser.popNextArg());
+      process(parser, parser);
    }
 }

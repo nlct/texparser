@@ -760,7 +760,7 @@ public class LaTeX2LaTeX extends LaTeXParserListener
 
    }
 
-   public void setGraphicsPath(TeXObjectList paths)
+   public void setGraphicsPath(DataObjectList paths)
      throws IOException
    {
       super.setGraphicsPath(paths);
@@ -777,12 +777,18 @@ public class LaTeX2LaTeX extends LaTeXParserListener
 
             writeCodePoint(bg);
 
-            for (TeXObject path : paths)
+            writeCodePoint(bg);
+
+            String path = imageDestPath.toString();
+
+            write(path);
+
+            if (!path.endsWith("/"))
             {
-               writeCodePoint(bg);
-               write(imageDestPath.toString());
-               writeCodePoint(eg);
+               write('/');
             }
+
+            writeCodePoint(eg);
 
             writeCodePoint(eg);
          }
@@ -797,11 +803,23 @@ public class LaTeX2LaTeX extends LaTeXParserListener
 
          writeCodePoint(bg);
 
-         for (TeXObject path : paths)
+         if (imageDestPath != null)
          {
-            writeCodePoint(bg);
-            write(path.toString(parser));
+            String path = imageDestPath.toString();
+
+            write(path);
+
+            if (!path.endsWith("/"))
+            {
+               write('/');
+            }
+
             writeCodePoint(eg);
+         }
+
+         for (TeXObject obj : paths)
+         {
+            write(obj.toString(parser));
          }
 
          writeCodePoint(eg);
@@ -1176,7 +1194,14 @@ public class LaTeX2LaTeX extends LaTeXParserListener
          getParser().message(TeXApp.MESSAGE_ENCODING, encoding.name());
       }
 
-      basePath = file.getParentFile().toPath();
+      File dir = file.getParentFile();
+
+      if (dir == null)
+      {
+         dir = new File(System.getProperty("user.dir"));
+      }
+
+      basePath = dir.toPath();
 
       if (writer == null)
       {

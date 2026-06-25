@@ -102,6 +102,32 @@ public class DataObjectList extends TeXObjectList
       return list;
    }
 
+   public static DataObjectList createUniqueFrom(TeXParser parser, TeXObjectList list)
+   {
+      return createUniqueFrom(parser, list, true, true);
+   }
+
+   public static DataObjectList createUniqueFrom(TeXParser parser, TeXObjectList list,
+       boolean protect, boolean removeGrouping)
+   {
+      DataObjectList dataList = new DataObjectList(list.capacity(), protect);
+
+      for (TeXObject obj : list)
+      {
+         if (removeGrouping && parser.isGroup(obj))
+         {
+            obj = ((Group)obj).toList();
+         }
+
+         if (!dataList.contains(obj))
+         {
+            dataList.add(obj);
+         }
+      }
+
+      return dataList;
+   }
+
    @Override
    public boolean add(TeXObject object, boolean flatten)
    {
