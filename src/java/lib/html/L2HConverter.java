@@ -4538,6 +4538,7 @@ public class L2HConverter extends LaTeXParserListener
          else
          {
             dest = outPath.resolve(imageDest.resolve(file.getName()));
+            relPath = outPath.relativize(dest);
          }
 
          addToManifest(new FileData(dest.toFile(), type));
