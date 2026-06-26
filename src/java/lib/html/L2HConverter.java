@@ -4401,45 +4401,34 @@ public class L2HConverter extends LaTeXParserListener
        KeyValList options, String filename)
     throws IOException
    {
-      File file = getImageFile(filename);
+      TeXPath texPath = getImagePath(filename);
 
-      includegraphics(stack, options, file, filename);
+      includegraphics(stack, options, texPath, filename);
    }
 
+   @Deprecated
    public void includegraphics(TeXObjectList stack, 
        KeyValList options, File file, String filename)
     throws IOException
    {
-      if (file == null || !file.exists())
+      includegraphics(stack, options,
+        file == null ? null : new TeXPath(getParser(), file),
+        filename);
+   }
+
+   public void includegraphics(TeXObjectList stack, 
+       KeyValList options, TeXPath texPath, String filename)
+    throws IOException
+   {
+      if (texPath == null || !texPath.exists())
       {
          throw new TeXSyntaxException(parser, 
           TeXSyntaxException.ERROR_FILE_NOT_FOUND, filename);
       }
 
-      Path imagePath = file.toPath();
-      Path relPath;
-
-      if (imagePath.startsWith(basePath))
-      {
-         relPath = basePath.relativize(imagePath);
-      }
-      else if (imagePath.isAbsolute())
-      {
-         Path absBasePath = basePath.toAbsolutePath();
-
-         if (imagePath.startsWith(absBasePath))
-         {
-            relPath = absBasePath.relativize(imagePath);
-         }
-         else
-         {
-            relPath = imagePath.getName(imagePath.getNameCount()-1);
-         }
-      }
-      else
-      {
-         relPath = imagePath;
-      }
+      Path imagePath = texPath.getPath();
+      Path relPath = texPath.getRelativePath();
+      File file = texPath.getFile();
 
       TeXObject alt = null;
       String cssClass = null;
@@ -4531,7 +4520,12 @@ public class L2HConverter extends LaTeXParserListener
       {
          Path dest;
 
-         if (imageDest == null)
+         if (texPath.wasFoundByKpsewhich() || texPath.isAbsolute())
+         {
+            relPath = texPath.getLeaf();
+            dest = (outPath == null ? relPath : outPath.resolve(relPath));
+         }
+         else if (imageDest == null)
          {
             dest = (outPath == null ? relPath : outPath.resolve(relPath));
          }

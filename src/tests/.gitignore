@@ -15,3 +15,4 @@ test*.pdf
 *.glstex
 *.sty
 *.def
+*-eps-converted-to.pdf

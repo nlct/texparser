@@ -180,13 +180,14 @@ public class SearchTeXFiles extends LaTeXParserListener
    public void includegraphics(TeXObjectList stack, KeyValList options, String imgName)
     throws IOException
    {
-      File imageFile = getImageFile(imgName);
+      TeXPath imagePath = getImagePath(imgName);
+      File file = imagePath.getFile();
 
       for (SearchMatcher matcher : searchMatchers)
       {
-         if (matcher.isMatch(imageFile))
+         if (matcher.isMatch(file))
          {
-            registerMatch(new SearchFileName(imageFile, matcher));
+            registerMatch(new SearchFileName(file, matcher));
             return;
          }
       }

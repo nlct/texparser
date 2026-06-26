@@ -661,54 +661,30 @@ public class LaTeX2LaTeX extends LaTeXParserListener
    {
       String[] grpaths = getGraphicsPaths();
 
-      Path imagePath = null;
+      TeXPath texPath = getImagePath(imgName);
+      Path imagePath = texPath == null ? null : texPath.getRelativePath();
+      Path dest = null;
 
-      try
+      if (texPath != null && !texPath.wasFoundByKpsewhich())
       {
-         if (imgName.contains("."))
+         if (imageDestPath == null)
          {
-            TeXPath path = new TeXPath(parser, imgName);
-
-            if (imageDestPath == null)
-            {
-               imagePath = copyImageFile(grpaths, path);
-            }
-            else
-            {
-               imagePath =
-                  copyImageFile(grpaths, path, 
-                    imageDestPath.resolve(path.getLeaf()));
-            }
+            dest = (outPath == null ? imagePath : outPath.resolve(imagePath));
          }
          else
          {
-            for (int i = 0; i < imageExtensions.length; i++)
-            {
-                String name = imgName+imageExtensions[i];
-
-                TeXPath path = new TeXPath(parser, name);
-
-                if (imageDestPath == null)
-                {
-                   imagePath = copyImageFile(grpaths, path);
-                }
-                else
-                {
-                   imagePath =
-                      copyImageFile(grpaths, path, 
-                        imageDestPath.resolve(path.getLeaf()));
-                }
-
-                if (imagePath != null)
-                {
-                   break;
-                }
-            }
+            dest = outPath.resolve(imageDestPath.resolve(texPath.getLeaf().toString()));
+            imagePath = outPath.relativize(dest);
          }
-      }
-      catch (InterruptedException e)
-      {
-         getParser().error(e);
+
+         try
+         {
+            getTeXApp().copyFile(texPath.getFile(), dest.toFile());
+         }
+         catch (InterruptedException e)
+         {
+            getParser().error(e);
+         }
       }
 
       if (imagePath != null

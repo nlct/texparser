@@ -3230,12 +3230,51 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       return grpaths;
    }
 
+   public TeXPath getImagePath(String imageName)
+     throws IOException
+   {
+      return getImagePath(getGraphicsPaths(), imageName);
+   }
+
+   public TeXPath getImagePath(String[] grpaths, String imgName)
+     throws IOException
+   {
+      if (grpaths != null)
+      {
+         for (String gp : grpaths)
+         {
+            if (!gp.endsWith("/"))
+            {
+               gp += "/";
+            }
+
+            TeXPath texPath = new TeXPath(getParser(), gp+imgName, imageExtensions);
+
+            if (texPath.exists())
+            {
+               return texPath;
+            }
+         }
+      }
+
+      TeXPath texPath = new TeXPath(getParser(), imgName, imageExtensions);
+
+      if (texPath.exists())
+      {
+         return texPath;
+      }
+
+      return null;
+   }
+
+   @Deprecated
    public File getImageFile(String imageName)
      throws IOException
    {
       return getImage(getGraphicsPaths(), imageName);
    }
 
+   @Deprecated
    public File getImage(String[] grpaths, String imgName)
      throws IOException
    {

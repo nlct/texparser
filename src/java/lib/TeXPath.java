@@ -179,10 +179,12 @@ public class TeXPath
 
       if (defExt != null && !defExt.isEmpty())
       {
-         if ((enforceDefExt && !baseName.endsWith("."+defExt)) 
+         String ext = (defExt.startsWith(".") ? defExt : "."+defExt);
+
+         if ((enforceDefExt && !baseName.endsWith(ext)) 
               || !baseName.contains("."))
          {
-            baseName += "."+defExt;
+            baseName += ext;
          }
       }
 
@@ -348,26 +350,45 @@ public class TeXPath
 
       if (!hasExtension)
       {
-         // First try without extension
-         if (tryExt(parser, useKpsewhich, useL3SearchPath, root, parent,
-              split, baseName, null))
+         if (defExt.length > 0)
          {
-            return;
-         }
-      }
+            for (String ext : defExt)
+            {
+               if (tryExt(parser, useKpsewhich, useL3SearchPath, root, parent,
+                     split, baseName, ext))
+               {
+                  return;
+               }
+            }
 
-      if (defExt.length > 0 && !hasExtension)
-      {
-         for (String ext : defExt)
-         {
+            // Now try without extension
             if (tryExt(parser, useKpsewhich, useL3SearchPath, root, parent,
-                  split, baseName, ext))
+                 split, baseName, null))
+            {
+               return;
+            }
+
+            if (defExt[0].startsWith("."))
+            {
+               split[n] = baseName + defExt[0];
+            }
+            else
+            {
+               split[n] = baseName + "." + defExt[0];
+            }
+         }
+         else
+         {
+            // Path name has no extension but also no default extension
+            // provided.
+
+            if (tryExt(parser, useKpsewhich, useL3SearchPath, root, parent,
+                    split, baseName, null))
             {
                return;
             }
          }
 
-         split[n] = baseName+"."+defExt[0];
          useKpsewhich = false;
       }
 
@@ -428,13 +449,18 @@ public class TeXPath
    {
       int n = split.length-1;
 
-      if (ext == null || ext.isEmpty())
+      if (ext == null || ext.isEmpty() || ext.equals("."))
       {
          split[n] = baseName;
+         ext = null;
+      }
+      else if (ext.startsWith("."))
+      {
+         split[n] = baseName + ext;
       }
       else
       {
-         split[n] = baseName+"."+ext;
+         split[n] = baseName + "." + ext;
       }
 
       File file = (parent == null ? new File(split[n]) : 
@@ -446,7 +472,7 @@ public class TeXPath
       {
          // if no extension and file is a directory, skip
 
-         if (file.isDirectory() && (ext == null || ext.isEmpty()))
+         if (file.isDirectory() && ext == null)
          {
             return false;
          }
