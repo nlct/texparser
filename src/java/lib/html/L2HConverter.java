@@ -352,7 +352,7 @@ public class L2HConverter extends LaTeXParserListener
       addToBibliographySection(createGroup("bib"));
 
       addInternalReference("bib", new TeXCsRef("refname"));
-      addInternalReference("toc", new TeXCsRef("contentsname"));
+      addInternalReference(getTocLabel(), new TeXCsRef("contentsname"));
 
       putControlSequence(new AtSecondOfTwo("texparser@ifintoc"));
       putControlSequence(new L2HTableOfContents());
@@ -534,6 +534,11 @@ public class L2HConverter extends LaTeXParserListener
       }
 
       return super.createUnknownReference(label);
+   }
+
+   public String getTocLabel()
+   {
+      return "toc";
    }
 
    @Deprecated

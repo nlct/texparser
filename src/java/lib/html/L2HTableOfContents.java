@@ -124,7 +124,7 @@ public class L2HTableOfContents extends ListOf
 
       stack.push(listener.getControlSequence("makeatletter"));
       stack.push(listener.getControlSequence("begingroup"));
-      stack.push(listener.createGroup("toc"));
+      stack.push(listener.createGroup(listener.getTocLabel()));
       stack.push(new TeXCsRef("label"));
       stack.push(new TeXCsRef("contentsname"));
       stack.push(listener.getOther('*'));
