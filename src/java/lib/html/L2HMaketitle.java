@@ -103,13 +103,18 @@ public class L2HMaketitle extends Maketitle
       list.add(new EndElement("div"));
       list.add(new HtmlLiteral("<!-- end of author -->"));
 
-      elem = new StartElement("div");
-      elem.putAttribute("class", "date");
+      ControlSequence date = listener.getControlSequence("@date");
 
-      list.add(elem);
-      list.add(listener.getControlSequence("@date"));
-      list.add(new EndElement("div"));
-      list.add(new HtmlLiteral("<!-- end of date -->"));
+      if (!date.isEmpty())
+      {
+         elem = new StartElement("div");
+         elem.putAttribute("class", "date");
+
+         list.add(elem);
+         list.add(date);
+         list.add(new EndElement("div"));
+         list.add(new HtmlLiteral("<!-- end of date -->"));
+      }
 
       list.add(listener.newHtml5EndElement("header"));
 
