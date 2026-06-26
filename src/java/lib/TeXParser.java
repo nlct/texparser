@@ -4613,6 +4613,10 @@ public class TeXParser extends TeXObjectList
             return cs;
          }
       }
+      else
+      {
+         settings.removeGlobalControlSequence(name);
+      }
 
       return csTable.remove(name);
    }
