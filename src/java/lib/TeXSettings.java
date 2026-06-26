@@ -1079,25 +1079,14 @@ public class TeXSettings
          cs = reg;
       }
 
-      ControlSequence parentCs = null;
-
-      if (parent == null)
+      if (parent != null)
       {
-         parentCs = parser.removeControlSequence(false, name);
+         ControlSequence parentCs = parent.removeGlobalControlSequence(name);
 
          if (parentCs != null)
          {
             cs = parentCs;
          }
-
-         return cs;
-      }
-
-      parentCs = parent.removeGlobalControlSequence(name);
-
-      if (parentCs != null)
-      {
-         cs = parentCs;
       }
 
       return cs;
