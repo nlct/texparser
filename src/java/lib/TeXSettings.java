@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013-2023 Nicola L.C. Talbot
+    Copyright (C) 2013-2026 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -20,6 +20,12 @@ package com.dickimawbooks.texparserlib;
 
 import java.awt.Color;
 import java.util.Hashtable;
+
+/**
+ * Keeps track of a local scope.
+ * This class needs replacing with a list as too deeply nested scopes cause a
+ * StackOverflow.
+ */
 
 public class TeXSettings
 {
