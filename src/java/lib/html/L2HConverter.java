@@ -541,6 +541,35 @@ public class L2HConverter extends LaTeXParserListener
       return "toc";
    }
 
+   public L2HList createTocList()
+   {
+      return new L2HList();
+   }
+
+   public L2HItem createTocItem()
+   {
+      return new L2HItem();
+   }
+
+   public StartElement createTocStartElement()
+   {
+      String navTag = isHtml5() ? "nav" : "div";
+
+      StartElement blockStartElem = new StartElement(navTag); 
+      blockStartElem.putAttribute("class", "toc");
+
+      if (isXml())
+      {
+         blockStartElem.putAttribute("title", "Table of Contents");
+      }
+      else
+      {
+         blockStartElem.putAttribute("aria-label", "Table of Contents");
+      }
+
+      return blockStartElem;
+   }
+
    @Deprecated
    public L2HImage toImage(String preamble, 
     String content, String mimeType, TeXObject alt, String name, boolean crop)
@@ -2165,9 +2194,13 @@ public class L2HConverter extends LaTeXParserListener
    public void writeCssStyles()
      throws IOException
    {
-      writeliteralln("#main {margin-left: 5%; margin-right: 15%; }");
-      writeliteralln("div.tomain {position: absolute; left: 0pt; width: 5%; text-align: right; font-size: x-small;}");
-      writeliteralln("div.tomain a {text-decoration: none;}");
+      if (createMainDiv)
+      {
+         writeliteralln("#main {margin-left: 5%; margin-right: 15%; }");
+         writeliteralln("div.tomain {position: absolute; left: 0pt; width: 5%; text-align: right; font-size: x-small;}");
+         writeliteralln("div.tomain a {text-decoration: none;}");
+      }
+
       writeliteralln(".labellink { font-size: x-small; margin-left: 1em; margin-right: 1em;}");
       writeliteralln("div.marginleft {position: absolute; left: 0pt; width: 5%;}");
       writeliteralln("div.marginright {position: absolute; right: 0pt; width: 15%;}");
@@ -2673,7 +2706,10 @@ public class L2HConverter extends LaTeXParserListener
 
       rootPagePreMain(stack);
 
-      writeliteralln("<div id=\"main\">");
+      if (createMainDiv)
+      {
+         writeliteralln("<div id=\"main\">");
+      }
    }
 
    protected void rootPagePreMain(TeXObjectList stack) throws IOException
@@ -2939,7 +2975,10 @@ public class L2HConverter extends LaTeXParserListener
          footerNav();
       }
 
-      writeliteralln("</div><!-- end of main -->");// ends <div id="main">
+      if (createMainDiv)
+      {
+         writeliteralln("</div><!-- end of main -->");// ends <div id="main">
+      }
 
       ControlSequence cs = parser.getControlSequence(
         "@enddocumenthook");
@@ -3045,7 +3084,10 @@ public class L2HConverter extends LaTeXParserListener
          writeNavigationList();
       }
 
-      writeliteralln("<div id=\"main\">");
+      if (createMainDiv)
+      {
+         writeliteralln("<div id=\"main\">");
+      }
 
    }
 
@@ -3077,7 +3119,10 @@ public class L2HConverter extends LaTeXParserListener
 
       footerNav();
 
-      writeliteralln("</div><!-- end of main -->");// ends <div id="main">
+      if (createMainDiv)
+      {
+         writeliteralln("</div><!-- end of main -->");// ends <div id="main">
+      }
 
       endBody(stack);
       writeliteralln("</html>");
@@ -5970,7 +6015,7 @@ public class L2HConverter extends LaTeXParserListener
    public void writeToTopLink(TeXObjectList stack)
     throws IOException
    {
-      if (isToTopLinkEnabled())
+      if (isToTopLinkEnabled() && createMainDiv)
       {
          ControlSequence cs = parser.getControlSequence("TeXParserLibToTopName");
          String text = "[top]";
@@ -6311,6 +6356,7 @@ public class L2HConverter extends LaTeXParserListener
 
    private boolean linkBoxEnabled = true;
    private boolean toTopLinkEnabled = true;
+   protected boolean createMainDiv = true;
 
    protected String generator = "TeX Parser Library";
 

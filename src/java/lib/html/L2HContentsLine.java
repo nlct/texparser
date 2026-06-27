@@ -100,7 +100,7 @@ public class L2HContentsLine extends ContentsLine
          {
             for (int i = prevLevel; i < currLevel; i++)
             {
-               L2HList listDec = new L2HList();
+               L2HList listDec = listener.createTocList();
                list.add(listDec);
 
                if (def != null)
@@ -125,7 +125,7 @@ public class L2HContentsLine extends ContentsLine
             }
          }
 
-         startItem = new L2HItem();
+         startItem = listener.createTocItem();
          startItem.putAttribute("class", "toc-"+typeStr);
 
          list.add(startItem);

@@ -100,6 +100,14 @@ public class L2HList extends TrivListDec
       return endElement;
    }
 
+   @Override
+   public String toString()
+   {
+      return String.format("%s[name=%s,start=%s,end=%s]",
+       getClass().getSimpleName(), getName(), 
+        startElement, endElement);
+   }
+
    protected StartElement startElement;
    protected EndElement endElement;
 }

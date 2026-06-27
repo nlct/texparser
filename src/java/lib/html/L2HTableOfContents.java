@@ -86,24 +86,12 @@ public class L2HTableOfContents extends ListOf
 
       if (cs instanceof L2HSection)
       {
-         String navTag = listener.isHtml5() ? "nav" : "div";
-
          L2HSection secCs = (L2HSection)cs.clone();
 
-         StartElement blockStartElem = new StartElement(navTag); 
-         blockStartElem.putAttribute("class", "toc");
-
-         if (listener.isXml())
-         {
-            blockStartElem.putAttribute("title", "Table of Contents");
-         }
-         else
-         {
-            blockStartElem.putAttribute("aria-label", "Table of Contents");
-         }
+         StartElement blockStartElem = listener.createTocStartElement();
 
          secCs.setBlockStartElement(blockStartElem);
-         secCs.setBlockEndElement(new EndElement(navTag));
+         secCs.setBlockEndElement(new EndElement(blockStartElem.getTag()));
 
          cs = secCs;
       }

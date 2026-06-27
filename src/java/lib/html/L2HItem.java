@@ -33,15 +33,27 @@ public class L2HItem extends ListItem
 
    public L2HItem(String name)
    {
+      this(name, true);
+   }
+
+   public L2HItem(String name, boolean useSpan)
+   {
       super(name);
 
+      this.useSpan = useSpan;
       startElement = new StartElement("li", true);
       endElement = new EndElement("li");
    }
 
    public L2HItem(String name, StartElement startElem, EndElement endElem)
    {
+      this(name, startElem, endElem, true);
+   }
+
+   public L2HItem(String name, StartElement startElem, EndElement endElem, boolean useSpan)
+   {
       super(name);
+      this.useSpan = useSpan;
       this.startElement = startElem;
       this.endElement = endElem;
    }
@@ -49,7 +61,7 @@ public class L2HItem extends ListItem
    public Object clone()
    {
       return new L2HItem(getName(), (StartElement)startElement.clone(),
-       (EndElement)endElement.clone());
+       (EndElement)endElement.clone(), useSpan);
    }
 
    @Override
@@ -59,27 +71,36 @@ public class L2HItem extends ListItem
    {
       L2HConverter listener = (L2HConverter)parser.getListener();
 
-      if (trivList.isInLine())
+      if (useSpan)
       {
-         listener.writeliteral("<span class=\"inlineitem\">");
+         if (trivList.isInLine())
+         {
+            listener.writeliteral("<span class=\"inlineitem\">");
+         }
+         else
+         {
+            listener.startListItem(startElement, stack);
+
+            if (listener.isIfTrue(listener.getControlSequence("if@nmbrlist")))
+            {
+               listener.writeliteral("<span class=\"numitem\">");
+            }
+            else
+            {
+               listener.writeliteral("<span class=\"bulletitem\">");
+            }
+         }
+
+         TeXParserUtils.process(label, parser, stack);
+
+         listener.writeliteral("</span>");
       }
       else
       {
          listener.startListItem(startElement, stack);
 
-         if (listener.isIfTrue(listener.getControlSequence("if@nmbrlist")))
-         {
-            listener.writeliteral("<span class=\"numitem\">");
-         }
-         else
-         {
-            listener.writeliteral("<span class=\"bulletitem\">");
-         }
+         TeXParserUtils.process(label, parser, stack);
       }
-
-      TeXParserUtils.process(label, parser, stack);
-
-      listener.writeliteral("</span>");
    }
 
    public String removeAttribute(String attrName)
@@ -119,4 +140,5 @@ public class L2HItem extends ListItem
 
    protected StartElement startElement;
    protected EndElement endElement;
+   protected boolean useSpan = true;
 }
