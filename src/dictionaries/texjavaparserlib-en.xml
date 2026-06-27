@@ -22,7 +22,7 @@ Nicola Talbot
 	expansion-once-list	Whenever a list is expanded once
 	io	I/O operations
 	popped	Object popped from a stack
-	process		Whenever an object is processed
+	process	Whenever an object is processed
 	process-generic-cs	Whenever a GenericCommand is processed
 	process-stack	Whenever a stack is processed
 	process-stack-list	Whenever a stack is processed (list details)
