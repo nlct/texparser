@@ -53,9 +53,12 @@ public class TextBlockCommand extends ControlSequence
    public void process(TeXParser parser, TeXObjectList stack) throws IOException
    {
       TeXParserListener listener = parser.getListener();
-      Group grp = listener.createGroup();
 
-      grp.add(declaration);
+      TeXObjectList list = listener.createStack();
+
+      parser.startGroup();
+
+      list.add(declaration);
       String argTypes = declaration.getArgTypes();
 
       if (argTypes != null)
@@ -67,16 +70,16 @@ public class TextBlockCommand extends ControlSequence
             switch (c)
             {
                case 'm':
-                  grp.add(TeXParserUtils.createGroup(parser, popArg(parser, stack)));
+                  list.add(TeXParserUtils.createGroup(parser, popArg(parser, stack)));
                break;
                case 'o':
                   TeXObject obj = popOptArg(parser, stack);
 
                   if (obj != null)
                   {
-                     grp.add(listener.getOther('['));
-                     grp.add(obj, true);
-                     grp.add(listener.getOther(']'));
+                     list.add(listener.getOther('['));
+                     list.add(obj, true);
+                     list.add(listener.getOther(']'));
                   }
 
                break;
@@ -89,9 +92,13 @@ public class TextBlockCommand extends ControlSequence
 
       TeXObject arg = popArg(parser, stack);
 
-      grp.add(arg, true);
+      list.add(arg, true);
 
-      TeXParserUtils.process(grp, parser, stack);
+      list.add(new EndDeclaration(declaration));
+
+      TeXParserUtils.process(list, parser, stack);
+
+      parser.endGroup();
    }
 
    private Declaration declaration;
