@@ -137,6 +137,15 @@ public class AtGlsAtLink extends AbstractGlsCommand
 
       boolean doIndex = true;
 
+      if (entry != null && entry.isUnset())
+      {
+// TODO check category attribute
+         if (TeXParserUtils.isTrue("ifglsindexonlyfirst", parser))
+         {
+            doIndex = false;
+         }
+      }
+
       TeXBoolean isHyper = TeXParserUtils.toBoolean("ifKV@glslink@hyper",
         parser);
 

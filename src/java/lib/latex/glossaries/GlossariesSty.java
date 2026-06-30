@@ -1134,6 +1134,8 @@ public class GlossariesSty extends LaTeXSty
       registerControlSequence(new GlsXtrInternalLocationHyperlink());
       registerControlSequence(new GlsXtrLocationHyperLink());
 
+      NewIf.createConditional(true, getParser(), "ifglsindexonlyfirst", false);
+
       registerControlSequence(new AtGobble("glsxtr@inc@wrglossaryctr"));
 
       registerControlSequence(new AtGobble("@@glsxtrwrglosscountermark"));
@@ -2748,9 +2750,20 @@ public class GlossariesSty extends LaTeXSty
       {
          indexcounter = true;
       }
+      else if (option.equals("indexonlyfirst"))
+      {
+         boolean on = true;
+
+         if (value != null && !(value instanceof MissingValue) && !value.isEmpty())
+         {
+            on = Boolean.parseBoolean(value.toString(parser));
+         }
+
+         TeXParserUtils.setConditional(true, parser, "glsindexonlyfirst", on);
+      }
       else if (option.equals("debug"))
       {
-         if (value != null)
+         if (value != null && !(value instanceof MissingValue))
          {
             String debugOpt = value.toString(parser);
 
@@ -2808,7 +2821,7 @@ public class GlossariesSty extends LaTeXSty
       {
          String section;
 
-         if (value == null || value.isEmpty())
+         if (value == null || value.isEmpty() || value instanceof MissingValue)
          {
             section = "section";
          }
@@ -2822,7 +2835,7 @@ public class GlossariesSty extends LaTeXSty
       }
       else if (option.equals("numberedsection"))
       {
-         if (value == null || value.isEmpty())
+         if (value == null || value.isEmpty() || value instanceof MissingValue)
          {
             getParser().putControlSequence(true,
               new TextualContentCommand("@@glossarysecstar", ""));
@@ -2865,7 +2878,7 @@ public class GlossariesSty extends LaTeXSty
       }
       else if (extra && option.equals("record"))
       {
-         if (value == null || !value.equals("off"))
+         if (value == null || !value.equals("off") || value instanceof MissingValue)
          {
             addField("group");
             addField("location");
@@ -2881,7 +2894,7 @@ public class GlossariesSty extends LaTeXSty
       {
          String valStr = "true";
 
-         if (value != null && !value.isEmpty())
+         if (value != null && !value.isEmpty() && !(value instanceof MissingValue))
          {
             valStr = parser.expandToString(value, parser);
          }
@@ -2894,7 +2907,7 @@ public class GlossariesSty extends LaTeXSty
       {
          String valStr = "";
 
-         if (value != null && !value.isEmpty())
+         if (value != null && !value.isEmpty() && !(value instanceof MissingValue))
          {
             valStr = parser.expandToString(value, parser);
          }
@@ -2920,7 +2933,7 @@ public class GlossariesSty extends LaTeXSty
       {
          String valStr = "true";
 
-         if (value != null && !value.isEmpty())
+         if (value != null && !value.isEmpty() && !(value instanceof MissingValue))
          {
             valStr = parser.expandToString(value, parser).trim();
          }
