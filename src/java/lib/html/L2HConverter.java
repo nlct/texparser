@@ -1859,7 +1859,7 @@ public class L2HConverter extends LaTeXParserListener
       }
 
       TeXObjectList stack = createStack();
-      String tag = "a";
+      String tag = (isHtml5() ? "span" : "a");
       String id = HtmlTag.getUriFragment(anchorName);
       String attrName = null;
       String attrValue = null;
