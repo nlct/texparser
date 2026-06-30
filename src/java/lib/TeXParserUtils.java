@@ -24,6 +24,8 @@ import java.util.SimpleTimeZone;
 import java.util.Locale;
 
 import com.dickimawbooks.texparserlib.primitives.Relax;
+import com.dickimawbooks.texparserlib.primitives.IfTrue;
+import com.dickimawbooks.texparserlib.primitives.IfFalse;
 import com.dickimawbooks.texparserlib.latex.KeyValList;
 import com.dickimawbooks.texparserlib.latex.CsvList;
 
@@ -1007,6 +1009,22 @@ public class TeXParserUtils
       }
 
       return null;
+   }
+
+   public static void setConditional(boolean isLocal, TeXParser parser,
+      String csname, boolean value)
+   throws TeXSyntaxException
+   {
+      if (parser.getControlSequence("if"+csname) == null)
+      {
+         throw new TeXSyntaxException(parser, 
+           TeXSyntaxException.ERROR_UNDEFINED, "if"+csname);
+      }
+      else
+      {
+         parser.putControlSequence(isLocal, 
+           value ? new IfTrue("if"+csname) : new IfFalse("if"+csname));
+      }
    }
 
    public static Numerical toNumerical(TeXObject obj, 
