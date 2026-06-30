@@ -3057,7 +3057,7 @@ public class L2HConverter extends LaTeXParserListener
          }
       }
 
-      writeMetaData(currentNode.getTitle());
+      writeMetaData(getDivisionTitle(currentNode, stack));
 
       if (separateCss && cssFile != null)
       {
@@ -3089,6 +3089,12 @@ public class L2HConverter extends LaTeXParserListener
          writeliteralln("<div id=\"main\">");
       }
 
+   }
+
+   public String getDivisionTitle(DivisionNode node, TeXObjectList stack)
+   throws IOException
+   {
+      return node.getPrefixedTitle();
    }
 
    protected void endDivisionFile(TeXObjectList stack)
@@ -3176,15 +3182,7 @@ public class L2HConverter extends LaTeXParserListener
          writeCodePoint(getNavLeftCodePoint());
          writeliteral("</div>");
 
-         String prefix = prevNode.getPrefix();
-
-         if (prefix != null)
-         {
-            writeliteral(prefix);
-            writeliteral(" ");
-         }
-
-         writeliteral(prevNode.getTitle());
+         writeliteral(getDivisionTitle(prevNode, null));
 
          writeliteralln("</a>");
 
@@ -3208,15 +3206,7 @@ public class L2HConverter extends LaTeXParserListener
          writeCodePoint(getNavUpCodePoint());
          writeliteral("</div>");
 
-         String prefix = upNode.getPrefix();
-
-         if (prefix != null)
-         {
-            writeliteral(prefix);
-            writeliteral(" ");
-         }
-
-         writeliteral(upNode.getTitle());
+         writeliteral(getDivisionTitle(upNode, null));
          writeliteral("</a>");
       }
 
@@ -3228,15 +3218,7 @@ public class L2HConverter extends LaTeXParserListener
 
          writeliteral(String.format("<a href=\"%s\">", nextNode.getRef()));
 
-         String prefix = nextNode.getPrefix();
-
-         if (prefix != null)
-         {
-            writeliteral(prefix);
-            writeliteral(" ");
-         }
-
-         writeliteral(nextNode.getTitle());
+         writeliteral(getDivisionTitle(nextNode, null));
 
          writeliteral("<div class=\"linkiconright\">");
          writeCodePoint(getNavRightCodePoint());
