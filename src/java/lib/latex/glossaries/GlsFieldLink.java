@@ -147,36 +147,56 @@ public class GlsFieldLink extends GlsEntryField
 
          listener.putControlSequence(true, new GenericCommand("glsinsert"));
 
+         String field = getField();
+
+         TeXObject value = getFieldValue(glslabel, field);
+
          switch (caseChange)
          {
             case SENTENCE:
               listener.putControlSequence(true,
                 new AtNumberOfNumber("glscapscase", 2, 3));
+
+              if (value != null && !value.isEmpty())
+              {
+                 TeXObjectList list = listener.createStack();
+                 list.add(listener.getControlSequence("makefirstuc"));
+                 Group grp = listener.createGroup();
+                 list.add(grp);
+                 grp.add(value, true);
+                 value = list;
+              }
             break;
             case TO_UPPER:
               listener.putControlSequence(true,
                 new AtNumberOfNumber("glscapscase", 3, 3));
-            break;
-            default:
-              listener.putControlSequence(true,
-                 new AtNumberOfNumber("glscapscase", 1, 3));
+
+              if (value != null && !value.isEmpty())
+              {
+                 TeXObjectList list = listener.createStack();
+                 list.add(listener.getControlSequence("MakeUppercase"));
+                 Group grp = listener.createGroup();
+                 list.add(grp);
+                 grp.add(value);
+                 value = list;
+              }
 
               if (insert != null && !insert.isEmpty())
               {
                  TeXObjectList list = listener.createStack();
-                 list.add(listener.getControlSequence("mfirstucMakeUppercase"));
+                 list.add(listener.getControlSequence("MakeUppercase"));
                  Group grp = listener.createGroup();
                  list.add(grp);
                  grp.add(insert);
                  insert = list;
               }
+            break;
+            default:
+              listener.putControlSequence(true,
+                 new AtNumberOfNumber("glscapscase", 1, 3));
          }
 
          TeXObjectList linktext = listener.createStack();
-
-         String field = getField();
-
-         TeXObject value = getFieldValue(glslabel, field);
 
          if (value != null)
          {
