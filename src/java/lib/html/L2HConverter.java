@@ -2712,6 +2712,16 @@ public class L2HConverter extends LaTeXParserListener
       }
    }
 
+   public String getTitleHeaderId()
+   {
+      return null;
+   }
+
+   public String getTitleId()
+   {
+      return null;
+   }
+
    protected void rootPagePreMain(TeXObjectList stack) throws IOException
    {
    }

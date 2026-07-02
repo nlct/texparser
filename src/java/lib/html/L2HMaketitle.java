@@ -72,10 +72,26 @@ public class L2HMaketitle extends Maketitle
 
       TeXObjectList list = listener.createStack();
 
-      list.add(listener.newHtml5StartElement("header"));
+      StartElement elem = listener.newHtml5StartElement("header");
 
-      StartElement elem = new StartElement("div");
+      String headerId = listener.getTitleHeaderId();
+
+      if (headerId != null)
+      {
+         elem.putAttribute("id", headerId);
+      }
+
+      list.add(elem);
+
+      elem = new StartElement("div");
       elem.putAttribute("class", "title");
+
+      String titleId = listener.getTitleId();
+
+      if (titleId != null)
+      {
+         elem.putAttribute("id", titleId);
+      }
 
       list.add(elem);
       list.add(listener.getControlSequence("@title"));
