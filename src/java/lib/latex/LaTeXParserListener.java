@@ -2229,6 +2229,18 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       return docCls;
    }
 
+   public boolean supportsChapter()
+   {
+      if (docCls != null)
+      {
+         return docCls.supportsChapter();
+      }
+
+      ControlSequence cs = getParser().getControlSequence("chapter");
+
+      return cs != null;
+   }
+
    public KeyValList getDocumentClassOptions()
    {
       return docCls == null ? null : docCls.getOptions();
