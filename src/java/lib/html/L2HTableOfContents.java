@@ -110,6 +110,13 @@ public class L2HTableOfContents extends ListOf
          stack.push(TeXParserActionObject.createInputAction(tocFile));
       }
 
+      ControlSequence preContentHook = parser.getControlSequence("TeXParser@pre@toc@content");
+
+      if (preContentHook != null)
+      {
+         stack.push(preContentHook);
+      }
+
       stack.push(listener.getControlSequence("makeatletter"));
       stack.push(listener.getControlSequence("begingroup"));
       stack.push(listener.createGroup(listener.getTocLabel()));
