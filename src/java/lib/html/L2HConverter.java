@@ -2643,7 +2643,8 @@ public class L2HConverter extends LaTeXParserListener
       {
          if (cssFile == null)
          {
-            cssFile = new File(outPath.toFile(), parser.getJobname()+".css");
+            cssFile = new File(outPath.toFile(),
+             (rootName == null ? parser.getJobname() : rootName)+".css");
             writeCssFile();
 
             addToManifest(new FileData(cssFile, "stylesheet", MIME_TYPE_CSS));
