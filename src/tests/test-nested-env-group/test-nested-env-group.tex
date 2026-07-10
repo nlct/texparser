@@ -13,4 +13,103 @@ Test
 }
 \end{table}
 
+\newcommand\test{Outer}
+
+{
+  \renewcommand\test{Group 1}
+  A. \test
+  \par
+
+  {
+    \renewcommand\test{Group 2}
+    B. \test
+    \par
+
+    {
+      \renewcommand\test{Group 3}
+      C. \test
+      \par
+
+      {
+        \renewcommand\test{Group 4}
+        D. \test
+        \par
+
+        {
+          \renewcommand\test{Group 5}
+          E. \test
+          \par
+
+          {
+            \renewcommand\test{Group 6}
+            F. \test
+            \par
+
+            {
+              \renewcommand\test{Group 7}
+              G. \test
+              \par
+
+              {
+                \renewcommand\test{Group 8}
+                H. \test
+                \par
+
+                {
+                  \renewcommand\test{Group 9}
+                  I. \test
+                  \par
+
+                  {
+                    \renewcommand\test{Group 10}
+                    J. \test
+                    \par
+
+                    {
+                      \renewcommand\test{Group 11}
+                      K. \test
+                      \par
+                    }
+
+                    J. \test
+                    \par
+                  }
+
+                  I. \test
+                  \par
+                }
+
+                H. \test
+                \par
+              }
+
+              G. \test
+              \par
+            }
+
+            F. \test
+            \par
+          }
+
+          E. \test
+          \par
+        }
+
+        D. \test
+        \par
+      }
+
+      C. \test
+      \par
+    }
+
+    B. \test
+    \par
+  }
+
+  A. \test
+  \par
+
+}
+
 \end{document}

@@ -16,7 +16,7 @@ tests/output	:
 
 test-nested	: lib/texjavaparsertest.jar tests/output
 	rm -f -r tests/output/test-nested-env-group
-	bin/texjavaparsertest --debug --in tests/test-nested-env-group/test-nested-env-group.tex --output tests/output/test-nested-env-group
+	bin/texjavaparsertest --debug --html --in tests/test-nested-env-group/test-nested-env-group.tex --output tests/output/test-nested-env-group
 
 test-obs	: lib/texjavaparsertest.jar tests/output
 	rm -f -r tests/output/test-obsolete
