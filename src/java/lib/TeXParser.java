@@ -1406,7 +1406,52 @@ public class TeXParser extends TeXObjectList
 
       // Skip any spaces at the start of the next line
 
-      return skipNextSpaces(list);
+      isNotEof = skipNextSpaces(list, true);
+
+      if (!isNotEof)
+      {
+         return isNotEof;
+      }
+
+      TeXObject obj = list.isEmpty() ? null : list.lastElement();
+
+      if (obj instanceof SkippedSpaces)
+      {
+         SkippedSpaces spaces = (SkippedSpaces)obj;
+
+         if (spaces.containsEol())
+         {
+            list.remove(list.size()-1);
+
+            obj = list.isEmpty() ? null : list.lastElement();
+
+            Eol eol = null;
+
+            if (obj instanceof Eol)
+            {
+               eol = (Eol)obj;
+               list.remove(list.size()-1);
+            }
+
+            if (!(obj instanceof Par))
+            {
+               parFound(list);
+            }
+
+            obj = list.lastElement();
+
+            if (obj instanceof Par)
+            {
+               Par par = (Par)obj;
+
+               if (eol != null) par.add(eol);
+
+               par.add(spaces);
+            }
+         }
+      }
+
+      return isNotEof;
    }
 
    private boolean skipNextEols(TeXObjectList list)
@@ -1449,6 +1494,12 @@ public class TeXParser extends TeXObjectList
    private boolean skipNextSpaces(TeXObjectList list)
      throws IOException
    {
+      return skipNextSpaces(list, false);
+   }
+
+   private boolean skipNextSpaces(TeXObjectList list, boolean incEols)
+     throws IOException
+   {
       int c = -1;
 
       mark();
@@ -1459,7 +1510,7 @@ public class TeXParser extends TeXObjectList
 
       while ((c = read()) != -1)
       {
-         if (!isCatCode(TYPE_SPACE, c))
+         if (!(isCatCode(TYPE_SPACE, c) || (incEols && isCatCode(TYPE_EOL, c))))
          {
             reset();
             break;
@@ -5277,6 +5328,6 @@ public class TeXParser extends TeXObjectList
    /** Scoping debugging flag. */
    public static final int DEBUG_SETTINGS = 65536;
 
-   public static final String VERSION = "1.9.20260703";
-   public static final String VERSION_DATE = "2026-07-03";
+   public static final String VERSION = "1.9.20260710";
+   public static final String VERSION_DATE = "2026-07-10";
 }

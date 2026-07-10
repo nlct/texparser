@@ -20,48 +20,74 @@ package com.dickimawbooks.texparserlib;
 
 import java.io.IOException;
 
+import java.util.Vector;
+
+/**
+ * A paragraph break identified by a blank line.
+ * (For <code>\par</code> see
+ * {@link com.dickimawbooks.texparserlib.generic.ParCs})
+ */
 public class Par extends AbstractTeXObject
 {
    public Par()
    {
-      this("par");
-   }
-
-   public Par(String name)
-   {
-      this.name = name;
-   }
-
-   public String getName()
-   {
-      return name;
+      spaces = new Vector<WhiteSpace>();
    }
 
    public Object clone()
    {
-      return new Par(getName());
+      Par par = new Par();
+
+      par.spaces.addAll(spaces);
+
+      return par;
    }
 
    public String toString(TeXParser parser)
    {
-      return String.format("%n%n");
+      if (spaces.isEmpty())
+      {
+         return String.format("%n%n");
+      }
+      
+      StringBuilder builder = new StringBuilder();
+
+      for (WhiteSpace sp : spaces)
+      {
+         builder.append(sp.toString(parser));
+      }
+
+      return builder.toString();
    }
 
+   @Override
    public String format()
    {
-      return String.format("\\%s ", name);
+      if (spaces.isEmpty())
+      {
+         return String.format("%n%n");
+      }
+      
+      StringBuilder builder = new StringBuilder();
+
+      for (WhiteSpace sp : spaces)
+      {
+         builder.append(sp.format());
+      }
+
+      return builder.toString();
    }
 
    public String toString()
    {
-      return String.format("%s%n", getClass().getSimpleName());
+      return String.format("%s[spaces=%s]",
+         getClass().getSimpleName(), spaces);
    }
 
    public TeXObjectList string(TeXParser parser)
      throws IOException
    {
-      return parser.string(String.format("%s%s", 
-        new String(Character.toChars(parser.getEscChar())), name));
+      return parser.string(toString(parser));
    }
 
    public void process(TeXParser parser, TeXObjectList list)
@@ -80,6 +106,21 @@ public class Par extends AbstractTeXObject
       return true;
    }
 
-   private String name;
+   public void add(WhiteSpace space)
+   {
+      spaces.add(space);
+   }
+
+   public void add(SkippedSpaces skipped)
+   {
+      spaces.addAll(skipped.getContents());
+   }
+
+   public Vector<WhiteSpace> getContents()
+   {
+      return spaces;
+   }
+
+   Vector<WhiteSpace> spaces;
 }
 
