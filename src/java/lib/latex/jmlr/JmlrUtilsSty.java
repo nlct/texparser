@@ -311,7 +311,7 @@ public class JmlrUtilsSty extends LaTeXSty
          "@theorempostheader");
 
       if (counter != null 
-            && getParser().getSettings().getRegister("c@"+counter) == null)
+            && !getParser().getScoping().isControlSequenceDefined("c@"+counter))
       {
          getListener().newcounter(counter, outerCounter);
       }

@@ -69,13 +69,14 @@ public class L2LMathGroup extends MathGroup
 
       String endDelim;
 
-      TeXMode orgMode = parser.getSettings().getCurrentMode();
+      Scoping scoping = parser.getScoping();
+      TeXMode orgMode = scoping.getCurrentSettings().getCurrentMode();
 
       if (isInLine())
       {
          endDelim = (closeDelim == null ? delim : closeDelim);
          delim = (openDelim == null ? delim : openDelim);
-         parser.getSettings().setMode(TeXMode.INLINE_MATH);
+         scoping.setMode(TeXMode.INLINE_MATH);
       }
       else
       {
@@ -108,7 +109,7 @@ public class L2LMathGroup extends MathGroup
                 orgDelim+argStr+orgDelim, delim+argStr+endDelim);
          }
 
-         parser.getSettings().setMode(TeXMode.DISPLAY_MATH);
+         scoping.setMode(TeXMode.DISPLAY_MATH);
       }
 
       writeable.write(delim);
@@ -160,7 +161,7 @@ public class L2LMathGroup extends MathGroup
          }
       }
 
-      parser.getSettings().setMode(orgMode);
+      scoping.setMode(orgMode);
 
       writeable.write(endDelim);
 

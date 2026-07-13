@@ -49,10 +49,10 @@ public class RelScale extends FontSizeDeclaration
       float factor = TeXParserUtils.toFloat(arg, parser, stack);
 
       TeXParserListener listener = parser.getListener();
-      TeXSettings settings = parser.getSettings();
-      orgSize = settings.getCurrentFontSize();
+      Scoping scoping = parser.getScoping();
+      orgSize = scoping.getCurrentSettings().getCurrentFontSize();
 
-      TeXDimension dim = settings.getFontDimension();
+      TeXDimension dim = scoping.getFontDimension();
 
       if (dim == null)
       {
@@ -61,7 +61,7 @@ public class RelScale extends FontSizeDeclaration
 
       dim = new UserDimension(dim.getValue()*factor, dim.getUnit());
 
-      settings.setUserFontSize(dim);
+      scoping.setUserFontSize(dim);
 
       if (listener instanceof L2HConverter)
       {

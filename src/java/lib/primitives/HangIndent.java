@@ -48,7 +48,7 @@ public class HangIndent extends Primitive implements Expandable,InternalQuantity
    public TeXObject getQuantity(TeXParser parser, TeXObjectList stack)
     throws IOException
    {
-      TeXDimension dim = parser.getSettings().getCurrentHangIndent();
+      TeXDimension dim = parser.getScoping().getHangIndent();
 
       if (dim == null)
       {
@@ -70,7 +70,7 @@ public class HangIndent extends Primitive implements Expandable,InternalQuantity
            TeXSyntaxException.ERROR_DIMEN_EXPECTED);
       }
 
-      parser.getSettings().setHangIndent((TeXDimension)quantity);
+      parser.getScoping().setHangIndent((TeXDimension)quantity);
    }
 
    @Override
@@ -89,14 +89,14 @@ public class HangIndent extends Primitive implements Expandable,InternalQuantity
    {
       popModifier(parser, stack, '=');
       TeXDimension dim = stack.popDimension(parser);
-      parser.getSettings().setHangIndent(dim);
+      parser.getScoping().setHangIndent(dim);
 
       Paragraph par = parser.getListener().createParagraph();
       par.setLeftMargin(dim);
 
       par.build(parser, stack);
 
-      parser.getSettings().setHangIndent(null);
+      parser.getScoping().setHangIndent(null);
 
       TeXObjectList list = parser.getListener().createStack();
       list.add(par);
@@ -109,14 +109,14 @@ public class HangIndent extends Primitive implements Expandable,InternalQuantity
    {
       popModifier(parser, parser, '=');
       TeXDimension dim = parser.popDimension();
-      parser.getSettings().setHangIndent(dim);
+      parser.getScoping().setHangIndent(dim);
 
       Paragraph par = parser.getListener().createParagraph();
       par.setLeftMargin(dim);
 
       par.build(parser, parser);
 
-      parser.getSettings().setHangIndent(null);
+      parser.getScoping().setHangIndent(null);
 
       TeXObjectList list = parser.getListener().createStack();
       list.add(par);
@@ -143,14 +143,14 @@ public class HangIndent extends Primitive implements Expandable,InternalQuantity
    {
       popModifier(parser, stack, '=');
       TeXDimension dim = stack.popDimension(parser);
-      parser.getSettings().setHangIndent(dim);
+      parser.getScoping().setHangIndent(dim);
 
       Paragraph par = parser.getListener().createParagraph();
       par.setLeftMargin(dim);
 
       par.build(parser, stack);
 
-      parser.getSettings().setHangIndent(null);
+      parser.getScoping().setHangIndent(null);
       stack.push(par);
    }
 
@@ -160,14 +160,14 @@ public class HangIndent extends Primitive implements Expandable,InternalQuantity
    {
       popModifier(parser, parser, '=');
       TeXDimension dim = parser.popDimension();
-      parser.getSettings().setHangIndent(dim);
+      parser.getScoping().setHangIndent(dim);
 
       Paragraph par = parser.getListener().createParagraph();
       par.setLeftMargin(dim);
 
       par.build(parser, parser);
 
-      parser.getSettings().setHangIndent(null);
+      parser.getScoping().setHangIndent(null);
       parser.push(par);
    }
 }

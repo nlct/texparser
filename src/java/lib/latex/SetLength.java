@@ -74,14 +74,7 @@ public class SetLength extends ControlSequence
 
          String csname = ((ControlSequence)obj).getName();
 
-         if (getPrefix() == PREFIX_GLOBAL)
-         {
-            parser.getSettings().globalSetRegister(csname, value);
-         }
-         else
-         {
-            parser.getSettings().localSetRegister(csname, value);
-         }
+         parser.getScoping().setRegister(getPrefix() != PREFIX_GLOBAL, csname, value);
       }
    }
 

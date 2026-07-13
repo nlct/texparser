@@ -50,7 +50,7 @@ public class ExampleFileBaseName extends Command
    {
       TeXParserListener listener = parser.getListener();
 
-      NumericRegister reg = parser.getSettings().getNumericRegister("c@example");
+      NumericRegister reg = parser.getScoping().getNumericRegister("c@example");
 
       if (reg == null)
       {

@@ -56,7 +56,7 @@ public class DataToolBaseSty extends LaTeXSty
    {
       TeXParser parser = getListener().getParser();
 
-      sortCountReg = parser.getSettings().newcount(false, "dtl@sortresult");
+      sortCountReg = registerNewCountRegister("dtl@sortresult");
       NewIf.createConditional(true, parser, "ifDTLlistskipempty", true);
 
       registerControlSequence(new LaTeX3Boolean(PARSE_DATETIME_BOOL, false));

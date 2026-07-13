@@ -85,14 +85,14 @@ public class FontEncodingCs extends Declaration
    public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      TeXSettings settings = parser.getSettings();
-      orgEncoding = settings.getCurrentFontEncoding();
+      Scoping scoping = parser.getScoping();
+      orgEncoding = scoping.getCurrentSettings().getCurrentFontEncoding();
 
       String encName = popLabelString(parser, stack);
 
       FontEncoding newEncoding = sty.getEncoding(encName);
 
-      settings.setFontEncoding(newEncoding);
+      scoping.setFontEncoding(newEncoding);
    }
 
    @Override
@@ -105,8 +105,7 @@ public class FontEncodingCs extends Declaration
    @Override
    public void end(TeXParser parser, TeXObjectList stack) throws IOException
    {
-      TeXSettings settings = parser.getSettings();
-      settings.setFontEncoding(orgEncoding);
+      parser.getScoping().setFontEncoding(orgEncoding);
    }
 
    @Override

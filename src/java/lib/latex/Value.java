@@ -56,7 +56,7 @@ public class Value extends Command
 
       String name = counter.toString(parser);
 
-      NumericRegister reg = parser.getSettings().getNumericRegister("c@"+name);
+      NumericRegister reg = parser.getScoping().getNumericRegister("c@"+name);
 
       if (reg == null)
       {
@@ -88,7 +88,7 @@ public class Value extends Command
 
       String name = counter.toString(parser);
 
-      NumericRegister reg = parser.getSettings().getNumericRegister("c@"+name);
+      NumericRegister reg = parser.getScoping().getNumericRegister("c@"+name);
 
       if (reg == null)
       {
@@ -120,7 +120,7 @@ public class Value extends Command
 
       String name = counter.toString(parser);
 
-      NumericRegister reg = parser.getSettings().getNumericRegister("c@"+name);
+      NumericRegister reg = parser.getScoping().getNumericRegister("c@"+name);
 
       if (reg == null)
       {
@@ -152,7 +152,7 @@ public class Value extends Command
 
       String name = counter.toString(parser);
 
-      NumericRegister reg = parser.getSettings().getNumericRegister("c@"+name);
+      NumericRegister reg = parser.getScoping().getNumericRegister("c@"+name);
 
       if (reg == null)
       {

@@ -160,26 +160,25 @@ public class DTLdisplaydb extends Command
       parser.putControlSequence(true, new SequenceCommand(
        DataToolSty.COLUMN_INDEXES_SEQ, colIndexes));
 
-      parser.getSettings().localSetRegister(
+      Scoping scoping = parser.getScoping();
+
+      scoping.setRegister(true,
         DataToolSty.MAX_COLS_INT,
         new UserNumber(colIndexes.size()));
 
-      NumericRegister maxColsReg = parser.getSettings().getNumericRegister(
+      NumericRegister maxColsReg = parser.getScoping().getNumericRegister(
         DataToolSty.MAX_COLS_INT);
 
-      parser.getSettings().localSetRegister("dtlcolumnnum", UserNumber.ZERO);
-      parser.getSettings().localSetRegister("dtlrownum", UserNumber.ZERO);
+      scoping.setRegister(true, "dtlcolumnnum", UserNumber.ZERO);
+      scoping.setRegister(true, "dtlrownum", UserNumber.ZERO);
 
-      NumericRegister colNumReg =
-        parser.getSettings().getNumericRegister("dtlcolumnnum");
-      NumericRegister rowNumReg =
-        parser.getSettings().getNumericRegister("dtlrownum");
+      NumericRegister colNumReg = scoping.getNumericRegister("dtlcolumnnum");
+      NumericRegister rowNumReg = scoping.getNumericRegister("dtlrownum");
 
-      parser.getSettings().localSetRegister(DataToolSty.ROW_IDX_INT,
-        UserNumber.ZERO);
+      scoping.setRegister(true, DataToolSty.ROW_IDX_INT, UserNumber.ZERO);
 
       NumericRegister tabRowNumReg =
-        parser.getSettings().getNumericRegister(DataToolSty.ROW_IDX_INT);
+        scoping.getNumericRegister(DataToolSty.ROW_IDX_INT);
 
       TokenListCommand userAlign = listener.getTokenListCommand(
         DataToolSty.USER_ALIGN, stack);

@@ -75,13 +75,13 @@ public class XColorSty extends LaTeXSty
       if (loadX11 || loadSvg)
       {
          UndefAction orgAction = listener.getUndefinedAction();
-         int orgCatCode = getParser().getCatCode('@');
+         CategoryCode orgCatCode = getParser().getCategoryCode('@');
 
          TeXObjectList substack = getListener().createStack();
 
          substack.add(new TeXParserSetUndefAction(UndefAction.WARN));
 
-         if (orgCatCode != TeXParser.TYPE_LETTER)
+         if (orgCatCode != CategoryCode.LETTER)
          {
             substack.add(listener.getControlSequence("makeatletter"));
          }
@@ -102,12 +102,12 @@ public class XColorSty extends LaTeXSty
             loadX11 = false;
          }
 
-         if (orgCatCode != TeXParser.TYPE_LETTER)
+         if (orgCatCode != CategoryCode.LETTER)
          {
             substack.add(listener.getControlSequence("catcode"));
             substack.add(new UserNumber((int)'@'));
             substack.add(listener.getOther('='));
-            substack.add(new UserNumber(orgCatCode));
+            substack.add(new UserNumber(orgCatCode.getId()));
          }
 
          substack.add(new TeXParserSetUndefAction(orgAction));

@@ -63,23 +63,23 @@ public class L2HTableOfContents extends ListOf
       }
       else
       {
-         reg = parser.getSettings().newcount(true, "@curr@toclevel@chapter");
+         reg = parser.getScoping().newcount("@curr@toclevel@chapter");
          reg.setValue(++level);
       }
 
-      reg = parser.getSettings().newcount(true, "@curr@toclevel@section");
+      reg = parser.getScoping().newcount("@curr@toclevel@section");
       reg.setValue(++level);
 
-      reg = parser.getSettings().newcount(true, "@curr@toclevel@subsection");
+      reg = parser.getScoping().newcount("@curr@toclevel@subsection");
       reg.setValue(++level);
 
-      reg = parser.getSettings().newcount(true, "@curr@toclevel@subsubsection");
+      reg = parser.getScoping().newcount("@curr@toclevel@subsubsection");
       reg.setValue(++level);
 
-      reg = parser.getSettings().newcount(true, "@curr@toclevel@paragraph");
+      reg = parser.getScoping().newcount("@curr@toclevel@paragraph");
       reg.setValue(++level);
 
-      reg = parser.getSettings().newcount(true, "@curr@toclevel@subparagraph");
+      reg = parser.getScoping().newcount("@curr@toclevel@subparagraph");
       reg.setValue(++level);
 
       listener.stepcounter(counter);
@@ -125,8 +125,7 @@ public class L2HTableOfContents extends ListOf
       stack.push(listener.getOther('*'));
       stack.push(cs);
 
-      reg = parser.getSettings().newcount(true, "@curr@toclevel");
-      reg.setValue(-1);
+      parser.getScoping().newcount("@curr@toclevel", -1);
 
       listener.setCurrentBlockType(DocumentBlockType.BODY);
    }

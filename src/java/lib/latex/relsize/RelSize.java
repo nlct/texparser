@@ -81,9 +81,9 @@ public class RelSize extends FontSizeDeclaration
          }
       }
 
-      TeXSettings settings = parser.getSettings();
+      Scoping scoping = parser.getScoping();
 
-      orgSize = settings.getCurrentFontSize();
+      orgSize = scoping.getCurrentSettings().getCurrentFontSize();
 
       TeXFontSize newSize = size.deriveRelative((int)Math.round(step));
 
@@ -91,7 +91,7 @@ public class RelSize extends FontSizeDeclaration
 
       if (newSize == null)
       {
-         TeXDimension dim = settings.getFontDimension();
+         TeXDimension dim = scoping.getFontDimension();
 
          if (dim == null)
          {
@@ -102,13 +102,13 @@ public class RelSize extends FontSizeDeclaration
 
          dim = new UserDimension(Math.max(1, pt+step), FixedUnit.PT);
 
-         settings.setUserFontSize(dim);
+         scoping.setUserFontSize(dim);
 
          font.setSize(dim);
       }
       else
       {
-         settings.setFontSize(newSize);
+         scoping.setFontSize(newSize);
          font.setSize(newSize);
       }
 

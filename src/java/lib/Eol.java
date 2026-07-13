@@ -84,10 +84,10 @@ public class Eol extends WhiteSpace
       if (parser.isDebugMode(TeXParser.DEBUG_PROCESSING))
       {
          parser.logMessage("PROCESSING "+toString()
-          +" obey="+obey+" font family: "+parser.getSettings().getFontFamily());
+          +" obey="+obey+" font family: "+parser.getScoping().getFontFamily());
       }
 
-      if (obey || parser.getSettings().getFontFamily() == TeXFontFamily.VERB)
+      if (obey || parser.getScoping().inVerbatim())
       {
           parser.getListener().getWriteable().write(eol);
       }

@@ -45,7 +45,7 @@ public class ParSkip extends Primitive implements InternalQuantity
    public TeXObject getQuantity(TeXParser parser, TeXObjectList stack)
     throws IOException
    {
-      TeXDimension dim = parser.getSettings().getCurrentParSkip();
+      TeXDimension dim = parser.getScoping().getParSkip();
 
       if (dim == null)
       {
@@ -67,7 +67,7 @@ public class ParSkip extends Primitive implements InternalQuantity
            TeXSyntaxException.ERROR_DIMEN_EXPECTED);
       }
 
-      parser.getSettings().setParSkip((TeXDimension)quantity);
+      parser.getScoping().setParSkip((TeXDimension)quantity);
    }
 
    @Override
@@ -76,7 +76,7 @@ public class ParSkip extends Primitive implements InternalQuantity
    {
       popModifier(parser, stack, '=');
       TeXDimension dim = stack.popDimension(parser);
-      parser.getSettings().setParSkip(dim);
+      parser.getScoping().setParSkip(dim);
    }
 
    @Override
@@ -85,6 +85,6 @@ public class ParSkip extends Primitive implements InternalQuantity
    {
       popModifier(parser, parser, '=');
       TeXDimension dim = parser.popDimension();
-      parser.getSettings().setParSkip(dim);
+      parser.getScoping().setParSkip(dim);
    }
 }

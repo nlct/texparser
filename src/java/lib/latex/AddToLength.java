@@ -88,14 +88,7 @@ public class AddToLength extends ControlSequence
 
          String csname = ((ControlSequence)obj).getName();
 
-         if (getPrefix() == PREFIX_GLOBAL)
-         {
-            parser.getSettings().globalAdvanceRegister(csname, incr);
-         }
-         else
-         {
-            parser.getSettings().localAdvanceRegister(csname, incr);
-         }
+         parser.getScoping().advanceRegister(getPrefix() != PREFIX_GLOBAL, csname, incr);
       }
    }
 

@@ -46,7 +46,7 @@ public class L2HAlignRow extends AlignRow
    @Override
    protected void startRow(TeXParser parser, TeXObjectList stack) throws IOException
    {// don't push onto stack
-      hlines = new int[parser.getSettings().getAlignmentColumnCount()];
+      hlines = new int[parser.getScoping().getAlignmentColumnCount()];
 
       for (int i = 0; i < hlines.length; i++)
       {
@@ -145,7 +145,7 @@ public class L2HAlignRow extends AlignRow
    public TeXDimension getDefaultColSep(TeXParser parser)
     throws TeXSyntaxException
    {
-      Register reg = parser.getSettings().getRegister("tabcolsep");
+      Register reg = parser.getScoping().getRegister("tabcolsep");
 
       if (reg == null || !(reg instanceof DimenRegister))
       {
@@ -179,7 +179,7 @@ public class L2HAlignRow extends AlignRow
          default: css.put("border-right", "double");
       }
 
-      int currentColumn = parser.getSettings().getAlignmentColumn();
+      int currentColumn = parser.getScoping().getAlignmentColumn();
 
       switch (hlines[currentColumn-1])
       {

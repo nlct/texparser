@@ -48,11 +48,11 @@ public class BigOperator extends MathSymbol
 
    public void write(TeXParser parser) throws IOException
    {
-      TeXSettings settings = parser.getSettings();
+      Scoping scoping = parser.getScoping();
 
       int cp;
 
-      switch (settings.getMode())
+      switch (scoping.getMode())
       {
          case INLINE_MATH:
             cp = getCharCode();
@@ -68,7 +68,7 @@ public class BigOperator extends MathSymbol
 
       TeXParserListener listener = parser.getListener();
 
-      int c = settings.getCharCode(cp);
+      int c = scoping.getCharCode(cp);
 
       listener.getWriteable().writeCodePoint(c == -1 ? cp : c);
    }

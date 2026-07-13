@@ -69,7 +69,7 @@ public class Footnote extends ControlSequence
       {
          String registerName = String.format("c@%s", counter);
 
-         reg = parser.getSettings().getNumericRegister(registerName);
+         reg = parser.getScoping().getNumericRegister(registerName);
 
          if (reg == null)
          {
@@ -147,7 +147,7 @@ public class Footnote extends ControlSequence
       {
          String registerName = String.format("c@%s", counter);
 
-         reg = parser.getSettings().getNumericRegister(registerName);
+         reg = parser.getScoping().getNumericRegister(registerName);
 
          if (reg == null)
          {

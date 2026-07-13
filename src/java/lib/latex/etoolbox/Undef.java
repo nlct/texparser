@@ -61,7 +61,7 @@ public class Undef extends AbstractEtoolBoxCommand
       ControlSequence cs = popCsArg(parser, stack);
       String csname = cs.getName();
 
-      parser.removeControlSequence(!isGlobal, csname);
+      parser.undefControlSequence(!isGlobal, csname);
    }
 
    @Override

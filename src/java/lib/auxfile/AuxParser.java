@@ -100,10 +100,10 @@ public class AuxParser extends DefaultTeXParserListener
          this.charset=charset;
       }
 
-      int code = parser.getCatCode('@');
-      parser.setCatCode('@', TeXParser.TYPE_LETTER);
+      CategoryCode catCode = parser.getCategoryCode('@');
+      parser.setCategoryCode('@', CategoryCode.LETTER);
       parser.parse(auxFile);
-      parser.setCatCode('@', code);
+      parser.setCategoryCode('@', catCode);
    }
 
    public String getLabelPrefix()

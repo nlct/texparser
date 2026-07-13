@@ -90,11 +90,16 @@ public class Letter extends CharObject implements CaseChangeable
       return new Letter(getCharCode());
    }
 
-   @Override
+   @Deprecated
    public int getCatCode()
    {
       return TeXParser.TYPE_LETTER;
    }
 
+   @Override
+   public CategoryCode getCategoryCode()
+   {
+      return CategoryCode.LETTER;
+   }
 }
 

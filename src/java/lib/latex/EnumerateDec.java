@@ -58,9 +58,9 @@ public class EnumerateDec extends ListDec
    {
       super.setup(parser, stack);
 
-      TeXSettings settings = parser.getSettings();
+      Scoping scoping = parser.getScoping();
 
-      NumericRegister enumdepth = settings.globalAdvanceRegister("@enumdepth",
+      NumericRegister enumdepth = scoping.globalAdvanceRegister("@enumdepth",
          LaTeXParserListener.ONE);
 
       String enumctrstr = "enum"
@@ -91,9 +91,7 @@ public class EnumerateDec extends ListDec
    public void end(TeXParser parser, TeXObjectList stack)
     throws IOException
    {
-      TeXSettings settings = parser.getSettings();
-
-      Register enumdepth = settings.globalAdvanceRegister("@enumdepth",
+      Register enumdepth = parser.getScoping().globalAdvanceRegister("@enumdepth",
          LaTeXParserListener.MINUS_ONE);
 
       super.end(parser, stack);

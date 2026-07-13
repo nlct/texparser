@@ -96,13 +96,15 @@ public class NewAcronym extends NewGlossaryEntry
       keyValList.put("short", shortArg);
       keyValList.put("long", longArg);
 
-      TokenRegister reg = parser.getSettings().getTokenRegister("glslabeltok");
+      Scoping scoping = parser.getScoping();
+
+      TokenRegister reg = scoping.getTokenRegister("glslabeltok");
       reg.setContents(parser, parser.getListener().createString(label));
 
-      reg = parser.getSettings().getTokenRegister("glsshorttok");
+      reg = scoping.getTokenRegister("glsshorttok");
       reg.setContents(parser, (TeXObject)shortArg.clone());
 
-      reg = parser.getSettings().getTokenRegister("glslongtok");
+      reg = scoping.getTokenRegister("glslongtok");
       reg.setContents(parser, (TeXObject)longArg.clone());
 
       if (sty.isExtra())
@@ -180,7 +182,7 @@ public class NewAcronym extends NewGlossaryEntry
 
       if (sty.isExtra())
       {
-         reg = parser.getSettings().getTokenRegister("glsshortpltok");
+         reg = scoping.getTokenRegister("glsshortpltok");
          reg.setContents(parser, (TeXObject)shortPluralArg.clone());
       }
 
@@ -200,7 +202,7 @@ public class NewAcronym extends NewGlossaryEntry
 
       if (sty.isExtra())
       {
-         reg = parser.getSettings().getTokenRegister("glslongpltok");
+         reg = scoping.getTokenRegister("glslongpltok");
          reg.setContents(parser, (TeXObject)longPluralArg.clone());
       }
 

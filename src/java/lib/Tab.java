@@ -49,10 +49,16 @@ public class Tab extends AbstractTeXObject implements SingleToken
       return charCode;
    }
 
-   @Override
+   @Deprecated
    public int getCatCode()
    {
       return TeXParser.TYPE_TAB;
+   }
+
+   @Override
+   public CategoryCode getCategoryCode()
+   {
+      return CategoryCode.TAB;
    }
 
    @Override
@@ -94,9 +100,7 @@ public class Tab extends AbstractTeXObject implements SingleToken
    public void process(TeXParser parser)
      throws IOException
    {
-      TeXSettings settings = parser.getSettings();
-
-      settings.startColumn();
+      parser.getScoping().startColumn();
    }
 
    protected int charCode;

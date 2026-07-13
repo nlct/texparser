@@ -46,7 +46,7 @@ public class MakeAtOther extends ControlSequence
    public void applyCatCodeChange(TeXParser parser)
       throws IOException
    {
-      parser.setCatCode(true, '@', TeXParser.TYPE_OTHER);
+      parser.setCategoryCode(true, '@', CategoryCode.OTHER);
    }
 
    @Override

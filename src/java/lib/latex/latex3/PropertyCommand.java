@@ -142,17 +142,17 @@ public class PropertyCommand<T> extends ControlSequence implements L3StorageComm
       }
       else if (cs instanceof PropertyCommand)
       {
-         TeXSettings settings = parser.getSettings();
+         Scoping scoping = parser.getScoping();
 
          String csname = cs.getName();
 
          if (editable && csname.startsWith("l_")
-               && !settings.isDefinedInCurrentScope(csname))
+               && !scoping.isControlSequenceDefined(csname))
          {
             @SuppressWarnings("unchecked")
             PropertyCommand<T> pc = (PropertyCommand<T>)cs.clone();
             propCs = pc;
-            settings.putControlSequence(propCs);
+            parser.putControlSequence(true, propCs);
          }
          else
          {

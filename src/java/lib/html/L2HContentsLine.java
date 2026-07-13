@@ -57,13 +57,13 @@ public class L2HContentsLine extends ContentsLine
       TeXObjectList list = new TeXObjectList();
 
       L2HConverter listener = (L2HConverter)parser.getListener();
-      TeXSettings settings = parser.getSettings();
+      Scoping scoping = parser.getScoping();
 
-      CountRegister reg = (CountRegister)settings.getNumericRegister("@curr@toclevel@"+typeStr);
+      CountRegister reg = (CountRegister)scoping.getNumericRegister("@curr@toclevel@"+typeStr);
 
       if (reg == null && typeStr.equals("part"))
       {// use chapter register instead
-         reg = (CountRegister)settings.getNumericRegister("@curr@toclevel@chapter");
+         reg = (CountRegister)scoping.getNumericRegister("@curr@toclevel@chapter");
       }
 
       L2HItem startItem;
@@ -83,7 +83,7 @@ public class L2HContentsLine extends ContentsLine
       else
       {
          currLevel = reg.number(parser);
-         reg = (CountRegister)settings.getNumericRegister("@curr@toclevel");
+         reg = (CountRegister)scoping.getNumericRegister("@curr@toclevel");
          prevLevel = reg.number(parser);
          reg.setValue(currLevel);
 

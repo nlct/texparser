@@ -28,7 +28,7 @@ public class CharSetCatCodeNN extends ControlSequence
 {
    public CharSetCatCodeNN()
    {
-      this("CharSetCatCodeNN");
+      this("char_set_catcode:nn");
    }
 
    public CharSetCatCodeNN(String name)
@@ -46,9 +46,32 @@ public class CharSetCatCodeNN extends ControlSequence
    public void applyCatCodeChange(TeXParser parser) throws IOException
    {
       Numerical cp = TeXParserUtils.popNumericalArg(parser, parser);
-      Numerical cat = TeXParserUtils.popNumericalArg(parser, parser);
+      Numerical cat = TeXParserUtils.popNumericalArg(parser, parser, true);
 
-      parser.setCatCode(true, cp.number(parser), cat.number(parser));
+      int catCodeId = cat.number(parser);
+      CategoryCode catCode;
+
+      try
+      {
+         catCode = CategoryCode.valueOf(catCodeId);
+      }
+      catch (IllegalArgumentException e)
+      {
+         try
+         {
+            throw new TeXSyntaxException(e, parser,
+             TeXSyntaxException.ERROR_INVALID_CAT_CODE, catCodeId);
+         }
+         catch (TeXSyntaxException tse)
+         {
+            parser.getTeXApp().error(tse);
+         }
+
+         catCode = CategoryCode.ESC;
+         cat = UserNumber.ZERO;
+      }
+
+      parser.setCategoryCode(true, cp.number(parser), catCode);
 
       parser.push(TeXParserUtils.createGroup(parser, cat));
       parser.push(TeXParserUtils.createGroup(parser, cp));
@@ -59,9 +82,30 @@ public class CharSetCatCodeNN extends ControlSequence
      throws IOException
    {
       int cp = TeXParserUtils.popInt(parser, stack);
-      int cat = TeXParserUtils.popInt(parser, stack);
+      int catCodeId = TeXParserUtils.popInt(parser, stack, true);
 
-      parser.setCatCode(true, cp, cat);
+      CategoryCode catCode;
+
+      try
+      {
+         catCode = CategoryCode.valueOf(catCodeId);
+      }
+      catch (IllegalArgumentException e)
+      {
+         try
+         {
+            throw new TeXSyntaxException(e, parser,
+             TeXSyntaxException.ERROR_INVALID_CAT_CODE, catCodeId);
+         }
+         catch (TeXSyntaxException tse)
+         {
+            parser.getTeXApp().error(tse);
+         }
+
+         catCode = CategoryCode.INVALID;
+      }
+
+      parser.setCategoryCode(true, cp, catCode);
    }
 
    @Override

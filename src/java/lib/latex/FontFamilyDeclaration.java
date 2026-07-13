@@ -108,18 +108,17 @@ public class FontFamilyDeclaration extends Declaration
    @Override
    public void process(TeXParser parser, TeXObjectList stack) throws IOException
    {
-      TeXSettings settings = parser.getSettings();
+      Scoping scoping = parser.getScoping();
 
-      orgFamily = settings.getCurrentFontFamily();
+      orgFamily = scoping.getCurrentSettings().getCurrentFontFamily();
 
-      settings.setFontFamily(family);
+      scoping.setFontFamily(family);
    }
 
    @Override
    public void end(TeXParser parser, TeXObjectList stack) throws IOException
    {
-      TeXSettings settings = parser.getSettings();
-      settings.setFontFamily(orgFamily);
+      parser.getScoping().setFontFamily(orgFamily);
    }
 
    @Override

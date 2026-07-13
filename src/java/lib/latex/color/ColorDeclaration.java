@@ -106,17 +106,18 @@ public class ColorDeclaration extends Declaration
 
       Color color = sty.getColor(parser, modelName, value);
 
-      TeXSettings settings = parser.getSettings();
+      Scoping scoping = parser.getScoping();
+      TeXSettings settings = scoping.getCurrentSettings();
 
       if (isFg)
       {
          orgColor = settings.getCurrentFgColor();
-         settings.setFgColor(color);
+         scoping.setFgColor(color);
       }
       else
       {
          orgColor = settings.getCurrentBgColor();
-         settings.setBgColor(color);
+         scoping.setBgColor(color);
       }
 
       ((LaTeXParserListener)parser.getListener()).startColor(color, isFg);
@@ -127,15 +128,15 @@ public class ColorDeclaration extends Declaration
    {
       ((LaTeXParserListener)parser.getListener()).endColor(isFg);
 
-      TeXSettings settings = parser.getSettings();
+      Scoping scoping = parser.getScoping();
 
       if (isFg)
       {
-         settings.setFgColor(orgColor);
+         scoping.setFgColor(orgColor);
       }
       else
       {
-         settings.setBgColor(orgColor);
+         scoping.setBgColor(orgColor);
       }
    }
 

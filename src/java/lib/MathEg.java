@@ -49,10 +49,16 @@ public class MathEg extends EgChar implements Expandable,MultiToken
       return isInLine();
    }
 
-   @Override
+   @Deprecated
    public int getCatCode()
    {
       return TeXParser.TYPE_MATH;
+   }
+
+   @Override
+   public CategoryCode getCategoryCode()
+   {
+      return CategoryCode.MATH;
    }
 
    @Override
@@ -60,11 +66,11 @@ public class MathEg extends EgChar implements Expandable,MultiToken
    {
       TeXObjectList list = new TeXObjectList();
 
-      list.add(new SpecialToken(this, getCharCode(), TeXParser.TYPE_MATH));
+      list.add(new SpecialToken(this, getCharCode(), CategoryCode.MATH));
 
       if (!isInLine())
       {
-         list.add(new SpecialToken(this, getCharCode(), TeXParser.TYPE_MATH));
+         list.add(new SpecialToken(this, getCharCode(), CategoryCode.MATH));
       }
 
       return list;
@@ -77,7 +83,7 @@ public class MathEg extends EgChar implements Expandable,MultiToken
       TeXObject obj = TeXParserUtils.peek(parser, stack, TeXObjectList.POP_SHORT);
 
       if (obj.isSingleToken()
-            && ((SingleToken)obj).getCatCode() == TeXParser.TYPE_MATH)
+            && ((SingleToken)obj).getCategoryCode() == CategoryCode.MATH)
       {
          isinline = true;
 
@@ -98,7 +104,7 @@ public class MathEg extends EgChar implements Expandable,MultiToken
    {
       TeXObjectList list = new TeXObjectList(1);
       list.add(this);
-      parser.getSettings().setMode(TeXMode.INHERIT);
+      parser.getScoping().setMode(TeXMode.INHERIT);
 
       if (parser.isDebugMode(TeXParser.DEBUG_SETTINGS))
       {

@@ -46,7 +46,7 @@ public class GlsTableStyleName extends ControlSequence
    {
       TeXParserListener listener = parser.getListener();
 
-      parser.getSettings().localSetRegister("glstablecolsperblock", UserNumber.ONE);
+      parser.getScoping().setRegister(true, "glstablecolsperblock", UserNumber.ONE);
 
       // \glstableinitlengthupdates
 

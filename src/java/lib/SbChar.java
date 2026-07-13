@@ -56,6 +56,12 @@ public class SbChar extends Macro implements SingleToken
    }
 
    @Override
+   public CategoryCode getCategoryCode()
+   {
+      return CategoryCode.SB;
+   }
+
+   @Deprecated
    public int getCatCode()
    {
       return TeXParser.TYPE_SB;

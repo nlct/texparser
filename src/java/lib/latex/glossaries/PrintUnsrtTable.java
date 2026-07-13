@@ -50,14 +50,14 @@ public class PrintUnsrtTable extends ControlSequence
      TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      TeXSettings settings = parser.getSettings();
+      Scoping scoping = parser.getScoping();
       TeXParserListener listener = parser.getListener();
 
       Vector<GlsLabel> labelList = new Vector<GlsLabel>();
 
       ControlSequence filterCs = listener.getControlSequence("glstableiffilter");
 
-      NumericRegister reg = settings.getNumericRegister("@glsxtr@leveloffset");
+      NumericRegister reg = scoping.getNumericRegister("@glsxtr@leveloffset");
       int levelOffset = reg.number(parser);
 
       for (String label : glossary)
@@ -546,7 +546,7 @@ public class PrintUnsrtTable extends ControlSequence
      TeXObjectList content, TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      TeXSettings settings = parser.getSettings();
+      Scoping scoping = parser.getScoping();
 
       LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
 
@@ -607,7 +607,7 @@ public class PrintUnsrtTable extends ControlSequence
       content.add(new TeXCsRef("tabularnewline"));
       content.add(new TeXCsRef("endhead"));
 
-      NumericRegister reg = settings.getNumericRegister("glstablecurrentblockindex");
+      NumericRegister reg = scoping.getNumericRegister("glstablecurrentblockindex");
       reg.setValue(parser, UserNumber.ONE);
 
       Vector<GlsLabel> labelList = getLabels(glossary, parser, stack);
@@ -626,7 +626,7 @@ public class PrintUnsrtTable extends ControlSequence
       parser.startGroup();
 
       TeXParserListener listener = parser.getListener();
-      TeXSettings settings = parser.getSettings();
+      Scoping scoping = parser.getScoping();
 
       TeXObjectList content = listener.createStack();
 
@@ -650,7 +650,7 @@ public class PrintUnsrtTable extends ControlSequence
       Boolean showCaptionBool = null;
       boolean showCaption = true;
 
-      NumericRegister reg = settings.getNumericRegister("glstableblockperrowcount");
+      NumericRegister reg = scoping.getNumericRegister("glstableblockperrowcount");
       int blocksperrow = reg.number(parser);
 
       TeXObject initCode = parser.getControlSequence("glstable@init");
@@ -827,10 +827,10 @@ public class PrintUnsrtTable extends ControlSequence
           new AtGobble("glstable@groupheading"));
       }
 
-      reg = settings.getNumericRegister("glstablecolsperblock");
+      reg = scoping.getNumericRegister("glstablecolsperblock");
       int colsperblock = reg.number(parser);
 
-      reg = settings.getNumericRegister("glstabletotalcols");
+      reg = scoping.getNumericRegister("glstabletotalcols");
       reg.setValue(parser, new UserNumber(colsperblock * blocksperrow));
 
       if (listener instanceof L2HConverter)

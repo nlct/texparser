@@ -45,15 +45,15 @@ public class ExplSyntaxOn extends ControlSequence
    @Override
    public void applyCatCodeChange(TeXParser parser) throws IOException
    {
-      parser.setCatCode(true, 9, TeXParser.TYPE_IGNORE);
-      parser.setCatCode(true, 32, TeXParser.TYPE_IGNORE);
-      parser.setCatCode(true, 34, TeXParser.TYPE_OTHER);
-      parser.setCatCode(true, 38, TeXParser.TYPE_TAB);
-      parser.setCatCode(true, 58, TeXParser.TYPE_LETTER);
-      parser.setCatCode(true, 94, TeXParser.TYPE_SP);
-      parser.setCatCode(true, 95, TeXParser.TYPE_LETTER);
-      parser.setCatCode(true, 124, TeXParser.TYPE_OTHER);
-      parser.setCatCode(true, 126, TeXParser.TYPE_SPACE);
+      parser.setCategoryCode(true, 9, CategoryCode.IGNORE);
+      parser.setCategoryCode(true, 32, CategoryCode.IGNORE);
+      parser.setCategoryCode(true, 34, CategoryCode.OTHER);
+      parser.setCategoryCode(true, 38, CategoryCode.TAB);
+      parser.setCategoryCode(true, 58, CategoryCode.LETTER);
+      parser.setCategoryCode(true, 94, CategoryCode.SP);
+      parser.setCategoryCode(true, 95, CategoryCode.LETTER);
+      parser.setCategoryCode(true, 124, CategoryCode.OTHER);
+      parser.setCategoryCode(true, 126, CategoryCode.SPACE);
    }
 
    @Override
@@ -67,47 +67,47 @@ public class ExplSyntaxOn extends ControlSequence
       def.add(new TeXCsRef("char_set_catcode:nn"));
       def.add(TeXParserUtils.createGroup(listener, new UserNumber(9)));
       def.add(TeXParserUtils.createGroup(listener, 
-        new UserNumber(parser.getCatCode(9))));
+        new UserNumber(parser.getCategoryCode(9).getId())));
   
       def.add(new TeXCsRef("char_set_catcode:nn"));
       def.add(TeXParserUtils.createGroup(listener, new UserNumber(32)));
       def.add(TeXParserUtils.createGroup(listener, 
-        new UserNumber(parser.getCatCode(32))));
+        new UserNumber(parser.getCategoryCode(32).getId())));
   
       def.add(new TeXCsRef("char_set_catcode:nn"));
       def.add(TeXParserUtils.createGroup(listener, new UserNumber(34)));
       def.add(TeXParserUtils.createGroup(listener, 
-        new UserNumber(parser.getCatCode(34))));
+        new UserNumber(parser.getCategoryCode(34).getId())));
   
       def.add(new TeXCsRef("char_set_catcode:nn"));
       def.add(TeXParserUtils.createGroup(listener, new UserNumber(38)));
       def.add(TeXParserUtils.createGroup(listener, 
-        new UserNumber(parser.getCatCode(38))));
+        new UserNumber(parser.getCategoryCode(38).getId())));
   
       def.add(new TeXCsRef("char_set_catcode:nn"));
       def.add(TeXParserUtils.createGroup(listener, new UserNumber(58)));
       def.add(TeXParserUtils.createGroup(listener, 
-        new UserNumber(parser.getCatCode(58))));
+        new UserNumber(parser.getCategoryCode(58).getId())));
   
       def.add(new TeXCsRef("char_set_catcode:nn"));
       def.add(TeXParserUtils.createGroup(listener, new UserNumber(94)));
       def.add(TeXParserUtils.createGroup(listener, 
-        new UserNumber(parser.getCatCode(94))));
+        new UserNumber(parser.getCategoryCode(94).getId())));
   
       def.add(new TeXCsRef("char_set_catcode:nn"));
       def.add(TeXParserUtils.createGroup(listener, new UserNumber(95)));
       def.add(TeXParserUtils.createGroup(listener, 
-        new UserNumber(parser.getCatCode(95))));
+        new UserNumber(parser.getCategoryCode(95).getId())));
   
       def.add(new TeXCsRef("char_set_catcode:nn"));
       def.add(TeXParserUtils.createGroup(listener, new UserNumber(124)));
       def.add(TeXParserUtils.createGroup(listener, 
-        new UserNumber(parser.getCatCode(124))));
+        new UserNumber(parser.getCategoryCode(124).getId())));
   
       def.add(new TeXCsRef("char_set_catcode:nn"));
       def.add(TeXParserUtils.createGroup(listener, new UserNumber(126)));
       def.add(TeXParserUtils.createGroup(listener, 
-        new UserNumber(parser.getCatCode(126))));
+        new UserNumber(parser.getCategoryCode(126).getId())));
   
       parser.putControlSequence(true, new GenericCommand(true,
        "ExplSyntaxOff", null, def));

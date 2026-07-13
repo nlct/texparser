@@ -90,7 +90,7 @@ public class L2HStringConverter extends L2HConverter
 
       if (atIsLetter)
       {
-         parser.setCatCode('@', TeXParser.TYPE_LETTER);
+         parser.setCategoryCode('@', CategoryCode.LETTER);
       }
 
       parser.parse(new TeXReader(getTeXApp(), str));
@@ -113,7 +113,7 @@ public class L2HStringConverter extends L2HConverter
 
       if (atIsLetter)
       {
-         parser.setCatCode('@', TeXParser.TYPE_LETTER);
+         parser.setCategoryCode('@', CategoryCode.LETTER);
       }
 
       parser.parse(new TeXReader(getTeXApp(), str));

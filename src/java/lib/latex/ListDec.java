@@ -63,9 +63,9 @@ public class ListDec extends TrivListDec
       parser.putControlSequence(true, new GenericCommand(true, "@itemlabel",
          null, labelCs));
 
-      TeXSettings settings = parser.getSettings();
+      Scoping scoping = parser.getScoping();
 
-      NumericRegister listdepth = settings.globalAdvanceRegister("@listdepth",
+      NumericRegister listdepth = scoping.globalAdvanceRegister("@listdepth",
          LaTeXParserListener.ONE);
 
       ControlSequence cs = parser.getControlSequence(String.format("@list%s",
@@ -92,9 +92,7 @@ public class ListDec extends TrivListDec
    public void end(TeXParser parser, TeXObjectList stack)
     throws IOException
    {
-      TeXSettings settings = parser.getSettings();
-
-      Register listdepth = settings.globalAdvanceRegister("@listdepth",
+      Register listdepth = parser.getScoping().globalAdvanceRegister("@listdepth",
          LaTeXParserListener.MINUS_ONE);
 
       super.end(parser, stack);

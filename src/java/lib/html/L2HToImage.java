@@ -153,17 +153,17 @@ public class L2HToImage extends ControlSequence
 
       StringBuilder content = new StringBuilder();
 
-      Color fgCol = parser.getSettings().getFgColor();
-      Color bgCol = parser.getSettings().getBgColor();
+      Color fgCol = parser.getScoping().getFgColor();
+      Color bgCol = parser.getScoping().getBgColor();
 
-      if (fgCol != null && fgCol != Color.BLACK)
+      if (fgCol != null && !fgCol.equals(Color.BLACK))
       {
          content.append(String.format("\\color[rgb]{%0.3f,%0.3f,%0.3f}",
            fgCol.getRed()/255.0f, fgCol.getGreen()/255.0f,
            fgCol.getBlue()/255.0f));
       }
 
-      if (bgCol != null && bgCol != Color.WHITE)
+      if (bgCol != null && !bgCol.equals(Color.WHITE))
       {
          content.append(String.format("\\pagecolor[rgb]{%0.3f,%0.3f,%0.3f}",
            bgCol.getRed()/255.0f, bgCol.getGreen()/255.0f,

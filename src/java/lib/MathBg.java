@@ -50,10 +50,16 @@ public class MathBg extends BgChar implements Expandable,MultiToken
       return isInLine();
    }
 
-   @Override
+   @Deprecated
    public int getCatCode()
    {
       return TeXParser.TYPE_MATH;
+   }
+
+   @Override
+   public CategoryCode getCategoryCode()
+   {
+      return CategoryCode.MATH;
    }
 
    @Override
@@ -61,11 +67,11 @@ public class MathBg extends BgChar implements Expandable,MultiToken
    {
       TeXObjectList list = new TeXObjectList();
 
-      list.add(new SpecialToken(this, getCharCode(), TeXParser.TYPE_MATH));
+      list.add(new SpecialToken(this, getCharCode(), CategoryCode.MATH));
 
       if (!isInLine())
       {
-         list.add(new SpecialToken(this, getCharCode(), TeXParser.TYPE_MATH));
+         list.add(new SpecialToken(this, getCharCode(), CategoryCode.MATH));
       }
 
       return list;
@@ -80,7 +86,7 @@ public class MathBg extends BgChar implements Expandable,MultiToken
       TeXObject obj = TeXParserUtils.peek(parser, stack, popStyle);
 
       if (obj.isSingleToken()
-            && ((SingleToken)obj).getCatCode() == TeXParser.TYPE_MATH)
+            && ((SingleToken)obj).getCategoryCode() == CategoryCode.MATH)
       {
          isinline = true;
 
@@ -102,7 +108,7 @@ public class MathBg extends BgChar implements Expandable,MultiToken
       TeXObjectList list = new TeXObjectList(1);
       list.add(this);
       parser.startGroup();
-      parser.getSettings().setMode(
+      parser.getScoping().setMode(
         isInLine() ? TeXMode.INLINE_MATH : TeXMode.DISPLAY_MATH);
 
       return list;

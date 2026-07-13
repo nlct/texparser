@@ -1050,7 +1050,7 @@ public class GeometrySty extends LaTeXSty
 
       if (dim == null)
       {
-         dim = getParser().getSettings().newdimen(name);
+         dim = getParser().getScoping().newdimen(name);
       }
 
       dim.setDimension(getParser(), newDim);

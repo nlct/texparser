@@ -19,12 +19,27 @@
 package com.dickimawbooks.texparserlib;
 
 import java.awt.Color;
-import java.util.Hashtable;
+
+import java.util.HashMap;
+import java.util.Iterator;
+
+import com.dickimawbooks.texparserlib.primitives.Undefined;
 
 /**
  * Keeps track of a local scope.
- * This class needs replacing with a list as too deeply nested scopes cause a
- * StackOverflow.
+ * The control sequence table contains local control sequence
+ * definitions.
+ *
+ * The active table keeps track of characters that have locally been
+ * made active in the current scope.
+ *
+ * The registers table keeps track of registers that have locally
+ * changed. (All registers should be globally defined.)
+ *
+ * The category codes table keeps track of characters that have had
+ * their category code changed in the current scope.
+ *
+ * The tables are automatically lost when the scope is discarded.
  */
 
 public class TeXSettings
@@ -32,20 +47,18 @@ public class TeXSettings
    private TeXSettings()
    {
       settingsID = ++currentSettingID;
-      activeTable = new Hashtable<Integer,ActiveChar>();
-      csTable = new Hashtable<String,ControlSequence>();
    }
 
    public TeXSettings(TeXParser parser)
    {
-      this(null, parser);
+      this();
+      this.parser = parser;
    }
 
+   @Deprecated
    public TeXSettings(TeXSettings parent, TeXParser parser)
    {
-      this();
-      this.parent = parent;
-      this.parser = parser;
+      this(parser);
    }
 
    public TeXParser getParser()
@@ -58,6 +71,7 @@ public class TeXSettings
       return settingsID;
    }
 
+   @Deprecated
    public TeXSettings getRoot()
    {
       if (parent == null)
@@ -68,6 +82,12 @@ public class TeXSettings
       return parent.getRoot();
    }
 
+   /**
+    * Adds object to after group list.
+    * The after group list is the list of objects to process after
+    * this scope has ended.
+    * @param object the object to go in the after group list
+    */
    public void addAfterGroup(TeXObject object)
    {
       if (afterGroup == null)
@@ -78,28 +98,27 @@ public class TeXSettings
       afterGroup.add(object);
    }
 
+   /**
+    * Gets the after group list.
+    * @return the after group list
+    */
    public TeXObjectList getAfterGroup()
    {
       return afterGroup;
    }
 
+   /**
+    * Gets the mode for this scope.
+    * @return the mode
+    */
    public TeXMode getCurrentMode()
    {
       return currentMode;
    }
 
+   @Deprecated
    public TeXMode getMode()
    {
-      if (currentMode == TeXMode.INHERIT)
-      {
-         if (parent == null)
-         {
-            return TeXMode.TEXT;
-         }
-
-         return parent.getMode();
-      }
-
       return currentMode;
    }
 
@@ -129,16 +148,25 @@ public class TeXSettings
       }
    }
 
-   public void setMode(TeXMode setting)
+   /**
+    * Sets the current mode.
+    * @param newMode the new mode
+    */
+   public void setMode(TeXMode newMode)
    {
-      currentMode = setting;
+      currentMode = newMode;
    }
 
+   /**
+    * Gets the character mapping mode for this scope.
+    * @return the character mapping mode
+    */
    public int getCurrentCharMapMode()
    {
       return currentCharMapMode;
    }
 
+   @Deprecated
    public int getCharMapMode()
    {
       if (currentCharMapMode == INHERIT)
@@ -154,7 +182,16 @@ public class TeXSettings
       return currentCharMapMode;
    }
 
+   /**
+    * Sets the character mapping mode.
+    * @param setting the mapping, which may be one of
+    * {@link #INHERIT},
+    * {@link #CHAR_MAP_ON}, or
+    * {@link #CHAR_MAP_OFF}.
+    * @throws IllegalArgumentException if the setting is invalid
+    */
    public void setCharMapMode(int setting)
+   throws IllegalArgumentException
    {
       if (setting == INHERIT
        || setting == CHAR_MAP_OFF
@@ -168,11 +205,16 @@ public class TeXSettings
           "Invalid argument '%d' for setCharMapMode(int)", setting));
    }
 
+   /**
+    * Gets the font family for this scope.
+    * @return the font family
+    */
    public TeXFontFamily getCurrentFontFamily()
    {
       return currentFontFamily;
    }
 
+   @Deprecated
    public TeXFontFamily getFontFamily()
    {
       if (currentFontFamily == TeXFontFamily.INHERIT)
@@ -188,11 +230,16 @@ public class TeXSettings
       return currentFontFamily;
    }
 
+   /**
+    * Gets the font shape for this scope.
+    * @return the font shape for this scope
+    */ 
    public TeXFontShape getCurrentFontShape()
    {
       return currentFontShape;
    }
 
+   @Deprecated
    public TeXFontShape getFontShape()
    {
       if (currentFontShape == TeXFontShape.INHERIT)
@@ -208,11 +255,16 @@ public class TeXSettings
       return currentFontShape;
    }
 
+   /**
+    * Gets the font weight for this scope.
+    * @return the font weight for this scope
+    */ 
    public TeXFontWeight getCurrentFontWeight()
    {
       return currentFontWeight;
    }
 
+   @Deprecated
    public TeXFontWeight getFontWeight()
    {
       if (currentFontWeight == TeXFontWeight.INHERIT)
@@ -228,11 +280,16 @@ public class TeXSettings
       return currentFontWeight;
    }
 
+   /**
+    * Gets the font size for this scope.
+    * @return the font size for this scope
+    */ 
    public TeXFontSize getCurrentFontSize()
    {
       return currentFontSize;
    }
 
+   @Deprecated
    public TeXFontSize getFontSize()
    {
       if (currentFontSize == TeXFontSize.INHERIT)
@@ -293,6 +350,7 @@ public class TeXSettings
       return currentFontDimension;
    }
 
+   @Deprecated
    public TeXDimension getFontDimension()
    {
       if (currentFontDimension == null)
@@ -308,11 +366,16 @@ public class TeXSettings
       return currentFontDimension;
    }
 
+   /**
+    * Gets the math font for this scope.
+    * @return the math font for this scope
+    */
    public TeXFontMath getCurrentMathFont()
    {
       return currentMathFont;
    }
 
+   @Deprecated
    public TeXFontMath getMathFont()
    {
       if (currentMathFont == TeXFontMath.INHERIT)
@@ -328,11 +391,16 @@ public class TeXSettings
       return currentMathFont;
    }
 
+   /**
+    * Gets the paragraph alignment for this scope.
+    * @return the paragraph alignment for this scope
+    */
    public int getCurrentParAlign()
    {
       return currentParAlign;
    }
 
+   @Deprecated
    public int getParAlign()
    {
       if (currentParAlign == INHERIT)
@@ -348,11 +416,16 @@ public class TeXSettings
       return currentParAlign;
    }
 
+   /**
+    * Gets the alignment mode for this scope.
+    * @return the alignment mode for this scope.
+    */
    public int getCurrentAlignMode()
    {
       return currentAlignMode;
    }
 
+   @Deprecated
    public int getAlignMode()
    {
       if (currentAlignMode == INHERIT)
@@ -368,7 +441,16 @@ public class TeXSettings
       return currentAlignMode;
    }
 
+   /**
+    * Sets the current alignment mode.
+    * @param setting the current align mode, which may be one of:
+    * {@link #ALIGN_MODE_FALSE},
+    * {@link #ALIGN_MODE_TRUE} or
+    * {@link #INHERIT}
+    * @throws IllegalArgumentException if the setting is invalid
+    */
    public void setAlignMode(int setting)
+    throws IllegalArgumentException
    {
       if (setting == INHERIT
        || setting == ALIGN_MODE_FALSE
@@ -383,6 +465,9 @@ public class TeXSettings
           "Invalid argument '%d' for setAlignMode(int)", setting));
    }
 
+   /**
+    * Ends tabular alignment.
+    */
    public void endAlignment()
    {
       setAlignMode(ALIGN_MODE_FALSE);
@@ -390,12 +475,18 @@ public class TeXSettings
       setStartColumnMode(START_COLUMN_MODE_FALSE);
    }
 
+   /**
+    * Starts tabular alignment.
+    */
    public void startAlignment()
    {
       setAlignMode(ALIGN_MODE_TRUE);
       startRow();
    }
 
+   /**
+    * Starts a tabular row.
+    */
    public void startRow()
    {
       setStartRowMode(START_ROW_MODE_TRUE);
@@ -403,16 +494,24 @@ public class TeXSettings
       resetAlignmentColumn();
    }
 
+   /**
+    * Starts a tabular column.
+    */
    public void startColumn()
    {
       setStartColumnMode(START_COLUMN_MODE_TRUE);
    }
 
+   /**
+    * Gets the start row mode for this scope.
+    * @return the start row mode for this scope
+    */
    public int getCurrentStartRowMode()
    {
       return currentStartRowMode;
    }
 
+   @Deprecated
    public int getStartRowMode()
    {
       if (currentStartRowMode == INHERIT)
@@ -428,7 +527,17 @@ public class TeXSettings
       return currentStartRowMode;
    }
 
+   /**
+    * Sets the start row mode for this scope.
+    * The setting may be one of:
+    * {@link #START_ROW_MODE_FALSE},
+    * {@link #START_ROW_MODE_TRUE} or
+    * {@link #INHERIT}
+    * @param setting the start row mode
+    * @throws IllegalArgumentException if the setting is invalid
+    */
    public void setStartRowMode(int setting)
+   throws IllegalArgumentException
    {
       if (setting == INHERIT
        || setting == START_ROW_MODE_FALSE
@@ -449,11 +558,16 @@ public class TeXSettings
           "Invalid argument '%d' for setStartRowMode(int)", setting));
    }
 
+   /**
+    * Gets the start column mode for this scope.
+    * @return the start column mode for this scope
+    */
    public int getCurrentStartColumnMode()
    {
       return currentStartColumnMode;
    }
 
+   @Deprecated
    public int getStartColumnMode()
    {
       if (currentStartColumnMode == INHERIT)
@@ -469,6 +583,15 @@ public class TeXSettings
       return currentStartColumnMode;
    }
 
+   /**
+    * Sets the start column mode for this scope.
+    * The setting may be one of:
+    * {@link #START_COLUMN_MODE_FALSE},
+    * {@link #START_COLUMN_MODE_TRUE} or
+    * {@link #INHERIT}
+    * @param setting the start column mode
+    * @throws IllegalArgumentException if the setting is invalid
+    */
    public void setStartColumnMode(int setting)
    {
       if (setting == INHERIT
@@ -489,11 +612,16 @@ public class TeXSettings
           "Invalid argument '%d' for setStartColumnMode(int)", setting));
    }
 
+   /**
+    * Gets the alignment column for this scope.
+    * @return the alignment column for this scope
+    */
    public int getCurrentAlignmentColumn()
    {
       return currentAlignmentColumn;
    }
 
+   @Deprecated
    public int getAlignmentColumn()
    {
       if (currentAlignmentColumn == INHERIT)
@@ -509,11 +637,16 @@ public class TeXSettings
       return currentAlignmentColumn;
    }
 
+   /**
+    * Gets the alignment list for this scope.
+    * @return the alignment list for this scope
+    */
    public TeXCellAlignList getCurrentAlignmentList()
    {
       return currentAlignmentList;
    }
 
+   @Deprecated
    public TeXCellAlignList getAlignmentList()
    {
       if (currentAlignmentList == null)
@@ -529,6 +662,10 @@ public class TeXSettings
       return currentAlignmentList;
    }
 
+   /**
+    * Sets the alignment list for this scope.
+    * @param list the alignment list
+    */ 
    public void setAlignmentList(TeXCellAlignList list)
    {
       currentAlignmentList = list;
@@ -544,12 +681,17 @@ public class TeXSettings
       currentAlignmentColumn = getAlignmentColumn()+1;
    }
 
+   /**
+    * Gets the alignment column count for this scope.
+    * @param the alignment column count or 0 if not set
+    */
    public int getCurrentAlignmentColumnCount()
    {
       return currentAlignmentList == null ? 0 :
              currentAlignmentList.size();
    }
 
+   @Deprecated
    public int getAlignmentColumnCount()
    {
       if (currentAlignmentList == null)
@@ -565,11 +707,16 @@ public class TeXSettings
       return getCurrentAlignmentColumnCount();
    }
 
+   /**
+    * Gets the foreground for this scope.
+    * @return the foreground for this scope
+    */
    public Color getCurrentFgColor()
    {
       return currentFgColor;
    }
 
+   @Deprecated
    public Color getFgColor()
    {
       if (currentFgColor == null)
@@ -585,16 +732,37 @@ public class TeXSettings
       return currentFgColor;
    }
 
+   /**
+    * Sets the foreground for this scope.
+    * @param col the foreground
+    */
    public void setFgColor(Color col)
    {
       currentFgColor = col;
    }
 
+   @Deprecated
+   public void setCurrentFgColor(Color color)
+   {
+      currentFgColor = color;
+   }
+
+   @Deprecated
+   public void setCurrentBgColor(Color color)
+   {
+      currentBgColor = color;
+   }
+
+   /**
+    * Gets the background for this scope.
+    * @return the background
+    */
    public Color getCurrentBgColor()
    {
       return currentBgColor;
    }
 
+   @Deprecated
    public Color getBgColor()
    {
       if (currentBgColor == null)
@@ -610,11 +778,20 @@ public class TeXSettings
       return currentBgColor;
    }
 
+   /**
+    * Sets the background for this scope.
+    * @param col the background
+    */
    public void setBgColor(Color col)
    {
       currentBgColor = col;
    }
 
+   /**
+    * Sets the font for this scope.
+    * Each font attribute (family, shape, weight and size) is set if not null.
+    * @param font the font
+    */
    public void setFont(TeXFontText font)
    {
       if (font.getFamily() != null)
@@ -638,12 +815,29 @@ public class TeXSettings
       }
    }
 
+   /**
+    * Sets the font family for this scope.
+    * @param setting the font family setting
+    */
    public void setFontFamily(TeXFontFamily setting)
    {
       currentFontFamily = setting;
    }
 
+   /**
+    * Sets the font family for this scope.
+    * @param setting the font family identified by a numeric value:
+    * {@link #INHERIT}, 
+    * {@link #FAMILY_RM}, 
+    * {@link #FAMILY_SF}, 
+    * {@link #FAMILY_TT}, 
+    * {@link #FAMILY_CAL}, or 
+    * {@link #FAMILY_VERB} 
+    * @throws IllegalArgumentException if setting is not a
+    * recognised value
+    */
    public void setFontFamily(int setting)
+   throws IllegalArgumentException
    {
       switch (setting)
       {
@@ -673,33 +867,54 @@ public class TeXSettings
    }
 
    /**
-    * Test if the current font family or any of the ancestor font
-    * families are VERB. This allows for pseudo-verbatim
+    * Test if the current font family is <code>TeXFontFamily.VERB</code>. This allows for pseudo-verbatim
     * environments that may have a local font change.
-    * @return true if the current font family is VERB or any
-    * ancestors have the current font family set to VERB
+    * @return true if the current font family is <code>TeXFontFamily.VERB</code>, null if the
+    * current font family is <code>TeXFontFamily.INHERIT</code> or false otherwise
     */ 
-   public boolean inVerb()
+   public Boolean inVerbatim()
    {
       if (currentFontFamily == TeXFontFamily.VERB)
       {
-         return true;
+         return Boolean.TRUE;
       }
-      else if (parent == null)
+      else if (currentFontFamily == TeXFontFamily.INHERIT)
       {
-         return false;
+         return null;
       }
       else
       {
-         return parent.inVerb();
+         return Boolean.FALSE;
       }
    }
 
+   @Deprecated
+   public boolean inVerb()
+   {
+      return Boolean.TRUE.equals(inVerbatim());
+   }
+
+   /**
+    * Sets the font shape for this scope.
+    * @param setting the font shape
+    */
    public void setFontShape(TeXFontShape setting)
    {
       currentFontShape = setting;
    }
 
+   /**
+    * Sets the font shape for this scope.
+    * @param setting the font shape identified by a numeric value:
+    * {@link #INHERIT}, 
+    * {@link #SHAPE_UP}, 
+    * {@link #SHAPE_IT}, 
+    * {@link #SHAPE_SL}, 
+    * {@link #SHAPE_EM}, or 
+    * {@link #SHAPE_SC} 
+    * @throws IllegalArgumentException if setting is not a
+    * recognised value
+    */
    public void setFontShape(int setting)
    {
       switch (setting)
@@ -729,12 +944,26 @@ public class TeXSettings
       }
    }
 
+   /**
+    * Sets the font weight for this scope.
+    * @param setting the font weight
+    */
    public void setFontWeight(TeXFontWeight setting)
    {
       currentFontWeight = setting;
    }
 
+   /**
+    * Sets the font weight for this scope.
+    * @param setting the font weight identified by a numeric value:
+    * {@link #INHERIT}, 
+    * {@link #WEIGHT_MD} or 
+    * {@link #WEIGHT_BF}.
+    * @throws IllegalArgumentException if setting is not a
+    * recognised value
+    */
    public void setFontWeight(int setting)
+   throws IllegalArgumentException
    {
       switch (setting)
       {
@@ -754,18 +983,52 @@ public class TeXSettings
       }
    }
 
+   /**
+    * Sets user font size for this scope.
+    * For use where an explicit size is requested rather than
+    * predefined relative sizes, such as
+    * <code>TeXFontSize.NORMAL</code> or
+    * <code>TeXFontSize.LARGE</code>. This automatically sets the current font
+    * size to <code>TeXFontSize.USER</code>.
+    * @param dim the font size dimension
+    */
    public void setUserFontSize(TeXDimension dim)
    {
       currentFontSize = TeXFontSize.USER;
       currentFontDimension = dim;
    }
 
+   /**
+    * Sets the font size for this scope.
+    * Note that <code>TeXFontSize.USER</code> requires the actual
+    * size to be provided with {@link #setUserFontSize(TeXDimension)}.
+    * @param setting the font size setting
+    */
    public void setFontSize(TeXFontSize setting)
    {
       currentFontSize = setting;
    }
 
+   /**
+    * Sets the font size for this scope.
+    * @param setting the font size identified by a numeric value:
+    * {@link #INHERIT}, 
+    * {@link #SIZE_NORMAL}, 
+    * {@link #SIZE_LARGE},
+    * {@link #SIZE_XLARGE},
+    * {@link #SIZE_XXLARGE},
+    * {@link #SIZE_HUGE},
+    * {@link #SIZE_XHUGE},
+    * {@link #SIZE_XXHUGE},
+    * {@link #SIZE_SMALL},
+    * {@link #SIZE_FOOTNOTE},
+    * {@link #SIZE_SCRIPT},
+    * {@link #SIZE_TINY},
+    * @throws IllegalArgumentException if setting is not a
+    * recognised value
+    */
    public void setFontSize(int setting)
+   throws IllegalArgumentException
    {
       switch (setting)
       {
@@ -812,12 +1075,35 @@ public class TeXSettings
       }
    }
 
+   /**
+    * Sets the math font for this scope.
+    * @param setting the math font setting
+    */
    public void setMathFont(TeXFontMath setting)
    {
       currentMathFont = setting;
    }
 
+   /**
+    * Sets the font size for this scope.
+    * @param setting the font size identified by a numeric value:
+    * {@link #INHERIT}, 
+    * {@link #MATH_STYLE_RM}, 
+    * {@link #MATH_STYLE_SF},
+    * {@link #MATH_STYLE_TT},
+    * {@link #MATH_STYLE_IT},
+    * {@link #MATH_STYLE_BF},
+    * {@link #MATH_STYLE_CAL},
+    * {@link #MATH_STYLE_BB},
+    * {@link #MATH_STYLE_FRAK},
+    * {@link #MATH_STYLE_BOLDSYMBOL},
+    * {@link #MATH_STYLE_PMB},
+    * {@link #MATH_STYLE_NORMAL},
+    * @throws IllegalArgumentException if setting is not a
+    * recognised value
+    */
    public void setMathFont(int setting)
+   throws IllegalArgumentException
    {
       switch (setting)
       {
@@ -862,7 +1148,20 @@ public class TeXSettings
       }
    }
 
+   /**
+    * Sets the paragraph alignment for this scope.
+    * The setting should be one of:
+    * {@link #INHERIT},
+    * {@link #PAR_ALIGN_NORMAL},
+    * {@link #PAR_ALIGN_LEFT},
+    * {@link #PAR_ALIGN_RIGHT}, or
+    * {@link #PAR_ALIGN_CENTER}.
+    * @param setting the alignment setting
+    * @throws IllegalArgumentException if the setting is not a
+    * recognised value
+    */
    public void setParAlign(int setting)
+   throws IllegalArgumentException
    {
       switch (setting)
       {
@@ -880,11 +1179,16 @@ public class TeXSettings
       }
    }
 
+   /**
+    * Gets the paragraph indentation for this scope.
+    * @return the paragraph indentation
+    */
    public TeXDimension getCurrentParIndent()
    {
       return currentParIndent;
    }
 
+   @Deprecated
    public TeXDimension getParIndent()
    {
       if (currentParIndent == null)
@@ -900,16 +1204,25 @@ public class TeXSettings
       return currentParIndent;
    }
 
+   /**
+    * Sets the paragraph indentation for this scope.
+    * @param indent the paragraph indentation
+    */
    public void setParIndent(TeXDimension indent)
    {
       currentParIndent = indent;
    }
 
+   /**
+    * Gets the paragraph skip for this scope.
+    * @return the paragraph skip
+    */
    public TeXDimension getCurrentParSkip()
    {
       return currentParSkip;
    }
 
+   @Deprecated
    public TeXDimension getParSkip()
    {
       if (currentParSkip == null)
@@ -925,16 +1238,25 @@ public class TeXSettings
       return currentParSkip;
    }
 
-   public void setParSkip(TeXDimension indent)
+   /**
+    * Sets the paragraph skip for this scope.
+    * @param dim the paragraph skip
+    */
+   public void setParSkip(TeXDimension dim)
    {
-      currentParSkip = indent;
+      currentParSkip = dim;
    }
 
+   /**
+    * Gets the hanging indent for this scope.
+    * @return the hanging indent
+    */
    public TeXDimension getCurrentHangIndent()
    {
       return currentHangIndent;
    }
 
+   @Deprecated
    public TeXDimension getHangIndent()
    {
       if (currentHangIndent == null)
@@ -950,21 +1272,22 @@ public class TeXSettings
       return currentHangIndent;
    }
 
+   /**
+    * Sets the hanging indent for this scope.
+    * @param indent the hanging indent
+    */
    public void setHangIndent(TeXDimension indent)
    {
       currentHangIndent = indent;
    }
 
-   public void setCurrentFgColor(Color color)
-   {
-      currentFgColor = color;
-   }
-
-   public void setCurrentBgColor(Color color)
-   {
-      currentBgColor = color;
-   }
-
+   /**
+    * Gets a named numeric register in this scope.
+    * @param name the register's control sequence name
+    * @throws TeXSyntaxException if a register is found with the
+    * given name but is not numeric
+    * @return the register or null if not found
+    */
    public NumericRegister getNumericRegister(String name)
     throws TeXSyntaxException
    {
@@ -980,6 +1303,13 @@ public class TeXSettings
         name);
    }
 
+   /**
+    * Gets a named token register in this scope.
+    * @param name the register's control sequence name
+    * @throws TeXSyntaxException if a register is found with the
+    * given name but is not a token register
+    * @return the register or null if not found
+    */
    public TokenRegister getTokenRegister(String name)
     throws TeXSyntaxException
    {
@@ -995,144 +1325,204 @@ public class TeXSettings
         name);
    }
 
+   /**
+    * Gets a named register in this scope.
+    * @param name the register's control sequence name
+    * @return the register or null if not found
+    */
    public Register getRegister(String name)
    {
-      ControlSequence cs = parser.getListener().getControlSequence(name);
+      Register reg = localRegisters == null ? null : localRegisters.get(name);
 
-      if (cs instanceof AssignedMacro)
+      if (reg == null)
       {
-         TeXObject obj = ((AssignedMacro)cs).getBaseUnderlying();
+         ControlSequence cs = csTable == null ? null : csTable.get(name);
 
-         if (obj instanceof ControlSequence)
+         if (cs instanceof Register)
          {
-            name = ((ControlSequence)obj).getName();
+            // shouldn't happen
+            reg = (Register)cs;
          }
-      }
+         else if (cs instanceof AssignedMacro)
+         {
+            TeXObject obj = ((AssignedMacro)cs).getBaseUnderlying();
 
-      Register reg = localRegisters.get(name);
+            if (obj instanceof Register)
+            {
+               reg = (Register)obj;
+            }
+            else if (obj instanceof ControlSequence)
+            {
+               name = ((ControlSequence)obj).getName();
 
-      if (reg == null && parent != null)
-      {
-         reg = parent.getRegister(name);
+               reg = localRegisters == null ? null : localRegisters.get(name);
+            }
+         }
       }
 
       return reg;
    }
 
+   /**
+    * Checks if there is a control sequence or register defined in
+    * this scope.
+    * Defined in this case means not null and not an instance of
+    * <code>Undefined</code>.
+    * @param name the control sequence name
+    * @return true if there is an entry in the control sequence
+    * table or register table with the given name that is not an
+    * instance of <code>Undefined</code>
+    */
    public boolean isDefinedInCurrentScope(String name)
    {
-      ControlSequence cs = csTable.get(name);
+      ControlSequence cs = csTable == null ? null : csTable.get(name);
 
       if (cs == null)
       {
-         cs = localRegisters.get(name);
+         cs = localRegisters == null ? null : localRegisters.get(name);
       }
 
-      return cs != null;
+      return cs != null && !(cs instanceof Undefined);
    }
 
+   /**
+    * Gets a control sequence or register in this scope.
+    * This method first checks the control sequence table and then
+    * checks the register table. Note that the returned control sequence may
+    * be an instance of <code>Undefined</code> if it was locally
+    * undefined. (This allows the previous definition to be restored
+    * outside of the scope.)
+    * @param name the control sequence name
+    * @return the control sequence or register or null if not found
+    */
    public ControlSequence getControlSequence(String name)
    {
-      ControlSequence cs = csTable.get(name);
+      ControlSequence cs = csTable == null ? null : csTable.get(name);
 
       if (cs == null)
       {
-         cs = localRegisters.get(name);
-      }
-
-      if (cs == null && parent != null)
-      {
-         cs = parent.getControlSequence(name);
+         cs = localRegisters == null ? null : localRegisters.get(name);
       }
 
       return cs;
    }
 
+   /**
+    * Puts a control sequence in the control sequence table for this
+    * scope.
+    * @param cs the control sequence
+    */
    public void putControlSequence(ControlSequence cs)
    {
+      if (csTable == null)
+      {
+         csTable = new HashMap<String,ControlSequence>();
+      }
+
       csTable.put(cs.getName(), cs);
    }
 
+   @Deprecated
    public void undefControlSequence(String name)
    {
-      removeLocalControlSequence(name);
-
-      if (parent != null)
-      {
-         parent.undefControlSequence(name);
-      }
+      removeControlSequence(name);
    }
 
-   public ControlSequence removeLocalControlSequence(String name)
+   /**
+    * Removes a control sequence or register with the given name.
+    * @param name the control sequence or register name
+    * @return the removed control sequence
+    */
+   public ControlSequence removeControlSequence(String name)
    {
-      ControlSequence cs = csTable.remove(name);
+      ControlSequence cs = csTable == null ? null : csTable.remove(name);
+      ControlSequence reg = localRegisters == null ? null : localRegisters.remove(name);
 
-      if (cs == null)
-      {
-         cs = removeLocalRegister(name);
-      }
-
-      return cs;
-   }
-
-   public ControlSequence removeGlobalControlSequence(String name)
-   {
-      ControlSequence cs = csTable.remove(name);
-      ControlSequence reg = localRegisters.remove(name);
-
-      if (cs == null)
+      if (cs == null && reg != null)
       {
          cs = reg;
       }
 
-      if (parent != null)
-      {
-         ControlSequence parentCs = parent.removeGlobalControlSequence(name);
-
-         if (parentCs != null)
-         {
-            cs = parentCs;
-         }
-      }
-
       return cs;
    }
 
+   @Deprecated
+   public ControlSequence removeLocalControlSequence(String name)
+   {
+      return removeControlSequence(name);
+   }
+
+   @Deprecated
+   public ControlSequence removeGlobalControlSequence(String name)
+   {
+      return removeControlSequence(name);
+   }
+
+   /**
+    * Gets the active character identified by its code point from
+    * the active character table in this scope.
+    * @param code the character's code point
+    * @return the active character or null if not set
+    */
    public ActiveChar getActiveChar(Integer code)
    {
-      ActiveChar ac = activeTable.get(code);
-
-      if (ac == null && parent != null)
-      {
-         ac = parent.getActiveChar(code);
-      }
-
-      return ac;
+      return activeTable == null ? null : activeTable.get(code);
    }
 
+   /**
+    * Puts an active character in the active character table in this
+    * scope.
+    * @param activeChar the active character
+    */
    public void putActiveChar(ActiveChar activeChar)
    {
-      activeTable.put(Integer.valueOf(activeChar.getCharCode()),
-        activeChar);
+      if (activeTable == null)
+      {
+         activeTable = new HashMap<Integer,ActiveChar>();
+      }
+
+      Integer character = Integer.valueOf(activeChar.getCharCode());
+
+      activeTable.put(character, activeChar);
+
+      setCategoryCode(character, CategoryCode.ACTIVE);
    }
 
+   /**
+    * Removes the active character identified by its code point from
+    * the active character table in this scope.
+    * @param code the character's code point
+    * @return the remove active character or null if not found
+    */
    public ActiveChar removeActiveChar(int code)
    {
       return removeActiveChar(Integer.valueOf(code));
    }
 
+   /**
+    * Removes the active character identified by its code point from
+    * the active character table in this scope.
+    * The associated category code is also removed if it's current
+    * <code>CategoryCode.ACTIVE</code>.
+    * @param code the character's code point
+    * @return the remove active character or null if not found
+    */
    public ActiveChar removeActiveChar(Integer code)
    {
-      ActiveChar ac = activeTable.remove(code);
-
-      if (ac != null || parent == null)
+      if (getCategoryCode(code) == CategoryCode.ACTIVE)
       {
-         return ac;
+         clearCodePointCategoryCode(code);
       }
 
-      return parent.removeActiveChar(code);
+      return activeTable == null ? null : activeTable.remove(code);
    }
 
+   /**
+    * Define a count register with a specific allocation number.
+    * @param name the register's control sequence name
+    * @param alloc the register allocation
+    * @return the new count register
+    */
    public CountRegister countdef(String name, int alloc)
    {
       CountRegister reg = new CountRegister(name);
@@ -1142,29 +1532,24 @@ public class TeXSettings
       return reg;
    }
 
+   @Deprecated
    public CountRegister newcount(boolean isLocal, String name)
    {
       return newcount(isLocal, name, 0);
    }
 
+   @Deprecated
    public CountRegister newcount(boolean isLocal, String name, int value)
    {
-      CountRegister reg;
-
-      if (isLocal || parent == null)
-      {
-         reg = newcount(name, value);
-      }
-      else
-      {
-         TeXSettings root = parent.getRoot();
-         reg = root.newcount(name, value);
-         localRegisters.put(name, (Register)reg.clone());
-      }
-
-      return reg;
+      return newcount(name, value);
    }
 
+   /**
+    * Defines a count register with an initial value.
+    * @param name the register's control sequence name
+    * @param value the register's initial value
+    * @return the new count register
+    */
    public CountRegister newcount(String name, int value)
    {
       CountRegister reg = newcount(name);
@@ -1172,6 +1557,11 @@ public class TeXSettings
       return reg;
    }
 
+   /**
+    * Defines a count register.
+    * @param name the register's control sequence name
+    * @return the new count register
+    */
    public CountRegister newcount(String name)
    {
       CountRegister reg = new CountRegister(name);
@@ -1181,6 +1571,12 @@ public class TeXSettings
       return reg;
    }
 
+   /**
+    * Define a dimension register with a specific allocation number.
+    * @param name the register's control sequence name
+    * @param alloc the register allocation
+    * @return the new dimension register
+    */
    public DimenRegister dimendef(String name, int alloc)
    {
       DimenRegister reg = new DimenRegister(name);
@@ -1190,6 +1586,11 @@ public class TeXSettings
       return reg;
    }
 
+   /**
+    * Defines a dimension register.
+    * @param name the register's control sequence name
+    * @return the new dimension register
+    */
    public DimenRegister newdimen(String name)
    {
       DimenRegister reg = new DimenRegister(name);
@@ -1199,18 +1600,18 @@ public class TeXSettings
       return reg;
    }
 
+   @Deprecated
    public DimenRegister newdimen(boolean isLocal, String name)
    {
-      if (isLocal || parent == null)
-      {
-         return newdimen(name);
-      }
-      else
-      {
-         return parent.newdimen(isLocal, name);
-      }
+      return newdimen(name);
    }
 
+   /**
+    * Define a token register with a specific allocation number.
+    * @param name the register's control sequence name
+    * @param alloc the register allocation
+    * @return the new token register
+    */
    public TokenRegister toksdef(String name, int alloc)
    {
       TokenRegister reg = new TokenRegister(name);
@@ -1220,6 +1621,11 @@ public class TeXSettings
       return reg;
    }
 
+   /**
+    * Defines a token register.
+    * @param name the register's control sequence name
+    * @return the new token register
+    */
    public TokenRegister newtoks(String name)
    {
       TokenRegister reg = new TokenRegister(name);
@@ -1229,186 +1635,74 @@ public class TeXSettings
       return reg;
    }
 
+   @Deprecated
    public TokenRegister newtoks(boolean isLocal, String name)
    {
-      TokenRegister reg;
-
-      if (isLocal || parent == null)
-      {
-         reg = newtoks(name);
-      }
-      else
-      {
-         TeXSettings root = parent.getRoot();
-         reg = root.newtoks(name);
-         localRegisters.put(name, (Register)reg.clone());
-      }
-
-      return reg;
+      return newtoks(name);
    }
 
-   protected Register putRegister(Register register)
+   /**
+    * Adds a register to the table of registers.
+    * @param register the register to add
+    */
+   public void putRegister(Register register)
    {
-      Register rootReg = register;
-
-      String name = register.getName();
-
-      TeXSettings root = parser.getSettings();
-
-      if (this != root)
+      if (localRegisters == null)
       {
-         Register reg = root.getRegister(name);
-
-         if (reg == null)
-         {
-            rootReg = root.putRegister((Register)register.clone());
-         }
+         localRegisters = new HashMap<String,Register>();
       }
 
-      localRegisters.put(name, register);
-
-      return rootReg;
+      localRegisters.put(register.getName(), register);
    }
 
+   @Deprecated
    public void localSetRegister(String name, TeXObject value)
      throws TeXSyntaxException
    {
-      Register reg = localRegisters.get(name);
+      Register reg = localRegisters == null ? null : localRegisters.get(name);
 
-      if (reg == null)
+      if (reg != null)
       {
-         if (parent != null)
-         {
-            reg = parent.getRegister(name);
-         }
-
-         if (reg == null)
-         {
-            throw new TeXSyntaxException(parser,
-               TeXSyntaxException.ERROR_REGISTER_UNDEF, name);
-         }
-
-         if (parent != null)
-         {
-            reg = (Register)reg.clone();
-            localRegisters.put(name, reg);
-         }
+         reg.setContents(parser, value);
       }
-
-      reg.setContents(parser, value);
    }
 
+   @Deprecated
    public void localSetRegister(String name, int value)
      throws TeXSyntaxException
    {
-      Register reg = localRegisters.get(name);
+      Register reg = localRegisters == null ? null : localRegisters.get(name);
 
-      if (reg == null)
+      if (reg != null)
       {
-         if (parent != null)
-         {
-            reg = parent.getRegister(name);
-         }
-
-         if (reg == null)
-         {
-            throw new TeXSyntaxException(parser,
-               TeXSyntaxException.ERROR_REGISTER_UNDEF, name);
-         }
-
-         if (parent != null)
-         {
-            reg = (Register)reg.clone();
-            localRegisters.put(name, reg);
-         }
+         reg.setContents(parser, value);
       }
-
-      reg.setContents(parser, value);
    }
 
+   @Deprecated
    public void globalSetRegister(String name, TeXObject value)
      throws TeXSyntaxException
    {
-      Register reg = getRegister(name);
-
-      if (reg == null)
-      {
-         throw new TeXSyntaxException(parser,
-            TeXSyntaxException.ERROR_REGISTER_UNDEF, name);
-      }
-
-      reg.setContents(parser, value);
-
-      if (parent != null)
-      {
-         TeXSettings root = parent.getRoot();
-
-         Register rootReg = root.getRegister(name);
-
-         if (rootReg == null)
-         {
-            root.putRegister((Register)reg.clone());
-         }
-         else if (reg != rootReg)
-         {
-            rootReg.setContents(parser, reg.getContents(parser));
-         }
-      }
+      localSetRegister(name, value);
    }
 
+   @Deprecated
    public void globalSetRegister(String name, int value)
      throws TeXSyntaxException
    {
-      Register reg = getRegister(name);
+      localSetRegister(name, value);
+   }
+
+   @Deprecated
+   public void localAdvanceRegister(String name, Numerical value)
+     throws TeXSyntaxException
+   {
+      Register reg = localRegisters == null ? null : localRegisters.get(name);
 
       if (reg == null)
       {
          throw new TeXSyntaxException(parser,
             TeXSyntaxException.ERROR_REGISTER_UNDEF, name);
-      }
-
-      reg.setContents(parser, value);
-
-      if (parent != null)
-      {
-         TeXSettings root = parent.getRoot();
-
-         Register rootReg = root.getRegister(name);
-
-         if (rootReg == null)
-         {
-            root.putRegister((Register)reg.clone());
-         }
-         else if (reg != rootReg)
-         {
-            rootReg.setContents(parser, value);
-         }
-      }
-   }
-
-   public void localAdvanceRegister(String name, Numerical value)
-     throws TeXSyntaxException
-   {
-      Register reg = localRegisters.get(name);
-
-      if (reg == null)
-      {
-         if (parent != null)
-         {
-            reg = parent.getRegister(name);
-         }
-
-         if (reg == null)
-         {
-            throw new TeXSyntaxException(parser,
-               TeXSyntaxException.ERROR_REGISTER_UNDEF, name);
-         }
-
-         if (parent != null)
-         {
-            reg = (Register)reg.clone();
-            localRegisters.put(name, reg);
-         }
       }
 
       if (!(reg instanceof NumericRegister))
@@ -1420,6 +1714,7 @@ public class TeXSettings
       ((NumericRegister)reg).advance(parser, value);
    }
 
+   @Deprecated
    public void localSetRegister(String name, Numerical value)
      throws TeXSyntaxException
    {
@@ -1434,6 +1729,7 @@ public class TeXSettings
       }
    }
 
+   @Deprecated
    public void globalSetRegister(String name, Numerical value)
      throws TeXSyntaxException
    {
@@ -1448,10 +1744,11 @@ public class TeXSettings
       }
    }
 
+   @Deprecated
    public NumericRegister globalAdvanceRegister(String name, Numerical value)
      throws TeXSyntaxException
    {
-      Register reg = getRegister(name);
+      Register reg = localRegisters == null ? null : localRegisters.get(name);
 
       if (reg == null)
       {
@@ -1467,48 +1764,19 @@ public class TeXSettings
 
       ((NumericRegister)reg).advance(parser, value);
 
-      if (parent != null)
-      {
-         TeXSettings root = parent.getRoot();
-
-         Register rootReg = root.getRegister(name);
-
-         if (rootReg == null || !(rootReg instanceof NumericRegister))
-         {
-            root.putRegister((NumericRegister)reg.clone());
-         }
-         else if (reg != rootReg)
-         {
-            ((NumericRegister)rootReg).setValue(parser, (NumericRegister)reg);
-         }
-      }
-
       return (NumericRegister)reg;
    }
 
+   @Deprecated
    public void localMultiplyRegister(String name, Numerical value)
      throws TeXSyntaxException
    {
-      Register reg = localRegisters.get(name);
+      Register reg = localRegisters == null ? null : localRegisters.get(name);
 
       if (reg == null)
       {
-         if (parent != null)
-         {
-            reg = parent.getRegister(name);
-         }
-
-         if (reg == null)
-         {
-            throw new TeXSyntaxException(parser,
+         throw new TeXSyntaxException(parser,
                TeXSyntaxException.ERROR_REGISTER_UNDEF, name);
-         }
-
-         if (parent != null)
-         {
-            reg = (Register)reg.clone();
-            localRegisters.put(name, reg);
-         }
       }
 
       if (!(reg instanceof NumericRegister))
@@ -1520,80 +1788,18 @@ public class TeXSettings
       ((NumericRegister)reg).multiply(value.number(parser));
    }
 
+   @Deprecated
    public void globalMultiplyRegister(String name, Numerical value)
      throws TeXSyntaxException
    {
-      Register reg = getRegister(name);
-
-      if (reg == null)
-      {
-         throw new TeXSyntaxException(parser,
-            TeXSyntaxException.ERROR_REGISTER_UNDEF, name);
-      }
-
-      if (!(reg instanceof NumericRegister))
-      {
-         throw new TeXSyntaxException(parser, 
-            TeXSyntaxException.ERROR_NUMERIC_REGISTER_EXPECTED);
-      }
-
-      ((NumericRegister)reg).multiply(value.number(parser));
-
-      if (parent != null)
-      {
-         TeXSettings root = parent.getRoot();
-
-         Register rootReg = root.getRegister(name);
-
-         if (rootReg == null || !(rootReg instanceof NumericRegister))
-         {
-            root.putRegister((NumericRegister)reg.clone());
-         }
-         else if (reg != rootReg)
-         {
-            ((NumericRegister)rootReg).setValue(parser, (NumericRegister)reg);
-         }
-      }
+      localMultiplyRegister(name, value);
    }
 
+   @Deprecated
    public void localDivideRegister(String name, Numerical value)
      throws TeXSyntaxException
    {
-      Register reg = localRegisters.get(name);
-
-      if (reg == null)
-      {
-         if (parent != null)
-         {
-            reg = parent.getRegister(name);
-         }
-
-         if (reg == null)
-         {
-            throw new TeXSyntaxException(parser,
-               TeXSyntaxException.ERROR_REGISTER_UNDEF, name);
-         }
-
-         if (parent != null)
-         {
-            reg = (Register)reg.clone();
-            localRegisters.put(name, reg);
-         }
-      }
-
-      if (!(reg instanceof NumericRegister))
-      {
-         throw new TeXSyntaxException(parser, 
-            TeXSyntaxException.ERROR_NUMERIC_REGISTER_EXPECTED);
-      }
-
-      ((NumericRegister)reg).divide(value.number(parser));
-   }
-
-   public void globalDivideRegister(String name, Numerical value)
-     throws TeXSyntaxException
-   {
-      Register reg = getRegister(name);
+      Register reg = localRegisters == null ? null : localRegisters.get(name);
 
       if (reg == null)
       {
@@ -1608,54 +1814,43 @@ public class TeXSettings
       }
 
       ((NumericRegister)reg).divide(value.number(parser));
-
-      if (parent != null)
-      {
-         TeXSettings root = parent.getRoot();
-
-         Register rootReg = root.getRegister(name);
-
-         if (rootReg == null || !(rootReg instanceof NumericRegister))
-         {
-            root.putRegister((NumericRegister)reg.clone());
-         }
-         else if (reg != rootReg)
-         {
-            ((NumericRegister)rootReg).setValue(parser, (NumericRegister)reg);
-         }
-      }
    }
 
+   @Deprecated
+   public void globalDivideRegister(String name, Numerical value)
+     throws TeXSyntaxException
+   {
+      localDivideRegister(name, value);
+   }
+
+   /**
+    * Removes the register identified by its control sequence name
+    * from the register table in this scope.
+    * @param name the register's control sequence name
+    * @return the removed register or null if not found
+    */
+   public Register removeRegister(String name)
+   {
+      return localRegisters == null ? null : localRegisters.remove(name);
+   }
+
+   @Deprecated
    private Register removeLocalRegister(String name)
    {
-      Register cs = localRegisters.remove(name);
+      Register cs = localRegisters == null ? null : localRegisters.remove(name);
 
       putControlSequence(parser.getListener().createUndefinedCs(name));
 
       return cs;
    }
 
+   @Deprecated
    private Register removeGlobalRegister(String name)
    {
-      Register cs = localRegisters.remove(name);
-
-      TeXSettings root = parser.getSettings();
-
-      if (this == root || parent == null)
-      {
-         return cs;
-      }
-
-      Register reg = parent.removeGlobalRegister(name);
-
-      if (reg != null)
-      {
-         cs = reg;
-      }
-
-      return cs;
+      return removeLocalRegister(name);
    }
 
+   @Deprecated
    public boolean isMathBold()
    {
       if (currentMathFont == TeXFontMath.BF 
@@ -1665,19 +1860,35 @@ public class TeXSettings
          return true;
       }
 
-      if (currentMathFont == TeXFontMath.INHERIT)
-      {
-         if (parent == null)
-         {
-            return false;
-         }
-
-         return parent.isMathBold();
-      }
-
       return false;
    }
 
+   /**
+    * Checks if the current math font is bold.
+    * Bold in this context means {@link TeXFont.Math.BF}, 
+    * {@link TeXFont.BOLDSYMBOL} or {@link TeXFont.PMB}.
+    * @return Boolean.TRUE if the math font is a bold type,
+    * or Boolean.FALSE if the math font is non-bold type,
+    * or null if the current setting is TeXFontMath.INHERIT
+    */ 
+   public Boolean isMathBoldFont()
+   {
+      if (currentMathFont == TeXFontMath.BF 
+       || currentMathFont == TeXFontMath.BOLDSYMBOL
+       || currentMathFont == TeXFontMath.PMB)
+      {
+         return Boolean.TRUE;
+      }
+
+      if (currentMathFont == TeXFontMath.INHERIT)
+      {
+         return null;
+      }
+
+      return Boolean.FALSE;
+   }
+
+   @Deprecated
    public boolean isMathSf()
    {
       if (currentMathFont == TeXFontMath.SF)
@@ -1698,6 +1909,28 @@ public class TeXSettings
       return false;
    }
 
+   /**
+    * Checks if the current math font is sans-serif.
+    * @return Boolean.TRUE if the math font is sans-serif,
+    * or Boolean.FALSE if the math font is another font type,
+    * or null if the current setting is TeXFontMath.INHERIT
+    */ 
+   public Boolean isMathSfFont()
+   {
+      if (currentMathFont == TeXFontMath.SF)
+      {
+         return Boolean.TRUE;
+      }
+
+      if (currentMathFont == TeXFontMath.INHERIT)
+      {
+         return null;
+      }
+
+      return Boolean.FALSE;
+   }
+
+   @Deprecated
    public boolean isMathRm()
    {
       if (currentMathFont == TeXFontMath.RM)
@@ -1718,6 +1951,28 @@ public class TeXSettings
       return false;
    }
 
+   /**
+    * Checks if the current math font is serif.
+    * @return Boolean.TRUE if the math font is serif,
+    * or Boolean.FALSE if the math font is another font type,
+    * or null if the current setting is TeXFontMath.INHERIT
+    */ 
+   public Boolean isMathRmFont()
+   {
+      if (currentMathFont == TeXFontMath.RM)
+      {
+         return Boolean.TRUE;
+      }
+
+      if (currentMathFont == TeXFontMath.INHERIT)
+      {
+         return null;
+      }
+
+      return Boolean.FALSE;
+   }
+
+   @Deprecated
    public boolean isMathTt()
    {
       if (currentMathFont == TeXFontMath.TT)
@@ -1738,6 +1993,28 @@ public class TeXSettings
       return false;
    }
 
+   /**
+    * Checks if the current math font is monospaced.
+    * @return Boolean.TRUE if the math font is monospaced,
+    * or Boolean.FALSE if the math font is another font type,
+    * or null if the current setting is TeXFontMath.INHERIT
+    */ 
+   public Boolean isMathTtFont()
+   {
+      if (currentMathFont == TeXFontMath.TT)
+      {
+         return Boolean.TRUE;
+      }
+
+      if (currentMathFont == TeXFontMath.INHERIT)
+      {
+         return null;
+      }
+
+      return Boolean.FALSE;
+   }
+
+   @Deprecated
    public boolean isMathCal()
    {
       if (currentMathFont == TeXFontMath.CAL)
@@ -1758,6 +2035,28 @@ public class TeXSettings
       return false;
    }
 
+   /**
+    * Checks if the current math font is calligraphic.
+    * @return Boolean.TRUE if the math font is calligraphic,
+    * or Boolean.FALSE if the math font is another font type,
+    * or null if the current setting is TeXFontMath.INHERIT
+    */ 
+   public Boolean isMathCalFont()
+   {
+      if (currentMathFont == TeXFontMath.CAL)
+      {
+         return Boolean.TRUE;
+      }
+
+      if (currentMathFont == TeXFontMath.INHERIT)
+      {
+         return null;
+      }
+
+      return Boolean.FALSE;
+   }
+
+   @Deprecated
    public boolean isMathFrak()
    {
       if (currentMathFont == TeXFontMath.FRAK)
@@ -1778,6 +2077,28 @@ public class TeXSettings
       return false;
    }
 
+   /**
+    * Checks if the current math font is frak.
+    * @return Boolean.TRUE if the math font is frak,
+    * or Boolean.FALSE if the math font is another font type,
+    * or null if the current setting is TeXFontMath.INHERIT
+    */ 
+   public Boolean isMathFrakFont()
+   {
+      if (currentMathFont == TeXFontMath.FRAK)
+      {
+         return Boolean.TRUE;
+      }
+
+      if (currentMathFont == TeXFontMath.INHERIT)
+      {
+         return null;
+      }
+
+      return Boolean.FALSE;
+   }
+
+   @Deprecated
    public boolean isMathBb()
    {
       if (currentMathFont == TeXFontMath.BB)
@@ -1798,6 +2119,28 @@ public class TeXSettings
       return false;
    }
 
+   /**
+    * Checks if the current math font is blackboard bold.
+    * @return Boolean.TRUE if the math font is blackboard bold,
+    * or Boolean.FALSE if the math font is another font type,
+    * or null if the current setting is TeXFontMath.INHERIT
+    */ 
+   public Boolean isMathBbFont()
+   {
+      if (currentMathFont == TeXFontMath.BB)
+      {
+         return Boolean.TRUE;
+      }
+
+      if (currentMathFont == TeXFontMath.INHERIT)
+      {
+         return null;
+      }
+
+      return Boolean.FALSE;
+   }
+
+   @Deprecated
    public boolean isMathIt()
    {
       if (currentMathFont == TeXFontMath.RM || currentMathFont == TeXFontMath.SF
@@ -1820,6 +2163,31 @@ public class TeXSettings
       return true;
    }
 
+   /**
+    * Checks if the current math font is italic.
+    * @return Boolean.TRUE if the math font is italic (that is, not rm, sf,
+    * tt, bf, cal or bb),
+    * or Boolean.FALSE if the math font is another font type,
+    * or null if the current setting is TeXFontMath.INHERIT
+    */ 
+   public Boolean isMathItFont()
+   {
+      if (currentMathFont == TeXFontMath.RM || currentMathFont == TeXFontMath.SF
+        || currentMathFont == TeXFontMath.TT || currentMathFont == TeXFontMath.BF
+        || currentMathFont == TeXFontMath.CAL || currentMathFont == TeXFontMath.BB)
+      {
+          return Boolean.FALSE;
+      }
+
+      if (currentMathFont == TeXFontMath.INHERIT)
+      {
+         return null;
+      }
+
+      return Boolean.TRUE;
+   }
+
+   @Deprecated
    public boolean isTextSansSerif()
    {
       if (currentFontFamily == TeXFontFamily.SF)
@@ -1840,6 +2208,28 @@ public class TeXSettings
       return true;
    }
 
+   /**
+    * Checks if the current text font is sans-serif.
+    * @return Boolean.TRUE if the text font is sans-serif
+    * or Boolean.FALSE if the text font is another font type,
+    * or null if the current setting is TeXFontFamily.INHERIT
+    */ 
+   public Boolean isTextSansSerifFont()
+   {
+      if (currentFontFamily == TeXFontFamily.SF)
+      {
+         return Boolean.TRUE;
+      }
+
+      if (currentFontFamily == TeXFontFamily.INHERIT)
+      {
+         return null;
+      }
+
+      return Boolean.TRUE;
+   }
+
+   @Deprecated
    public boolean isTextItalic()
    {
       if (currentFontShape == TeXFontShape.IT || currentFontShape == TeXFontShape.SL)
@@ -1868,26 +2258,29 @@ public class TeXSettings
       return false;
    }
 
+   /**
+    * Gets the font encoding for this scope.
+    * A return value of null indicates that the encoding should be
+    * inherited.
+    * @return the font encoding or null if not set
+    */
    public FontEncoding getCurrentFontEncoding()
    {
       return currentFontEncoding;
    }
 
+   @Deprecated
    public FontEncoding getFontEncoding()
    {
-      if (currentFontEncoding == null)
-      {
-         if (parent == null)
-         {
-            return null;
-         }
-
-         return parent.getFontEncoding();
-      }
-
       return currentFontEncoding;
    }
 
+   /**
+    * Sets the current font encoding for this scope.
+    * If not null, the font encoding definitions will be added to
+    * this scope.
+    * @param fontEncoding the current font encoding (may be null)
+    */
    public void setFontEncoding(FontEncoding fontEncoding)
    {
       currentFontEncoding = fontEncoding;
@@ -1898,6 +2291,7 @@ public class TeXSettings
       }
    }
 
+   @Deprecated
    public String getCharString(int charCode)
    {
       int mappedCode = getCharCode(charCode);
@@ -1922,6 +2316,7 @@ public class TeXSettings
       }
    }
 
+   @Deprecated
    public int getCharCode(int charCode)
    {
       FontEncoding fontEncoding = getFontEncoding();
@@ -2040,6 +2435,12 @@ public class TeXSettings
       return FontEncoding.CHAR_MAP_NONE;
    }
 
+   /**
+    * Finds the character map from the given set of tables.
+    * @param charCode the source character code
+    * @param array the character mapping tables
+    * @return the found mapping or -1 if not found
+    */
    public static int getCode(int charCode, int[][] array)
    {
       for (int i = 0; i < array.length; i++)
@@ -2053,11 +2454,259 @@ public class TeXSettings
       return -1;
    }
 
+   /**
+    * Indicates whether or not detokenizing is on.
+    * @return true if detokenizing is on
+    */
+   public boolean isDetokenizing()
+   {
+      return detokenizing;
+   }
+
+   /**
+    * Sets whether or not detokenizing is on.
+    * @param on sets the detokenizing state
+    */
+   public void setDetokenizing(boolean on)
+   {
+      detokenizing = on;
+   }
+
+   /**
+    * Sets the category code for the given character.
+    * The character is identified by its code point.
+    * @param codePoint the character's code point
+    * @param catCode the category code
+    */
+   @Deprecated
+   public void setCatCode(int codePoint, int catCode)
+   {
+      setCatCode(Integer.valueOf(codePoint), catCode);
+   }
+
+   /**
+    * Sets the category code for the given character.
+    * The character is identified by its code point.
+    * @param codePoint the character's code point
+    * @param catCode the category code
+    * @throws IllegaArgumentException if the category code is
+    * invalid
+    */
+   @Deprecated
+   public void setCatCode(Integer codePoint, int catCode)
+   throws IllegalArgumentException
+   {
+      setCategoryCode(codePoint, CategoryCode.valueOf(catCode));
+   }
+
+   /**
+    * Sets the category code for the given character.
+    * The character is identified by its code point.
+    * @param codePoint the character's code point
+    * @param catCode the category code
+    * @throws IllegaArgumentException if the category code is
+    * invalid
+    */
+   public void setCategoryCode(Integer codePoint, CategoryCode catCode)
+   {
+      if (catCodes == null)
+      {
+         catCodes = new HashMap<Integer,CategoryCode>();
+      }
+
+      catCodes.put(codePoint, catCode);
+   }
+
+   /**
+    * Sets the category code for the given character.
+    * The character is identified by its code point.
+    * @param codePoint the character's code point
+    * @param catCode the category code
+    * @throws IllegaArgumentException if the category code is
+    * invalid
+    */
+   public void setCategoryCode(char character, CategoryCode catCode)
+   {
+      setCategoryCode(Integer.valueOf(character), catCode);
+   }
+
+   /**
+    * Sets the default category codes.
+    */
+   public void setDefaultCategoryCodes()
+   {
+      setCategoryCode('\\', CategoryCode.ESC);
+      setCategoryCode('{', CategoryCode.BG);
+      setCategoryCode('}', CategoryCode.EG);
+      setCategoryCode('$', CategoryCode.MATH);
+      setCategoryCode('&', CategoryCode.TAB);
+      setCategoryCode('\n', CategoryCode.EOL);
+      setCategoryCode('\r', CategoryCode.EOL);
+      setCategoryCode('#', CategoryCode.PARAM);
+      setCategoryCode('^', CategoryCode.SP);
+      setCategoryCode('_', CategoryCode.SB);
+
+      setCategoryCode(' ', CategoryCode.SPACE);
+      setCategoryCode('\t', CategoryCode.SPACE);
+
+      setCategoryCode('~', CategoryCode.ACTIVE);
+      setCategoryCode('%', CategoryCode.COMMENT);
+   }
+
+   /**
+    * Clears the category code for the given character.
+    * The category code will then be that from a parent scope
+    * or determined by whether it is considered alphabetic.
+    * @param codePoint the character's code point
+    */
+   public void clearCodePointCategoryCode(int codePoint)
+   {
+      clearCodePointCategoryCode(Integer.valueOf(codePoint));
+   }
+
+   /**
+    * Clears the category code for the given character.
+    * The category code will then be that from a parent scope
+    * or determined by whether it is considered alphabetic.
+    * @param codePoint the character's code point
+    */
+   public void clearCodePointCategoryCode(Integer codePoint)
+   {
+      if (catCodes != null)
+      {
+         catCodes.remove(codePoint);
+      }
+   }
+
+
+   /**
+    * Clears all category codes.
+    */
+   public void clearAllCategoryCodes()
+   {
+      if (catCodes != null)
+      {
+         catCodes.clear();
+      }
+   }
+
+   /**
+    * Gets the category code for the given character for this scope.
+    * @param codePoint the character's code point
+    * @return the character's category code or -1 if not set in this
+    * scope
+    */
+   @Deprecated
+   public int getCatCode(int codePoint)
+   {
+      return getCatCode(Integer.valueOf(codePoint));
+   }
+
+   /**
+    * Gets the category code for the given character for this scope.
+    * @param codePoint the character's code point
+    * @return the character's category code or -1 if not set in this
+    * scope
+    */
+   @Deprecated
+   public int getCatCode(Integer codePoint)
+   {
+      CategoryCode catCode = getCategoryCode(codePoint);
+
+      return catCode == null ? -1 : catCode.getId();
+   }
+
+   /**
+    * Gets the category code for the given character for this scope.
+    * @param codePoint the character's code point
+    * @return the character's category code or null if not set in this
+    * scope
+    */
+   public CategoryCode getCategoryCode(int codePoint)
+   {
+      if (catCodes == null)
+      {
+         return null;
+      }
+      else
+      {
+         return catCodes.get(Integer.valueOf(codePoint));
+      }
+   }
+
+   /**
+    * Gets the category code for the given character for this scope.
+    * @param codePoint the character's code point
+    * @return the character's category code or null if not set in this
+    * scope
+    */
+   public CategoryCode getCategoryCode(Integer codePoint)
+   {
+      if (catCodes == null)
+      {
+         return null;
+      }
+      else
+      {
+         return catCodes.get(codePoint);
+      }
+   }
+
+   /**
+    * Gets the first character with the given category code assigned
+    * to it in this scope.
+    * @param catCode the category code
+    * @return the character code point or -1 if none set
+    */
+   public int getSpecialChar(int catCode)
+   {
+      if (catCodes != null)
+      {
+         for (Iterator<Integer> it = catCodes.keySet().iterator(); it.hasNext();)
+         {
+            Integer codePoint = it.next();
+
+            if (catCodes.get(codePoint).getId() == catCode)
+            {
+               return codePoint.intValue();
+            }
+         }
+      }
+
+      return -1;
+   }
+
+   /**
+    * Gets the first character with the given category code assigned
+    * to it in this scope.
+    * @param catCode the category code
+    * @return the character code point or -1 if none set
+    */
+   public int getSpecialChar(CategoryCode catCode)
+   {
+      if (catCodes != null)
+      {
+         for (Iterator<Integer> it = catCodes.keySet().iterator(); it.hasNext();)
+         {
+            Integer codePoint = it.next();
+
+            if (catCodes.get(codePoint) == catCode)
+            {
+               return codePoint.intValue();
+            }
+         }
+      }
+
+      return -1;
+   }
+
+   @Deprecated
    public TeXSettings getParent()
    {
       return parent;
    }
 
+   @Deprecated
    private TeXSettings parent;
 
    public static final int INHERIT=-1, USER=-2;
@@ -3165,61 +3814,6 @@ public class TeXSettings
       new int[]{(int)'9', 0x1D7FF}
    };
 
-   public void setCatCode(int c, int catCode)
-   {
-      if (catcodes == null)
-      {
-         catcodes = new CatCodeList[16];
-      }
-
-      if (catcodes[catCode] == null)
-      {
-         catcodes[catCode] = new CatCodeList();
-      }
-
-      catcodes[catCode].add(Integer.valueOf(c));
-   }
-
-   public void clearCatCode(int catCode)
-   {
-      if (catcodes != null) 
-      {
-         catcodes[catCode] = null;
-      }
-   }
-
-   public int getCatCode(int charCode)
-   {
-      if (catcodes == null)
-      {
-         if (parent == null)
-         {
-            return parser.getRootCatCode(charCode);
-         }
-         else
-         {
-            return parent.getCatCode(charCode);
-         }
-      }
-
-      for (int i = 0; i < catcodes.length; i++)
-      {
-         if (catcodes[i] != null && catcodes[i].contains(charCode))
-         {
-            return i;
-         }
-      }
-
-      if (parent == null)
-      {
-         return parser.getRootCatCode(charCode);
-      }
-      else
-      {
-         return parent.getCatCode(charCode);
-      }
-   }
-
    private TeXFontFamily currentFontFamily = TeXFontFamily.INHERIT;
    private TeXFontShape currentFontShape   = TeXFontShape.INHERIT;
    private TeXFontWeight currentFontWeight = TeXFontWeight.INHERIT;
@@ -3252,16 +3846,17 @@ public class TeXSettings
 
    private TeXParser parser;
 
-   private Hashtable<String,Register> localRegisters 
-     = new Hashtable<String,Register>();
+   private HashMap<String,Register> localRegisters;
 
-   protected Hashtable<String,ControlSequence> csTable;
+   protected HashMap<String,ControlSequence> csTable;
 
-   protected Hashtable<Integer,ActiveChar> activeTable;
+   protected HashMap<Integer,ActiveChar> activeTable;
 
    protected TeXObjectList afterGroup;
 
-   protected CatCodeList[] catcodes=null;
+   //protected CatCodeList[] catcodes=null;
+   HashMap<Integer,CategoryCode> catCodes;
+   boolean detokenizing = false;// true if detokenize
 
    private long settingsID = -1;
    private static long currentSettingID=0;

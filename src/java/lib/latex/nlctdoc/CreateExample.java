@@ -149,7 +149,7 @@ public class CreateExample extends ControlSequence
       }
       else
       {
-         NumericRegister reg = parser.getSettings().getNumericRegister("c@example");
+         NumericRegister reg = parser.getScoping().getNumericRegister("c@example");
 
          if (reg == null)
          {

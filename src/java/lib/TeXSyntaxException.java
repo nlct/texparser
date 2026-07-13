@@ -231,6 +231,8 @@ public class TeXSyntaxException extends IOException
       "tex.error.invalid.debug_mode";
    public static final String ERROR_INVALID_PDF_DATE =
       "tex.error.invalid.pdf_date";
+   public static final String ERROR_INVALID_CAT_CODE =
+      "tex.error.invalid.catcode";
 
    public static final String WARNING_NO_WRITER = "warning.no_writer_available";
 }

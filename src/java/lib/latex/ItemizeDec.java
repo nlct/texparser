@@ -58,9 +58,9 @@ public class ItemizeDec extends ListDec
    {
       super.setup(parser, stack);
 
-      TeXSettings settings = parser.getSettings();
+      Scoping scoping = parser.getScoping();
 
-      NumericRegister itemdepth = settings.globalAdvanceRegister("@itemdepth",
+      NumericRegister itemdepth = scoping.globalAdvanceRegister("@itemdepth",
          LaTeXParserListener.ONE);
 
       String labelitem = "labelitem"
@@ -85,9 +85,7 @@ public class ItemizeDec extends ListDec
    public void end(TeXParser parser, TeXObjectList stack)
     throws IOException
    {
-      TeXSettings settings = parser.getSettings();
-
-      Register enumdepth = settings.globalAdvanceRegister("@itemdepth",
+      Register enumdepth = parser.getScoping().globalAdvanceRegister("@itemdepth",
          LaTeXParserListener.MINUS_ONE);
 
       super.end(parser, stack);

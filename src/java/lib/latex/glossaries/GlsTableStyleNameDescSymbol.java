@@ -46,7 +46,7 @@ public class GlsTableStyleNameDescSymbol extends ControlSequence
    {
       TeXParserListener listener = parser.getListener();
 
-      parser.getSettings().localSetRegister("glstablecolsperblock", UserNumber.THREE);
+      parser.getScoping().setRegister(true, "glstablecolsperblock", UserNumber.THREE);
 
       // \glstableinitlengthupdates
       TeXObjectList def = listener.createStack();

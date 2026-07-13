@@ -82,7 +82,7 @@ public class L2HMathGroup extends MathGroup
       {
          listener.endParagraph();
 
-         parser.getSettings().setMode(TeXMode.DISPLAY_MATH);
+         parser.getScoping().setMode(TeXMode.DISPLAY_MATH);
 
          listener.writeliteral("<div class=\"displaymath\">");
 
@@ -90,7 +90,7 @@ public class L2HMathGroup extends MathGroup
       }
       else
       {
-         parser.getSettings().setMode(TeXMode.INLINE_MATH);
+         parser.getScoping().setMode(TeXMode.INLINE_MATH);
       }
 
       if (listener.useMathJax())

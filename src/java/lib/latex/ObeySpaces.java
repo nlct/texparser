@@ -46,7 +46,7 @@ public class ObeySpaces extends ControlSequence
    public void applyCatCodeChange(TeXParser parser)
       throws IOException
    {
-      parser.setCatCode(true, ' ', TeXParser.TYPE_ACTIVE);
+      parser.setCategoryCode(true, ' ', CategoryCode.ACTIVE);
 
       parser.putActiveChar(true, new AssignedActiveChar(' ', 
         parser.getListener().getControlSequence("obeyedspace")));

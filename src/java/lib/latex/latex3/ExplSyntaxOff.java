@@ -23,8 +23,10 @@ import java.io.IOException;
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.primitives.Relax;
 
-/* This will normally be defined by ExplSyntaxOn but this is
- provided just in case ExplSyntaxOn isn't detected and also to provide no-op.
+/**
+ * Emulates <code>\ExplSyntaxOff</code>.
+ * This command will normally be defined by ExplSyntaxOn but this
+ * class is provided just in case ExplSyntaxOn isn't detected and also to provide no-op.
 */
 public class ExplSyntaxOff extends ControlSequence
   implements CatCodeChanger
@@ -48,15 +50,15 @@ public class ExplSyntaxOff extends ControlSequence
    @Override
    public void applyCatCodeChange(TeXParser parser) throws IOException
    {
-      parser.setCatCode(true, 9, TeXParser.TYPE_SPACE);
-      parser.setCatCode(true, 32, TeXParser.TYPE_SPACE);
-      parser.setCatCode(true, 34, TeXParser.TYPE_OTHER);
-      parser.setCatCode(true, 38, TeXParser.TYPE_TAB);
-      parser.setCatCode(true, 58, TeXParser.TYPE_OTHER);
-      parser.setCatCode(true, 94, TeXParser.TYPE_SP);
-      parser.setCatCode(true, 95, TeXParser.TYPE_SB);
-      parser.setCatCode(true, 124, TeXParser.TYPE_OTHER);
-      parser.setCatCode(true, 126, TeXParser.TYPE_ACTIVE);
+      parser.setCategoryCode(true, 9, CategoryCode.SPACE);
+      parser.setCategoryCode(true, 32, CategoryCode.SPACE);
+      parser.setCategoryCode(true, 34, CategoryCode.OTHER);
+      parser.setCategoryCode(true, 38, CategoryCode.TAB);
+      parser.setCategoryCode(true, 58, CategoryCode.OTHER);
+      parser.setCategoryCode(true, 94, CategoryCode.SP);
+      parser.setCategoryCode(true, 95, CategoryCode.SB);
+      parser.setCategoryCode(true, 124, CategoryCode.OTHER);
+      parser.setCategoryCode(true, 126, CategoryCode.ACTIVE);
    }
 
    @Override

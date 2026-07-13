@@ -272,18 +272,18 @@ public class DataBase
             int separator = settings.getSeparator();
             int delimiter = settings.getDelimiter();
 
-            int catcode = parser.getCatCode(separator);
+            CategoryCode catcode = parser.getCategoryCode(separator);
 
-            if (catcode != TeXParser.TYPE_OTHER)
+            if (catcode != CategoryCode.OTHER)
             {
-               parser.setCatCode(true, separator, TeXParser.TYPE_OTHER);
+               parser.setCategoryCode(true, separator, CategoryCode.OTHER);
             }
 
-            catcode = parser.getCatCode(delimiter);
+            catcode = parser.getCategoryCode(delimiter);
 
-            if (catcode != TeXParser.TYPE_OTHER)
+            if (catcode != CategoryCode.OTHER)
             {
-               parser.setCatCode(true, delimiter, TeXParser.TYPE_OTHER);
+               parser.setCategoryCode(true, delimiter, CategoryCode.OTHER);
             }
 
             FileMapType mapType;

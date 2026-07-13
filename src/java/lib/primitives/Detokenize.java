@@ -51,29 +51,11 @@ public class Detokenize extends Primitive implements Expandable
    {
       parser.startGroup();
 
-      TeXSettings settings = parser.getSettings();
+      Scoping scoping = parser.getScoping();
 
-      settings.clearCatCode(TeXParser.TYPE_ESC);
-      settings.clearCatCode(TeXParser.TYPE_MATH);
-      settings.clearCatCode(TeXParser.TYPE_TAB);
-      settings.clearCatCode(TeXParser.TYPE_EOL);
-      settings.clearCatCode(TeXParser.TYPE_PARAM);
-      settings.clearCatCode(TeXParser.TYPE_SP);
-      settings.clearCatCode(TeXParser.TYPE_SB);
-      settings.clearCatCode(TeXParser.TYPE_SPACE);
-      settings.clearCatCode(TeXParser.TYPE_ACTIVE);
-      settings.clearCatCode(TeXParser.TYPE_COMMENT);
+      scoping.setDetokenizing(true);
 
-      TeXObjectList arg;
-
-      if (parser == stack)
-      {
-         arg = parser.popNextArg().string(parser);
-      }
-      else
-      {
-         arg = stack.popArg(parser).string(parser);
-      }
+      TeXObjectList arg = popArg(parser, stack).string(parser);
 
       parser.endGroup();
 

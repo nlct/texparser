@@ -30,6 +30,13 @@ public class SpecialToken extends AbstractTeXObject implements SingleToken
    {
       this.object = object;
       this.charCode = charCode;
+      this.catCode = CategoryCode.valueOf(catCode);
+   }
+
+   public SpecialToken(MultiToken object, int charCode, CategoryCode catCode)
+   {
+      this.object = object;
+      this.charCode = charCode;
       this.catCode = catCode;
    }
 
@@ -50,8 +57,14 @@ public class SpecialToken extends AbstractTeXObject implements SingleToken
       return charCode;
    }
 
-   @Override
+   @Deprecated
    public int getCatCode()
+   {
+      return catCode.getId();
+   }
+
+   @Override
+   public CategoryCode getCategoryCode()
    {
       return catCode;
    }
@@ -104,6 +117,7 @@ public class SpecialToken extends AbstractTeXObject implements SingleToken
    }
 
    protected MultiToken object;
-   protected int charCode, catCode;
+   protected int charCode;
+   protected CategoryCode catCode;
 }
 

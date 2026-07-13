@@ -51,7 +51,7 @@ public abstract class LaTeXSty extends LaTeXFile
          // complicated.
 
          UndefAction orgAction = listener.getUndefinedAction();
-         int orgCatCode = getParser().getCatCode('@');
+         CategoryCode orgCatCode = getParser().getCategoryCode('@');
 
          ControlSequence orgCurrNameCs = getParser().getControlSequence(
            "@currname");
@@ -75,7 +75,7 @@ public abstract class LaTeXSty extends LaTeXFile
 
          substack.add(new TeXParserSetUndefAction(UndefAction.WARN));
 
-         if (orgCatCode != TeXParser.TYPE_LETTER)
+         if (orgCatCode != CategoryCode.LETTER)
          {
             substack.add(listener.getControlSequence("makeatletter"));
          }
@@ -104,12 +104,12 @@ public abstract class LaTeXSty extends LaTeXFile
             substack.add(listener.createGroup(orgCurrExt));
          }
 
-         if (orgCatCode != TeXParser.TYPE_LETTER)
+         if (orgCatCode != CategoryCode.LETTER)
          {
             substack.add(listener.getControlSequence("catcode"));
             substack.add(new UserNumber((int)'@'));
             substack.add(listener.getOther('='));
-            substack.add(new UserNumber(orgCatCode));
+            substack.add(new UserNumber(orgCatCode.getId()));
          }
 
          substack.add(new TeXParserSetUndefAction(orgAction));
@@ -137,9 +137,44 @@ public abstract class LaTeXSty extends LaTeXFile
       listener.registerControlSequence(this, cs);
    }
 
+   public void registerNewCounter(String name)
+   {
+      listener.newcounter(name);
+   }
+
+   public void registerNewCounter(String name, int value)
+   {
+      listener.newcounter(name, value);
+   }
+
+   public void registerNewCounter(String name, String parent)
+   {
+      listener.newcounter(name, parent);
+   }
+
+   public void registerNewCounter(String name, String parent, String format)
+   {
+      listener.newcounter(name, parent, format);
+   }
+
+   public void registerNewCounter(String name, String parent, String format, int value)
+   {
+      listener.newcounter(name, parent, format, value);
+   }
+
+   public CountRegister registerNewCountRegister(String name)
+   {
+      return listener.getParser().getScoping().newcount(name);
+   }
+
+   public CountRegister registerNewCountRegister(String name, int value)
+   {
+      return listener.getParser().getScoping().newcount(name, value);
+   }
+
    public DimenRegister registerNewLength(String name)
    {
-      return listener.getParser().getSettings().newdimen(name);
+      return listener.getParser().getScoping().newdimen(name);
    }
 
    public DimenRegister registerNewLength(String name, 

@@ -87,14 +87,14 @@ public class Tabular extends Declaration
      int verticalAlignment, TeXObject columnSpecs)
      throws IOException
    {
-      TeXSettings settings = parser.getSettings();
+      Scoping scoping = parser.getScoping();
 
       LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
 
       parser.putControlSequence(true, new TabularNewline());
 
-      settings.setAlignmentList(listener.createTeXCellAlignList(columnSpecs));
-      settings.startAlignment();
+      scoping.setAlignmentList(listener.createTeXCellAlignList(columnSpecs));
+      scoping.startAlignment();
    }
 
    @Override
@@ -139,7 +139,7 @@ public class Tabular extends Declaration
    @Override
    public void end(TeXParser parser, TeXObjectList stack) throws IOException
    {
-      parser.getSettings().endAlignment();
+      parser.getScoping().endAlignment();
    }
 
    @Override

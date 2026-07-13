@@ -120,7 +120,7 @@ public class L2HMathAlignRow extends L2HAlignRow
    public TeXDimension getDefaultColSep(TeXParser parser)
     throws TeXSyntaxException
    {
-      Register reg = parser.getSettings().getRegister("arraycolsep");
+      Register reg = parser.getScoping().getRegister("arraycolsep");
 
       if (reg == null || !(reg instanceof DimenRegister))
       {

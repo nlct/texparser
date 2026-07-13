@@ -62,7 +62,7 @@ public class L2HOther extends Other
                 new String(Character.toChars(getCharCode())));
          }
       }
-      else if (parser.getSettings().inVerb())
+      else if (parser.getScoping().inVerbatim())
       {
          listener.writeCodePoint(getCharCode());
       }

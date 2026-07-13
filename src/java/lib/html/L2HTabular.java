@@ -67,7 +67,7 @@ public class L2HTabular extends Tabular
 
       String cls = "tabular-";
 
-      switch (parser.getSettings().getParAlign())
+      switch (parser.getScoping().getParAlign())
       {
          case TeXSettings.PAR_ALIGN_LEFT:
            cls += "l";

@@ -52,8 +52,6 @@ public class DisplayStyle extends Primitive
    public void process(TeXParser parser)
       throws IOException
    {
-      TeXSettings settings = parser.getSettings();
-
-      settings.setMode(TeXMode.DISPLAY_MATH);
+      parser.getScoping().setMode(TeXMode.DISPLAY_MATH);
    }
 }

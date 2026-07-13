@@ -49,7 +49,7 @@ public abstract class Register extends ControlSequence implements InternalQuanti
    public void setQuantity(TeXParser parser, TeXObject quantity)
     throws TeXSyntaxException
    {
-      parser.getSettings().localSetRegister(getName(), quantity);
+      parser.getScoping().setRegister(true, getName(), quantity);
    }
 
    public abstract TeXObject getContents(TeXParser parser)
@@ -94,11 +94,11 @@ public abstract class Register extends ControlSequence implements InternalQuanti
 
       if (getPrefix() == PREFIX_GLOBAL)
       {
-         parser.getSettings().globalSetRegister(getName(), object);
+         parser.getScoping().setRegister(false, getName(), object);
       }
       else
       {
-         parser.getSettings().localSetRegister(getName(), object);
+         parser.getScoping().setRegister(true, getName(), object);
       }
    }
 

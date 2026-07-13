@@ -75,27 +75,27 @@ public class DTLreconstructdbdata extends ControlSequence
       String contentsRegName = sty.getContentsRegisterName(name);
       String headerRegName = sty.getHeaderRegisterName(name);
 
-      TeXSettings settings = parser.getSettings();
-      NumericRegister reg = settings.getNumericRegister(colRegName);
+      Scoping scoping = parser.getScoping();
+      NumericRegister reg = scoping.getNumericRegister(colRegName);
 
       if (reg == null)
       {
-         settings.newcount(false, colRegName, numCols);
+         scoping.newcount(colRegName, numCols);
       }
       else
       {
-         settings.globalSetRegister(colRegName, numCols);
+         scoping.setRegister(false, colRegName, numCols);
       }
 
-      reg = settings.getNumericRegister(rowRegName);
+      reg = scoping.getNumericRegister(rowRegName);
 
       if (reg == null)
       {
-         settings.newcount(false, rowRegName, numRows);
+         scoping.newcount(rowRegName, numRows);
       }
       else
       {
-         settings.globalSetRegister(rowRegName, numRows);
+         scoping.setRegister(false, rowRegName, numRows);
       }
 
       TokenRegister contentsReg, headerReg;

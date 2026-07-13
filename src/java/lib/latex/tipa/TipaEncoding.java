@@ -86,21 +86,20 @@ public class TipaEncoding extends Declaration
    public void process(TeXParser parser)
      throws IOException
    {
-      TeXSettings settings = parser.getSettings();
-      orgEncoding = settings.getCurrentFontEncoding();
+      Scoping scoping = parser.getScoping();
+      orgEncoding = scoping.getCurrentSettings().getCurrentFontEncoding();
 
       FontEncSty sty = 
         ((LaTeXParserListener)parser.getListener()).getFontEncSty();
 
       FontEncoding newEncoding = sty.getEncoding("T3");
-      settings.setFontEncoding(newEncoding);
+      scoping.setFontEncoding(newEncoding);
    }
 
    @Override
    public void end(TeXParser parser, TeXObjectList stack) throws IOException
    {
-      TeXSettings settings = parser.getSettings();
-      settings.setFontEncoding(orgEncoding);
+      parser.getScoping().setFontEncoding(orgEncoding);
    }
 
    @Override

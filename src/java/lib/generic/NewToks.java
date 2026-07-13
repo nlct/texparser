@@ -52,7 +52,7 @@ public class NewToks extends ControlSequence
               object.getClass().getSimpleName());
       }
 
-      parser.getSettings().newtoks(getPrefix() != PREFIX_GLOBAL, 
+      parser.getScoping().newtoks(getPrefix() != PREFIX_GLOBAL, 
         ((ControlSequence)object).getName());
    }
 

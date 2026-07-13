@@ -66,15 +66,16 @@ public class TeXFontWeightDeclaration extends TeXFontDeclaration
    @Override
    public void process(TeXParser parser) throws IOException
    {
-      TeXSettings settings = parser.getSettings();
+      Scoping scoping = parser.getScoping();
+      TeXSettings settings = scoping.getCurrentSettings();
 
       orgWeight = settings.getCurrentFontWeight();
       orgShape = settings.getCurrentFontShape();
       orgFamily = settings.getCurrentFontFamily();
 
-      settings.setFontWeight(weight);
-      settings.setFontShape(TeXFontShape.UP);
-      settings.setFontFamily(TeXFontFamily.RM);
+      scoping.setFontWeight(weight);
+      scoping.setFontShape(TeXFontShape.UP);
+      scoping.setFontFamily(TeXFontFamily.RM);
    }
 
    @Override
@@ -86,10 +87,11 @@ public class TeXFontWeightDeclaration extends TeXFontDeclaration
    @Override
    public void end(TeXParser parser, TeXObjectList stack) throws IOException
    {
-      TeXSettings settings = parser.getSettings();
-      settings.setFontWeight(orgWeight);
-      settings.setFontShape(orgShape);
-      settings.setFontFamily(orgFamily);
+      Scoping scoping = parser.getScoping();
+
+      scoping.setFontWeight(orgWeight);
+      scoping.setFontShape(orgShape);
+      scoping.setFontFamily(orgFamily);
    }
 
    private TeXFontWeight weight, orgWeight;

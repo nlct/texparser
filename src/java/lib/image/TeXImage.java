@@ -28,7 +28,7 @@ public class TeXImage extends TeXGraphicsGroup
    {
       super(parser);
 
-      Color fg = parser.getSettings().getFgColor();
+      Color fg = parser.getScoping().getFgColor();
 
       if (fg != null)
       {

@@ -44,7 +44,7 @@ public class NewLength extends ControlSequence
    {
       ControlSequence cs = popControlSequence(parser, stack);
 
-      parser.getSettings().newdimen(cs.getName());
+      parser.getScoping().newdimen(cs.getName());
    }
 
    public void process(TeXParser parser)

@@ -52,7 +52,7 @@ public class NewCount extends ControlSequence
               object.getClass().getSimpleName());
       }
 
-      parser.getSettings().newcount(getPrefix() != PREFIX_GLOBAL, 
+      parser.getScoping().newcount(getPrefix() != PREFIX_GLOBAL, 
         ((ControlSequence)object).getName());
    }
 

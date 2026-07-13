@@ -79,7 +79,7 @@ public class GlsXtrUnsrtDo extends AbstractGlsCommand
             grp.add((TeXObject)location.clone());
          }
 
-         NumericRegister levelReg = parser.getSettings().getNumericRegister("gls@level");
+         NumericRegister levelReg = parser.getScoping().getNumericRegister("gls@level");
          int offset = TeXParserUtils.toInt(
             parser.getControlSequence("@glsxtr@leveloffset"), parser, stack);
 
@@ -173,7 +173,7 @@ public class GlsXtrUnsrtDo extends AbstractGlsCommand
                   (TeXObject)location.clone()));
          }
 
-         NumericRegister levelReg = parser.getSettings().getNumericRegister("gls@level");
+         NumericRegister levelReg = parser.getScoping().getNumericRegister("gls@level");
          int offset = TeXParserUtils.toInt(
             parser.getControlSequence("@glsxtr@leveloffset"), parser, stack);
 

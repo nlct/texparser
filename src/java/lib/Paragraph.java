@@ -140,7 +140,7 @@ public class Paragraph extends DataObjectList
 
       if (isStart)
       {
-         TeXDimension dim = parser.getSettings().getCurrentParIndent();
+         TeXDimension dim = parser.getScoping().getParIndent();
 
          if (dim != null)
          {
@@ -188,7 +188,7 @@ public class Paragraph extends DataObjectList
                token.process(parser, stack);
             }
 
-            TeXDimension dim = parser.getSettings().getCurrentParIndent();
+            TeXDimension dim = parser.getScoping().getParIndent();
 
             if (dim != null)
             {

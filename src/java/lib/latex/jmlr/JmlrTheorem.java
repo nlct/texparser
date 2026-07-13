@@ -42,7 +42,7 @@ public class JmlrTheorem extends Declaration
             counter = name;
          }
 
-         if (listener.getParser().getSettings().getRegister("c@"+counter) == null)
+         if (!listener.getParser().getScoping().isControlSequenceDefined("c@"+counter))
          {
             listener.newcounter(counter, outerCounter);
          }

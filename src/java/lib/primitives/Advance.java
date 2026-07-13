@@ -77,16 +77,8 @@ public class Advance extends Primitive
 
       Numerical num = stack.popNumerical(parser);
 
-      TeXSettings settings = parser.getSettings();
-
-      if (getPrefix() == PREFIX_GLOBAL)
-      {
-         settings.globalAdvanceRegister(reg.getName(), num);
-      }
-      else
-      {
-         settings.localAdvanceRegister(reg.getName(), num);
-      }
+      parser.getScoping().advanceRegister(
+         getPrefix() != PREFIX_GLOBAL, reg.getName(), num);
    }
 
    public void process(TeXParser parser)

@@ -45,7 +45,7 @@ public class ParIndent extends Primitive implements InternalQuantity
    public TeXObject getQuantity(TeXParser parser, TeXObjectList stack)
     throws IOException
    {
-      TeXDimension dim = parser.getSettings().getCurrentParIndent();
+      TeXDimension dim = parser.getScoping().getParIndent();
 
       if (dim == null)
       {
@@ -67,7 +67,7 @@ public class ParIndent extends Primitive implements InternalQuantity
            TeXSyntaxException.ERROR_DIMEN_EXPECTED);
       }
 
-      parser.getSettings().setParIndent((TeXDimension)quantity);
+      parser.getScoping().setParIndent((TeXDimension)quantity);
    }
 
    @Override
@@ -76,7 +76,7 @@ public class ParIndent extends Primitive implements InternalQuantity
    {
       popModifier(parser, stack, '=');
       TeXDimension dim = stack.popDimension(parser);
-      parser.getSettings().setParIndent(dim);
+      parser.getScoping().setParIndent(dim);
    }
 
    @Override
@@ -85,6 +85,6 @@ public class ParIndent extends Primitive implements InternalQuantity
    {
       popModifier(parser, parser, '=');
       TeXDimension dim = parser.popDimension();
-      parser.getSettings().setParIndent(dim);
+      parser.getScoping().setParIndent(dim);
    }
 }

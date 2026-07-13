@@ -52,8 +52,6 @@ public class TextStyle extends Primitive
    public void process(TeXParser parser)
       throws IOException
    {
-      TeXSettings settings = parser.getSettings();
-
-      settings.setMode(TeXMode.INLINE_MATH);
+      parser.getScoping().setMode(TeXMode.INLINE_MATH);
    }
 }

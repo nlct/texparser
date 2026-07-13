@@ -99,10 +99,15 @@ public class BgChar extends Macro implements SingleToken
       return charCode;
    }
 
-   @Override
+   @Deprecated
    public int getCatCode()
    {
       return TeXParser.TYPE_BG;
+   }
+
+   public CategoryCode getCategoryCode()
+   {
+      return CategoryCode.BG;
    }
 
    public Group createGroup(TeXParser parser)

@@ -41,7 +41,7 @@ public abstract class CharObject extends AbstractTeXObject implements SingleToke
    @Override
    public String toString(TeXParser parser)
    {
-      return parser.getSettings().getCharString(charCode);
+      return parser.getScoping().getCharString(charCode);
    }
 
    @Override
@@ -85,7 +85,7 @@ public abstract class CharObject extends AbstractTeXObject implements SingleToke
 
    public int getMappedCharCode(TeXParser parser)
    {
-      int code = parser.getSettings().getCharCode(charCode);
+      int code = parser.getScoping().getCharCode(charCode);
 
       return (code == -1 ? charCode : code);
    }

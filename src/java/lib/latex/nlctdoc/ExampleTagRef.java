@@ -72,7 +72,7 @@ public class ExampleTagRef extends ControlSequence
       }
       else
       {
-         NumericRegister reg = parser.getSettings().getNumericRegister(
+         NumericRegister reg = parser.getScoping().getNumericRegister(
           "l_nlctdoc_extag_item_threshold_int");
 
          int threshold = reg.number(parser);

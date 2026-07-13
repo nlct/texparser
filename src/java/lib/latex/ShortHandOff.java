@@ -62,45 +62,45 @@ public class ShortHandOff extends ControlSequence
 
          if (parser.isActive(cp))
          {
-            int catCode = TeXParser.TYPE_OTHER;
+            CategoryCode catCode = CategoryCode.OTHER;
 
             if (isStar)
             {
                if (cp == '\\')
                {
-                  catCode = TeXParser.TYPE_ESC;
+                  catCode = CategoryCode.ESC;
                }
                else if (cp == '{')
                {
-                  catCode = TeXParser.TYPE_BG;
+                  catCode = CategoryCode.BG;
                }
                else if (cp == '}')
                {
-                  catCode = TeXParser.TYPE_EG;
+                  catCode = CategoryCode.EG;
                }
                else if (cp == '$')
                {
-                  catCode = TeXParser.TYPE_MATH;
+                  catCode = CategoryCode.MATH;
                }
                else if (cp == '&')
                {
-                  catCode = TeXParser.TYPE_TAB;
+                  catCode = CategoryCode.TAB;
                }
                else if (cp == '#')
                {
-                  catCode = TeXParser.TYPE_PARAM;
+                  catCode = CategoryCode.PARAM;
                }
                else if (cp == '^')
                {
-                  catCode = TeXParser.TYPE_SP;
+                  catCode = CategoryCode.SP;
                }
                else if (cp == '_')
                {
-                  catCode = TeXParser.TYPE_SB;
+                  catCode = CategoryCode.SB;
                }
             }
 
-            parser.setCatCode(true, cp, catCode);
+            parser.setCategoryCode(true, cp, catCode);
          }
       }
 
@@ -130,53 +130,53 @@ public class ShortHandOff extends ControlSequence
 
          if (parser.isActive(cp))
          {
-            int catCode = TeXParser.TYPE_OTHER;
+            CategoryCode catCode = CategoryCode.OTHER;
 
             if (isStar)
             {
                if (cp == '\\')
                {
-                  catCode = TeXParser.TYPE_ESC;
+                  catCode = CategoryCode.ESC;
                }
                else if (cp == '{')
                {
-                  catCode = TeXParser.TYPE_BG;
+                  catCode = CategoryCode.BG;
                }
                else if (cp == '}')
                {
-                  catCode = TeXParser.TYPE_EG;
+                  catCode = CategoryCode.EG;
                }
                else if (cp == '$')
                {
-                  catCode = TeXParser.TYPE_MATH;
+                  catCode = CategoryCode.MATH;
                }
                else if (cp == '&')
                {
-                  catCode = TeXParser.TYPE_TAB;
+                  catCode = CategoryCode.TAB;
                }
                else if (cp == '#')
                {
-                  catCode = TeXParser.TYPE_PARAM;
+                  catCode = CategoryCode.PARAM;
                }
                else if (cp == '^')
                {
-                  catCode = TeXParser.TYPE_SP;
+                  catCode = CategoryCode.SP;
                }
                else if (cp == '_')
                {
-                  catCode = TeXParser.TYPE_SB;
+                  catCode = CategoryCode.SB;
                }
                else if (cp == '%')
                {
-                  catCode = TeXParser.TYPE_COMMENT;
+                  catCode = CategoryCode.COMMENT;
                }
                else if (Character.isWhitespace(cp))
                {
-                  catCode = TeXParser.TYPE_SPACE;
+                  catCode = CategoryCode.SPACE;
                }
             }
 
-            parser.setCatCode(true, cp, catCode);
+            parser.setCategoryCode(true, cp, catCode);
          }
       }
    }

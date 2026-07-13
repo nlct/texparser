@@ -1866,8 +1866,7 @@ public class UserGuideSty extends LaTeXSty
       registerControlSequence(
         new TextualContentCommand("nldbdbdbsp", String.format("%n      ")));
 
-      getParser().getSettings().newcount(true,
-        "l_nlctdoc_extag_item_threshold_int", 4);
+      registerNewCountRegister("l_nlctdoc_extag_item_threshold_int", 4);
 
       registerControlSequence(new ExampleTagRef(this));
       registerControlSequence(new AtRefAtNumName());

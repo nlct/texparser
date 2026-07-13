@@ -52,7 +52,7 @@ public class NewDimen extends ControlSequence
               object.getClass().getSimpleName());
       }
 
-      parser.getSettings().newdimen(getPrefix() != PREFIX_GLOBAL, 
+      parser.getScoping().newdimen(getPrefix() != PREFIX_GLOBAL, 
         ((ControlSequence)object).getName());
    }
 

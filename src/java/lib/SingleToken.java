@@ -27,6 +27,9 @@ public interface SingleToken extends TeXObject
 {
    public int getCharCode();
 
+   @Deprecated
    public int getCatCode();
+
+   public CategoryCode getCategoryCode();
 }
 

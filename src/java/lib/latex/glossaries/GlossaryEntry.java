@@ -207,7 +207,7 @@ public class GlossaryEntry
             csname = cs.getName();
          }
 
-         sty.getParser().removeControlSequence(local, csname);
+         sty.getParser().undefControlSequence(local, csname);
       }
       else
       {
@@ -242,7 +242,7 @@ public class GlossaryEntry
 
       fields.remove(key);
 
-      sty.getParser().removeControlSequence(local, csname);
+      sty.getParser().undefControlSequence(local, csname);
    }
 
    /**

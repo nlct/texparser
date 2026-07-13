@@ -49,10 +49,15 @@ public class EgChar extends Macro implements SingleToken
       return charCode;
    }
 
-   @Override
+   @Deprecated
    public int getCatCode()
    {
       return TeXParser.TYPE_EG;
+   }
+
+   public CategoryCode getCategoryCode()
+   {
+      return CategoryCode.EG;
    }
 
    @Override

@@ -65,18 +65,17 @@ public class ParAlign extends Declaration
    public void process(TeXParser parser)
      throws IOException
    {
-       TeXSettings settings = parser.getSettings();
+       Scoping scoping = parser.getScoping();
 
-       orgAlign = settings.getCurrentParAlign();
+       orgAlign = scoping.getCurrentSettings().getCurrentParAlign();
 
-       settings.setParAlign(align);
+       scoping.setParAlign(align);
    }
 
    @Override
    public void end(TeXParser parser, TeXObjectList stack) throws IOException
    {
-      TeXSettings settings = parser.getSettings();
-      settings.setParAlign(orgAlign);
+      parser.getScoping().setParAlign(orgAlign);
    }
 
    @Override

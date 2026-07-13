@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Nicola L.C. Talbot
+    Copyright (C) 2026 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -16,38 +16,34 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
-package com.dickimawbooks.texparserlib.primitives;
+package com.dickimawbooks.texparserlib;
 
-import java.io.IOException;
-
-import com.dickimawbooks.texparserlib.*;
-
-public class AfterGroup extends Primitive
+public enum CategoryCode
 {
-   public AfterGroup()
+   ESC(0), BG(1), EG(2), MATH(3), TAB(4), EOL(5), PARAM(6),
+   SP(7), SB(8), IGNORE(9), SPACE(10), LETTER(11), OTHER(12),
+   ACTIVE(13), COMMENT(14), INVALID(15);
+
+   CategoryCode(int id)
    {
-      this("aftergroup");
+      this.id = id;
    }
 
-   public AfterGroup(String name)
+   public int getId()
    {
-      super(name);
+      return id;
    }
 
-   public Object clone()
+   public static CategoryCode valueOf(int id)
+   throws IllegalArgumentException
    {
-      return new AfterGroup(getName());
+      for (CategoryCode catCode : values())
+      {
+         if (catCode.id == id) return catCode;
+      }
+
+      throw new IllegalArgumentException("Invalid category code "+id);
    }
 
-   public void process(TeXParser parser, TeXObjectList stack)
-      throws IOException
-   {
-      parser.getScoping().addAfterGroup(stack.popToken());
-   }
-
-   public void process(TeXParser parser)
-      throws IOException
-   {
-      parser.getScoping().addAfterGroup(parser.popToken());
-   }
+   final int id;
 }

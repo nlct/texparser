@@ -23,8 +23,13 @@ import java.io.EOFException;
 
 import com.dickimawbooks.texparserlib.*;
 
-// \active isn't actually a primitive but since its value shouldn't
-// change, this seems more suitable
+/**
+ * Class representing <code>\active</code>.
+ * That is, the number 13, which is the active character category code.
+ * It's defined in TeX as <code>\char"D</code> so
+ * <code>\active</code> isn't actually a primitive but since its value shouldn't
+ * change, this seems more suitable.
+*/
 public class Active extends Primitive implements Expandable,TeXNumber
 {
    public Active()

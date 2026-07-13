@@ -44,11 +44,11 @@ public class GlsXtrLoadResources extends ControlSequence
    public void process(TeXParser parser, TeXObjectList stack)
      throws IOException
    {
-      TeXSettings settings = parser.getSettings();
+      Scoping scoping = parser.getScoping();
 
       popOptArg(parser, stack);
 
-      NumericRegister register = settings.getNumericRegister("glsxtrresourcecount");
+      NumericRegister register = scoping.getNumericRegister("glsxtrresourcecount");
 
       int n = register.number(parser);
       register.setValue(parser, new UserNumber(n+1));
@@ -65,16 +65,7 @@ public class GlsXtrLoadResources extends ControlSequence
          basename = parser.getListener().createDataList(jobname+"-"+n+".glstex");
       }
 
-      stack.push(basename);
-
-      if (parser == stack || stack == null)
-      {
-         parser.getListener().getControlSequence("input").process(parser);
-      }
-      else
-      {
-         parser.getListener().getControlSequence("input").process(parser, stack);
-      }
+      TeXParserUtils.inputFileWithAtLetter(basename, parser, stack);
    }
 
    @Override

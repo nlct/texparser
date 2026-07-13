@@ -196,9 +196,9 @@ public class AlignRow extends DataObjectList
    public void process(TeXParser parser, TeXObjectList stack)
     throws IOException
    {
-      TeXSettings settings = parser.getSettings();
+      Scoping scoping = parser.getScoping();
 
-      TeXCellAlignList alignList = settings.getAlignmentList();
+      TeXCellAlignList alignList = scoping.getAlignmentList();
 
       if (alignList == null)
       {
@@ -208,7 +208,7 @@ public class AlignRow extends DataObjectList
 
       startRow(parser, stack);
 
-      settings.startRow();
+      scoping.startRow();
 
       boolean doEnd = true;
 
@@ -226,9 +226,9 @@ public class AlignRow extends DataObjectList
          }
          else
          {
-            int currentColumn = settings.getAlignmentColumn();
+            int currentColumn = scoping.getAlignmentColumn();
             TeXCellAlign alignCell = alignList.get(currentColumn);
-            parser.getSettings().startColumn();
+            scoping.startColumn();
 
             // obj should already be a group
 
@@ -257,7 +257,7 @@ public class AlignRow extends DataObjectList
 
             for (int i = 1; i < colSpan; i++)
             {
-               parser.getSettings().startColumn();
+               scoping.startColumn();
             }
          }
       }

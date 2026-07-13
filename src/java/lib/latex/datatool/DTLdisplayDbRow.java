@@ -61,8 +61,9 @@ public class DTLdisplayDbRow extends ControlSequence
       DataToolEntryRow row = data.getRow(rowIdx);
       int numCols = db.getColumnCount();
 
-      NumericRegister rowNumReg =
-        parser.getSettings().getNumericRegister("dtlrownum");
+      Scoping scoping = parser.getScoping();
+
+      NumericRegister rowNumReg = scoping.getNumericRegister("dtlrownum");
 
       if (row == null)
       {
@@ -82,11 +83,10 @@ public class DTLdisplayDbRow extends ControlSequence
               parser, stack);
          }
 
-         parser.getSettings().localSetRegister(DataToolSty.COL_IDX_INT,
-            UserNumber.ZERO);
+         scoping.setRegister(true, DataToolSty.COL_IDX_INT, UserNumber.ZERO);
 
          NumericRegister colIdxReg =
-           parser.getSettings().getNumericRegister(DataToolSty.COL_IDX_INT);
+           scoping.getNumericRegister(DataToolSty.COL_IDX_INT);
 
          SequenceCommand colIndexes = listener.getSequenceCommand(
            DataToolSty.COLUMN_INDEXES_SEQ, stack);

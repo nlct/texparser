@@ -48,7 +48,7 @@ public class DTLsettabseparator extends ControlSequence
    public void applyCatCodeChange(TeXParser parser)
       throws IOException
    {
-      parser.setCatCode(true, '\t', TeXParser.TYPE_OTHER);
+      parser.setCategoryCode(true, '\t', CategoryCode.OTHER);
    }
 
    @Override

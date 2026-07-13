@@ -22,13 +22,21 @@ import java.io.IOException;
 
 public abstract class ActiveChar extends Macro implements Expandable,SingleToken
 {
-   // Character
-
+   /**
+    * Gets the code point of this active character.
+    */
    public abstract int getCharCode();
 
+   @Deprecated
    public int getCatCode()
    {
       return TeXParser.TYPE_ACTIVE;
+   }
+
+   @Override
+   public CategoryCode getCategoryCode()
+   {
+      return CategoryCode.ACTIVE;
    }
 
    @Override

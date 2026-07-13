@@ -48,7 +48,7 @@ public class StartFrameBox extends AbstractTeXObject
          parser.logMessage("Applying settings for "+fbox);
       }
 
-      fbox.applyToSettings(parser.getSettings());
+      fbox.applyToSettings(parser.getScoping().getCurrentSettings());
       listener.startFrameBox(fbox);
    }
 
@@ -65,7 +65,7 @@ public class StartFrameBox extends AbstractTeXObject
          parser.logMessage("Applying settings for "+fbox);
       }
 
-      fbox.applyToSettings(parser.getSettings());
+      fbox.applyToSettings(parser.getScoping().getCurrentSettings());
       listener.startFrameBox(fbox);
    }
 

@@ -44,6 +44,12 @@ public class SpChar extends Macro implements SingleToken
    }
 
    @Override
+   public CategoryCode getCategoryCode()
+   {
+      return CategoryCode.SP;
+   }
+
+   @Deprecated
    public int getCatCode()
    {
       return TeXParser.TYPE_SP;

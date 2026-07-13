@@ -1582,8 +1582,8 @@ public class TeXObjectList extends Vector<TeXObject>
             ! (
                obj1.isSingleToken()
             && obj2.isSingleToken()
-            && ((SingleToken)obj1).getCatCode()
-                   == ((SingleToken)obj2).getCatCode()
+            && ((SingleToken)obj1).getCategoryCode()
+                   == ((SingleToken)obj2).getCategoryCode()
             && obj1.equals(obj2)
               )
             )

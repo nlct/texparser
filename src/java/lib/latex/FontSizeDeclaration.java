@@ -129,18 +129,17 @@ public class FontSizeDeclaration extends Declaration
    @Override
    public void process(TeXParser parser, TeXObjectList stack) throws IOException
    {
-      TeXSettings settings = parser.getSettings();
+      Scoping scoping = parser.getScoping();
 
-      orgSize = settings.getCurrentFontSize();
+      orgSize = scoping.getCurrentSettings().getCurrentFontSize();
 
-      settings.setFontSize(size);
+      scoping.setFontSize(size);
    }
 
    @Override
    public void end(TeXParser parser, TeXObjectList stack) throws IOException
    {
-      TeXSettings settings = parser.getSettings();
-      settings.setFontSize(orgSize);
+      parser.getScoping().setFontSize(orgSize);
    }
 
    @Override

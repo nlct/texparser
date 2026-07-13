@@ -51,12 +51,12 @@ public class L2HEqnarray extends L2HMathDeclaration
 
       listener.writeliteralln("<table class=\"eqnarray\">");
 
-      TeXSettings settings = parser.getSettings();
+      Scoping scoping = parser.getScoping();
 
-      settings.setAlignmentList(listener.createTeXCellAlignList(
+      scoping.setAlignmentList(listener.createTeXCellAlignList(
          listener.createString("rcl")));
 
-      settings.startAlignment();
+      scoping.startAlignment();
    }   
 
    @Override

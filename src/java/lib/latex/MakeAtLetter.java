@@ -46,7 +46,7 @@ public class MakeAtLetter extends ControlSequence
    public void applyCatCodeChange(TeXParser parser)
       throws IOException
    {
-      parser.setCatCode(true, '@', TeXParser.TYPE_LETTER);
+      parser.setCategoryCode(true, '@', CategoryCode.LETTER);
    }
 
    @Override

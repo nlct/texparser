@@ -645,7 +645,7 @@ public class CsvReadHandler implements FileMapHandler
                   pendingRow.add(parser.getListener().createStack());
                }
             }
-            else if (parser.isCatCode(TeXParser.TYPE_SPACE, cp))
+            else if (parser.isCategoryCode(CategoryCode.SPACE, cp))
             {
                Space space = parser.getListener().getSpace();
                space.setSpace(cp);
@@ -801,7 +801,7 @@ public class CsvReadHandler implements FileMapHandler
 
             case ESC_DELIM_BKSL:
 
-               if ((cp == delimiter || parser.isCatCode(TeXParser.TYPE_ESC, cp))
+               if ((cp == delimiter || parser.isCategoryCode(CategoryCode.ESC, cp))
                    && csname.length() == Character.charCount(cp)
                   )
                {

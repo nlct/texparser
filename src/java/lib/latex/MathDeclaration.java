@@ -122,15 +122,14 @@ public class MathDeclaration extends Declaration
 
    public void doModeSwitch(TeXParser parser)
    {
-      TeXSettings settings = parser.getSettings();
-      orgMode = settings.getCurrentMode();
-      settings.setMode(mode);
+      Scoping scoping = parser.getScoping();
+      orgMode = scoping.getCurrentSettings().getCurrentMode();
+      scoping.setMode(mode);
    }
 
    public void revertModeSwitch(TeXParser parser)
    {
-      TeXSettings settings = parser.getSettings();
-      settings.setMode(orgMode);
+      parser.getScoping().setMode(orgMode);
    }
 
    @Override

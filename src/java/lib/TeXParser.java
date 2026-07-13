@@ -85,7 +85,8 @@ import com.dickimawbooks.texparserlib.primitives.Undefined;
  * {@link Group}: a form of stack that is treated as a single unit and
  * causes a new {@link TeXSettings} object to be created that represents the
  * local scope. The <code>TeXSettings</code> object is discarded when the group
- * ends.
+ * ends. The {@link Scoping} class now deals with the list of
+ * <code>TeXSettings</code> objects.
  *
  * {@link MathGroup}: a sub-class of <code>Group</code> that switches to math-mode.
  *
@@ -127,10 +128,12 @@ public class TeXParser extends TeXObjectList
       this.listener = listener;
       reader = null;
 
+/*
       activeTable = new Hashtable<Integer,ActiveChar>();
       csTable = new Hashtable<String,ControlSequence>();
+*/
 
-      settings = new TeXSettings(this);
+      scoping = new Scoping(this);
 
       verbatim = new Vector<String>();
 
@@ -205,6 +208,8 @@ public class TeXParser extends TeXObjectList
       dimenReg = new DimenRegister("dimen@ii");
       allocDimen(2, dimenReg);
 
+      TeXSettings settings = scoping.getGlobalSettings();
+
       for (int i=0; i < 10; i++)
       {
          countReg = new CountRegister("count"+i);
@@ -268,46 +273,7 @@ public class TeXParser extends TeXObjectList
 
    private void initDefCatCodes()
    {
-      catcodes = new CatCodeList[16];
-
-      for (int i = 0; i < catcodes.length; i++)
-      {
-          if (i == TYPE_OTHER)
-          {
-             catcodes[i] = null;
-             continue;
-          }
-
-          catcodes[i] = new CatCodeList();
-      }
-
-      catcodes[TYPE_ESC].add('\\');
-      catcodes[TYPE_BG].add('{');
-      catcodes[TYPE_EG].add('}');
-      catcodes[TYPE_MATH].add('$');
-      catcodes[TYPE_TAB].add('&');
-      catcodes[TYPE_EOL].add('\n');
-      catcodes[TYPE_EOL].add('\r');
-      catcodes[TYPE_PARAM].add('#');
-      catcodes[TYPE_SP].add('^');
-      catcodes[TYPE_SB].add('_');
-
-      catcodes[TYPE_SPACE].add(' ');
-      catcodes[TYPE_SPACE].add('\t');
-
-      for (int i = 'A'; i <= 'Z'; i++)
-      {
-         catcodes[TYPE_LETTER].add(Integer.valueOf(i));
-      }
-
-      for (int i = 'a'; i <= 'z'; i++)
-      {
-         catcodes[TYPE_LETTER].add(Integer.valueOf(i));
-      }
-
-      catcodes[TYPE_ACTIVE].add('~');
-      catcodes[TYPE_COMMENT].add('%');
-
+      scoping.getGlobalSettings().setDefaultCategoryCodes();
    }
 
    /**
@@ -743,18 +709,25 @@ public class TeXParser extends TeXObjectList
     */
    public boolean isActive(int codePoint)
    {
-      ActiveChar ac = getActiveChar(Integer.valueOf(codePoint));
-
-      return ac != null;
+      return isActive(Integer.valueOf(codePoint));
    }
 
    /**
-    * Checks if a character has the given category code.  
-    * @param catType the category code
+    * Checks if in a character is an active character.
     * @param codePoint the code point identifying the character
-    * @return true if the character is identified as having the
-    * given category
+    * @return true if the character is active
     */
+   public boolean isActive(Integer codePoint)
+   {
+      return isCategoryCode(CategoryCode.ACTIVE, codePoint);
+/*
+      ActiveChar ac = getActiveChar(codePoint);
+
+      return ac != null;
+*/
+   }
+
+   @Deprecated
    public boolean isCatCode(int catType, int codePoint)
    {
       if (catType == TYPE_ACTIVE)
@@ -768,28 +741,55 @@ public class TeXParser extends TeXObjectList
    }
 
    /**
+    * Checks if a character has the given category code.  
+    * @param catType the category code
+    * @param codePoint the code point identifying the character
+    * @return true if the character is identified as having the
+    * given category
+    */
+   public boolean isCategoryCode(CategoryCode catType, int codePoint)
+   {
+      CategoryCode catCode = getCategoryCode(codePoint);
+
+      return catType == catCode;
+   }
+
+   /**
+    * Checks if a character has the given category code.  
+    * @param catType the category code
+    * @param codePoint the code point identifying the character
+    * @return true if the character is identified as having the
+    * given category
+    */
+   public boolean isCategoryCode(CategoryCode catType, Integer codePoint)
+   {
+      CategoryCode catCode = getCategoryCode(codePoint);
+
+      return catType == catCode;
+   }
+
+   /**
     * Sets the category code for a given character.
     * @param isLocal true if this change should only apply to the
     * current scope
     * @param codePoint the code point identifying the character
     * @param catCode the category code
     */
-   public void setCatCode(boolean isLocal, int codePoint, int catCode)
+   public void setCategoryCode(boolean isLocal, int codePoint, CategoryCode catCode)
    {
-      if (isLocal)
-      {
-         if (isDebugMode(DEBUG_CATCODE))
-         {
-            logMessage(String.format("CatCode (local) %s -> %d", 
-             new String(Character.toChars(codePoint)), catCode));
-         }
+      scoping.setCategoryCode(isLocal, codePoint, catCode);
+   }
 
-         settings.setCatCode(codePoint, catCode);
-      }
-      else
-      {
-         setCatCode(codePoint, catCode);
-      }
+   /**
+    * Sets the category code for a given character.
+    * @param isLocal true if this change should only apply to the
+    * current scope
+    * @param codePoint the code point identifying the character
+    * @param catCode the category code
+    */
+   public void setCategoryCode(boolean isLocal, Integer codePoint, CategoryCode catCode)
+   {
+      scoping.setCategoryCode(isLocal, codePoint, catCode);
    }
 
    /**
@@ -797,65 +797,67 @@ public class TeXParser extends TeXObjectList
     * @param codePoint the code point identifying the character
     * @param catCode the category code
     */
-   public void setCatCode(int codePoint, int catCode)
+   public void setCategoryCode(int codePoint, CategoryCode catCode)
    {
-      if (isDebugMode(DEBUG_CATCODE))
-      {
-         logMessage(String.format("CatCode (global) %s -> %d", 
-          new String(Character.toChars(codePoint)), catCode));
-      }
-
-      Integer character = Integer.valueOf(codePoint);
-
-      // remove it from its current catcode list
-
-      for (int i = 0; i < catcodes.length; i++)
-      {
-         if (catcodes[i] == null) continue;
-
-         if (catcodes[i].remove(character))
-         {
-            break;
-         }
-      }
-
-      // "Other" cat code list is null
-      if (catcodes[catCode] != null)
-      {
-         // add it to its new catcode list
-         catcodes[catCode].add(character);
-      }
+      setCategoryCode(false, codePoint, catCode);
    }
 
    /**
-    * Gets the root category code for a given character.
-    * Disregards any local changes to the character's category code.
+    * Globally sets the category code for a given character.
     * @param codePoint the code point identifying the character
-    * @return the corresponding category code or <code>TYPE_OTHER</code> if not
-    * assigned.
+    * @param catCode the category code
     */
+   public void setCategoryCode(Integer codePoint, CategoryCode catCode)
+   {
+      setCategoryCode(false, codePoint, catCode);
+   }
+
+   @Deprecated
+   public void setCatCode(boolean isLocal, int codePoint, int catCode)
+   {
+      scoping.setCategoryCode(isLocal, codePoint, CategoryCode.valueOf(catCode));
+   }
+
+   @Deprecated
+   public void setCatCode(int codePoint, int catCode)
+   {
+      setCatCode(false, codePoint, catCode);
+   }
+
+   @Deprecated
    public int getRootCatCode(int codePoint)
    {
-      Integer character = Integer.valueOf(codePoint);
+      CategoryCode catCode = scoping.getGlobalSettings().getCategoryCode(codePoint);
 
-      for (int i = 0; i < catcodes.length; i++)
-      {
-         if (catcodes[i] != null && catcodes[i].contains(character))
-         {
-            return i;
-         }
-      }
-
-      return TYPE_OTHER;
+      return catCode == null ? -1 : catCode.getId();
    }
 
    /**
     * Gets the current category code for a given character.
     * @param codePoint the code point identifying the character
+    * @return the character's category code
     */
+   public CategoryCode getCategoryCode(int codePoint)
+   {
+      return scoping.getCategoryCode(codePoint);
+   }
+
+   /**
+    * Gets the current category code for a given character.
+    * @param codePoint the code point identifying the character
+    * @return the character's category code
+    */
+   public CategoryCode getCategoryCode(Integer codePoint)
+   {
+      return scoping.getCategoryCode(codePoint);
+   }
+
+   @Deprecated
    public int getCatCode(int codePoint)
    {
-      return settings.getCatCode(codePoint);
+      CategoryCode catCode = getCategoryCode(codePoint);
+
+      return catCode == null ? -1 : catCode.getId();
    }
 
    /**
@@ -912,41 +914,13 @@ public class TeXParser extends TeXObjectList
 
    /**
     * Tests if a character is considered a letter.
-    * To avoid maintaining a map of every single Unicode character, 
-    * most characters are not actually assigned a category code by
-    * default. For example, the letter <code>A</code> would not usually have a
-    * category code set. Whereas <code>MakeAtLetter</code> and <code>MakeAtOther</code>
-    * will set the category code of <code>@</code> to <code>TYPE_LETTER</code> or
-    * <code>TYPE_OTHER</code>. Since <code>getRootCatCode(int)</code> returns
-    * <code>TYPE_OTHER</code> for characters that don't have a
-    * category code assigned, simply testing with
-    * <code>isCatCode(TYPE_LETTER, codePoint)</code>
-    * is not a reliable method for testing if
-    * the character with the given code point should be consider a letter.
-    *
-    * This method first tests if the character has actually been
-    * assigned the <code>TYPE_LETTER</code> category (which will be
-    * the case for <code>@</code> if <code>MakeAtLetter</code> is processed)
-    * but then tests with <code>Character.isAlphabetic(int)</code> if
-    * <code>isCatCode(TYPE_OTHER, codePoint)</code> is true.
-    *
-    * As such, this doesn't allow for instances where an
-    * alphabetical character is intentionally set to other.
-    * Such oddities are usually hidden out of the parser's sight
-    * inside packages.
     *
     * @param codePoint the code point identifying the character
     * @return true if the character is considered a letter
     */
    public boolean isLetter(int codePoint)
    {
-      if (isCatCode(TYPE_LETTER, codePoint)
-           || (Character.isAlphabetic(codePoint) && isCatCode(TYPE_OTHER, codePoint)))
-      {
-         return true;
-      }
-
-      return false;
+      return scoping.getCategoryCode(codePoint) == CategoryCode.LETTER;
    }
 
    private int read() throws IOException
@@ -1143,17 +1117,17 @@ public class TeXParser extends TeXObjectList
       {
          int c = read();
 
-         while (isCatCode(TYPE_SPACE, c))
+         while (isCategoryCode(CategoryCode.SPACE, c))
          {
             c = read();
          }
 
-         if (isCatCode(TYPE_EOL, c))
+         if (isCategoryCode(CategoryCode.EOL, c))
          {
             parseEOL(c, this);
             text = pop().toString(this);
          }
-         else if (isCatCode(TYPE_ESC, c))
+         else if (isCategoryCode(CategoryCode.ESC, c))
          {
             readControlSequence(this, true);
             text = pop().toString(this);
@@ -1258,7 +1232,7 @@ public class TeXParser extends TeXObjectList
 
             c = read();
 
-            if (isCatCode(TYPE_EOL, c))
+            if (isCategoryCode(CategoryCode.EOL, c))
             {
                // we have a paragraph break. Skip any
                // following eol
@@ -1276,7 +1250,7 @@ public class TeXParser extends TeXObjectList
                eolFound(list, followsControlWord);
             }
          }
-         else if (isCatCode(TYPE_EOL, c))
+         else if (isCategoryCode(CategoryCode.EOL, c))
          {
             // user assigned EOL cat code to c
             // so we have a paragraph break
@@ -1331,7 +1305,7 @@ public class TeXParser extends TeXObjectList
 
             c = read();
 
-            if (isCatCode(TYPE_EOL, c))
+            if (isCategoryCode(CategoryCode.EOL, c))
             {
                // we have a paragraph break. Skip any
                // following eol
@@ -1349,7 +1323,7 @@ public class TeXParser extends TeXObjectList
                eolFound(list, followsControlWord);
             }
          }
-         else if (isCatCode(TYPE_EOL, c))
+         else if (isCategoryCode(CategoryCode.EOL, c))
          {
             // user assigned EOL cat code to c
             // so we have a paragraph break
@@ -1379,7 +1353,7 @@ public class TeXParser extends TeXObjectList
 
          // Do we have a paragraph break?
 
-         if (isCatCode(TYPE_EOL, c))
+         if (isCategoryCode(CategoryCode.EOL, c))
          {
             // paragraph break
 
@@ -1465,7 +1439,7 @@ public class TeXParser extends TeXObjectList
 
       while ((c = read()) != -1)
       {
-         if (!isCatCode(TYPE_EOL, c))
+         if (!isCategoryCode(CategoryCode.EOL, c))
          {
             reset();
             break;
@@ -1506,11 +1480,12 @@ public class TeXParser extends TeXObjectList
 
       SkippedSpaces skipped = null;
 
-      boolean inVerb = settings.inVerb();
+      boolean inVerb = scoping.inVerbatim();
 
       while ((c = read()) != -1)
       {
-         if (!(isCatCode(TYPE_SPACE, c) || (incEols && isCatCode(TYPE_EOL, c))))
+         if (!(isCategoryCode(CategoryCode.SPACE, c)
+              || (incEols && isCategoryCode(CategoryCode.EOL, c))))
          {
             reset();
             break;
@@ -1593,7 +1568,7 @@ public class TeXParser extends TeXObjectList
 
       while ((c = read()) != -1)
       {
-         if (isCatCode(TYPE_EOL, c))
+         if (isCategoryCode(CategoryCode.EOL, c))
          {
             if (c == '\n')
             {
@@ -1606,7 +1581,7 @@ public class TeXParser extends TeXObjectList
                   mark();
                   c = read();
 
-                  if (isCatCode(TYPE_EOL, c))
+                  if (isCategoryCode(CategoryCode.EOL, c))
                   {
                      list.add(comment);
                      list.add(listener.getPar());
@@ -1627,7 +1602,7 @@ public class TeXParser extends TeXObjectList
 
                   return skipNextEols(list);
                }
-               else if (isCatCode(TYPE_EOL, c))
+               else if (isCategoryCode(CategoryCode.EOL, c))
                {
                   // LF EOL
 
@@ -1661,7 +1636,7 @@ public class TeXParser extends TeXObjectList
                   mark();
                   c = read();
 
-                  if (isCatCode(TYPE_EOL, c))
+                  if (isCategoryCode(CategoryCode.EOL, c))
                   {
                      list.add(comment);
                      list.add(listener.getPar());
@@ -1682,7 +1657,7 @@ public class TeXParser extends TeXObjectList
 
                   return skipNextEols(list);
                }
-               else if (isCatCode(TYPE_EOL, c))
+               else if (isCategoryCode(CategoryCode.EOL, c))
                {
                   // CR EOL
 
@@ -1712,7 +1687,7 @@ public class TeXParser extends TeXObjectList
                mark();
                c = read();
 
-               if (isCatCode(TYPE_EOL, c))
+               if (isCategoryCode(CategoryCode.EOL, c))
                {
                   // EOL EOL
 
@@ -1761,7 +1736,7 @@ public class TeXParser extends TeXObjectList
          return false;
       }
 
-      if (isCatCode(TYPE_PARAM, c))
+      if (isCategoryCode(CategoryCode.PARAM, c))
       {
          DoubleParam dblParam = listener.getDoubleParam(paramToken);
          dblParam.setCharCode(c);
@@ -1775,7 +1750,7 @@ public class TeXParser extends TeXObjectList
             paramToken.tail().setDigit(c-'0');
             list.add(paramToken);
          }
-         else if (isCatCode(TYPE_BG, c))
+         else if (isCategoryCode(CategoryCode.BG, c))
          {
             paramToken.tail().setDigit(-1);
             list.add(paramToken);
@@ -1807,7 +1782,7 @@ public class TeXParser extends TeXObjectList
          return false;
       }
 
-      if (isCatCode(TYPE_PARAM, c))
+      if (isCategoryCode(CategoryCode.PARAM, c))
       {
          DoubleParam dblParam = listener.getDoubleParam(param);
          dblParam.setCharCode(c);
@@ -1819,7 +1794,7 @@ public class TeXParser extends TeXObjectList
          param.setDigit(c-'0');
          list.add(param);
       }
-      else if (isCatCode(TYPE_BG, c))
+      else if (isCategoryCode(CategoryCode.BG, c))
       {
          param.setDigit(-1);
          list.add(param);
@@ -1827,7 +1802,7 @@ public class TeXParser extends TeXObjectList
       }
       else
       {
-         list.add(new SpecialToken(param, charCode, TYPE_PARAM));
+         list.add(new SpecialToken(param, charCode, CategoryCode.PARAM));
          reset();
       }
 
@@ -1997,12 +1972,12 @@ public class TeXParser extends TeXObjectList
       {
          while ((c = read()) != -1)
          {
-            if (isCatCode(TYPE_EG, c))
+            if (isCategoryCode(CategoryCode.EG, c))
             {
                return true;
             }
 
-            if (isCatCode(TYPE_BG, c))
+            if (isCategoryCode(CategoryCode.BG, c))
             {
                Group subGroup = listener.createGroup();
 
@@ -2076,7 +2051,7 @@ public class TeXParser extends TeXObjectList
          throw new TeXSyntaxException(this,
             TeXSyntaxException.ERROR_MISSING_ENDMATH);
       }
-      else if (isCatCode(TYPE_MATH, c))
+      else if (isCategoryCode(CategoryCode.MATH, c))
       {
          math.setInLine(false);
          readDisplayMath(math);
@@ -2101,7 +2076,7 @@ public class TeXParser extends TeXObjectList
       {
          while ((c = read()) != -1)
          {
-            if (isCatCode(TYPE_MATH, c))
+            if (isCategoryCode(CategoryCode.MATH, c))
             {
                return;
             }
@@ -2147,7 +2122,7 @@ public class TeXParser extends TeXObjectList
       {
          while ((c = read()) != -1)
          {
-            if (isCatCode(TYPE_MATH, c))
+            if (isCategoryCode(CategoryCode.MATH, c))
             {
                mark();
                c = read();
@@ -2158,7 +2133,7 @@ public class TeXParser extends TeXObjectList
                      TeXSyntaxException.ERROR_MISSING_ENDMATH);
                }
 
-               if (!isCatCode(TYPE_MATH, c))
+               if (!isCategoryCode(CategoryCode.MATH, c))
                {
                   reset();
                   throw new TeXSyntaxException(this,
@@ -2318,7 +2293,7 @@ public class TeXParser extends TeXObjectList
          {
             TeXCsRef cs;
 
-            if (isCatCode(TYPE_EOL, c))
+            if (isCategoryCode(CategoryCode.EOL, c))
             {
                // Control sequence ended with EOL.
 
@@ -2344,7 +2319,7 @@ public class TeXParser extends TeXObjectList
 
                list.add(cs);
             }
-            else if (isCatCode(TYPE_SPACE, c))
+            else if (isCategoryCode(CategoryCode.SPACE, c))
             {
                // Control word ended by a space
 
@@ -2394,13 +2369,35 @@ public class TeXParser extends TeXObjectList
             {
                c = read();
 
-               if (isCatCode(TYPE_BG, c))
+               if (isCategoryCode(CategoryCode.BG, c))
                {
                   c = read();
 
-                  while (!isCatCode(TYPE_EG, c) && c != -1)
+                  while (!isCategoryCode(CategoryCode.EG, c) && c != -1)
                   {
-                     list.add(listener.getOther(c));
+                     // may be in a command definition
+
+                     if (isCategoryCode(CategoryCode.PARAM, c))
+                     {
+                        // TODO check for ##?
+
+                        int nextChar = read();
+
+                        if ('1' <= nextChar && nextChar <= '9')
+                        {
+                           list.add(listener.getParam(nextChar-'0'));
+                        }
+                        else
+                        {
+                           list.add(listener.getOther(c));
+                           list.add(listener.getOther(nextChar));
+                        }
+                     }
+                     else
+                     {
+                        list.add(listener.getOther(c));
+                     }
+
                      c = read();
                   }
                }
@@ -2414,17 +2411,17 @@ public class TeXParser extends TeXObjectList
                mark();
                c = read();
 
-               while (isCatCode(TYPE_SPACE, c))
+               while (isCategoryCode(CategoryCode.SPACE, c))
                {
                   mark();
                   c = read();
                }
 
-               if (isCatCode(TYPE_ESC, c))
+               if (isCategoryCode(CategoryCode.ESC, c))
                {
                   reset();
                }
-               else if (isCatCode(TYPE_LETTER, c))
+               else if (isCategoryCode(CategoryCode.LETTER, c))
                {
                   list.add(listener.getLetter(c));
                }
@@ -2494,23 +2491,23 @@ public class TeXParser extends TeXObjectList
 
       if (c == -1) return false;
 
-      if (isCatCode(TYPE_EOL, c))
+      if (isCategoryCode(CategoryCode.EOL, c))
       {
          parseEOL(c, list);
       }
-      else if (isCatCode(TYPE_ESC, c))
+      else if (isCategoryCode(CategoryCode.ESC, c))
       {
         return readControlSequence(list);
       }
-      else if (isCatCode(TYPE_COMMENT, c))
+      else if (isCategoryCode(CategoryCode.COMMENT, c))
       {
          return readComment(list);
       }
-      else if (isCatCode(TYPE_PARAM, c))
+      else if (isCategoryCode(CategoryCode.PARAM, c))
       {
          return readParam(list, c);
       }
-      else if (isCatCode(TYPE_ACTIVE, c))
+      else if (isCategoryCode(CategoryCode.ACTIVE, c))
       {
          TeXObject obj = listener.getActiveChar(c);
 
@@ -2523,33 +2520,33 @@ public class TeXParser extends TeXObjectList
 
          list.add(obj);
       }
-      else if (isCatCode(TYPE_SP, c))
+      else if (isCategoryCode(CategoryCode.SP, c))
       {
          list.add(listener.createSpChar(c));
       }
-      else if (isCatCode(TYPE_SB, c))
+      else if (isCategoryCode(CategoryCode.SB, c))
       {
          list.add(listener.createSbChar(c));
       }
-      else if (isCatCode(TYPE_TAB, c))
+      else if (isCategoryCode(CategoryCode.TAB, c))
       {
          list.add(listener.getTab(c));
       }
-      else if (isCatCode(TYPE_MATH, c))
+      else if (isCategoryCode(CategoryCode.MATH, c))
       {
          MathGroup math = listener.createMathGroup();
          list.add(math);
          readMath(math);
       }
-      else if (isCatCode(TYPE_BG, c))
+      else if (isCategoryCode(CategoryCode.BG, c))
       {
          list.add(listener.getBgChar(c));
       }
-      else if (isCatCode(TYPE_EG, c))
+      else if (isCategoryCode(CategoryCode.EG, c))
       {
          list.add(listener.getEgChar(c));
       }
-      else if (isCatCode(TYPE_SPACE, c))
+      else if (isCategoryCode(CategoryCode.SPACE, c))
       {
          Space space = listener.getSpace();
          space.setSpace(c);
@@ -2692,7 +2689,7 @@ public class TeXParser extends TeXObjectList
          logMessage("PARSE setting mode: "+mode);
       }
 
-      settings.setMode(mode);
+      scoping.setMode(mode);
 
       try
       {
@@ -2892,7 +2889,7 @@ public class TeXParser extends TeXObjectList
            parse(file, charset, obj.getPending());
          break;
          case MODE_CHANGE:
-           settings.setMode((TeXMode)data);
+           scoping.setMode((TeXMode)data);
          break;
       }
    }
@@ -3180,7 +3177,7 @@ public class TeXParser extends TeXObjectList
 
       while (c != -1)
       {
-         if (isCatCode(TYPE_EOL, c))
+         if (isCategoryCode(CategoryCode.EOL, c))
          {
             if (c == '\r')
             {
@@ -3222,7 +3219,7 @@ public class TeXParser extends TeXObjectList
             break;
             case VERBATIM_EXCEPT_ESC_SYM:
 
-               if (isCatCode(TYPE_ESC, c))
+               if (isCategoryCode(CategoryCode.ESC, c))
                {
                   c = read();
 
@@ -3231,7 +3228,7 @@ public class TeXParser extends TeXObjectList
                      line.add(new TeXCsRef("\n"));
                      eol = true;
                   }
-                  else if (isCatCode(TYPE_EOL, c))
+                  else if (isCategoryCode(CategoryCode.EOL, c))
                   {
                      eol = true;
 
@@ -3284,7 +3281,7 @@ public class TeXParser extends TeXObjectList
             break;
             case VERBATIM_EXCEPT_ESC_SEQ:
 
-               if (isCatCode(TYPE_ESC, c))
+               if (isCategoryCode(CategoryCode.ESC, c))
                {
                   c = read();
 
@@ -3293,7 +3290,7 @@ public class TeXParser extends TeXObjectList
                      eol = true;
                      line.add(new TeXCsRef("\n"));
                   }
-                  else if (isCatCode(TYPE_EOL, c))
+                  else if (isCategoryCode(CategoryCode.EOL, c))
                   {
                      eol = true;
 
@@ -3338,7 +3335,7 @@ public class TeXParser extends TeXObjectList
 
                      boolean reset = false;
 
-                     while (!(eol || isCatCode(TYPE_EOL, c))
+                     while (!(eol || isCategoryCode(CategoryCode.EOL, c))
                               && Character.isLetter(c))
                      {
                         csname.appendCodePoint(c);
@@ -3356,7 +3353,7 @@ public class TeXParser extends TeXObjectList
 
                      line.add(new TeXCsRef(csname.toString()));
 
-                     if (isCatCode(TYPE_EOL, c))
+                     if (isCategoryCode(CategoryCode.EOL, c))
                      {
                         eol = true;
 
@@ -3397,7 +3394,7 @@ public class TeXParser extends TeXObjectList
             break;
             case TEX:
 
-               if (isCatCode(TYPE_ESC, c))
+               if (isCategoryCode(CategoryCode.ESC, c))
                {
                   /*
                      The actual line ending will be skipped
@@ -3407,7 +3404,7 @@ public class TeXParser extends TeXObjectList
 
                   eol = !readControlSequence(line);
                }
-               else if (isCatCode(TYPE_COMMENT, c))
+               else if (isCategoryCode(CategoryCode.COMMENT, c))
                {
                   /*
                      The actual line ending will be skipped
@@ -3417,11 +3414,11 @@ public class TeXParser extends TeXObjectList
 
                   eol = !readComment(line);
                }
-               else if (isCatCode(TYPE_PARAM, c))
+               else if (isCategoryCode(CategoryCode.PARAM, c))
                {
                   eol = !readParam(line, c);
                }
-               else if (isCatCode(TYPE_ACTIVE, c))
+               else if (isCategoryCode(CategoryCode.ACTIVE, c))
                {
                   TeXObject obj = listener.getActiveChar(c);
 
@@ -3434,25 +3431,25 @@ public class TeXParser extends TeXObjectList
 
                   line.add(obj);
                }
-               else if (isCatCode(TYPE_SP, c))
+               else if (isCategoryCode(CategoryCode.SP, c))
                {
                   line.add(listener.createSpChar(c));
                }
-               else if (isCatCode(TYPE_SB, c))
+               else if (isCategoryCode(CategoryCode.SB, c))
                {
                   line.add(listener.createSbChar(c));
                }
-               else if (isCatCode(TYPE_TAB, c))
+               else if (isCategoryCode(CategoryCode.TAB, c))
                {
                   line.add(listener.getTab(c));
                }
-               else if (isCatCode(TYPE_MATH, c))
+               else if (isCategoryCode(CategoryCode.MATH, c))
                {
                   MathGroup math = listener.createMathGroup();
                   line.add(math);
                   readMath(math);
                }
-               else if (isCatCode(TYPE_BG, c))
+               else if (isCategoryCode(CategoryCode.BG, c))
                {
                   /*
                     EOL within a group is considered part of the same line.
@@ -3463,11 +3460,11 @@ public class TeXParser extends TeXObjectList
 
                   eol = !readGroup(grp, false);
                }
-               else if (isCatCode(TYPE_EG, c))
+               else if (isCategoryCode(CategoryCode.EG, c))
                {
                   line.add(listener.getEgChar(c));
                }
-               else if (isCatCode(TYPE_SPACE, c))
+               else if (isCategoryCode(CategoryCode.SPACE, c))
                {
                   Space space = listener.getSpace();
                   space.setSpace(c);
@@ -3483,7 +3480,7 @@ public class TeXParser extends TeXObjectList
                      mark();
                      c = read();
 
-                     if (isCatCode(TYPE_EOL, c))
+                     if (isCategoryCode(CategoryCode.EOL, c))
                      {
                         eol = true;
                         isSpace = false;
@@ -3507,7 +3504,7 @@ public class TeXParser extends TeXObjectList
                            }
                         }
                      }
-                     else if (isCatCode(TYPE_SPACE, c))
+                     else if (isCategoryCode(CategoryCode.SPACE, c))
                      {
                         space = listener.getSpace();
                         space.setSpace(c);
@@ -4355,7 +4352,7 @@ public class TeXParser extends TeXObjectList
 
       while (cp != -1)
       {
-         if (isCatCode(TYPE_ESC, cp))
+         if (isCategoryCode(CategoryCode.ESC, cp))
          {
             StringBuilder builder = new StringBuilder(endTag.length());
 
@@ -4364,7 +4361,7 @@ public class TeXParser extends TeXObjectList
 
             while (cp != -1 && builder.length() < endTag.length())
             {
-               if (isCatCode(TYPE_ESC, cp))
+               if (isCategoryCode(CategoryCode.ESC, cp))
                {
                   reset();
                   break;
@@ -4559,224 +4556,195 @@ public class TeXParser extends TeXObjectList
       return source instanceof File ? (File)source : null;
    }
 
+   /**
+    * Returns true if current scope is math mode.
+    * @return true if current scope is math mode
+    */
    public boolean isMathMode()
    {
-      return TeXMode.isMath(settings.getMode());
+      return TeXMode.isMath(scoping.getMode());
    }
 
+   /**
+    * Globally adds a control sequence.
+    * Any local instances are removed.
+    * @param cs the control sequence
+    */
    public void putControlSequence(ControlSequence cs)
    {
-      settings.removeGlobalControlSequence(cs.getName());
-      settings.getRoot().putControlSequence(cs);
-
-      if (cs instanceof Declaration)
-      {
-         EndDeclaration endDec = new EndDeclaration(cs.getName());
-         settings.putControlSequence(endDec);
-      }
-
-      csTable.put(cs.getName(), cs);
-
-      if (isDebugMode(DEBUG_CS))
-      {
-         logMessage("Globally defining "+cs);
-      }
-
-      if (cs instanceof Declaration && isLetter(cs.getName().charAt(0)))
-      {
-         EndDeclaration endDec = new EndDeclaration(cs.getName());
-         csTable.put(endDec.getName(), endDec);
-
-         if (isDebugMode(DEBUG_CS))
-         {
-            logMessage("Globally defining "+endDec);
-         }
-      }
+      putControlSequence(false, cs);
    }
 
+   /**
+    * Locally or globally adds a control sequence.
+    * If global, any local instances are removed.
+    * @param isLocal true if control sequence should be added to
+    * current scope, otherwise added to global settings
+    * @param cs the control sequence
+    */
    public void putControlSequence(boolean isLocal, ControlSequence cs)
    {
-      if (isLocal)
-      {
-         settings.putControlSequence(cs);
-
-         if (isDebugMode(DEBUG_CS))
-         {
-            logMessage("Locally defining "+cs);
-         }
-
-         if (cs instanceof Declaration)
-         {
-            EndDeclaration endDec = new EndDeclaration(cs.getName());
-            settings.putControlSequence(endDec);
-
-            if (isDebugMode(DEBUG_CS))
-            {
-               logMessage("Locally defining "+endDec);
-            }
-         }
-      }
-      else
-      {
-         putControlSequence(cs);
-      }
+      putControlSequence(isLocal, cs, false);
    }
 
+   /**
+    * Locally or globally adds a control sequence.
+    * If global, any local instances are removed.
+    * @param isLocal true if control sequence should be added to
+    * current scope, otherwise added to global settings
+    * @param cs the control sequence
+    * @param addEnd if true and the control sequence is a
+    * {@link Declaration}, add the {@link EndDeclaration} as well
+    */
+   public void putControlSequence(boolean isLocal, ControlSequence cs, boolean addEnd)
+   {
+      scoping.putControlSequence(isLocal, cs, addEnd);
+   }
+
+   /**
+    * Locally or globally adds a <code>Declaration</code> and its corresponding
+    * <code>EndDeclaration</code>.
+    */
+   public void putEnvironment(boolean isLocal, Declaration decl)
+   {
+      scoping.putControlSequence(isLocal, decl, true);
+   }
+
+   /**
+    * Tests if a control sequence with the given name is undefined.
+    * Undefined means that either there is no control sequence with
+    * the given name or there is but it's an instance of {@link
+    * Undefined}. This method searches through the local scope and
+    * then tries the global scope.
+    * @param csname the control sequence name
+    * @return true if the control sequence is considered undefined
+    * in the current scope.
+    */
+   public boolean isControlSequenceUndefined(String csname)
+   {
+      ControlSequence cs = getControlSequence(csname);
+
+      return cs == null || (cs instanceof Undefined);
+   }
+
+   /**
+    * Gets the control sequence with the given name.
+    * This method searches through the local scope and
+    * then tries the global scope. The return value may be null or
+    * an instance of <code>Undefined</code>. Use 
+    * {@link TeXParserUtils.isUndefined(ControlSequence)} to test it.
+    *
+    * Note that <code>TeXParser.getControlSequence(String)</code> may return null
+    * but <code>TeXParserListener.getControlSequence(String)</code> should not
+    * return null but instead return an instance of
+    * <code>Undefined</code>. This means that it you want to
+    * guarantee a non-null return value you need to use
+    * <code>TeXParserListener.getControlSequence(String)</code> instead.
+    */
    public ControlSequence getControlSequence(String name)
    {
-      ControlSequence cs = settings.getControlSequence(name);
-
-      if (cs != null)
-      {
-         if (isDebugMode(DEBUG_CS))
-         {
-            logMessage("Fetched LOCAL control sequence: "+cs);
-         }
-
-         return cs;
-      }
-
-      cs = csTable.get(name);
-
-      if (isDebugMode(DEBUG_CS))
-      {
-         if (cs == null)
-         {
-            logMessage("No control sequence found for: "+name);
-         }
-         else
-         {
-            logMessage("Fetched GLOBAL control sequence: "+cs);
-         }
-      }
-
-      return cs;
+      return scoping.getControlSequence(name);
    }
 
-   public ControlSequence removeControlSequence(boolean isLocal, String name)
+   public void undefControlSequence(boolean isLocal, String csname)
    {
-      if (isLocal)
-      {
-         ControlSequence cs = settings.removeLocalControlSequence(name);
-
-         if (cs != null)
-         {
-            return cs;
-         }
-      }
-      else
-      {
-         settings.removeGlobalControlSequence(name);
-      }
-
-      return csTable.remove(name);
+      scoping.undefControlSequence(isLocal, csname);
    }
 
-   public ActiveChar removeActiveChar(int code)
+   public ControlSequence removeControlSequence(String name)
    {
-      return activeTable.remove(Integer.valueOf(code));
+      return scoping.removeControlSequence(name);
    }
 
+   public ActiveChar removeActiveChar(int codePoint)
+   {
+      return scoping.removeActiveChar(Integer.valueOf(codePoint));
+   }
+
+   public void undefActiveChar(boolean isLocal, int codePoint)
+   {
+      scoping.undefActiveChar(isLocal, Integer.valueOf(codePoint));
+   }
+
+   public void undefActiveChar(boolean isLocal, Integer codePoint)
+   {
+      scoping.undefActiveChar(isLocal, codePoint);
+   }
+
+   @Deprecated
    public ActiveChar removeActiveChar(boolean isLocal, int code)
    {
+      Integer character = Integer.valueOf(code);
+
       if (isLocal)
       {
-         return settings.removeActiveChar(code);
+         return scoping.getCurrentSettings().removeActiveChar(character);
       }
       else
       {
-         return removeActiveChar(code);
+         return removeActiveChar(character);
       }
    }
 
    public void putActiveChar(ActiveChar activeChar)
    {
-      activeTable.put(Integer.valueOf(activeChar.getCharCode()),
-        activeChar);
+      putActiveChar(false, activeChar);
    }
 
    public void putActiveChar(boolean isLocal, ActiveChar activeChar)
    {
-      if (isLocal)
-      {
-         settings.putActiveChar(activeChar);
-      }
-      else
-      {
-         putActiveChar(activeChar);
-      }
+      scoping.putActiveChar(isLocal, activeChar);
    }
 
    public ActiveChar getActiveChar(int charCode)
    {
-      Integer intCode = Integer.valueOf(charCode);
-
-      ActiveChar activeChar = settings.getActiveChar(intCode);
-
-      if (activeChar != null)
-      {
-         return activeChar;
-      }
-
-      return activeTable.get(intCode);
+      return scoping.getActiveChar(Integer.valueOf(charCode));
    }
 
    public void startGroup()
    {
-      settings = new TeXSettings(settings, this);
-
-      if (isDebugMode(DEBUG_SETTINGS))
-      {
-        logMessage("START GROUP ID "+settings.getID());
-      }
+      scoping.startGroup();
    }
 
    public void endGroup()
     throws TeXSyntaxException
    {
-      if (isDebugMode(DEBUG_SETTINGS))
-      {
-        logMessage("ENDING GROUP ID "+settings.getID());
-      }
-
-      if (settings.getParent() == null)
-      {
-         throw new TeXSyntaxException(this,
-            TeXSyntaxException.ERROR_UNEXPECTED_EG);
-      }
+      TeXSettings settings = scoping.endGroup();
 
       TeXObjectList afterGroup = settings.getAfterGroup();
-      settings = settings.getParent();
-
-      if (isDebugMode(DEBUG_SETTINGS))
-      {
-        logMessage("RETURNING TO GROUP ID "+settings.getID());
-      }
 
       if (afterGroup != null)
       {
          if (isDebugMode(DEBUG_SETTINGS))
          {
-           logMessage("PUSHING AFTER GROUP CONTENT: "+afterGroup);
+            logMessage("PUSHING AFTER GROUP CONTENT: "+afterGroup);
          }
 
          addAll(0, afterGroup);
       }
    }
 
-   public TeXSettings getSettings()
+   public Scoping getScoping()
    {
-      return settings;
+      return scoping;
    }
 
-   public int getSpecialChar(int type, int def)
+   @Deprecated
+   public TeXSettings getSettings()
    {
-      if (catcodes[type].size() == 0)
-      {
-         return def;
-      }
+      return scoping.getCurrentSettings();
+   }
 
-      return catcodes[type].firstElement().intValue();
+   /**
+    * Gets the first character with the given category code assigned
+    * to it.
+    * @param catCode the category code
+    * @param defValue the default value
+    * @return the character code point or the default value if none set
+    */
+   public int getSpecialChar(int type, int defValue)
+   {
+      return scoping.getSpecialChar(type, defValue);
    }
 
    public int getEscChar()
@@ -5178,7 +5146,8 @@ public class TeXParser extends TeXObjectList
       return null;
    }
 
-   private TeXSettings settings;
+   //private TeXSettings settings;
+   private Scoping scoping;
 
    private Hashtable<Integer,CountRegister> countAlloc
      = new Hashtable<Integer,CountRegister>();
@@ -5203,9 +5172,9 @@ public class TeXParser extends TeXObjectList
    public static final Integer ALLOC_NUMBER = Integer.valueOf(21);
    public static final Integer MINUS_ONE = Integer.valueOf(22);
 
-   protected Hashtable<String,ControlSequence> csTable;
+   //protected Hashtable<String,ControlSequence> csTable;
 
-   protected Hashtable<Integer,ActiveChar> activeTable;
+   //protected Hashtable<Integer,ActiveChar> activeTable;
 
    private Writer writer;
 
@@ -5263,7 +5232,7 @@ public class TeXParser extends TeXObjectList
    /** Invalid category code. */
    public static final int TYPE_INVALID=15;
 
-   private CatCodeList[] catcodes;
+   //private CatCodeList[] catcodes;
 
    private Vector<String> verbatim;
 
@@ -5328,6 +5297,6 @@ public class TeXParser extends TeXObjectList
    /** Scoping debugging flag. */
    public static final int DEBUG_SETTINGS = 65536;
 
-   public static final String VERSION = "1.9.20260710";
-   public static final String VERSION_DATE = "2026-07-10";
+   public static final String VERSION = "1.9.20260711";
+   public static final String VERSION_DATE = "2026-07-11";
 }

@@ -51,9 +51,9 @@ public class FontEncSty extends LaTeXSty
       {
          LaTeXParserListener listener = getListener();
 
-         TeXSettings settings = listener.getParser().getSettings();
-         encoding.addDefinitions(settings);
-         settings.setFontEncoding(encoding);
+         Scoping scoping = listener.getParser().getScoping();
+         encoding.addDefinitions(scoping.getCurrentSettings());
+         scoping.setFontEncoding(encoding);
       }
    }
 

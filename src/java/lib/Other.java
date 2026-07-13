@@ -57,10 +57,16 @@ public class Other extends CharObject implements CaseChangeable
       return parser.getListener().getOther(Character.toUpperCase(charCode));
    }
 
-   @Override
+   @Deprecated
    public int getCatCode()
    {
       return TeXParser.TYPE_OTHER;
+   }
+
+   @Override
+   public CategoryCode getCategoryCode()
+   {
+      return CategoryCode.OTHER;
    }
 }
 

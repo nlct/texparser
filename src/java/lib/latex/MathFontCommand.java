@@ -38,33 +38,23 @@ public class MathFontCommand extends ControlSequence
 
    public void process(TeXParser parser) throws IOException
    {
-      TeXObject arg = parser.popNextArg();
-
-      TeXSettings settings = parser.getSettings();
-
-      TeXFontMath orgStyle = settings.getCurrentMathFont();
-
-      settings.setMathFont(style);
-
-      arg.process(parser);
-
-      settings.setMathFont(orgStyle);
+      process(parser, parser);
    }
 
-   public void process(TeXParser parser, TeXObjectList list)
+   public void process(TeXParser parser, TeXObjectList stack)
        throws IOException
    {
-      TeXObject arg = list.popArg(parser);
+      TeXObject arg = popArg(parser, stack);
 
-      TeXSettings settings = parser.getSettings();
+      Scoping scoping = parser.getScoping();
 
-      TeXFontMath orgStyle = settings.getCurrentMathFont();
+      TeXFontMath orgStyle = scoping.getCurrentSettings().getCurrentMathFont();
 
-      settings.setMathFont(style);
+      scoping.setMathFont(style);
 
-      arg.process(parser, list);
+      TeXParserUtils.process(arg, parser, stack);
 
-      settings.setMathFont(orgStyle);
+      scoping.setMathFont(orgStyle);
    }
 
    public TeXFontMath getStyle()

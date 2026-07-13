@@ -61,7 +61,7 @@ public class CatCodeCs extends Primitive
    {
       Numerical arg = stack.popNumerical(parser);
 
-      return new UserNumber(parser.getCatCode(arg.number(parser)));
+      return new UserNumber(parser.getCategoryCode(arg.number(parser)).getId());
    }
 
    @Override
@@ -83,11 +83,35 @@ public class CatCodeCs extends Primitive
 
       try
       {
-         Numerical arg2 = parser.popNumerical();
+         Numerical catNum = parser.popNumerical();
 
-         parser.push(arg2);
+         int catCodeId = catNum.number(parser);
 
-         parser.setCatCode(true, arg1.number(parser), arg2.number(parser));
+         CategoryCode catCode;
+
+         try
+         {
+            catCode = CategoryCode.valueOf(catCodeId);
+         }
+         catch (IllegalArgumentException e)
+         {
+            try
+            {
+               throw new TeXSyntaxException(e, parser,
+                TeXSyntaxException.ERROR_INVALID_CAT_CODE, catCodeId);
+            }
+            catch (TeXSyntaxException tse)
+            {
+               parser.getTeXApp().error(tse);
+            }
+
+            catCode = CategoryCode.ESC;
+            catNum = UserNumber.ZERO;
+         }
+
+         parser.setCategoryCode(true, arg1.number(parser), catCode);
+
+         parser.push(catNum);
       }
       catch (TeXSyntaxException e)
       {// do nothing (may have been preceded by \the or similar)
@@ -110,7 +134,7 @@ public class CatCodeCs extends Primitive
    {
       Numerical arg1 = stack.popNumerical(parser);
 
-      int num1 = arg1.number(parser);
+      int charCode = arg1.number(parser);
 
       TeXObject obj = stack.peekStack();
 
@@ -120,11 +144,33 @@ public class CatCodeCs extends Primitive
          stack.popToken();
       }
 
-      Numerical arg2 = stack.popNumerical(parser);
+      Numerical catNum = stack.popNumerical(parser);
 
-      int num2 = arg2.number(parser);
+      int catCodeId = catNum.number(parser);
 
-      parser.setCatCode(true, num1, num2);
+      CategoryCode catCode;
+
+      try
+      {
+         catCode = CategoryCode.valueOf(catCodeId);
+      }
+      catch (IllegalArgumentException e)
+      {
+         try
+         {
+            throw new TeXSyntaxException(e, parser,
+             TeXSyntaxException.ERROR_INVALID_CAT_CODE, catCodeId);
+         }
+         catch (TeXSyntaxException tse)
+         {
+            parser.getTeXApp().error(tse);
+         }
+
+         catCode = CategoryCode.ESC;
+         catNum = UserNumber.ZERO;
+      }
+
+      parser.setCategoryCode(true, charCode, catCode);
    }
 
    @Override
@@ -133,7 +179,7 @@ public class CatCodeCs extends Primitive
    {
       Numerical arg1 = parser.popNumerical();
 
-      int num1 = arg1.number(parser);
+      int charCode = arg1.number(parser);
 
       TeXObject obj = parser.peekStack();
 
@@ -143,11 +189,33 @@ public class CatCodeCs extends Primitive
          parser.popToken();
       }
 
-      Numerical arg2 = parser.popNumerical();
+      Numerical catNum = parser.popNumerical();
 
-      int num2 = arg2.number(parser);
+      int catCodeId = catNum.number(parser);
 
-      parser.setCatCode(true, num1, num2);
+      CategoryCode catCode;
+
+      try
+      {
+         catCode = CategoryCode.valueOf(catCodeId);
+      }
+      catch (IllegalArgumentException e)
+      {
+         try
+         {
+            throw new TeXSyntaxException(e, parser,
+             TeXSyntaxException.ERROR_INVALID_CAT_CODE, catCodeId);
+         }
+         catch (TeXSyntaxException tse)
+         {
+            parser.getTeXApp().error(tse);
+         }
+
+         catCode = CategoryCode.ESC;
+         catNum = UserNumber.ZERO;
+      }
+
+      parser.setCategoryCode(true, charCode, catCode);
    }
 
    public ControlSequence getNoOpCommand()

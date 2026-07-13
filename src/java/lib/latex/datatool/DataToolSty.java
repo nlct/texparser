@@ -162,9 +162,9 @@ public class DataToolSty extends LaTeXSty
       registerControlSequence(
          new TokenListCommand("dtlaftercols"));
 
-      getParser().getSettings().newcount(true, "dtlcolumnnum");
-      getParser().getSettings().newcount(true, "dtlrownum");
-      getParser().getSettings().newcount(true, OMIT_LINES);
+      registerNewCountRegister("dtlcolumnnum");
+      registerNewCountRegister("dtlrownum");
+      registerNewCountRegister(OMIT_LINES);
 
       // datatool v3.0:
 
@@ -218,11 +218,11 @@ public class DataToolSty extends LaTeXSty
 
       registerControlSequence(new DTLdisplayDbRow(this));
 
-      getParser().getSettings().newcount(true, MAX_COLS_INT);
-      getParser().getSettings().newcount(true, ROW_IDX_INT);
-      getParser().getSettings().newcount(true, COL_IDX_INT);
+      registerNewCountRegister(MAX_COLS_INT);
+      registerNewCountRegister(ROW_IDX_INT);
+      registerNewCountRegister(COL_IDX_INT);
 
-      getParser().getSettings().newcount(true, ITEM_TYPE_INT);
+      registerNewCountRegister(ITEM_TYPE_INT);
 
       registerControlSequence(
         new LaTeX3Boolean(DB_GLOBAL_BOOL, true));
@@ -380,12 +380,12 @@ public class DataToolSty extends LaTeXSty
          throw new LaTeXSyntaxException(parser, ERROR_DB_EXISTS, name);
       }
 
-      TeXSettings settings = parser.getSettings();
+      Scoping scoping = parser.getScoping();
 
-      settings.newtoks(!global, getContentsRegisterName(name));
-      settings.newtoks(!global, getHeaderRegisterName(name));
-      settings.newcount(!global, getRowCountRegisterName(name));
-      settings.newcount(!global, getColumnCountRegisterName(name));
+      scoping.newtoks(!global, getContentsRegisterName(name));
+      scoping.newtoks(!global, getHeaderRegisterName(name));
+      scoping.newcount(!global, getRowCountRegisterName(name));
+      scoping.newcount(!global, getColumnCountRegisterName(name));
 
       DataBase db = new DataBase(name);
 
@@ -465,49 +465,26 @@ public class DataToolSty extends LaTeXSty
          db = databases.get(name);
       }
 
-      TeXSettings settings = parser.getSettings();
-
       if (db != null)
       {
          DataToolHeaderRow headers = db.getHeaders();
 
          for (DataToolHeader header : headers)
          {
-            if (global)
-            {
-               settings.removeGlobalControlSequence(
-                 getColumnHeaderName(name, header));
-            }
-            else
-            {
-               settings.removeLocalControlSequence(
-                 getColumnHeaderName(name, header));
-            }
+            parser.undefControlSequence(!global, getColumnHeaderName(name, header));
          }
       }
 
-      if (global)
-      {
-         settings.globalSetRegister(getContentsRegisterName(name),
+      Scoping scoping = parser.getScoping();
+
+      scoping.setRegister(!global, getContentsRegisterName(name),
            new TeXObjectList());
-         settings.globalSetRegister(getHeaderRegisterName(name),
+      scoping.setRegister(!global, getHeaderRegisterName(name),
            new TeXObjectList());
-         settings.globalSetRegister(getRowCountRegisterName(name),
+      scoping.setRegister(!global, getRowCountRegisterName(name),
             (TeXObject)new UserNumber(0));
-         settings.globalSetRegister(getColumnCountRegisterName(name),
+      scoping.setRegister(!global, getColumnCountRegisterName(name),
             (TeXObject)new UserNumber(0));
-      }
-      else
-      {
-         settings.localSetRegister(getContentsRegisterName(name),
-           new TeXObjectList());
-         settings.localSetRegister(getHeaderRegisterName(name),
-           new TeXObjectList());
-         settings.localSetRegister(getRowCountRegisterName(name),
-            (TeXObject)new UserNumber(0));
-         settings.localSetRegister(getColumnCountRegisterName(name),
-            (TeXObject)new UserNumber(0));
-      }
 
       if (db == null)
       {
@@ -676,7 +653,7 @@ public class DataToolSty extends LaTeXSty
          db = databases.remove(name);
       }
 
-      TeXSettings settings = getListener().getParser().getSettings();
+      TeXParser parser = getParser();
 
       if (db != null)
       {
@@ -684,41 +661,14 @@ public class DataToolSty extends LaTeXSty
 
          for (DataToolHeader header : headers)
          {
-            if (global)
-            {
-               settings.removeGlobalControlSequence(
-                 getColumnHeaderName(name, header));
-            }
-            else
-            {
-               settings.removeLocalControlSequence(
-                 getColumnHeaderName(name, header));
-            }
+            parser.undefControlSequence(!global, getColumnHeaderName(name, header));
          }
       }
 
-      if (global)
-      {
-         settings.removeGlobalControlSequence(
-            getContentsRegisterName(name));
-         settings.removeGlobalControlSequence(
-            getHeaderRegisterName(name));
-         settings.removeGlobalControlSequence(
-            getRowCountRegisterName(name));
-         settings.removeGlobalControlSequence(
-            getColumnCountRegisterName(name));
-      }
-      else
-      {
-         settings.removeLocalControlSequence(
-            getContentsRegisterName(name));
-         settings.removeLocalControlSequence(
-            getHeaderRegisterName(name));
-         settings.removeLocalControlSequence(
-            getRowCountRegisterName(name));
-         settings.removeLocalControlSequence(
-            getColumnCountRegisterName(name));
-      }
+      parser.undefControlSequence(!global, getContentsRegisterName(name));
+      parser.undefControlSequence(!global, getHeaderRegisterName(name));
+      parser.undefControlSequence(!global, getRowCountRegisterName(name));
+      parser.undefControlSequence(!global, getColumnCountRegisterName(name));
 
       return db;
    }
@@ -744,24 +694,14 @@ public class DataToolSty extends LaTeXSty
       String rowCountRegName = getRowCountRegisterName(name);
       String colCountRegName = getColumnCountRegisterName(name);
 
-      TeXSettings settings = getParser().getSettings();
+      Scoping scoping = getParser().getScoping();
 
       DataToolHeaderRow headers = db.getHeaders();
 
-      if (global)
-      {
-         settings.globalSetRegister(headerRegName, headers);
-         settings.globalSetRegister(contentRegName, db.getData());
-         settings.globalSetRegister(rowCountRegName, db.getRowCount());
-         settings.globalSetRegister(colCountRegName, db.getColumnCount());
-      }
-      else
-      {
-         settings.localSetRegister(headerRegName, headers);
-         settings.localSetRegister(contentRegName, db.getData());
-         settings.localSetRegister(rowCountRegName, db.getRowCount());
-         settings.localSetRegister(colCountRegName, db.getColumnCount());
-      }
+      scoping.setRegister(!global, headerRegName, headers);
+      scoping.setRegister(!global, contentRegName, db.getData());
+      scoping.setRegister(!global, rowCountRegName, db.getRowCount());
+      scoping.setRegister(!global, colCountRegName, db.getColumnCount());
 
       for (DataToolHeader header : headers)
       {
@@ -911,20 +851,13 @@ public class DataToolSty extends LaTeXSty
          db.update(header, rows);
       }
 
-      TeXParser parser = getListener().getParser();
       String colRegName = getColumnCountRegisterName(name);
       String rowRegName = getRowCountRegisterName(name);
 
-      if (global)
-      {
-         parser.getSettings().globalSetRegister(colRegName, db.getColumnCount());
-         parser.getSettings().globalSetRegister(rowRegName, db.getRowCount());
-      }
-      else
-      {
-         parser.getSettings().localSetRegister(colRegName, db.getColumnCount());
-         parser.getSettings().localSetRegister(rowRegName, db.getRowCount());
-      }
+      Scoping scoping = getParser().getScoping();
+
+      scoping.setRegister(!global, colRegName, db.getColumnCount());
+      scoping.setRegister(!global, rowRegName, db.getRowCount());
 
       return db;
    }
@@ -1515,7 +1448,7 @@ public class DataToolSty extends LaTeXSty
                }
             }
 
-            parser.getSettings().localSetRegister(OMIT_LINES, num);
+            parser.getScoping().setRegister(true, OMIT_LINES, num);
          }
          else if (key.equals("no-header") || key.equals("noheader"))
          {
@@ -1722,7 +1655,7 @@ public class DataToolSty extends LaTeXSty
          parser.putControlSequence(true, new IfFalse("ifdtlautokeys"));
       }
 
-      parser.getSettings().localSetRegister(OMIT_LINES, ioSettings.getSkipLines());
+      parser.getScoping().setRegister(true, OMIT_LINES, ioSettings.getSkipLines());
 
       parser.putControlSequence(true,
         new TextualContentCommand(CSV_BLANK,

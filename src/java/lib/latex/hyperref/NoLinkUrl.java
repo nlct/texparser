@@ -43,10 +43,10 @@ public class NoLinkUrl extends ControlSequence
    protected void process(TeXParser parser, TeXObjectList stack, TeXObject arg)
      throws IOException
    {
-      TeXSettings settings = parser.getSettings();
+      Scoping scoping = parser.getScoping();
 
-      TeXFontFamily family = settings.getCurrentFontFamily();
-      settings.setFontFamily(TeXFontFamily.TT);
+      TeXFontFamily family = scoping.getCurrentSettings().getCurrentFontFamily();
+      scoping.setFontFamily(TeXFontFamily.TT);
 
       TeXObjectList expanded = null;
 
@@ -71,7 +71,7 @@ public class NoLinkUrl extends ControlSequence
          parser.getListener().getWriteable().write(expanded.toString(parser));
       }
 
-      settings.setFontFamily(family);
+      scoping.setFontFamily(family);
    }
 
    public void process(TeXParser parser) throws IOException

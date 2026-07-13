@@ -26,6 +26,7 @@ import java.util.Locale;
 import com.dickimawbooks.texparserlib.primitives.Relax;
 import com.dickimawbooks.texparserlib.primitives.IfTrue;
 import com.dickimawbooks.texparserlib.primitives.IfFalse;
+import com.dickimawbooks.texparserlib.primitives.Undefined;
 import com.dickimawbooks.texparserlib.latex.KeyValList;
 import com.dickimawbooks.texparserlib.latex.CsvList;
 
@@ -350,13 +351,25 @@ public class TeXParserUtils
       return expandFully(arg, parser, stack);
    }
 
+   /**
+    * Tests if the given control sequence is considered undefined.
+    * Undefined means null or an instance of {@link Undefined}.
+    * @param cs the control sequence
+    * @return true if the control sequence is null or an instance of
+    * <code>Undefined</code>
+    */
+   public static boolean isUndefined(ControlSequence cs)
+   {
+      return cs == null || (cs instanceof Undefined);
+   }
+
    public static String getControlSequenceValue(String csname, String defValue,
      TeXParser parser, TeXObjectList stack)
    throws IOException
    {
       ControlSequence cs = parser.getControlSequence(csname);
                
-      if (cs == null) return defValue;
+      if (isUndefined(cs)) return defValue;
             
       if (cs instanceof TextualContentCommand)
       {
@@ -473,9 +486,13 @@ public class TeXParserUtils
       TeXObject obj = popArg(parser, stack);
       NumericRegister reg = null;
 
-      if (obj instanceof ControlSequence)
+      if (obj instanceof NumericRegister)
       {
-         reg = parser.getSettings().getNumericRegister(((ControlSequence)obj).getName());
+         reg = (NumericRegister)obj;
+      }
+      else if (obj instanceof ControlSequence)
+      {
+         reg = parser.getScoping().getNumericRegister(((ControlSequence)obj).getName());
       }
 
       if (reg == null)
@@ -930,7 +947,7 @@ public class TeXParserUtils
          case 'c':
             String csn = popLabelString(parser, stack);
             ControlSequence cseq = parser.getControlSequence(csn);
-            return cseq == null ? new TeXCsRef(csn) : cseq;
+            return isUndefined(cseq) ? new TeXCsRef(csn) : cseq;
       }
 
       if (argType == 'v' || argType == 'V')
@@ -1015,7 +1032,7 @@ public class TeXParserUtils
       String csname, boolean value)
    throws TeXSyntaxException
    {
-      if (parser.getControlSequence("if"+csname) == null)
+      if (parser.isControlSequenceUndefined("if"+csname))
       {
          throw new TeXSyntaxException(parser, 
            TeXSyntaxException.ERROR_UNDEFINED, "if"+csname);
@@ -1440,11 +1457,11 @@ public class TeXParserUtils
       }
       else if (object.isSingleToken())
       {
-         int catcode = ((SingleToken)object).getCatCode();
+         CategoryCode catcode = ((SingleToken)object).getCategoryCode();
 
-         return (catcode == TeXParser.TYPE_LETTER
-               || catcode == TeXParser.TYPE_OTHER
-               || catcode == TeXParser.TYPE_SPACE);
+         return (catcode == CategoryCode.LETTER
+               || catcode == CategoryCode.OTHER
+               || catcode == CategoryCode.SPACE);
       }
       else
       {
@@ -1692,5 +1709,45 @@ public class TeXParserUtils
       return builder.build();
    }
 
+   /**
+    * Inputs a file with <code>@</code> set to letter category code.
+    * The original category code is restored afterwards.
+    * Note that grouping is not added around the filename so it
+    * should be included in the filename parameter if it is
+    * required.
+    * @param filename the file name (include grouping if appropriate)
+    * @param parser the TeXParser
+    * @param stack the stack (may be null or the parser)
+    */
+   public static void inputFileWithAtLetter(TeXObject filename, TeXParser parser, TeXObjectList stack)
+   throws IOException
+   {
+      CategoryCode atCode = parser.getCategoryCode('@');
+
+      if (stack == null)
+      {
+         stack = parser;
+      }
+
+      if (atCode != CategoryCode.LETTER)
+      {
+         parser.setCategoryCode(true, '@', CategoryCode.LETTER);
+
+         if (atCode == CategoryCode.OTHER)
+         {
+            stack.push(new TeXCsRef("makeatother"));
+         }
+         else
+         {
+            stack.push(new UserNumber(atCode.getId()));
+            stack.push(new UserNumber('@'));
+            stack.push(new TeXCsRef("catcode"));
+         }
+      }
+
+      stack.push(filename);
+
+      process(parser.getListener().getControlSequence("input"), parser, stack);
+   }
 }
 

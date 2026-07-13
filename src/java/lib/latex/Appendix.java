@@ -50,7 +50,7 @@ public class Appendix extends ControlSequence
    {
       LaTeXParserListener listener = (LaTeXParserListener)parser.getListener();
 
-      Register reg = parser.getSettings().getRegister("c@chapter");
+      Register reg = parser.getScoping().getRegister("c@chapter");
       String counter;
 
       if (reg == null)

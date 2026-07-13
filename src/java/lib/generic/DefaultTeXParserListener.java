@@ -269,14 +269,14 @@ public abstract class DefaultTeXParserListener extends TeXParserListener
 
    public DimenRegister newlength(boolean isLocal, String name)
    {
-      return parser.getSettings().newdimen(isLocal, name);
+      return parser.getScoping().newdimen(isLocal, name);
    }
 
    public DimenRegister newlength(String name,
      TeXDimension dimen)
     throws TeXSyntaxException
    {
-      DimenRegister reg = parser.getSettings().newdimen(name);
+      DimenRegister reg = parser.getScoping().newdimen(name);
 
       reg.setDimension(getParser(), dimen);
 
@@ -286,7 +286,7 @@ public abstract class DefaultTeXParserListener extends TeXParserListener
    public DimenRegister newlength(String name,
      float value, TeXUnit unit)
    {
-      DimenRegister reg = parser.getSettings().newdimen(name);
+      DimenRegister reg = parser.getScoping().newdimen(name);
 
       try
       {
@@ -302,13 +302,13 @@ public abstract class DefaultTeXParserListener extends TeXParserListener
 
    public CountRegister newcount(boolean isLocal, String name)
    {
-      return parser.getSettings().newcount(isLocal, name);
+      return parser.getScoping().newcount(isLocal, name);
    }
 
    public CountRegister newcount(String name, TeXNumber number)
     throws TeXSyntaxException
    {
-      CountRegister reg = parser.getSettings().newcount(name);
+      CountRegister reg = parser.getScoping().newcount(name);
 
       reg.setValue(getParser(), number);
 
@@ -317,7 +317,7 @@ public abstract class DefaultTeXParserListener extends TeXParserListener
 
    public CountRegister newcount(String name, int number)
    {
-      CountRegister reg = parser.getSettings().newcount(name);
+      CountRegister reg = parser.getScoping().newcount(name);
 
       try
       {
@@ -333,7 +333,7 @@ public abstract class DefaultTeXParserListener extends TeXParserListener
 
    public TokenRegister newtoks(boolean isLocal, String name)
    {
-      return parser.getSettings().newtoks(isLocal, name);
+      return parser.getScoping().newtoks(isLocal, name);
    }
 
    // Gets active character identified by charCode.

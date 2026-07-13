@@ -1040,11 +1040,11 @@ public class L2HConverter extends LaTeXParserListener
    public void cr(boolean isStar, TeXObject optArg)
      throws IOException
    {
-      TeXSettings settings = getParser().getSettings();
+      Scoping scoping = getParser().getScoping();
 
-      if (settings.getAlignMode() == TeXSettings.ALIGN_MODE_TRUE)
+      if (scoping.getAlignMode() == TeXSettings.ALIGN_MODE_TRUE)
       {
-         settings.startRow();
+         scoping.startRow();
       }
       else
       {
@@ -1124,7 +1124,8 @@ public class L2HConverter extends LaTeXParserListener
 
       if (parser != null)
       {
-         TeXSettings settings = parser.getSettings();
+         Scoping scoping = parser.getScoping();
+         TeXSettings settings = scoping.getCurrentSettings();
 
          switch (settings.getCurrentFontFamily())
          {
@@ -1155,32 +1156,10 @@ public class L2HConverter extends LaTeXParserListener
                style += "font-style: oblique; font-variant: normal; ";
                break;
             case EM:
-               TeXSettings parent = settings.getParent();
 
-               if (parent != null)
+               if (scoping.isTextItalicOrSlanted())
                {
-                  TeXFontShape parentStyle = parent.getFontShape();
-
-                  if (parentStyle == TeXFontShape.UP
-                    ||parentStyle == TeXFontShape.INHERIT)
-                  {
-                     if (settings.getFontFamily() == TeXFontFamily.SF)
-                     {
-                        style += "font-style: oblique; ";
-                     }
-                     else
-                     {
-                        style += "font-style: italic; ";
-                     }
-                  }
-                  else
-                  {
-                     style += "font-style: normal; ";
-                  }
-               }
-               else
-               {
-                  if (settings.getFontFamily() == TeXFontFamily.SF)
+                  if (scoping.isTextSansSerif())
                   {
                      style += "font-style: oblique; ";
                   }
@@ -1188,6 +1167,10 @@ public class L2HConverter extends LaTeXParserListener
                   {
                      style += "font-style: italic; ";
                   }
+               }
+               else
+               {
+                  style += "font-style: normal; ";
                }
 
                style += "font-variant: normal; ";
@@ -2329,11 +2312,11 @@ public class L2HConverter extends LaTeXParserListener
          writeliteralln(String.format(".%s {%s}", defaultStyles.get(style), style));
       }
 
-      Color fgCol = getParser().getSettings().getFgColor();
-      Color bgCol = getParser().getSettings().getBgColor();
+      Color fgCol = getParser().getScoping().getFgColor();
+      Color bgCol = getParser().getScoping().getBgColor();
 
-      boolean addFg = (fgCol != null && fgCol != Color.BLACK);
-      boolean addBg = (bgCol != null && bgCol != Color.WHITE);
+      boolean addFg = (fgCol != null && !fgCol.equals(Color.BLACK));
+      boolean addBg = (bgCol != null && !bgCol.equals(Color.WHITE));
 
       if (addFg || addBg)
       {
@@ -2674,7 +2657,7 @@ public class L2HConverter extends LaTeXParserListener
          addMathJaxCommands();
       }
 
-      getParser().getSettings().setCharMapMode(TeXSettings.CHAR_MAP_ON);
+      getParser().getScoping().setCharMapMode(TeXSettings.CHAR_MAP_ON);
 
       if (divisionData != null && !divisionData.isEmpty())
       {
@@ -5723,7 +5706,7 @@ public class L2HConverter extends LaTeXParserListener
       }
 
       if (tag.equals("div") && !fbox.isInLine() 
-           && !getParser().getSettings().inVerb())
+           && !getParser().getScoping().inVerbatim())
       {
          writeliteralln(String.format("<!-- end of %s -->", fbox.getId()));
       }
@@ -6040,7 +6023,7 @@ public class L2HConverter extends LaTeXParserListener
    protected void addDefaultTabularStyles()
     throws IOException
    {
-      Register reg = parser.getSettings().getRegister("tabcolsep");
+      Register reg = parser.getScoping().getRegister("tabcolsep");
 
       if (reg == null || !(reg instanceof DimenRegister))
       {
@@ -6166,7 +6149,7 @@ public class L2HConverter extends LaTeXParserListener
    protected void addDefaultArrayStyles()
     throws IOException
    {
-      Register reg = parser.getSettings().getRegister("arraycolsep");
+      Register reg = parser.getScoping().getRegister("arraycolsep");
 
       if (reg == null || !(reg instanceof DimenRegister))
       {

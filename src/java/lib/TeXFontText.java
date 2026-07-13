@@ -136,11 +136,11 @@ public class TeXFontText
    {
       int normal = parser.getListener().getNormalFontSize();
 
-      TeXSettings settings = parser.getSettings();
+      Scoping scoping = parser.getScoping();
 
       if (size == TeXFontSize.SMALLER || size == TeXFontSize.LARGER)
       {
-         TeXFontSize currentSize = settings.getFontSize();
+         TeXFontSize currentSize = scoping.getFontSize();
          boolean smaller = (size == TeXFontSize.SMALLER);
          int relStep = (relative == null ? 1 : relative.number(parser));
          double bp;
@@ -228,7 +228,7 @@ public class TeXFontText
 
       if (size == TeXFontSize.INHERIT)
       {
-         currentSize = settings.getFontSize();
+         currentSize = scoping.getFontSize();
       }
 
       if (currentSize == TeXFontSize.USER)
@@ -250,27 +250,27 @@ public class TeXFontText
    public Font getFont(TeXParser parser)
     throws TeXSyntaxException
    {
-      TeXSettings settings = parser.getSettings();
+      Scoping scoping = parser.getScoping();
 
       TeXFontFamily currentFamily = family;
 
       if (family == TeXFontFamily.INHERIT)
       {
-         currentFamily = settings.getFontFamily();
+         currentFamily = scoping.getFontFamily();
       }
 
       TeXFontShape currentShape = shape;
 
       if (shape == TeXFontShape.INHERIT)
       {
-         currentShape = settings.getFontShape();
+         currentShape = scoping.getFontShape();
       }
 
       TeXFontWeight currentWeight = weight;
 
       if (weight == TeXFontWeight.INHERIT)
       {
-         currentWeight = settings.getFontWeight();
+         currentWeight = scoping.getFontWeight();
       }
 
       int fontSize = deriveSize(parser);
@@ -365,8 +365,6 @@ public class TeXFontText
    public String getCss(TeXParser parser)
     throws TeXSyntaxException
    {
-      TeXSettings settings = parser.getSettings();
-
       StringBuilder builder = new StringBuilder();
 
       if (family != TeXFontFamily.INHERIT)
@@ -432,8 +430,9 @@ public class TeXFontText
             builder.append("font-style: oblique; font-variant: normal; ");
          break;
          case EM:
-            TeXFontFamily parentFamily = settings.getFontFamily();
-            TeXFontShape parentShape = settings.getFontShape();
+            Scoping scoping = parser.getScoping();
+            TeXFontFamily parentFamily = scoping.getFontFamily();
+            TeXFontShape parentShape = scoping.getFontShape();
 
             if (parentShape == TeXFontShape.IT || parentShape == TeXFontShape.SL)
             {
@@ -527,8 +526,6 @@ public class TeXFontText
    {
       HashMap<String,String> attrs = new HashMap<String,String>();
 
-      TeXSettings settings = parser.getSettings();
-
       if (family != TeXFontFamily.INHERIT)
       {
          StringBuilder builder = new StringBuilder();
@@ -596,8 +593,9 @@ public class TeXFontText
             attrs.put("font-variant", "normal");
          break;
          case EM:
-            TeXFontFamily parentFamily = settings.getFontFamily();
-            TeXFontShape parentShape = settings.getFontShape();
+            Scoping scoping = parser.getScoping();
+            TeXFontFamily parentFamily = scoping.getFontFamily();
+            TeXFontShape parentShape = scoping.getFontShape();
 
             if (parentShape == TeXFontShape.IT || parentShape == TeXFontShape.SL)
             {

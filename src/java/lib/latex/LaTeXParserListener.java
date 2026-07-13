@@ -989,9 +989,9 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
       newcounter("secnumdepth", 3);
       newcounter("tocdepth", 3);
 
-      parser.getSettings().newcount("@listdepth");
-      parser.getSettings().newcount("@enumdepth");
-      parser.getSettings().newcount("@itemdepth");
+      parser.getScoping().newcount("@listdepth");
+      parser.getScoping().newcount("@enumdepth");
+      parser.getScoping().newcount("@itemdepth");
 
       NewIf.createConditional(true, parser, "if@nmbrlist");
 
@@ -2114,7 +2114,7 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
             LaTeXSyntaxException.ERROR_MULTI_BEGIN_DOC);
       }
 
-      getParser().getSettings().setCharMapMode(TeXSettings.CHAR_MAP_OFF);
+      getParser().getScoping().setCharMapMode(TeXSettings.CHAR_MAP_OFF);
 
       setIsInDocEnv(true);
 
@@ -3326,11 +3326,11 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
    public void cr(boolean isStar, TeXObject optArg)
      throws IOException
    {
-      TeXSettings settings = getParser().getSettings();
+      Scoping scoping = getParser().getScoping();
 
-      if (settings.getAlignMode() == TeXSettings.ALIGN_MODE_TRUE)
+      if (scoping.getAlignMode() == TeXSettings.ALIGN_MODE_TRUE)
       {
-         settings.startRow();
+         scoping.startRow();
       }
    }
 
@@ -3489,7 +3489,7 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
    public void newcounter(String name, String parent, String format, int value)
    {
       // counters are global
-      CountRegister reg = parser.getSettings().newcount(false, "c@"+name);
+      CountRegister reg = parser.getScoping().newcount(false, "c@"+name);
       reg.setValue(value);
 
       if (parent == null)
@@ -3506,6 +3506,7 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
                getOther('.'),
                new TeXCsRef("number"),
                new TeXCsRef("c@"+name)}));
+
          addtoreset(name, parent);
       }
    }
@@ -3526,7 +3527,7 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
    public int getcountervalue(String name)
     throws TeXSyntaxException,LaTeXSyntaxException
    {
-      NumericRegister reg = parser.getSettings().getNumericRegister("c@"+name);
+      NumericRegister reg = parser.getScoping().getNumericRegister("c@"+name);
 
       if (reg == null)
       {
@@ -3540,13 +3541,13 @@ public abstract class LaTeXParserListener extends DefaultTeXParserListener
    public void addtocounter(String name, Numerical value)
      throws TeXSyntaxException
    {
-      parser.getSettings().globalAdvanceRegister("c@"+name, value);
+      parser.getScoping().globalAdvanceRegister("c@"+name, value);
    }
 
    public void setcounter(String name, Numerical value)
      throws TeXSyntaxException
    {
-      parser.getSettings().globalSetRegister("c@"+name, value);
+      parser.getScoping().globalSetRegister("c@"+name, value);
    }
 
    public void resetcounter(String name)

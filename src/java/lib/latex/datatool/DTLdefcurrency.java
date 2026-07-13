@@ -47,7 +47,7 @@ public class DTLdefcurrency extends ControlSequence implements CatCodeChanger
    public void applyCatCodeChange(TeXParser parser)
       throws IOException
    {
-      parser.setCatCode(true, '$', TeXParser.TYPE_OTHER);
+      parser.setCategoryCode(true, '$', CategoryCode.OTHER);
    }
 
    @Override

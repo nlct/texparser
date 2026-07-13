@@ -522,7 +522,7 @@ public class GlossariesSty extends LaTeXSty
       registerControlSequence(new GlsEntryFull("glsentryfullpl", true, this));
       registerControlSequence(new GlsEntryFull("Glsentryfullpl", CaseChange.SENTENCE, true, this));
 
-      getParser().getSettings().newcount("gls@level");
+      registerNewCountRegister("gls@level");
 
       registerControlSequence(new GenericCommand(true, "@gls@counter", null,
          new TeXCsRef("glscounter")));
@@ -656,7 +656,7 @@ public class GlossariesSty extends LaTeXSty
       registerControlSequence(
         new TextualContentCommand("GlsXtrDefaultResourceOptions", ""));
 
-      getParser().getSettings().newcount("glsxtrresourcecount");
+      registerNewCountRegister("glsxtrresourcecount");
 
       registerControlSequence(new GlsXtrResourceFile());
       registerControlSequence(new GlsXtrLoadResources());
@@ -739,7 +739,7 @@ public class GlossariesSty extends LaTeXSty
       registerControlSequence(new TextualContentCommand(
          "GlsXtrLocationField", "location"));
 
-      getParser().getSettings().newcount("@glsxtr@leveloffset");
+      registerNewCountRegister("@glsxtr@leveloffset");
 
       NewIf.createConditional(true, getParser(), "ifglsxtr@printgloss@groups", true);
       NewIf.createConditional(true, getParser(), "ifglsxtrprintglossflatten", false);
@@ -1796,17 +1796,13 @@ public class GlossariesSty extends LaTeXSty
       TeXParser parser = getParser();
       LaTeXParserListener listener = getListener();
 
-      CountRegister reg = parser.getSettings().newcount(true,
-        "glstableblockperrowcount");
-      reg.setValue(2);
+      registerNewCountRegister("glstableblockperrowcount", 2);
 
-      parser.getSettings().newcount(true, "glstablecurrentblockindex");
+      registerNewCountRegister("glstablecurrentblockindex");
 
-      parser.getSettings().newcount(true, "glstabletotalcols");
+      registerNewCountRegister("glstabletotalcols");
 
-      reg = parser.getSettings().newcount(true,
-        "glstablecolsperblock");
-      reg.setValue(2);
+      registerNewCountRegister("glstablecolsperblock", 2);
 
       registerControlSequence(new GenericCommand(true,
        "glstablenameheader", null, new TeXCsRef("entryname")));
@@ -2407,7 +2403,7 @@ public class GlossariesSty extends LaTeXSty
 
       if (indexcounter)
       {
-         getListener().newcounter("wrglossary");
+         registerNewCounter("wrglossary");
          registerControlSequence(new TextualContentCommand("glscounter", 
            "wrglossary"));
 
@@ -2517,7 +2513,7 @@ public class GlossariesSty extends LaTeXSty
       boolean loadStyles = (loadList || loadTree || extra);
 
       UndefAction orgAction = listener.getUndefinedAction();
-      int orgCatCode = getParser().getCatCode('@');
+      CategoryCode orgCatCode = getParser().getCategoryCode('@');
 
       if (stylemods != null && !stylemods.isEmpty())
       {
@@ -2555,7 +2551,7 @@ public class GlossariesSty extends LaTeXSty
       {
          substack.add(new TeXParserSetUndefAction(UndefAction.WARN));
 
-         if (orgCatCode != TeXParser.TYPE_LETTER)
+         if (orgCatCode != CategoryCode.LETTER)
          {
             substack.add(listener.getControlSequence("makeatletter"));
          }
@@ -2622,12 +2618,19 @@ public class GlossariesSty extends LaTeXSty
 
       if (loadStyles)
       {
-         if (orgCatCode != TeXParser.TYPE_LETTER)
+         if (orgCatCode != CategoryCode.LETTER)
          {
-            substack.add(listener.getControlSequence("catcode"));
-            substack.add(new UserNumber((int)'@'));
-            substack.add(listener.getOther('='));
-            substack.add(new UserNumber(orgCatCode));
+            if (orgCatCode == CategoryCode.OTHER)
+            {
+               substack.add(listener.getControlSequence("makeatother"));
+            }
+            else
+            {
+               substack.add(listener.getControlSequence("catcode"));
+               substack.add(new UserNumber((int)'@'));
+               substack.add(listener.getOther('='));
+               substack.add(new UserNumber(orgCatCode.getId()));
+            }
          }
 
          substack.add(new TeXParserSetUndefAction(orgAction));
@@ -2967,23 +2970,30 @@ public class GlossariesSty extends LaTeXSty
       TeXObjectList substack = getListener().createStack();
 
       UndefAction orgAction = listener.getUndefinedAction();
-      int orgCatCode = getParser().getCatCode('@');
+      CategoryCode orgCatCode = getParser().getCategoryCode('@');
 
       substack.add(new TeXParserSetUndefAction(UndefAction.WARN));
 
-      if (orgCatCode != TeXParser.TYPE_LETTER)
+      if (orgCatCode != CategoryCode.LETTER)
       {
          substack.add(listener.getControlSequence("makeatletter"));
       }
 
       substack.add(TeXParserActionObject.createInputAction(texPath)); 
 
-      if (orgCatCode != TeXParser.TYPE_LETTER)
+      if (orgCatCode != CategoryCode.LETTER)
       {
-         substack.add(listener.getControlSequence("catcode"));
-         substack.add(new UserNumber((int)'@'));
-         substack.add(listener.getOther('='));
-         substack.add(new UserNumber(orgCatCode));
+         if (orgCatCode == CategoryCode.OTHER)
+         {
+            substack.add(listener.getControlSequence("makeatother"));
+         }
+         else
+         {
+            substack.add(listener.getControlSequence("catcode"));
+            substack.add(new UserNumber((int)'@'));
+            substack.add(listener.getOther('='));
+            substack.add(new UserNumber(orgCatCode.getId()));
+         }
       }
 
       substack.add(new TeXParserSetUndefAction(orgAction));
@@ -4023,7 +4033,7 @@ public class GlossariesSty extends LaTeXSty
                     TeXSyntaxException.ERROR_NUMBER_EXPECTED, str);
                }
 
-               NumericRegister reg = parser.getSettings().getNumericRegister("@glsxtr@leveloffset");
+               NumericRegister reg = parser.getScoping().getNumericRegister("@glsxtr@leveloffset");
 
                if (reg != null)
                {

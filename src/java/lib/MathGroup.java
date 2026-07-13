@@ -103,9 +103,9 @@ public class MathGroup extends Group
    {
       super.startGroup(parser);
 
-      TeXSettings settings = parser.getSettings();
+      Scoping scoping = parser.getScoping();
 
-      settings.setMode(isinline ? TeXMode.INLINE_MATH :
+      scoping.setMode(isinline ? TeXMode.INLINE_MATH :
          TeXMode.DISPLAY_MATH);
    }
 

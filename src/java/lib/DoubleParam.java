@@ -55,9 +55,15 @@ public class DoubleParam extends AbstractTeXObject
       return charCode;
    }
 
+   @Deprecated
    public int getCatCode()
    {
       return TeXParser.TYPE_PARAM;
+   }
+
+   public CategoryCode getCategoryCode()
+   {
+      return CategoryCode.PARAM;
    }
 
    @Override
@@ -65,7 +71,7 @@ public class DoubleParam extends AbstractTeXObject
    {
       TeXObjectList list = new TeXObjectList();
 
-      list.add(new SpecialToken(this, charCode, TeXParser.TYPE_PARAM));
+      list.add(new SpecialToken(this, charCode, CategoryCode.PARAM));
 
       list.addAll(param.splitTokens(parser));
 
@@ -97,7 +103,7 @@ public class DoubleParam extends AbstractTeXObject
       else if (nextToken.isSingleToken())
       {
          int cp = ((SingleToken)nextToken).getCharCode();
-         int cat = ((SingleToken)nextToken).getCatCode();
+         CategoryCode catCode = ((SingleToken)nextToken).getCategoryCode();
          
          if (cp >= '1' && cp <= '9')
          {
@@ -106,13 +112,13 @@ public class DoubleParam extends AbstractTeXObject
             paramToken = param;
             pop = true;
          }
-         else if (cat == TeXParser.TYPE_BG)
+         else if (catCode == CategoryCode.BG)
          {
             Param param = parser.getListener().getParam(-1);
             param.setCharCode(getCharCode());
             paramToken = param;
          }
-         else if (cat == TeXParser.TYPE_PARAM && nextToken instanceof SpecialToken)
+         else if (catCode == CategoryCode.PARAM && nextToken instanceof SpecialToken)
          {
             SpecialToken st = (SpecialToken)nextToken;
 

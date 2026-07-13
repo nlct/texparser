@@ -64,9 +64,15 @@ public class Param extends AbstractTeXObject implements ParameterToken
       return charCode;
    }
 
+   @Deprecated
    public int getCatCode()
    {
       return TeXParser.TYPE_PARAM;
+   }
+
+   public CategoryCode getCategoryCode()
+   {
+      return CategoryCode.PARAM;
    }
 
    @Override
@@ -74,7 +80,7 @@ public class Param extends AbstractTeXObject implements ParameterToken
    {
       TeXObjectList list = new TeXObjectList();
 
-      list.add(new SpecialToken(this, charCode, TeXParser.TYPE_PARAM));
+      list.add(new SpecialToken(this, charCode, CategoryCode.PARAM));
 
       if (digit > 0)
       {
@@ -112,18 +118,18 @@ public class Param extends AbstractTeXObject implements ParameterToken
       else if (nextToken.isSingleToken())
       {
          int cp = ((SingleToken)nextToken).getCharCode();
-         int cat = ((SingleToken)nextToken).getCatCode();
+         CategoryCode catCode = ((SingleToken)nextToken).getCategoryCode();
 
          if (cp >= '1' && cp <= '9')
          {
             param.setDigit(cp - '0');
             pop = true;
          }
-         else if (cat == TeXParser.TYPE_BG)
+         else if (catCode == CategoryCode.BG)
          {
             param.setDigit(-1);
          }
-         else if (cat == TeXParser.TYPE_PARAM && nextToken instanceof SpecialToken)
+         else if (catCode == CategoryCode.PARAM && nextToken instanceof SpecialToken)
          {
             SpecialToken st = (SpecialToken)nextToken;
 

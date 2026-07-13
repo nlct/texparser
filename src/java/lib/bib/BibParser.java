@@ -106,30 +106,30 @@ public class BibParser extends DefaultTeXParserListener
          this.charset=charset;
       }
 
-      int atcode = parser.getCatCode('@');
-      int hashcode = parser.getCatCode('#');
-      int tildecode = TeXParser.TYPE_ACTIVE;
+      CategoryCode atcode = parser.getCategoryCode('@');
+      CategoryCode hashcode = parser.getCategoryCode('#');
+      CategoryCode tildecode = CategoryCode.ACTIVE;
 
       if (maketildeother)
       {
-         tildecode = parser.getCatCode('~');
+         tildecode = parser.getCategoryCode('~');
       }
 
-      parser.setCatCode('@', TeXParser.TYPE_ACTIVE);
-      parser.setCatCode('#', TeXParser.TYPE_OTHER);
+      parser.setCategoryCode('@', CategoryCode.ACTIVE);
+      parser.setCategoryCode('#', CategoryCode.OTHER);
 
       if (maketildeother)
       {
-         parser.setCatCode('~', TeXParser.TYPE_OTHER);
+         parser.setCategoryCode('~', CategoryCode.OTHER);
       }
 
       parser.parse(bibFile, getCharSet());
-      parser.setCatCode('@', atcode);
-      parser.setCatCode('#', hashcode);
+      parser.setCategoryCode('@', atcode);
+      parser.setCategoryCode('#', hashcode);
 
       if (maketildeother)
       {
-         parser.setCatCode('~', tildecode);
+         parser.setCategoryCode('~', tildecode);
       }
    }
 

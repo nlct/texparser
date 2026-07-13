@@ -115,9 +115,8 @@ public class Symbol extends ControlSequence implements Expandable,CaseChangeable
      throws IOException
    {
       TeXParserListener listener = parser.getListener();
-      TeXSettings settings = parser.getSettings();
 
-      int c = settings.getCharCode(codePoint);
+      int c = parser.getScoping().getCharCode(codePoint);
 
       listener.getWriteable().writeCodePoint(c == -1 ? codePoint : c);
    }
