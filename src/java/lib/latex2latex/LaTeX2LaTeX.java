@@ -783,6 +783,8 @@ public class LaTeX2LaTeX extends LaTeXParserListener
          {
             String path = imageDestPath.toString();
 
+            writeCodePoint(bg);
+
             write(path);
 
             if (!path.endsWith("/"))
@@ -795,7 +797,16 @@ public class LaTeX2LaTeX extends LaTeXParserListener
 
          for (TeXObject obj : paths)
          {
-            write(obj.toString(parser));
+            if (obj instanceof Group)
+            {
+               write(obj.toString(parser));
+            }
+            else
+            {
+               writeCodePoint(bg);
+               write(obj.toString(parser));
+               writeCodePoint(eg);
+            }
          }
 
          writeCodePoint(eg);
