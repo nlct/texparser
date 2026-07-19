@@ -1,0 +1,164 @@
+v2.0 (2026-07-19):
+
+ * Added Scoping class (deprecated parent variable in TeXSettings)
+
+v1.9.20260601 (2026-06-01)
+
+ * dictionary files now bundled into jar files
+
+v1.9.20260528 (2026-05-28)
+
+ * Renamed TeX Parser Library -> TeX Java Parser Library
+   (package path names unchanged)
+
+   The jar file is now texjavaparserlib.jar instead of
+   texparserlib.jar
+
+v1.9 (2026-04-25)
+
+ * Bundled with TeX Java Help v1.3
+
+v1.8 (2025-11-23)
+
+ * Bundled with TeX Java Help v1.1
+
+v1.7 (2025-11-13)
+
+ * added limited support for flowfram
+ * added \mfirstucMakeUppercase
+ * html listener: don't write spaces outside of content
+
+v1.6 (2025-08-16)
+
+ * Bundled with TeX Java Help v1.0
+
+v1.5 (2025-07-27)
+
+ * Bundled with bib2gls v4.6
+
+v1.4 (2025-05-14)
+
+ * Bundled with bib2gls v4.5
+
+v1.3 (2025-01-30)
+
+ * Bundled with bib2gls v4.3
+
+v1.2 (2025-01-24)
+
+ * Bundled with bib2gls v4.2
+
+v1.1 (2025-01-03)
+
+ * Bundled with bib2gls v4.1
+
+v1.0 (2024-12-14)
+
+ * Bundled with bib2gls v4.0
+
+v0.9.9b (2024-01-30)
+
+ * Bundled with bib2gls v3.9
+
+v0.9.8b (2023-09-29)
+
+ * Bundled with bib2gls v3.7
+
+v0.9.7b (2023-09-04)
+
+ * Bundled with bib2gls v3.6
+ * Corrected default charset used by TeXParser
+
+v0.9.6b (2023-08-24)
+
+ * Bundled with bib2gls v3.5
+ * Added \LaTeXe and \two@digits
+ * Added extra debugging
+ * added TeXApp.getDefaultCharset()
+
+v0.9.5b (2023-04-24)
+
+ * Bundled bib2gls v3.3
+ * Added \text and TeXMode
+ * Improved MathJax support
+ * Added SingleToken
+ * Added case-change support for eszett etc
+ * Added toTruncatedString for lists to provide abridged output
+
+v0.9.2.9b (2022-11-24)
+
+ * Bundled with bib2gls v3.2
+ * Added option in AuxParser to determine whether or not known catcode 
+   changing commands should implement the category code change or 
+   ignore their argument.
+
+v0.9.2.8b (2022-11-05)
+
+ * Bundled with bib2gls v3.1
+ * Added limited support for \NewDocumentCommand, \RenewDocumentCommand,
+   \ProvideDocumentCommand and \DeclareDocumentCommand. 
+   (Some argument specifiers not recognised.)
+
+v0.9.2.7b (2022-10-15)
+
+ * Bundled with bib2gls v3.0
+ * Limited support for twemojis and fontawesome.
+ * Limited implementation of glossaries (not used by bib2gls, 
+   which has the data stored in a subclass of BibEntry). 
+   This is essentially limited to the feature set required by nlctuserguide.sty.
+ * Implementation of nlctuserguide.sty
+
+v0.9.2.6b (2021-11-25)
+
+ * Bundled with bib2gls v2.8 and v2.9
+ * Implemented \MFUskippunc and \MFUwordbreak in mfirstuc.
+
+v0.9.2.5b (2020-07-11)
+
+ * Bundled with bib2gls v2.7
+ * Bug fixes in SI units.
+
+v0.9.2.4b (2020-05-30)
+
+ * Bundled with bib2gls v2.5
+ * Bug fix: corrected \else part of conditionals.
+
+v0.9.2.3b (2020-05-27)
+
+ * Bundled with bib2gls v2.4
+ * Fixed bug #3: If.doTruePart results in infinite loop on encountering begin group
+
+v0.9.2.2b (2020-03-23)
+
+ * Bundled with bib2gls v2.3
+
+v0.9.2b (2020-03-16)
+
+ * Corrected check for root directory
+
+v0.9.1b (2020-02-28)
+
+ * Bundled with bib2gls v2.1
+ * Include parser when throwing TeXSyntaxException
+ * Extended permitted commands allowed in aux parser
+
+v0.9b (2020-02-12)
+
+ * Bundled with bib2gls v2.0
+ * Added commands for (re)defining robust commands
+
+v0.8b (2019-12-14)
+
+ * This release is the first version to use the new naming scheme 
+   "auxfile" instead of "aux" (see issue #1) and "test" instead of "app".
+
+v0.7b Legacy (2019-12-14)
+
+ * This is the last release to include the "aux" folder. This will be 
+   renamed in future versions to allow the repository to be cloned 
+   under Windows. (See issue #1.) Any existing code will need to be 
+   modified for future versions. (This includes bib2gls.)
+
+v0.1b (2013-10-06)
+
+ * Migrated from local subversion repository to GitHub.
