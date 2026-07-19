@@ -32,6 +32,31 @@ import com.dickimawbooks.texparserlib.latex.CsvList;
 
 public class TeXParserUtils
 {
+   public static void push(TeXObject obj, TeXParser parser, TeXObjectList stack)
+   {
+      if (stack == null)
+      {
+         parser.push(obj);
+      }
+      else
+      {
+         stack.push(obj);
+      }
+   }
+
+   public static void push(TeXObject obj, TeXParser parser, TeXObjectList stack,
+     boolean flattenStacks)
+   {
+      if (stack == null)
+      {
+         parser.push(obj, flattenStacks);
+      }
+      else
+      {
+         stack.push(obj, flattenStacks);
+      }
+   }
+
    public static TeXObject peek(TeXParser parser, TeXObjectList stack, byte popStyle)
    throws IOException
    {
