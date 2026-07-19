@@ -1,6 +1,8 @@
 v2.0 (2026-07-19):
 
  * Added Scoping class (deprecated parent variable in TeXSettings)
+ * Check for paragraph breaks with spaces between eol
+ * LaTeX2LaTeX: corrected bracing in graphicspath
 
 v1.9.20260601 (2026-06-01)
 
