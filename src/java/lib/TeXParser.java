@@ -4729,6 +4729,11 @@ public class TeXParser extends TeXObjectList
       return scoping;
    }
 
+   public TeXSettings getCurrentSettings()
+   {
+      return scoping.getCurrentSettings();
+   }
+
    @Deprecated
    public TeXSettings getSettings()
    {
@@ -5297,6 +5302,6 @@ public class TeXParser extends TeXObjectList
    /** Scoping debugging flag. */
    public static final int DEBUG_SETTINGS = 65536;
 
-   public static final String VERSION = "2.0";
-   public static final String VERSION_DATE = "2026-07-19";
+   public static final String VERSION = "2.0.20261110";
+   public static final String VERSION_DATE = "2026-11-10";
 }
