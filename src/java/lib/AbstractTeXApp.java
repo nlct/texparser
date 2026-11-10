@@ -55,6 +55,14 @@ public abstract class AbstractTeXApp implements TeXApp
    public abstract String requestUserInput(String message)
      throws IOException;
 
+   public String getTeXParserVersionInfo()
+   {
+      return String.format("%s %s (%s)",
+          getMessage("texjavaparserlib.name"),
+          TeXParser.VERSION, TeXParser.VERSION_DATE
+       );
+   }
+
    @Override
    public void substituting(TeXParser parser, String original, String replacement)
    {
